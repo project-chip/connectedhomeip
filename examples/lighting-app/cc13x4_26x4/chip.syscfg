@@ -83,7 +83,8 @@ for(var setting in ccfgSettings)
     CCFG[setting] = ccfgSettings[setting];
 }
 
-CCFG.enableCodeGeneration = true;
+/* disable CCFG for OTA-able application */
+CCFG.enableCodeGeneration = false;
 
 
 /* NVS */
@@ -192,7 +193,7 @@ ble.numOfAdvSets                                          = 1;
 ble.lockProject                                           = true;
 ble.oneLibSizeOpt                                         = true;
 ble.maxPDUSize                                            = 255;
-ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param2;
+ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param1;
 ble.connUpdateParamsPeripheral.$name                      = "ti_ble5stack_general_ble_conn_update_params0";
 ble.connUpdateParamsPeripheral.reqMinConnInt               = 30;
 ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
@@ -200,7 +201,7 @@ ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
 ble.advSet1.$name                                         = "ti_ble5stack_broadcaster_advertisement_set0";
 ble.advSet1.advParam1.$name                               = "ti_ble5stack_broadcaster_advertisement_params0";
 
-ble.rfDesign                                 = "LP_EM_CC1354P10_1";
+ble.rfDesign                                 = "LP_EM_CC1354P10_6";
 
 ble.thorPg = 2;
 /* DMM */
