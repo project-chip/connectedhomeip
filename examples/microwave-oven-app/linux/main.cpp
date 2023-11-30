@@ -29,10 +29,13 @@ Platform::UniquePtr<ExampleMicrowaveOvenDevice> gMicrowaveOvenDevice;
 void ApplicationInit()
 {
     gMicrowaveOvenDevice = Platform::MakeUnique<ExampleMicrowaveOvenDevice>(kMicrowaveOvenEndpointId);
-    gMicrowaveOvenDevice.get()->MicrowaveOvenInit(kMicrowaveOvenEndpointId);
+    gMicrowaveOvenDevice.get()->MicrowaveOvenInit();
 }
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    gMicrowaveOvenDevice = nullptr;
+}
 
 int main(int argc, char * argv[])
 {

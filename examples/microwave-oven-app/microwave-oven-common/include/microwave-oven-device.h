@@ -95,14 +95,13 @@ public:
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, &mOperationalStateInstance,
                                       &mMicrowaveOvenModeInstance),
         mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
-        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id,
-                                   chip::to_underlying(MicrowaveOvenMode::Feature::kOnOff))
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id,0)
     {}
 
     /**
      * Init all the clusters used by this device.
      */
-    void MicrowaveOvenInit(EndpointId aEndpoint);
+    void MicrowaveOvenInit();
 
     // delegates from MicrowaveOvenControl cluster
     /**

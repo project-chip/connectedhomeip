@@ -29,7 +29,7 @@ using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
-void ExampleMicrowaveOvenDevice::MicrowaveOvenInit(EndpointId aEndpoint)
+void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     mOperationalStateInstance.Init();

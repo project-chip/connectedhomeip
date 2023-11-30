@@ -50,8 +50,8 @@ public:
      * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
      * @param aOpStateInstance The pointer of Operational State Instance.
      * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance.
-     * Note: a MicrowaveOvenControl instance must live relying on an Operational State instance and a Microwave Oven Mode instance,
-     * caller should be initialized that 2 instances before initializing MicorwaveOvenControl instance.
+     * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
+     * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
              Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
@@ -79,18 +79,9 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    /**
-     * Operational State instance
-     */
     Clusters::OperationalState::Instance * mOpStateInstance = nullptr;
-    /**
-     * Microwave Oven Mode instance
-     */
     Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance = nullptr;
 
-    /**
-     * set default values
-     */
     uint32_t mCookTime    = kDefaultCookTime;
     uint8_t mPowerSetting = kDefaultPowerSetting;
 
@@ -107,13 +98,17 @@ private:
 
     /**
      * @brief Handle Command: SetCookingParameters.
-     * This programme will also check if the input values is invalid.
+     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
+     * If the input value is invalid, returns the Interaction Model status code of INVALID_COMMAND.
+     * If the operational state is not in 'Stopped', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     void HandleSetCookingParameters(HandlerContext & ctx, const Commands::SetCookingParameters::DecodableType & req);
 
     /**
      * @brief Handle Command: AddMoreTime.
-     * This programme will also check if the added time is out of range.
+     * @param ctx Returns the Interaction Model status code which was user determined in the business logic.
+     * If the cook time value is out of range, returns the Interaction Model status code of CONSTRAINT_ERROR.
+     * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
 };
@@ -145,19 +140,10 @@ public:
      */
     virtual Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) = 0;
 
-    /**
-     *   @brief get the MinPower
-     */
     virtual uint8_t GetMinPower() const = 0;
 
-    /**
-     *   @brief get the MaxPower
-     */
     virtual uint8_t GetMaxPower() const = 0;
 
-    /**
-     *   @brief get the PowerStep
-     */
     virtual uint8_t GetPowerStep() const = 0;
 
 private:
