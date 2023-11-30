@@ -300,7 +300,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         err = CHIP_NO_ERROR;
     }
 
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err)); aPath.LogPath()));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err)); aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #endif
     // Create TLV byte array to pass to Java layer
@@ -438,7 +438,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
         err = CHIP_NO_ERROR;
     }
     VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err); aEventHeader.LogPath()));
+                   ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err)); aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #endif
 
