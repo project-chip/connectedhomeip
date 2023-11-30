@@ -6,7 +6,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- /*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -24,21 +24,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- /*******************************************************************************/
+/*******************************************************************************/
 
+// clang-fomat off
 #ifndef __FLASH_MAP_BACKEND_H__
 #define __FLASH_MAP_BACKEND_H__
 
 #include <mcuboot_config/mcuboot_config.h>
-#define FLASH_DEVICE_INDEX_MASK                 (0x7F)
-#define FLASH_DEVICE_GET_EXT_INDEX(n)           ((n) & FLASH_DEVICE_INDEX_MASK)
-#define FLASH_DEVICE_EXTERNAL_FLAG              (0x80)
-#define FLASH_DEVICE_INTERNAL_FLASH             (0x7F)
-#define FLASH_DEVICE_EXTERNAL_FLASH(index)      (FLASH_DEVICE_EXTERNAL_FLAG | index)
+#define FLASH_DEVICE_INDEX_MASK (0x7F)
+#define FLASH_DEVICE_GET_EXT_INDEX(n) ((n) & FLASH_DEVICE_INDEX_MASK)
+#define FLASH_DEVICE_EXTERNAL_FLAG (0x80)
+#define FLASH_DEVICE_INTERNAL_FLASH (0x7F)
+#define FLASH_DEVICE_EXTERNAL_FLASH(index) (FLASH_DEVICE_EXTERNAL_FLAG | index)
 
 #ifndef TI_BOOT_EXTERNAL_DEVICE_INDEX
 /* assume first(one) SMIF device is used */
-#define TI_BOOT_EXTERNAL_DEVICE_INDEX            (0)
+#define TI_BOOT_EXTERNAL_DEVICE_INDEX (0)
 #endif
 
 /*
@@ -55,40 +56,40 @@
 #endif
 
 #ifdef DeviceFamily_CC13X4
-  #if (MCUBOOT_IMAGE_NUMBER == 2)
-    #define BOOT_SLOT_1_SIZE                0x0002B000
-    #define BOOT_SLOT_2_SIZE                0x000CC800
+#if (MCUBOOT_IMAGE_NUMBER == 2)
+#define BOOT_SLOT_1_SIZE 0x0002B000
+#define BOOT_SLOT_2_SIZE 0x000CC800
 
-    /* Internal Flash locations */
-    #define BOOTLOADER_BASE_ADDRESS         0x00000800
-    #define BOOT_BOOTLOADER_SIZE            0x00005800
+/* Internal Flash locations */
+#define BOOTLOADER_BASE_ADDRESS 0x00000800
+#define BOOT_BOOTLOADER_SIZE 0x00005800
 
-    #define BOOT_PRIMARY_1_BASE_ADDRESS     (BOOTLOADER_BASE_ADDRESS + BOOT_BOOTLOADER_SIZE)
-    #define BOOT_PRIMARY_1_SIZE             BOOT_SLOT_1_SIZE
+#define BOOT_PRIMARY_1_BASE_ADDRESS (BOOTLOADER_BASE_ADDRESS + BOOT_BOOTLOADER_SIZE)
+#define BOOT_PRIMARY_1_SIZE BOOT_SLOT_1_SIZE
 
-    #define BOOT_PRIMARY_2_BASE_ADDRESS     (BOOT_PRIMARY_1_BASE_ADDRESS + BOOT_PRIMARY_1_SIZE)
-    #define BOOT_PRIMARY_2_SIZE             BOOT_SLOT_2_SIZE
+#define BOOT_PRIMARY_2_BASE_ADDRESS (BOOT_PRIMARY_1_BASE_ADDRESS + BOOT_PRIMARY_1_SIZE)
+#define BOOT_PRIMARY_2_SIZE BOOT_SLOT_2_SIZE
 
-    /* EXT Flash locations */
-    #define BOOT_SECONDARY_1_BASE_ADDRESS   0x00000000
-    #define BOOT_SECONDARY_1_SIZE           BOOT_SLOT_1_SIZE
+/* EXT Flash locations */
+#define BOOT_SECONDARY_1_BASE_ADDRESS 0x00000000
+#define BOOT_SECONDARY_1_SIZE BOOT_SLOT_1_SIZE
 
-    #define BOOT_SECONDARY_2_BASE_ADDRESS   (BOOT_SECONDARY_1_BASE_ADDRESS + BOOT_SECONDARY_1_SIZE)
-    #define BOOT_SECONDARY_2_SIZE           BOOT_SLOT_2_SIZE
-  #else
-    #define BOOT_SLOT_1_SIZE                0x000F7800
+#define BOOT_SECONDARY_2_BASE_ADDRESS (BOOT_SECONDARY_1_BASE_ADDRESS + BOOT_SECONDARY_1_SIZE)
+#define BOOT_SECONDARY_2_SIZE BOOT_SLOT_2_SIZE
+#else
+#define BOOT_SLOT_1_SIZE 0x000F6000
 
-    /* Internal Flash locations */
-    #define BOOTLOADER_BASE_ADDRESS         0x00000000
-    #define BOOT_BOOTLOADER_SIZE            0x00006000
+/* Internal Flash locations */
+#define BOOTLOADER_BASE_ADDRESS 0x00000000
+#define BOOT_BOOTLOADER_SIZE 0x00006000
 
-    #define BOOT_PRIMARY_1_BASE_ADDRESS     (BOOTLOADER_BASE_ADDRESS + BOOT_BOOTLOADER_SIZE)
-    #define BOOT_PRIMARY_1_SIZE             BOOT_SLOT_1_SIZE
+#define BOOT_PRIMARY_1_BASE_ADDRESS (BOOTLOADER_BASE_ADDRESS + BOOT_BOOTLOADER_SIZE)
+#define BOOT_PRIMARY_1_SIZE BOOT_SLOT_1_SIZE
 
-    /* EXT Flash locations */
-    #define BOOT_SECONDARY_1_BASE_ADDRESS   0x00000000
-    #define BOOT_SECONDARY_1_SIZE           BOOT_SLOT_1_SIZE
-  #endif
+/* EXT Flash locations */
+#define BOOT_SECONDARY_1_BASE_ADDRESS 0x00000000
+#define BOOT_SECONDARY_1_SIZE BOOT_SLOT_1_SIZE
+#endif
 
 #else
 #error "DeviceFamily not recognized, is MCUBoot meant to be used?"
@@ -121,7 +122,8 @@
  * which may have its own areas. For this reason, flash areas track
  * which flash device they are part of.
  */
-struct flash_area {
+struct flash_area
+{
     /**
      * This flash area's ID; unique in the system.
      */
@@ -153,7 +155,8 @@ struct flash_area {
  * (NOT relative to the start of its flash device), and a size. A
  * flash area may contain sectors with different sizes.
  */
-struct flash_sector {
+struct flash_sector
+{
     /**
      * Offset of this sector, from the start of its flash area (not device).
      */
@@ -165,7 +168,8 @@ struct flash_sector {
     uint32_t fs_size;
 };
 
-struct flash_map_entry {
+struct flash_map_entry
+{
     uint32_t magic;
     struct flash_area area;
     unsigned int ref_count;
@@ -177,23 +181,21 @@ struct flash_map_entry {
  * ret.
  * Returns 0 on success, or an error code on failure.
  */
-int flash_device_base(uint8_t fd_id, uintptr_t *ret);
+int flash_device_base(uint8_t fd_id, uintptr_t * ret);
 
 /*< Opens the area for use. id is one of the `fa_id`s */
 int flash_area_open(uint8_t id, const struct flash_area **);
 void flash_area_close(const struct flash_area *);
 /*< Reads `len` bytes of flash memory at `off` to the buffer at `dst` */
-int flash_area_read(const struct flash_area *, uint32_t off, void *dst,
-                     uint32_t len);
+int flash_area_read(const struct flash_area *, uint32_t off, void * dst, uint32_t len);
 /*< Writes `len` bytes of flash memory at `off` from the buffer at `src` */
-int flash_area_write(const struct flash_area *, uint32_t off,
-                     const void *src, uint32_t len);
+int flash_area_write(const struct flash_area *, uint32_t off, const void * src, uint32_t len);
 /*< Erases `len` bytes of flash memory at `off` */
 int flash_area_erase(const struct flash_area *, uint32_t off, uint32_t len);
 /*< Returns this `flash_area`s alignment */
 size_t flash_area_align(const struct flash_area *);
 /*< Initializes an array of flash_area elements for the slot's sectors */
-int flash_area_to_sectors(int idx, int *cnt, struct flash_area *ret);
+int flash_area_to_sectors(int idx, int * cnt, struct flash_area * ret);
 /*< Returns the `fa_id` for slot, where slot is 0 (primary) or 1 (secondary) */
 int flash_area_id_from_image_slot(int slot);
 /*< Returns the slot, for the `fa_id` supplied */
@@ -202,23 +204,24 @@ int flash_area_id_to_image_slot(int area_id);
 int flash_area_id_from_multi_image_slot(int image_index, int slot);
 int flash_area_id_to_multi_image_slot(int image_index, int area_id);
 #ifdef MCUBOOT_USE_FLASH_AREA_GET_SECTORS
-int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret);
+int flash_area_get_sectors(int idx, uint32_t * cnt, struct flash_sector * ret);
 #endif
 #ifdef MCUBOOT_HW_ROLLBACK_PROT
-void flash_area_lock(const struct flash_area *fa);
+void flash_area_lock(const struct flash_area * fa);
 #endif
 /*
  * Returns the value expected to be read when accesing any erased
  * flash byte.
  */
-uint8_t flash_area_erased_val(const struct flash_area *fap);
+uint8_t flash_area_erased_val(const struct flash_area * fap);
 
 /*
  * Reads len bytes from off, and checks if the read data is erased.
  *
  * Returns 1 if erased, 0 if non-erased, and -1 on failure.
  */
-int flash_area_read_is_empty(const struct flash_area *fa, uint32_t off,
-        void *dst, uint32_t len);
+int flash_area_read_is_empty(const struct flash_area * fa, uint32_t off, void * dst, uint32_t len);
 
 #endif /* __FLASH_MAP_BACKEND_H__ */
+
+// clang-format on

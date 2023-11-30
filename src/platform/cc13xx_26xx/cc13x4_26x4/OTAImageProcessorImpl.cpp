@@ -153,7 +153,6 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
         }
     }
     status = NVS_write(handle, imageOffset, data, dataSize, NVS_WRITE_POST_VERIFY);
-    ChipLogProgress(SoftwareUpdate, "block written into flash: %s", data);
     if (status != NVS_STATUS_SUCCESS)
     {
         ChipLogError(SoftwareUpdate, "NVS_write failed status: %d", status);
@@ -161,9 +160,6 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
     }
     else
     {
-        uint8_t buf[1024] = {0};
-        status = NVS_read(handle, totalBytesWrittenNvs, buf, dataSize);
-        ChipLogProgress(SoftwareUpdate, "block read out of flash: %s", buf);
         totalBytesWrittenNvs += dataSize;
         ChipLogProgress(SoftwareUpdate, "Total written bytes: %d", (size_t) totalBytesWrittenNvs);
     }
@@ -171,7 +167,7 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
 }
 
 /* Erase the MCUBoot slot */
-#define BOOT_SLOT_SIZE (0x000F7800) /* must match flash_map_backend */
+#define BOOT_SLOT_SIZE (0x000F6000) /* must match flash_map_backend */
 static bool eraseExtSlot(NVS_Handle handle)
 {
     int_fast16_t status;
