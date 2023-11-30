@@ -112,6 +112,8 @@ public:
      * @brief Return LCD object
      */
     static SilabsLCD & GetLCD(void);
+
+    static void UpdateLCDStatusScreen(void);
 #endif
 
     /**
