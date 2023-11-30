@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
  *                                          Only present when MTREventTimeTypeKey is MTREventTimeTypeSystemUpTime.
  *                MTREventTimestampDateKey : NSDate object.
  *                                           Only present when MTREventTimeTypeKey is MTREventTimeTypeTimestampDate.
+ *                MTREventIsHistoricalKey : NSNumber-wrapped BOOL value.
+ *                                          Value is YES if the event is in the far past or not realtime.
+ *                                          Only present when MTREventPathKey is present.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
  *                MTREventTimeTypeKey.
@@ -141,6 +144,7 @@ extern NSString * const MTREventPriorityKey MTR_AVAILABLE(ios(16.5), macos(13.4)
 extern NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 extern NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 extern NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
