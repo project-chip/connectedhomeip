@@ -253,7 +253,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @param key           NSString * for the key to store the value as
  */
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
 
 /**
  *
@@ -266,12 +266,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 /**
  *
+ * Remove client metadata for a key.
+ *
+ * @param key           NSString * for the key to store the value as
+ */
+- (void)removeClientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+
+/**
+ *
  * Retrieve client metadata for a key, returns nil if no value is set
  *
  * @param key           NSString * for the key to store the value as
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  */
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
 
 /**
  *
@@ -282,6 +290,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param value         id <NSSecureCoding> for the value to store
  */
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+
+/**
+ *
+ * Remove client metadata for a key.
+ *
+ * @param key           NSString * for the key to store the value as
+ * @param endpointID    NSNumber * for the endpoint to associate the metadata with
+ */
+- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
 
 @end
 

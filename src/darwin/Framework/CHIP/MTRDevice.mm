@@ -1729,13 +1729,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
+    if ( key == nil ) return nil;
+
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
+    if ( key == nil || value == nil ) return;
+
     if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
     }
@@ -1743,19 +1747,36 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
+- (void)removeClientDataForKey:(NSString *)key {
+    if ( key == nil ) return;
+
+    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
+}
+
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
+    if ( key == nil || endpointID == nil ) return nil;
+
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
+    if ( key == nil || value == nil || endpointID == nil ) return;
+
     if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
     }
 
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
+
+- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID {
+    if ( key == nil || endpointID == nil ) return;
+
+    [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
+}
+
 
 @end
 
