@@ -2785,7 +2785,9 @@ cluster BooleanState = 69 {
 
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
-server cluster LaundryDryerControls = 74 {
+cluster LaundryDryerControls = 74 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
     kNormal = 1;
