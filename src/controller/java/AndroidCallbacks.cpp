@@ -300,7 +300,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         err = CHIP_NO_ERROR;
     }
 
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err)); aPath.LogPath());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode attribute with error %s", ErrorStr(err));
+                   aPath.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #endif
     // Create TLV byte array to pass to Java layer
@@ -437,8 +438,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     {
         err = CHIP_NO_ERROR;
     }
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err)); aEventHeader.LogPath());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to decode event with error %s", ErrorStr(err));
+                   aEventHeader.LogPath());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 #endif
 
@@ -461,7 +462,9 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     // Convert TLV to JSON
     std::string json;
     err = ConvertReportTlvToJson(static_cast<uint32_t>(aEventHeader.mPath.mEventId), *apData, json);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to convert report tlv to Json with error %s", ErrorStr(err)); aEventHeader.LogPath());
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Fail to convert report tlv to Json with error %s", ErrorStr(err));
+                   aEventHeader.LogPath());
     UtfString jsonString(env, json.c_str());
 
     // Create EventState object
@@ -470,17 +473,20 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Failed to find EventState class"); aEventHeader.LogPath());
     VerifyOrReturn(eventStateCls != nullptr, ChipLogError(Controller, "Could not find EventState class"); aEventHeader.LogPath());
     jmethodID eventStateCtor = env->GetMethodID(eventStateCls, "<init>", "(JIIJLjava/lang/Object;[BLjava/lang/String;)V");
-    VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor"); aEventHeader.LogPath());
+    VerifyOrReturn(eventStateCtor != nullptr, ChipLogError(Controller, "Could not find EventState constructor");
+                   aEventHeader.LogPath());
     jobject eventStateObj = env->NewObject(eventStateCls, eventStateCtor, eventNumber, priorityLevel, timestampType, timestampValue,
                                            value, jniByteArray.jniValue(), jsonString.jniValue());
-    VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object"); aEventHeader.LogPath());
+    VerifyOrReturn(eventStateObj != nullptr, ChipLogError(Controller, "Could not create EventState object");
+                   aEventHeader.LogPath());
 
     // Add EventState to NodeState
     jmethodID addEventMethod;
     jobject nodeState = mNodeStateObj.ObjectRef();
     err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
                                                   &addEventMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method with error %s", ErrorStr(err)); aEventHeader.LogPath());
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method with error %s", ErrorStr(err));
+                   aEventHeader.LogPath());
     env->CallVoidMethod(nodeState, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
                         static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
                         eventStateObj);
