@@ -67,6 +67,10 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    if (IsInactiveICDSubscription())
+    {
+        return;
+    }
     MoveToState(ClientState::Idle);
 }
 
@@ -223,6 +227,8 @@ const char * ReadClient::GetStateStr() const
         return "AwaitingSubscribeResponse";
     case ClientState::SubscriptionActive:
         return "SubscriptionActive";
+    case ClientState::InactiveICDSubscription:
+        return "InactiveICDSubscription";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -425,6 +431,15 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     }
 
     return CHIP_NO_ERROR;
+}
+
+void ReadClient::OnActiveModeNotification()
+{
+    VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+    // Simply do nothing if the subscription is not at `InactiveICDSubscription` state.
+    VerifyOrReturn(IsInactiveICDSubscription());
+    MoveToState(ClientState::Idle);
+    Close(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -894,6 +909,17 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
+    if (_this->mIsPeerICD)
+    {
+        // If the device is idle, we mark the subscription as "InactiveICDSubscription", readClient consumer decides whether it goes
+        // with retry or resubscription is triggered on `OnActiveModeNotification`. Note: the liveness timeout is always longer than
+        // the MaxInterval (and idle duration), so we can move the device to `IdleSubcription` when liveness timeout is reached.
+        ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
+        _this->MoveToState(ClientState::InactiveICDSubscription);
+        _this->Close(CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT);
+        return;
+    }
+
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
     // have not seen peer activity in at least as long as our session.
@@ -997,6 +1023,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     {
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
+
+    mIsPeerICD = aReadPrepareParams.mIsPeerICD;
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
@@ -1102,6 +1130,12 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
 CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
+    if (aTerminationCause == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT)
+    {
+        ChipLogProgress(DataManagement, "ICD device is inactive, not resubscribe within DefaultResubscribePolicy");
+        return CHIP_NO_ERROR;
+    }
+
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
     auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
@@ -1110,8 +1144,7 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
                     "ms due to error %" CHIP_ERROR_FORMAT,
                     GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()), mNumRetries, timeTillNextResubscription,
                     aTerminationCause.Format());
-    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
-    return CHIP_NO_ERROR;
+    return ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT);
 }
 
 void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
