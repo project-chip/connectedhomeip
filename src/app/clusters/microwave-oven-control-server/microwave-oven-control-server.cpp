@@ -232,6 +232,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     status = mDelegate->HandleModifyCookTimeCallback(finalCookTime);
+    
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
