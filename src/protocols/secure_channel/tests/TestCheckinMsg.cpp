@@ -183,19 +183,22 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
         Aes128KeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+        Aes128KeyHandle keyHandle1;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle1));
+
+        Aes128KeyHandle keyHandle2;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle2));
 
         //=================Encrypt=======================
 
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
+        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle1, counter, userData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         //=================Decrypt=======================
         uint32_t decryptedCounter = 0;
         ByteSpan payload          = chip::ByteSpan(outputBuffer.data(), outputBuffer.size());
 
-        err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, buffer);
+        err = CheckinMessage::ParseCheckinMessagePayload(keyHandle2, payload, decryptedCounter, buffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         NL_TEST_ASSERT(inSuite, (memcmp(data, buffer.data(), sizeof(data)) == 0));
