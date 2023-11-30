@@ -26,7 +26,9 @@ STACKSIZE = 0x2000;
 MEMORY
 {
     MCUBOOT_HDR (RX) : ORIGIN = 0x00006000, LENGTH = 0x00000080
-    FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F9F80
+    FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F8780
+    /* FLASH_NVS (RX)   : ORIGIN = 0x000FC000, LENGTH = 0x00002800 */
+    FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
     /*
      * Customer Configuration Area and Bootloader Backdoor configuration in
      * flash
@@ -44,6 +46,7 @@ MEMORY
 }
 
 REGION_ALIAS("REGION_TEXT", FLASH);
+REGION_ALIAS("REGION_FACTORY_DATA", FLASH_FACTORY_DATA);
 REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
@@ -67,6 +70,14 @@ SECTIONS {
     .vtable (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
     } > REGION_DATA
+
+     /* Define base address for the Factory Data arrays and struct */
+    PROVIDE (_factory_data_base_address =
+        DEFINED(_factory_data_base_address) ? _factory_data_base_address : 0xFE800);
+
+    .factory_data(_factory_data_base_address) : AT (_factory_data_base_address) {
+        KEEP (*(.factory_data_struct))
+    } > REGION_FACTORY_DATA 
 
     /*
      * UDMACC26XX_CONFIG_BASE below must match UDMACC26XX_CONFIG_BASE defined
@@ -216,7 +227,7 @@ SECTIONS {
     PROVIDE (_flash_end_address = .);
 
     /* 5 pages of NV Memory (0x800 each) at the end of Flash */
-    .nvs (0xFD800) (NOLOAD) : AT (0xFD800) ALIGN(0x800) {
+    .nvs (0xFC000) (NOLOAD) : AT (0xFC000) ALIGN(0x800) {
         *(.nvs)
     } > REGION_TEXT
 

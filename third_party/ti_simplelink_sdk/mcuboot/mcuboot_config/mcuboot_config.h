@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- /*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -27,13 +27,14 @@
 #define MCUBOOT_DOWNGRADE_PREVENTION
 #define MCUBOOT_HAVE_LOGGING 1
 #define MCUBOOT_IMAGE_NUMBER 1
-#define MCUBOOT_MAX_IMG_SECTORS 512
+#define MCUBOOT_MAX_IMG_SECTORS 492
 #define MCUBOOT_OVERWRITE_ONLY
 #define MCUBOOT_SIGN_EC256
 #define MCUBOOT_USE_FLASH_AREA_GET_SECTORS
 #define MCUBOOT_USE_TI_CRYPTO
 #define MCUBOOT_VALIDATE_PRIMARY_SLOT
-#define MCUBOOT_WATCHDOG_FEED() { }
+#define MCUBOOT_WATCHDOG_FEED()                                                                                                    \
+    {}
 
 #define TI_BOOT_USE_EXTERNAL_FLASH
 
@@ -42,7 +43,6 @@
 #define MCUBOOT_SHARED_DATA_SIZE 0x400
 #endif
 
-#if defined(TI_BOOT_USE_EXTERNAL_FLASH) &&  \
-	(!defined(MCUBOOT_OVERWRITE_ONLY) || defined(MCUBOOT_DIRECT_XIP))
-    	#error "If external flash is configured, only MCUBOOT_OVERWRITE_ONLY is supported"
+#if defined(TI_BOOT_USE_EXTERNAL_FLASH) && (!defined(MCUBOOT_OVERWRITE_ONLY) || defined(MCUBOOT_DIRECT_XIP))
+#error "If external flash is configured, only MCUBOOT_OVERWRITE_ONLY is supported"
 #endif
