@@ -47,6 +47,7 @@ class BouffalolabApp(Enum):
         else:
             raise Exception('Unknown app type: %r' % self)
 
+
 class BouffalolabBoard(Enum):
     BL602_IoT_Matter_V1 = auto()
     BL602_NIGHT_LIGHT = auto()
