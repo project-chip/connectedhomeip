@@ -2533,7 +2533,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // This is done in a separate step since we've already used up all the available read paths in the previous read step
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
-        app::AttributePathParams readPaths[3];
+        app::AttributePathParams readPaths[4];
 
         // Mandatory attribute
         readPaths[numberOfAttributes++] =
@@ -3059,6 +3059,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+    }
+    break;
+    case CommissioningStage::kICDSendStayActive: {
+        // TODO(#24259): Send StayActiveRequest once server supports this.
+        CommissioningStageComplete(CHIP_NO_ERROR);
     }
     break;
     case CommissioningStage::kFindOperational: {

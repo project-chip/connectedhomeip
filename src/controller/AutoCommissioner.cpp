@@ -491,6 +491,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kICDGetRegistraionInfo:
         return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
+        return CommissioningStage::kICDSendStayActive;
+    case CommissioningStage::kICDSendStayActive:
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
         return CommissioningStage::kSendComplete;

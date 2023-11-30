@@ -141,6 +141,10 @@ const char * StageToString(CommissioningStage stage)
         return "ICDRegistration";
         break;
 
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
+        break;
+
     case kFindOperational:
         return "FindOperational";
         break;
