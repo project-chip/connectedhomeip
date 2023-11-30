@@ -1,9 +1,10 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| zap                                     |          82 |
-| builds                                  |          90 |
-| bloat-check                             |          99 |
+| zap                                     |          80 |
+| builds                                  |          92 |
+| build-example-open-iot-sdk              |          93 |
+| delete-old-artifacts                    |          96 |
 | build-example-linux-standalone          |         100 |
 | build-example-linux-arm                 |         100 |
 | darwin-tests                            |         100 |
@@ -11,14 +12,13 @@
 | cirque                                  |         100 |
 | documentation-build                     |         100 |
 | build-example-esp32                     |         100 |
-| recent-fail-summary                     |         100 |
 | build-example-efr32                     |         100 |
+| bloat-check                             |         100 |
 | build-example-bouffalolab               |         100 |
 | issue-labeler                           |         100 |
 | qemu                                    |         100 |
-| delete-old-artifacts                    |         100 |
 | unit-integration-tests                  |         100 |
-| build-example-open-iot-sdk              |         100 |
+| recent-fail-summary                     |         100 |
 | build-example-infineon                  |         100 |
 | full-builds-android                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
