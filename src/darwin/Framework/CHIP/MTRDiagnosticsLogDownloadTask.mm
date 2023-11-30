@@ -260,4 +260,3 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 }
 
 @end
-
