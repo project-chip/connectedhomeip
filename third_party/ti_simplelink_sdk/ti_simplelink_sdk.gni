@@ -114,6 +114,7 @@ template("ti_sysconfig") {
 
     if (defined(invoker.rtos)) {
       rtos = invoker.rtos
+<<<<<<< HEAD
     } else {
       rtos = "freertos"
     }
@@ -149,6 +150,27 @@ template("ti_sysconfig") {
         "freertos",
       ]
     }
+=======
+    }
+    else {
+      rtos = "freertos"
+    }
+
+    args = [
+      ti_sysconfig_root,
+      "-s",
+      rebase_path(ti_simplelink_sdk_root + "/.metadata/product.json",
+                  root_build_dir),
+      "-o",
+      rebase_path(output_dir, root_build_dir),
+      "--compiler",
+      "gcc",
+      "--board",
+      "/ti/boards/" + ti_simplelink_board,
+      "--rtos",
+      rtos,
+    ]
+>>>>>>> 0125b0f6b36cb7d1a6234ede0242db0610f2bff6
 
     foreach(source, sources) {
       args += [ rebase_path(source, root_build_dir) ]
