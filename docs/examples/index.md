@@ -320,3 +320,12 @@ rvc-app/README
 
 air-purifier-app/**/README
 ```
+
+## Network Infrastructure Manager example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+network-manager-app/README
+```

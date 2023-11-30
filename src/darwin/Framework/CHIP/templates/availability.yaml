@@ -7961,6 +7961,7 @@
           - ValveConfigurationAndControl
           - Timer
           - OvenMode
+          - LaundryDryerControls
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
