@@ -121,6 +121,9 @@ public:
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
     void ResetTransfer();
 };
 
@@ -147,6 +150,9 @@ public:
                                 System::Clock::Timeout timeout,
                                 System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
     void ResetTransfer();
 };
 
