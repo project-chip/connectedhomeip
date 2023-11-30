@@ -82,7 +82,12 @@ public:
     CHIP_ERROR FinalizeBuffer(chip::TLV::TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) override;
     virtual bool IsSafeToReserve() override
     {
-        // It is safe to reserve if there is no chained buffers.
+        // When using chained buffers there is no guarantee what the size of new buffer will
+        // be when calling GetNewBuffer. This makes it very difficult for a caller to safely
+        // ensure there is always enough space at the end of new buffer for reservation,
+        // when going from one buffer to the next.
+        // For non-chained buffers, caller is given one chunk of conigous memory so it is
+        // possible to reserve with buffer currently in use by caller.
         return !mUseChainedBuffers;
     }
 

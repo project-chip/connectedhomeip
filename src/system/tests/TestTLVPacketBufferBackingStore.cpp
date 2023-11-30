@@ -35,14 +35,12 @@ using namespace ::chip;
 
 namespace {
 
-void WriteUntilRemainingLessThan(nlTestSuite * inSuite, PacketBufferTLVWriter & writer, const uint32_t & remainingSize)
+void WriteUntilRemainingLessThan(nlTestSuite * inSuite, PacketBufferTLVWriter & writer, const uint32_t remainingSize)
 {
-    CHIP_ERROR error;
     uint32_t lengthRemaining = writer.GetRemainingFreeLength();
     while (lengthRemaining >= remainingSize)
     {
-        error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
-        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7)) == CHIP_NO_ERROR);
         lengthRemaining = writer.GetRemainingFreeLength();
     }
 }
@@ -259,7 +257,7 @@ void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * i
     uint32_t smallSize             = 5;
     uint32_t smallerSizeToReserver = smallSize - 1;
 
-    auto buffer = PacketBufferHandle::New(smallSize, 0);
+    auto buffer = PacketBufferHandle::New(smallSize, /* reservedSize = */ 0);
 
     PacketBufferTLVWriter writer;
     writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
