@@ -394,6 +394,22 @@ exit:
     return CHIP_ERROR_INTERNAL;
 }
 
+uint16_t ThreadStackManagerImpl::_GetThreadVersion()
+{
+    int threadErr            = THREAD_ERROR_NONE;
+    thread_version_e version = 0;
+
+    VerifyOrExit(mIsInitialized, ChipLogError(DeviceLayer, "Thread stack not initialized"));
+
+    threadErr = thread_get_version(mThreadInstance, &version);
+    VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get thread version"));
+
+    ChipLogProgress(DeviceLayer, "Thread version [%u]", version);
+
+exit:
+    return version;
+}
+
 ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceType()
 {
     VerifyOrReturnError(mIsInitialized, ConnectivityManager::ThreadDeviceType::kThreadDeviceType_NotSupported,

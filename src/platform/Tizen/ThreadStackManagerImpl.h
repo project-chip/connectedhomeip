@@ -84,6 +84,8 @@ public:
 
     void _OnThreadAttachFinished(void);
 
+    uint16_t _GetThreadVersion();
+
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);

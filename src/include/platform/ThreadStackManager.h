@@ -179,6 +179,7 @@ private:
 
     void OnPlatformEvent(const ChipDeviceEvent * event);
     void ErasePersistentInfo();
+    uint16_t GetThreadVersion();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);
 
@@ -395,6 +396,11 @@ inline CHIP_ERROR ThreadStackManager::StartThreadScan(NetworkCommissioning::Thre
 inline void ThreadStackManager::ErasePersistentInfo()
 {
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
+}
+
+inline uint16_t ThreadStackManager::GetThreadVersion()
+{
+    return static_cast<ImplClass *>(this)->_GetThreadVersion();
 }
 
 inline ConnectivityManager::ThreadDeviceType ThreadStackManager::GetThreadDeviceType()
