@@ -460,6 +460,8 @@ CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
+
     uint64_t extAddr;
     int threadErr;
 
