@@ -72,13 +72,13 @@ limitations under the License.
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances.</description>
 
-    <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntryStruct" writable="true">
+    <attribute side="server" code="0x0000" define="ACL" type="array" entryType="AccessControlEntryStruct" writable="true">
       <description>ACL</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
     </attribute>
 
-    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="AccessControlExtensionStruct" writable="true" optional="true">
+    <attribute side="server" code="0x0001" define="EXTENSION" type="array" entryType="AccessControlExtensionStruct" writable="true" optional="true">
       <description>Extension</description>
       <access op="read" privilege="administer"/>
       <access op="write" privilege="administer"/>
