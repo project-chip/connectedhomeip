@@ -30,10 +30,10 @@ namespace {
 #ifdef CONFIG_WS2812_STRIP
 const struct device * const ws2812_dev = DEVICE_DT_GET(DT_ALIAS(led_strip));
 #else
-const struct pwm_dt_spec sPwmRgbSpecBlueLed  = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+const struct pwm_dt_spec sPwmRgbSpecBlueLed  = PWM_DT_SPEC_GET_OR(DT_ALIAS(pwm_led0), {});
 #if USE_RGB_PWM
-const struct pwm_dt_spec sPwmRgbSpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
-const struct pwm_dt_spec sPwmRgbSpecRedLed   = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2));
+const struct pwm_dt_spec sPwmRgbSpecGreenLed = PWM_DT_SPEC_GET_OR(DT_ALIAS(pwm_led1), {});
+const struct pwm_dt_spec sPwmRgbSpecRedLed   = PWM_DT_SPEC_GET_OR(DT_ALIAS(pwm_led2), {});
 #endif
 #endif // CONFIG_WS2812_STRIP
 
