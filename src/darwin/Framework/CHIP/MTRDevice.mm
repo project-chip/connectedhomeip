@@ -190,7 +190,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 @property (nonatomic) NSDate * estimatedStartTimeFromGeneralDiagnosticsUpTime;
 
-@property (nonatomic) NSMutableDictionary *temporaryMetaDataCache;
+@property (nonatomic) NSMutableDictionary * temporaryMetaDataCache;
 
 /**
  * If currentReadClient is non-null, that means that we successfully
@@ -1729,28 +1729,32 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key {
-    return [self.temporaryMetaDataCache objectForKey: [NSString stringWithFormat: @"%@:-1", key]];
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key
+{
+    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value {
-    if ( self.temporaryMetaDataCache == nil ) {
+- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
+{
+    if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
     }
 
-    [self.temporaryMetaDataCache setObject: value forKey: [NSString stringWithFormat: @"%@:-1", key]];
+    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID {
-    if ( self.temporaryMetaDataCache == nil ) {
+- (id<NSSecureCoding>)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
+{
+    if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
     }
 
-    [self.temporaryMetaDataCache setObject: value forKey: [NSString stringWithFormat: @"%@:%@", key, endpointID]];
+    [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value {
-    return [self.temporaryMetaDataCache objectForKey: [NSString stringWithFormat: @"%@:%@", key, endpointID]];
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
+{
+    return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
 @end
