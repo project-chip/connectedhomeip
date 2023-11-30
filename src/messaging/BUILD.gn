@@ -67,7 +67,7 @@ static_library("messaging") {
 
   public_deps = [
     ":messaging_mrp_config",
-    "${chip_root}/src/app/icd:notifier",
+    "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
@@ -77,4 +77,11 @@ static_library("messaging") {
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
   ]
+
+  if (chip_enable_icd_server) {
+    public_deps += [
+      "${chip_root}/src/app/icd:configuration-data",
+      "${chip_root}/src/app/icd:notifier",
+    ]
+  }
 }

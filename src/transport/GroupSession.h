@@ -57,7 +57,8 @@ public:
         return subjectDescriptor;
     }
 
-    bool RequireMRP() const override { return false; }
+    bool AllowsMRP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
     const SessionParameters & GetRemoteSessionParameters() const override
     {
@@ -108,7 +109,8 @@ public:
         return Access::SubjectDescriptor(); // no subject exists for outgoing group session.
     }
 
-    bool RequireMRP() const override { return false; }
+    bool AllowsMRP() const override { return false; }
+    bool AllowsLargePayload() const override { return false; }
 
     const SessionParameters & GetRemoteSessionParameters() const override
     {

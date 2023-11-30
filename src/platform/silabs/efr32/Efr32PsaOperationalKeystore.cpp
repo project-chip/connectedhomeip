@@ -185,7 +185,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
                                                               MutableByteSpan & outCertificateSigningRequest)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // If a key is pending, we cannot generate for a different fabric index until we commit or revert.
@@ -260,7 +260,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::NewOpKeypairForFabric(FabricIndex fabric
 CHIP_ERROR Efr32PsaOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex fabricIndex,
                                                                    const Crypto::P256PublicKey & nocPublicKey)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
@@ -274,7 +274,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::ActivateOpKeypairForFabric(FabricIndex f
 
 CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fabricIndex)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex) && (fabricIndex == mPendingFabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
     VerifyOrReturnError(mIsPendingKeypairActive == true, CHIP_ERROR_INCORRECT_STATE);
@@ -320,7 +320,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
 
 CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fabricIndex)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Remove pending keypair if we have it and the fabric ID matches
@@ -387,7 +387,7 @@ void Efr32PsaOperationalKeystore::RevertPendingKeypair()
 CHIP_ERROR Efr32PsaOperationalKeystore::SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                                           Crypto::P256ECDSASignature & outSignature) const
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     // Check to see whether the key is an activated pending key
