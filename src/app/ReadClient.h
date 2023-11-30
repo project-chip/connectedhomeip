@@ -323,6 +323,37 @@ public:
      */
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
+    /**
+     *  Wake up the sleeping subscription.
+     *
+     *  When subscriptiing to ICD, the subscriber is expected to set the `mActivePeriod`
+     * in `ReadPrepareParams`.
+     *
+     *  @retval #others fail to send read request
+     *  @retval #CHIP_NO_ERROR Successfully waked up the subscription.
+     *  @retval #CHIP_ERROR_INCORRECT_STATE The transcation is not an active subscription
+     */
+    CHIP_ERROR WakeUp();
+
+    /**
+     *  Update the active period of the device. This method **will not** update the
+     * timestamp used to determine whether the device is idle.
+     *
+     *  A Zero period means the device will always be active.
+     */
+    void UpdateActivePeriod(System::Clock::Timeout aActivePeriod);
+
+    /**
+     *  Update the time used to determine whether the device is idle to the period from now.
+     * This method **will not** update the active period for future wake-ups.
+     *
+     *  A zero period means the device will sleep immediately.
+     *
+     *  @retval #CHIP_NO_ERROR Successfully updated the active time.
+     *  @retval #others failed to update the active time.
+     */
+    CHIP_ERROR TouchPeerActiveTime(System::Clock::Timeout aActivePeriod);
+
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     void OnUnsolicitedMessageFromPublisher()
@@ -477,6 +508,7 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
+        IdleSubscription,          ///< The client is ICD and is sleeping
     };
 
     enum class ReportType
@@ -500,7 +532,7 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsIdle() const { return mState == ClientState::Idle; }
+    bool IsIdle() const { return mState == ClientState::Idle || mState == ClientState::IdleSubscription; }
     bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
@@ -611,6 +643,11 @@ private:
     uint32_t mNumRetries = 0;
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
+
+    // When the liveness timeout fired after `mPeerActiveUntilTimestamp`, the ReadClient will enter "Sleep" state until WakeUp() is called.
+    // The Zero value means the device should always be active.
+    System::Clock::Timeout mPeerActivePeriod = System::Clock::kZero;
+    System::Clock::Timestamp mPeerActiveUntilTimestamp = System::Clock::kZero;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;

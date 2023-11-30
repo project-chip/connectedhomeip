@@ -47,6 +47,8 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds = 0;
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
+    // The active period of the device, a Zero value means the device is always active.
+    System::Clock::Timeout mActivePeriod = System::Clock::kZero;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
@@ -64,6 +66,7 @@ struct ReadPrepareParams
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
+        mActivePeriod                      = other.mActivePeriod;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
@@ -88,6 +91,7 @@ struct ReadPrepareParams
         mMaxIntervalCeilingSeconds         = other.mMaxIntervalCeilingSeconds;
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
+        mActivePeriod                      = other.mActivePeriod;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
