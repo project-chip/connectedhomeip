@@ -404,24 +404,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
-    chip::app::ICDClientInfo clientInfo;
-    clientInfo.peer_node = chip::ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
-    CHIP_ERROR err       = mICDClientStorage.SetKey(clientInfo, mICDSymmetricKey.Value());
-    if (err == CHIP_NO_ERROR)
-    {
-        err = mICDClientStorage.StoreEntry(clientInfo);
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
-    }
-    else
-    {
-        ChipLogError(chipTool, "Cannot persist symmetric key for" ChipLogFormatX64, ChipLogValueX64(nodeId));
-        Unpair(nodeId);
-        SetCommandExitStatus(err);
-    }
+    // TODO: Persist symmetric key.
 
     ChipLogProgress(chipTool,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
