@@ -666,22 +666,22 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_WRONG_KEY_TYPE                              CHIP_CORE_ERROR(0x1b)
 
 /**
- *  @def CHIP_ERROR_WELL_UNINITIALIZED
+ *  @def CHIP_ERROR_UNINITIALIZED
  *
  *  @brief
  *    A requested object is uninitialized.
  *
  */
-#define CHIP_ERROR_WELL_UNINITIALIZED                          CHIP_CORE_ERROR(0x1c)
+#define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
 /**
- *  @def CHIP_ERROR_WELL_EMPTY
+ *  @def CHIP_ERROR_EMPTY
  *
  *  @brief
  *    A requested object is empty.
  *
  */
-#define CHIP_ERROR_WELL_EMPTY                                  CHIP_CORE_ERROR(0x1d)
+#define CHIP_ERROR_EMPTY                                       CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH

@@ -17,8 +17,8 @@ import logging
 from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
-from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
-                                         CommandQuality, ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
+from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
+                                         ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
@@ -537,7 +537,6 @@ class ClusterHandler(BaseHandler):
 
         return ClusterHandler(context, idl,
                               Cluster(
-                                  side=ClusterSide.CLIENT,
                                   name=NormalizeName(attrs["name"]),
                                   code=ParseInt(attrs["id"]),
                                   parse_meta=context.GetCurrentLocationMeta()
