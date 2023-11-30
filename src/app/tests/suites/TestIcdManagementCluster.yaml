@@ -56,7 +56,10 @@ tests:
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: 0
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Read ClientsSupportedPerFabric"
       command: "readAttribute"
@@ -135,7 +138,7 @@ tests:
                 value: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
       response:
           values:
-              - name: "ICDCounter"      
+              - name: "ICDCounter"
                 constraints:
                     type: int32u
                     minValue: 0x0
@@ -154,7 +157,7 @@ tests:
                     "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
       response:
           values:
-              - name: "ICDCounter"      
+              - name: "ICDCounter"
                 constraints:
                     type: int32u
                     minValue: 0x0
@@ -195,7 +198,7 @@ tests:
                 value: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1"
       response:
           values:
-              - name: "ICDCounter"      
+              - name: "ICDCounter"
                 constraints:
                     type: int32u
                     minValue: 0x0
@@ -226,7 +229,7 @@ tests:
                     "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2f\x2f"
       response:
           values:
-              - name: "ICDCounter"      
+              - name: "ICDCounter"
                 constraints:
                     type: int32u
                     minValue: 0x0
