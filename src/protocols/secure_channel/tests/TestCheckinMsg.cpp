@@ -180,14 +180,21 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Aes128KeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
+        Aes128KeyByteArray keyMaterial1;
+        memcpy(keyMaterial1, test.key, test.key_len);
+
+        Aes128KeyByteArray keyMaterial2;
+        memcpy(keyMaterial2, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle1;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle1));
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial1, keyHandle1));
 
         Aes128KeyHandle keyHandle2;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle2));
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial2, keyHandle2));
+
+        printf("----------------------- %d-------------------------\n", memcmp(keyHandle1.As<Aes128KeyByteArray>(), keyHandle2.As<Aes128KeyByteArray>(),  (size_t)sizeof(Aes128KeyByteArray)));
+
+        NL_TEST_ASSERT(inSuite, memcmp(keyHandle1.As<Aes128KeyByteArray>(), keyHandle2.As<Aes128KeyByteArray>(),  (size_t)sizeof(Aes128KeyByteArray)) == 0);
 
         //=================Encrypt=======================
 
