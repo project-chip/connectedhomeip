@@ -1466,9 +1466,6 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
 
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
-
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
 
@@ -1541,9 +1538,6 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
@@ -1618,9 +1612,6 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
