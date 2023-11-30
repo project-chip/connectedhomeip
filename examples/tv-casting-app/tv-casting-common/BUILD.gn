@@ -93,12 +93,18 @@ chip_data_model("tv-casting-common") {
 
   # Add simplified casting API files here
   sources += [
+    "clusters/ContentLauncherCluster.h",
+    "clusters/MediaPlaybackCluster.h",
+    "clusters/TargetNavigatorCluster.h",
+    "core/Attribute.h",
     "core/CastingApp.cpp",
     "core/CastingApp.h",
     "core/CastingPlayer.cpp",
     "core/CastingPlayer.h",
     "core/CastingPlayerDiscovery.cpp",
     "core/CastingPlayerDiscovery.h",
+    "core/Cluster.h",
+    "core/Endpoint.h",
     "core/Types.h",
     "support/AppParameters.h",
     "support/CastingStore.cpp",
@@ -106,6 +112,8 @@ chip_data_model("tv-casting-common") {
     "support/ChipDeviceEventHandler.cpp",
     "support/ChipDeviceEventHandler.h",
     "support/DataProvider.h",
+    "support/EndpointListLoader.cpp",
+    "support/EndpointListLoader.h",
   ]
 
   deps = [

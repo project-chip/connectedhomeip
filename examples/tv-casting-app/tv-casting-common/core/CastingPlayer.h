@@ -18,8 +18,10 @@
 
 #pragma once
 
+#include "Endpoint.h"
 #include "Types.h"
 #include "support/ChipDeviceEventHandler.h"
+#include "support/EndpointListLoader.h"
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
@@ -35,6 +37,16 @@ const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
 const int kIdMaxLength                                      = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
 const unsigned long long int kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
+
+/**
+ * @brief Describes an Endpoint that the client wants to connect to
+ */
+struct EndpointFilter
+{
+    uint16_t vendorId  = 0;
+    uint16_t productId = 0;
+    std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> requiredDeviceTypes;
+};
 
 class CastingPlayerAttributes
 {
@@ -54,6 +66,8 @@ public:
     chip::NodeId nodeId           = 0;
     chip::FabricIndex fabricIndex = 0;
 };
+
+class Endpoint;
 
 /**
  * @brief Represents CastingPlayer ConnectionState.
@@ -107,9 +121,20 @@ public:
      * For failure - called back with an error and nullptr.
      * @param commissioningWindowTimeoutSec time (in sec) to keep the commissioning window open, if commissioning is required.
      * Defaults to kCommissioningWindowTimeoutSec.
+     * @param desiredEndpointFilter
      */
     void VerifyOrEstablishConnection(ConnectCallback onCompleted,
-                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec);
+                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec,
+                                     EndpointFilter desiredEndpointFilter                 = EndpointFilter());
+
+    /**
+     * @brief Register an endpoint on this CastingPlayer. If the provided endpoint was already registered, its information will be
+     * updated in the registry.
+     */
+    void RegisterEndpoint(const memory::Strong<Endpoint> endpoint);
+
+    const std::vector<memory::Strong<Endpoint>> GetEndpoints() const { return mEndpoints; }
+
     void LogDetail() const;
 
     const char * GetId() const { return mAttributes.id; }
@@ -140,12 +165,8 @@ public:
 
     void SetFabricIndex(chip::FabricIndex fabricIndex) { mAttributes.fabricIndex = fabricIndex; }
 
-    // void RegisterEndpoint(const memory::Strong<Endpoint> endpoint) { endpoints.push_back(endpoint); }
-
-    // const std::vector<memory::Strong<Endpoint>> GetEndpoints() const { return endpoints; }
-
 private:
-    // std::vector<memory::Strong<Endpoint>> endpoints;
+    std::vector<memory::Strong<Endpoint>> mEndpoints;
     ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
     CastingPlayerAttributes mAttributes;
     static CastingPlayer * mTargetCastingPlayer;
@@ -184,10 +205,20 @@ private:
     void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
                                 chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
 
+    /**
+     * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter
+     *
+     * @return true - cachedCastingPlayer contains at least one endpoint that matches all the (non-default) values in
+     * desiredEndpointFilter, false otherwise
+     */
+    bool ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter);
+
     // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
     // and connect to a CastingPlayer
     friend class support::ChipDeviceEventHandler;
+
     friend class ConnectionContext;
+    friend class support::EndpointListLoader;
 };
 
 class ConnectionContext
