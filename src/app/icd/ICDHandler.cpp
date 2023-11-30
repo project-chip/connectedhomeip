@@ -79,7 +79,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     Crypto::Aes128KeyHandle key;
     chip::Protocols::SecureChannel::CounterType counter;
     MutableByteSpan appData;
-    uint8_t checkInPayload[chip::Protocols::SecureChannel::CheckinMessage::sMinPayloadSize];
+    ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     memcpy(&checkInPayload, payload->Start(), sizeof(checkInPayload));
     chip::ByteSpan payloadByteSpan(checkInPayload);
     chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(key, payloadByteSpan, counter, appData);
