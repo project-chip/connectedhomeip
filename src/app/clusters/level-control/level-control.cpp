@@ -120,7 +120,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, chip::Optional<chip::BitMask<OptionsBitmap>> optionsMask,
                                chip::Optional<chip::BitMask<OptionsBitmap>> optionsOverride);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 class DefaultLevelControlSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
@@ -238,17 +238,15 @@ public:
 
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}
-        Status status;
-        CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
-                                                                                            : Commands::MoveToLevel::Id;
 
-        status = moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
-                                    chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
-                                    INVALID_STORED_LEVEL);
-
-        if (status != Status::Success)
+        if (!chip::app::NumericAttributeTraits<uint8_t>::IsNullValue(level))
         {
-            return CHIP_ERROR_READ_FAILED;
+            CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
+                                                                                                : Commands::MoveToLevel::Id;
+
+            moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
+                               chip::Optional<BitMask<OptionsBitmap>>(), chip::Optional<BitMask<OptionsBitmap>>(),
+                               INVALID_STORED_LEVEL);
         }
 
         return CHIP_NO_ERROR;
@@ -256,7 +254,7 @@ public:
 };
 static DefaultLevelControlSceneHandler sLevelControlSceneHandler;
 
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 #if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
@@ -610,11 +608,11 @@ Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::Decodable
 
 chip::scenes::SceneHandler * GetSceneHandler()
 {
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     return &sLevelControlSceneHandler;
 #else
     return nullptr;
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 }
 
 } // namespace LevelControlServer
@@ -1446,10 +1444,10 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
     // Registers Scene handlers for the level control cluster on the server
     app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpoint, LevelControlServer::GetSceneHandler());
-#endif
+#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
 }

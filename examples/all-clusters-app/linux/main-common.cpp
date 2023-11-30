@@ -25,6 +25,7 @@
 #include "include/tv-callbacks.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
+#include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
@@ -229,6 +230,7 @@ void ApplicationShutdown()
     Clusters::LaundryWasherMode::Shutdown();
     Clusters::RvcCleanMode::Shutdown();
     Clusters::RvcRunMode::Shutdown();
+    Clusters::MicrowaveOvenMode::Shutdown();
     Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Shutdown();
     Clusters::HepaFilterMonitoring::Shutdown();
     Clusters::ActivatedCarbonFilterMonitoring::Shutdown();

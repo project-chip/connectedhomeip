@@ -982,9 +982,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     using EnumType = EthernetNetworkDiagnostics::PHYRateEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kRate10M:
     case EnumType::kRate100M:
     case EnumType::kRate1G:
@@ -995,18 +992,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     case EnumType::kRate100G:
     case EnumType::kRate200G:
     case EnumType::kRate400G:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE1_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE40_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE200_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE400_G:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(10);
@@ -1216,6 +1201,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
 {
     using EnumType = OvenMode::ModeTag;
@@ -1233,6 +1247,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
         return val;
     default:
         return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryDryerControls::DrynessLevelEnum val)
+{
+    using EnumType = LaundryDryerControls::DrynessLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
     }
 }
 
@@ -1572,17 +1601,77 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::PowerSavingsEnum val)
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::EnergyTransferStoppedReasonEnum val)
 {
-    using EnumType = DemandResponseLoadControl::PowerSavingsEnum;
+    using EnumType = EnergyEvse::EnergyTransferStoppedReasonEnum;
     switch (val)
     {
-    case EnumType::kLow:
-    case EnumType::kMedium:
-    case EnumType::kHigh:
+    case EnumType::kEVStopped:
+    case EnumType::kEVSEStopped:
+    case EnumType::kOther:
         return val;
     default:
         return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::FaultStateEnum val)
+{
+    using EnumType = EnergyEvse::FaultStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kMeterFailure:
+    case EnumType::kOverVoltage:
+    case EnumType::kUnderVoltage:
+    case EnumType::kOverCurrent:
+    case EnumType::kContactWetFailure:
+    case EnumType::kContactDryFailure:
+    case EnumType::kGroundFault:
+    case EnumType::kPowerLoss:
+    case EnumType::kPowerQuality:
+    case EnumType::kPilotShortCircuit:
+    case EnumType::kEmergencyStop:
+    case EnumType::kEVDisconnected:
+    case EnumType::kWrongPowerSupply:
+    case EnumType::kLiveNeutralSwap:
+    case EnumType::kOverTemperature:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(16);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::StateEnum val)
+{
+    using EnumType = EnergyEvse::StateEnum;
+    switch (val)
+    {
+    case EnumType::kNotPluggedIn:
+    case EnumType::kPluggedInNoDemand:
+    case EnumType::kPluggedInDemand:
+    case EnumType::kPluggedInCharging:
+    case EnumType::kPluggedInDischarging:
+    case EnumType::kSessionEnding:
+    case EnumType::kFault:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyStateEnum val)
+{
+    using EnumType = EnergyEvse::SupplyStateEnum;
+    switch (val)
+    {
+    case EnumType::kDisabled:
+    case EnumType::kChargingEnabled:
+    case EnumType::kDischargingEnabled:
+    case EnumType::kDisabledError:
+    case EnumType::kDisabledDiagnostics:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -2201,17 +2290,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
     using EnumType = ColorControl::ColorMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
     case EnumType::kColorTemperature:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
-    case EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
-    case EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -2875,9 +2956,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:

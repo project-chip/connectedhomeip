@@ -954,6 +954,9 @@ void BuildInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aW
 
     BuildInvokeResponses(apSuite, invokeResponsesBuilder);
 
+    invokeResponseMessageBuilder.MoreChunkedMessages(true);
+    NL_TEST_ASSERT(apSuite, invokeResponseMessageBuilder.GetError() == CHIP_NO_ERROR);
+
     invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, invokeResponseMessageBuilder.GetError() == CHIP_NO_ERROR);
 }
@@ -966,8 +969,15 @@ void ParseInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVReader & aR
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     bool suppressResponse = false;
-    invokeResponseMessageParser.GetSuppressResponse(&suppressResponse);
+    err                   = invokeResponseMessageParser.GetSuppressResponse(&suppressResponse);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, suppressResponse == true);
+
+    bool moreChunkedMessages = true;
+    err                      = invokeResponseMessageParser.GetMoreChunkedMessages(&suppressResponse);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, moreChunkedMessages == true);
+
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeResponseMessageParser.PrettyPrint();
 #endif

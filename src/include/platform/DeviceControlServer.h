@@ -36,7 +36,8 @@ public:
     CHIP_ERROR PostCommissioningCompleteEvent(NodeId peerNodeId, FabricIndex accessingFabricIndex);
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode);
     CHIP_ERROR PostConnectedToOperationalNetworkEvent(ByteSpan networkID);
-
+    CHIP_ERROR PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    CHIP_ERROR PostWiFiDeviceAvailableNetworkEvent();
     static DeviceControlServer & DeviceControlSvr();
 
 private:

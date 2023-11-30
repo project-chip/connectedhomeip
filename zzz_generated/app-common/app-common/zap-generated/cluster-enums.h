@@ -21,8 +21,6 @@
 
 #include <stdint.h>
 
-#include <app-common/zap-generated/enums.h>
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -1198,9 +1196,6 @@ enum class Feature : uint32_t
 
 namespace EthernetNetworkDiagnostics {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PHYRateEnum
 enum class PHYRateEnum : uint8_t
 {
@@ -1220,10 +1215,6 @@ enum class PHYRateEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 10,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateEnum                                                        = EmberAfPHYRateEnum;
-static PHYRateEnum __attribute__((unused)) kPHYRateEnumkUnknownEnumValue = static_cast<PHYRateEnum>(10);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -1533,6 +1524,37 @@ enum class Feature : uint32_t
 };
 } // namespace Timer
 
+namespace OvenCavityOperationalState {
+
+// Enum for ErrorStateEnum
+enum class ErrorStateEnum : uint8_t
+{
+    kNoError                   = 0x00,
+    kUnableToStartOrResume     = 0x01,
+    kUnableToCompleteOperation = 0x02,
+    kCommandInvalidInState     = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for OperationalStateEnum
+enum class OperationalStateEnum : uint8_t
+{
+    kStopped = 0x00,
+    kRunning = 0x01,
+    kPaused  = 0x02,
+    kError   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+} // namespace OvenCavityOperationalState
+
 namespace OvenMode {
 
 // Enum for ModeTag
@@ -1560,6 +1582,23 @@ enum class Feature : uint32_t
     kOnOff = 0x1,
 };
 } // namespace OvenMode
+
+namespace LaundryDryerControls {
+
+// Enum for DrynessLevelEnum
+enum class DrynessLevelEnum : uint8_t
+{
+    kLow    = 0x00,
+    kNormal = 0x01,
+    kExtra  = 0x02,
+    kMax    = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+} // namespace LaundryDryerControls
 
 namespace ModeSelect {
 
@@ -2216,19 +2255,6 @@ enum class LoadControlEventStatusEnum : uint8_t
     kUnknownEnumValue = 13,
 };
 
-// Enum for PowerSavingsEnum
-enum class PowerSavingsEnum : uint8_t
-{
-    kLow    = 0x00,
-    kMedium = 0x01,
-    kHigh   = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
-
 // Bitmap for CancelControlBitmap
 enum class CancelControlBitmap : uint16_t
 {
@@ -2282,6 +2308,103 @@ enum class Feature : uint32_t
     kHeatingSource       = 0x40,
 };
 } // namespace DemandResponseLoadControl
+
+namespace EnergyEvse {
+
+// Enum for EnergyTransferStoppedReasonEnum
+enum class EnergyTransferStoppedReasonEnum : uint8_t
+{
+    kEVStopped   = 0x00,
+    kEVSEStopped = 0x01,
+    kOther       = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for FaultStateEnum
+enum class FaultStateEnum : uint8_t
+{
+    kNoError           = 0x00,
+    kMeterFailure      = 0x01,
+    kOverVoltage       = 0x02,
+    kUnderVoltage      = 0x03,
+    kOverCurrent       = 0x04,
+    kContactWetFailure = 0x05,
+    kContactDryFailure = 0x06,
+    kGroundFault       = 0x07,
+    kPowerLoss         = 0x08,
+    kPowerQuality      = 0x09,
+    kPilotShortCircuit = 0x0A,
+    kEmergencyStop     = 0x0B,
+    kEVDisconnected    = 0x0C,
+    kWrongPowerSupply  = 0x0D,
+    kLiveNeutralSwap   = 0x0E,
+    kOverTemperature   = 0x0F,
+    kOther             = 0xFF,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 16,
+};
+
+// Enum for StateEnum
+enum class StateEnum : uint8_t
+{
+    kNotPluggedIn         = 0x00,
+    kPluggedInNoDemand    = 0x01,
+    kPluggedInDemand      = 0x02,
+    kPluggedInCharging    = 0x03,
+    kPluggedInDischarging = 0x04,
+    kSessionEnding        = 0x05,
+    kFault                = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for SupplyStateEnum
+enum class SupplyStateEnum : uint8_t
+{
+    kDisabled            = 0x00,
+    kChargingEnabled     = 0x01,
+    kDischargingEnabled  = 0x02,
+    kDisabledError       = 0x03,
+    kDisabledDiagnostics = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kChargingPreferences = 0x1,
+    kSoCReporting        = 0x2,
+    kPlugAndCharge       = 0x4,
+    kRfid                = 0x8,
+    kV2x                 = 0x10,
+};
+
+// Bitmap for TargetDayOfWeekBitmap
+enum class TargetDayOfWeekBitmap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+} // namespace EnergyEvse
 
 namespace DoorLock {
 
@@ -3235,9 +3358,6 @@ enum class ColorLoopDirection : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorMode
 enum class ColorMode : uint8_t
 {
@@ -3250,10 +3370,6 @@ enum class ColorMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                                                      = EmberAfColorMode;
-static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue = static_cast<ColorMode>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for HueDirection
 enum class HueDirection : uint8_t
@@ -4153,8 +4269,8 @@ namespace LowPower {} // namespace LowPower
 
 namespace KeypadInput {
 
-// Enum for CecKeyCode
-enum class CecKeyCode : uint8_t
+// Enum for CECKeyCodeEnum
+enum class CECKeyCodeEnum : uint8_t
 {
     kSelect                    = 0x00,
     kUp                        = 0x01,

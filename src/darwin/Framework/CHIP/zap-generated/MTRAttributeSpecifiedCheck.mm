@@ -1958,6 +1958,51 @@ static BOOL AttributeIsSpecifiedInTimerCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenCavityOperationalState;
+    switch (aAttributeId) {
+    case Attributes::PhaseList::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPhase::Id: {
+        return YES;
+    }
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::OperationalStateList::Id: {
+        return YES;
+    }
+    case Attributes::OperationalState::Id: {
+        return YES;
+    }
+    case Attributes::OperationalError::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OvenMode;
@@ -1972,6 +2017,39 @@ static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInLaundryDryerControlsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LaundryDryerControls;
+    switch (aAttributeId) {
+    case Attributes::SupportedDrynessLevels::Id: {
+        return YES;
+    }
+    case Attributes::SelectedDrynessLevel::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2841,9 +2919,6 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
 {
     using namespace Clusters::DemandResponseLoadControl;
     switch (aAttributeId) {
-    case Attributes::DeviceClass::Id: {
-        return YES;
-    }
     case Attributes::LoadControlPrograms::Id: {
         return YES;
     }
@@ -2859,13 +2934,115 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     case Attributes::NumberOfEventsPerProgram::Id: {
         return YES;
     }
-    case Attributes::NumberOfTransistions::Id: {
+    case Attributes::NumberOfTransitions::Id: {
         return YES;
     }
     case Attributes::DefaultRandomStart::Id: {
         return YES;
     }
     case Attributes::DefaultRandomDuration::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvse;
+    switch (aAttributeId) {
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::SupplyState::Id: {
+        return YES;
+    }
+    case Attributes::FaultState::Id: {
+        return YES;
+    }
+    case Attributes::ChargingEnabledUntil::Id: {
+        return YES;
+    }
+    case Attributes::DischargingEnabledUntil::Id: {
+        return YES;
+    }
+    case Attributes::CircuitCapacity::Id: {
+        return YES;
+    }
+    case Attributes::MinimumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::MaximumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::MaximumDischargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::UserMaximumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::RandomizationDelayWindow::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfWeeklyTargets::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfDailyTargets::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeStartTime::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeTargetTime::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeRequiredEnergy::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeTargetSoC::Id: {
+        return YES;
+    }
+    case Attributes::ApproximateEVEfficiency::Id: {
+        return YES;
+    }
+    case Attributes::StateOfCharge::Id: {
+        return YES;
+    }
+    case Attributes::BatteryCapacity::Id: {
+        return YES;
+    }
+    case Attributes::VehicleID::Id: {
+        return YES;
+    }
+    case Attributes::SessionID::Id: {
+        return YES;
+    }
+    case Attributes::SessionDuration::Id: {
+        return YES;
+    }
+    case Attributes::SessionEnergyCharged::Id: {
+        return YES;
+    }
+    case Attributes::SessionEnergyDischarged::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5922,8 +6099,14 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::Timer::Id: {
         return AttributeIsSpecifiedInTimerCluster(aAttributeId);
     }
+    case Clusters::OvenCavityOperationalState::Id: {
+        return AttributeIsSpecifiedInOvenCavityOperationalStateCluster(aAttributeId);
+    }
     case Clusters::OvenMode::Id: {
         return AttributeIsSpecifiedInOvenModeCluster(aAttributeId);
+    }
+    case Clusters::LaundryDryerControls::Id: {
+        return AttributeIsSpecifiedInLaundryDryerControlsCluster(aAttributeId);
     }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
@@ -5987,6 +6170,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    }
+    case Clusters::EnergyEvse::Id: {
+        return AttributeIsSpecifiedInEnergyEVSECluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

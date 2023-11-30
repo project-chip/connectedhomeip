@@ -151,9 +151,15 @@ static constexpr ClusterId Id = 0x00000046;
 namespace Timer {
 static constexpr ClusterId Id = 0x00000047;
 } // namespace Timer
+namespace OvenCavityOperationalState {
+static constexpr ClusterId Id = 0x00000048;
+} // namespace OvenCavityOperationalState
 namespace OvenMode {
 static constexpr ClusterId Id = 0x00000049;
 } // namespace OvenMode
+namespace LaundryDryerControls {
+static constexpr ClusterId Id = 0x0000004A;
+} // namespace LaundryDryerControls
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
@@ -217,6 +223,9 @@ static constexpr ClusterId Id = 0x00000081;
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
+namespace EnergyEvse {
+static constexpr ClusterId Id = 0x00000099;
+} // namespace EnergyEvse
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

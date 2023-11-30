@@ -214,15 +214,13 @@ class TestXmlParser(unittest.TestCase):
                   ModeTagStruct modeTags[] = 2;
                }
 
+               readonly attribute ModeOptionStruct supportedModes[] = 0;
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
                readonly attribute command_id acceptedCommandList[] = 65529;
                readonly attribute command_id generatedCommandList[] = 65528;
                readonly attribute bitmap32 featureMap = 65532;
                readonly attribute int16u clusterRevision = 65533;
-
-               // baseline inserted after, so to pass the test add this at the end
-               readonly attribute ModeOptionStruct supportedModes[] = 0;
            }
         ''')
 

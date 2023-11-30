@@ -42,11 +42,6 @@
             "output": "callback.h"
         },
         {
-            "path": "../../zap-templates/templates/app/enums.zapt",
-            "name": "ZCL enums header",
-            "output": "enums.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/print-cluster.zapt",
             "name": "ZCL print-cluster header",
             "output": "print-cluster.h"

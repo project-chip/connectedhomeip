@@ -98,6 +98,7 @@ public:
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session) const = 0;
 
     const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteSessionParams.GetMRPConfig(); }
+    const SessionParameters & GetRemoteSessionParameters() const { return mRemoteSessionParams; }
     void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteSessionParams.SetMRPConfig(config); }
 
     /**

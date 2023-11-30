@@ -33,7 +33,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRScenesClusterSceneInfoStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull sceneCount MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull currentScene MTR_PROVISIONALLY_AVAILABLE;
@@ -791,6 +791,31 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTROvenCavityOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTROvenCavityOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTROvenCavityOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTROvenCavityOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTROvenCavityOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenModeClusterModeTagStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull value MTR_PROVISIONALLY_AVAILABLE;
@@ -1119,6 +1144,55 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) MTRDemandResponseLoadControlClusterDutyCycleControlStruct * _Nullable dutyCycleControl MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRDemandResponseLoadControlClusterPowerSavingsControlStruct * _Nullable powerSavingsControl MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) MTRDemandResponseLoadControlClusterHeatingSourceControlStruct * _Nullable heatingSourceControl MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterChargingTargetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull targetTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable targetSoC MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable addedEnergy MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterEVConnectedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterEVNotDetectedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull sessionDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull sessionEnergyCharged MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable sessionEnergyDischarged MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterEnergyTransferStartedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maximumCurrent MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterEnergyTransferStoppedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull reason MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull energyTransferred MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterFaultEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull faultStatePreviousState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull faultStateCurrentState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyEVSEClusterRFIDEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nonnull uid MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
