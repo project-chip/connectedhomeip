@@ -74,14 +74,12 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
                                                     System::PacketBufferHandle && payload)
 {
     // TODO : Pass the parsed payload to ICDClientManagement via callback
-    VerifyOrReturn(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn));
+    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_ERROR_INVALID_ARGUMENT);
 
     Crypto::Aes128KeyHandle key;
     chip::Protocols::SecureChannel::CounterType counter;
     MutableByteSpan appData;
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
-    memcpy(&checkInPayload, payload->Start(), sizeof(checkInPayload));
-    chip::ByteSpan payloadByteSpan(checkInPayload);
     chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(key, payloadByteSpan, counter, appData);
 
     return CHIP_NO_ERROR;
