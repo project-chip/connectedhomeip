@@ -98,7 +98,7 @@ def _read_value(input_string: str) -> str:
     ret_val = ""
     if not input_string:
         ret_val = ""
-    if "0x" in input_string:
+    elif "0x" in input_string:
         ret_val = int(input_string, 16)
     elif "." in input_string:
         try:
