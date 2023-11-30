@@ -36,7 +36,6 @@ ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
-    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",
@@ -45,6 +44,10 @@ ti_sysconfig("sysconfig") {
     "ti_ble_config.h",
     "ti_dmm_application_policy.c",
     "ti_dmm_application_policy.h",
+
+    # CCFG generation disabled for OTA-able application
+    #"ti_devices_config.c",
+    #"ti_devices_config.h",
 
     # disabled until upstream generation is aligned
     #"tiop_config.h",

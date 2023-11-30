@@ -39,6 +39,15 @@ template("ti_simplelink_executable") {
 
   output_base_name = get_path_info(invoker.output_name, "name")
 
+  #used for OTA image creator for the cc13xx
+  if (ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+      ti_simplelink_device_family == "cc13x4_26x4") {
+    objcopy_image_name = output_base_name + ".hex"
+    objcopy_image_format = "ihex"
+  } else {
+    objcopy_image_name = output_base_name + ".bin"
+    objcopy_image_format = "binary"
+  }
   objcopy = "arm-none-eabi-objcopy"
 
   config("${simplelink_target_name}_config") {
@@ -58,15 +67,6 @@ template("ti_simplelink_executable") {
   }
 
   flashable_executable("${simplelink_target_name}.out") {
-    #used for OTA image creator for the cc13xx
-    if (ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
-        ti_simplelink_device_family == "cc13x4_26x4") {
-      objcopy_image_name = output_base_name + ".hex"
-      objcopy_image_format = "ihex"
-    } else {
-      objcopy_image_name = output_base_name + ".bin"
-      objcopy_image_format = "binary"
-    }
     forward_variables_from(invoker, "*")
 
     public_configs = [ ":${simplelink_target_name}_config" ]
@@ -107,7 +107,7 @@ template("ti_simplelink_executable") {
       pw_python_action("${simplelink_target_name}.bin") {
         public_deps = [ ":${simplelink_target_name}.out.image" ]
 
-        script = "${ti_simplelink_sdk_root}/tools/common/oad/oad_image_tool.py"
+        script = "${ti_simplelink_sdk_root}//tools/common/oad/oad_image_tool.py"
         sources = [ "${root_out_dir}/${objcopy_image_name}" ]
         outputs = [ "${root_out_dir}/${output_base_name}.bin" ]
 
