@@ -134,6 +134,9 @@ public:
     static StorageKeyName GroupDataCounter() { return StorageKeyName::FromConst("g/gdc"); }
     static StorageKeyName GroupControlCounter() { return StorageKeyName::FromConst("g/gcc"); }
 
+    // ICD Check-In Counter
+    static StorageKeyName ICDCheckInCounter() { return StorageKeyName::FromConst("icd/cic"); }
+
     // Device Information Provider
     static StorageKeyName UserLabelLengthKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/userlbl/%x", endpoint); }
     static StorageKeyName UserLabelIndexKey(EndpointId endpoint, uint32_t index)
