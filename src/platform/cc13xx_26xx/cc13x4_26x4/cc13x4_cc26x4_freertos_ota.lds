@@ -27,6 +27,11 @@ MEMORY
 {
     MCUBOOT_HDR (RX) : ORIGIN = 0x00006000, LENGTH = 0x00000080
     FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F8780
+    /*
+     * NVS is the last 5 pages of slot, this area is not erased 
+     * during OTA. The slot size for the primary and secondary slots
+     * is therefore 0xF6000 (MCUBoot Header + all the remaining space)
+     */
     /* FLASH_NVS (RX)   : ORIGIN = 0x000FC000, LENGTH = 0x00002800 */
     FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
     /*
