@@ -112,12 +112,6 @@ template("ti_sysconfig") {
     sources = invoker.sources
     outputs = gen_outputs
 
-    if (defined(invoker.rtos)) {
-      rtos = invoker.rtos
-    } else {
-      rtos = "freertos"
-    }
-
     if (ti_simplelink_device == "") {
       args = [
         ti_sysconfig_root,
