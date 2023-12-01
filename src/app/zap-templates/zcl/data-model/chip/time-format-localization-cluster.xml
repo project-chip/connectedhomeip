@@ -64,6 +64,6 @@ limitations under the License.
         <description>ActiveCalendarType</description>
         <access op="write" role="manage" />
     </attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>

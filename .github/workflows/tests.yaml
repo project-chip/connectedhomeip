@@ -110,6 +110,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/content-app-observer-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/content-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml \
@@ -117,6 +119,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fault-injection-cluster.xml \
@@ -131,6 +134,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
@@ -143,6 +147,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \

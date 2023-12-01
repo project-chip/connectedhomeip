@@ -7453,11 +7453,8 @@
           - ICDManagement
           - LaundryWasherMode
           - RefrigeratorAndTemperatureControlledCabinetMode
-          - RVCRunMode
-          - RVCCleanMode
           - DishwasherMode
           - LaundryWasherControls
-          - RVCOperationalState
           - DishwasherAlarm
           - SampleMEI
       attributes:
@@ -7474,6 +7471,10 @@
           DoorLock:
               # Not stable yet
               - UnboltDoor
+          RVCOperationalState:
+              # Disallowed in the spec, but present in our XML?
+              - Start
+              - Stop
       enums:
           FanControl:
               # Not stable yet.
@@ -7767,17 +7768,136 @@
 - release: "Future"
   versions: "future"
   introduced:
+      clusters:
+          - RVCRunMode
+          - RVCCleanMode
+          - RVCOperationalState
+      attributes:
+          RVCRunMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCCleanMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+      commands:
+          RVCRunMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCCleanMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+      command fields:
+          RVCRunMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCCleanMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+      structs:
+          RVCOperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          RVCRunMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          RVCCleanMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+      struct fields:
+          RVCOperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          RVCRunMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          RVCCleanMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+      events:
+          RVCOperationalState:
+              - OperationalError
+              - OperationCompletion
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+          RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
       enums:
           ContentLauncher:
               - StatusEnum
+          KeypadInput:
+              - CECKeyCodeEnum
           ThermostatUserInterfaceConfiguration:
               - KeypadLockoutEnum
               - ScheduleProgrammingVisibilityEnum
               - TemperatureDisplayModeEnum
+          RVCOperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          RVCRunMode:
+              - ModeTag
+              - StatusCode
+          RVCCleanMode:
+              - ModeTag
+              - StatusCode
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -7788,6 +7908,94 @@
               FanModeSequenceEnum:
                   - OffHighAuto
                   - OffHigh
+          KeypadInput:
+              CECKeyCodeEnum:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
           ThermostatUserInterfaceConfiguration:
               KeypadLockoutEnum:
                   - NoLockout
@@ -7802,6 +8010,40 @@
               TemperatureDisplayModeEnum:
                   - Celsius
                   - Fahrenheit
+          RVCOperationalState:
+              OperationalStateEnum:
+                  - SeekingCharger
+                  - Charging
+                  - Docked
+              ErrorStateEnum:
+                  - FailedToFindChargingDock
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+          RVCRunMode:
+              ModeTag:
+                  - Idle
+                  - Cleaning
+              StatusCode:
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+                  - BatteryLow
+          RVCCleanMode:
+              ModeTag:
+                  - DeepClean
+                  - Vacuum
+                  - Mop
+              StatusCode:
+                  - CleaningInProgress
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -7811,6 +8053,10 @@
               - SupportedProtocolsBitmap
           LevelControl:
               - OptionsBitmap
+          RVCRunMode:
+              - Feature
+          RVCCleanMode:
+              - Feature
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7832,6 +8078,12 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+          RVCRunMode:
+              Feature:
+                  - OnOff
+          RVCCleanMode:
+              Feature:
+                  - OnOff
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
@@ -7840,6 +8092,8 @@
       enums:
           ContentLauncher:
               - ContentLaunchStatusEnum
+          KeypadInput:
+              - CecKeyCode
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -7869,6 +8123,9 @@
           - ValveConfigurationAndControl
           - Timer
           - OvenMode
+          - LaundryDryerControls
+          - EnergyEVSE
+          - OvenCavityOperationalState
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7953,6 +8210,8 @@
       enums:
           ContentLauncher:
               StatusEnum: ContentLaunchStatusEnum
+          KeypadInput:
+              CECKeyCodeEnum: CecKeyCode
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time

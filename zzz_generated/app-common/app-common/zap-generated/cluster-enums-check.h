@@ -1203,6 +1203,35 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum 
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
 {
     using EnumType = OvenMode::ModeTag;
@@ -1220,6 +1249,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
         return val;
     default:
         return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryDryerControls::DrynessLevelEnum val)
+{
+    using EnumType = LaundryDryerControls::DrynessLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
     }
 }
 
@@ -1557,6 +1601,79 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return val;
     default:
         return static_cast<EnumType>(13);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::EnergyTransferStoppedReasonEnum val)
+{
+    using EnumType = EnergyEvse::EnergyTransferStoppedReasonEnum;
+    switch (val)
+    {
+    case EnumType::kEVStopped:
+    case EnumType::kEVSEStopped:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::FaultStateEnum val)
+{
+    using EnumType = EnergyEvse::FaultStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kMeterFailure:
+    case EnumType::kOverVoltage:
+    case EnumType::kUnderVoltage:
+    case EnumType::kOverCurrent:
+    case EnumType::kContactWetFailure:
+    case EnumType::kContactDryFailure:
+    case EnumType::kGroundFault:
+    case EnumType::kPowerLoss:
+    case EnumType::kPowerQuality:
+    case EnumType::kPilotShortCircuit:
+    case EnumType::kEmergencyStop:
+    case EnumType::kEVDisconnected:
+    case EnumType::kWrongPowerSupply:
+    case EnumType::kLiveNeutralSwap:
+    case EnumType::kOverTemperature:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(16);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::StateEnum val)
+{
+    using EnumType = EnergyEvse::StateEnum;
+    switch (val)
+    {
+    case EnumType::kNotPluggedIn:
+    case EnumType::kPluggedInNoDemand:
+    case EnumType::kPluggedInDemand:
+    case EnumType::kPluggedInCharging:
+    case EnumType::kPluggedInDischarging:
+    case EnumType::kSessionEnding:
+    case EnumType::kFault:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyStateEnum val)
+{
+    using EnumType = EnergyEvse::SupplyStateEnum;
+    switch (val)
+    {
+    case EnumType::kDisabled:
+    case EnumType::kChargingEnabled:
+    case EnumType::kDischargingEnabled:
+    case EnumType::kDisabledError:
+    case EnumType::kDisabledDiagnostics:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -2748,6 +2865,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnum val)
+{
+    using EnumType = Channel::ChannelTypeEnum;
+    switch (val)
+    {
+    case EnumType::kSatellite:
+    case EnumType::kCable:
+    case EnumType::kTerrestrial:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)
 {
     using EnumType = Channel::LineupInfoTypeEnum;
@@ -2787,6 +2917,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::Status
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::CharacteristicEnum val)
+{
+    using EnumType = MediaPlayback::CharacteristicEnum;
+    switch (val)
+    {
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
+        return val;
+    default:
+        return static_cast<EnumType>(18);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
 {
     using EnumType = MediaPlayback::PlaybackStateEnum;
@@ -2841,9 +2999,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:
@@ -2951,6 +3109,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::StatusEnum
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::CharacteristicEnum val)
+{
+    using EnumType = ContentLauncher::CharacteristicEnum;
+    switch (val)
+    {
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
+        return val;
+    default:
+        return static_cast<EnumType>(18);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::MetricTypeEnum val)
 {
     using EnumType = ContentLauncher::MetricTypeEnum;
@@ -2982,9 +3168,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
     case EnumType::kSportsTeam:
     case EnumType::kType:
     case EnumType::kVideo:
+    case EnumType::kSeason:
+    case EnumType::kEpisode:
+    case EnumType::kAny:
         return val;
     default:
-        return static_cast<EnumType>(14);
+        return static_cast<EnumType>(17);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
@@ -2995,9 +3184,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Status
     case EnumType::kSuccess:
     case EnumType::kURLNotAvailable:
     case EnumType::kAuthFailed:
+    case EnumType::kTextTrackNotAvailable:
+    case EnumType::kAudioTrackNotAvailable:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -3044,6 +3235,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationBasic::Appli
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentAppObserver::StatusEnum val)
+{
+    using EnumType = ContentAppObserver::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnexpectedData:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
     }
 }
 

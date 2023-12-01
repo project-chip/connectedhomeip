@@ -51,42 +51,58 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager,
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
-    // If there is a pending acknowledgment piggyback it on this message.
-    if (reliableMessageContext->HasPiggybackAckPending())
+    if (session->AllowsMRP())
     {
-        payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
-    }
+        // If there is a pending acknowledgment piggyback it on this message.
+        if (reliableMessageContext->HasPiggybackAckPending())
+        {
+            payloadHeader.SetAckMessageCounter(reliableMessageContext->TakePendingPeerAckMessageCounter());
+        }
 
-    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
-        reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
-    {
-        auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
+        if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() &&
+            reliableMessageContext->GetReliableMessageMgr() != nullptr && isReliableTransmission)
+        {
+            auto * reliableMessageMgr = reliableMessageContext->GetReliableMessageMgr();
 
-        payloadHeader.SetNeedsAck(true);
+            payloadHeader.SetNeedsAck(true);
 
-        ReliableMessageMgr::RetransTableEntry * entry = nullptr;
+            ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
-        // Add to Table for subsequent sending
-        ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
-        auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
-            reliableMessageMgr->ClearRetransTable(*e);
-        };
-        std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
+            // Add to Table for subsequent sending
+            ReturnErrorOnFailure(reliableMessageMgr->AddToRetransTable(reliableMessageContext, &entry));
+            auto deleter = [reliableMessageMgr](ReliableMessageMgr::RetransTableEntry * e) {
+                reliableMessageMgr->ClearRetransTable(*e);
+            };
+            std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
-        CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
-        err            = ReliableMessageMgr::MapSendError(err, exchangeId, isInitiator);
-        ReturnErrorOnFailure(err);
-        reliableMessageMgr->StartRetransmision(entryOwner.release());
+            ReturnErrorOnFailure(
+                sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+            CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
+            err            = ReliableMessageMgr::MapSendError(err, exchangeId, isInitiator);
+            ReturnErrorOnFailure(err);
+            reliableMessageMgr->StartRetransmision(entryOwner.release());
+        }
+        else
+        {
+            ReturnErrorOnFailure(PrepareAndSendNonMRPMessage(sessionManager, session, payloadHeader, std::move(message)));
+        }
     }
     else
     {
-        // If the channel itself is providing reliability, let's not request MRP acks
-        payloadHeader.SetNeedsAck(false);
-        EncryptedPacketBufferHandle preparedMessage;
-        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
-        ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
+        ReturnErrorOnFailure(PrepareAndSendNonMRPMessage(sessionManager, session, payloadHeader, std::move(message)));
     }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExchangeMessageDispatch::PrepareAndSendNonMRPMessage(SessionManager * sessionManager, const SessionHandle & session,
+                                                                PayloadHeader & payloadHeader,
+                                                                System::PacketBufferHandle && message)
+{
+    payloadHeader.SetNeedsAck(false);
+    EncryptedPacketBufferHandle preparedMessage;
+    ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
+    ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
 
     return CHIP_NO_ERROR;
 }

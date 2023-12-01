@@ -36,13 +36,11 @@ namespace Controller {
 class DLL_EXPORT CommissionableNodeController : public AbstractDnssdDiscoveryController
 {
 public:
-    CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : mResolver(resolver) {}
+    CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : AbstractDnssdDiscoveryController(resolver) {}
     ~CommissionableNodeController() override;
 
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
-
-    CHIP_ERROR StopDiscovery();
 
     /**
      * @return
@@ -57,7 +55,6 @@ protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
-    Dnssd::Resolver * mResolver = nullptr;
     Dnssd::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];
 };
 

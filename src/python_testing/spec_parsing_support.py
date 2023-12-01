@@ -18,6 +18,7 @@
 import glob
 import logging
 import os
+import typing
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
@@ -28,7 +29,7 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, or_operation, parse_callable_from_xml)
+                                 feature, optional, or_operation, parse_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
@@ -295,6 +296,25 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
                 clusters[cluster_id] = new
             else:
                 derived_clusters[name] = new
+
+    # There are a few clusters where the conformance columns are listed as desc. These clusters need specific, targeted tests
+    # to properly assess conformance. Here, we list them as Optional to allow these for the general test. Targeted tests are described below.
+    # Descriptor - TagList feature - this feature is mandated when the duplicate condition holds for the endpoint. It is tested in DESC-2.2
+    # Actions cluster - all commands - these need to be listed in the ActionsList attribute to be supported.
+    #                                  We do not currently have a test for this. Please see https://github.com/CHIP-Specifications/chip-test-plans/issues/3646.
+    def remove_problem(location: typing.Union[CommandPathLocation, FeaturePathLocation]):
+        nonlocal problems
+        problems = [p for p in problems if p.location != location]
+
+    descriptor_id = Clusters.Descriptor.id
+    code = 'TAGLIST'
+    mask = clusters[descriptor_id].feature_map[code]
+    clusters[descriptor_id].features[mask].conformance = optional()
+    remove_problem(FeaturePathLocation(endpoint_id=0, cluster_id=descriptor_id, feature_code=code))
+    action_id = Clusters.Actions.id
+    for c in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[action_id]:
+        clusters[action_id].accepted_commands[c].conformance = optional()
+        remove_problem(CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=c))
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop

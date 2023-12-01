@@ -1284,24 +1284,19 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             commandObj->AddStatus(commandPath, Status::ConstraintError);
             return true;
         }
-        if (!GetDelegate()->IsNTPAddressValid(dNtpChar.Value()))
+        bool dnsResolve;
+        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+        bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
+        bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
+        bool useable  = isIPv6 || (isDomain && dnsResolve);
+        if (!useable)
         {
             commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
-        }
-        if (GetDelegate()->IsNTPAddressDomain(dNtpChar.Value()))
-        {
-            bool dnsResolve;
-            if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
-            {
-                commandObj->AddStatus(commandPath, Status::Failure);
-                return true;
-            }
-            if (!dnsResolve)
-            {
-                commandObj->AddStatus(commandPath, Status::InvalidCommand);
-                return true;
-            }
         }
     }
 

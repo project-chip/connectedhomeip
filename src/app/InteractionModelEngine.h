@@ -306,6 +306,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
+    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
+    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
