@@ -163,6 +163,13 @@ menu "CHIP Core"
             help
                 Option to enable/disable CHIP data model.
 
+        config CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+            bool "Use heap memory for system buffer pool"
+            default y
+            help
+                Option to use heap memory for system buffer pool.
+                If enabled, will allocate system buffer pool from Heap.
+
     endmenu # "General Options"
 
     menu "Networking Options"
