@@ -766,6 +766,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPThermostatClusterGetRelayStatusLogResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPChannelClusterChangeChannelResponseCallback
     : public Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>
 {

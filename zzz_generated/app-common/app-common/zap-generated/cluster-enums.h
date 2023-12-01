@@ -3108,21 +3108,77 @@ enum class PumpStatusBitmap : uint16_t
 
 namespace Thermostat {
 
-// Enum for SetpointAdjustMode
-enum class SetpointAdjustMode : uint8_t
+// Enum for ACCapacityFormatEnum
+enum class ACCapacityFormatEnum : uint8_t
 {
-    kHeat = 0x00,
-    kCool = 0x01,
-    kBoth = 0x02,
+    kBTUh = 0x00,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 1,
 };
 
-// Enum for ThermostatControlSequence
-enum class ThermostatControlSequence : uint8_t
+// Enum for ACCompressorTypeEnum
+enum class ACCompressorTypeEnum : uint8_t
+{
+    kUnknown = 0x00,
+    kT1      = 0x01,
+    kT2      = 0x02,
+    kT3      = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ACLouverPositionEnum
+enum class ACLouverPositionEnum : uint8_t
+{
+    kClosed        = 0x01,
+    kOpen          = 0x02,
+    kQuarter       = 0x03,
+    kHalf          = 0x04,
+    kThreeQuarters = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ACRefrigerantTypeEnum
+enum class ACRefrigerantTypeEnum : uint8_t
+{
+    kUnknown = 0x00,
+    kR22     = 0x01,
+    kR410a   = 0x02,
+    kR407c   = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ACTypeEnum
+enum class ACTypeEnum : uint8_t
+{
+    kUnknown          = 0x00,
+    kCoolingFixed     = 0x01,
+    kHeatPumpFixed    = 0x02,
+    kCoolingInverter  = 0x03,
+    kHeatPumpInverter = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for ControlSequenceOfOperationEnum
+enum class ControlSequenceOfOperationEnum : uint8_t
 {
     kCoolingOnly                 = 0x00,
     kCoolingWithReheat           = 0x01,
@@ -3137,21 +3193,51 @@ enum class ThermostatControlSequence : uint8_t
     kUnknownEnumValue = 6,
 };
 
-// Enum for ThermostatRunningMode
-enum class ThermostatRunningMode : uint8_t
+// Enum for SetpointChangeSourceEnum
+enum class SetpointChangeSourceEnum : uint8_t
 {
-    kOff  = 0x00,
-    kCool = 0x03,
-    kHeat = 0x04,
+    kManual   = 0x00,
+    kSchedule = 0x01,
+    kExternal = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 1,
+    kUnknownEnumValue = 3,
 };
 
-// Enum for ThermostatSystemMode
-enum class ThermostatSystemMode : uint8_t
+// Enum for SetpointRaiseLowerModeEnum
+enum class SetpointRaiseLowerModeEnum : uint8_t
+{
+    kHeat = 0x00,
+    kCool = 0x01,
+    kBoth = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for StartOfWeekEnum
+enum class StartOfWeekEnum : uint8_t
+{
+    kSunday    = 0x00,
+    kMonday    = 0x01,
+    kTuesday   = 0x02,
+    kWednesday = 0x03,
+    kThursday  = 0x04,
+    kFriday    = 0x05,
+    kSaturday  = 0x06,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 7,
+};
+
+// Enum for SystemModeEnum
+enum class SystemModeEnum : uint8_t
 {
     kOff           = 0x00,
     kAuto          = 0x01,
@@ -3169,8 +3255,100 @@ enum class ThermostatSystemMode : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Bitmap for DayOfWeek
-enum class DayOfWeek : uint8_t
+// Enum for TemperatureSetpointHoldEnum
+enum class TemperatureSetpointHoldEnum : uint8_t
+{
+    kSetpointHoldOff = 0x00,
+    kSetpointHoldOn  = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for ThermostatRunningModeEnum
+enum class ThermostatRunningModeEnum : uint8_t
+{
+    kOff  = 0x00,
+    kCool = 0x03,
+    kHeat = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 1,
+};
+
+// Bitmap for ACErrorCodeBitmap
+enum class ACErrorCodeBitmap : uint32_t
+{
+    kCompressorFail    = 0x1,
+    kRoomSensorFail    = 0x2,
+    kOutdoorSensorFail = 0x4,
+    kCoilSensorFail    = 0x8,
+    kFanFail           = 0x10,
+};
+
+// Bitmap for AlarmCodeBitmap
+enum class AlarmCodeBitmap : uint8_t
+{
+    kInitialization  = 0x1,
+    kHardware        = 0x2,
+    kSelfCalibration = 0x4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kHeating                     = 0x1,
+    kCooling                     = 0x2,
+    kOccupancy                   = 0x4,
+    kZigbeeScheduleConfiguration = 0x8,
+    kSetback                     = 0x10,
+    kAutoMode                    = 0x20,
+    kLocalTemperatureNotExposed  = 0x40,
+};
+
+// Bitmap for HVACSystemTypeBitmap
+enum class HVACSystemTypeBitmap : uint8_t
+{
+    kCoolingStage      = 0x3,
+    kHeatingStage      = 0xC,
+    kHeatingIsHeatPump = 0x10,
+    kHeatingUsesFuel   = 0x20,
+};
+
+// Bitmap for ProgrammingOperationModeBitmap
+enum class ProgrammingOperationModeBitmap : uint8_t
+{
+    kScheduleActive = 0x1,
+    kAutoRecovery   = 0x2,
+    kEconomy        = 0x4,
+};
+
+// Bitmap for RelayStateBitmap
+enum class RelayStateBitmap : uint16_t
+{
+    kHeat       = 0x1,
+    kCool       = 0x2,
+    kFan        = 0x4,
+    kHeatStage2 = 0x8,
+    kCoolStage2 = 0x10,
+    kFanStage2  = 0x20,
+    kFanStage3  = 0x40,
+};
+
+// Bitmap for RemoteSensingBitmap
+enum class RemoteSensingBitmap : uint8_t
+{
+    kLocalTemperature   = 0x1,
+    kOutdoorTemperature = 0x2,
+    kOccupancy          = 0x4,
+};
+
+// Bitmap for ScheduleDayOfWeekBitmap
+enum class ScheduleDayOfWeekBitmap : uint8_t
 {
     kSunday    = 0x1,
     kMonday    = 0x2,
@@ -3182,20 +3360,8 @@ enum class DayOfWeek : uint8_t
     kAway      = 0x80,
 };
 
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kHeating                    = 0x1,
-    kCooling                    = 0x2,
-    kOccupancy                  = 0x4,
-    kScheduleConfiguration      = 0x8,
-    kSetback                    = 0x10,
-    kAutoMode                   = 0x20,
-    kLocalTemperatureNotExposed = 0x40,
-};
-
-// Bitmap for ModeForSequence
-enum class ModeForSequence : uint8_t
+// Bitmap for ScheduleModeBitmap
+enum class ScheduleModeBitmap : uint8_t
 {
     kHeatSetpointPresent = 0x1,
     kCoolSetpointPresent = 0x2,

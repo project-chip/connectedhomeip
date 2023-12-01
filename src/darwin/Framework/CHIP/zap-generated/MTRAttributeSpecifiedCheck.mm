@@ -3480,9 +3480,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::PIHeatingDemand::Id: {
         return YES;
     }
-    case Attributes::HVACSystemTypeConfiguration::Id: {
-        return YES;
-    }
     case Attributes::LocalTemperatureCalibration::Id: {
         return YES;
     }

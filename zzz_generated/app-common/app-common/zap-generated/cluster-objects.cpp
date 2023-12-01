@@ -17693,7 +17693,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 namespace Thermostat {
 namespace Structs {
 
-namespace ThermostatScheduleTransition {
+namespace WeeklyScheduleTransitionStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -17737,7 +17737,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace ThermostatScheduleTransition
+} // namespace WeeklyScheduleTransitionStruct
 } // namespace Structs
 
 namespace Commands {
@@ -17785,7 +17785,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNumberOfTransitionsForSequence), numberOfTransitionsForSequence);
-    encoder.Encode(to_underlying(Fields::kDayOfWeekForSequence), dayOfWeekForSequence);
+    encoder.Encode(to_underlying(Fields::kDayOfWeekforSequence), dayOfWeekforSequence);
     encoder.Encode(to_underlying(Fields::kModeForSequence), modeForSequence);
     encoder.Encode(to_underlying(Fields::kTransitions), transitions);
     return encoder.Finalize();
@@ -17809,9 +17809,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, numberOfTransitionsForSequence);
         }
-        else if (__context_tag == to_underlying(Fields::kDayOfWeekForSequence))
+        else if (__context_tag == to_underlying(Fields::kDayOfWeekforSequence))
         {
-            err = DataModel::Decode(reader, dayOfWeekForSequence);
+            err = DataModel::Decode(reader, dayOfWeekforSequence);
         }
         else if (__context_tag == to_underlying(Fields::kModeForSequence))
         {
@@ -17834,7 +17834,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kNumberOfTransitionsForSequence), numberOfTransitionsForSequence);
-    encoder.Encode(to_underlying(Fields::kDayOfWeekForSequence), dayOfWeekForSequence);
+    encoder.Encode(to_underlying(Fields::kDayOfWeekforSequence), dayOfWeekforSequence);
     encoder.Encode(to_underlying(Fields::kModeForSequence), modeForSequence);
     encoder.Encode(to_underlying(Fields::kTransitions), transitions);
     return encoder.Finalize();
@@ -17858,9 +17858,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, numberOfTransitionsForSequence);
         }
-        else if (__context_tag == to_underlying(Fields::kDayOfWeekForSequence))
+        else if (__context_tag == to_underlying(Fields::kDayOfWeekforSequence))
         {
-            err = DataModel::Decode(reader, dayOfWeekForSequence);
+            err = DataModel::Decode(reader, dayOfWeekforSequence);
         }
         else if (__context_tag == to_underlying(Fields::kModeForSequence))
         {
@@ -17878,6 +17878,65 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace SetWeeklySchedule.
+namespace GetRelayStatusLogResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kTimeOfDay), timeOfDay);
+    encoder.Encode(to_underlying(Fields::kRelayStatus), relayStatus);
+    encoder.Encode(to_underlying(Fields::kLocalTemperature), localTemperature);
+    encoder.Encode(to_underlying(Fields::kHumidityInPercentage), humidityInPercentage);
+    encoder.Encode(to_underlying(Fields::kSetPoint), setPoint);
+    encoder.Encode(to_underlying(Fields::kUnreadEntries), unreadEntries);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kTimeOfDay))
+        {
+            err = DataModel::Decode(reader, timeOfDay);
+        }
+        else if (__context_tag == to_underlying(Fields::kRelayStatus))
+        {
+            err = DataModel::Decode(reader, relayStatus);
+        }
+        else if (__context_tag == to_underlying(Fields::kLocalTemperature))
+        {
+            err = DataModel::Decode(reader, localTemperature);
+        }
+        else if (__context_tag == to_underlying(Fields::kHumidityInPercentage))
+        {
+            err = DataModel::Decode(reader, humidityInPercentage);
+        }
+        else if (__context_tag == to_underlying(Fields::kSetPoint))
+        {
+            err = DataModel::Decode(reader, setPoint);
+        }
+        else if (__context_tag == to_underlying(Fields::kUnreadEntries))
+        {
+            err = DataModel::Decode(reader, unreadEntries);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace GetRelayStatusLogResponse.
 namespace GetWeeklySchedule {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -17937,6 +17996,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace ClearWeeklySchedule.
+namespace GetRelayStatusLog {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace GetRelayStatusLog.
 } // namespace Commands
 
 namespace Attributes {
@@ -17962,8 +18041,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, PICoolingDemand);
     case Attributes::PIHeatingDemand::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, PIHeatingDemand);
-    case Attributes::HVACSystemTypeConfiguration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, HVACSystemTypeConfiguration);
     case Attributes::LocalTemperatureCalibration::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, localTemperatureCalibration);
     case Attributes::OccupiedCoolingSetpoint::TypeInfo::GetAttributeId():

@@ -7704,9 +7704,9 @@ class ChipClusters:
                 "commandName": "SetWeeklySchedule",
                 "args": {
                     "numberOfTransitionsForSequence": "int",
-                    "dayOfWeekForSequence": "int",
+                    "dayOfWeekforSequence": "int",
                     "modeForSequence": "int",
-                    "transitions": "ThermostatScheduleTransition",
+                    "transitions": "WeeklyScheduleTransitionStruct",
                 },
             },
             0x00000002: {
@@ -7720,6 +7720,12 @@ class ChipClusters:
             0x00000003: {
                 "commandId": 0x00000003,
                 "commandName": "ClearWeeklySchedule",
+                "args": {
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "GetRelayStatusLog",
                 "args": {
                 },
             },
@@ -7778,13 +7784,6 @@ class ChipClusters:
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "HVACSystemTypeConfiguration",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x00000010: {
                 "attributeName": "LocalTemperatureCalibration",

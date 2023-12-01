@@ -2039,28 +2039,6 @@ public class ClusterWriteMapping {
     writePumpConfigurationAndControlInteractionInfo.put("writeControlModeAttribute", writePumpConfigurationAndControlControlModeAttributeInteractionInfo);
     writeAttributeMap.put("pumpConfigurationAndControl", writePumpConfigurationAndControlInteractionInfo);
     Map<String, InteractionInfo> writeThermostatInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeThermostatHVACSystemTypeConfigurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostatHVACSystemTypeConfigurationCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeThermostatHVACSystemTypeConfigurationCommandParams.put(
-        "value",
-        thermostatHVACSystemTypeConfigurationCommandParameterInfo
-    );
-    InteractionInfo writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster).writeHVACSystemTypeConfigurationAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeThermostatHVACSystemTypeConfigurationCommandParams
-    );
-    writeThermostatInteractionInfo.put("writeHVACSystemTypeConfigurationAttribute", writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatLocalTemperatureCalibrationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatlocalTemperatureCalibrationCommandParameterInfo =
         new CommandParameterInfo(

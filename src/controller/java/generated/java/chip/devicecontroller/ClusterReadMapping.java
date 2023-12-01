@@ -10815,17 +10815,6 @@ public class ClusterReadMapping {
           readThermostatPIHeatingDemandCommandParams
         );
         result.put("readPIHeatingDemandAttribute", readThermostatPIHeatingDemandAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThermostatHVACSystemTypeConfigurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThermostatHVACSystemTypeConfigurationAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThermostatCluster) cluster).readHVACSystemTypeConfigurationAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readThermostatHVACSystemTypeConfigurationCommandParams
-        );
-        result.put("readHVACSystemTypeConfigurationAttribute", readThermostatHVACSystemTypeConfigurationAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatLocalTemperatureCalibrationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatLocalTemperatureCalibrationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

@@ -23,9 +23,18 @@ import matter.devicecontroller.cluster.structs.*
 class ThermostatCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GetWeeklyScheduleResponse(
     val numberOfTransitionsForSequence: UByte,
-    val dayOfWeekForSequence: UInt,
+    val dayOfWeekforSequence: UInt,
     val modeForSequence: UInt,
-    val transitions: List<ThermostatClusterThermostatScheduleTransition>
+    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>
+  )
+
+  class GetRelayStatusLogResponse(
+    val timeOfDay: UShort,
+    val relayStatus: UInt,
+    val localTemperature: Short?,
+    val humidityInPercentage: UByte?,
+    val setPoint: Short,
+    val unreadEntries: UShort
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -70,9 +79,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun setWeeklySchedule(
     numberOfTransitionsForSequence: UByte,
-    dayOfWeekForSequence: UInt,
+    dayOfWeekforSequence: UInt,
     modeForSequence: UInt,
-    transitions: List<ThermostatClusterThermostatScheduleTransition>,
+    transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId = 1L
@@ -100,6 +109,16 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int? = null) {
     val commandId = 3L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getRelayStatusLog(timedInvokeTimeoutMs: Int? = null): GetRelayStatusLogResponse {
+    val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
@@ -183,28 +202,6 @@ class ThermostatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun subscribePIHeatingDemandAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readHVACSystemTypeConfigurationAttribute(): UByte {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeHVACSystemTypeConfigurationAttribute(
-    value: UInt,
-    timedWriteTimeoutMs: Int? = null
-  ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
-    }
-  }
-
-  suspend fun subscribeHVACSystemTypeConfigurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
     // Implementation needs to be added here
   }
 
