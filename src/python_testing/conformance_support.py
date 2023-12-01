@@ -68,6 +68,11 @@ def conformance_allowed(conformance_decision: ConformanceDecision, allow_provisi
     return True
 
 
+def is_disallowed(conformance: Callable):
+    # Deprecated and disallowed conformances will come back as disallowed regardless of the implemented features / attributes / etc.
+    return conformance(0, [], []) == ConformanceDecision.DISALLOWED
+
+
 class zigbee:
     def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
         return ConformanceDecision.NOT_APPLICABLE
