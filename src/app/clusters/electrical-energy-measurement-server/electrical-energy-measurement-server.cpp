@@ -50,7 +50,7 @@ namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 namespace Server {
 
-bool NotifyCumulativeEnergyImported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported)
+bool NotifyCumulativeEnergyImported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported)
 {
     Events::CumulativeEnergyImported::Type event;
     event.importedTimestamp = aImportedTimeStampS;
@@ -69,7 +69,7 @@ bool NotifyCumulativeEnergyImported(chip::EndpointId endpointId, uint32_t aImpor
     return true;
 }
 
-bool NotifyCumulativeEnergyExported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported)
+bool NotifyCumulativeEnergyExported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported)
 {
     Events::CumulativeEnergyExported::Type event;
     event.importedTimestamp = aImportedTimeStampS;
@@ -88,7 +88,7 @@ bool NotifyCumulativeEnergyExported(chip::EndpointId endpointId, uint32_t aImpor
     return true;
 }
 
-bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
+bool NotifyPeriodicEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
     Events::PeriodicEnergyImported::Type event;
     event.periodStart = aPeriodStartS;
@@ -108,7 +108,7 @@ bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodS
     return true;
 }
 
-bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
+bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
     Events::PeriodicEnergyExported::Type event;
     event.periodStart = aPeriodStartS;
@@ -128,7 +128,7 @@ bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodS
     return true;
 }
 
-bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
+bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
     Events::EphemeralEnergyImported::Type event;
     event.periodStart = aPeriodStartS;
@@ -148,7 +148,7 @@ bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriod
     return true;
 }
 
-bool NotifyEphemeralEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
+bool NotifyEphemeralEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
     Events::EphemeralEnergyExported::Type event;
     event.periodStart = aPeriodStartS;
