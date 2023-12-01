@@ -16,6 +16,7 @@ import os
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Idl
 
+
 class SummaryMarkdownGenerator(CodeGenerator):
     """
     Code generation for markdown files
@@ -32,4 +33,3 @@ class SummaryMarkdownGenerator(CodeGenerator):
                 'idl': self.idl,
             }
         )
-
