@@ -5516,6 +5516,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
+@dynamic transitionTime;
+@dynamic heatSetpoint;
+@dynamic coolSetpoint;
+@end
+
 @implementation MTRChannelClusterProgramCastStruct
 - (instancetype)init
 {
