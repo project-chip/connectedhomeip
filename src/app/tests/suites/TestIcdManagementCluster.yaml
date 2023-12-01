@@ -64,7 +64,10 @@ tests:
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: 0
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Read ClientsSupportedPerFabric"
       command: "readAttribute"
@@ -158,7 +161,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 2.1"
       command: "RegisterClient"
@@ -174,7 +180,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 3.1"
       command: "RegisterClient"
@@ -212,7 +221,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"
@@ -240,7 +252,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"

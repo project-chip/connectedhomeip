@@ -166,20 +166,20 @@ limitations under the License.
     <attribute side="server" code="0x0014" define="INT64S" type="int64s" writable="true" default="0" optional="false">int64s</attribute>
     <attribute side="server" code="0x0015" define="ENUM8" type="enum8" writable="true" default="0" optional="false">enum8</attribute>
     <attribute side="server" code="0x0016" define="ENUM16" type="enum16" writable="true" default="0" optional="false">enum16</attribute>
-    <attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="SINGLE" writable="true" default="0" optional="false">float_single</attribute>
-    <attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" optional="false">float_double</attribute>
+    <attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="single" writable="true" default="0" optional="false">float_single</attribute>
+    <attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="double" writable="true" default="0" optional="false">float_double</attribute>
     <attribute side="server" code="0x0019" define="OCTET_STRING" type="octet_string" length="10" writable="true" optional="false">octet_string</attribute>
-    <attribute side="server" code="0x001A" define="LIST" type="ARRAY" entryType="int8u" length="10" writable="true" optional="false">list_int8u</attribute>
-    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="ARRAY" entryType="octet_string" length="254" writable="true" optional="false">list_octet_string</attribute>
-    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="ARRAY" entryType="TestListStructOctet" length="254" writable="true" optional="false">list_struct_octet_string</attribute>
-    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="LONG_OCTET_STRING" length="1000" writable="true" optional="false">long_octet_string</attribute>
+    <attribute side="server" code="0x001A" define="LIST" type="array" entryType="int8u" length="10" writable="true" optional="false">list_int8u</attribute>
+    <attribute side="server" code="0x001B" define="LIST_OCTET_STRING" type="array" entryType="octet_string" length="254" writable="true" optional="false">list_octet_string</attribute>
+    <attribute side="server" code="0x001C" define="LIST_STRUCT_OCTET_STRING" type="array" entryType="TestListStructOctet" length="254" writable="true" optional="false">list_struct_octet_string</attribute>
+    <attribute side="server" code="0x001D" define="LONG_OCTET_STRING" type="long_octet_string" length="1000" writable="true" optional="false">long_octet_string</attribute>
     <attribute side="server" code="0x001E" define="CHAR_STRING" type="char_string" length="10" writable="true" optional="false">char_string</attribute>
     <attribute side="server" code="0x001F" define="LONG_CHAR_STRING" type="LONG_CHAR_STRING" length="1000" writable="true" optional="false">long_char_string</attribute>
     <attribute side="server" code="0x0020" define="EPOCH_US" type="epoch_us" writable="true" optional="false">epoch_us</attribute>
     <attribute side="server" code="0x0021" define="EPOCH_S" type="epoch_s" writable="true" optional="false">epoch_s</attribute>
     <attribute side="server" code="0x0022" define="TEST_VENDOR_ID" type="vendor_id"
                writable="true" optional="false" default="0">vendor_id</attribute>
-    <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
+    <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="array" entryType="NullablesAndOptionalsStruct"
                writable="true" optional="false">list_nullables_and_optionals_struct</attribute>
     <attribute side="server" code="0x0024" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">enum_attr</attribute>
     <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="false">struct_attr</attribute>
@@ -187,8 +187,8 @@ limitations under the License.
     <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
     <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
-    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="true" optional="false">list_long_octet_string</attribute>
-    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="ARRAY" entryType="TestFabricScoped" length="10" writable="true" optional="false">list_fabric_scoped</attribute>
+    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="array" entryType="long_octet_string" length="1000" writable="true" optional="false">list_long_octet_string</attribute>
+    <attribute side="server" code="0x002B" define="LIST_FABRIC_SCOPED" type="array" entryType="TestFabricScoped" length="10" writable="true" optional="false">list_fabric_scoped</attribute>
     <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
                type="boolean" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
     <!-- Reading/writing the following two attributes will respond with a
@@ -221,8 +221,8 @@ limitations under the License.
     <attribute side="server" code="0x4014" define="NULLABLE_INT64S" type="int64s" writable="true" default="0" isNullable="true" optional="false">nullable_int64s</attribute>
     <attribute side="server" code="0x4015" define="NULLABLE_ENUM8" type="enum8" writable="true" default="0" isNullable="true" optional="false">nullable_enum8</attribute>
     <attribute side="server" code="0x4016" define="NULLABLE_ENUM16" type="enum16" writable="true" default="0" isNullable="true" optional="false">nullable_enum16</attribute>
-    <attribute side="server" code="0x4017" define="NULLABLE_FLOAT_SINGLE" type="SINGLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_single</attribute>
-    <attribute side="server" code="0x4018" define="NULLABLE_FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_double</attribute>
+    <attribute side="server" code="0x4017" define="NULLABLE_FLOAT_SINGLE" type="single" writable="true" default="0" isNullable="true" optional="false">nullable_float_single</attribute>
+    <attribute side="server" code="0x4018" define="NULLABLE_FLOAT_DOUBLE" type="double" writable="true" default="0" isNullable="true" optional="false">nullable_float_double</attribute>
     <attribute side="server" code="0x4019" define="NULLABLE_OCTET_STRING" type="octet_string" length="10" writable="true" isNullable="true" optional="false">nullable_octet_string</attribute>
     <attribute side="server" code="0x401E" define="NULLABLE_CHAR_STRING" type="char_string" length="10" writable="true" isNullable="true" optional="false">nullable_char_string</attribute>
     <attribute side="server" code="0x4024" define="NULLABLE_SIMPLE_ENUM" type="SimpleEnum" writable="true" isNullable="true" optional="false">nullable_enum_attr</attribute>
