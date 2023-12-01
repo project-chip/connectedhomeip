@@ -156,7 +156,7 @@ public:
      */
     virtual CHIP_ERROR FinalizeBuffer(TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) = 0;
 
-    virtual bool IsSafeToReserve() { return false; }
+    virtual bool GetNewBufferWillAlwaysFail() { return false; }
 };
 
 } // namespace TLV

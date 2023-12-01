@@ -101,12 +101,9 @@ CHIP_ERROR TLVWriter::ReserveBuffer(uint32_t aBufferSize)
 {
     VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
 
-    uint32_t spaceLeftInCurrentBuffer        = mReservedSize + mRemainingLen;
-    bool canPossiblyAllocateAdditionalMemory = spaceLeftInCurrentBuffer < mMaxLen;
-
-    if (mBackingStore && canPossiblyAllocateAdditionalMemory)
+    if (mBackingStore)
     {
-        VerifyOrReturnError(mBackingStore->IsSafeToReserve(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mBackingStore->GetNewBufferWillAlwaysFail(), CHIP_ERROR_INCORRECT_STATE);
     }
     mReservedSize += aBufferSize;
     mRemainingLen -= aBufferSize;

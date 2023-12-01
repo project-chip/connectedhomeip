@@ -285,7 +285,7 @@ void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(
         uint32_t lengthRemaining = writer.GetRemainingFreeLength();
         NL_TEST_ASSERT(inSuite, lengthRemaining == 1);
         // Lets try to overflow by getting next buffer in the chain,
-        // unreserving then writting until the end of the current buffer.
+        // unreserving then writing until the end of the current buffer.
         error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 

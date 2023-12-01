@@ -80,14 +80,10 @@ public:
     CHIP_ERROR OnInit(chip::TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
     CHIP_ERROR GetNewBuffer(chip::TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
     CHIP_ERROR FinalizeBuffer(chip::TLV::TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) override;
-    virtual bool IsSafeToReserve() override
+    virtual bool GetNewBufferWillAlwaysFail() override
     {
-        // When using chained buffers there is no guarantee what the size of new buffer will
-        // be when calling GetNewBuffer. This makes it very difficult for a caller to safely
-        // ensure there is always enough space at the end of new buffer for reservation,
-        // when going from one buffer to the next.
-        // For non-chained buffers, caller is given one chunk of conigous memory so it is
-        // possible to reserve with buffer currently in use by caller.
+        // For non-chained buffers, caller is given one chunk of contiguous memory all calls to
+        // GetNewBuffer will fail with CHIP_ERROR_NO_MEMORY.
         return !mUseChainedBuffers;
     }
 
