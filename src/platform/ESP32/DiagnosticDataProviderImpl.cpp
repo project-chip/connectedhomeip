@@ -38,8 +38,15 @@
 #else
 #include "esp_spi_flash.h"
 #endif
+#include <esp_mac.h>
 #include "esp_system.h"
 #include "esp_wifi.h"
+
+#if CONFIG_IEEE802154_ENABLED
+#define MAC_ADDRESS_LEN 8
+#else
+#define MAC_ADDRESS_LEN 6
+#endif
 
 using namespace ::chip;
 using namespace ::chip::TLV;
@@ -222,13 +229,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             ifp->type          = GetInterfaceType(esp_netif_get_desc(ifa));
             ifp->offPremiseServicesReachableIPv4.SetNull();
             ifp->offPremiseServicesReachableIPv6.SetNull();
-            if (esp_netif_get_mac(ifa, ifp->MacAddress) != ESP_OK)
+            if (esp_efuse_mac_get_default(ifp->MacAddress) != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
             }
             else
             {
-                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, MAC_ADDRESS_LEN);
             }
 #if !CONFIG_DISABLE_IPV4
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
