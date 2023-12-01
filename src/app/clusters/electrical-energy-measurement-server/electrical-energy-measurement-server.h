@@ -29,7 +29,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
-namespace Server {
 
 bool NotifyCumulativeEnergyImported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported);
 bool NotifyCumulativeEnergyExported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported);
@@ -40,7 +39,6 @@ bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS,
 bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported);
 bool NotifyEphemeralEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported);
 
-} // namespace Server
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app
