@@ -82,7 +82,7 @@ public:
     CHIP_ERROR FinalizeBuffer(chip::TLV::TLVWriter & writer, uint8_t * bufStart, uint32_t bufLen) override;
     virtual bool GetNewBufferWillAlwaysFail() override
     {
-        // For non-chained buffers, caller is given one chunk of contiguous memory all calls to
+        // For non-chained buffers, caller is given one chunk of contiguous memory. All calls to
         // GetNewBuffer will fail with CHIP_ERROR_NO_MEMORY.
         return !mUseChainedBuffers;
     }
