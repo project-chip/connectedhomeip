@@ -1,4 +1,4 @@
-## List of available clusters
+## List of currently defined clusters
 
 | Code (dec) | Code (hex) | Name                                                    |
 | ---------- | ---------- | ------------------------------------------------------- |
