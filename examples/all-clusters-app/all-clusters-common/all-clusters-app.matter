@@ -3637,7 +3637,9 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
-provisional server cluster ElectricalEnergyMeasurement = 145 {
+provisional cluster ElectricalEnergyMeasurement = 145 {
+  revision 1;
+
   bitmap Feature : bitmap32 {
     kImportedEnergy = 0x1;
     kExportedEnergy = 0x2;
@@ -3681,18 +3683,18 @@ provisional server cluster ElectricalEnergyMeasurement = 145 {
   }
 
   readonly attribute boolean measured = 0;
-  readonly attribute nullable epoch_s cumulativeEnergyImportedTime = 1;
-  readonly attribute nullable int64u cumulativeEnergyImported = 2;
-  readonly attribute nullable epoch_s cumulativeEnergyExportedTime = 3;
-  readonly attribute nullable int64u cumulativeEnergyExported = 4;
-  readonly attribute nullable epoch_s periodicEnergyImportedStartTime = 5;
-  readonly attribute nullable epoch_s periodicEnergyImportedEndTime = 6;
-  readonly attribute nullable int64u periodicEnergyImported = 7;
-  readonly attribute nullable epoch_s periodicEnergyExportedStartTime = 8;
-  readonly attribute nullable epoch_s periodicEnergyExportedEndTime = 9;
-  readonly attribute nullable int64u periodicEnergyExported = 10;
-  readonly attribute nullable int64u ephemeralEnergyImported = 11;
-  readonly attribute nullable int64u ephemeralEnergyExported = 12;
+  readonly attribute optional nullable epoch_s cumulativeEnergyImportedTime = 1;
+  readonly attribute optional nullable int64u cumulativeEnergyImported = 2;
+  readonly attribute optional nullable epoch_s cumulativeEnergyExportedTime = 3;
+  readonly attribute optional nullable int64u cumulativeEnergyExported = 4;
+  readonly attribute optional nullable epoch_s periodicEnergyImportedStartTime = 5;
+  readonly attribute optional nullable epoch_s periodicEnergyImportedEndTime = 6;
+  readonly attribute optional nullable int64u periodicEnergyImported = 7;
+  readonly attribute optional nullable epoch_s periodicEnergyExportedStartTime = 8;
+  readonly attribute optional nullable epoch_s periodicEnergyExportedEndTime = 9;
+  readonly attribute optional nullable int64u periodicEnergyExported = 10;
+  readonly attribute optional nullable int64u ephemeralEnergyImported = 11;
+  readonly attribute optional nullable int64u ephemeralEnergyExported = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

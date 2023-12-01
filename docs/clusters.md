@@ -77,6 +77,7 @@ Generally regenerate using one of:
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
 |        128 |       0x80 | BooleanSensorConfiguration                              |
 |        129 |       0x81 | ValveConfigurationAndControl                            |
+|        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        153 |       0x99 | EnergyEvse                                              |
 |        257 |      0x101 | DoorLock                                                |
