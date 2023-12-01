@@ -208,7 +208,6 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
     ReturnErrorCodeIf(!mFactoryData.spake2p_it.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memset(&iterationCount, 0, 4);
     memcpy(&iterationCount, mFactoryData.spake2p_it.data, mFactoryData.spake2p_it.len);
-    ChipLogProgress(DeviceLayer,"iteration count %ld", iterationCount);
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
@@ -217,7 +216,6 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     ReturnErrorCodeIf(!mFactoryData.spake2p_salt.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(saltBuf.data(), mFactoryData.spake2p_salt.data, mFactoryData.spake2p_salt.len);
     saltBuf.reduce_size(mFactoryData.spake2p_salt.len);
-    ChipLogProgress(DeviceLayer, "spake salt: %s", saltBuf.data());
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
@@ -227,7 +225,6 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     memcpy(verifierBuf.data(), mFactoryData.spake2p_verifier.data, mFactoryData.spake2p_verifier.len);
     verifierLen = mFactoryData.spake2p_verifier.len;
     verifierBuf.reduce_size(verifierLen);
-    ChipLogProgress(DeviceLayer, "spake verifier: %s", verifierBuf.data());
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
@@ -314,8 +311,8 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 {
     ReturnErrorCodeIf(bufSize < mFactoryData.hw_ver_str.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(!mFactoryData.hw_ver_str.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memset(buf, 0, bufSize);
     memcpy(buf, mFactoryData.hw_ver_str.data, mFactoryData.hw_ver_str.len);
-    FactoryDataProvider::GetProductAttestationIntermediateCert(paiSpan);
 
     return CHIP_NO_ERROR;
 }

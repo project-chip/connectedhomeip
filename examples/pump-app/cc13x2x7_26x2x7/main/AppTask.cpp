@@ -238,9 +238,6 @@ int AppTask::Init()
 
 
     ConfigurationMgr().LogDeviceConfig();
-    char buf[32] ={0};
-    mFactoryDataProvider.GetVendorName(buf, 32);
-    mFactoryDataProvider.GetHardwareVersionString(buf, 32);
 
     uint32_t iterationCount;
     mFactoryDataProvider.GetSpake2pIterationCount(iterationCount);
