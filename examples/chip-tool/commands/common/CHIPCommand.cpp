@@ -47,6 +47,8 @@ constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH"
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+// All fabrics shares the same ICD client storage.
+chip::app::DefaultICDClientStorage * sICDClientStorage = nullptr;
 
 namespace {
 
@@ -99,6 +101,12 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
+
+    if (sICDClientStorage == nullptr)
+    {
+        ReturnLogErrorOnFailure(mICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
+        sICDClientStorage = &mICDClientStorage;
+    }
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
@@ -165,6 +173,11 @@ void CHIPCommand::MaybeTearDownStack()
     if (IsInteractive())
     {
         return;
+    }
+
+    if (sICDClientStorage == &mICDClientStorage)
+    {
+        sICDClientStorage = nullptr;
     }
 
     //
@@ -412,6 +425,13 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     return *item->second;
 }
 
+chip::app::DefaultICDClientStorage & CHIPCommand::GetICDClientStorage()
+{
+    // This method should not be called before MaybeSetUpStack or after MaybeShutdownStack
+    VerifyOrDie(sICDClientStorage != nullptr);
+    return *sICDClientStorage;
+}
+
 void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 {
     mCommissioners[key].get()->Shutdown();
@@ -485,6 +505,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         ReturnLogErrorOnFailure(
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
+
+    GetICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex());
 
     mCommissioners[identity] = std::move(commissioner);
 

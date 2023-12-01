@@ -253,6 +253,8 @@ private:
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
 
+    bool mDeviceIsICD;
+    uint32_t mICDCounter;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair
@@ -260,4 +262,5 @@ private:
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
+    void PersistIcdInfo();
 };
