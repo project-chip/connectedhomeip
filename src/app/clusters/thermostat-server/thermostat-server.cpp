@@ -104,7 +104,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
                 StatusIB statusIB(ToInteractionModelStatus(status));
                 return statusIB.ToChipError();
             }
-            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature); // clear bit 1 (LocalTemperature RemoteSensing bit)
+            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
             return aEncoder.Encode(valueRemoteSensing);
         }
         break;
