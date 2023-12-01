@@ -2574,12 +2574,12 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.periodStart];
             value.periodStart = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.periodEnd];
             value.periodEnd = memberValue;
         } while (0);
         do {
@@ -2601,12 +2601,12 @@ static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(Even
 
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodStart];
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.periodStart];
             value.periodStart = memberValue;
         } while (0);
         do {
             NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.periodEnd];
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.periodEnd];
             value.periodEnd = memberValue;
         } while (0);
         do {

@@ -74,14 +74,14 @@ limitations under the License.
     </event>
     <event side="server" code="0x04" name="EphemeralEnergyImported" priority="info" optional="true">
       <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy.</description>
-      <field id="0" name="PeriodStart" type="epoch_s"/>
-      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="0" name="PeriodStart" type="systime_ms"/>
+      <field id="1" name="PeriodEnd" type="systime_ms"/>
       <field id="2" name="EnergyImported" type="int64u"/>
     </event>
     <event side="server" code="0x05" name="EphemeralEnergyExported" priority="info" optional="true">
       <description>This event SHALL be generated when the server reaches the end of a reporting period for exported energy.</description>
-      <field id="0" name="PeriodStart" type="epoch_s"/>
-      <field id="1" name="PeriodEnd" type="epoch_s"/>
+      <field id="0" name="PeriodStart" type="systime_ms"/>
+      <field id="1" name="PeriodEnd" type="systime_ms"/>
       <field id="2" name="EnergyExported" type="int64u"/>
     </event>
 

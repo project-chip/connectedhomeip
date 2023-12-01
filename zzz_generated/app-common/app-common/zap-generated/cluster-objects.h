@@ -20508,8 +20508,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint32_t periodStart    = static_cast<uint32_t>(0);
-    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t periodStart    = static_cast<uint64_t>(0);
+    uint64_t periodEnd      = static_cast<uint64_t>(0);
     uint64_t energyImported = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -20522,8 +20522,8 @@ public:
     static constexpr EventId GetEventId() { return Events::EphemeralEnergyImported::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
 
-    uint32_t periodStart    = static_cast<uint32_t>(0);
-    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t periodStart    = static_cast<uint64_t>(0);
+    uint64_t periodEnd      = static_cast<uint64_t>(0);
     uint64_t energyImported = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -20547,8 +20547,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint32_t periodStart    = static_cast<uint32_t>(0);
-    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t periodStart    = static_cast<uint64_t>(0);
+    uint64_t periodEnd      = static_cast<uint64_t>(0);
     uint64_t energyExported = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -20561,8 +20561,8 @@ public:
     static constexpr EventId GetEventId() { return Events::EphemeralEnergyExported::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
 
-    uint32_t periodStart    = static_cast<uint32_t>(0);
-    uint32_t periodEnd      = static_cast<uint32_t>(0);
+    uint64_t periodStart    = static_cast<uint64_t>(0);
+    uint64_t periodEnd      = static_cast<uint64_t>(0);
     uint64_t energyExported = static_cast<uint64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

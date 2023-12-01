@@ -4140,14 +4140,14 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   }
 
   info event EphemeralEnergyImported = 4 {
-    epoch_s periodStart = 0;
-    epoch_s periodEnd = 1;
+    systime_ms periodStart = 0;
+    systime_ms periodEnd = 1;
     int64u energyImported = 2;
   }
 
   info event EphemeralEnergyExported = 5 {
-    epoch_s periodStart = 0;
-    epoch_s periodEnd = 1;
+    systime_ms periodStart = 0;
+    systime_ms periodEnd = 1;
     int64u energyExported = 2;
   }
 

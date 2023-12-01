@@ -23,8 +23,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent(
-  val periodStart: UInt,
-  val periodEnd: UInt,
+  val periodStart: ULong,
+  val periodEnd: ULong,
   val energyExported: ULong
 ) {
   override fun toString(): String = buildString {
@@ -55,8 +55,8 @@ class ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent(
       tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent {
       tlvReader.enterStructure(tlvTag)
-      val periodStart = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_START))
-      val periodEnd = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
+      val periodStart = tlvReader.getULong(ContextSpecificTag(TAG_PERIOD_START))
+      val periodEnd = tlvReader.getULong(ContextSpecificTag(TAG_PERIOD_END))
       val energyExported = tlvReader.getULong(ContextSpecificTag(TAG_ENERGY_EXPORTED))
 
       tlvReader.exitContainer()
