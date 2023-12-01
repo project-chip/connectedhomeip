@@ -50,7 +50,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def teardown_test(self):
-        await self._cleanup_acl(default_acl=default_acl)
+        await self._cleanup_acl(default_acl=self.default_acl)
 
     async def _setup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct], privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         if privilege is not None:
