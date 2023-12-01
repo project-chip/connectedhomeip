@@ -77,7 +77,7 @@ limitations under the License.
 
   <cluster apiMaturity="provisional">
     <name>Electrical Energy Measurement</name>
-    <domain>Energy</domain>
+    <domain>Measurement &amp; Sensing</domain>
     <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
     <code>0x0091</code>
     <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
