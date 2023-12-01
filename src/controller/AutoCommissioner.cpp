@@ -264,7 +264,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
         // The values must be valid now.
         memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
-        mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
+        mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey));
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
         mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
     }

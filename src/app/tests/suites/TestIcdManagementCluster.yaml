@@ -20,6 +20,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -96,14 +104,20 @@ tests:
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value: [{ CheckInNodeID: 112233, MonitoredSubject: 112233 }]
+          value:
+              [
+                  {
+                      CheckInNodeID: commissionerNodeId,
+                      MonitoredSubject: commissionerNodeId,
+                  },
+              ]
 
     - label: "Unregister Client Registered During Commissioning"
       command: "UnregisterClient"
       arguments:
           values:
               - name: "CheckInNodeID"
-                value: 112233
+                value: commissionerNodeId
 
     - label: "Register 1.0 (key too short)"
       command: "RegisterClient"
