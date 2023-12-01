@@ -153,7 +153,7 @@ tests:
               - name: "TargetTemperature"
                 value: Step_10_setTemp
       response:
-          error: INVALID_IN_MODE
+          error: INVALID_IN_STATE
 
     - label: "Wait for 5s"
       cluster: "DelayCommands"
