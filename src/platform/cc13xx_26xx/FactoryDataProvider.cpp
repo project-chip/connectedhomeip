@@ -314,25 +314,7 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 {
     ReturnErrorCodeIf(bufSize < mFactoryData.hw_ver_str.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(!mFactoryData.hw_ver_str.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memset(buf, 0, bufSize);
     memcpy(buf, mFactoryData.hw_ver_str.data, mFactoryData.hw_ver_str.len);
-    ChipLogProgress(DeviceLayer, "hw_version_string: %s", buf);
-    
-    uint8_t buffer[32] = {0};
-    MutableByteSpan bufSpan(buffer);
-    FactoryDataProvider::GetRotatingDeviceIdUniqueId(bufSpan);
-    
-    uint8_t saltBuffer[16] = {0};
-    MutableByteSpan saltBufSpan(saltBuffer);
-    FactoryDataProvider::GetSpake2pSalt(saltBufSpan);
-    
-    uint8_t verifier[97] = {0};
-    size_t verifierLen;
-    MutableByteSpan verifierSpan(verifier);
-    FactoryDataProvider::GetSpake2pVerifier(verifierSpan, verifierLen);
-
-    uint8_t pai[480] = {0};
-    MutableByteSpan paiSpan(pai);
     FactoryDataProvider::GetProductAttestationIntermediateCert(paiSpan);
 
     return CHIP_NO_ERROR;
@@ -346,8 +328,6 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
     ReturnErrorCodeIf(!mFactoryData.rd_uniqueid.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     memcpy(uniqueIdSpan.data(), mFactoryData.rd_uniqueid.data, mFactoryData.rd_uniqueid.len);
     uniqueIdSpan.reduce_size(mFactoryData.rd_uniqueid.len);
-
-    ChipLogProgress(DeviceLayer, "rd_uid: %s", uniqueIdSpan.data());
 
     return CHIP_NO_ERROR;
 }

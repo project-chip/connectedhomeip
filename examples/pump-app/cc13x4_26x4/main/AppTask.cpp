@@ -236,9 +236,6 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     ConfigurationMgr().LogDeviceConfig();
-    char buf[32] ={0};
-    mFactoryDataProvider.GetVendorName(buf, 32);
-    mFactoryDataProvider.GetHardwareVersionString(buf, 32);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
