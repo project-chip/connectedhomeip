@@ -79,7 +79,7 @@ switch (systemMode)
         mThermMode = 2;
         break; // unknown value;
     }
-    
+
     GetAppTask().UpdateThermoStatUI();
 
     return CHIP_NO_ERROR;

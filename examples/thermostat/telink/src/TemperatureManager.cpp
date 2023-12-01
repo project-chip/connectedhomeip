@@ -49,7 +49,7 @@ CHIP_ERROR TemperatureManager::Init()
     mCurrentTempCelsius     = ConvertToPrintableTemp(temp.Value());
     mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
-    
+
     switch (systemMode)
     {
     case SystemModeEnum::kOff:
