@@ -67,6 +67,12 @@ Davis, CA 95616, USA
     <feature bit="1" code="LI" name="LineupInfo" summary="Provides lineup info, which is a reference to an external source of lineup information.">
       <optionalConform/>
     </feature>
+    <feature bit="2" code="EG" name="ElectronicGuide" summary="Provides electronic program guide information.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="RP" name="RecordProgram" summary="Provides ability to record program.">
+      <optionalConform/>
+    </feature>
   </features>
   <dataTypes>
     <enum name="LineupInfoTypeEnum">
@@ -85,6 +91,161 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
     </enum>
+    <enum name="ChannelTypeEnum">
+      <item value="0" name="Satellite" summary="The channel is sourced from a satellite provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Cable" summary="The channel is sourced from a satellite provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Terrestrial" summary="The channel is sourced from a terrestrial provider.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="OTT" summary="The channel is sourced from an OTT provider.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="RecordingFlagBitmap">
+      <bitfield name="Scheduled" bit="0" summary="The program is scheduled for recording.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="RecordSeries" bit="1" summary="The program series is scheduled for recording.">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Recorded" bit="2" summary="The program is recorded and available to be played.">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="ProgramStruct">
+      <field id="0" name="Identifier" type="string">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Channel" type="ChannelInfoStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="StartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="EndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="Title" type="string" default="empty">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="5" name="Subtitle" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="6" name="Description" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+      <field id="7" name="AudioLanguages" type="list" default="empty">
+        <entry type="string">
+          <constraint type="maxLength" value="50"/>
+        </entry>
+        <optionalConform/>
+        <constraint type="maxLength" value="10"/>
+      </field>
+      <field id="8" name="Ratings" type="list" default="empty">
+        <entry type="string"/>
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="9" name="ThumbnailUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+      <field id="10" name="PosterArtUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+      <field id="11" name="DvbiUrl" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+      <field id="12" name="ReleaseDate" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="30"/>
+      </field>
+      <field id="13" name="ParentalGuidanceText" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="14" name="RecordingFlag" type="RecordingFlagBitmap">
+        <mandatoryConform>
+          <feature name="RP"/>
+        </mandatoryConform>
+      </field>
+      <field id="15" name="SeriesInfo" type="SeriesInfoStruct" default="null">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="16" name="CategoryList" type="list[ProgramCategoryStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="16" name="CastList" type="list[ProgramCastStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="16" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+    </struct>
+    <struct name="SeriesInfoStruct">
+      <field id="0" name="Season" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+      <field id="1" name="Episode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+    </struct>
+    <struct name="ProgramCategoryStruct">
+      <field id="0" name="Category" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+      <field id="1" name="SubCategory" type="string" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+    </struct>
+    <struct name="ProgramCastStruct">
+      <field id="0" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+      <field id="1" name="Role" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="256"/>
+      </field>
+    </struct>
+    <struct name="PageTokenStruct">
+      <field id="0" name="Limit" type="uint16" default="0">
+        <optionalConform/>
+      </field>
+      <field id="1" name="After" type="string">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+      <field id="2" name="Before" type="string">
+        <optionalConform/>
+        <constraint type="maxLength" value="8192"/>
+      </field>
+    </struct>
+    <struct name="ChannelPagingStruct">
+      <field id="0" name="PreviousToken" type="PageTokenStruct" default="null">
+        <optionalConform/>
+      </field>
+      <field id="1" name="NextToken" type="PageTokenStruct" default="null">
+        <optionalConform/>
+      </field>
+    </struct>
     <struct name="ChannelInfoStruct">
       <field id="0" name="MajorNumber" type="uint16">
         <mandatoryConform/>
@@ -99,6 +260,12 @@ Davis, CA 95616, USA
         <optionalConform/>
       </field>
       <field id="4" name="AffiliateCallSign" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="5" name="Identifier" type="string" default="empty">
+        <optionalConform/>
+      </field>
+      <field id="6" name="Type" type="ChannelTypeEnum" default="empty">
         <optionalConform/>
       </field>
     </struct>
@@ -188,6 +355,95 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="Count" type="int16">
         <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="GetProgramGuide" response="ProgramGuideResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
+      <field id="0" name="StartTime" type="epoch-s" default="null">
+        <optionalConform/>
+      </field>
+      <field id="1" name="EndTime" type="epoch-s" default="null">
+        <optionalConform/>
+      </field>
+      <field id="2" name="ChannelList" type="list[ChannelInfoStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="3" name="PageToken" type="PageTokenStruct" default="null">
+        <optionalConform/>
+      </field>
+      <field id="4" name="RecordingFlag" type="RecordingFlagBitmap" default="null">
+        <optionalConform/>
+      </field>
+      <field id="5" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="6" name="Data" type="octets" default="MS">
+        <optionalConform/>
+        <constraint type="maxLength" value="8092"/>
+      </field>
+    </command>
+    <command id="0x05" name="ProgramGuideResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="EG"/>
+      </mandatoryConform>
+      <field id="0" name="Paging" type="epoch-s" default="null">
+        <mandatoryConform/>
+      </field>
+      <field id="1" type="list[ProgramStruct Type]" default="empty">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="RecordProgram" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="ProgramIdentifier" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="1" name="ShouldRecordSeries" type="boolean">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="3" name="Data" type="octets" default="MS">
+        <optionalConform/>
+        <constraint type="maxLength" value="8092"/>
+      </field>
+    </command>
+    <command id="0x07" name="CancelRecordProgram" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="RP"/>
+          <feature name="EG"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="ProgramIdentifier" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="1" name="ShouldRecordSeries" type="boolean">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ExternalIDList" type="list[AdditionalInfoStruct Type]" default="empty">
+        <optionalConform/>
+        <constraint type="maxLength" value="255"/>
+      </field>
+      <field id="3" name="Data" type="octets" default="MS">
+        <optionalConform/>
+        <constraint type="maxLength" value="8092"/>
       </field>
     </command>
   </commands>

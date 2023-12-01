@@ -45,10 +45,10 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
-    <attribute side="server" code="0x0000" define="DEVICE_LIST" type="ARRAY" entryType="DeviceTypeStruct" writable="false" optional="false">DeviceTypeList</attribute>
-    <attribute side="server" code="0x0001" define="SERVER_LIST" type="ARRAY" entryType="cluster_id" writable="false" optional="false">ServerList</attribute>
-    <attribute side="server" code="0x0002" define="CLIENT_LIST" type="ARRAY" entryType="cluster_id" writable="false" optional="false">ClientList</attribute>
-    <attribute side="server" code="0x0003" define="PARTS_LIST" type="ARRAY" entryType="endpoint_no" writable="false" optional="false">PartsList</attribute>
-    <attribute side="server" code="0x0004" define="TAG_LIST" type="ARRAY" entryType="SemanticTagStruct" writable="false" optional="true" length="6">TagList</attribute>
+    <attribute side="server" code="0x0000" define="DEVICE_LIST" type="array" entryType="DeviceTypeStruct" writable="false" optional="false">DeviceTypeList</attribute>
+    <attribute side="server" code="0x0001" define="SERVER_LIST" type="array" entryType="cluster_id" writable="false" optional="false">ServerList</attribute>
+    <attribute side="server" code="0x0002" define="CLIENT_LIST" type="array" entryType="cluster_id" writable="false" optional="false">ClientList</attribute>
+    <attribute side="server" code="0x0003" define="PARTS_LIST" type="array" entryType="endpoint_no" writable="false" optional="false">PartsList</attribute>
+    <attribute side="server" code="0x0004" define="TAG_LIST" type="array" entryType="SemanticTagStruct" writable="false" optional="true" length="6">TagList</attribute>
   </cluster>
 </configurator>

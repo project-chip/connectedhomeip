@@ -362,7 +362,7 @@ limitations under the License.
             <access op="invoke" role="administer" />
             <arg name="OperationType" type="DataOperationTypeEnum" />
             <arg name="Credential" type="CredentialStruct" />
-            <arg name="CredentialData" type="LONG_OCTET_STRING" />
+            <arg name="CredentialData" type="long_octet_string" />
             <arg name="UserIndex" type="int16u" isNullable="true" />
             <arg name="UserStatus" type="UserStatusEnum" isNullable="true" />
             <arg name="UserType" type="UserTypeEnum" isNullable="true" />

@@ -2078,7 +2078,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2178,7 +2178,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2227,7 +2227,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2252,7 +2252,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 

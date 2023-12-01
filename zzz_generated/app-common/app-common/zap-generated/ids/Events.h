@@ -547,6 +547,46 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
+namespace TargetNavigator {
+namespace Events {
+
+namespace TargetUpdated {
+static constexpr EventId Id = 0x00000000;
+} // namespace TargetUpdated
+
+} // namespace Events
+} // namespace TargetNavigator
+
+namespace MediaPlayback {
+namespace Events {
+
+namespace StateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace StateChanged
+
+} // namespace Events
+} // namespace MediaPlayback
+
+namespace AccountLogin {
+namespace Events {
+
+namespace LoggedOut {
+static constexpr EventId Id = 0x00000000;
+} // namespace LoggedOut
+
+} // namespace Events
+} // namespace AccountLogin
+
+namespace ContentControl {
+namespace Events {
+
+namespace RemainingScreenTimeExpired {
+static constexpr EventId Id = 0x00000000;
+} // namespace RemainingScreenTimeExpired
+
+} // namespace Events
+} // namespace ContentControl
+
 namespace UnitTesting {
 namespace Events {
 
