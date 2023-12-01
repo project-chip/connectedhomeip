@@ -17,10 +17,18 @@ namespace Server {
 bool NotifyCumulativeEnergyImported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported);
 bool NotifyCumulativeEnergyExported(chip::EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported);
 
-bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported);
-bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported);
+bool NotifyPeriodicEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS,
+                                  uint64_t aEnergyImported);
+bool NotifyPeriodicEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS,
+                                  uint64_t aEnergyExported);
 
-bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported);
-bool NotifyEphemeralEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported);
+bool NotifyEphemeralEnergyImported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS,
+                                   uint64_t aEnergyImported);
+bool NotifyEphemeralEnergyExported(chip::EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS,
+                                   uint64_t aEnergyExported);
 
-}}}}}
+} // namespace Server
+} // namespace ElectricalEnergyMeasurement
+} // namespace Clusters
+} // namespace app
+} // namespace chip

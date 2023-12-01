@@ -20,12 +20,12 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Events.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
-#include <app/EventLogging.h>
+#include <app-common/zap-generated/ids/Events.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 
 #include <app/util/af.h>
 #include <app/util/common.h>
@@ -35,14 +35,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
-using namespace chip::app; 
+using namespace chip::app;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using chip::Protocols::InteractionModel::Status;
 
-void MatterElectricalEnergyMeasurementPluginServerInitCallback() 
-{
-
-}
+void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 
 namespace chip {
 namespace app {
@@ -54,17 +51,20 @@ bool NotifyCumulativeEnergyImported(EndpointId endpointId, uint32_t aImportedTim
 {
     Events::CumulativeEnergyImported::Type event;
     event.importedTimestamp = aImportedTimeStampS;
-    event.energyImported = aEnergyImported;
+    event.energyImported    = aEnergyImported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyCumulativeEnergyImported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyCumulativeEnergyImported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",importedTimestamp=%u,energyImported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyCumulativeEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",importedTimestamp=%u,energyImported=%" PRIu64 "]",
                     endpointId, eventNumber, aImportedTimeStampS, aEnergyImported);
     return true;
 }
@@ -73,17 +73,20 @@ bool NotifyCumulativeEnergyExported(EndpointId endpointId, uint32_t aImportedTim
 {
     Events::CumulativeEnergyExported::Type event;
     event.importedTimestamp = aImportedTimeStampS;
-    event.energyExported = aEnergyExported;
+    event.energyExported    = aEnergyExported;
 
     EventNumber eventNumber;
     CHIP_ERROR error = app::LogEvent(event, endpointId, eventNumber);
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyCumulativeEnergyExported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyCumulativeEnergyExported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",importedTimestamp=%u,energyExported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyCumulativeEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",importedTimestamp=%u,energyExported=%" PRIu64 "]",
                     endpointId, eventNumber, aImportedTimeStampS, aEnergyExported);
     return true;
 }
@@ -91,8 +94,8 @@ bool NotifyCumulativeEnergyExported(EndpointId endpointId, uint32_t aImportedTim
 bool NotifyPeriodicEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
     Events::PeriodicEnergyImported::Type event;
-    event.periodStart = aPeriodStartS;
-    event.periodEnd = aPeriodEndS;
+    event.periodStart    = aPeriodStartS;
+    event.periodEnd      = aPeriodEndS;
     event.energyImported = aEnergyImported;
 
     EventNumber eventNumber;
@@ -100,10 +103,13 @@ bool NotifyPeriodicEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS,
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyPeriodicEnergyImported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyPeriodicEnergyImported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",periodStart=%u,periodEnd=%u,energyImported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyPeriodicEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",periodStart=%u,periodEnd=%u,energyImported=%" PRIu64 "]",
                     endpointId, eventNumber, aPeriodStartS, aPeriodEndS, aEnergyImported);
     return true;
 }
@@ -111,8 +117,8 @@ bool NotifyPeriodicEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS,
 bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
     Events::PeriodicEnergyExported::Type event;
-    event.periodStart = aPeriodStartS;
-    event.periodEnd = aPeriodEndS;
+    event.periodStart    = aPeriodStartS;
+    event.periodEnd      = aPeriodEndS;
     event.energyExported = aEnergyExported;
 
     EventNumber eventNumber;
@@ -120,10 +126,13 @@ bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS,
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyPeriodicEnergyExported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyPeriodicEnergyExported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",periodStart=%u,periodEnd=%u,energyExported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyPeriodicEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",periodStart=%u,periodEnd=%u,energyExported=%" PRIu64 "]",
                     endpointId, eventNumber, aPeriodStartS, aPeriodEndS, aEnergyExported);
     return true;
 }
@@ -131,8 +140,8 @@ bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS,
 bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported)
 {
     Events::EphemeralEnergyImported::Type event;
-    event.periodStart = aPeriodStartS;
-    event.periodEnd = aPeriodEndS;
+    event.periodStart    = aPeriodStartS;
+    event.periodEnd      = aPeriodEndS;
     event.energyImported = aEnergyImported;
 
     EventNumber eventNumber;
@@ -140,10 +149,13 @@ bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyEphemeralEnergyImported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyEphemeralEnergyImported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyEphemeralEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",periodStart=%u,periodEnd=%u,energyImported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyEphemeralEnergyImported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",periodStart=%u,periodEnd=%u,energyImported=%" PRIu64 "]",
                     endpointId, eventNumber, aPeriodStartS, aPeriodEndS, aEnergyImported);
     return true;
 }
@@ -151,8 +163,8 @@ bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS
 bool NotifyEphemeralEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported)
 {
     Events::EphemeralEnergyExported::Type event;
-    event.periodStart = aPeriodStartS;
-    event.periodEnd = aPeriodEndS;
+    event.periodStart    = aPeriodStartS;
+    event.periodEnd      = aPeriodEndS;
     event.energyExported = aEnergyExported;
 
     EventNumber eventNumber;
@@ -160,12 +172,19 @@ bool NotifyEphemeralEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS
 
     if (CHIP_NO_ERROR != error)
     {
-        ChipLogError(Zcl, "[NotifyEphemeralEnergyExported] Unable to send event: %s [endpointId=%d]", error.AsString(), endpointId);
+        ChipLogError(Zcl, "[NotifyEphemeralEnergyExported] Unable to send event: %" CHIP_ERROR_FORMAT " [endpointId=%d]",
+                     error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyEphemeralEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64 ",periodStart=%u,periodEnd=%u,energyExported=%" PRIu64 "]",
+    ChipLogProgress(Zcl,
+                    "[NotifyEphemeralEnergyExported] Sent event [endpointId=%d,eventNumber=%" PRIu64
+                    ",periodStart=%u,periodEnd=%u,energyExported=%" PRIu64 "]",
                     endpointId, eventNumber, aPeriodStartS, aPeriodEndS, aEnergyExported);
     return true;
 }
 
-}}}}}
+} // namespace Server
+} // namespace ElectricalEnergyMeasurement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
