@@ -140,7 +140,8 @@ template <typename E>
 Optional<E> SafeCast(uint8_t value)
 {
     E val = static_cast<E>(value);
-    if (EnsureKnownEnumValue(val) == E::kUnknownEnumValue) {
+    if (EnsureKnownEnumValue(val) == E::kUnknownEnumValue)
+    {
         return NullOptional;
     }
     return chip::MakeOptional(val);
