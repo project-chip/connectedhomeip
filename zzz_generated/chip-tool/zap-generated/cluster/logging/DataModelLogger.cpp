@@ -17528,22 +17528,22 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         switch (header.mPath.mEventId)
         {
         case DeviceEnergyManagement::Events::PowerAdjustStart::Id: {
-            DeviceEnergyManagement::Events::PowerAdjustStart::DecodableType value;
+            chip::app::Clusters::DeviceEnergyManagement::Events::PowerAdjustStart::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerAdjustStart", 1, value);
         }
         case DeviceEnergyManagement::Events::PowerAdjustEnd::Id: {
-            DeviceEnergyManagement::Events::PowerAdjustEnd::DecodableType value;
+            chip::app::Clusters::DeviceEnergyManagement::Events::PowerAdjustEnd::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerAdjustEnd", 1, value);
         }
         case DeviceEnergyManagement::Events::Paused::Id: {
-            DeviceEnergyManagement::Events::Paused::DecodableType value;
+            chip::app::Clusters::DeviceEnergyManagement::Events::Paused::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Paused", 1, value);
         }
         case DeviceEnergyManagement::Events::Resumed::Id: {
-            DeviceEnergyManagement::Events::Resumed::DecodableType value;
+            chip::app::Clusters::DeviceEnergyManagement::Events::Resumed::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Resumed", 1, value);
         }
