@@ -167,6 +167,7 @@ public:
             return true;
         default:
             return false;
+        }
     }
 
     void DoAction(int i) override
