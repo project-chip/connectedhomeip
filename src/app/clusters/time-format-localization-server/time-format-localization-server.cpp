@@ -135,7 +135,7 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     return false;
 }
 
-chip::Optional<HourFormatEnum> SafeCastToKnowHourFormat(uint8_t value)
+Optional<HourFormatEnum> SafeCastToKnowHourFormat(uint8_t value)
 {
     switch (value)
     {
@@ -144,11 +144,10 @@ chip::Optional<HourFormatEnum> SafeCastToKnowHourFormat(uint8_t value)
     case to_underlying(HourFormatEnum::kUseActiveLocale):
         return chip::MakeOptional(static_cast<HourFormatEnum>(value));
     default:
-        return chip::Optional<HourFormatEnum>::Missing();
+        return NullOptional;
     }
 }
-
-chip::Optional<CalendarTypeEnum> SafeCastToKnowCalendarType(uint8_t value)
+Optional<CalendarTypeEnum> SafeCastToKnowCalendarType(uint8_t value)
 {
     switch (value)
     {
@@ -167,7 +166,7 @@ chip::Optional<CalendarTypeEnum> SafeCastToKnowCalendarType(uint8_t value)
     case to_underlying(CalendarTypeEnum::kUseActiveLocale):
         return chip::MakeOptional(static_cast<CalendarTypeEnum>(value));
     default:
-        return chip::Optional<CalendarTypeEnum>::Missing();
+        return NullOptional;
     }
 }
 
