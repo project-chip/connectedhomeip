@@ -17,4 +17,4 @@ You can now build MCUBoot and have an image that can be merged with a MCUBoot-co
 
 ## Creating image for OTA
 
-The MCUBoot-compatible Matter application will be named `{project_name}_header.bin`. This can be merged with the MCUBoot hex file using the `oad_merge_tool.py` script in `{Matter repo root}/third_party/ti_simplelink_sdk`. Follow the instructions at the top of the script to generate the final hex image. 
+The MCUBoot-compatible Matter application will be named `{project_name}_header.hex`. This can be merged with the MCUBoot hex file using the `oad_merge_tool.py` script in `{Matter repo root}/third_party/ti_simplelink_sdk`. Follow the instructions at the top of the script to generate the final hex image. 
