@@ -111,7 +111,7 @@ static BOOL AttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
     case Attributes::SceneTableSize::Id: {
         return YES;
     }
-    case Attributes::RemainingCapacity::Id: {
+    case Attributes::FabricSceneInfo::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -577,6 +577,12 @@ static BOOL AttributeIsSpecifiedInBasicInformationCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ProductAppearance::Id: {
+        return YES;
+    }
+    case Attributes::SpecificationVersion::Id: {
+        return YES;
+    }
+    case Attributes::MaxPathsPerInvoke::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -1916,6 +1922,159 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInTimerCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Timer;
+    switch (aAttributeId) {
+    case Attributes::SetTime::Id: {
+        return YES;
+    }
+    case Attributes::TimeRemaining::Id: {
+        return YES;
+    }
+    case Attributes::TimerState::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInOvenCavityOperationalStateCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenCavityOperationalState;
+    switch (aAttributeId) {
+    case Attributes::PhaseList::Id: {
+        return YES;
+    }
+    case Attributes::CurrentPhase::Id: {
+        return YES;
+    }
+    case Attributes::CountdownTime::Id: {
+        return YES;
+    }
+    case Attributes::OperationalStateList::Id: {
+        return YES;
+    }
+    case Attributes::OperationalState::Id: {
+        return YES;
+    }
+    case Attributes::OperationalError::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInOvenModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::OvenMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInLaundryDryerControlsCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::LaundryDryerControls;
+    switch (aAttributeId) {
+    case Attributes::SupportedDrynessLevels::Id: {
+        return YES;
+    }
+    case Attributes::SelectedDrynessLevel::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInModeSelectCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ModeSelect;
@@ -2660,6 +2819,102 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
+static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::BooleanSensorConfiguration;
+    switch (aAttributeId) {
+    case Attributes::SensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsActive::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSuppressed::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ValveConfigurationAndControl;
+    switch (aAttributeId) {
+    case Attributes::OpenDuration::Id: {
+        return YES;
+    }
+    case Attributes::AutoCloseTime::Id: {
+        return YES;
+    }
+    case Attributes::RemainingDuration::Id: {
+        return YES;
+    }
+    case Attributes::CurrentState::Id: {
+        return YES;
+    }
+    case Attributes::TargetState::Id: {
+        return YES;
+    }
+    case Attributes::StartUpState::Id: {
+        return YES;
+    }
+    case Attributes::CurrentLevel::Id: {
+        return YES;
+    }
+    case Attributes::TargetLevel::Id: {
+        return YES;
+    }
+    case Attributes::OpenLevel::Id: {
+        return YES;
+    }
+    case Attributes::ValveFault::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
@@ -2701,6 +2956,159 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
         return YES;
     }
     case Attributes::EphemeralEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DemandResponseLoadControl;
+    switch (aAttributeId) {
+    case Attributes::LoadControlPrograms::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfLoadControlPrograms::Id: {
+        return YES;
+    }
+    case Attributes::Events::Id: {
+        return YES;
+    }
+    case Attributes::ActiveEvents::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfEventsPerProgram::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfTransitions::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomStart::Id: {
+        return YES;
+    }
+    case Attributes::DefaultRandomDuration::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvse;
+    switch (aAttributeId) {
+    case Attributes::State::Id: {
+        return YES;
+    }
+    case Attributes::SupplyState::Id: {
+        return YES;
+    }
+    case Attributes::FaultState::Id: {
+        return YES;
+    }
+    case Attributes::ChargingEnabledUntil::Id: {
+        return YES;
+    }
+    case Attributes::DischargingEnabledUntil::Id: {
+        return YES;
+    }
+    case Attributes::CircuitCapacity::Id: {
+        return YES;
+    }
+    case Attributes::MinimumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::MaximumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::MaximumDischargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::UserMaximumChargeCurrent::Id: {
+        return YES;
+    }
+    case Attributes::RandomizationDelayWindow::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfWeeklyTargets::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfDailyTargets::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeStartTime::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeTargetTime::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeRequiredEnergy::Id: {
+        return YES;
+    }
+    case Attributes::NextChargeTargetSoC::Id: {
+        return YES;
+    }
+    case Attributes::ApproximateEVEfficiency::Id: {
+        return YES;
+    }
+    case Attributes::StateOfCharge::Id: {
+        return YES;
+    }
+    case Attributes::BatteryCapacity::Id: {
+        return YES;
+    }
+    case Attributes::VehicleID::Id: {
+        return YES;
+    }
+    case Attributes::SessionID::Id: {
+        return YES;
+    }
+    case Attributes::SessionDuration::Id: {
+        return YES;
+    }
+    case Attributes::SessionEnergyCharged::Id: {
+        return YES;
+    }
+    case Attributes::SessionEnergyDischarged::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -4635,6 +5043,18 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::SeekRangeStart::Id: {
         return YES;
     }
+    case Attributes::ActiveAudioTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableAudioTracks::Id: {
+        return YES;
+    }
+    case Attributes::ActiveTextTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableTextTracks::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4898,6 +5318,84 @@ static BOOL AttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttribute
 static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentControl;
+    switch (aAttributeId) {
+    case Attributes::Enabled::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatings::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatings::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScreenDailyTime::Id: {
+        return YES;
+    }
+    case Attributes::RemainingScreenTime::Id: {
+        return YES;
+    }
+    case Attributes::BlockUnrated::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
     case Attributes::GeneratedCommandList::Id: {
         return YES;
@@ -5754,6 +6252,18 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::IcdManagement::Id: {
         return AttributeIsSpecifiedInICDManagementCluster(aAttributeId);
     }
+    case Clusters::Timer::Id: {
+        return AttributeIsSpecifiedInTimerCluster(aAttributeId);
+    }
+    case Clusters::OvenCavityOperationalState::Id: {
+        return AttributeIsSpecifiedInOvenCavityOperationalStateCluster(aAttributeId);
+    }
+    case Clusters::OvenMode::Id: {
+        return AttributeIsSpecifiedInOvenModeCluster(aAttributeId);
+    }
+    case Clusters::LaundryDryerControls::Id: {
+        return AttributeIsSpecifiedInLaundryDryerControlsCluster(aAttributeId);
+    }
     case Clusters::ModeSelect::Id: {
         return AttributeIsSpecifiedInModeSelectCluster(aAttributeId);
     }
@@ -5808,8 +6318,20 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
+    case Clusters::BooleanSensorConfiguration::Id: {
+        return AttributeIsSpecifiedInBooleanSensorConfigurationCluster(aAttributeId);
+    }
+    case Clusters::ValveConfigurationAndControl::Id: {
+        return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
+    }
     case Clusters::ElectricalEnergyMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
+    }
+    case Clusters::DemandResponseLoadControl::Id: {
+        return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    }
+    case Clusters::EnergyEvse::Id: {
+        return AttributeIsSpecifiedInEnergyEVSECluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);
@@ -5921,6 +6443,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AccountLogin::Id: {
         return AttributeIsSpecifiedInAccountLoginCluster(aAttributeId);
+    }
+    case Clusters::ContentControl::Id: {
+        return AttributeIsSpecifiedInContentControlCluster(aAttributeId);
+    }
+    case Clusters::ContentAppObserver::Id: {
+        return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);

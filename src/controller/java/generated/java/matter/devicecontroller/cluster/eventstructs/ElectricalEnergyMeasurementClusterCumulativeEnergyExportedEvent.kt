@@ -17,19 +17,16 @@
 package matter.devicecontroller.cluster.eventstructs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent (
-    val importedTimestamp: UInt,
-    val energyExported: ULong) {
-  override fun toString(): String  = buildString {
+class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent(
+  val importedTimestamp: UInt,
+  val energyExported: ULong
+) {
+  override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent {\n")
     append("\timportedTimestamp : $importedTimestamp\n")
     append("\tenergyExported : $energyExported\n")
@@ -49,14 +46,20 @@ class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent (
     private const val TAG_IMPORTED_TIMESTAMP = 0
     private const val TAG_ENERGY_EXPORTED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent {
       tlvReader.enterStructure(tlvTag)
       val importedTimestamp = tlvReader.getUInt(ContextSpecificTag(TAG_IMPORTED_TIMESTAMP))
       val energyExported = tlvReader.getULong(ContextSpecificTag(TAG_ENERGY_EXPORTED))
-      
+
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent(importedTimestamp, energyExported)
+      return ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent(
+        importedTimestamp,
+        energyExported
+      )
     }
   }
 }

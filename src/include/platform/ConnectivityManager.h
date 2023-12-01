@@ -25,9 +25,9 @@
 #include <memory>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/icd/ICDConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 

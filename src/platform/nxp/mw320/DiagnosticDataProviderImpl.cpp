@@ -21,7 +21,6 @@
  *          for k32w0 platform.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>

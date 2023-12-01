@@ -20,57 +20,42 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class AccessControlCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class AclAttribute(
-    val value: List<AccessControlClusterAccessControlEntryStruct>
-  )
+class AccessControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class AclAttribute(val value: List<AccessControlClusterAccessControlEntryStruct>)
 
-  class ExtensionAttribute(
-    val value: List<AccessControlClusterAccessControlExtensionStruct>?
-  )
+  class ExtensionAttribute(val value: List<AccessControlClusterAccessControlExtensionStruct>?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readAclAttribute(): AclAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun readAclAttributeWithFabricFilter(
-    isFabricFiltered: Boolean
-  ): AclAttribute {
+  suspend fun readAclAttributeWithFabricFilter(isFabricFiltered: Boolean): AclAttribute {
     // Implementation needs to be added here
   }
 
-
   suspend fun writeAclAttribute(
     value: List<AccessControlClusterAccessControlEntryStruct>,
-    timedWriteTimeoutMs: Int? = null    
+    timedWriteTimeoutMs: Int? = null
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeAclAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AclAttribute {
+  suspend fun subscribeAclAttribute(minInterval: Int, maxInterval: Int): AclAttribute {
     // Implementation needs to be added here
   }
 
@@ -84,22 +69,18 @@ class AccessControlCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-
   suspend fun writeExtensionAttribute(
     value: List<AccessControlClusterAccessControlExtensionStruct>,
-    timedWriteTimeoutMs: Int? = null    
+    timedWriteTimeoutMs: Int? = null
   ) {
     if (timedWriteTimeoutMs != null) {
       // Do the action with timedWriteTimeoutMs
     } else {
       // Do the action without timedWriteTimeoutMs
-    }    
+    }
   }
 
-  suspend fun subscribeExtensionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): ExtensionAttribute {
+  suspend fun subscribeExtensionAttribute(minInterval: Int, maxInterval: Int): ExtensionAttribute {
     // Implementation needs to be added here
   }
 
@@ -162,10 +143,7 @@ class AccessControlCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -184,10 +162,7 @@ class AccessControlCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -195,10 +170,7 @@ class AccessControlCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -53,6 +53,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     chip_use_transitional_commissionable_data_provider =
         chip_device_platform != "linux" && chip_device_platform != "android"
 
+    # Enable default/generic test-mode DeviceInstanceInfoProvider in GenericConfigurationManagerImpl
+    # === FOR TRANSITION UNTIL ALL EXAMPLES PROVIDE THEIR OWN ===
+    chip_use_transitional_device_instance_info_provider = true
+
     # lock tracking: none/log/fatal or auto for a platform-dependent choice
     chip_stack_lock_tracking = "auto"
 
@@ -111,11 +115,14 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
+      "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
       "CHIP_DEVICE_CONFIG_RUN_AS_ROOT=${chip_device_config_run_as_root}",
       "CHIP_DISABLE_PLATFORM_KVS=${chip_disable_platform_kvs}",
+      "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=${chip_use_transitional_commissionable_data_provider}",
+      "CHIP_USE_TRANSITIONAL_DEVICE_INSTANCE_INFO_PROVIDER=${chip_use_transitional_device_instance_info_provider}",
     ]
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
@@ -149,12 +156,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
-    }
-
-    if (chip_use_transitional_commissionable_data_provider) {
-      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1" ]
-    } else {
-      defines += [ "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=0" ]
     }
 
     if (chip_device_platform == "cc13x2_26x2") {
@@ -371,6 +372,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     }
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
+
+    visibility = [
+      ":platform_config_header",
+      "${chip_root}/src/ble:ble_config_header",
+      "${chip_root}/src/system:system_config_header",
+    ]
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {
@@ -392,10 +399,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
   }
 }
 
+source_set("platform_config_header") {
+  sources = [ "../include/platform/CHIPDeviceConfig.h" ]
+
+  deps = [ ":platform_buildconfig" ]
+}
+
 if (chip_device_platform != "none") {
-  group("platform_base") {
+  source_set("platform_base") {
     public_deps = [
-      ":platform_buildconfig",
+      ":platform_config_header",
       "${chip_root}/src/ble",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib/core",
@@ -412,7 +425,6 @@ if (chip_device_platform != "none") {
 
     sources = [
       "../include/platform/BuildTime.h",
-      "../include/platform/CHIPDeviceConfig.h",
       "../include/platform/CHIPDeviceError.h",
       "../include/platform/CHIPDeviceEvent.h",
       "../include/platform/CHIPDeviceLayer.h",
@@ -488,6 +500,7 @@ if (chip_device_platform != "none") {
       ":platform_base",
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
+      "${chip_root}/src/app/icd:icd_config",
       "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",

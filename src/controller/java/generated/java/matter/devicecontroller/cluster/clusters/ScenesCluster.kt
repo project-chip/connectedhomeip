@@ -21,194 +21,212 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class ScenesCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class AddSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte
-  )
+  class AddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class ViewSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte, 
-    val transitionTime: UShort?, 
-    val sceneName: String?, 
+    val status: UByte,
+    val groupID: UShort,
+    val sceneID: UByte,
+    val transitionTime: UShort?,
+    val sceneName: String?,
     val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
   )
 
-  class RemoveSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte
-  )
+  class RemoveSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
-  class RemoveAllScenesResponse(
-    val status: UShort, 
-    val groupID: UShort
-  )
+  class RemoveAllScenesResponse(val status: UByte, val groupID: UShort)
 
-  class StoreSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte
-  )
+  class StoreSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class GetSceneMembershipResponse(
-    val status: UShort, 
-    val capacity: UByte?, 
-    val groupID: UShort, 
+    val status: UByte,
+    val capacity: UByte?,
+    val groupID: UShort,
     val sceneList: List<UByte>?
   )
 
-  class EnhancedAddSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte
-  )
+  class EnhancedAddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class EnhancedViewSceneResponse(
-    val status: UShort, 
-    val groupID: UShort, 
-    val sceneID: UByte, 
-    val transitionTime: UShort?, 
-    val sceneName: String?, 
+    val status: UByte,
+    val groupID: UShort,
+    val sceneID: UByte,
+    val transitionTime: UShort?,
+    val sceneName: String?,
     val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
   )
 
   class CopySceneResponse(
-    val status: UShort, 
-    val groupIdentifierFrom: UShort, 
+    val status: UByte,
+    val groupIdentifierFrom: UShort,
     val sceneIdentifierFrom: UByte
   )
 
-  class LastConfiguredByAttribute(
-    val value: ULong?
-  )
+  class LastConfiguredByAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class FabricSceneInfoAttribute(val value: List<ScenesClusterSceneInfoStruct>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  suspend fun addScene(groupID: UShort, sceneID: UByte, transitionTime: UShort, sceneName: String, extensionFieldSets: List<ScenesClusterExtensionFieldSet>, timedInvokeTimeoutMs: Int? = null): AddSceneResponse {
+  class AttributeListAttribute(val value: List<UInt>)
+
+  suspend fun addScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort,
+    sceneName: String,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    timedInvokeTimeoutMs: Int? = null
+  ): AddSceneResponse {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun viewScene(groupID: UShort, sceneID: UByte, timedInvokeTimeoutMs: Int? = null): ViewSceneResponse {
+  suspend fun viewScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): ViewSceneResponse {
     val commandId = 1L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun removeScene(groupID: UShort, sceneID: UByte, timedInvokeTimeoutMs: Int? = null): RemoveSceneResponse {
+  suspend fun removeScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): RemoveSceneResponse {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun removeAllScenes(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveAllScenesResponse {
+  suspend fun removeAllScenes(
+    groupID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): RemoveAllScenesResponse {
     val commandId = 3L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun storeScene(groupID: UShort, sceneID: UByte, timedInvokeTimeoutMs: Int? = null): StoreSceneResponse {
+  suspend fun storeScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): StoreSceneResponse {
     val commandId = 4L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun recallScene(groupID: UShort, sceneID: UByte, transitionTime: UShort?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun recallScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort?,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 5L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun getSceneMembership(groupID: UShort, timedInvokeTimeoutMs: Int? = null): GetSceneMembershipResponse {
+  suspend fun getSceneMembership(
+    groupID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): GetSceneMembershipResponse {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun enhancedAddScene(groupID: UShort, sceneID: UByte, transitionTime: UShort, sceneName: String, extensionFieldSets: List<ScenesClusterExtensionFieldSet>, timedInvokeTimeoutMs: Int? = null): EnhancedAddSceneResponse {
+  suspend fun enhancedAddScene(
+    groupID: UShort,
+    sceneID: UByte,
+    transitionTime: UShort,
+    sceneName: String,
+    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    timedInvokeTimeoutMs: Int? = null
+  ): EnhancedAddSceneResponse {
     val commandId = 64L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun enhancedViewScene(groupID: UShort, sceneID: UByte, timedInvokeTimeoutMs: Int? = null): EnhancedViewSceneResponse {
+  suspend fun enhancedViewScene(
+    groupID: UShort,
+    sceneID: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): EnhancedViewSceneResponse {
     val commandId = 65L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun copyScene(mode: UInt, groupIdentifierFrom: UShort, sceneIdentifierFrom: UByte, groupIdentifierTo: UShort, sceneIdentifierTo: UByte, timedInvokeTimeoutMs: Int? = null): CopySceneResponse {
+  suspend fun copyScene(
+    mode: UInt,
+    groupIdentifierFrom: UShort,
+    sceneIdentifierFrom: UByte,
+    groupIdentifierTo: UShort,
+    sceneIdentifierTo: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ): CopySceneResponse {
     val commandId = 66L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun readSceneCountAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSceneCountAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeSceneCountAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -216,10 +234,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentSceneAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeCurrentSceneAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -227,10 +242,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentGroupAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeCurrentGroupAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -238,10 +250,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSceneValidAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  suspend fun subscribeSceneValidAttribute(minInterval: Int, maxInterval: Int): Boolean {
     // Implementation needs to be added here
   }
 
@@ -249,10 +258,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNameSupportAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeNameSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -271,21 +277,24 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSceneTableSizeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeSceneTableSizeAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readRemainingCapacityAttribute(): UByte {
+  suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemainingCapacityAttribute(
+  suspend fun readFabricSceneInfoAttributeWithFabricFilter(
+    isFabricFiltered: Boolean
+  ): FabricSceneInfoAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFabricSceneInfoAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): UByte {
+  ): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 
@@ -315,10 +324,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -337,10 +343,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -348,10 +351,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

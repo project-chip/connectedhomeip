@@ -17,20 +17,17 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class GroupKeyManagementClusterGroupKeyMapStruct (
-    val groupId: UShort,
-    val groupKeySetID: UShort,
-    val fabricIndex: UByte) {
-  override fun toString(): String  = buildString {
+class GroupKeyManagementClusterGroupKeyMapStruct(
+  val groupId: UShort,
+  val groupKeySetID: UShort,
+  val fabricIndex: UByte
+) {
+  override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeyMapStruct {\n")
     append("\tgroupId : $groupId\n")
     append("\tgroupKeySetID : $groupKeySetID\n")
@@ -53,12 +50,12 @@ class GroupKeyManagementClusterGroupKeyMapStruct (
     private const val TAG_GROUP_KEY_SET_I_D = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : GroupKeyManagementClusterGroupKeyMapStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeyMapStruct {
       tlvReader.enterStructure(tlvTag)
       val groupId = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_ID))
       val groupKeySetID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return GroupKeyManagementClusterGroupKeyMapStruct(groupId, groupKeySetID, fabricIndex)

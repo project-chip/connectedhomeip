@@ -18,7 +18,7 @@ if (current_os == "android") {
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support:attributes",
       "${chip_root}/src/lib/support:logging_constants",
-      "${chip_root}/src/platform:platform_buildconfig",
+      "${chip_root}/src/platform:platform_config_header",
       "${chip_root}/src/platform/logging:headers",
     ]
 
@@ -43,7 +43,7 @@ static_library("stdio") {
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
-    "${chip_root}/src/platform:platform_buildconfig",
+    "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/platform/logging:headers",
   ]
 

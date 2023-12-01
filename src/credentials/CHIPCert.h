@@ -49,7 +49,7 @@ static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 
-// As per specifications (6.3.5. Node Operational Credentials Certificates)
+// As per specifications (6.4.5. Node Operational Credentials Certificates)
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
 

@@ -17,20 +17,17 @@
 package matter.devicecontroller.cluster.eventstructs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent (
-    val periodStart: UInt,
-    val periodEnd: UInt,
-    val energyExported: ULong) {
-  override fun toString(): String  = buildString {
+class ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent(
+  val periodStart: UInt,
+  val periodEnd: UInt,
+  val energyExported: ULong
+) {
+  override fun toString(): String = buildString {
     append("ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent {\n")
     append("\tperiodStart : $periodStart\n")
     append("\tperiodEnd : $periodEnd\n")
@@ -53,15 +50,22 @@ class ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent (
     private const val TAG_PERIOD_END = 1
     private const val TAG_ENERGY_EXPORTED = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent {
       tlvReader.enterStructure(tlvTag)
       val periodStart = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_START))
       val periodEnd = tlvReader.getUInt(ContextSpecificTag(TAG_PERIOD_END))
       val energyExported = tlvReader.getULong(ContextSpecificTag(TAG_ENERGY_EXPORTED))
-      
+
       tlvReader.exitContainer()
 
-      return ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent(periodStart, periodEnd, energyExported)
+      return ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent(
+        periodStart,
+        periodEnd,
+        energyExported
+      )
     }
   }
 }

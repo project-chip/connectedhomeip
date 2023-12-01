@@ -26,7 +26,7 @@
 #include "EventPathIB.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>

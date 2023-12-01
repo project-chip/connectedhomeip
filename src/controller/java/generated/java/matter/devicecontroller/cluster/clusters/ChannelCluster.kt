@@ -21,57 +21,52 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class ChannelCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class ChangeChannelResponse(
-    val status: UInt, 
-    val data: String?
+  class ChangeChannelResponse(val status: UInt, val data: String?)
+
+  class ProgramGuideResponse(
+    val channelPagingStruct: Short,
+    val programList: List<ChannelClusterProgramStruct>
   )
 
-  class ChannelListAttribute(
-    val value: List<ChannelClusterChannelInfoStruct>?
-  )
+  class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
 
-  class LineupAttribute(
-    val value: ChannelClusterLineupInfoStruct?
-  )
+  class LineupAttribute(val value: ChannelClusterLineupInfoStruct?)
 
-  class CurrentChannelAttribute(
-    val value: ChannelClusterChannelInfoStruct?
-  )
+  class CurrentChannelAttribute(val value: ChannelClusterChannelInfoStruct?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun changeChannel(match: String, timedInvokeTimeoutMs: Int? = null): ChangeChannelResponse {
+  suspend fun changeChannel(
+    match: String,
+    timedInvokeTimeoutMs: Int? = null
+  ): ChangeChannelResponse {
     val commandId = 0L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun changeChannelByNumber(majorNumber: UShort, minorNumber: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun changeChannelByNumber(
+    majorNumber: UShort,
+    minorNumber: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
     val commandId = 2L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
@@ -81,7 +76,58 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
+  }
+
+  suspend fun getProgramGuide(
+    startTime: UInt?,
+    endTime: UInt?,
+    channelList: List<ChannelClusterChannelInfoStruct>?,
+    pageToken: ChannelClusterPageTokenStruct?,
+    recordingFlag: ULong?,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>?,
+    data: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ProgramGuideResponse {
+    val commandId = 4L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun recordProgram(
+    programIdentifier: String,
+    shouldRecordSeries: Boolean,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
+    data: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 6L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun cancelRecordProgram(
+    programIdentifier: String,
+    shouldRecordSeries: Boolean,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
+    data: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 7L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readChannelListAttribute(): ChannelListAttribute {
@@ -99,10 +145,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLineupAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LineupAttribute {
+  suspend fun subscribeLineupAttribute(minInterval: Int, maxInterval: Int): LineupAttribute {
     // Implementation needs to be added here
   }
 
@@ -143,10 +186,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -165,10 +205,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -176,10 +213,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

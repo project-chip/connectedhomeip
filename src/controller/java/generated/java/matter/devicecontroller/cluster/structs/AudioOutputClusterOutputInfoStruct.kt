@@ -17,20 +17,13 @@
 package matter.devicecontroller.cluster.structs
 
 import matter.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AudioOutputClusterOutputInfoStruct (
-    val index: UByte,
-    val outputType: UInt,
-    val name: String) {
-  override fun toString(): String  = buildString {
+class AudioOutputClusterOutputInfoStruct(val index: UByte, val outputType: UInt, val name: String) {
+  override fun toString(): String = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")
     append("\tindex : $index\n")
     append("\toutputType : $outputType\n")
@@ -53,12 +46,12 @@ class AudioOutputClusterOutputInfoStruct (
     private const val TAG_OUTPUT_TYPE = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AudioOutputClusterOutputInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AudioOutputClusterOutputInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val index = tlvReader.getUByte(ContextSpecificTag(TAG_INDEX))
       val outputType = tlvReader.getUInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      
+
       tlvReader.exitContainer()
 
       return AudioOutputClusterOutputInfoStruct(index, outputType, name)

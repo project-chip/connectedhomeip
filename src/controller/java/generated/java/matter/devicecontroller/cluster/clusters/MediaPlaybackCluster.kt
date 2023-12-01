@@ -20,47 +20,37 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class MediaPlaybackCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class PlaybackResponse(
-    val status: UInt, 
-    val data: String?
-  )
+class MediaPlaybackCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class PlaybackResponse(val status: UInt, val data: String?)
 
-  class StartTimeAttribute(
-    val value: ULong?
-  )
+  class StartTimeAttribute(val value: ULong?)
 
-  class DurationAttribute(
-    val value: ULong?
-  )
+  class DurationAttribute(val value: ULong?)
 
-  class SampledPositionAttribute(
-    val value: MediaPlaybackClusterPlaybackPositionStruct?
-  )
+  class SampledPositionAttribute(val value: MediaPlaybackClusterPlaybackPositionStruct?)
 
-  class SeekRangeEndAttribute(
-    val value: ULong?
-  )
+  class SeekRangeEndAttribute(val value: ULong?)
 
-  class SeekRangeStartAttribute(
-    val value: ULong?
-  )
+  class SeekRangeStartAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class ActiveAudioTrackAttribute(val value: MediaPlaybackClusterTrackStruct?)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AvailableAudioTracksAttribute(val value: List<MediaPlaybackClusterTrackStruct>?)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class ActiveTextTrackAttribute(val value: MediaPlaybackClusterTrackStruct?)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AvailableTextTracksAttribute(val value: List<MediaPlaybackClusterTrackStruct>?)
+
+  class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  class AcceptedCommandListAttribute(val value: List<UInt>)
+
+  class EventListAttribute(val value: List<UInt>)
+
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun play(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
     val commandId = 0L
@@ -69,7 +59,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun pause(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -79,7 +69,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun stop(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -89,7 +79,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun startOver(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -99,7 +89,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun previous(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -109,7 +99,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun next(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -119,47 +109,59 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun rewind(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun rewind(
+    audioAdvanceUnmuted: Boolean?,
+    timedInvokeTimeoutMs: Int? = null
+  ): PlaybackResponse {
     val commandId = 6L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun fastForward(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun fastForward(
+    audioAdvanceUnmuted: Boolean?,
+    timedInvokeTimeoutMs: Int? = null
+  ): PlaybackResponse {
     val commandId = 7L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun skipForward(deltaPositionMilliseconds: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun skipForward(
+    deltaPositionMilliseconds: ULong,
+    timedInvokeTimeoutMs: Int? = null
+  ): PlaybackResponse {
     val commandId = 8L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
-  suspend fun skipBackward(deltaPositionMilliseconds: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun skipBackward(
+    deltaPositionMilliseconds: ULong,
+    timedInvokeTimeoutMs: Int? = null
+  ): PlaybackResponse {
     val commandId = 9L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
   }
 
   suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
@@ -169,17 +171,48 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
       // Do the action with timedInvokeTimeoutMs
     } else {
       // Do the action without timedInvokeTimeoutMs
-    }    
+    }
+  }
+
+  suspend fun activateAudioTrack(
+    trackID: String,
+    audioOutputIndex: UByte,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 12L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun activateTextTrack(trackID: String, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 13L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun deactivateTextTrack(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 14L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readCurrentStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
+  suspend fun subscribeCurrentStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -187,10 +220,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStartTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): StartTimeAttribute {
+  suspend fun subscribeStartTimeAttribute(minInterval: Int, maxInterval: Int): StartTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -198,10 +228,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDurationAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): DurationAttribute {
+  suspend fun subscribeDurationAttribute(minInterval: Int, maxInterval: Int): DurationAttribute {
     // Implementation needs to be added here
   }
 
@@ -220,10 +247,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePlaybackSpeedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Float {
+  suspend fun subscribePlaybackSpeedAttribute(minInterval: Int, maxInterval: Int): Float {
     // Implementation needs to be added here
   }
 
@@ -246,6 +270,50 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     minInterval: Int,
     maxInterval: Int
   ): SeekRangeStartAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveAudioTrackAttribute(): ActiveAudioTrackAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveAudioTrackAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveAudioTrackAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAvailableAudioTracksAttribute(): AvailableAudioTracksAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAvailableAudioTracksAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AvailableAudioTracksAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveTextTrackAttribute(): ActiveTextTrackAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveTextTrackAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveTextTrackAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAvailableTextTracksAttribute(): AvailableTextTracksAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAvailableTextTracksAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AvailableTextTracksAttribute {
     // Implementation needs to be added here
   }
 
@@ -275,10 +343,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -297,10 +362,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -308,10 +370,7 @@ class MediaPlaybackCluster(private val controller: MatterController, private val
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

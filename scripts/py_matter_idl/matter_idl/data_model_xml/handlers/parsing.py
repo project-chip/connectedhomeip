@@ -92,10 +92,13 @@ def NormalizeDataType(t: str) -> str:
 
 # Handle oddities in current data model XML schema for nicer diffs
 _REF_NAME_MAPPING = {
-    "<<ref_DataTypeString>>": "char_string",
-    "<<ref_DataTypeOctstr>>": "octet_string",
-    "<<ref_DataTypeVendorId>>": "vendor_id",
     "<<ref_DataTypeEndpointNumber>>": "endpoint_no",
+    "<<ref_DataTypeEpochUs>>": "epoch_us",
+    "<<ref_DataTypeNodeId>>": "node_id",
+    "<<ref_DataTypeOctstr>>": "octet_string",
+    "<<ref_DataTypeString>>": "char_string",
+    "<<ref_DataTypeVendorId>>": "vendor_id",
+    "<<ref_FabricIdx>>": "fabric_idx",
 }
 
 

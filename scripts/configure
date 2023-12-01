@@ -93,6 +93,10 @@ function main() { # ...
         [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
     fi
 
+    if [[ -n "$PW_ROOT" ]]; then
+        info "WARNING: A Pigweed environment appears to be active, this is usually a misconfiguration."
+    fi
+
     check_binary gn GN
     check_binary ninja NINJA
 
@@ -149,7 +153,7 @@ function create_empty_pw_env() {
             info "Creating empty $gni in source tree"
             echo "# ${CONFIGURE_MARKER}" >"${CHIP_ROOT}/${gni}"
         else
-            info "Warning: Leaving existing $gni in place, this might affect the build configuration."
+            info "WARNING: Leaving existing $gni in place, this might affect the build configuration."
         fi
     fi
 }

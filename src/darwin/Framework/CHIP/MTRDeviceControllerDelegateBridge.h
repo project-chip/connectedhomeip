@@ -19,7 +19,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningDelegate.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

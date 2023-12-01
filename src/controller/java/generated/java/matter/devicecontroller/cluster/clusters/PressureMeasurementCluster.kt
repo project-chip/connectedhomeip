@@ -20,46 +20,29 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PressureMeasurementCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class MeasuredValueAttribute(
-    val value: Short?
-  )
+class PressureMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class MeasuredValueAttribute(val value: Short?)
 
-  class MinMeasuredValueAttribute(
-    val value: Short?
-  )
+  class MinMeasuredValueAttribute(val value: Short?)
 
-  class MaxMeasuredValueAttribute(
-    val value: Short?
-  )
+  class MaxMeasuredValueAttribute(val value: Short?)
 
-  class ScaledValueAttribute(
-    val value: Short?
-  )
+  class ScaledValueAttribute(val value: Short?)
 
-  class MinScaledValueAttribute(
-    val value: Short?
-  )
+  class MinScaledValueAttribute(val value: Short?)
 
-  class MaxScaledValueAttribute(
-    val value: Short?
-  )
+  class MaxScaledValueAttribute(val value: Short?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readMeasuredValueAttribute(): MeasuredValueAttribute {
     // Implementation needs to be added here
@@ -98,10 +81,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeToleranceAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeToleranceAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -142,10 +122,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeScaledToleranceAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeScaledToleranceAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -153,10 +130,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeScaleAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Byte {
+  suspend fun subscribeScaleAttribute(minInterval: Int, maxInterval: Int): Byte {
     // Implementation needs to be added here
   }
 
@@ -186,10 +160,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -208,10 +179,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -219,10 +187,7 @@ class PressureMeasurementCluster(private val controller: MatterController, priva
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

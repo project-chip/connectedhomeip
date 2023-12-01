@@ -20,7 +20,7 @@
 
 #include <dlog.h>
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>

@@ -55,7 +55,7 @@ public:
                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder);
 
     /**
-     * @brief Set the highest level of Expressed State according to priorityOrder
+     * @brief Request self-test when receiving local commands
      * @param endpointId ID of the endpoint
      * @return true on success, false on failure
      */

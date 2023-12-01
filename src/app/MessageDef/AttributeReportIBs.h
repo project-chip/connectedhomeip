@@ -27,7 +27,7 @@
 #include "ArrayParser.h"
 #include "AttributeReportIB.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/util/basic-types.h>

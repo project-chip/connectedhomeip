@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>

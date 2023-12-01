@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>

@@ -26,8 +26,9 @@
 
 #include <cstdint>
 
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_HAVE_CONFIG_H
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 #endif
 

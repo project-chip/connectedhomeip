@@ -20,79 +20,47 @@ package matter.devicecontroller.cluster.clusters
 import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ElectricalEnergyMeasurementCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class CumulativeEnergyImportedTimeAttribute(
-    val value: UInt?
-  )
+class ElectricalEnergyMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
+  class CumulativeEnergyImportedTimeAttribute(val value: UInt?)
 
-  class CumulativeEnergyImportedAttribute(
-    val value: ULong?
-  )
+  class CumulativeEnergyImportedAttribute(val value: ULong?)
 
-  class CumulativeEnergyExportedTimeAttribute(
-    val value: UInt?
-  )
+  class CumulativeEnergyExportedTimeAttribute(val value: UInt?)
 
-  class CumulativeEnergyExportedAttribute(
-    val value: ULong?
-  )
+  class CumulativeEnergyExportedAttribute(val value: ULong?)
 
-  class PeriodicEnergyImportedStartTimeAttribute(
-    val value: UInt?
-  )
+  class PeriodicEnergyImportedStartTimeAttribute(val value: UInt?)
 
-  class PeriodicEnergyImportedEndTimeAttribute(
-    val value: UInt?
-  )
+  class PeriodicEnergyImportedEndTimeAttribute(val value: UInt?)
 
-  class PeriodicEnergyImportedAttribute(
-    val value: ULong?
-  )
+  class PeriodicEnergyImportedAttribute(val value: ULong?)
 
-  class PeriodicEnergyExportedStartTimeAttribute(
-    val value: UInt?
-  )
+  class PeriodicEnergyExportedStartTimeAttribute(val value: UInt?)
 
-  class PeriodicEnergyExportedEndTimeAttribute(
-    val value: UInt?
-  )
+  class PeriodicEnergyExportedEndTimeAttribute(val value: UInt?)
 
-  class PeriodicEnergyExportedAttribute(
-    val value: ULong?
-  )
+  class PeriodicEnergyExportedAttribute(val value: ULong?)
 
-  class EphemeralEnergyImportedAttribute(
-    val value: ULong?
-  )
+  class EphemeralEnergyImportedAttribute(val value: ULong?)
 
-  class EphemeralEnergyExportedAttribute(
-    val value: ULong?
-  )
+  class EphemeralEnergyExportedAttribute(val value: ULong?)
 
-  class GeneratedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class GeneratedCommandListAttribute(val value: List<UInt>)
 
-  class AcceptedCommandListAttribute(
-    val value: List<UInt>
-  )
+  class AcceptedCommandListAttribute(val value: List<UInt>)
 
-  class EventListAttribute(
-    val value: List<UInt>
-  )
+  class EventListAttribute(val value: List<UInt>)
 
-  class AttributeListAttribute(
-    val value: List<UInt>
-  )
+  class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readMeasuredAttribute(): Boolean {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasuredAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Boolean {
+  suspend fun subscribeMeasuredAttribute(minInterval: Int, maxInterval: Int): Boolean {
     // Implementation needs to be added here
   }
 
@@ -140,7 +108,8 @@ class ElectricalEnergyMeasurementCluster(private val controller: MatterControlle
     // Implementation needs to be added here
   }
 
-  suspend fun readPeriodicEnergyImportedStartTimeAttribute(): PeriodicEnergyImportedStartTimeAttribute {
+  suspend fun readPeriodicEnergyImportedStartTimeAttribute():
+    PeriodicEnergyImportedStartTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -173,7 +142,8 @@ class ElectricalEnergyMeasurementCluster(private val controller: MatterControlle
     // Implementation needs to be added here
   }
 
-  suspend fun readPeriodicEnergyExportedStartTimeAttribute(): PeriodicEnergyExportedStartTimeAttribute {
+  suspend fun readPeriodicEnergyExportedStartTimeAttribute():
+    PeriodicEnergyExportedStartTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -254,10 +224,7 @@ class ElectricalEnergyMeasurementCluster(private val controller: MatterControlle
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EventListAttribute {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
@@ -276,10 +243,7 @@ class ElectricalEnergyMeasurementCluster(private val controller: MatterControlle
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UInt {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -287,10 +251,7 @@ class ElectricalEnergyMeasurementCluster(private val controller: MatterControlle
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

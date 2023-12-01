@@ -146,6 +146,127 @@ public static class ScenesClusterExtensionFieldSet {
     return output.toString();
   }
 }
+public static class ScenesClusterSceneInfoStruct {
+  public Integer sceneCount;
+  public Integer currentScene;
+  public Integer currentGroup;
+  public Boolean sceneValid;
+  public Integer remainingCapacity;
+  public Integer fabricIndex;
+  private static final long SCENE_COUNT_ID = 0L;
+  private static final long CURRENT_SCENE_ID = 1L;
+  private static final long CURRENT_GROUP_ID = 2L;
+  private static final long SCENE_VALID_ID = 3L;
+  private static final long REMAINING_CAPACITY_ID = 4L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public ScenesClusterSceneInfoStruct(
+    Integer sceneCount,
+    Integer currentScene,
+    Integer currentGroup,
+    Boolean sceneValid,
+    Integer remainingCapacity,
+    Integer fabricIndex
+  ) {
+    this.sceneCount = sceneCount;
+    this.currentScene = currentScene;
+    this.currentGroup = currentGroup;
+    this.sceneValid = sceneValid;
+    this.remainingCapacity = remainingCapacity;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SCENE_COUNT_ID, new UIntType(sceneCount)));
+    values.add(new StructElement(CURRENT_SCENE_ID, new UIntType(currentScene)));
+    values.add(new StructElement(CURRENT_GROUP_ID, new UIntType(currentGroup)));
+    values.add(new StructElement(SCENE_VALID_ID, new BooleanType(sceneValid)));
+    values.add(new StructElement(REMAINING_CAPACITY_ID, new UIntType(remainingCapacity)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static ScenesClusterSceneInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sceneCount = null;
+    Integer currentScene = null;
+    Integer currentGroup = null;
+    Boolean sceneValid = null;
+    Integer remainingCapacity = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SCENE_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sceneCount = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_SCENE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentScene = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_GROUP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentGroup = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SCENE_VALID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          sceneValid = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REMAINING_CAPACITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          remainingCapacity = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ScenesClusterSceneInfoStruct(
+      sceneCount,
+      currentScene,
+      currentGroup,
+      sceneValid,
+      remainingCapacity,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ScenesClusterSceneInfoStruct {\n");
+    output.append("\tsceneCount: ");
+    output.append(sceneCount);
+    output.append("\n");
+    output.append("\tcurrentScene: ");
+    output.append(currentScene);
+    output.append("\n");
+    output.append("\tcurrentGroup: ");
+    output.append(currentGroup);
+    output.append("\n");
+    output.append("\tsceneValid: ");
+    output.append(sceneValid);
+    output.append("\n");
+    output.append("\tremainingCapacity: ");
+    output.append(remainingCapacity);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DescriptorClusterDeviceTypeStruct {
   public Long deviceType;
   public Integer revision;
@@ -3678,6 +3799,280 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     return output.toString();
   }
 }
+public static class OvenCavityOperationalStateClusterErrorStateStruct {
+  public Integer errorStateID;
+  public Optional<String> errorStateLabel;
+  public Optional<String> errorStateDetails;
+  private static final long ERROR_STATE_I_D_ID = 0L;
+  private static final long ERROR_STATE_LABEL_ID = 1L;
+  private static final long ERROR_STATE_DETAILS_ID = 2L;
+
+  public OvenCavityOperationalStateClusterErrorStateStruct(
+    Integer errorStateID,
+    Optional<String> errorStateLabel,
+    Optional<String> errorStateDetails
+  ) {
+    this.errorStateID = errorStateID;
+    this.errorStateLabel = errorStateLabel;
+    this.errorStateDetails = errorStateDetails;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ERROR_STATE_I_D_ID, new UIntType(errorStateID)));
+    values.add(new StructElement(ERROR_STATE_LABEL_ID, errorStateLabel.<BaseTLVType>map((nonOptionalerrorStateLabel) -> new StringType(nonOptionalerrorStateLabel)).orElse(new EmptyType())));
+    values.add(new StructElement(ERROR_STATE_DETAILS_ID, errorStateDetails.<BaseTLVType>map((nonOptionalerrorStateDetails) -> new StringType(nonOptionalerrorStateDetails)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer errorStateID = null;
+    Optional<String> errorStateLabel = Optional.empty();
+    Optional<String> errorStateDetails = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ERROR_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          errorStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == ERROR_STATE_DETAILS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          errorStateDetails = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterErrorStateStruct(
+      errorStateID,
+      errorStateLabel,
+      errorStateDetails
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterErrorStateStruct {\n");
+    output.append("\terrorStateID: ");
+    output.append(errorStateID);
+    output.append("\n");
+    output.append("\terrorStateLabel: ");
+    output.append(errorStateLabel);
+    output.append("\n");
+    output.append("\terrorStateDetails: ");
+    output.append(errorStateDetails);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenCavityOperationalStateClusterOperationalStateStruct {
+  public Integer operationalStateID;
+  public Optional<String> operationalStateLabel;
+  private static final long OPERATIONAL_STATE_I_D_ID = 0L;
+  private static final long OPERATIONAL_STATE_LABEL_ID = 1L;
+
+  public OvenCavityOperationalStateClusterOperationalStateStruct(
+    Integer operationalStateID,
+    Optional<String> operationalStateLabel
+  ) {
+    this.operationalStateID = operationalStateID;
+    this.operationalStateLabel = operationalStateLabel;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(OPERATIONAL_STATE_I_D_ID, new UIntType(operationalStateID)));
+    values.add(new StructElement(OPERATIONAL_STATE_LABEL_ID, operationalStateLabel.<BaseTLVType>map((nonOptionaloperationalStateLabel) -> new StringType(nonOptionaloperationalStateLabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static OvenCavityOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer operationalStateID = null;
+    Optional<String> operationalStateLabel = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == OPERATIONAL_STATE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          operationalStateID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == OPERATIONAL_STATE_LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          operationalStateLabel = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new OvenCavityOperationalStateClusterOperationalStateStruct(
+      operationalStateID,
+      operationalStateLabel
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenCavityOperationalStateClusterOperationalStateStruct {\n");
+    output.append("\toperationalStateID: ");
+    output.append(operationalStateID);
+    output.append("\n");
+    output.append("\toperationalStateLabel: ");
+    output.append(operationalStateLabel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenModeClusterModeTagStruct {
+  public Optional<Integer> mfgCode;
+  public Integer value;
+  private static final long MFG_CODE_ID = 0L;
+  private static final long VALUE_ID = 1L;
+
+  public OvenModeClusterModeTagStruct(
+    Optional<Integer> mfgCode,
+    Integer value
+  ) {
+    this.mfgCode = mfgCode;
+    this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MFG_CODE_ID, mfgCode.<BaseTLVType>map((nonOptionalmfgCode) -> new UIntType(nonOptionalmfgCode)).orElse(new EmptyType())));
+    values.add(new StructElement(VALUE_ID, new UIntType(value)));
+
+    return new StructType(values);
+  }
+
+  public static OvenModeClusterModeTagStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> mfgCode = Optional.empty();
+    Integer value = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MFG_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mfgCode = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          value = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new OvenModeClusterModeTagStruct(
+      mfgCode,
+      value
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenModeClusterModeTagStruct {\n");
+    output.append("\tmfgCode: ");
+    output.append(mfgCode);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class OvenModeClusterModeOptionStruct {
+  public String label;
+  public Integer mode;
+  public ArrayList<ChipStructs.OvenModeClusterModeTagStruct> modeTags;
+  private static final long LABEL_ID = 0L;
+  private static final long MODE_ID = 1L;
+  private static final long MODE_TAGS_ID = 2L;
+
+  public OvenModeClusterModeOptionStruct(
+    String label,
+    Integer mode,
+    ArrayList<ChipStructs.OvenModeClusterModeTagStruct> modeTags
+  ) {
+    this.label = label;
+    this.mode = mode;
+    this.modeTags = modeTags;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MODE_ID, new UIntType(mode)));
+    values.add(new StructElement(MODE_TAGS_ID, ArrayType.generateArrayType(modeTags, (elementmodeTags) -> elementmodeTags.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static OvenModeClusterModeOptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String label = null;
+    Integer mode = null;
+    ArrayList<ChipStructs.OvenModeClusterModeTagStruct> modeTags = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == MODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          mode = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MODE_TAGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          modeTags = castingValue.map((elementcastingValue) -> ChipStructs.OvenModeClusterModeTagStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new OvenModeClusterModeOptionStruct(
+      label,
+      mode,
+      modeTags
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("OvenModeClusterModeOptionStruct {\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("\tmode: ");
+    output.append(mode);
+    output.append("\n");
+    output.append("\tmodeTags: ");
+    output.append(modeTags);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ModeSelectClusterSemanticTagStruct {
   public Integer mfgCode;
   public Integer value;
@@ -5033,6 +5428,750 @@ public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStru
     return output.toString();
   }
 }
+public static class DemandResponseLoadControlClusterHeatingSourceControlStruct {
+  public Integer heatingSource;
+  private static final long HEATING_SOURCE_ID = 0L;
+
+  public DemandResponseLoadControlClusterHeatingSourceControlStruct(
+    Integer heatingSource
+  ) {
+    this.heatingSource = heatingSource;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(HEATING_SOURCE_ID, new UIntType(heatingSource)));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterHeatingSourceControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer heatingSource = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == HEATING_SOURCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          heatingSource = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterHeatingSourceControlStruct(
+      heatingSource
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterHeatingSourceControlStruct {\n");
+    output.append("\theatingSource: ");
+    output.append(heatingSource);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterPowerSavingsControlStruct {
+  public Integer powerSavings;
+  private static final long POWER_SAVINGS_ID = 0L;
+
+  public DemandResponseLoadControlClusterPowerSavingsControlStruct(
+    Integer powerSavings
+  ) {
+    this.powerSavings = powerSavings;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(POWER_SAVINGS_ID, new UIntType(powerSavings)));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterPowerSavingsControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer powerSavings = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == POWER_SAVINGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          powerSavings = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterPowerSavingsControlStruct(
+      powerSavings
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterPowerSavingsControlStruct {\n");
+    output.append("\tpowerSavings: ");
+    output.append(powerSavings);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterDutyCycleControlStruct {
+  public Integer dutyCycle;
+  private static final long DUTY_CYCLE_ID = 0L;
+
+  public DemandResponseLoadControlClusterDutyCycleControlStruct(
+    Integer dutyCycle
+  ) {
+    this.dutyCycle = dutyCycle;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DUTY_CYCLE_ID, new UIntType(dutyCycle)));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterDutyCycleControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer dutyCycle = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DUTY_CYCLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          dutyCycle = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterDutyCycleControlStruct(
+      dutyCycle
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterDutyCycleControlStruct {\n");
+    output.append("\tdutyCycle: ");
+    output.append(dutyCycle);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterAverageLoadControlStruct {
+  public Integer loadAdjustment;
+  private static final long LOAD_ADJUSTMENT_ID = 0L;
+
+  public DemandResponseLoadControlClusterAverageLoadControlStruct(
+    Integer loadAdjustment
+  ) {
+    this.loadAdjustment = loadAdjustment;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LOAD_ADJUSTMENT_ID, new IntType(loadAdjustment)));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterAverageLoadControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer loadAdjustment = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LOAD_ADJUSTMENT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          loadAdjustment = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterAverageLoadControlStruct(
+      loadAdjustment
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterAverageLoadControlStruct {\n");
+    output.append("\tloadAdjustment: ");
+    output.append(loadAdjustment);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterTemperatureControlStruct {
+  public @Nullable Optional<Integer> coolingTempOffset;
+  public @Nullable Optional<Integer> heatingtTempOffset;
+  public @Nullable Optional<Integer> coolingTempSetpoint;
+  public @Nullable Optional<Integer> heatingTempSetpoint;
+  private static final long COOLING_TEMP_OFFSET_ID = 0L;
+  private static final long HEATINGT_TEMP_OFFSET_ID = 1L;
+  private static final long COOLING_TEMP_SETPOINT_ID = 2L;
+  private static final long HEATING_TEMP_SETPOINT_ID = 3L;
+
+  public DemandResponseLoadControlClusterTemperatureControlStruct(
+    @Nullable Optional<Integer> coolingTempOffset,
+    @Nullable Optional<Integer> heatingtTempOffset,
+    @Nullable Optional<Integer> coolingTempSetpoint,
+    @Nullable Optional<Integer> heatingTempSetpoint
+  ) {
+    this.coolingTempOffset = coolingTempOffset;
+    this.heatingtTempOffset = heatingtTempOffset;
+    this.coolingTempSetpoint = coolingTempSetpoint;
+    this.heatingTempSetpoint = heatingTempSetpoint;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COOLING_TEMP_OFFSET_ID, coolingTempOffset != null ? coolingTempOffset.<BaseTLVType>map((nonOptionalcoolingTempOffset) -> new UIntType(nonOptionalcoolingTempOffset)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(HEATINGT_TEMP_OFFSET_ID, heatingtTempOffset != null ? heatingtTempOffset.<BaseTLVType>map((nonOptionalheatingtTempOffset) -> new UIntType(nonOptionalheatingtTempOffset)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(COOLING_TEMP_SETPOINT_ID, coolingTempSetpoint != null ? coolingTempSetpoint.<BaseTLVType>map((nonOptionalcoolingTempSetpoint) -> new IntType(nonOptionalcoolingTempSetpoint)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(HEATING_TEMP_SETPOINT_ID, heatingTempSetpoint != null ? heatingTempSetpoint.<BaseTLVType>map((nonOptionalheatingTempSetpoint) -> new IntType(nonOptionalheatingTempSetpoint)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterTemperatureControlStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<Integer> coolingTempOffset = null;
+    @Nullable Optional<Integer> heatingtTempOffset = null;
+    @Nullable Optional<Integer> coolingTempSetpoint = null;
+    @Nullable Optional<Integer> heatingTempSetpoint = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COOLING_TEMP_OFFSET_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          coolingTempOffset = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == HEATINGT_TEMP_OFFSET_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          heatingtTempOffset = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == COOLING_TEMP_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          coolingTempSetpoint = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == HEATING_TEMP_SETPOINT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          heatingTempSetpoint = Optional.of(castingValue.value(Integer.class));
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterTemperatureControlStruct(
+      coolingTempOffset,
+      heatingtTempOffset,
+      coolingTempSetpoint,
+      heatingTempSetpoint
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterTemperatureControlStruct {\n");
+    output.append("\tcoolingTempOffset: ");
+    output.append(coolingTempOffset);
+    output.append("\n");
+    output.append("\theatingtTempOffset: ");
+    output.append(heatingtTempOffset);
+    output.append("\n");
+    output.append("\tcoolingTempSetpoint: ");
+    output.append(coolingTempSetpoint);
+    output.append("\n");
+    output.append("\theatingTempSetpoint: ");
+    output.append(heatingTempSetpoint);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
+  public Integer duration;
+  public Integer control;
+  public Optional<ChipStructs.DemandResponseLoadControlClusterTemperatureControlStruct> temperatureControl;
+  public Optional<ChipStructs.DemandResponseLoadControlClusterAverageLoadControlStruct> averageLoadControl;
+  public Optional<ChipStructs.DemandResponseLoadControlClusterDutyCycleControlStruct> dutyCycleControl;
+  public Optional<ChipStructs.DemandResponseLoadControlClusterPowerSavingsControlStruct> powerSavingsControl;
+  public Optional<ChipStructs.DemandResponseLoadControlClusterHeatingSourceControlStruct> heatingSourceControl;
+  private static final long DURATION_ID = 0L;
+  private static final long CONTROL_ID = 1L;
+  private static final long TEMPERATURE_CONTROL_ID = 2L;
+  private static final long AVERAGE_LOAD_CONTROL_ID = 3L;
+  private static final long DUTY_CYCLE_CONTROL_ID = 4L;
+  private static final long POWER_SAVINGS_CONTROL_ID = 5L;
+  private static final long HEATING_SOURCE_CONTROL_ID = 6L;
+
+  public DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
+    Integer duration,
+    Integer control,
+    Optional<ChipStructs.DemandResponseLoadControlClusterTemperatureControlStruct> temperatureControl,
+    Optional<ChipStructs.DemandResponseLoadControlClusterAverageLoadControlStruct> averageLoadControl,
+    Optional<ChipStructs.DemandResponseLoadControlClusterDutyCycleControlStruct> dutyCycleControl,
+    Optional<ChipStructs.DemandResponseLoadControlClusterPowerSavingsControlStruct> powerSavingsControl,
+    Optional<ChipStructs.DemandResponseLoadControlClusterHeatingSourceControlStruct> heatingSourceControl
+  ) {
+    this.duration = duration;
+    this.control = control;
+    this.temperatureControl = temperatureControl;
+    this.averageLoadControl = averageLoadControl;
+    this.dutyCycleControl = dutyCycleControl;
+    this.powerSavingsControl = powerSavingsControl;
+    this.heatingSourceControl = heatingSourceControl;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DURATION_ID, new UIntType(duration)));
+    values.add(new StructElement(CONTROL_ID, new UIntType(control)));
+    values.add(new StructElement(TEMPERATURE_CONTROL_ID, temperatureControl.<BaseTLVType>map((nonOptionaltemperatureControl) -> nonOptionaltemperatureControl.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(AVERAGE_LOAD_CONTROL_ID, averageLoadControl.<BaseTLVType>map((nonOptionalaverageLoadControl) -> nonOptionalaverageLoadControl.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(DUTY_CYCLE_CONTROL_ID, dutyCycleControl.<BaseTLVType>map((nonOptionaldutyCycleControl) -> nonOptionaldutyCycleControl.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(POWER_SAVINGS_CONTROL_ID, powerSavingsControl.<BaseTLVType>map((nonOptionalpowerSavingsControl) -> nonOptionalpowerSavingsControl.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(HEATING_SOURCE_CONTROL_ID, heatingSourceControl.<BaseTLVType>map((nonOptionalheatingSourceControl) -> nonOptionalheatingSourceControl.encodeTlv()).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterLoadControlEventTransitionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer duration = null;
+    Integer control = null;
+    Optional<ChipStructs.DemandResponseLoadControlClusterTemperatureControlStruct> temperatureControl = Optional.empty();
+    Optional<ChipStructs.DemandResponseLoadControlClusterAverageLoadControlStruct> averageLoadControl = Optional.empty();
+    Optional<ChipStructs.DemandResponseLoadControlClusterDutyCycleControlStruct> dutyCycleControl = Optional.empty();
+    Optional<ChipStructs.DemandResponseLoadControlClusterPowerSavingsControlStruct> powerSavingsControl = Optional.empty();
+    Optional<ChipStructs.DemandResponseLoadControlClusterHeatingSourceControlStruct> heatingSourceControl = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          control = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TEMPERATURE_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          temperatureControl = Optional.of(ChipStructs.DemandResponseLoadControlClusterTemperatureControlStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == AVERAGE_LOAD_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          averageLoadControl = Optional.of(ChipStructs.DemandResponseLoadControlClusterAverageLoadControlStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == DUTY_CYCLE_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          dutyCycleControl = Optional.of(ChipStructs.DemandResponseLoadControlClusterDutyCycleControlStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == POWER_SAVINGS_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          powerSavingsControl = Optional.of(ChipStructs.DemandResponseLoadControlClusterPowerSavingsControlStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == HEATING_SOURCE_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          heatingSourceControl = Optional.of(ChipStructs.DemandResponseLoadControlClusterHeatingSourceControlStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
+      duration,
+      control,
+      temperatureControl,
+      averageLoadControl,
+      dutyCycleControl,
+      powerSavingsControl,
+      heatingSourceControl
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterLoadControlEventTransitionStruct {\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\tcontrol: ");
+    output.append(control);
+    output.append("\n");
+    output.append("\ttemperatureControl: ");
+    output.append(temperatureControl);
+    output.append("\n");
+    output.append("\taverageLoadControl: ");
+    output.append(averageLoadControl);
+    output.append("\n");
+    output.append("\tdutyCycleControl: ");
+    output.append(dutyCycleControl);
+    output.append("\n");
+    output.append("\tpowerSavingsControl: ");
+    output.append(powerSavingsControl);
+    output.append("\n");
+    output.append("\theatingSourceControl: ");
+    output.append(heatingSourceControl);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterLoadControlEventStruct {
+  public byte[] eventID;
+  public @Nullable byte[] programID;
+  public Integer control;
+  public Long deviceClass;
+  public Optional<Integer> enrollmentGroup;
+  public Integer criticality;
+  public @Nullable Long startTime;
+  public ArrayList<ChipStructs.DemandResponseLoadControlClusterLoadControlEventTransitionStruct> transitions;
+  private static final long EVENT_I_D_ID = 0L;
+  private static final long PROGRAM_I_D_ID = 1L;
+  private static final long CONTROL_ID = 2L;
+  private static final long DEVICE_CLASS_ID = 3L;
+  private static final long ENROLLMENT_GROUP_ID = 4L;
+  private static final long CRITICALITY_ID = 5L;
+  private static final long START_TIME_ID = 6L;
+  private static final long TRANSITIONS_ID = 7L;
+
+  public DemandResponseLoadControlClusterLoadControlEventStruct(
+    byte[] eventID,
+    @Nullable byte[] programID,
+    Integer control,
+    Long deviceClass,
+    Optional<Integer> enrollmentGroup,
+    Integer criticality,
+    @Nullable Long startTime,
+    ArrayList<ChipStructs.DemandResponseLoadControlClusterLoadControlEventTransitionStruct> transitions
+  ) {
+    this.eventID = eventID;
+    this.programID = programID;
+    this.control = control;
+    this.deviceClass = deviceClass;
+    this.enrollmentGroup = enrollmentGroup;
+    this.criticality = criticality;
+    this.startTime = startTime;
+    this.transitions = transitions;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(EVENT_I_D_ID, new ByteArrayType(eventID)));
+    values.add(new StructElement(PROGRAM_I_D_ID, programID != null ? new ByteArrayType(programID) : new NullType()));
+    values.add(new StructElement(CONTROL_ID, new UIntType(control)));
+    values.add(new StructElement(DEVICE_CLASS_ID, new UIntType(deviceClass)));
+    values.add(new StructElement(ENROLLMENT_GROUP_ID, enrollmentGroup.<BaseTLVType>map((nonOptionalenrollmentGroup) -> new UIntType(nonOptionalenrollmentGroup)).orElse(new EmptyType())));
+    values.add(new StructElement(CRITICALITY_ID, new UIntType(criticality)));
+    values.add(new StructElement(START_TIME_ID, startTime != null ? new UIntType(startTime) : new NullType()));
+    values.add(new StructElement(TRANSITIONS_ID, ArrayType.generateArrayType(transitions, (elementtransitions) -> elementtransitions.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterLoadControlEventStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] eventID = null;
+    @Nullable byte[] programID = null;
+    Integer control = null;
+    Long deviceClass = null;
+    Optional<Integer> enrollmentGroup = Optional.empty();
+    Integer criticality = null;
+    @Nullable Long startTime = null;
+    ArrayList<ChipStructs.DemandResponseLoadControlClusterLoadControlEventTransitionStruct> transitions = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == EVENT_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          eventID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PROGRAM_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          programID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          control = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == DEVICE_CLASS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          deviceClass = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ENROLLMENT_GROUP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          enrollmentGroup = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == CRITICALITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          criticality = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TRANSITIONS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          transitions = castingValue.map((elementcastingValue) -> ChipStructs.DemandResponseLoadControlClusterLoadControlEventTransitionStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterLoadControlEventStruct(
+      eventID,
+      programID,
+      control,
+      deviceClass,
+      enrollmentGroup,
+      criticality,
+      startTime,
+      transitions
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterLoadControlEventStruct {\n");
+    output.append("\teventID: ");
+    output.append(Arrays.toString(eventID));
+    output.append("\n");
+    output.append("\tprogramID: ");
+    output.append(Arrays.toString(programID));
+    output.append("\n");
+    output.append("\tcontrol: ");
+    output.append(control);
+    output.append("\n");
+    output.append("\tdeviceClass: ");
+    output.append(deviceClass);
+    output.append("\n");
+    output.append("\tenrollmentGroup: ");
+    output.append(enrollmentGroup);
+    output.append("\n");
+    output.append("\tcriticality: ");
+    output.append(criticality);
+    output.append("\n");
+    output.append("\tstartTime: ");
+    output.append(startTime);
+    output.append("\n");
+    output.append("\ttransitions: ");
+    output.append(transitions);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DemandResponseLoadControlClusterLoadControlProgramStruct {
+  public byte[] programID;
+  public String name;
+  public @Nullable Integer enrollmentGroup;
+  public @Nullable Integer randomStartMinutes;
+  public @Nullable Integer randomDurationMinutes;
+  private static final long PROGRAM_I_D_ID = 0L;
+  private static final long NAME_ID = 1L;
+  private static final long ENROLLMENT_GROUP_ID = 2L;
+  private static final long RANDOM_START_MINUTES_ID = 3L;
+  private static final long RANDOM_DURATION_MINUTES_ID = 4L;
+
+  public DemandResponseLoadControlClusterLoadControlProgramStruct(
+    byte[] programID,
+    String name,
+    @Nullable Integer enrollmentGroup,
+    @Nullable Integer randomStartMinutes,
+    @Nullable Integer randomDurationMinutes
+  ) {
+    this.programID = programID;
+    this.name = name;
+    this.enrollmentGroup = enrollmentGroup;
+    this.randomStartMinutes = randomStartMinutes;
+    this.randomDurationMinutes = randomDurationMinutes;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PROGRAM_I_D_ID, new ByteArrayType(programID)));
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(ENROLLMENT_GROUP_ID, enrollmentGroup != null ? new UIntType(enrollmentGroup) : new NullType()));
+    values.add(new StructElement(RANDOM_START_MINUTES_ID, randomStartMinutes != null ? new UIntType(randomStartMinutes) : new NullType()));
+    values.add(new StructElement(RANDOM_DURATION_MINUTES_ID, randomDurationMinutes != null ? new UIntType(randomDurationMinutes) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static DemandResponseLoadControlClusterLoadControlProgramStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] programID = null;
+    String name = null;
+    @Nullable Integer enrollmentGroup = null;
+    @Nullable Integer randomStartMinutes = null;
+    @Nullable Integer randomDurationMinutes = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PROGRAM_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          programID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == ENROLLMENT_GROUP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          enrollmentGroup = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RANDOM_START_MINUTES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          randomStartMinutes = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == RANDOM_DURATION_MINUTES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          randomDurationMinutes = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new DemandResponseLoadControlClusterLoadControlProgramStruct(
+      programID,
+      name,
+      enrollmentGroup,
+      randomStartMinutes,
+      randomDurationMinutes
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DemandResponseLoadControlClusterLoadControlProgramStruct {\n");
+    output.append("\tprogramID: ");
+    output.append(Arrays.toString(programID));
+    output.append("\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tenrollmentGroup: ");
+    output.append(enrollmentGroup);
+    output.append("\n");
+    output.append("\trandomStartMinutes: ");
+    output.append(randomStartMinutes);
+    output.append("\n");
+    output.append("\trandomDurationMinutes: ");
+    output.append(randomDurationMinutes);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class EnergyEvseClusterChargingTargetStruct {
+  public Integer targetTime;
+  public Optional<Integer> targetSoC;
+  public Optional<Long> addedEnergy;
+  private static final long TARGET_TIME_ID = 0L;
+  private static final long TARGET_SO_C_ID = 1L;
+  private static final long ADDED_ENERGY_ID = 2L;
+
+  public EnergyEvseClusterChargingTargetStruct(
+    Integer targetTime,
+    Optional<Integer> targetSoC,
+    Optional<Long> addedEnergy
+  ) {
+    this.targetTime = targetTime;
+    this.targetSoC = targetSoC;
+    this.addedEnergy = addedEnergy;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(TARGET_TIME_ID, new UIntType(targetTime)));
+    values.add(new StructElement(TARGET_SO_C_ID, targetSoC.<BaseTLVType>map((nonOptionaltargetSoC) -> new UIntType(nonOptionaltargetSoC)).orElse(new EmptyType())));
+    values.add(new StructElement(ADDED_ENERGY_ID, addedEnergy.<BaseTLVType>map((nonOptionaladdedEnergy) -> new IntType(nonOptionaladdedEnergy)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterChargingTargetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer targetTime = null;
+    Optional<Integer> targetSoC = Optional.empty();
+    Optional<Long> addedEnergy = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == TARGET_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetTime = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == TARGET_SO_C_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          targetSoC = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == ADDED_ENERGY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Int) {
+          IntType castingValue = element.value(IntType.class);
+          addedEnergy = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new EnergyEvseClusterChargingTargetStruct(
+      targetTime,
+      targetSoC,
+      addedEnergy
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterChargingTargetStruct {\n");
+    output.append("\ttargetTime: ");
+    output.append(targetTime);
+    output.append("\n");
+    output.append("\ttargetSoC: ");
+    output.append(targetSoC);
+    output.append("\n");
+    output.append("\taddedEnergy: ");
+    output.append(addedEnergy);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterCredentialStruct {
   public Integer credentialType;
   public Integer credentialIndex;
@@ -5170,30 +6309,221 @@ public static class ThermostatClusterThermostatScheduleTransition {
     return output.toString();
   }
 }
+public static class ChannelClusterProgramCastStruct {
+  public String name;
+  public String role;
+  private static final long NAME_ID = 0L;
+  private static final long ROLE_ID = 1L;
+
+  public ChannelClusterProgramCastStruct(
+    String name,
+    String role
+  ) {
+    this.name = name;
+    this.role = role;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(ROLE_ID, new StringType(role)));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterProgramCastStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    String role = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == ROLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          role = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ChannelClusterProgramCastStruct(
+      name,
+      role
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterProgramCastStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\trole: ");
+    output.append(role);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterProgramCategoryStruct {
+  public String category;
+  public Optional<String> subCategory;
+  private static final long CATEGORY_ID = 0L;
+  private static final long SUB_CATEGORY_ID = 1L;
+
+  public ChannelClusterProgramCategoryStruct(
+    String category,
+    Optional<String> subCategory
+  ) {
+    this.category = category;
+    this.subCategory = subCategory;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CATEGORY_ID, new StringType(category)));
+    values.add(new StructElement(SUB_CATEGORY_ID, subCategory.<BaseTLVType>map((nonOptionalsubCategory) -> new StringType(nonOptionalsubCategory)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterProgramCategoryStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String category = null;
+    Optional<String> subCategory = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CATEGORY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          category = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SUB_CATEGORY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          subCategory = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ChannelClusterProgramCategoryStruct(
+      category,
+      subCategory
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterProgramCategoryStruct {\n");
+    output.append("\tcategory: ");
+    output.append(category);
+    output.append("\n");
+    output.append("\tsubCategory: ");
+    output.append(subCategory);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterSeriesInfoStruct {
+  public String season;
+  public String episode;
+  private static final long SEASON_ID = 0L;
+  private static final long EPISODE_ID = 1L;
+
+  public ChannelClusterSeriesInfoStruct(
+    String season,
+    String episode
+  ) {
+    this.season = season;
+    this.episode = episode;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SEASON_ID, new StringType(season)));
+    values.add(new StructElement(EPISODE_ID, new StringType(episode)));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterSeriesInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String season = null;
+    String episode = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SEASON_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          season = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == EPISODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          episode = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ChannelClusterSeriesInfoStruct(
+      season,
+      episode
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterSeriesInfoStruct {\n");
+    output.append("\tseason: ");
+    output.append(season);
+    output.append("\n");
+    output.append("\tepisode: ");
+    output.append(episode);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ChannelClusterChannelInfoStruct {
   public Integer majorNumber;
   public Integer minorNumber;
   public Optional<String> name;
   public Optional<String> callSign;
   public Optional<String> affiliateCallSign;
+  public Optional<String> identifier;
+  public Optional<Integer> type;
   private static final long MAJOR_NUMBER_ID = 0L;
   private static final long MINOR_NUMBER_ID = 1L;
   private static final long NAME_ID = 2L;
   private static final long CALL_SIGN_ID = 3L;
   private static final long AFFILIATE_CALL_SIGN_ID = 4L;
+  private static final long IDENTIFIER_ID = 5L;
+  private static final long TYPE_ID = 6L;
 
   public ChannelClusterChannelInfoStruct(
     Integer majorNumber,
     Integer minorNumber,
     Optional<String> name,
     Optional<String> callSign,
-    Optional<String> affiliateCallSign
+    Optional<String> affiliateCallSign,
+    Optional<String> identifier,
+    Optional<Integer> type
   ) {
     this.majorNumber = majorNumber;
     this.minorNumber = minorNumber;
     this.name = name;
     this.callSign = callSign;
     this.affiliateCallSign = affiliateCallSign;
+    this.identifier = identifier;
+    this.type = type;
   }
 
   public StructType encodeTlv() {
@@ -5203,6 +6533,8 @@ public static class ChannelClusterChannelInfoStruct {
     values.add(new StructElement(NAME_ID, name.<BaseTLVType>map((nonOptionalname) -> new StringType(nonOptionalname)).orElse(new EmptyType())));
     values.add(new StructElement(CALL_SIGN_ID, callSign.<BaseTLVType>map((nonOptionalcallSign) -> new StringType(nonOptionalcallSign)).orElse(new EmptyType())));
     values.add(new StructElement(AFFILIATE_CALL_SIGN_ID, affiliateCallSign.<BaseTLVType>map((nonOptionalaffiliateCallSign) -> new StringType(nonOptionalaffiliateCallSign)).orElse(new EmptyType())));
+    values.add(new StructElement(IDENTIFIER_ID, identifier.<BaseTLVType>map((nonOptionalidentifier) -> new StringType(nonOptionalidentifier)).orElse(new EmptyType())));
+    values.add(new StructElement(TYPE_ID, type.<BaseTLVType>map((nonOptionaltype) -> new UIntType(nonOptionaltype)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -5216,6 +6548,8 @@ public static class ChannelClusterChannelInfoStruct {
     Optional<String> name = Optional.empty();
     Optional<String> callSign = Optional.empty();
     Optional<String> affiliateCallSign = Optional.empty();
+    Optional<String> identifier = Optional.empty();
+    Optional<Integer> type = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MAJOR_NUMBER_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5242,6 +6576,16 @@ public static class ChannelClusterChannelInfoStruct {
           StringType castingValue = element.value(StringType.class);
           affiliateCallSign = Optional.of(castingValue.value(String.class));
         }
+      } else if (element.contextTagNum() == IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          identifier = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == TYPE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          type = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ChannelClusterChannelInfoStruct(
@@ -5249,7 +6593,9 @@ public static class ChannelClusterChannelInfoStruct {
       minorNumber,
       name,
       callSign,
-      affiliateCallSign
+      affiliateCallSign,
+      identifier,
+      type
     );
   }
 
@@ -5271,6 +6617,526 @@ public static class ChannelClusterChannelInfoStruct {
     output.append("\n");
     output.append("\taffiliateCallSign: ");
     output.append(affiliateCallSign);
+    output.append("\n");
+    output.append("\tidentifier: ");
+    output.append(identifier);
+    output.append("\n");
+    output.append("\ttype: ");
+    output.append(type);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterProgramStruct {
+  public String identifier;
+  public ChipStructs.ChannelClusterChannelInfoStruct channel;
+  public Long startTime;
+  public Long endTime;
+  public String title;
+  public Optional<String> subtitle;
+  public Optional<String> description;
+  public Optional<ArrayList<String>> audioLanguages;
+  public Optional<ArrayList<String>> ratings;
+  public Optional<String> thumbnailUrl;
+  public Optional<String> posterArtUrl;
+  public Optional<String> dvbiUrl;
+  public Optional<String> releaseDate;
+  public Optional<String> parentalGuidanceText;
+  public Optional<Long> recordingFlag;
+  public @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo;
+  public Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList;
+  public Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList;
+  public Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList;
+  private static final long IDENTIFIER_ID = 0L;
+  private static final long CHANNEL_ID = 1L;
+  private static final long START_TIME_ID = 2L;
+  private static final long END_TIME_ID = 3L;
+  private static final long TITLE_ID = 4L;
+  private static final long SUBTITLE_ID = 5L;
+  private static final long DESCRIPTION_ID = 6L;
+  private static final long AUDIO_LANGUAGES_ID = 7L;
+  private static final long RATINGS_ID = 8L;
+  private static final long THUMBNAIL_URL_ID = 9L;
+  private static final long POSTER_ART_URL_ID = 10L;
+  private static final long DVBI_URL_ID = 11L;
+  private static final long RELEASE_DATE_ID = 12L;
+  private static final long PARENTAL_GUIDANCE_TEXT_ID = 13L;
+  private static final long RECORDING_FLAG_ID = 14L;
+  private static final long SERIES_INFO_ID = 15L;
+  private static final long CATEGORY_LIST_ID = 16L;
+  private static final long CAST_LIST_ID = 17L;
+  private static final long EXTERNAL_I_D_LIST_ID = 18L;
+
+  public ChannelClusterProgramStruct(
+    String identifier,
+    ChipStructs.ChannelClusterChannelInfoStruct channel,
+    Long startTime,
+    Long endTime,
+    String title,
+    Optional<String> subtitle,
+    Optional<String> description,
+    Optional<ArrayList<String>> audioLanguages,
+    Optional<ArrayList<String>> ratings,
+    Optional<String> thumbnailUrl,
+    Optional<String> posterArtUrl,
+    Optional<String> dvbiUrl,
+    Optional<String> releaseDate,
+    Optional<String> parentalGuidanceText,
+    Optional<Long> recordingFlag,
+    @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo,
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList,
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList,
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList
+  ) {
+    this.identifier = identifier;
+    this.channel = channel;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.title = title;
+    this.subtitle = subtitle;
+    this.description = description;
+    this.audioLanguages = audioLanguages;
+    this.ratings = ratings;
+    this.thumbnailUrl = thumbnailUrl;
+    this.posterArtUrl = posterArtUrl;
+    this.dvbiUrl = dvbiUrl;
+    this.releaseDate = releaseDate;
+    this.parentalGuidanceText = parentalGuidanceText;
+    this.recordingFlag = recordingFlag;
+    this.seriesInfo = seriesInfo;
+    this.categoryList = categoryList;
+    this.castList = castList;
+    this.externalIDList = externalIDList;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(IDENTIFIER_ID, new StringType(identifier)));
+    values.add(new StructElement(CHANNEL_ID, channel.encodeTlv()));
+    values.add(new StructElement(START_TIME_ID, new UIntType(startTime)));
+    values.add(new StructElement(END_TIME_ID, new UIntType(endTime)));
+    values.add(new StructElement(TITLE_ID, new StringType(title)));
+    values.add(new StructElement(SUBTITLE_ID, subtitle.<BaseTLVType>map((nonOptionalsubtitle) -> new StringType(nonOptionalsubtitle)).orElse(new EmptyType())));
+    values.add(new StructElement(DESCRIPTION_ID, description.<BaseTLVType>map((nonOptionaldescription) -> new StringType(nonOptionaldescription)).orElse(new EmptyType())));
+    values.add(new StructElement(AUDIO_LANGUAGES_ID, audioLanguages.<BaseTLVType>map((nonOptionalaudioLanguages) -> ArrayType.generateArrayType(nonOptionalaudioLanguages, (elementnonOptionalaudioLanguages) -> new StringType(elementnonOptionalaudioLanguages))).orElse(new EmptyType())));
+    values.add(new StructElement(RATINGS_ID, ratings.<BaseTLVType>map((nonOptionalratings) -> ArrayType.generateArrayType(nonOptionalratings, (elementnonOptionalratings) -> new StringType(elementnonOptionalratings))).orElse(new EmptyType())));
+    values.add(new StructElement(THUMBNAIL_URL_ID, thumbnailUrl.<BaseTLVType>map((nonOptionalthumbnailUrl) -> new StringType(nonOptionalthumbnailUrl)).orElse(new EmptyType())));
+    values.add(new StructElement(POSTER_ART_URL_ID, posterArtUrl.<BaseTLVType>map((nonOptionalposterArtUrl) -> new StringType(nonOptionalposterArtUrl)).orElse(new EmptyType())));
+    values.add(new StructElement(DVBI_URL_ID, dvbiUrl.<BaseTLVType>map((nonOptionaldvbiUrl) -> new StringType(nonOptionaldvbiUrl)).orElse(new EmptyType())));
+    values.add(new StructElement(RELEASE_DATE_ID, releaseDate.<BaseTLVType>map((nonOptionalreleaseDate) -> new StringType(nonOptionalreleaseDate)).orElse(new EmptyType())));
+    values.add(new StructElement(PARENTAL_GUIDANCE_TEXT_ID, parentalGuidanceText.<BaseTLVType>map((nonOptionalparentalGuidanceText) -> new StringType(nonOptionalparentalGuidanceText)).orElse(new EmptyType())));
+    values.add(new StructElement(RECORDING_FLAG_ID, recordingFlag.<BaseTLVType>map((nonOptionalrecordingFlag) -> new UIntType(nonOptionalrecordingFlag)).orElse(new EmptyType())));
+    values.add(new StructElement(SERIES_INFO_ID, seriesInfo != null ? seriesInfo.<BaseTLVType>map((nonOptionalseriesInfo) -> nonOptionalseriesInfo.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(CATEGORY_LIST_ID, categoryList.<BaseTLVType>map((nonOptionalcategoryList) -> ArrayType.generateArrayType(nonOptionalcategoryList, (elementnonOptionalcategoryList) -> elementnonOptionalcategoryList.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(CAST_LIST_ID, castList.<BaseTLVType>map((nonOptionalcastList) -> ArrayType.generateArrayType(nonOptionalcastList, (elementnonOptionalcastList) -> elementnonOptionalcastList.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(EXTERNAL_I_D_LIST_ID, externalIDList.<BaseTLVType>map((nonOptionalexternalIDList) -> ArrayType.generateArrayType(nonOptionalexternalIDList, (elementnonOptionalexternalIDList) -> elementnonOptionalexternalIDList.encodeTlv())).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterProgramStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String identifier = null;
+    ChipStructs.ChannelClusterChannelInfoStruct channel = null;
+    Long startTime = null;
+    Long endTime = null;
+    String title = null;
+    Optional<String> subtitle = Optional.empty();
+    Optional<String> description = Optional.empty();
+    Optional<ArrayList<String>> audioLanguages = Optional.empty();
+    Optional<ArrayList<String>> ratings = Optional.empty();
+    Optional<String> thumbnailUrl = Optional.empty();
+    Optional<String> posterArtUrl = Optional.empty();
+    Optional<String> dvbiUrl = Optional.empty();
+    Optional<String> releaseDate = Optional.empty();
+    Optional<String> parentalGuidanceText = Optional.empty();
+    Optional<Long> recordingFlag = Optional.empty();
+    @Nullable Optional<ChipStructs.ChannelClusterSeriesInfoStruct> seriesInfo = null;
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCategoryStruct>> categoryList = Optional.empty();
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> castList = Optional.empty();
+    Optional<ArrayList<ChipStructs.ChannelClusterProgramCastStruct>> externalIDList = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == IDENTIFIER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          identifier = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == CHANNEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          channel = ChipStructs.ChannelClusterChannelInfoStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == END_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          endTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TITLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          title = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == SUBTITLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          subtitle = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == DESCRIPTION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          description = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == AUDIO_LANGUAGES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          audioLanguages = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class)));
+        }
+      } else if (element.contextTagNum() == RATINGS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ratings = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(String.class)));
+        }
+      } else if (element.contextTagNum() == THUMBNAIL_URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          thumbnailUrl = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == POSTER_ART_URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          posterArtUrl = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == DVBI_URL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          dvbiUrl = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == RELEASE_DATE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          releaseDate = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == PARENTAL_GUIDANCE_TEXT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          parentalGuidanceText = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == RECORDING_FLAG_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          recordingFlag = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == SERIES_INFO_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          seriesInfo = Optional.of(ChipStructs.ChannelClusterSeriesInfoStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == CATEGORY_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          categoryList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ChannelClusterProgramCategoryStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == CAST_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          castList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ChannelClusterProgramCastStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == EXTERNAL_I_D_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          externalIDList = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ChannelClusterProgramCastStruct.decodeTlv(elementcastingValue)));
+        }
+      }
+    }
+    return new ChannelClusterProgramStruct(
+      identifier,
+      channel,
+      startTime,
+      endTime,
+      title,
+      subtitle,
+      description,
+      audioLanguages,
+      ratings,
+      thumbnailUrl,
+      posterArtUrl,
+      dvbiUrl,
+      releaseDate,
+      parentalGuidanceText,
+      recordingFlag,
+      seriesInfo,
+      categoryList,
+      castList,
+      externalIDList
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterProgramStruct {\n");
+    output.append("\tidentifier: ");
+    output.append(identifier);
+    output.append("\n");
+    output.append("\tchannel: ");
+    output.append(channel);
+    output.append("\n");
+    output.append("\tstartTime: ");
+    output.append(startTime);
+    output.append("\n");
+    output.append("\tendTime: ");
+    output.append(endTime);
+    output.append("\n");
+    output.append("\ttitle: ");
+    output.append(title);
+    output.append("\n");
+    output.append("\tsubtitle: ");
+    output.append(subtitle);
+    output.append("\n");
+    output.append("\tdescription: ");
+    output.append(description);
+    output.append("\n");
+    output.append("\taudioLanguages: ");
+    output.append(audioLanguages);
+    output.append("\n");
+    output.append("\tratings: ");
+    output.append(ratings);
+    output.append("\n");
+    output.append("\tthumbnailUrl: ");
+    output.append(thumbnailUrl);
+    output.append("\n");
+    output.append("\tposterArtUrl: ");
+    output.append(posterArtUrl);
+    output.append("\n");
+    output.append("\tdvbiUrl: ");
+    output.append(dvbiUrl);
+    output.append("\n");
+    output.append("\treleaseDate: ");
+    output.append(releaseDate);
+    output.append("\n");
+    output.append("\tparentalGuidanceText: ");
+    output.append(parentalGuidanceText);
+    output.append("\n");
+    output.append("\trecordingFlag: ");
+    output.append(recordingFlag);
+    output.append("\n");
+    output.append("\tseriesInfo: ");
+    output.append(seriesInfo);
+    output.append("\n");
+    output.append("\tcategoryList: ");
+    output.append(categoryList);
+    output.append("\n");
+    output.append("\tcastList: ");
+    output.append(castList);
+    output.append("\n");
+    output.append("\texternalIDList: ");
+    output.append(externalIDList);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterPageTokenStruct {
+  public Optional<Integer> limit;
+  public Optional<String> after;
+  public Optional<String> before;
+  private static final long LIMIT_ID = 0L;
+  private static final long AFTER_ID = 1L;
+  private static final long BEFORE_ID = 2L;
+
+  public ChannelClusterPageTokenStruct(
+    Optional<Integer> limit,
+    Optional<String> after,
+    Optional<String> before
+  ) {
+    this.limit = limit;
+    this.after = after;
+    this.before = before;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LIMIT_ID, limit.<BaseTLVType>map((nonOptionallimit) -> new UIntType(nonOptionallimit)).orElse(new EmptyType())));
+    values.add(new StructElement(AFTER_ID, after.<BaseTLVType>map((nonOptionalafter) -> new StringType(nonOptionalafter)).orElse(new EmptyType())));
+    values.add(new StructElement(BEFORE_ID, before.<BaseTLVType>map((nonOptionalbefore) -> new StringType(nonOptionalbefore)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterPageTokenStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<Integer> limit = Optional.empty();
+    Optional<String> after = Optional.empty();
+    Optional<String> before = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LIMIT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          limit = Optional.of(castingValue.value(Integer.class));
+        }
+      } else if (element.contextTagNum() == AFTER_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          after = Optional.of(castingValue.value(String.class));
+        }
+      } else if (element.contextTagNum() == BEFORE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          before = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ChannelClusterPageTokenStruct(
+      limit,
+      after,
+      before
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterPageTokenStruct {\n");
+    output.append("\tlimit: ");
+    output.append(limit);
+    output.append("\n");
+    output.append("\tafter: ");
+    output.append(after);
+    output.append("\n");
+    output.append("\tbefore: ");
+    output.append(before);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterChannelPagingStruct {
+  public @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> previousToken;
+  public @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> nextToken;
+  private static final long PREVIOUS_TOKEN_ID = 0L;
+  private static final long NEXT_TOKEN_ID = 1L;
+
+  public ChannelClusterChannelPagingStruct(
+    @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> previousToken,
+    @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> nextToken
+  ) {
+    this.previousToken = previousToken;
+    this.nextToken = nextToken;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PREVIOUS_TOKEN_ID, previousToken != null ? previousToken.<BaseTLVType>map((nonOptionalpreviousToken) -> nonOptionalpreviousToken.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(NEXT_TOKEN_ID, nextToken != null ? nextToken.<BaseTLVType>map((nonOptionalnextToken) -> nonOptionalnextToken.encodeTlv()).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterChannelPagingStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> previousToken = null;
+    @Nullable Optional<ChipStructs.ChannelClusterPageTokenStruct> nextToken = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PREVIOUS_TOKEN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          previousToken = Optional.of(ChipStructs.ChannelClusterPageTokenStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == NEXT_TOKEN_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          nextToken = Optional.of(ChipStructs.ChannelClusterPageTokenStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ChannelClusterChannelPagingStruct(
+      previousToken,
+      nextToken
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterChannelPagingStruct {\n");
+    output.append("\tpreviousToken: ");
+    output.append(previousToken);
+    output.append("\n");
+    output.append("\tnextToken: ");
+    output.append(nextToken);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ChannelClusterAdditionalInfoStruct {
+  public String name;
+  public String value;
+  private static final long NAME_ID = 0L;
+  private static final long VALUE_ID = 1L;
+
+  public ChannelClusterAdditionalInfoStruct(
+    String name,
+    String value
+  ) {
+    this.name = name;
+    this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(NAME_ID, new StringType(name)));
+    values.add(new StructElement(VALUE_ID, new StringType(value)));
+
+    return new StructType(values);
+  }
+
+  public static ChannelClusterAdditionalInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String name = null;
+    String value = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          name = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          value = castingValue.value(String.class);
+        }
+      }
+    }
+    return new ChannelClusterAdditionalInfoStruct(
+      name,
+      value
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ChannelClusterAdditionalInfoStruct {\n");
+    output.append("\tname: ");
+    output.append(name);
+    output.append("\n");
+    output.append("\tvalue: ");
+    output.append(value);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5423,6 +7289,128 @@ public static class TargetNavigatorClusterTargetInfoStruct {
     output.append("\n");
     output.append("\tname: ");
     output.append(name);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaPlaybackClusterTrackAttributesStruct {
+  public String languageCode;
+  public @Nullable Optional<String> displayName;
+  private static final long LANGUAGE_CODE_ID = 0L;
+  private static final long DISPLAY_NAME_ID = 1L;
+
+  public MediaPlaybackClusterTrackAttributesStruct(
+    String languageCode,
+    @Nullable Optional<String> displayName
+  ) {
+    this.languageCode = languageCode;
+    this.displayName = displayName;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LANGUAGE_CODE_ID, new StringType(languageCode)));
+    values.add(new StructElement(DISPLAY_NAME_ID, displayName != null ? displayName.<BaseTLVType>map((nonOptionaldisplayName) -> new StringType(nonOptionaldisplayName)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MediaPlaybackClusterTrackAttributesStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String languageCode = null;
+    @Nullable Optional<String> displayName = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LANGUAGE_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          languageCode = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == DISPLAY_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          displayName = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new MediaPlaybackClusterTrackAttributesStruct(
+      languageCode,
+      displayName
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaPlaybackClusterTrackAttributesStruct {\n");
+    output.append("\tlanguageCode: ");
+    output.append(languageCode);
+    output.append("\n");
+    output.append("\tdisplayName: ");
+    output.append(displayName);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MediaPlaybackClusterTrackStruct {
+  public String id;
+  public @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes;
+  private static final long ID_ID = 0L;
+  private static final long TRACK_ATTRIBUTES_ID = 1L;
+
+  public MediaPlaybackClusterTrackStruct(
+    String id,
+    @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes
+  ) {
+    this.id = id;
+    this.trackAttributes = trackAttributes;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ID_ID, new StringType(id)));
+    values.add(new StructElement(TRACK_ATTRIBUTES_ID, trackAttributes != null ? trackAttributes.encodeTlv() : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static MediaPlaybackClusterTrackStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String id = null;
+    @Nullable ChipStructs.MediaPlaybackClusterTrackAttributesStruct trackAttributes = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          id = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == TRACK_ATTRIBUTES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          trackAttributes = ChipStructs.MediaPlaybackClusterTrackAttributesStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new MediaPlaybackClusterTrackStruct(
+      id,
+      trackAttributes
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MediaPlaybackClusterTrackStruct {\n");
+    output.append("\tid: ");
+    output.append(id);
+    output.append("\n");
+    output.append("\ttrackAttributes: ");
+    output.append(trackAttributes);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -5651,6 +7639,158 @@ public static class ContentLauncherClusterDimensionStruct {
     output.append("\n");
     output.append("\tmetric: ");
     output.append(metric);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterTrackPreferenceStruct {
+  public String languageCode;
+  public Optional<ArrayList<Integer>> characteristics;
+  public Integer audioOutputIndex;
+  private static final long LANGUAGE_CODE_ID = 0L;
+  private static final long CHARACTERISTICS_ID = 1L;
+  private static final long AUDIO_OUTPUT_INDEX_ID = 2L;
+
+  public ContentLauncherClusterTrackPreferenceStruct(
+    String languageCode,
+    Optional<ArrayList<Integer>> characteristics,
+    Integer audioOutputIndex
+  ) {
+    this.languageCode = languageCode;
+    this.characteristics = characteristics;
+    this.audioOutputIndex = audioOutputIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(LANGUAGE_CODE_ID, new StringType(languageCode)));
+    values.add(new StructElement(CHARACTERISTICS_ID, characteristics.<BaseTLVType>map((nonOptionalcharacteristics) -> ArrayType.generateArrayType(nonOptionalcharacteristics, (elementnonOptionalcharacteristics) -> new UIntType(elementnonOptionalcharacteristics))).orElse(new EmptyType())));
+    values.add(new StructElement(AUDIO_OUTPUT_INDEX_ID, new UIntType(audioOutputIndex)));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterTrackPreferenceStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String languageCode = null;
+    Optional<ArrayList<Integer>> characteristics = Optional.empty();
+    Integer audioOutputIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == LANGUAGE_CODE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          languageCode = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == CHARACTERISTICS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          characteristics = Optional.of(castingValue.map((elementcastingValue) -> elementcastingValue.value(Integer.class)));
+        }
+      } else if (element.contextTagNum() == AUDIO_OUTPUT_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          audioOutputIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ContentLauncherClusterTrackPreferenceStruct(
+      languageCode,
+      characteristics,
+      audioOutputIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterTrackPreferenceStruct {\n");
+    output.append("\tlanguageCode: ");
+    output.append(languageCode);
+    output.append("\n");
+    output.append("\tcharacteristics: ");
+    output.append(characteristics);
+    output.append("\n");
+    output.append("\taudioOutputIndex: ");
+    output.append(audioOutputIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentLauncherClusterPlaybackPreferencesStruct {
+  public Long playbackPosition;
+  public ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack;
+  public Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks;
+  private static final long PLAYBACK_POSITION_ID = 0L;
+  private static final long TEXT_TRACK_ID = 1L;
+  private static final long AUDIO_TRACKS_ID = 2L;
+
+  public ContentLauncherClusterPlaybackPreferencesStruct(
+    Long playbackPosition,
+    ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack,
+    Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks
+  ) {
+    this.playbackPosition = playbackPosition;
+    this.textTrack = textTrack;
+    this.audioTracks = audioTracks;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(PLAYBACK_POSITION_ID, new UIntType(playbackPosition)));
+    values.add(new StructElement(TEXT_TRACK_ID, textTrack.encodeTlv()));
+    values.add(new StructElement(AUDIO_TRACKS_ID, audioTracks.<BaseTLVType>map((nonOptionalaudioTracks) -> ArrayType.generateArrayType(nonOptionalaudioTracks, (elementnonOptionalaudioTracks) -> elementnonOptionalaudioTracks.encodeTlv())).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ContentLauncherClusterPlaybackPreferencesStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long playbackPosition = null;
+    ChipStructs.ContentLauncherClusterTrackPreferenceStruct textTrack = null;
+    Optional<ArrayList<ChipStructs.ContentLauncherClusterTrackPreferenceStruct>> audioTracks = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == PLAYBACK_POSITION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          playbackPosition = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == TEXT_TRACK_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          textTrack = ChipStructs.ContentLauncherClusterTrackPreferenceStruct.decodeTlv(castingValue);
+        }
+      } else if (element.contextTagNum() == AUDIO_TRACKS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          audioTracks = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.ContentLauncherClusterTrackPreferenceStruct.decodeTlv(elementcastingValue)));
+        }
+      }
+    }
+    return new ContentLauncherClusterPlaybackPreferencesStruct(
+      playbackPosition,
+      textTrack,
+      audioTracks
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentLauncherClusterPlaybackPreferencesStruct {\n");
+    output.append("\tplaybackPosition: ");
+    output.append(playbackPosition);
+    output.append("\n");
+    output.append("\ttextTrack: ");
+    output.append(textTrack);
+    output.append("\n");
+    output.append("\taudioTracks: ");
+    output.append(audioTracks);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -6290,6 +8430,67 @@ public static class ApplicationBasicClusterApplicationStruct {
     output.append("\n");
     output.append("\tapplicationID: ");
     output.append(applicationID);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterRatingNameStruct {
+  public String ratingName;
+  public Optional<String> ratingNameDesc;
+  private static final long RATING_NAME_ID = 0L;
+  private static final long RATING_NAME_DESC_ID = 1L;
+
+  public ContentControlClusterRatingNameStruct(
+    String ratingName,
+    Optional<String> ratingNameDesc
+  ) {
+    this.ratingName = ratingName;
+    this.ratingNameDesc = ratingNameDesc;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RATING_NAME_ID, new StringType(ratingName)));
+    values.add(new StructElement(RATING_NAME_DESC_ID, ratingNameDesc.<BaseTLVType>map((nonOptionalratingNameDesc) -> new StringType(nonOptionalratingNameDesc)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterRatingNameStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    String ratingName = null;
+    Optional<String> ratingNameDesc = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RATING_NAME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          ratingName = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == RATING_NAME_DESC_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          ratingNameDesc = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new ContentControlClusterRatingNameStruct(
+      ratingName,
+      ratingNameDesc
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterRatingNameStruct {\n");
+    output.append("\tratingName: ");
+    output.append(ratingName);
+    output.append("\n");
+    output.append("\tratingNameDesc: ");
+    output.append(ratingNameDesc);
     output.append("\n");
     output.append("}\n");
     return output.toString();

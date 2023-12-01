@@ -32,7 +32,7 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <net/if.h>
 
-#include <inet/InetBuildConfig.h>
+#include <inet/InetConfig.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
