@@ -80,9 +80,6 @@ private:
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
-    // Helper function to determine whether next stage should be kICDGetRegistrationInfo,
-    // or kFindOperational, depending on whether the device is an ICD.
-    CommissioningStage GetNextStateAfterNetworkCommissioning();
 
     // Helper function to determine if a scan attempt should be made given the
     // scan attempt commissioning params and the corresponding network endpoint of

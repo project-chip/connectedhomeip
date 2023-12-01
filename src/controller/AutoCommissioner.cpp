@@ -314,15 +314,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
     return CommissioningStage::kCleanup;
 }
 
-CommissioningStage AutoCommissioner::GetNextSommissioningStageAfterNetworkCommissioning()
-{
-    if (mNeedIcdRegistration)
-    {
-        return CommissioningStage::kICDGetRegistrationInfo;
-    }
-    return CommissioningStage::kFindOperational;
-}
-
 CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
 {
     if (mStopCommissioning)
@@ -416,6 +407,17 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
         }
     case CommissioningStage::kConfigureTrustedTimeSource:
+        if (mNeedIcdRegistration)
+        {
+            return CommissioningStage::kICDGetRegistrationInfo;
+        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kICDSendStayActive, lastErr);
+    case CommissioningStage::kICDGetRegistrationInfo:
+        return CommissioningStage::kICDRegistration;
+    case CommissioningStage::kICDRegistration:
+        // TODO(#24259): StayActiveRequest is not supported by server. We may want to SendStayActive after OpDiscovery.
+        return CommissioningStage::kICDSendStayActive;
+    case CommissioningStage::kICDSendStayActive:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -439,7 +441,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             {
                 return CommissioningStage::kCleanup;
             }
-            return GetNextStateAfterNetworkCommissioning();
+            return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kScanNetworks:
         return CommissioningStage::kNeedsNetworkCreds;
@@ -482,7 +484,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         else
         {
             SetCASEFailsafeTimerIfNeeded();
-            return GetNextStateAfterNetworkCommissioning();
+            return CommissioningStage::kFindOperational;
         }
     case CommissioningStage::kThreadNetworkEnable:
         SetCASEFailsafeTimerIfNeeded();
@@ -490,12 +492,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return GetNextCommissioningStageAfterNetworkCommissioning();
-    case CommissioningStage::kICDGetRegistrationInfo:
-        return CommissioningStage::kICDRegistration;
-    case CommissioningStage::kICDRegistration:
-        return CommissioningStage::kICDSendStayActive;
-    case CommissioningStage::kICDSendStayActive:
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
         return CommissioningStage::kSendComplete;

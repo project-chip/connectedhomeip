@@ -109,6 +109,18 @@ const char * StageToString(CommissioningStage stage)
         return "ConfigureTrustedTimeSource";
         break;
 
+    case kICDGetRegistrationInfo:
+        return "ICDGetRegistrationInfo";
+        break;
+
+    case kICDRegistration:
+        return "ICDRegistration";
+        break;
+
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
+        break;
+
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
         break;
@@ -131,18 +143,6 @@ const char * StageToString(CommissioningStage stage)
 
     case kThreadNetworkEnable:
         return "ThreadNetworkEnable";
-        break;
-
-    case kICDGetRegistrationInfo:
-        return "NeedICDRegistrationInfo";
-        break;
-
-    case kICDRegistration: ///< Register for ICD management
-        return "ICDRegistration";
-        break;
-
-    case kICDSendStayActive:
-        return "ICDSendStayActive";
         break;
 
     case kFindOperational:
