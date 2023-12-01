@@ -67,15 +67,19 @@ static bool IsUnsafeSpan(const Optional<SpanType> & maybeUnsafeSpan, const Optio
     return maybeUnsafeSpan.Value().data() != knownSafeSpan.Value().data();
 }
 
-CHIP_ERROR AutoCommissioner::VerifyICDRegistraionInfo(const CommissioningParameters & params)
+CHIP_ERROR AutoCommissioner::VerifyICDRegistrationInfo(const CommissioningParameters & params)
 {
     ChipLogProgress(Controller, "Checking ICD registration parameters");
     if (!params.GetICDSymmetricKey().HasValue())
     {
-        ChipLogError(Controller, "Unexpected ICD symmetric key!");
+        ChipLogError(Controller, "Missing ICD symmetric key!");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    VerifyOrReturnError(params.GetICDSymmetricKey().Value().size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+    if (params.GetICDSymmetricKey().Value().size() != sizeof(mICDSymmetricKey))
+    {
+        ChipLogError(Controller, "Invalid ICD symmetric key length!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     if (!params.GetICDCheckInNodeId().HasValue())
     {
         ChipLogError(Controller, "Missing ICD check-in node id!");
@@ -256,10 +260,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
 
     if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore && params.GetICDSymmetricKey().HasValue())
     {
-        // The application may set this when Commissioner requires one, but it should be valid if the application provides one.
-        ReturnErrorOnFailure(VerifyICDRegistraionInfo(params));
+        ReturnErrorOnFailure(VerifyICDRegistrationInfo(params));
 
-        // The values are valid now.
+        // The values must be valid now.
         memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
         mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey, sizeof(mICDSymmetricKey)));
         mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
@@ -311,11 +314,11 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageNetworkSetup(Commi
     return CommissioningStage::kCleanup;
 }
 
-CommissioningStage AutoCommissioner::GetNextStateAfterNetworkCommissioning()
+CommissioningStage AutoCommissioner::GetNextSommissioningStageAfterNetworkCommissioning()
 {
-    if (mNeedIcdRegistraion)
+    if (mNeedIcdRegistration)
     {
-        return CommissioningStage::kICDGetRegistraionInfo;
+        return CommissioningStage::kICDGetRegistrationInfo;
     }
     return CommissioningStage::kFindOperational;
 }
@@ -487,8 +490,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         {
             return CommissioningStage::kCleanup;
         }
-        return GetNextStateAfterNetworkCommissioning();
-    case CommissioningStage::kICDGetRegistraionInfo:
+        return GetNextCommissioningStageAfterNetworkCommissioning();
+    case CommissioningStage::kICDGetRegistrationInfo:
         return CommissioningStage::kICDRegistration;
     case CommissioningStage::kICDRegistration:
         return CommissioningStage::kICDSendStayActive;
@@ -763,7 +766,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 if (commissioningInfo.isIcd && commissioningInfo.checkInProtocolSupport)
                 {
-                    mNeedIcdRegistraion = true;
+                    mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
                 }
             }
@@ -828,10 +831,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
-        case CommissioningStage::kICDRegistration: {
+        case CommissioningStage::kICDRegistration:
             break;
-        }
-        break;
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;

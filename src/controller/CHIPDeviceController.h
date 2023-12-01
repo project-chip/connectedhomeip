@@ -612,21 +612,19 @@ public:
 
     /**
      * @brief
-     *   This function is called by the DevicePairingDelegate to indicate that network credentials have been set
-     * on the CommissioningParameters of the CommissioningDelegate using CommissioningDelegate.SetCommissioningParameters().
-     * As a result, commissioning can advance to the next stage.
+     *   This function is called by the DevicePairingDelegate to indicate that ICD registration info (ICDSymmetricKey,
+     * ICDCheckInNodeId and ICDMonitoredSubject) have been set on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(). As a result, commissioning can advance to the next stage.
      *
-     * The DevicePairingDelegate may call this method from the OnICDRegistraionInfoRequired callback, or it may call this
+     * The DevicePairingDelegate may call this method from the OnICDRegistrationInfoRequired callback, or it may call this
      * method after obtaining required parameters for ICD registration using asyncronous methods (like RPC call etc).
      *
-     * The DevicePairingDelegate can exit the commissioning process by calling StopPairing.
-     *
-     * When the ICD Registration completed, OnICDRegistrationComplete will be called.
+     * When the ICD Registration completes, OnICDRegistrationComplete will be called.
      *
      * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state
-     * (kICDGetRegistraionInfo).
+     * (kICDGetRegistrationInfo).
      */
-    CHIP_ERROR ICDRegistraionInfoReady();
+    CHIP_ERROR ICDRegistrationInfoReady();
 
     /**
      * @brief

@@ -133,7 +133,7 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkEnable";
         break;
 
-    case kICDGetRegistraionInfo:
+    case kICDGetRegistrationInfo:
         return "NeedICDRegistrationInfo";
         break;
 

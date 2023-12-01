@@ -66,12 +66,12 @@ public:
                     " If true, the commissioning will continue in case of attestation verification failure.");
         AddArgument("case-auth-tags", 1, UINT32_MAX, &mCASEAuthTags, "The CATs to be encoded in the NOC sent to the commissionee");
         AddArgument("skip-icd-registration", 0, 1, &mSkipICDRegistration,
-                    "Skip ICD registration for ICDs during commissioning. Default: false");
+                    "Skip registering for check-ins from ICDs during commissioning. Default: false");
         AddArgument("icd-check-in-nodeid", 0, UINT64_MAX, &mICDCheckInNodeId,
                     "The check-in node id for the ICD, default: node id of the commissioner.");
         AddArgument("icd-monitored-subject", 0, UINT64_MAX, &mICDMonitoredSubject,
                     "The monitored subject of the ICD, default: The node id used for icd-check-in-nodeid.");
-        AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: random generated.");
+        AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
 
         switch (networkType)
         {
@@ -195,7 +195,7 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-    void OnICDRegistraionInfoRequired() override;
+    void OnICDRegistrationInfoRequired() override;
     void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////

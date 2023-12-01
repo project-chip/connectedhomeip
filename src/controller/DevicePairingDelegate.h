@@ -117,17 +117,17 @@ public:
 
     /**
      * @brief
-     *  Called when the ICD symmetric key is required.
+     *  Called when the ICD registration information (ICD symmetric key, check-in node ID and monitored subject) is required.
      *
-     * The DeviceCommissioner will be waiting in the kICDGetRegistraionInfo step and not advancing the commissioning process.
+     * The DeviceCommissioner will be waiting in the kICDGetRegistrationInfo step and not advancing the commissioning process.
      *
-     * The implementation should set the ICD registraion info on the CommissioningParameters of the CommissioningDelegate
-     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistraionInfoReady()
+     * The implementation should set the ICD registration info on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistrationInfoReady()
      * in order to resume the commissioning process.
      *
-     * The implementation may set the credentials before start commissioning, and call ICDRegistraionInfoReady() directly.
+     * The implementation may set the credentials before start commissioning, and call ICDRegistrationInfoReady() directly.
      */
-    virtual void OnICDRegistraionInfoRequired() {}
+    virtual void OnICDRegistrationInfoRequired() {}
 
     /**
      * @bried

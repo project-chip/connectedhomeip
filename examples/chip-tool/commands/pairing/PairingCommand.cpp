@@ -149,7 +149,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         {
             mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
         }
-        // These Optional-s must have values now.
+        // These Optionals must have values now.
         // The commissioner will verify these values.
         params.SetICDSymmetricKey(mICDSymmetricKey.Value());
         params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
@@ -391,10 +391,10 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     SetCommandExitStatus(err);
 }
 
-void PairingCommand::OnICDRegistraionInfoRequired()
+void PairingCommand::OnICDRegistrationInfoRequired()
 {
-    // As we have set the ICD Registraion info before, we can call ICDRegistraionInfoReady() directly.
-    CurrentCommissioner().ICDRegistraionInfoReady();
+    // Since we compute our ICD Registration info up front, we can call ICDRegistrationInfoReady() directly.
+    CurrentCommissioner().ICDRegistrationInfoReady();
 }
 
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
