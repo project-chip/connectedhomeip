@@ -87,10 +87,10 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="MEASURED" type="boolean" writable="false" default="false" optional="false">Measured</attribute>
     <attribute side="server" code="0x0001" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" default="false" optional="false">Accuracy</attribute>
-    <attribute side="server" code="0x0002" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
-    <attribute side="server" code="0x0003" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
-    <attribute side="server" code="0x0004" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
-    <attribute side="server" code="0x0005" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
+    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute side="server" code="0x0003" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
+    <attribute side="server" code="0x0004" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
+    <attribute side="server" code="0x0005" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
 
     <event side="server" code="0x00" name="CumulativeEnergyMeasured" priority="info" optional="true">
       <description>This event SHALL be generated when the server takes a snapshot of th cumulative energy imported by the server.</description>
