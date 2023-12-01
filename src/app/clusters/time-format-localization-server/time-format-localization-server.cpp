@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums-check.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -135,39 +136,14 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     return false;
 }
 
-Optional<HourFormatEnum> SafeCastToKnowHourFormat(uint8_t value)
+template <typename E>
+Optional<E> SafeCast(uint8_t value)
 {
-    switch (value)
-    {
-    case to_underlying(HourFormatEnum::k12hr):
-    case to_underlying(HourFormatEnum::k24hr):
-    case to_underlying(HourFormatEnum::kUseActiveLocale):
-        return chip::MakeOptional(static_cast<HourFormatEnum>(value));
-    default:
+    E val = static_cast<E>(value);
+    if (EnsureKnownEnumValue(val) == E::kUnknownEnumValue) {
         return NullOptional;
     }
-}
-Optional<CalendarTypeEnum> SafeCastToKnowCalendarType(uint8_t value)
-{
-    switch (value)
-    {
-    case to_underlying(CalendarTypeEnum::kBuddhist):
-    case to_underlying(CalendarTypeEnum::kChinese):
-    case to_underlying(CalendarTypeEnum::kCoptic):
-    case to_underlying(CalendarTypeEnum::kEthiopian):
-    case to_underlying(CalendarTypeEnum::kGregorian):
-    case to_underlying(CalendarTypeEnum::kHebrew):
-    case to_underlying(CalendarTypeEnum::kIndian):
-    case to_underlying(CalendarTypeEnum::kIslamic):
-    case to_underlying(CalendarTypeEnum::kJapanese):
-    case to_underlying(CalendarTypeEnum::kKorean):
-    case to_underlying(CalendarTypeEnum::kPersian):
-    case to_underlying(CalendarTypeEnum::kTaiwanese):
-    case to_underlying(CalendarTypeEnum::kUseActiveLocale):
-        return chip::MakeOptional(static_cast<CalendarTypeEnum>(value));
-    default:
-        return NullOptional;
-    }
+    return chip::MakeOptional(val);
 }
 
 } // anonymous namespace
@@ -203,7 +179,7 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
     case ActiveCalendarType::Id: {
         VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-        auto calendarType = SafeCastToKnowCalendarType(*value);
+        auto calendarType = SafeCast<CalendarTypeEnum>(*value);
         VerifyOrReturnValue(calendarType.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
 
         return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType.Value());
@@ -211,7 +187,7 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
     case HourFormat::Id: {
         VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-        auto hourFormat = SafeCastToKnowHourFormat(*value);
+        auto hourFormat = SafeCast<HourFormatEnum>(*value);
         if (!hourFormat.HasValue())
         {
             return Protocols::InteractionModel::Status::ConstraintError;
