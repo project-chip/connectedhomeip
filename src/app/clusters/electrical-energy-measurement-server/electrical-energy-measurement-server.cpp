@@ -48,8 +48,8 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
                      error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyMeasured] Sent event [endpointId=%d,eventNumber=%" PRIu64 "]", endpointId,
-                    eventNumber);
+    ChipLogProgress(Zcl, "[NotifyCumulativeEnergyMeasured] Sent event [endpointId=%d,eventNumber=%lu]", endpointId,
+                    static_cast<unsigned long>(eventNumber));
     return true;
 }
 
@@ -70,8 +70,8 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
                      error.Format(), endpointId);
         return false;
     }
-    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyMeasured] Sent event [endpointId=%d,eventNumber=%" PRIu64 "]", endpointId,
-                    eventNumber);
+    ChipLogProgress(Zcl, "[NotifyPeriodicEnergyMeasured] Sent event [endpointId=%d,eventNumber=%lu]", endpointId,
+                    static_cast<unsigned long>(eventNumber));
     return true;
 }
 
