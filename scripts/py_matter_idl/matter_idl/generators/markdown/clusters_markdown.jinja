@@ -1,1 +1,7 @@
-# FIXME: implement
+## List of available clusters
+
+| Code (dec) | Code (hex) | Name                                                    |
+| ---------- | ---------- | ------------------------------------------------------- |
+{%- for cluster in idl.clusters | sort(attribute="code") %}
+| {{ "%10d" | format(cluster.code) }} | {{ ("0x%02X" | format(cluster.code)).rjust(10) }} | {{cluster.name.ljust(55)}} |
+{%- endfor %}
