@@ -7036,11 +7036,11 @@ endpoint 1 {
     emits event CumulativeEnergyMeasured;
     emits event PeriodicEnergyMeasured;
     ram      attribute measured default = false;
-    ram      attribute accuracy;
-    ram      attribute cumulativeEnergyImported;
-    ram      attribute cumulativeEnergyExported;
-    ram      attribute periodicEnergyImported;
-    ram      attribute periodicEnergyExported;
+    callback attribute accuracy;
+    callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

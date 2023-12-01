@@ -1969,66 +1969,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Measured
 
-namespace Accuracy {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type *
-                      value); // MeasurementAccuracyStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type value);
-} // namespace Accuracy
-
-namespace CumulativeEnergyImported {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-                      value); // EnergyMeasurementStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-        value);
-} // namespace CumulativeEnergyImported
-
-namespace CumulativeEnergyExported {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-                      value); // EnergyMeasurementStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-        value);
-} // namespace CumulativeEnergyExported
-
-namespace PeriodicEnergyImported {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-                      value); // EnergyMeasurementStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-        value);
-} // namespace PeriodicEnergyImported
-
-namespace PeriodicEnergyExported {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-                      value); // EnergyMeasurementStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus
-Set(chip::EndpointId endpoint,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
-        value);
-} // namespace PeriodicEnergyExported
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
