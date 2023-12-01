@@ -36,8 +36,9 @@ public:
 
     inline void SetSetupPin(char * setupPin) override { CopyString(mSetupPin, sizeof(mSetupPin), setupPin); };
 
-    bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString) override;
-    bool HandleLogout() override;
+    bool HandleLogin(const CharSpan & tempAccountIdentifierString, const CharSpan & setupPinString,
+                     const chip::Optional<chip::NodeId> & nodeId) override;
+    bool HandleLogout(const chip::Optional<chip::NodeId> & nodeId) override;
     void HandleGetSetupPin(CommandResponseHelper<GetSetupPINResponse> & helper,
                            const CharSpan & tempAccountIdentifierString) override;
     inline void GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifierString) override

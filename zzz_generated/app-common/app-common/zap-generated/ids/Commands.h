@@ -1296,6 +1296,22 @@ namespace SkipChannel {
 static constexpr CommandId Id = 0x00000003;
 } // namespace SkipChannel
 
+namespace GetProgramGuide {
+static constexpr CommandId Id = 0x00000004;
+} // namespace GetProgramGuide
+
+namespace ProgramGuideResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace ProgramGuideResponse
+
+namespace RecordProgram {
+static constexpr CommandId Id = 0x00000006;
+} // namespace RecordProgram
+
+namespace CancelRecordProgram {
+static constexpr CommandId Id = 0x00000007;
+} // namespace CancelRecordProgram
+
 } // namespace Commands
 } // namespace Channel
 
@@ -1363,6 +1379,18 @@ static constexpr CommandId Id = 0x0000000A;
 namespace Seek {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace Seek
+
+namespace ActivateAudioTrack {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace ActivateAudioTrack
+
+namespace ActivateTextTrack {
+static constexpr CommandId Id = 0x0000000D;
+} // namespace ActivateTextTrack
+
+namespace DeactivateTextTrack {
+static constexpr CommandId Id = 0x0000000E;
+} // namespace DeactivateTextTrack
 
 } // namespace Commands
 } // namespace MediaPlayback
@@ -1488,6 +1516,70 @@ static constexpr CommandId Id = 0x00000003;
 
 } // namespace Commands
 } // namespace AccountLogin
+
+namespace ContentControl {
+namespace Commands {
+
+namespace UpdatePIN {
+static constexpr CommandId Id = 0x00000000;
+} // namespace UpdatePIN
+
+namespace ResetPIN {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ResetPIN
+
+namespace ResetPINResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ResetPINResponse
+
+namespace Enable {
+static constexpr CommandId Id = 0x00000003;
+} // namespace Enable
+
+namespace Disable {
+static constexpr CommandId Id = 0x00000004;
+} // namespace Disable
+
+namespace AddBonusTime {
+static constexpr CommandId Id = 0x00000005;
+} // namespace AddBonusTime
+
+namespace SetScreenDailyTime {
+static constexpr CommandId Id = 0x00000006;
+} // namespace SetScreenDailyTime
+
+namespace BlockUnratedContent {
+static constexpr CommandId Id = 0x00000007;
+} // namespace BlockUnratedContent
+
+namespace UnblockUnratedContent {
+static constexpr CommandId Id = 0x00000008;
+} // namespace UnblockUnratedContent
+
+namespace SetOnDemandRatingThreshold {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SetOnDemandRatingThreshold
+
+namespace SetScheduledContentRatingThreshold {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace SetScheduledContentRatingThreshold
+
+} // namespace Commands
+} // namespace ContentControl
+
+namespace ContentAppObserver {
+namespace Commands {
+
+namespace ContentAppMessage {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ContentAppMessage
+
+namespace ContentAppMessageResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ContentAppMessageResponse
+
+} // namespace Commands
+} // namespace ContentAppObserver
 
 namespace ElectricalMeasurement {
 namespace Commands {

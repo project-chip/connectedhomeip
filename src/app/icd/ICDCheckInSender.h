@@ -34,7 +34,7 @@ public:
     ICDCheckInSender(Messaging::ExchangeManager * exchangeManager);
     ~ICDCheckInSender(){};
 
-    CHIP_ERROR RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable);
+    CHIP_ERROR RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter);
 
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
@@ -51,6 +51,8 @@ private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
     Crypto::Aes128KeyHandle mKey = Crypto::Aes128KeyHandle();
+
+    uint32_t mICDCounter = 0;
 };
 
 } // namespace app
