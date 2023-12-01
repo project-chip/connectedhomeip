@@ -42,6 +42,8 @@ class ICDManager;
 class ICDConfigurationData
 {
 public:
+    static constexpr uint32_t ICD_CHECK_IN_COUNTER_MIN_INCREMENT = 100;
+
     enum class ICDMode : uint8_t
     {
         SIT, // Short Interval Time ICD
@@ -108,8 +110,6 @@ private:
 
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
-    // TODO : Implement ICD counter
-    // https://github.com/project-chip/connectedhomeip/issues/29184
     uint32_t mICDCounter = 0;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,

@@ -33,6 +33,8 @@
         "color-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
+        "content-app-observer-cluster.xml",
+        "content-control-cluster.xml",
         "descriptor-cluster.xml",
         "device-energy-management-cluster.xml",
         "diagnostic-logs-cluster.xml",
@@ -312,7 +314,11 @@
             "OverrunCount"
         ],
         "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
+        "Media Playback": [
+            "SampledPosition",
+            "ActiveAudioTrack",
+            "ActiveTextTrack"
+        ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
         "Time Synchronization": [

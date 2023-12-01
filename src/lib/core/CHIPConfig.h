@@ -1679,6 +1679,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous ICD Clients info iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
  *
  * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.

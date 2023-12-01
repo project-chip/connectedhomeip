@@ -19,6 +19,7 @@
 #pragma once
 
 #include "AppTaskCommon.h"
+#include "PWMDevice.h"
 
 class AppTask : public AppTaskCommon
 {

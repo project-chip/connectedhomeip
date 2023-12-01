@@ -5025,6 +5025,18 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::SeekRangeStart::Id: {
         return YES;
     }
+    case Attributes::ActiveAudioTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableAudioTracks::Id: {
+        return YES;
+    }
+    case Attributes::ActiveTextTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableTextTracks::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5288,6 +5300,84 @@ static BOOL AttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttribute
 static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentControl;
+    switch (aAttributeId) {
+    case Attributes::Enabled::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatings::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatings::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScreenDailyTime::Id: {
+        return YES;
+    }
+    case Attributes::RemainingScreenTime::Id: {
+        return YES;
+    }
+    case Attributes::BlockUnrated::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
     case Attributes::GeneratedCommandList::Id: {
         return YES;
@@ -6335,6 +6425,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AccountLogin::Id: {
         return AttributeIsSpecifiedInAccountLoginCluster(aAttributeId);
+    }
+    case Clusters::ContentControl::Id: {
+        return AttributeIsSpecifiedInContentControlCluster(aAttributeId);
+    }
+    case Clusters::ContentAppObserver::Id: {
+        return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);
