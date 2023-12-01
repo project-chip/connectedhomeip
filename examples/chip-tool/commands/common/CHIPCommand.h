@@ -159,7 +159,6 @@ protected:
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
-    chip::app::DefaultICDClientStorage mICDClientStorage;
     chip::app::DefaultCheckInDelegate mCheckInDelegate;
     chip::app::CheckInMessageHandler mCheckInHandler;
 
@@ -177,6 +176,8 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
     ChipDeviceCommissioner & GetCommissioner(std::string identity);
+
+    chip::app::DefaultICDClientStorage & GetICDClientStorage();
 
 private:
     CHIP_ERROR MaybeSetUpStack();

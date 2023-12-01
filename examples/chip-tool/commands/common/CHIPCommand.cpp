@@ -47,7 +47,9 @@ constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH"
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
+// All fabrics share the same ICD client storage.
 
+chip::app::DefaultICDClientStorage sICDClientStorage;
 namespace {
 
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
@@ -100,6 +102,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
+
+    // Initialized with a non-persistent keystore without PSA(chip-tool has not yet build with PSA)
+    ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
@@ -416,6 +421,12 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     return *item->second;
 }
 
+chip::app::DefaultICDClientStorage & CHIPCommand::GetICDClientStorage()
+{
+    // This method should not be called before MaybeSetUpStack or after MaybeShutdownStack
+    return sICDClientStorage;
+}
+
 void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 {
     mCommissioners[key].get()->Shutdown();
@@ -489,6 +500,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         ReturnLogErrorOnFailure(
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
+
+    GetICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex());
 
     mCommissioners[identity] = std::move(commissioner);
 
