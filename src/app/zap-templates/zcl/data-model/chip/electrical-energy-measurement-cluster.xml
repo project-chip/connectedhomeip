@@ -23,8 +23,57 @@ limitations under the License.
     <field name="ExportedEnergy" mask="0x2"/>
     <field name="CumulativeEnergy" mask="0x4"/>
     <field name="PeriodicEnergy" mask="0x8"/>
-    <field name="EphemeralEnergy" mask="0x10"/>
   </bitmap>
+
+  <enum name="MeasurementTypeEnum" type="enum16">
+    <cluster code="0x0091"/>
+    <item name="Unspecified" value="0" />
+    <item name="Voltage" value="1" />
+    <item name="ActiveCurrent" value="2" />
+    <item name="ReactiveCurrent" value="3" />
+    <item name="ApparentCurrent" value="4" />
+    <item name="ActivePower" value="5" />
+    <item name="ReactivePower" value="6" />
+    <item name="ApparentPower" value="7" />
+    <item name="RMSVoltage" value="8" />
+    <item name="RMSCurrent" value="9" />
+    <item name="RMSPower" value="10" />
+    <item name="Frequency" value="11" />
+    <item name="PowerFactor" value="12" />
+    <item name="NeutralCurrent" value="13" />
+    <item name="ElectricalEnergy" value="14" />
+  </enum>
+
+  <struct name="EnergyMeasurementStruct">
+    <cluster code="0x0091"/>
+    <!-- TODO: Energy should be energy_mwh once supported -->
+    <item fieldId="0" name="Energy" type="int64s" />
+    <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="2" name="EndTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="3" name="StartSystime" type="systime_ms" optional="true"/>
+    <item fieldId="4" name="EndSystime" type="systime_ms" optional="true"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyRangeStruct">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="RangeMin" type="int64s" />
+    <item fieldId="1" name="RangeMax" type="int64s" />
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true" />
+    <item fieldId="3" name="PercentMin" type="percent100ths"  optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths"  optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u"  optional="true"/>
+    <item fieldId="6" name="FixedMin" type="int64u"  optional="true"/>
+    <item fieldId="7" name="FixedTypical" type="int64u"  optional="true"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyStruct">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" />
+    <item fieldId="1" name="Measured" type="boolean" />
+    <item fieldId="2" name="MinMeasuredValue" type="int64s" />
+    <item fieldId="3" name="MaxMeasuredValue" type="int64s" />
+    <item fieldId="4" name="AccuracyRanges" type="MeasurementAccuracyRangeStruct" array="true" />
+  </struct>
 
   <cluster apiMaturity="provisional">
     <name>Electrical Energy Measurement</name>
@@ -37,52 +86,22 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
     <attribute side="server" code="0x0000" define="MEASURED" type="boolean" writable="false" default="false" optional="false">Measured</attribute>
-    <attribute side="server" code="0x0001" define="CUMULATIVE_ENERGY_IMPORTED_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">CumulativeEnergyImportedTime</attribute>
-    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
-    <attribute side="server" code="0x0003" define="CUMULATIVE_ENERGY_EXPORTED_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">CumulativeEnergyExportedTime</attribute>
-    <attribute side="server" code="0x0004" define="CUMULATIVE_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
-    <attribute side="server" code="0x0005" define="PERIODIC_ENERGY_IMPORTED_START_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyImportedStartTime</attribute>
-    <attribute side="server" code="0x0006" define="PERIODIC_ENERGY_IMPORTED_END_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyImportedEndTime</attribute>
-    <attribute side="server" code="0x0007" define="PERIODIC_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
-    <attribute side="server" code="0x0008" define="PERIODIC_ENERGY_EXPORTED_START_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyExportedStartTime</attribute>
-    <attribute side="server" code="0x0009" define="PERIODIC_ENERGY_EXPORTED_END_TIME" type="epoch_s" writable="false" optional="true" isNullable="true">PeriodicEnergyExportedEndTime</attribute>
-    <attribute side="server" code="0x000A" define="PERIODIC_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
-    <attribute side="server" code="0x000B" define="EPHEMERAL_ENERGY_IMPORTED" type="int64u" writable="false" optional="true" isNullable="true">EphemeralEnergyImported</attribute>
-    <attribute side="server" code="0x000C" define="EPHEMERAL_ENERGY_EXPORTED" type="int64u" writable="false" optional="true" isNullable="true">EphemeralEnergyExported</attribute>
+    <attribute side="server" code="0x0001" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" default="false" optional="false">Accuracy</attribute>
+    <attribute side="server" code="0x0002" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute side="server" code="0x0003" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
+    <attribute side="server" code="0x0004" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
+    <attribute side="server" code="0x0005" define="ACCURACY" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
 
-    <event side="server" code="0x00" name="CumulativeEnergyImported" priority="info" optional="true">
+    <event side="server" code="0x00" name="CumulativeEnergyMeasured" priority="info" optional="true">
+      <description>This event SHALL be generated when the server takes a snapshot of th cumulative energy imported by the server.</description>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
+    </event>
+
+    <event side="server" code="0x01" name="PeriodicEnergyMeasured" priority="info" optional="true">
       <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server.</description>
-      <field id="0" name="ImportedTimestamp" type="epoch_s"/>
-      <field id="1" name="EnergyImported" type="int64u"/>
-    </event>
-    <event side="server" code="0x01" name="CumulativeEnergyExported" priority="info" optional="true">
-      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy exported by the server.</description>
-      <field id="0" name="ImportedTimestamp" type="epoch_s"/>
-      <field id="1" name="EnergyExported" type="int64u"/>
-    </event>
-    <event side="server" code="0x02" name="PeriodicEnergyImported" priority="info" optional="true">
-      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy.</description>
-      <field id="0" name="PeriodStart" type="epoch_s"/>
-      <field id="1" name="PeriodEnd" type="epoch_s"/>
-      <field id="2" name="EnergyImported" type="int64u"/>
-    </event>
-    <event side="server" code="0x03" name="PeriodicEnergyExported" priority="info" optional="true">
-      <description>This event SHALL be generated when the server reaches the end of a reporting period for exported energy.</description>
-      <field id="0" name="PeriodStart" type="epoch_s"/>
-      <field id="1" name="PeriodEnd" type="epoch_s"/>
-      <field id="2" name="EnergyExported" type="int64u"/>
-    </event>
-    <event side="server" code="0x04" name="EphemeralEnergyImported" priority="info" optional="true">
-      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy.</description>
-      <field id="0" name="PeriodStart" type="systime_ms"/>
-      <field id="1" name="PeriodEnd" type="systime_ms"/>
-      <field id="2" name="EnergyImported" type="int64u"/>
-    </event>
-    <event side="server" code="0x05" name="EphemeralEnergyExported" priority="info" optional="true">
-      <description>This event SHALL be generated when the server reaches the end of a reporting period for exported energy.</description>
-      <field id="0" name="PeriodStart" type="systime_ms"/>
-      <field id="1" name="PeriodEnd" type="systime_ms"/>
-      <field id="2" name="EnergyExported" type="int64u"/>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
 
   </cluster>
