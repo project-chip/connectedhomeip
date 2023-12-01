@@ -17,27 +17,20 @@
  */
 #pragma once
 
+#include <lib/core/Optional.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
-#include <app/util/config.h>
-#include <platform/CHIPDeviceConfig.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
 
-bool NotifyCumulativeEnergyImported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyImported);
-bool NotifyCumulativeEnergyExported(EndpointId endpointId, uint32_t aImportedTimeStampS, uint64_t aEnergyExported);
+bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                    const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
-bool NotifyPeriodicEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported);
-bool NotifyPeriodicEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported);
-
-bool NotifyEphemeralEnergyImported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyImported);
-bool NotifyEphemeralEnergyExported(EndpointId endpointId, uint32_t aPeriodStartS, uint32_t aPeriodEndS, uint64_t aEnergyExported);
+bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
+                                  const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
