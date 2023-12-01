@@ -29,10 +29,10 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, mandatory, optional, or_operation, parse_callable_from_xml, is_disallowed)
+                                 feature, is_disallowed, mandatory, optional, or_operation, parse_callable_from_xml)
+from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
-from global_attribute_ids import GlobalAttributeIds
 
 
 def to_access_code(privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:

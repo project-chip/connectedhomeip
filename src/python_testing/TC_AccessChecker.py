@@ -1,17 +1,16 @@
 import logging
-
-from typing import Callable
 from copy import deepcopy
+from typing import Callable
 
 import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
+from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters, XmlCluster
-from chip.interaction_model import InteractionModelError, Status
+from spec_parsing_support import CommandType, XmlCluster, build_xml_clusters
 
 
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, acl_set_to: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> bool:
