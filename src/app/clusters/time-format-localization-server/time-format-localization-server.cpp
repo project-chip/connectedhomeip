@@ -189,10 +189,7 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
         VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
         auto hourFormat = SafeCast<HourFormatEnum>(*value);
-        if (!hourFormat.HasValue())
-        {
-            return Protocols::InteractionModel::Status::ConstraintError;
-        }
+        VerifyOrReturnValue(hourFormat.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
 
         return Protocols::InteractionModel::Status::Success;
     }
