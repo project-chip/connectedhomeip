@@ -23,6 +23,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <limits>
 
 namespace {
 // FabricIndex is uint8_t, the tlv size with anonymous tag is 1(control bytes) + 1(value) = 2
@@ -31,6 +32,9 @@ constexpr size_t kFabricIndexTlvSize = 2;
 // The array itself has a control byte and an end-of-array marker.
 constexpr size_t kArrayOverHead  = 2;
 constexpr size_t kFabricIndexMax = 255;
+
+constexpr size_t kMaxFabricListTlvLength = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
+static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "Expected size for fabric list TLV is too large!");
 } // namespace
 
 namespace chip {
@@ -72,14 +76,12 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    size_t len = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
-    uint16_t length = static_cast<uint16_t>(len);
+    ReturnErrorCodeIf(!backingBuffer.Calloc(kMaxFabricListTlvLength), CHIP_ERROR_NO_MEMORY);
+    uint16_t length = kMaxFabricListTlvLength;
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(), backingBuffer.Get(), length));
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
