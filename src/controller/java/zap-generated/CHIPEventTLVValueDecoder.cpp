@@ -3841,319 +3841,567 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::ElectricalEnergyMeasurement;
         switch (aPath.mEventId)
         {
-        case Events::CumulativeEnergyImported::Id: {
-            Events::CumulativeEnergyImported::DecodableType cppValue;
+        case Events::CumulativeEnergyMeasured::Id: {
+            Events::CumulativeEnergyMeasured::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
             {
                 return nullptr;
             }
-            jobject value_importedTimestamp;
-            std::string value_importedTimestampClassName     = "java/lang/Long";
-            std::string value_importedTimestampCtorSignature = "(J)V";
-            jlong jnivalue_importedTimestamp                 = static_cast<jlong>(cppValue.importedTimestamp);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_importedTimestampClassName.c_str(),
-                                                                        value_importedTimestampCtorSignature.c_str(),
-                                                                        jnivalue_importedTimestamp, value_importedTimestamp);
-
             jobject value_energyImported;
-            std::string value_energyImportedClassName     = "java/lang/Long";
-            std::string value_energyImportedCtorSignature = "(J)V";
-            jlong jnivalue_energyImported                 = static_cast<jlong>(cppValue.energyImported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyImportedClassName.c_str(),
-                                                                        value_energyImportedCtorSignature.c_str(),
-                                                                        jnivalue_energyImported, value_energyImported);
-
-            jclass cumulativeEnergyImportedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent",
-                cumulativeEnergyImportedStructClass);
-            if (err != CHIP_NO_ERROR)
+            if (!cppValue.energyImported.HasValue())
             {
-                ChipLogError(
-                    Zcl, "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent");
-                return nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImported);
             }
-            jmethodID cumulativeEnergyImportedStructCtor =
-                env->GetMethodID(cumulativeEnergyImportedStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (cumulativeEnergyImportedStructCtor == nullptr)
+            else
             {
-                ChipLogError(
-                    Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent constructor");
-                return nullptr;
-            }
+                jobject value_energyImportedInsideOptional;
+                jobject value_energyImportedInsideOptional_energy;
+                std::string value_energyImportedInsideOptional_energyClassName     = "java/lang/Long";
+                std::string value_energyImportedInsideOptional_energyCtorSignature = "(J)V";
+                jlong jnivalue_energyImportedInsideOptional_energy = static_cast<jlong>(cppValue.energyImported.Value().energy);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_energyImportedInsideOptional_energyClassName.c_str(),
+                    value_energyImportedInsideOptional_energyCtorSignature.c_str(), jnivalue_energyImportedInsideOptional_energy,
+                    value_energyImportedInsideOptional_energy);
+                jobject value_energyImportedInsideOptional_startTimestamp;
+                if (!cppValue.energyImported.Value().startTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_startTimestamp);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_startTimestampInsideOptional;
+                    std::string value_energyImportedInsideOptional_startTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_startTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_startTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().startTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_startTimestampInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_startTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_startTimestampInsideOptional,
+                        value_energyImportedInsideOptional_startTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        value_energyImportedInsideOptional_startTimestampInsideOptional,
+                        value_energyImportedInsideOptional_startTimestamp);
+                }
+                jobject value_energyImportedInsideOptional_endTimestamp;
+                if (!cppValue.energyImported.Value().endTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_endTimestamp);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_endTimestampInsideOptional;
+                    std::string value_energyImportedInsideOptional_endTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_endTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_endTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().endTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_endTimestampInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_endTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_endTimestampInsideOptional,
+                        value_energyImportedInsideOptional_endTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_endTimestampInsideOptional,
+                                                                      value_energyImportedInsideOptional_endTimestamp);
+                }
+                jobject value_energyImportedInsideOptional_startSystime;
+                if (!cppValue.energyImported.Value().startSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_startSystime);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_startSystimeInsideOptional;
+                    std::string value_energyImportedInsideOptional_startSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_startSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_startSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().startSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_startSystimeInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_startSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_startSystimeInsideOptional,
+                        value_energyImportedInsideOptional_startSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_startSystimeInsideOptional,
+                                                                      value_energyImportedInsideOptional_startSystime);
+                }
+                jobject value_energyImportedInsideOptional_endSystime;
+                if (!cppValue.energyImported.Value().endSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_endSystime);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_endSystimeInsideOptional;
+                    std::string value_energyImportedInsideOptional_endSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_endSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_endSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().endSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_endSystimeInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_endSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_endSystimeInsideOptional,
+                        value_energyImportedInsideOptional_endSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_endSystimeInsideOptional,
+                                                                      value_energyImportedInsideOptional_endSystime);
+                }
 
-            jobject value = env->NewObject(cumulativeEnergyImportedStructClass, cumulativeEnergyImportedStructCtor,
-                                           value_importedTimestamp, value_energyImported);
+                jclass energyMeasurementStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
+                    energyMeasurementStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+                    return nullptr;
+                }
+                jmethodID energyMeasurementStructStructCtor_1 = env->GetMethodID(
+                    energyMeasurementStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                if (energyMeasurementStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl, "Could not find ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct constructor");
+                    return nullptr;
+                }
 
-            return value;
-        }
-        case Events::CumulativeEnergyExported::Id: {
-            Events::CumulativeEnergyExported::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
+                value_energyImportedInsideOptional =
+                    env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1,
+                                   value_energyImportedInsideOptional_energy, value_energyImportedInsideOptional_startTimestamp,
+                                   value_energyImportedInsideOptional_endTimestamp, value_energyImportedInsideOptional_startSystime,
+                                   value_energyImportedInsideOptional_endSystime);
+                chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional, value_energyImported);
             }
-            jobject value_importedTimestamp;
-            std::string value_importedTimestampClassName     = "java/lang/Long";
-            std::string value_importedTimestampCtorSignature = "(J)V";
-            jlong jnivalue_importedTimestamp                 = static_cast<jlong>(cppValue.importedTimestamp);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_importedTimestampClassName.c_str(),
-                                                                        value_importedTimestampCtorSignature.c_str(),
-                                                                        jnivalue_importedTimestamp, value_importedTimestamp);
 
             jobject value_energyExported;
-            std::string value_energyExportedClassName     = "java/lang/Long";
-            std::string value_energyExportedCtorSignature = "(J)V";
-            jlong jnivalue_energyExported                 = static_cast<jlong>(cppValue.energyExported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyExportedClassName.c_str(),
-                                                                        value_energyExportedCtorSignature.c_str(),
-                                                                        jnivalue_energyExported, value_energyExported);
+            if (!cppValue.energyExported.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExported);
+            }
+            else
+            {
+                jobject value_energyExportedInsideOptional;
+                jobject value_energyExportedInsideOptional_energy;
+                std::string value_energyExportedInsideOptional_energyClassName     = "java/lang/Long";
+                std::string value_energyExportedInsideOptional_energyCtorSignature = "(J)V";
+                jlong jnivalue_energyExportedInsideOptional_energy = static_cast<jlong>(cppValue.energyExported.Value().energy);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_energyExportedInsideOptional_energyClassName.c_str(),
+                    value_energyExportedInsideOptional_energyCtorSignature.c_str(), jnivalue_energyExportedInsideOptional_energy,
+                    value_energyExportedInsideOptional_energy);
+                jobject value_energyExportedInsideOptional_startTimestamp;
+                if (!cppValue.energyExported.Value().startTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_startTimestamp);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_startTimestampInsideOptional;
+                    std::string value_energyExportedInsideOptional_startTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_startTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_startTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().startTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_startTimestampInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_startTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_startTimestampInsideOptional,
+                        value_energyExportedInsideOptional_startTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        value_energyExportedInsideOptional_startTimestampInsideOptional,
+                        value_energyExportedInsideOptional_startTimestamp);
+                }
+                jobject value_energyExportedInsideOptional_endTimestamp;
+                if (!cppValue.energyExported.Value().endTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_endTimestamp);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_endTimestampInsideOptional;
+                    std::string value_energyExportedInsideOptional_endTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_endTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_endTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().endTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_endTimestampInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_endTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_endTimestampInsideOptional,
+                        value_energyExportedInsideOptional_endTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_endTimestampInsideOptional,
+                                                                      value_energyExportedInsideOptional_endTimestamp);
+                }
+                jobject value_energyExportedInsideOptional_startSystime;
+                if (!cppValue.energyExported.Value().startSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_startSystime);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_startSystimeInsideOptional;
+                    std::string value_energyExportedInsideOptional_startSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_startSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_startSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().startSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_startSystimeInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_startSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_startSystimeInsideOptional,
+                        value_energyExportedInsideOptional_startSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_startSystimeInsideOptional,
+                                                                      value_energyExportedInsideOptional_startSystime);
+                }
+                jobject value_energyExportedInsideOptional_endSystime;
+                if (!cppValue.energyExported.Value().endSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_endSystime);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_endSystimeInsideOptional;
+                    std::string value_energyExportedInsideOptional_endSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_endSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_endSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().endSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_endSystimeInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_endSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_endSystimeInsideOptional,
+                        value_energyExportedInsideOptional_endSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_endSystimeInsideOptional,
+                                                                      value_energyExportedInsideOptional_endSystime);
+                }
 
-            jclass cumulativeEnergyExportedStructClass;
+                jclass energyMeasurementStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
+                    energyMeasurementStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+                    return nullptr;
+                }
+                jmethodID energyMeasurementStructStructCtor_1 = env->GetMethodID(
+                    energyMeasurementStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                if (energyMeasurementStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl, "Could not find ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct constructor");
+                    return nullptr;
+                }
+
+                value_energyExportedInsideOptional =
+                    env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1,
+                                   value_energyExportedInsideOptional_energy, value_energyExportedInsideOptional_startTimestamp,
+                                   value_energyExportedInsideOptional_endTimestamp, value_energyExportedInsideOptional_startSystime,
+                                   value_energyExportedInsideOptional_endSystime);
+                chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional, value_energyExported);
+            }
+
+            jclass cumulativeEnergyMeasuredStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent",
-                cumulativeEnergyExportedStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent",
+                cumulativeEnergyMeasuredStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(
-                    Zcl, "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent");
+                    Zcl, "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent");
                 return nullptr;
             }
-            jmethodID cumulativeEnergyExportedStructCtor =
-                env->GetMethodID(cumulativeEnergyExportedStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (cumulativeEnergyExportedStructCtor == nullptr)
+            jmethodID cumulativeEnergyMeasuredStructCtor =
+                env->GetMethodID(cumulativeEnergyMeasuredStructClass, "<init>", "(Ljava/util/Optional;Ljava/util/Optional;)V");
+            if (cumulativeEnergyMeasuredStructCtor == nullptr)
             {
                 ChipLogError(
                     Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent constructor");
+                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(cumulativeEnergyExportedStructClass, cumulativeEnergyExportedStructCtor,
-                                           value_importedTimestamp, value_energyExported);
+            jobject value = env->NewObject(cumulativeEnergyMeasuredStructClass, cumulativeEnergyMeasuredStructCtor,
+                                           value_energyImported, value_energyExported);
 
             return value;
         }
-        case Events::PeriodicEnergyImported::Id: {
-            Events::PeriodicEnergyImported::DecodableType cppValue;
+        case Events::PeriodicEnergyMeasured::Id: {
+            Events::PeriodicEnergyMeasured::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
             {
                 return nullptr;
             }
-            jobject value_periodStart;
-            std::string value_periodStartClassName     = "java/lang/Long";
-            std::string value_periodStartCtorSignature = "(J)V";
-            jlong jnivalue_periodStart                 = static_cast<jlong>(cppValue.periodStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_periodStartClassName.c_str(),
-                                                                        value_periodStartCtorSignature.c_str(),
-                                                                        jnivalue_periodStart, value_periodStart);
-
-            jobject value_periodEnd;
-            std::string value_periodEndClassName     = "java/lang/Long";
-            std::string value_periodEndCtorSignature = "(J)V";
-            jlong jnivalue_periodEnd                 = static_cast<jlong>(cppValue.periodEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_periodEndClassName.c_str(), value_periodEndCtorSignature.c_str(), jnivalue_periodEnd, value_periodEnd);
-
             jobject value_energyImported;
-            std::string value_energyImportedClassName     = "java/lang/Long";
-            std::string value_energyImportedCtorSignature = "(J)V";
-            jlong jnivalue_energyImported                 = static_cast<jlong>(cppValue.energyImported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyImportedClassName.c_str(),
-                                                                        value_energyImportedCtorSignature.c_str(),
-                                                                        jnivalue_energyImported, value_energyImported);
+            if (!cppValue.energyImported.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImported);
+            }
+            else
+            {
+                jobject value_energyImportedInsideOptional;
+                jobject value_energyImportedInsideOptional_energy;
+                std::string value_energyImportedInsideOptional_energyClassName     = "java/lang/Long";
+                std::string value_energyImportedInsideOptional_energyCtorSignature = "(J)V";
+                jlong jnivalue_energyImportedInsideOptional_energy = static_cast<jlong>(cppValue.energyImported.Value().energy);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_energyImportedInsideOptional_energyClassName.c_str(),
+                    value_energyImportedInsideOptional_energyCtorSignature.c_str(), jnivalue_energyImportedInsideOptional_energy,
+                    value_energyImportedInsideOptional_energy);
+                jobject value_energyImportedInsideOptional_startTimestamp;
+                if (!cppValue.energyImported.Value().startTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_startTimestamp);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_startTimestampInsideOptional;
+                    std::string value_energyImportedInsideOptional_startTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_startTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_startTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().startTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_startTimestampInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_startTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_startTimestampInsideOptional,
+                        value_energyImportedInsideOptional_startTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        value_energyImportedInsideOptional_startTimestampInsideOptional,
+                        value_energyImportedInsideOptional_startTimestamp);
+                }
+                jobject value_energyImportedInsideOptional_endTimestamp;
+                if (!cppValue.energyImported.Value().endTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_endTimestamp);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_endTimestampInsideOptional;
+                    std::string value_energyImportedInsideOptional_endTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_endTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_endTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().endTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_endTimestampInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_endTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_endTimestampInsideOptional,
+                        value_energyImportedInsideOptional_endTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_endTimestampInsideOptional,
+                                                                      value_energyImportedInsideOptional_endTimestamp);
+                }
+                jobject value_energyImportedInsideOptional_startSystime;
+                if (!cppValue.energyImported.Value().startSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_startSystime);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_startSystimeInsideOptional;
+                    std::string value_energyImportedInsideOptional_startSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_startSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_startSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().startSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_startSystimeInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_startSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_startSystimeInsideOptional,
+                        value_energyImportedInsideOptional_startSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_startSystimeInsideOptional,
+                                                                      value_energyImportedInsideOptional_startSystime);
+                }
+                jobject value_energyImportedInsideOptional_endSystime;
+                if (!cppValue.energyImported.Value().endSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyImportedInsideOptional_endSystime);
+                }
+                else
+                {
+                    jobject value_energyImportedInsideOptional_endSystimeInsideOptional;
+                    std::string value_energyImportedInsideOptional_endSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyImportedInsideOptional_endSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyImportedInsideOptional_endSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyImported.Value().endSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyImportedInsideOptional_endSystimeInsideOptionalClassName.c_str(),
+                        value_energyImportedInsideOptional_endSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyImportedInsideOptional_endSystimeInsideOptional,
+                        value_energyImportedInsideOptional_endSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional_endSystimeInsideOptional,
+                                                                      value_energyImportedInsideOptional_endSystime);
+                }
 
-            jclass periodicEnergyImportedStructClass;
+                jclass energyMeasurementStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
+                    energyMeasurementStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+                    return nullptr;
+                }
+                jmethodID energyMeasurementStructStructCtor_1 = env->GetMethodID(
+                    energyMeasurementStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                if (energyMeasurementStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl, "Could not find ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct constructor");
+                    return nullptr;
+                }
+
+                value_energyImportedInsideOptional =
+                    env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1,
+                                   value_energyImportedInsideOptional_energy, value_energyImportedInsideOptional_startTimestamp,
+                                   value_energyImportedInsideOptional_endTimestamp, value_energyImportedInsideOptional_startSystime,
+                                   value_energyImportedInsideOptional_endSystime);
+                chip::JniReferences::GetInstance().CreateOptional(value_energyImportedInsideOptional, value_energyImported);
+            }
+
+            jobject value_energyExported;
+            if (!cppValue.energyExported.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExported);
+            }
+            else
+            {
+                jobject value_energyExportedInsideOptional;
+                jobject value_energyExportedInsideOptional_energy;
+                std::string value_energyExportedInsideOptional_energyClassName     = "java/lang/Long";
+                std::string value_energyExportedInsideOptional_energyCtorSignature = "(J)V";
+                jlong jnivalue_energyExportedInsideOptional_energy = static_cast<jlong>(cppValue.energyExported.Value().energy);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_energyExportedInsideOptional_energyClassName.c_str(),
+                    value_energyExportedInsideOptional_energyCtorSignature.c_str(), jnivalue_energyExportedInsideOptional_energy,
+                    value_energyExportedInsideOptional_energy);
+                jobject value_energyExportedInsideOptional_startTimestamp;
+                if (!cppValue.energyExported.Value().startTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_startTimestamp);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_startTimestampInsideOptional;
+                    std::string value_energyExportedInsideOptional_startTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_startTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_startTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().startTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_startTimestampInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_startTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_startTimestampInsideOptional,
+                        value_energyExportedInsideOptional_startTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(
+                        value_energyExportedInsideOptional_startTimestampInsideOptional,
+                        value_energyExportedInsideOptional_startTimestamp);
+                }
+                jobject value_energyExportedInsideOptional_endTimestamp;
+                if (!cppValue.energyExported.Value().endTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_endTimestamp);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_endTimestampInsideOptional;
+                    std::string value_energyExportedInsideOptional_endTimestampInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_endTimestampInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_endTimestampInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().endTimestamp.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_endTimestampInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_endTimestampInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_endTimestampInsideOptional,
+                        value_energyExportedInsideOptional_endTimestampInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_endTimestampInsideOptional,
+                                                                      value_energyExportedInsideOptional_endTimestamp);
+                }
+                jobject value_energyExportedInsideOptional_startSystime;
+                if (!cppValue.energyExported.Value().startSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_startSystime);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_startSystimeInsideOptional;
+                    std::string value_energyExportedInsideOptional_startSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_startSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_startSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().startSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_startSystimeInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_startSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_startSystimeInsideOptional,
+                        value_energyExportedInsideOptional_startSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_startSystimeInsideOptional,
+                                                                      value_energyExportedInsideOptional_startSystime);
+                }
+                jobject value_energyExportedInsideOptional_endSystime;
+                if (!cppValue.energyExported.Value().endSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_energyExportedInsideOptional_endSystime);
+                }
+                else
+                {
+                    jobject value_energyExportedInsideOptional_endSystimeInsideOptional;
+                    std::string value_energyExportedInsideOptional_endSystimeInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_energyExportedInsideOptional_endSystimeInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_energyExportedInsideOptional_endSystimeInsideOptional =
+                        static_cast<jlong>(cppValue.energyExported.Value().endSystime.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_energyExportedInsideOptional_endSystimeInsideOptionalClassName.c_str(),
+                        value_energyExportedInsideOptional_endSystimeInsideOptionalCtorSignature.c_str(),
+                        jnivalue_energyExportedInsideOptional_endSystimeInsideOptional,
+                        value_energyExportedInsideOptional_endSystimeInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional_endSystimeInsideOptional,
+                                                                      value_energyExportedInsideOptional_endSystime);
+                }
+
+                jclass energyMeasurementStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
+                    energyMeasurementStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+                    return nullptr;
+                }
+                jmethodID energyMeasurementStructStructCtor_1 = env->GetMethodID(
+                    energyMeasurementStructStructClass_1, "<init>",
+                    "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
+                if (energyMeasurementStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl, "Could not find ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct constructor");
+                    return nullptr;
+                }
+
+                value_energyExportedInsideOptional =
+                    env->NewObject(energyMeasurementStructStructClass_1, energyMeasurementStructStructCtor_1,
+                                   value_energyExportedInsideOptional_energy, value_energyExportedInsideOptional_startTimestamp,
+                                   value_energyExportedInsideOptional_endTimestamp, value_energyExportedInsideOptional_startSystime,
+                                   value_energyExportedInsideOptional_endSystime);
+                chip::JniReferences::GetInstance().CreateOptional(value_energyExportedInsideOptional, value_energyExported);
+            }
+
+            jclass periodicEnergyMeasuredStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent",
-                periodicEnergyImportedStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent",
+                periodicEnergyMeasuredStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl,
-                             "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent");
+                             "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent");
                 return nullptr;
             }
-            jmethodID periodicEnergyImportedStructCtor = env->GetMethodID(periodicEnergyImportedStructClass, "<init>",
-                                                                          "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (periodicEnergyImportedStructCtor == nullptr)
+            jmethodID periodicEnergyMeasuredStructCtor =
+                env->GetMethodID(periodicEnergyMeasuredStructClass, "<init>", "(Ljava/util/Optional;Ljava/util/Optional;)V");
+            if (periodicEnergyMeasuredStructCtor == nullptr)
             {
                 ChipLogError(
                     Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent constructor");
+                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(periodicEnergyImportedStructClass, periodicEnergyImportedStructCtor, value_periodStart,
-                                           value_periodEnd, value_energyImported);
-
-            return value;
-        }
-        case Events::PeriodicEnergyExported::Id: {
-            Events::PeriodicEnergyExported::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value_periodStart;
-            std::string value_periodStartClassName     = "java/lang/Long";
-            std::string value_periodStartCtorSignature = "(J)V";
-            jlong jnivalue_periodStart                 = static_cast<jlong>(cppValue.periodStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_periodStartClassName.c_str(),
-                                                                        value_periodStartCtorSignature.c_str(),
-                                                                        jnivalue_periodStart, value_periodStart);
-
-            jobject value_periodEnd;
-            std::string value_periodEndClassName     = "java/lang/Long";
-            std::string value_periodEndCtorSignature = "(J)V";
-            jlong jnivalue_periodEnd                 = static_cast<jlong>(cppValue.periodEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_periodEndClassName.c_str(), value_periodEndCtorSignature.c_str(), jnivalue_periodEnd, value_periodEnd);
-
-            jobject value_energyExported;
-            std::string value_energyExportedClassName     = "java/lang/Long";
-            std::string value_energyExportedCtorSignature = "(J)V";
-            jlong jnivalue_energyExported                 = static_cast<jlong>(cppValue.energyExported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyExportedClassName.c_str(),
-                                                                        value_energyExportedCtorSignature.c_str(),
-                                                                        jnivalue_energyExported, value_energyExported);
-
-            jclass periodicEnergyExportedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent",
-                periodicEnergyExportedStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl,
-                             "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent");
-                return nullptr;
-            }
-            jmethodID periodicEnergyExportedStructCtor = env->GetMethodID(periodicEnergyExportedStructClass, "<init>",
-                                                                          "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (periodicEnergyExportedStructCtor == nullptr)
-            {
-                ChipLogError(
-                    Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(periodicEnergyExportedStructClass, periodicEnergyExportedStructCtor, value_periodStart,
-                                           value_periodEnd, value_energyExported);
-
-            return value;
-        }
-        case Events::EphemeralEnergyImported::Id: {
-            Events::EphemeralEnergyImported::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value_periodStart;
-            std::string value_periodStartClassName     = "java/lang/Long";
-            std::string value_periodStartCtorSignature = "(J)V";
-            jlong jnivalue_periodStart                 = static_cast<jlong>(cppValue.periodStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_periodStartClassName.c_str(),
-                                                                        value_periodStartCtorSignature.c_str(),
-                                                                        jnivalue_periodStart, value_periodStart);
-
-            jobject value_periodEnd;
-            std::string value_periodEndClassName     = "java/lang/Long";
-            std::string value_periodEndCtorSignature = "(J)V";
-            jlong jnivalue_periodEnd                 = static_cast<jlong>(cppValue.periodEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_periodEndClassName.c_str(), value_periodEndCtorSignature.c_str(), jnivalue_periodEnd, value_periodEnd);
-
-            jobject value_energyImported;
-            std::string value_energyImportedClassName     = "java/lang/Long";
-            std::string value_energyImportedCtorSignature = "(J)V";
-            jlong jnivalue_energyImported                 = static_cast<jlong>(cppValue.energyImported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyImportedClassName.c_str(),
-                                                                        value_energyImportedCtorSignature.c_str(),
-                                                                        jnivalue_energyImported, value_energyImported);
-
-            jclass ephemeralEnergyImportedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent",
-                ephemeralEnergyImportedStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(
-                    Zcl, "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent");
-                return nullptr;
-            }
-            jmethodID ephemeralEnergyImportedStructCtor = env->GetMethodID(ephemeralEnergyImportedStructClass, "<init>",
-                                                                           "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (ephemeralEnergyImportedStructCtor == nullptr)
-            {
-                ChipLogError(
-                    Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(ephemeralEnergyImportedStructClass, ephemeralEnergyImportedStructCtor, value_periodStart,
-                                           value_periodEnd, value_energyImported);
-
-            return value;
-        }
-        case Events::EphemeralEnergyExported::Id: {
-            Events::EphemeralEnergyExported::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value_periodStart;
-            std::string value_periodStartClassName     = "java/lang/Long";
-            std::string value_periodStartCtorSignature = "(J)V";
-            jlong jnivalue_periodStart                 = static_cast<jlong>(cppValue.periodStart);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_periodStartClassName.c_str(),
-                                                                        value_periodStartCtorSignature.c_str(),
-                                                                        jnivalue_periodStart, value_periodStart);
-
-            jobject value_periodEnd;
-            std::string value_periodEndClassName     = "java/lang/Long";
-            std::string value_periodEndCtorSignature = "(J)V";
-            jlong jnivalue_periodEnd                 = static_cast<jlong>(cppValue.periodEnd);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_periodEndClassName.c_str(), value_periodEndCtorSignature.c_str(), jnivalue_periodEnd, value_periodEnd);
-
-            jobject value_energyExported;
-            std::string value_energyExportedClassName     = "java/lang/Long";
-            std::string value_energyExportedCtorSignature = "(J)V";
-            jlong jnivalue_energyExported                 = static_cast<jlong>(cppValue.energyExported);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_energyExportedClassName.c_str(),
-                                                                        value_energyExportedCtorSignature.c_str(),
-                                                                        jnivalue_energyExported, value_energyExported);
-
-            jclass ephemeralEnergyExportedStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent",
-                ephemeralEnergyExportedStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(
-                    Zcl, "Could not find class ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent");
-                return nullptr;
-            }
-            jmethodID ephemeralEnergyExportedStructCtor = env->GetMethodID(ephemeralEnergyExportedStructClass, "<init>",
-                                                                           "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (ephemeralEnergyExportedStructCtor == nullptr)
-            {
-                ChipLogError(
-                    Zcl,
-                    "Could not find ChipEventStructs$ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(ephemeralEnergyExportedStructClass, ephemeralEnergyExportedStructCtor, value_periodStart,
-                                           value_periodEnd, value_energyExported);
+            jobject value = env->NewObject(periodicEnergyMeasuredStructClass, periodicEnergyMeasuredStructCtor,
+                                           value_energyImported, value_energyExported);
 
             return value;
         }

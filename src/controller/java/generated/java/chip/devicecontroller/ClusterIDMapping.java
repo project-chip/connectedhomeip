@@ -9046,18 +9046,11 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             Measured(0L),
-            CumulativeEnergyImportedTime(1L),
+            Accuracy(1L),
             CumulativeEnergyImported(2L),
-            CumulativeEnergyExportedTime(3L),
-            CumulativeEnergyExported(4L),
-            PeriodicEnergyImportedStartTime(5L),
-            PeriodicEnergyImportedEndTime(6L),
-            PeriodicEnergyImported(7L),
-            PeriodicEnergyExportedStartTime(8L),
-            PeriodicEnergyExportedEndTime(9L),
-            PeriodicEnergyExported(10L),
-            EphemeralEnergyImported(11L),
-            EphemeralEnergyExported(12L),
+            CumulativeEnergyExported(3L),
+            PeriodicEnergyImported(4L),
+            PeriodicEnergyExported(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9084,12 +9077,8 @@ public class ClusterIDMapping {
         }
 
         public enum Event {
-            CumulativeEnergyImported(0L),
-            CumulativeEnergyExported(1L),
-            PeriodicEnergyImported(2L),
-            PeriodicEnergyExported(3L),
-            EphemeralEnergyImported(4L),
-            EphemeralEnergyExported(5L),;
+            CumulativeEnergyMeasured(0L),
+            PeriodicEnergyMeasured(1L),;
             private final long id;
             Event(long id) {
                 this.id = id;

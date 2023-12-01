@@ -24,29 +24,23 @@ class ElectricalEnergyMeasurementCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
-  class CumulativeEnergyImportedTimeAttribute(val value: UInt?)
+  class AccuracyAttribute(val value: ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct)
 
-  class CumulativeEnergyImportedAttribute(val value: ULong?)
+  class CumulativeEnergyImportedAttribute(
+    val value: ElectricalEnergyMeasurementClusterEnergyMeasurementStruct?
+  )
 
-  class CumulativeEnergyExportedTimeAttribute(val value: UInt?)
+  class CumulativeEnergyExportedAttribute(
+    val value: ElectricalEnergyMeasurementClusterEnergyMeasurementStruct?
+  )
 
-  class CumulativeEnergyExportedAttribute(val value: ULong?)
+  class PeriodicEnergyImportedAttribute(
+    val value: ElectricalEnergyMeasurementClusterEnergyMeasurementStruct?
+  )
 
-  class PeriodicEnergyImportedStartTimeAttribute(val value: UInt?)
-
-  class PeriodicEnergyImportedEndTimeAttribute(val value: UInt?)
-
-  class PeriodicEnergyImportedAttribute(val value: ULong?)
-
-  class PeriodicEnergyExportedStartTimeAttribute(val value: UInt?)
-
-  class PeriodicEnergyExportedEndTimeAttribute(val value: UInt?)
-
-  class PeriodicEnergyExportedAttribute(val value: ULong?)
-
-  class EphemeralEnergyImportedAttribute(val value: ULong?)
-
-  class EphemeralEnergyExportedAttribute(val value: ULong?)
+  class PeriodicEnergyExportedAttribute(
+    val value: ElectricalEnergyMeasurementClusterEnergyMeasurementStruct?
+  )
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -64,14 +58,11 @@ class ElectricalEnergyMeasurementCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun readCumulativeEnergyImportedTimeAttribute(): CumulativeEnergyImportedTimeAttribute {
+  suspend fun readAccuracyAttribute(): AccuracyAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCumulativeEnergyImportedTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CumulativeEnergyImportedTimeAttribute {
+  suspend fun subscribeAccuracyAttribute(minInterval: Int, maxInterval: Int): AccuracyAttribute {
     // Implementation needs to be added here
   }
 
@@ -86,17 +77,6 @@ class ElectricalEnergyMeasurementCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun readCumulativeEnergyExportedTimeAttribute(): CumulativeEnergyExportedTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeCumulativeEnergyExportedTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): CumulativeEnergyExportedTimeAttribute {
-    // Implementation needs to be added here
-  }
-
   suspend fun readCumulativeEnergyExportedAttribute(): CumulativeEnergyExportedAttribute {
     // Implementation needs to be added here
   }
@@ -105,29 +85,6 @@ class ElectricalEnergyMeasurementCluster(
     minInterval: Int,
     maxInterval: Int
   ): CumulativeEnergyExportedAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPeriodicEnergyImportedStartTimeAttribute():
-    PeriodicEnergyImportedStartTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePeriodicEnergyImportedStartTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PeriodicEnergyImportedStartTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPeriodicEnergyImportedEndTimeAttribute(): PeriodicEnergyImportedEndTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePeriodicEnergyImportedEndTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PeriodicEnergyImportedEndTimeAttribute {
     // Implementation needs to be added here
   }
 
@@ -142,29 +99,6 @@ class ElectricalEnergyMeasurementCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun readPeriodicEnergyExportedStartTimeAttribute():
-    PeriodicEnergyExportedStartTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePeriodicEnergyExportedStartTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PeriodicEnergyExportedStartTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPeriodicEnergyExportedEndTimeAttribute(): PeriodicEnergyExportedEndTimeAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribePeriodicEnergyExportedEndTimeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): PeriodicEnergyExportedEndTimeAttribute {
-    // Implementation needs to be added here
-  }
-
   suspend fun readPeriodicEnergyExportedAttribute(): PeriodicEnergyExportedAttribute {
     // Implementation needs to be added here
   }
@@ -173,28 +107,6 @@ class ElectricalEnergyMeasurementCluster(
     minInterval: Int,
     maxInterval: Int
   ): PeriodicEnergyExportedAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readEphemeralEnergyImportedAttribute(): EphemeralEnergyImportedAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeEphemeralEnergyImportedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EphemeralEnergyImportedAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readEphemeralEnergyExportedAttribute(): EphemeralEnergyExportedAttribute {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeEphemeralEnergyExportedAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): EphemeralEnergyExportedAttribute {
     // Implementation needs to be added here
   }
 

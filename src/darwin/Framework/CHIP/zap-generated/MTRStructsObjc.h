@@ -1073,43 +1073,45 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull importedTimestamp MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyImported MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentTypical MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedTypical MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull importedTimestamp MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyExported MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull measurementType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull measured MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull accuracyRanges MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull periodStart MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull periodEnd MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyImported MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull energy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startSystime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endSystime MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull periodStart MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull periodEnd MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyExported MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyImported MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyExported MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull periodStart MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull periodEnd MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyImported MTR_PROVISIONALLY_AVAILABLE;
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull periodStart MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull periodEnd MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull energyExported MTR_PROVISIONALLY_AVAILABLE;
+@interface MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyImported MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyExported MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

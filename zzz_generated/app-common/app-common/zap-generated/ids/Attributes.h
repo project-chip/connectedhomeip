@@ -3636,53 +3636,25 @@ namespace Measured {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace Measured
 
-namespace CumulativeEnergyImportedTime {
+namespace Accuracy {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CumulativeEnergyImportedTime
+} // namespace Accuracy
 
 namespace CumulativeEnergyImported {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace CumulativeEnergyImported
 
-namespace CumulativeEnergyExportedTime {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace CumulativeEnergyExportedTime
-
 namespace CumulativeEnergyExported {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace CumulativeEnergyExported
 
-namespace PeriodicEnergyImportedStartTime {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace PeriodicEnergyImportedStartTime
-
-namespace PeriodicEnergyImportedEndTime {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace PeriodicEnergyImportedEndTime
-
 namespace PeriodicEnergyImported {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace PeriodicEnergyImported
 
-namespace PeriodicEnergyExportedStartTime {
-static constexpr AttributeId Id = 0x00000008;
-} // namespace PeriodicEnergyExportedStartTime
-
-namespace PeriodicEnergyExportedEndTime {
-static constexpr AttributeId Id = 0x00000009;
-} // namespace PeriodicEnergyExportedEndTime
-
 namespace PeriodicEnergyExported {
-static constexpr AttributeId Id = 0x0000000A;
+static constexpr AttributeId Id = 0x00000005;
 } // namespace PeriodicEnergyExported
-
-namespace EphemeralEnergyImported {
-static constexpr AttributeId Id = 0x0000000B;
-} // namespace EphemeralEnergyImported
-
-namespace EphemeralEnergyExported {
-static constexpr AttributeId Id = 0x0000000C;
-} // namespace EphemeralEnergyExported
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

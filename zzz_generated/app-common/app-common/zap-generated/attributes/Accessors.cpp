@@ -10164,64 +10164,50 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 } // namespace Measured
 
-namespace CumulativeEnergyImportedTime {
+#error Attribute "Accuracy" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+namespace Accuracy {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type * value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
-        value.SetNull();
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
+    *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
+} // namespace Accuracy
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace CumulativeEnergyImportedTime
-
+#error Attribute "CumulativeEnergyImported" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
 namespace CumulativeEnergyImported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> & value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
@@ -10236,9 +10222,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -10246,19 +10233,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
+        value)
 {
     if (value.IsNull())
     {
@@ -10270,64 +10260,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 } // namespace CumulativeEnergyImported
 
-namespace CumulativeEnergyExportedTime {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace CumulativeEnergyExportedTime
-
+#error Attribute "CumulativeEnergyExported" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
 namespace CumulativeEnergyExported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> & value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
@@ -10342,9 +10282,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -10352,19 +10293,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
+        value)
 {
     if (value.IsNull())
     {
@@ -10376,117 +10320,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 } // namespace CumulativeEnergyExported
 
-namespace PeriodicEnergyImportedStartTime {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace PeriodicEnergyImportedStartTime
-
-namespace PeriodicEnergyImportedEndTime {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace PeriodicEnergyImportedEndTime
-
+#error Attribute "PeriodicEnergyImported" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
 namespace PeriodicEnergyImported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> & value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
@@ -10501,9 +10342,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -10511,19 +10353,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
+        value)
 {
     if (value.IsNull())
     {
@@ -10535,117 +10380,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 } // namespace PeriodicEnergyImported
 
-namespace PeriodicEnergyExportedStartTime {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace PeriodicEnergyExportedStartTime
-
-namespace PeriodicEnergyExportedEndTime {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint32_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace PeriodicEnergyExportedEndTime
-
+#error Attribute "PeriodicEnergyExported" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
 namespace PeriodicEnergyExported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> & value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
@@ -10660,9 +10402,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type value)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -10670,19 +10413,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<uint64_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
+EmberAfStatus
+Set(chip::EndpointId endpoint,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type> &
+        value)
 {
     if (value.IsNull())
     {
@@ -10693,112 +10439,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 }
 
 } // namespace PeriodicEnergyExported
-
-namespace EphemeralEnergyImported {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace EphemeralEnergyImported
-
-namespace EphemeralEnergyExported {
-
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType temp;
-    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (Traits::IsNullValue(temp))
-    {
-        value.SetNull();
-    }
-    else
-    {
-        value.SetNonNull() = Traits::StorageToWorking(temp);
-    }
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    Traits::StorageType storageValue;
-    Traits::WorkingToStorage(value, storageValue);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus SetNull(chip::EndpointId endpoint)
-{
-    using Traits = NumericAttributeTraits<uint64_t>;
-    Traits::StorageType value;
-    Traits::SetNull(value);
-    uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
-}
-
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
-{
-    if (value.IsNull())
-    {
-        return SetNull(endpoint);
-    }
-
-    return Set(endpoint, value.Value());
-}
-
-} // namespace EphemeralEnergyExported
 
 namespace FeatureMap {
 

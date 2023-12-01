@@ -3060,110 +3060,49 @@ public static class ValveConfigurationAndControlClusterValveFaultEvent {
     return output.toString();
   }
 }
-public static class ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent {
-  public Long importedTimestamp;
-  public Long energyImported;
-  private static final long IMPORTED_TIMESTAMP_ID = 0L;
-  private static final long ENERGY_IMPORTED_ID = 1L;
-
-  public ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent(
-    Long importedTimestamp,
-    Long energyImported
-  ) {
-    this.importedTimestamp = importedTimestamp;
-    this.energyImported = energyImported;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(IMPORTED_TIMESTAMP_ID, new UIntType(importedTimestamp)));
-    values.add(new StructElement(ENERGY_IMPORTED_ID, new UIntType(energyImported)));
-
-    return new StructType(values);
-  }
-
-  public static ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long importedTimestamp = null;
-    Long energyImported = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == IMPORTED_TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          importedTimestamp = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyImported = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent(
-      importedTimestamp,
-      energyImported
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyImportedEvent {\n");
-    output.append("\timportedTimestamp: ");
-    output.append(importedTimestamp);
-    output.append("\n");
-    output.append("\tenergyImported: ");
-    output.append(energyImported);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent {
-  public Long importedTimestamp;
-  public Long energyExported;
-  private static final long IMPORTED_TIMESTAMP_ID = 0L;
+public static class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
   private static final long ENERGY_EXPORTED_ID = 1L;
 
-  public ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent(
-    Long importedTimestamp,
-    Long energyExported
+  public ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
   ) {
-    this.importedTimestamp = importedTimestamp;
+    this.energyImported = energyImported;
     this.energyExported = energyExported;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(IMPORTED_TIMESTAMP_ID, new UIntType(importedTimestamp)));
-    values.add(new StructElement(ENERGY_EXPORTED_ID, new UIntType(energyExported)));
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long importedTimestamp = null;
-    Long energyExported = null;
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == IMPORTED_TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          importedTimestamp = castingValue.value(Long.class);
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
         }
       } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyExported = castingValue.value(Long.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
         }
       }
     }
-    return new ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent(
-      importedTimestamp,
+    return new ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+      energyImported,
       energyExported
     );
   }
@@ -3171,9 +3110,9 @@ public static class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEv
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEvent {\n");
-    output.append("\timportedTimestamp: ");
-    output.append(importedTimestamp);
+    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {\n");
+    output.append("\tenergyImported: ");
+    output.append(energyImported);
     output.append("\n");
     output.append("\tenergyExported: ");
     output.append(energyExported);
@@ -3182,137 +3121,49 @@ public static class ElectricalEnergyMeasurementClusterCumulativeEnergyExportedEv
     return output.toString();
   }
 }
-public static class ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent {
-  public Long periodStart;
-  public Long periodEnd;
-  public Long energyImported;
-  private static final long PERIOD_START_ID = 0L;
-  private static final long PERIOD_END_ID = 1L;
-  private static final long ENERGY_IMPORTED_ID = 2L;
+public static class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
+  private static final long ENERGY_EXPORTED_ID = 1L;
 
-  public ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent(
-    Long periodStart,
-    Long periodEnd,
-    Long energyImported
+  public ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
   ) {
-    this.periodStart = periodStart;
-    this.periodEnd = periodEnd;
     this.energyImported = energyImported;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
-    values.add(new StructElement(PERIOD_END_ID, new UIntType(periodEnd)));
-    values.add(new StructElement(ENERGY_IMPORTED_ID, new UIntType(energyImported)));
-
-    return new StructType(values);
-  }
-
-  public static ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long periodStart = null;
-    Long periodEnd = null;
-    Long energyImported = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PERIOD_START_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodStart = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PERIOD_END_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodEnd = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyImported = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent(
-      periodStart,
-      periodEnd,
-      energyImported
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterPeriodicEnergyImportedEvent {\n");
-    output.append("\tperiodStart: ");
-    output.append(periodStart);
-    output.append("\n");
-    output.append("\tperiodEnd: ");
-    output.append(periodEnd);
-    output.append("\n");
-    output.append("\tenergyImported: ");
-    output.append(energyImported);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent {
-  public Long periodStart;
-  public Long periodEnd;
-  public Long energyExported;
-  private static final long PERIOD_START_ID = 0L;
-  private static final long PERIOD_END_ID = 1L;
-  private static final long ENERGY_EXPORTED_ID = 2L;
-
-  public ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent(
-    Long periodStart,
-    Long periodEnd,
-    Long energyExported
-  ) {
-    this.periodStart = periodStart;
-    this.periodEnd = periodEnd;
     this.energyExported = energyExported;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
-    values.add(new StructElement(PERIOD_END_ID, new UIntType(periodEnd)));
-    values.add(new StructElement(ENERGY_EXPORTED_ID, new UIntType(energyExported)));
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long periodStart = null;
-    Long periodEnd = null;
-    Long energyExported = null;
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PERIOD_START_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodStart = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PERIOD_END_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodEnd = castingValue.value(Long.class);
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
         }
       } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyExported = castingValue.value(Long.class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
         }
       }
     }
-    return new ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent(
-      periodStart,
-      periodEnd,
+    return new ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+      energyImported,
       energyExported
     );
   }
@@ -3320,164 +3171,9 @@ public static class ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEven
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterPeriodicEnergyExportedEvent {\n");
-    output.append("\tperiodStart: ");
-    output.append(periodStart);
-    output.append("\n");
-    output.append("\tperiodEnd: ");
-    output.append(periodEnd);
-    output.append("\n");
-    output.append("\tenergyExported: ");
-    output.append(energyExported);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent {
-  public Long periodStart;
-  public Long periodEnd;
-  public Long energyImported;
-  private static final long PERIOD_START_ID = 0L;
-  private static final long PERIOD_END_ID = 1L;
-  private static final long ENERGY_IMPORTED_ID = 2L;
-
-  public ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent(
-    Long periodStart,
-    Long periodEnd,
-    Long energyImported
-  ) {
-    this.periodStart = periodStart;
-    this.periodEnd = periodEnd;
-    this.energyImported = energyImported;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
-    values.add(new StructElement(PERIOD_END_ID, new UIntType(periodEnd)));
-    values.add(new StructElement(ENERGY_IMPORTED_ID, new UIntType(energyImported)));
-
-    return new StructType(values);
-  }
-
-  public static ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long periodStart = null;
-    Long periodEnd = null;
-    Long energyImported = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PERIOD_START_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodStart = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PERIOD_END_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodEnd = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyImported = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent(
-      periodStart,
-      periodEnd,
-      energyImported
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterEphemeralEnergyImportedEvent {\n");
-    output.append("\tperiodStart: ");
-    output.append(periodStart);
-    output.append("\n");
-    output.append("\tperiodEnd: ");
-    output.append(periodEnd);
-    output.append("\n");
+    output.append("ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {\n");
     output.append("\tenergyImported: ");
     output.append(energyImported);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent {
-  public Long periodStart;
-  public Long periodEnd;
-  public Long energyExported;
-  private static final long PERIOD_START_ID = 0L;
-  private static final long PERIOD_END_ID = 1L;
-  private static final long ENERGY_EXPORTED_ID = 2L;
-
-  public ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent(
-    Long periodStart,
-    Long periodEnd,
-    Long energyExported
-  ) {
-    this.periodStart = periodStart;
-    this.periodEnd = periodEnd;
-    this.energyExported = energyExported;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(PERIOD_START_ID, new UIntType(periodStart)));
-    values.add(new StructElement(PERIOD_END_ID, new UIntType(periodEnd)));
-    values.add(new StructElement(ENERGY_EXPORTED_ID, new UIntType(energyExported)));
-
-    return new StructType(values);
-  }
-
-  public static ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long periodStart = null;
-    Long periodEnd = null;
-    Long energyExported = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == PERIOD_START_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodStart = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == PERIOD_END_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          periodEnd = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          energyExported = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent(
-      periodStart,
-      periodEnd,
-      energyExported
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ElectricalEnergyMeasurementClusterEphemeralEnergyExportedEvent {\n");
-    output.append("\tperiodStart: ");
-    output.append(periodStart);
-    output.append("\n");
-    output.append("\tperiodEnd: ");
-    output.append(periodEnd);
     output.append("\n");
     output.append("\tenergyExported: ");
     output.append(energyExported);

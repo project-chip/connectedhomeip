@@ -28315,18 +28315,11 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 145L;
 
     private static final long MEASURED_ATTRIBUTE_ID = 0L;
-    private static final long CUMULATIVE_ENERGY_IMPORTED_TIME_ATTRIBUTE_ID = 1L;
+    private static final long ACCURACY_ATTRIBUTE_ID = 1L;
     private static final long CUMULATIVE_ENERGY_IMPORTED_ATTRIBUTE_ID = 2L;
-    private static final long CUMULATIVE_ENERGY_EXPORTED_TIME_ATTRIBUTE_ID = 3L;
-    private static final long CUMULATIVE_ENERGY_EXPORTED_ATTRIBUTE_ID = 4L;
-    private static final long PERIODIC_ENERGY_IMPORTED_START_TIME_ATTRIBUTE_ID = 5L;
-    private static final long PERIODIC_ENERGY_IMPORTED_END_TIME_ATTRIBUTE_ID = 6L;
-    private static final long PERIODIC_ENERGY_IMPORTED_ATTRIBUTE_ID = 7L;
-    private static final long PERIODIC_ENERGY_EXPORTED_START_TIME_ATTRIBUTE_ID = 8L;
-    private static final long PERIODIC_ENERGY_EXPORTED_END_TIME_ATTRIBUTE_ID = 9L;
-    private static final long PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID = 10L;
-    private static final long EPHEMERAL_ENERGY_IMPORTED_ATTRIBUTE_ID = 11L;
-    private static final long EPHEMERAL_ENERGY_EXPORTED_ATTRIBUTE_ID = 12L;
+    private static final long CUMULATIVE_ENERGY_EXPORTED_ATTRIBUTE_ID = 3L;
+    private static final long PERIODIC_ENERGY_IMPORTED_ATTRIBUTE_ID = 4L;
+    private static final long PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -28344,52 +28337,24 @@ public class ChipClusters {
       return 0L;
     }
 
-    public interface CumulativeEnergyImportedTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+    public interface AccuracyAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(ChipStructs.ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct value);
     }
 
     public interface CumulativeEnergyImportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface CumulativeEnergyExportedTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value);
     }
 
     public interface CumulativeEnergyExportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface PeriodicEnergyImportedStartTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface PeriodicEnergyImportedEndTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value);
     }
 
     public interface PeriodicEnergyImportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface PeriodicEnergyExportedStartTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface PeriodicEnergyExportedEndTimeAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value);
     }
 
     public interface PeriodicEnergyExportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface EphemeralEnergyImportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
-    }
-
-    public interface EphemeralEnergyExportedAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Long value);
+      void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -28433,29 +28398,29 @@ public class ChipClusters {
         }, MEASURED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readCumulativeEnergyImportedTimeAttribute(
-        CumulativeEnergyImportedTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_IMPORTED_TIME_ATTRIBUTE_ID);
+    public void readAccuracyAttribute(
+        AccuracyAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCURACY_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, CUMULATIVE_ENERGY_IMPORTED_TIME_ATTRIBUTE_ID, true);
+        }, ACCURACY_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeCumulativeEnergyImportedTimeAttribute(
-        CumulativeEnergyImportedTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_IMPORTED_TIME_ATTRIBUTE_ID);
+    public void subscribeAccuracyAttribute(
+        AccuracyAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ACCURACY_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            ChipStructs.ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
-        }, CUMULATIVE_ENERGY_IMPORTED_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, ACCURACY_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readCumulativeEnergyImportedAttribute(
@@ -28465,7 +28430,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, CUMULATIVE_ENERGY_IMPORTED_ATTRIBUTE_ID, true);
@@ -28478,34 +28443,9 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, CUMULATIVE_ENERGY_IMPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readCumulativeEnergyExportedTimeAttribute(
-        CumulativeEnergyExportedTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_EXPORTED_TIME_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, CUMULATIVE_ENERGY_EXPORTED_TIME_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeCumulativeEnergyExportedTimeAttribute(
-        CumulativeEnergyExportedTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CUMULATIVE_ENERGY_EXPORTED_TIME_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, CUMULATIVE_ENERGY_EXPORTED_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readCumulativeEnergyExportedAttribute(
@@ -28515,7 +28455,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, CUMULATIVE_ENERGY_EXPORTED_ATTRIBUTE_ID, true);
@@ -28528,59 +28468,9 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, CUMULATIVE_ENERGY_EXPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPeriodicEnergyImportedStartTimeAttribute(
-        PeriodicEnergyImportedStartTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_IMPORTED_START_TIME_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PERIODIC_ENERGY_IMPORTED_START_TIME_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePeriodicEnergyImportedStartTimeAttribute(
-        PeriodicEnergyImportedStartTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_IMPORTED_START_TIME_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, PERIODIC_ENERGY_IMPORTED_START_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPeriodicEnergyImportedEndTimeAttribute(
-        PeriodicEnergyImportedEndTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_IMPORTED_END_TIME_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PERIODIC_ENERGY_IMPORTED_END_TIME_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePeriodicEnergyImportedEndTimeAttribute(
-        PeriodicEnergyImportedEndTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_IMPORTED_END_TIME_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, PERIODIC_ENERGY_IMPORTED_END_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPeriodicEnergyImportedAttribute(
@@ -28590,7 +28480,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PERIODIC_ENERGY_IMPORTED_ATTRIBUTE_ID, true);
@@ -28603,59 +28493,9 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, PERIODIC_ENERGY_IMPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPeriodicEnergyExportedStartTimeAttribute(
-        PeriodicEnergyExportedStartTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_EXPORTED_START_TIME_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PERIODIC_ENERGY_EXPORTED_START_TIME_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePeriodicEnergyExportedStartTimeAttribute(
-        PeriodicEnergyExportedStartTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_EXPORTED_START_TIME_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, PERIODIC_ENERGY_EXPORTED_START_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readPeriodicEnergyExportedEndTimeAttribute(
-        PeriodicEnergyExportedEndTimeAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_EXPORTED_END_TIME_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, PERIODIC_ENERGY_EXPORTED_END_TIME_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribePeriodicEnergyExportedEndTimeAttribute(
-        PeriodicEnergyExportedEndTimeAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, PERIODIC_ENERGY_EXPORTED_END_TIME_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, PERIODIC_ENERGY_EXPORTED_END_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPeriodicEnergyExportedAttribute(
@@ -28665,7 +28505,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID, true);
@@ -28678,59 +28518,9 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, PERIODIC_ENERGY_EXPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEphemeralEnergyImportedAttribute(
-        EphemeralEnergyImportedAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EPHEMERAL_ENERGY_IMPORTED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EPHEMERAL_ENERGY_IMPORTED_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEphemeralEnergyImportedAttribute(
-        EphemeralEnergyImportedAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EPHEMERAL_ENERGY_IMPORTED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, EPHEMERAL_ENERGY_IMPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readEphemeralEnergyExportedAttribute(
-        EphemeralEnergyExportedAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EPHEMERAL_ENERGY_EXPORTED_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, EPHEMERAL_ENERGY_EXPORTED_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeEphemeralEnergyExportedAttribute(
-        EphemeralEnergyExportedAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, EPHEMERAL_ENERGY_EXPORTED_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, EPHEMERAL_ENERGY_EXPORTED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

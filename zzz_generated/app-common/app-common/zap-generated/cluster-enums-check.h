@@ -1533,6 +1533,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndCo
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalEnergyMeasurement::MeasurementTypeEnum val)
+{
+    using EnumType = ElectricalEnergyMeasurement::MeasurementTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kVoltage:
+    case EnumType::kActiveCurrent:
+    case EnumType::kReactiveCurrent:
+    case EnumType::kApparentCurrent:
+    case EnumType::kActivePower:
+    case EnumType::kReactivePower:
+    case EnumType::kApparentPower:
+    case EnumType::kRMSVoltage:
+    case EnumType::kRMSCurrent:
+    case EnumType::kRMSPower:
+    case EnumType::kFrequency:
+    case EnumType::kPowerFactor:
+    case EnumType::kNeutralCurrent:
+    case EnumType::kElectricalEnergy:
+        return val;
+    default:
+        return static_cast<EnumType>(15);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
 {
     using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;

@@ -7606,18 +7606,66 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
-    case Attributes::CumulativeEnergyImportedTime::Id: {
-        using TypeInfo = Attributes::CumulativeEnergyImportedTime::TypeInfo;
+    case Attributes::Accuracy::Id: {
+        using TypeInfo = Attributes::Accuracy::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct * _Nonnull value;
+        value = [MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct new];
+        value.measurementType = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.measurementType)];
+        value.measured = [NSNumber numberWithBool:cppValue.measured];
+        value.minMeasuredValue = [NSNumber numberWithLongLong:cppValue.minMeasuredValue];
+        value.maxMeasuredValue = [NSNumber numberWithLongLong:cppValue.maxMeasuredValue];
+        { // Scope for our temporary variables
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = cppValue.accuracyRanges.begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct * newElement_1;
+                newElement_1 = [MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct new];
+                newElement_1.rangeMin = [NSNumber numberWithLongLong:entry_1.rangeMin];
+                newElement_1.rangeMax = [NSNumber numberWithLongLong:entry_1.rangeMax];
+                if (entry_1.percentMax.HasValue()) {
+                    newElement_1.percentMax = [NSNumber numberWithUnsignedShort:entry_1.percentMax.Value()];
+                } else {
+                    newElement_1.percentMax = nil;
+                }
+                if (entry_1.percentMin.HasValue()) {
+                    newElement_1.percentMin = [NSNumber numberWithUnsignedShort:entry_1.percentMin.Value()];
+                } else {
+                    newElement_1.percentMin = nil;
+                }
+                if (entry_1.percentTypical.HasValue()) {
+                    newElement_1.percentTypical = [NSNumber numberWithUnsignedShort:entry_1.percentTypical.Value()];
+                } else {
+                    newElement_1.percentTypical = nil;
+                }
+                if (entry_1.fixedMax.HasValue()) {
+                    newElement_1.fixedMax = [NSNumber numberWithUnsignedLongLong:entry_1.fixedMax.Value()];
+                } else {
+                    newElement_1.fixedMax = nil;
+                }
+                if (entry_1.fixedMin.HasValue()) {
+                    newElement_1.fixedMin = [NSNumber numberWithUnsignedLongLong:entry_1.fixedMin.Value()];
+                } else {
+                    newElement_1.fixedMin = nil;
+                }
+                if (entry_1.fixedTypical.HasValue()) {
+                    newElement_1.fixedTypical = [NSNumber numberWithUnsignedLongLong:entry_1.fixedTypical.Value()];
+                } else {
+                    newElement_1.fixedTypical = nil;
+                }
+                [array_1 addObject:newElement_1];
+            }
+            CHIP_ERROR err = iter_1.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value.accuracyRanges = array_1;
         }
         return value;
     }
@@ -7628,26 +7676,32 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
+        MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::CumulativeEnergyExportedTime::Id: {
-        using TypeInfo = Attributes::CumulativeEnergyExportedTime::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            value = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+            value.energy = [NSNumber numberWithLongLong:cppValue.Value().energy];
+            if (cppValue.Value().startTimestamp.HasValue()) {
+                value.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().startTimestamp.Value()];
+            } else {
+                value.startTimestamp = nil;
+            }
+            if (cppValue.Value().endTimestamp.HasValue()) {
+                value.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().endTimestamp.Value()];
+            } else {
+                value.endTimestamp = nil;
+            }
+            if (cppValue.Value().startSystime.HasValue()) {
+                value.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().startSystime.Value()];
+            } else {
+                value.startSystime = nil;
+            }
+            if (cppValue.Value().endSystime.HasValue()) {
+                value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
+            } else {
+                value.endSystime = nil;
+            }
         }
         return value;
     }
@@ -7658,41 +7712,32 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
+        MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::PeriodicEnergyImportedStartTime::Id: {
-        using TypeInfo = Attributes::PeriodicEnergyImportedStartTime::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::PeriodicEnergyImportedEndTime::Id: {
-        using TypeInfo = Attributes::PeriodicEnergyImportedEndTime::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            value = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+            value.energy = [NSNumber numberWithLongLong:cppValue.Value().energy];
+            if (cppValue.Value().startTimestamp.HasValue()) {
+                value.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().startTimestamp.Value()];
+            } else {
+                value.startTimestamp = nil;
+            }
+            if (cppValue.Value().endTimestamp.HasValue()) {
+                value.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().endTimestamp.Value()];
+            } else {
+                value.endTimestamp = nil;
+            }
+            if (cppValue.Value().startSystime.HasValue()) {
+                value.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().startSystime.Value()];
+            } else {
+                value.startSystime = nil;
+            }
+            if (cppValue.Value().endSystime.HasValue()) {
+                value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
+            } else {
+                value.endSystime = nil;
+            }
         }
         return value;
     }
@@ -7703,41 +7748,32 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
+        MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::PeriodicEnergyExportedStartTime::Id: {
-        using TypeInfo = Attributes::PeriodicEnergyExportedStartTime::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::PeriodicEnergyExportedEndTime::Id: {
-        using TypeInfo = Attributes::PeriodicEnergyExportedEndTime::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+            value = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+            value.energy = [NSNumber numberWithLongLong:cppValue.Value().energy];
+            if (cppValue.Value().startTimestamp.HasValue()) {
+                value.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().startTimestamp.Value()];
+            } else {
+                value.startTimestamp = nil;
+            }
+            if (cppValue.Value().endTimestamp.HasValue()) {
+                value.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().endTimestamp.Value()];
+            } else {
+                value.endTimestamp = nil;
+            }
+            if (cppValue.Value().startSystime.HasValue()) {
+                value.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().startSystime.Value()];
+            } else {
+                value.startSystime = nil;
+            }
+            if (cppValue.Value().endSystime.HasValue()) {
+                value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
+            } else {
+                value.endSystime = nil;
+            }
         }
         return value;
     }
@@ -7748,41 +7784,32 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
+        MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::EphemeralEnergyImported::Id: {
-        using TypeInfo = Attributes::EphemeralEnergyImported::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
-        }
-        return value;
-    }
-    case Attributes::EphemeralEnergyExported::Id: {
-        using TypeInfo = Attributes::EphemeralEnergyExported::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedLongLong:cppValue.Value()];
+            value = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+            value.energy = [NSNumber numberWithLongLong:cppValue.Value().energy];
+            if (cppValue.Value().startTimestamp.HasValue()) {
+                value.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().startTimestamp.Value()];
+            } else {
+                value.startTimestamp = nil;
+            }
+            if (cppValue.Value().endTimestamp.HasValue()) {
+                value.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.Value().endTimestamp.Value()];
+            } else {
+                value.endTimestamp = nil;
+            }
+            if (cppValue.Value().startSystime.HasValue()) {
+                value.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().startSystime.Value()];
+            } else {
+                value.startSystime = nil;
+            }
+            if (cppValue.Value().endSystime.HasValue()) {
+                value.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.Value().endSystime.Value()];
+            } else {
+                value.endSystime = nil;
+            }
         }
         return value;
     }

@@ -2922,40 +2922,19 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
     case Attributes::Measured::Id: {
         return YES;
     }
-    case Attributes::CumulativeEnergyImportedTime::Id: {
+    case Attributes::Accuracy::Id: {
         return YES;
     }
     case Attributes::CumulativeEnergyImported::Id: {
         return YES;
     }
-    case Attributes::CumulativeEnergyExportedTime::Id: {
-        return YES;
-    }
     case Attributes::CumulativeEnergyExported::Id: {
-        return YES;
-    }
-    case Attributes::PeriodicEnergyImportedStartTime::Id: {
-        return YES;
-    }
-    case Attributes::PeriodicEnergyImportedEndTime::Id: {
         return YES;
     }
     case Attributes::PeriodicEnergyImported::Id: {
         return YES;
     }
-    case Attributes::PeriodicEnergyExportedStartTime::Id: {
-        return YES;
-    }
-    case Attributes::PeriodicEnergyExportedEndTime::Id: {
-        return YES;
-    }
     case Attributes::PeriodicEnergyExported::Id: {
-        return YES;
-    }
-    case Attributes::EphemeralEnergyImported::Id: {
-        return YES;
-    }
-    case Attributes::EphemeralEnergyExported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

@@ -9260,9 +9260,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeMeasuredID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCumulativeEnergyImportedTimeWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAccuracyWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedTimeID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAccuracyID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCumulativeEnergyImportedWithParams:(MTRReadParams * _Nullable)params
@@ -9270,24 +9270,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeCumulativeEnergyExportedTimeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedTimeID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCumulativeEnergyExportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyImportedStartTimeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedStartTimeID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyImportedEndTimeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedEndTimeID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyImportedWithParams:(MTRReadParams * _Nullable)params
@@ -9295,29 +9280,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyExportedStartTimeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedStartTimeID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyExportedEndTimeWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedEndTimeID) params:params];
-}
-
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePeriodicEnergyExportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEphemeralEnergyImportedWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEphemeralEnergyImportedID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEphemeralEnergyExportedWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalEnergyMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEphemeralEnergyExportedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
