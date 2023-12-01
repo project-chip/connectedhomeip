@@ -1,3 +1,13 @@
+<!--
+THIS FILE IS AUTO-GENERATED! DO NOT MODIFY!
+
+Generated from `clusters_markdown.jinja`.
+
+Generally regenerate using one of:
+  - scripts/tools/zap_regen_all.py
+  - ./scripts/codegen.py --output-dir docs --generator summary-markdown src/controller/data_model/controller-clusters.matter
+-->
+
 ## List of currently defined clusters
 
 | Code (dec) | Code (hex) | Name                                                    |
