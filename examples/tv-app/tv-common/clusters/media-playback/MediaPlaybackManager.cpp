@@ -60,6 +60,40 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
     return mDuration;
 }
 
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveAudioTrack);
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & audioTrack : mAvailableAudioTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(audioTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(mActiveTextTrack);
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder)
+{
+    // TODO: Insert code here
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & textTrack : mAvailableTextTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(textTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     // TODO: Insert code here
@@ -97,7 +131,8 @@ void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackRe
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                             const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxForwardSpeed)
@@ -137,7 +172,8 @@ void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Playba
     helper.Success(response);
 }
 
-void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                        const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     // TODO: Insert code here
     if (mPlaybackSpeed == kPlaybackMaxRewindSpeed)
@@ -237,6 +273,56 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
     response.data   = chip::MakeOptional(CharSpan::fromCharString("data response"));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
+}
+
+bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
+{
+    bool foundMatch = false;
+    for (auto const & availableAudioTrack : mAvailableAudioTracks)
+    {
+        if (strcmp(availableAudioTrack.id.data(), trackId.data()) == 0)
+        {
+            mActiveAudioTrack = availableAudioTrack;
+            foundMatch        = true;
+        }
+    }
+
+    if (!foundMatch)
+    {
+        // return an error
+    }
+
+    return true;
+}
+
+bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
+{
+    bool foundMatch = false;
+    for (auto const & availableTextTrack : mAvailableTextTracks)
+    {
+        if (strcmp(availableTextTrack.id.data(), trackId.data()) == 0)
+        {
+            mActiveAudioTrack = availableTextTrack;
+            foundMatch        = true;
+        }
+    }
+
+    if (!foundMatch)
+    {
+        // return an error
+    }
+
+    return true;
+}
+
+bool MediaPlaybackManager::HandleDeactivateTextTrack()
+{
+    // Handle Deactivate Text Track
+    if (mActiveTextTrack.id.data() != nullptr)
+    {
+        mActiveTextTrack = {};
+    }
+    return true;
 }
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)

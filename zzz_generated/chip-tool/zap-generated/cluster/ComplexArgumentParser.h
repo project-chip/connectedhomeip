@@ -339,10 +339,45 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Thermostat::Str
 
 static void Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::ProgramCastStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramCategoryStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::ProgramCategoryStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::SeriesInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::SeriesInfoStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ProgramStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::ProgramStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::PageTokenStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::PageTokenStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type & request,
                         Json::Value & value);
@@ -353,6 +388,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TargetNavigator
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::TrackAttributesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaPlayback::Structs::TrackAttributesStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::MediaPlayback::Structs::TrackStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Type & request,
                         Json::Value & value);
@@ -368,6 +413,17 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ContentLauncher::Structs::DimensionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::TrackPreferenceStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::TrackPreferenceStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentLauncher::Structs::AdditionalInfoStruct::Type & request,
                         Json::Value & value);
@@ -404,6 +460,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ApplicationLaun
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::ContentControl::Structs::RatingNameStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::Structs::SimpleStruct::Type & request,
                         Json::Value & value);
