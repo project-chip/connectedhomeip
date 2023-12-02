@@ -943,7 +943,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     // Sequence 4: Rename fabric index 2, applies immediately when nothing pending
     {
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(2, CharSpan("roboto")));
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(2, "roboto"_span));
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
 
         NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(), numStorageAfterUpdate); // Number of keys unchanged

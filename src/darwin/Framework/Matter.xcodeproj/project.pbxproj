@@ -1901,6 +1901,13 @@
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Debug;
 		};
@@ -1970,6 +1977,13 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Release;
 		};
@@ -2060,6 +2074,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",
@@ -2225,6 +2240,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+					"MTR_ENABLE_PROVISIONAL=1",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(CHIP_ROOT)/src",

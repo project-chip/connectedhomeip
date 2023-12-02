@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OnOffCluster(private val endpointId: UShort) {
+class OnOffCluster(private val controller: MatterController, private val endpointId: UShort) {
   class StartUpOnOffAttribute(val value: UInt?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +32,8 @@ class OnOffCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun off(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -39,6 +42,8 @@ class OnOffCluster(private val endpointId: UShort) {
   }
 
   suspend fun on(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -47,6 +52,8 @@ class OnOffCluster(private val endpointId: UShort) {
   }
 
   suspend fun toggle(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -59,6 +66,8 @@ class OnOffCluster(private val endpointId: UShort) {
     effectVariant: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 64L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -67,6 +76,8 @@ class OnOffCluster(private val endpointId: UShort) {
   }
 
   suspend fun onWithRecallGlobalScene(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 65L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -80,6 +91,8 @@ class OnOffCluster(private val endpointId: UShort) {
     offWaitTime: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 66L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -107,12 +120,12 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -123,12 +136,12 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOffWaitTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOffWaitTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOffWaitTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOffWaitTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -139,12 +152,12 @@ class OnOffCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpOnOffAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeStartUpOnOffAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeStartUpOnOffAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeStartUpOnOffAttribute(

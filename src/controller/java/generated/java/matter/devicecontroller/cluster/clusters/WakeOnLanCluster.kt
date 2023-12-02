@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class WakeOnLanCluster(private val endpointId: UShort) {
+class WakeOnLanCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -33,6 +34,14 @@ class WakeOnLanCluster(private val endpointId: UShort) {
   }
 
   suspend fun subscribeMACAddressAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLinkLocalAddressAttribute(): OctetString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLinkLocalAddressAttribute(minInterval: Int, maxInterval: Int): OctetString {
     // Implementation needs to be added here
   }
 

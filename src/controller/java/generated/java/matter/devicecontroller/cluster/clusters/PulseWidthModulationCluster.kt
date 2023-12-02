@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PulseWidthModulationCluster(private val endpointId: UShort) {
+class PulseWidthModulationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)

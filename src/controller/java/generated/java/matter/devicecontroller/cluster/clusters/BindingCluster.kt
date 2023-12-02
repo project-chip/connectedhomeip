@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class BindingCluster(private val endpointId: UShort) {
+class BindingCluster(private val controller: MatterController, private val endpointId: UShort) {
   class BindingAttribute(val value: List<BindingClusterTargetStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -38,15 +39,15 @@ class BindingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeBindingAttribute(value: List<BindingClusterTargetStruct>) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeBindingAttribute(
     value: List<BindingClusterTargetStruct>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeBindingAttribute(minInterval: Int, maxInterval: Int): BindingAttribute {

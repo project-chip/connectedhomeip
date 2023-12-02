@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class GroupKeyManagementCluster(private val endpointId: UShort) {
+class GroupKeyManagementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class KeySetReadResponse(val groupKeySet: GroupKeyManagementClusterGroupKeySetStruct)
 
   class KeySetReadAllIndicesResponse(val groupKeySetIDs: List<UShort>)
@@ -40,6 +44,8 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     groupKeySet: GroupKeyManagementClusterGroupKeySetStruct,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -51,6 +57,8 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     groupKeySetID: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): KeySetReadResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -59,6 +67,8 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
   }
 
   suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -69,6 +79,8 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
   suspend fun keySetReadAllIndices(
     timedInvokeTimeoutMs: Int? = null
   ): KeySetReadAllIndicesResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -86,15 +98,15 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeGroupKeyMapAttribute(value: List<GroupKeyManagementClusterGroupKeyMapStruct>) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeGroupKeyMapAttribute(
     value: List<GroupKeyManagementClusterGroupKeyMapStruct>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeGroupKeyMapAttribute(

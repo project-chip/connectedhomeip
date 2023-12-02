@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class TemperatureControlCluster(private val endpointId: UShort) {
+class TemperatureControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SupportedTemperatureLevelsAttribute(val value: List<String>?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -35,6 +39,8 @@ class TemperatureControlCluster(private val endpointId: UShort) {
     targetTemperatureLevel: UByte?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

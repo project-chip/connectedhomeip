@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class TimeFormatLocalizationCluster(private val endpointId: UShort) {
+class TimeFormatLocalizationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SupportedCalendarTypesAttribute(val value: List<UInt>?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -34,12 +38,12 @@ class TimeFormatLocalizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeHourFormatAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeHourFormatAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeHourFormatAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeHourFormatAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -50,12 +54,12 @@ class TimeFormatLocalizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeActiveCalendarTypeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeActiveCalendarTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeActiveCalendarTypeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeActiveCalendarTypeAttribute(minInterval: Int, maxInterval: Int): UByte {

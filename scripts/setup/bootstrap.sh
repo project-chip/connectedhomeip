@@ -66,7 +66,7 @@ _bootstrap_or_activate() {
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
     local _BOOTSTRAP_DIR="${_BOOTSTRAP_PATH%/*}"
     # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
-    _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
+    _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." > /dev/null && pwd)"
 
     local _CONFIG_FILE="scripts/setup/environment.json"
 

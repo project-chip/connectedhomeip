@@ -23,6 +23,8 @@
 #include <platform/ConfigurationManager.h>
 #include <string>
 
+constexpr const char * kNullHexMACAddress = "000000000000";
+
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
 
@@ -33,7 +35,7 @@ std::string getMacAddress()
     if (chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac) != CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress no primary MAC configured by DeviceLayer");
-        return "0000000000";
+        return kNullHexMACAddress;
     }
 
     char macStr[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength * 2 + 1] = { 0 }; // added null char
@@ -41,7 +43,7 @@ std::string getMacAddress()
         CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress hex conversion failed");
-        return "0000000000";
+        return kNullHexMACAddress;
     }
 
     return std::string(macStr);
@@ -50,6 +52,14 @@ std::string getMacAddress()
 CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "WakeOnLanManager::HandleGetMacAddress");
+
+    // Spec REQUIRES 48-bit mac addresses. This means at least Thread devices will
+    // fail here.
+    if (chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength != 6)
+    {
+        ChipLogError(Zcl, "WakeOnLanManager: primary MAC address is not 48-bit");
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
     return aEncoder.Encode(CharSpan::fromCharString(getMacAddress().c_str()));
 }

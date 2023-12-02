@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OperationalCredentialsCluster(private val endpointId: UShort) {
+class OperationalCredentialsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class AttestationResponse(
     val attestationElements: ByteArray,
     val attestationSignature: ByteArray
@@ -49,6 +53,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     attestationNonce: ByteArray,
     timedInvokeTimeoutMs: Int? = null
   ): AttestationResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,6 +66,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     certificateType: UInt,
     timedInvokeTimeoutMs: Int? = null
   ): CertificateChainResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -72,6 +80,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     isForUpdateNOC: Boolean?,
     timedInvokeTimeoutMs: Int? = null
   ): CSRResponse {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -87,6 +97,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     adminVendorId: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): NOCResponse {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -99,6 +111,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     ICACValue: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): NOCResponse {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -107,6 +121,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
   }
 
   suspend fun updateFabricLabel(label: String, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+    val commandId = 9L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -115,6 +131,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
   }
 
   suspend fun removeFabric(fabricIndex: UByte, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+    val commandId = 10L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -126,6 +144,8 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     rootCACertificate: ByteArray,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 11L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ElectricalMeasurementCluster(private val endpointId: UShort) {
+class ElectricalMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -29,6 +33,8 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -42,6 +48,8 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     numberOfIntervals: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -568,15 +576,15 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeAverageRmsVoltageMeasurementPeriodAttribute(
@@ -590,12 +598,15 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeAverageRmsUnderVoltageCounterAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeAverageRmsUnderVoltageCounterAttribute(
@@ -609,12 +620,15 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRmsExtremeOverVoltagePeriodAttribute(
@@ -628,12 +642,15 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRmsExtremeUnderVoltagePeriodAttribute(
@@ -647,12 +664,12 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRmsVoltageSagPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -663,12 +680,12 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRmsVoltageSwellPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -727,12 +744,12 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -759,12 +776,12 @@ class ElectricalMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeAcOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UShort {

@@ -31,10 +31,10 @@ class StepCommand
 public:
     StepCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
-    CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepMode stepMode, uint8_t stepSize,
+    CHIP_ERROR Invoke(chip::app::Clusters::LevelControl::StepModeEnum stepMode, uint8_t stepSize,
                       chip::app::DataModel::Nullable<uint16_t> transitionTime,
-                      chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> optionMask,
-                      chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> optionOverride,
+                      chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionMask,
+                      chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionOverride,
                       std::function<void(CHIP_ERROR)> responseCallback);
 };
 
@@ -45,8 +45,8 @@ public:
     MoveToLevelCommand() : MediaCommandBase(chip::app::Clusters::LevelControl::Id) {}
 
     CHIP_ERROR Invoke(uint8_t level, chip::app::DataModel::Nullable<uint16_t> transitionTime,
-                      chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> optionMask,
-                      chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> optionOverride,
+                      chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionMask,
+                      chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> optionOverride,
                       std::function<void(CHIP_ERROR)> responseCallback);
 };
 

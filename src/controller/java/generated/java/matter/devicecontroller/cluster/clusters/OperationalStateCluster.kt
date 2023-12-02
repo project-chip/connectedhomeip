@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OperationalStateCluster(private val endpointId: UShort) {
+class OperationalStateCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class OperationalCommandResponse(
     val commandResponseState: OperationalStateClusterErrorStateStruct
   )
@@ -45,6 +49,8 @@ class OperationalStateCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -53,6 +59,8 @@ class OperationalStateCluster(private val endpointId: UShort) {
   }
 
   suspend fun stop(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,6 +69,8 @@ class OperationalStateCluster(private val endpointId: UShort) {
   }
 
   suspend fun start(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -69,6 +79,8 @@ class OperationalStateCluster(private val endpointId: UShort) {
   }
 
   suspend fun resume(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

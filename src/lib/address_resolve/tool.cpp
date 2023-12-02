@@ -119,7 +119,8 @@ bool Cmd_Node(int argc, const char ** argv)
         return false;
     }
 
-    ChipLogProgress(NotSpecified, "Will search for node %" PRIx64 " on fabric %" PRIx64, node, fabric);
+    ChipLogProgress(NotSpecified, "Will search for node 0x" ChipLogFormatX64 " on fabric 0x" ChipLogFormatX64,
+                    ChipLogValueX64(node), ChipLogValueX64(fabric));
 
     AddressResolve::NodeLookupRequest request(PeerId().SetNodeId(node).SetCompressedFabricId(fabric));
 

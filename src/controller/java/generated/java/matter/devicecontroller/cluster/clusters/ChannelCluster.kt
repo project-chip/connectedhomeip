@@ -17,10 +17,16 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ChannelCluster(private val endpointId: UShort) {
+class ChannelCluster(private val controller: MatterController, private val endpointId: UShort) {
   class ChangeChannelResponse(val status: UInt, val data: String?)
+
+  class ProgramGuideResponse(
+    val channelPagingStruct: Short,
+    val programList: List<ChannelClusterProgramStruct>
+  )
 
   class ChannelListAttribute(val value: List<ChannelClusterChannelInfoStruct>?)
 
@@ -40,6 +46,8 @@ class ChannelCluster(private val endpointId: UShort) {
     match: String,
     timedInvokeTimeoutMs: Int? = null
   ): ChangeChannelResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -52,6 +60,8 @@ class ChannelCluster(private val endpointId: UShort) {
     minorNumber: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -60,6 +70,59 @@ class ChannelCluster(private val endpointId: UShort) {
   }
 
   suspend fun skipChannel(count: Short, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun getProgramGuide(
+    startTime: UInt?,
+    endTime: UInt?,
+    channelList: List<ChannelClusterChannelInfoStruct>?,
+    pageToken: ChannelClusterPageTokenStruct?,
+    recordingFlag: ULong?,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>?,
+    data: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ProgramGuideResponse {
+    val commandId = 4L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun recordProgram(
+    programIdentifier: String,
+    shouldRecordSeries: Boolean,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
+    data: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 6L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun cancelRecordProgram(
+    programIdentifier: String,
+    shouldRecordSeries: Boolean,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
+    data: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

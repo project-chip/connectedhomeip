@@ -232,6 +232,9 @@
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    0x0000002D, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -288,6 +291,9 @@
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    0x00000000, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -344,6 +350,9 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \

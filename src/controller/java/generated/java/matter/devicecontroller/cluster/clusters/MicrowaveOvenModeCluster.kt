@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class MicrowaveOvenModeCluster(private val endpointId: UShort) {
+class MicrowaveOvenModeCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SupportedModesAttribute(val value: List<MicrowaveOvenModeClusterModeOptionStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)

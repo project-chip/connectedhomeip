@@ -16,7 +16,7 @@
  */
 #include <stdio.h>
 
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/logging/LogV.h>
 
 #include <CHIPDevicePlatformConfig.h>

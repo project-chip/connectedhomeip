@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class SoftwareDiagnosticsCluster(private val endpointId: UShort) {
+class SoftwareDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ThreadMetricsAttribute(val value: List<SoftwareDiagnosticsClusterThreadMetricsStruct>?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +35,8 @@ class SoftwareDiagnosticsCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetWatermarks(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

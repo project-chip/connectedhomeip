@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
+class OtaSoftwareUpdateProviderCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class QueryImageResponse(
     val status: UInt,
     val delayedActionTime: UInt?,
@@ -52,6 +56,8 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
     metadataForProvider: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): QueryImageResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -64,6 +70,8 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
     newVersion: UInt,
     timedInvokeTimeoutMs: Int? = null
   ): ApplyUpdateResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -76,6 +84,8 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
     softwareVersion: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class RelativeHumidityMeasurementCluster(private val endpointId: UShort) {
+class RelativeHumidityMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class MeasuredValueAttribute(val value: UShort?)
 
   class MinMeasuredValueAttribute(val value: UShort?)

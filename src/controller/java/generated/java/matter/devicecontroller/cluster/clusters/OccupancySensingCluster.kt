@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class OccupancySensingCluster(private val endpointId: UShort) {
+class OccupancySensingCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -59,12 +63,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePIROccupiedToUnoccupiedDelayAttribute(
@@ -78,12 +85,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
+    value: UShort,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePIRUnoccupiedToOccupiedDelayAttribute(
@@ -97,15 +107,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePIRUnoccupiedToOccupiedThresholdAttribute(
@@ -119,15 +129,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUltrasonicOccupiedToUnoccupiedDelayAttribute(
@@ -141,15 +151,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUltrasonicUnoccupiedToOccupiedDelayAttribute(
@@ -163,15 +173,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
@@ -185,15 +195,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
@@ -207,15 +217,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
@@ -229,15 +239,15 @@ class OccupancySensingCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribePhysicalContactUnoccupiedToOccupiedThresholdAttribute(

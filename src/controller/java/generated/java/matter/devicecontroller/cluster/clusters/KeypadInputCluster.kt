@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class KeypadInputCluster(private val endpointId: UShort) {
+class KeypadInputCluster(private val controller: MatterController, private val endpointId: UShort) {
   class SendKeyResponse(val status: UInt)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +32,8 @@ class KeypadInputCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun sendKey(keyCode: UInt, timedInvokeTimeoutMs: Int? = null): SendKeyResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

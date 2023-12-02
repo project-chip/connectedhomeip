@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class UserLabelCluster(private val endpointId: UShort) {
+class UserLabelCluster(private val controller: MatterController, private val endpointId: UShort) {
   class LabelListAttribute(val value: List<UserLabelClusterLabelStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -34,15 +35,15 @@ class UserLabelCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLabelListAttribute(value: List<UserLabelClusterLabelStruct>) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeLabelListAttribute(
     value: List<UserLabelClusterLabelStruct>,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLabelListAttribute(minInterval: Int, maxInterval: Int): LabelListAttribute {

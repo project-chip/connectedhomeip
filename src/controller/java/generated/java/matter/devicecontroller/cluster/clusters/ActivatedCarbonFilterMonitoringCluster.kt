@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ActivatedCarbonFilterMonitoringCluster(private val endpointId: UShort) {
+class ActivatedCarbonFilterMonitoringCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class LastChangedTimeAttribute(val value: UInt?)
 
   class ReplacementProductListAttribute(
@@ -35,6 +39,8 @@ class ActivatedCarbonFilterMonitoringCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -78,12 +84,12 @@ class ActivatedCarbonFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLastChangedTimeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLastChangedTimeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLastChangedTimeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLastChangedTimeAttribute(

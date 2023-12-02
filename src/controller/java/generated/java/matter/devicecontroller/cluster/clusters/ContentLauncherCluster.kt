@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ContentLauncherCluster(private val endpointId: UShort) {
+class ContentLauncherCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class LauncherResponse(val status: UInt, val data: String?)
 
   class AcceptHeaderAttribute(val value: List<String>?)
@@ -36,8 +40,12 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     search: ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?,
+    playbackPreferences: ContentLauncherClusterPlaybackPreferencesStruct?,
+    useCurrentContext: Boolean?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -51,6 +59,8 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     brandingInformation: ContentLauncherClusterBrandingInformationStruct?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -70,14 +80,6 @@ class ContentLauncherCluster(private val endpointId: UShort) {
   }
 
   suspend fun readSupportedStreamingProtocolsAttribute(): UInt {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 

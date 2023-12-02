@@ -31,7 +31,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <credentials/CHIPCert.h>
+#include <credentials/CHIPCert_Internal.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
@@ -313,8 +313,6 @@ exit:
     return err;
 }
 
-} // namespace
-
 CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
                          const Crypto::P256PublicKey & issuerPubkey, ASN1Writer & writer)
 {
@@ -360,6 +358,61 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
 
         // certificate extensions
         ReturnErrorOnFailure(EncodeExtensions(isCA, subjectPubkey, issuerPubkey, requestParams.FutureExt, writer));
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
+}
+
+} // namespace
+
+CHIP_ERROR EncodeNetworkIdentityTBSCert(const P256PublicKey & pubkey, ASN1Writer & writer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipDN issuerAndSubject;
+    InitNetworkIdentitySubject(issuerAndSubject);
+
+    ASN1_START_SEQUENCE
+    {
+        // version [0] EXPLICIT Version DEFAULT v1
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
+        {
+            ASN1_ENCODE_INTEGER(2); // Version ::= INTEGER { v1(0), v2(1), v3(2) }
+        }
+        ASN1_END_CONSTRUCTED;
+
+        ReturnErrorOnFailure(writer.PutInteger(kNetworkIdentitySerialNumber));
+
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
+        ASN1_END_SEQUENCE;
+
+        // issuer Name
+        ReturnErrorOnFailure(issuerAndSubject.EncodeToASN1(writer));
+
+        // validity Validity,
+        ReturnErrorOnFailure(EncodeValidity(kNetworkIdentityNotBeforeTime, kNetworkIdentityNotAfterTime, writer));
+
+        // subject Name
+        ReturnErrorOnFailure(issuerAndSubject.EncodeToASN1(writer));
+
+        ReturnErrorOnFailure(EncodeSubjectPublicKeyInfo(pubkey, writer));
+
+        // certificate extensions
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 3)
+        {
+            ASN1_START_SEQUENCE
+            {
+                EncodeIsCAExtension(kNotCACert, writer);
+                EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer);
+                EncodeExtKeyUsageExtension({ kOID_KeyPurpose_ClientAuth, kOID_KeyPurpose_ServerAuth }, writer);
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_CONSTRUCTED;
     }
     ASN1_END_SEQUENCE;
 

@@ -23,7 +23,7 @@
 #include "StructBuilder.h"
 #include "StructParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -37,6 +37,7 @@ enum class Tag : uint8_t
 {
     kPath   = 0,
     kFields = 1,
+    kRef    = 2,
 };
 
 class Parser : public StructParser
@@ -66,6 +67,17 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetFields(TLV::TLVReader * const apReader) const;
+
+    /**
+     *  @brief Get the provided command reference associated with the CommandData
+     *
+     *  @param [out] apRef    A pointer to apRef
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetRef(uint16_t * const apRef) const;
 };
 
 class Builder : public StructBuilder
@@ -77,6 +89,16 @@ public:
      *  @return A reference to CommandPathIB::Builder
      */
     CommandPathIB::Builder & CreatePath();
+
+    /**
+     *  @brief Inject Command Ref into the TLV stream.
+     *
+     *  @param [in] aRef refer to the CommandRef to set in CommandDataIB.
+     *
+     *  TODO What are some more errors
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR Ref(const uint16_t aRef);
 
     /**
      *  @brief Mark the end of this CommandDataIB

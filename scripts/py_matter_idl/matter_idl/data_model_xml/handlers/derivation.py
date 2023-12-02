@@ -13,10 +13,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+import dataclasses
 import logging
 from typing import Iterable, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
+from matter_idl.matter_idl_types import Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
@@ -81,6 +82,9 @@ def merge_event_into(e: Event, cluster: Cluster):
 
 
 def merge_attribute_into(a: Attribute, cluster: Cluster):
+    """Pushes an attribute from a base cluster into an already
+       parsed cluster.
+    """
     existing: Optional[Attribute] = None
     for existing_a in cluster.attributes:
         if existing_a.definition.name == a.definition.name:
@@ -88,13 +92,24 @@ def merge_attribute_into(a: Attribute, cluster: Cluster):
             break
 
     if existing:
-        # Do not provide merging as it seems only conformance is changed from
-        # the base cluster
-        #
-        # This should fix the correct types
-        #
-        # LOGGER.error("TODO: Do not know how to merge attribute for %s::%s", cluster.name, existing.definition.name)
-        cluster.attributes.remove(existing)
+        # Merge examples:
+        #   UserLabelCluster::LabelList changes qualities (access, mandatory)
+        #   ModeDishwasher:
+        #      - changes the type of a list from sint32 to list[ModeOptionStruct]
+        #      - Sets the field as read-only
+
+        # Carry over data type and definitions, except quality and maturity
+        existing.definition = dataclasses.replace(
+            a.definition,
+            qualities=existing.definition.qualities,
+            api_maturity=existing.definition.api_maturity,
+        )
+
+        # Inherit attribute quality
+        if existing.qualities == AttributeQuality.NONE:
+            existing.qualities = a.qualities
+
+        return
 
     cluster.attributes.append(a)
 

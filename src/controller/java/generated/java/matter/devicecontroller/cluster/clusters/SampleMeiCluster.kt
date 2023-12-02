@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class SampleMeiCluster(private val endpointId: UShort) {
+class SampleMeiCluster(private val controller: MatterController, private val endpointId: UShort) {
   class AddArgumentsResponse(val returnValue: UByte)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +32,8 @@ class SampleMeiCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun ping(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -43,6 +46,8 @@ class SampleMeiCluster(private val endpointId: UShort) {
     arg2: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): AddArgumentsResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -54,12 +59,12 @@ class SampleMeiCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeFlipFlopAttribute(value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeFlipFlopAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeFlipFlopAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeFlipFlopAttribute(minInterval: Int, maxInterval: Int): Boolean {

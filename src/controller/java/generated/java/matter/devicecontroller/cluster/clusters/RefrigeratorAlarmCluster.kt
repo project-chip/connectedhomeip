@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class RefrigeratorAlarmCluster(private val endpointId: UShort) {
+class RefrigeratorAlarmCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)

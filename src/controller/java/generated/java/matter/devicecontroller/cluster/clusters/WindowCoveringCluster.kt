@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class WindowCoveringCluster(private val endpointId: UShort) {
+class WindowCoveringCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class CurrentPositionLiftAttribute(val value: UShort?)
 
   class CurrentPositionTiltAttribute(val value: UShort?)
@@ -45,6 +49,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun upOrOpen(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -53,6 +59,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
   }
 
   suspend fun downOrClose(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,6 +69,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
   }
 
   suspend fun stopMotion(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -69,6 +79,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
   }
 
   suspend fun goToLiftValue(liftValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -80,6 +92,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     liftPercent100thsValue: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -88,6 +102,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
   }
 
   suspend fun goToTiltValue(tiltValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -99,6 +115,8 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     tiltPercent100thsValue: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 8L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -310,12 +328,12 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeModeAttribute(minInterval: Int, maxInterval: Int): UByte {

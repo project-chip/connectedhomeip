@@ -32,11 +32,6 @@
     ],
     "templates": [
         {
-            "path": "../../zap-templates/templates/app/attribute-size.zapt",
-            "name": "ZCL attribute-size header",
-            "output": "attribute-size.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/attribute-type.zapt",
             "name": "ZCL attribute-type header",
             "output": "attribute-type.h"
@@ -45,11 +40,6 @@
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/enums.zapt",
-            "name": "ZCL enums header",
-            "output": "enums.h"
         },
         {
             "path": "../../zap-templates/templates/app/print-cluster.zapt",

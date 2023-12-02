@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class LevelControlCluster(private val endpointId: UShort) {
+class LevelControlCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class CurrentLevelAttribute(val value: UByte?)
 
   class OnLevelAttribute(val value: UByte?)
@@ -47,6 +51,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -61,6 +67,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -76,6 +84,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -84,6 +94,8 @@ class LevelControlCluster(private val endpointId: UShort) {
   }
 
   suspend fun stop(optionsMask: UInt, optionsOverride: UInt, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -98,6 +110,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -112,6 +126,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -127,6 +143,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -139,6 +157,8 @@ class LevelControlCluster(private val endpointId: UShort) {
     optionsOverride: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -147,6 +167,8 @@ class LevelControlCluster(private val endpointId: UShort) {
   }
 
   suspend fun moveToClosestFrequency(frequency: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 8L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -217,12 +239,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOptionsAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOptionsAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -233,12 +255,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnOffTransitionTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnOffTransitionTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -249,12 +271,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnLevelAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnLevelAttribute(minInterval: Int, maxInterval: Int): OnLevelAttribute {
@@ -265,12 +287,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnTransitionTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnTransitionTimeAttribute(
@@ -284,12 +306,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOffTransitionTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOffTransitionTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOffTransitionTimeAttribute(
@@ -303,12 +325,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeDefaultMoveRateAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeDefaultMoveRateAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeDefaultMoveRateAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeDefaultMoveRateAttribute(
@@ -322,12 +344,12 @@ class LevelControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpCurrentLevelAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeStartUpCurrentLevelAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeStartUpCurrentLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeStartUpCurrentLevelAttribute(

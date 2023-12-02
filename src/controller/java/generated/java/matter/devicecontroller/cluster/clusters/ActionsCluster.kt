@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ActionsCluster(private val endpointId: UShort) {
+class ActionsCluster(private val controller: MatterController, private val endpointId: UShort) {
   class ActionListAttribute(val value: List<ActionsClusterActionStruct>)
 
   class EndpointListsAttribute(val value: List<ActionsClusterEndpointListStruct>)
@@ -33,6 +34,8 @@ class ActionsCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun instantAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -46,6 +49,8 @@ class ActionsCluster(private val endpointId: UShort) {
     transitionTime: UShort,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -54,6 +59,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun startAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -67,6 +74,8 @@ class ActionsCluster(private val endpointId: UShort) {
     duration: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -75,6 +84,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun stopAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -83,6 +94,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun pauseAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -96,6 +109,8 @@ class ActionsCluster(private val endpointId: UShort) {
     duration: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 6L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -104,6 +119,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun resumeAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 7L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -112,6 +129,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun enableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 8L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -125,6 +144,8 @@ class ActionsCluster(private val endpointId: UShort) {
     duration: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 9L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -133,6 +154,8 @@ class ActionsCluster(private val endpointId: UShort) {
   }
 
   suspend fun disableAction(actionID: UShort, invokeID: UInt?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 10L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -146,6 +169,8 @@ class ActionsCluster(private val endpointId: UShort) {
     duration: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 11L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

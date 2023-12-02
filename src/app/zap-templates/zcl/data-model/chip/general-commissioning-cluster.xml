@@ -60,12 +60,12 @@ limitations under the License.
     <command source="server" code="0x01" name="ArmFailSafeResponse" optional="false" cli="chip fabric_commissioning armfailsaferesponse">
       <description>Success/failure response for ArmFailSafe command</description>
       <arg name="ErrorCode" type="CommissioningErrorEnum"/>
-      <arg name="DebugText" type="char_string"/>
+      <arg name="DebugText" type="char_string" length="128"/>
     </command>
     <command source="client" code="0x02" name="SetRegulatoryConfig" response="SetRegulatoryConfigResponse" cli="chip fabric_commissioning setregulatoryconfig">
       <description>Set the regulatory configuration to be used during commissioning</description>
       <arg name="NewRegulatoryConfig" type="RegulatoryLocationTypeEnum"/>
-      <arg name="CountryCode" type="char_string"/>
+      <arg name="CountryCode" type="char_string" length="2"/>
       <arg name="Breadcrumb" type="int64u"/>
       <access op="invoke" privilege="administer"/>
     </command>

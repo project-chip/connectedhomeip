@@ -124,12 +124,12 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0030" name="LampType" type="string" default="empty string">
+    <attribute id="0x0030" name="LampType" type="string" default="&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="maxLength" value="16"/>
     </attribute>
-    <attribute id="0x0031" name="LampManufacturer" type="string" default="empty string">
+    <attribute id="0x0031" name="LampManufacturer" type="string" default="&quot;">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <optionalConform/>
       <constraint type="maxLength" value="16"/>

@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class MediaInputCluster(private val endpointId: UShort) {
+class MediaInputCluster(private val controller: MatterController, private val endpointId: UShort) {
   class InputListAttribute(val value: List<MediaInputClusterInputInfoStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -31,6 +32,8 @@ class MediaInputCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun selectInput(index: UByte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -39,6 +42,8 @@ class MediaInputCluster(private val endpointId: UShort) {
   }
 
   suspend fun showInputStatus(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -47,6 +52,8 @@ class MediaInputCluster(private val endpointId: UShort) {
   }
 
   suspend fun hideInputStatus(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -55,6 +62,8 @@ class MediaInputCluster(private val endpointId: UShort) {
   }
 
   suspend fun renameInput(index: UByte, name: String, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

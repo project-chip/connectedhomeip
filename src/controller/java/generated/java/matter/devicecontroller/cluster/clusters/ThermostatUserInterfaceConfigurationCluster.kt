@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ThermostatUserInterfaceConfigurationCluster(private val endpointId: UShort) {
+class ThermostatUserInterfaceConfigurationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -32,12 +36,12 @@ class ThermostatUserInterfaceConfigurationCluster(private val endpointId: UShort
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureDisplayModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeTemperatureDisplayModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeTemperatureDisplayModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeTemperatureDisplayModeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -48,12 +52,12 @@ class ThermostatUserInterfaceConfigurationCluster(private val endpointId: UShort
     // Implementation needs to be added here
   }
 
-  suspend fun writeKeypadLockoutAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeKeypadLockoutAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeKeypadLockoutAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeKeypadLockoutAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -64,12 +68,15 @@ class ThermostatUserInterfaceConfigurationCluster(private val endpointId: UShort
     // Implementation needs to be added here
   }
 
-  suspend fun writeScheduleProgrammingVisibilityAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeScheduleProgrammingVisibilityAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeScheduleProgrammingVisibilityAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeScheduleProgrammingVisibilityAttribute(

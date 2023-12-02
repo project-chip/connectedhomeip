@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PowerSourceConfigurationCluster(private val endpointId: UShort) {
+class PowerSourceConfigurationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SourcesAttribute(val value: List<UShort>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)

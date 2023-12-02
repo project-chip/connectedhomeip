@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ThermostatCluster(private val endpointId: UShort) {
+class ThermostatCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GetWeeklyScheduleResponse(
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekForSequence: UInt,
@@ -58,6 +59,8 @@ class ThermostatCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun setpointRaiseLower(mode: UInt, amount: Byte, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -72,6 +75,8 @@ class ThermostatCluster(private val endpointId: UShort) {
     transitions: List<ThermostatClusterThermostatScheduleTransition>,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -84,6 +89,8 @@ class ThermostatCluster(private val endpointId: UShort) {
     modeToReturn: UInt,
     timedInvokeTimeoutMs: Int? = null
   ): GetWeeklyScheduleResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -92,6 +99,8 @@ class ThermostatCluster(private val endpointId: UShort) {
   }
 
   suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 3L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -181,12 +190,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeHVACSystemTypeConfigurationAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeHVACSystemTypeConfigurationAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeHVACSystemTypeConfigurationAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeHVACSystemTypeConfigurationAttribute(
@@ -200,12 +212,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeLocalTemperatureCalibrationAttribute(value: Byte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeLocalTemperatureCalibrationAttribute(value: Byte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeLocalTemperatureCalibrationAttribute(
+    value: Byte,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeLocalTemperatureCalibrationAttribute(
@@ -219,12 +234,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOccupiedCoolingSetpointAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOccupiedCoolingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOccupiedCoolingSetpointAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOccupiedCoolingSetpointAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -235,12 +253,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOccupiedHeatingSetpointAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOccupiedHeatingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOccupiedHeatingSetpointAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOccupiedHeatingSetpointAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -251,12 +272,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUnoccupiedCoolingSetpointAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeUnoccupiedCoolingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeUnoccupiedCoolingSetpointAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUnoccupiedCoolingSetpointAttribute(
@@ -270,12 +294,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUnoccupiedHeatingSetpointAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeUnoccupiedHeatingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeUnoccupiedHeatingSetpointAttribute(
+    value: Short,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUnoccupiedHeatingSetpointAttribute(
@@ -289,12 +316,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinHeatSetpointLimitAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeMinHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeMinHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeMinHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -305,12 +332,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeMaxHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -321,12 +348,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinCoolSetpointLimitAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeMinCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeMinCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeMinCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -337,12 +364,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeMaxCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
@@ -353,12 +380,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeMinSetpointDeadBandAttribute(value: Byte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeMinSetpointDeadBandAttribute(value: Byte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeMinSetpointDeadBandAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeMinSetpointDeadBandAttribute(minInterval: Int, maxInterval: Int): Byte {
@@ -369,12 +396,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeRemoteSensingAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeRemoteSensingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeRemoteSensingAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeRemoteSensingAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -385,12 +412,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeControlSequenceOfOperationAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeControlSequenceOfOperationAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeControlSequenceOfOperationAttribute(
+    value: UInt,
+    timedWriteTimeoutMs: Int? = null
+  ) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeControlSequenceOfOperationAttribute(
@@ -404,12 +434,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSystemModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSystemModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeSystemModeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeSystemModeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -458,12 +488,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureSetpointHoldAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeTemperatureSetpointHoldAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeTemperatureSetpointHoldAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeTemperatureSetpointHoldAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -475,15 +505,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeTemperatureSetpointHoldDurationAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeTemperatureSetpointHoldDurationAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeTemperatureSetpointHoldDurationAttribute(
@@ -497,15 +527,15 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeThermostatProgrammingOperationModeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
   suspend fun writeThermostatProgrammingOperationModeAttribute(
     value: UInt,
-    timedWriteTimeoutMs: Int
+    timedWriteTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeThermostatProgrammingOperationModeAttribute(
@@ -557,12 +587,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOccupiedSetbackAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOccupiedSetbackAttribute(
@@ -598,12 +628,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeUnoccupiedSetbackAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeUnoccupiedSetbackAttribute(
@@ -639,12 +669,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeEmergencyHeatDeltaAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -655,12 +685,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACTypeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACTypeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -671,12 +701,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACCapacityAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACCapacityAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACCapacityAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACCapacityAttribute(minInterval: Int, maxInterval: Int): UShort {
@@ -687,12 +717,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACRefrigerantTypeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACRefrigerantTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACRefrigerantTypeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACRefrigerantTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -703,12 +733,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACCompressorTypeAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACCompressorTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACCompressorTypeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACCompressorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -719,12 +749,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACErrorCodeAttribute(value: ULong) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACErrorCodeAttribute(value: ULong, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACErrorCodeAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACErrorCodeAttribute(minInterval: Int, maxInterval: Int): UInt {
@@ -735,12 +765,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACLouverPositionAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACLouverPositionAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACLouverPositionAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACLouverPositionAttribute(minInterval: Int, maxInterval: Int): UByte {
@@ -762,12 +792,12 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeACCapacityformatAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeACCapacityformatAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeACCapacityformatAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeACCapacityformatAttribute(minInterval: Int, maxInterval: Int): UByte {

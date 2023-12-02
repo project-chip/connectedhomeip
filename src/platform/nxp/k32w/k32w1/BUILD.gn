@@ -106,7 +106,4 @@ static_library("k32w1") {
   }
 
   public_deps += [ "${chip_root}/src/crypto" ]
-
-  public_configs =
-      [ "${chip_root}/src/lib/address_resolve:default_address_resolve_config" ]
 }

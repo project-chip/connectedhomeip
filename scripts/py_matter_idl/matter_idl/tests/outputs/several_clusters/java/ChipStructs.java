@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static chip.devicecontroller.ChipTLVType.*;
+
 public class ChipStructs {
 public static class SecondClusterFabricDescriptorStruct {
   public byte[] rootPublicKey;
@@ -29,6 +31,13 @@ public static class SecondClusterFabricDescriptorStruct {
   public Long nodeID;
   public String label;
   public Integer fabricIndex;
+  private static final long ROOT_PUBLIC_KEY_ID = 1L;
+  private static final long VENDOR_I_D_ID = 2L;
+  private static final long FABRIC_I_D_ID = 3L;
+  private static final long NODE_I_D_ID = 4L;
+  private static final long LABEL_ID = 5L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
   public SecondClusterFabricDescriptorStruct(
     byte[] rootPublicKey,
     Integer vendorID,
@@ -43,6 +52,71 @@ public static class SecondClusterFabricDescriptorStruct {
     this.nodeID = nodeID;
     this.label = label;
     this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ROOT_PUBLIC_KEY_ID, new ByteArrayType(rootPublicKey)));
+    values.add(new StructElement(VENDOR_I_D_ID, new UIntType(vendorID)));
+    values.add(new StructElement(FABRIC_I_D_ID, new UIntType(fabricID)));
+    values.add(new StructElement(NODE_I_D_ID, new UIntType(nodeID)));
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static SecondClusterFabricDescriptorStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] rootPublicKey = null;
+    Integer vendorID = null;
+    Long fabricID = null;
+    Long nodeID = null;
+    String label = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ROOT_PUBLIC_KEY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          rootPublicKey = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == VENDOR_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          vendorID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == NODE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          nodeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new SecondClusterFabricDescriptorStruct(
+      rootPublicKey,
+      vendorID,
+      fabricID,
+      nodeID,
+      label,
+      fabricIndex
+    );
   }
 
   @Override

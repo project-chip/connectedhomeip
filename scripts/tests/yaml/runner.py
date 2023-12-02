@@ -144,7 +144,7 @@ pass_parser_group = click.make_pass_decorator(ParserGroup)
 class YamlTestParserGroup(click.Group):
     def format_options(self, ctx, formatter):
         """Writes all the options into the formatter if they exist."""
-        if ctx.custom_options:
+        if getattr(ctx, 'custom_options', None):
             params_copy = self.params
             non_custom_params = list(filter(lambda x: x.name not in ctx.custom_options, self.params))
             custom_params = list(filter(lambda x: x.name in ctx.custom_options, self.params))

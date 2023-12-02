@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class LaundryWasherControlsCluster(private val endpointId: UShort) {
+class LaundryWasherControlsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SpinSpeedsAttribute(val value: List<String>?)
 
   class SpinSpeedCurrentAttribute(val value: UByte?)
@@ -49,12 +53,12 @@ class LaundryWasherControlsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSpinSpeedCurrentAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSpinSpeedCurrentAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeSpinSpeedCurrentAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeSpinSpeedCurrentAttribute(
@@ -68,12 +72,12 @@ class LaundryWasherControlsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeNumberOfRinsesAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeNumberOfRinsesAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeNumberOfRinsesAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeNumberOfRinsesAttribute(minInterval: Int, maxInterval: Int): UByte {

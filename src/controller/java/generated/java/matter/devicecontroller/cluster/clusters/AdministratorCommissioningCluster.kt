@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class AdministratorCommissioningCluster(private val endpointId: UShort) {
+class AdministratorCommissioningCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class AdminFabricIndexAttribute(val value: UByte?)
 
   class AdminVendorIdAttribute(val value: UShort?)
@@ -38,32 +42,26 @@ class AdministratorCommissioningCluster(private val endpointId: UShort) {
     discriminator: UShort,
     iterations: UInt,
     salt: ByteArray,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeoutMs: Int
   ) {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val commandId = 0L
+
+    // Implementation needs to be added here
   }
 
   suspend fun openBasicCommissioningWindow(
     commissioningTimeout: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeoutMs: Int
   ) {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val commandId = 1L
+
+    // Implementation needs to be added here
   }
 
-  suspend fun revokeCommissioning(timedInvokeTimeoutMs: Int? = null) {
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+  suspend fun revokeCommissioning(timedInvokeTimeoutMs: Int) {
+    val commandId = 2L
+
+    // Implementation needs to be added here
   }
 
   suspend fun readWindowStatusAttribute(): UByte {

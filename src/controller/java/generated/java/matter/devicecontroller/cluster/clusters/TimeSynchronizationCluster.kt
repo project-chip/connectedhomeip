@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class TimeSynchronizationCluster(private val endpointId: UShort) {
+class TimeSynchronizationCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class SetTimeZoneResponse(val DSTOffsetRequired: Boolean)
 
   class UTCTimeAttribute(val value: ULong?)
@@ -48,6 +52,8 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     timeSource: UInt?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -59,6 +65,8 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     trustedTimeSource: TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 1L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -70,6 +78,8 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     timeZone: List<TimeSynchronizationClusterTimeZoneStruct>,
     timedInvokeTimeoutMs: Int? = null
   ): SetTimeZoneResponse {
+    val commandId = 2L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -81,6 +91,8 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     DSTOffset: List<TimeSynchronizationClusterDSTOffsetStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 4L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -89,6 +101,8 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
   }
 
   suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 5L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

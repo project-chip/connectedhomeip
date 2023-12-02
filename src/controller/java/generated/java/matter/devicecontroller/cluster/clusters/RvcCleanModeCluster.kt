@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class RvcCleanModeCluster(private val endpointId: UShort) {
+class RvcCleanModeCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ChangeToModeResponse(val status: UInt, val statusText: String?)
 
   class SupportedModesAttribute(val value: List<RvcCleanModeClusterModeOptionStruct>)
@@ -38,6 +42,8 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     newMode: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): ChangeToModeResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -68,12 +74,12 @@ class RvcCleanModeCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnModeAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnModeAttribute(minInterval: Int, maxInterval: Int): OnModeAttribute {

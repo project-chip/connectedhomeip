@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class IdentifyCluster(private val endpointId: UShort) {
+class IdentifyCluster(private val controller: MatterController, private val endpointId: UShort) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -29,6 +30,8 @@ class IdentifyCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun identify(identifyTime: UShort, timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -41,6 +44,8 @@ class IdentifyCluster(private val endpointId: UShort) {
     effectVariant: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
+    val commandId = 64L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -52,12 +57,12 @@ class IdentifyCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeIdentifyTimeAttribute(value: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeIdentifyTimeAttribute(value: UShort, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeIdentifyTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeIdentifyTimeAttribute(minInterval: Int, maxInterval: Int): UShort {

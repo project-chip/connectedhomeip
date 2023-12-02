@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class RefrigeratorAndTemperatureControlledCabinetModeCluster(private val endpointId: UShort) {
+class RefrigeratorAndTemperatureControlledCabinetModeCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ChangeToModeResponse(val status: UInt, val statusText: String?)
 
   class SupportedModesAttribute(
@@ -42,6 +46,8 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(private val endpoin
     newMode: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): ChangeToModeResponse {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -72,12 +78,12 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun writeStartUpModeAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeStartUpModeAttribute(
@@ -91,12 +97,12 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(private val endpoin
     // Implementation needs to be added here
   }
 
-  suspend fun writeOnModeAttribute(value: UByte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeOnModeAttribute(minInterval: Int, maxInterval: Int): OnModeAttribute {

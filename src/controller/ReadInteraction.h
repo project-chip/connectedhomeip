@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadPrepareParams.h>

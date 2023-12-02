@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class SmokeCoAlarmCluster(private val endpointId: UShort) {
+class SmokeCoAlarmCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -29,6 +33,8 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun selfTestRequest(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {
@@ -128,12 +134,12 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun writeSmokeSensitivityLevelAttribute(value: UInt) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeSmokeSensitivityLevelAttribute(value: UInt, timedWriteTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun writeSmokeSensitivityLevelAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
+    }
   }
 
   suspend fun subscribeSmokeSensitivityLevelAttribute(minInterval: Int, maxInterval: Int): UByte {

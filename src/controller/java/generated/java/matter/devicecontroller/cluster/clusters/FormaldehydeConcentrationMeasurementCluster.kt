@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class FormaldehydeConcentrationMeasurementCluster(private val endpointId: UShort) {
+class FormaldehydeConcentrationMeasurementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class MeasuredValueAttribute(val value: Float?)
 
   class MinMeasuredValueAttribute(val value: Float?)

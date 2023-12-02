@@ -15,11 +15,16 @@
 #    limitations under the License.
 #
 
+import asyncio
 import os
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
-from capture.file_utils import create_standard_log_name, print_and_write
 from capture.platform.android.android import Android
+from capture.platform.android.streams.logcat import LogcatStreamer
+from utils.artifact import create_standard_log_name
+from utils.log import get_logger, print_and_write
+
+logger = get_logger(__file__)
 
 
 class PlayServicesUser(EcosystemCapture):
@@ -28,7 +33,7 @@ class PlayServicesUser(EcosystemCapture):
     """
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
-
+        self.logger = logger
         self.artifact_dir = artifact_dir
         self.analysis_file = os.path.join(
             self.artifact_dir, create_standard_log_name(
@@ -39,28 +44,47 @@ class PlayServicesUser(EcosystemCapture):
                 'only platform=android is supported for '
                 'ecosystem=PlayServicesUser')
         self.platform = platform
+        self.logcat_fd = None
+        self.output = ""
+        self.logcat_stream: LogcatStreamer = self.platform.streams["LogcatStreamer"]
 
     async def start_capture(self) -> None:
-        await self.platform.start_streaming()
+        pass
 
     async def stop_capture(self) -> None:
-        await self.platform.stop_streaming()
+        self.show_analysis()
+
+    def proc_line(self, line) -> None:
+        if "CommissioningServiceBin: Binding to service" in line:
+            s = f"3P commissioner initiated Play Services commissioning\n{line}"
+            logger.info(s)
+            self.output += f"{s}\n"
+        elif "CommissioningServiceBin: Sending commissioning request to bound service" in line:
+            s = f"Play Services commissioning complete; passing back to 3P\n{line}"
+            logger.info(s)
+            self.output += f"{s}\n"
+        elif "CommissioningServiceBin: Received commissioning complete from bound service" in line:
+            s = f"3P commissioning complete!\n{line}"
+            logger.info(s)
+            self.output += f"{s}\n"
 
     async def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
-        analysis_file = open(self.analysis_file, mode='w+')
-        with open(self.platform.logcat_output_path, mode='r') as logcat_file:
-            for line in logcat_file:
-                if "CommissioningServiceBin: Binding to service" in line:
-                    print_and_write(
-                        f"3P commissioner initiated Play Services commissioning\n{line}",
-                        analysis_file)
-                elif "CommissioningServiceBin: Sending commissioning request to bound service" in line:
-                    print_and_write(
-                        f"Play Services commissioning complete; passing back to 3P\n{line}",
-                        analysis_file)
-                elif "CommissioningServiceBin: Received commissioning complete from bound service" in line:
-                    print_and_write(
-                        f"3P commissioning complete!\n{line}",
-                        analysis_file)
-        analysis_file.close()
+        try:
+            self.logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
+            while True:
+                for line in self.logcat_fd.readlines():
+                    self.proc_line(line)
+                # Releasing async event loop for other analysis / monitor tasks
+                await asyncio.sleep(0.5)
+        except asyncio.CancelledError:
+            self.logger.info("Closing logcat stream")
+            if self.logcat_fd is not None:
+                self.logcat_fd.close()
+
+    def show_analysis(self) -> None:
+        with open(self.analysis_file, "w") as analysis_file:
+            print_and_write(self.output, analysis_file)
+
+    async def probe_capture(self) -> None:
+        pass

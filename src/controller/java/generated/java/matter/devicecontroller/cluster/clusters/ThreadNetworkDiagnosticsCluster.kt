@@ -17,9 +17,13 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
+class ThreadNetworkDiagnosticsCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class ChannelAttribute(val value: UShort?)
 
   class RoutingRoleAttribute(val value: UInt?)
@@ -71,6 +75,8 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+    val commandId = 0L
+
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs
     } else {

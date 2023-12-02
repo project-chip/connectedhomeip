@@ -17,9 +17,10 @@
 
 package matter.devicecontroller.cluster.clusters
 
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
-class PowerSourceCluster(private val endpointId: UShort) {
+class PowerSourceCluster(private val controller: MatterController, private val endpointId: UShort) {
   class WiredAssessedInputVoltageAttribute(val value: UInt?)
 
   class WiredAssessedInputFrequencyAttribute(val value: UShort?)

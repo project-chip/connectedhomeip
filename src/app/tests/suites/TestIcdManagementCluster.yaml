@@ -28,29 +28,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read Feature Map"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0x07
+
     - label: "Read IdleModeDuration"
       command: "readAttribute"
       attribute: "IdleModeDuration"
       response:
-          value: 300
+          value: 3600
 
     - label: "Read ActiveModeDuration"
       command: "readAttribute"
       attribute: "ActiveModeDuration"
       response:
-          value: 300
+          value: 10000
 
     - label: "Read ActiveModeThreshold"
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
       response:
-          value: 300
+          value: 1000
 
     - label: "Read ICDCounter"
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: 0
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Read ClientsSupportedPerFabric"
       command: "readAttribute"
@@ -130,7 +139,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 2.1"
       command: "RegisterClient"
@@ -146,7 +158,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 3.1"
       command: "RegisterClient"
@@ -184,7 +199,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"
@@ -212,7 +230,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"
