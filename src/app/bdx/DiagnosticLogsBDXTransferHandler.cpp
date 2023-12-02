@@ -102,7 +102,7 @@ void DiagnosticLogsBDXTransferHandler::HandleBDXError(CHIP_ERROR error)
     VerifyOrReturn(error != CHIP_NO_ERROR);
     LogErrorOnFailure(error);
 
-    // If Send Accept was not received, send a response with status Denied to the RetreiveLogRequest
+    // If Send Accept was not received, send a response with status Denied to the RetrieveLogsRequest
     if (!mIsAcceptReceived)
     {
         DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kDenied);
@@ -176,7 +176,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
             mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_INCORRECT_STATE));
             return;
         }
-        // Send a response with status Success to the RetreiveLogRequest, since we got a SendAccept message.
+        // Send a response with status Success to the RetrieveLogsRequest, since we got a SendAccept message.
         DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kSuccess);
 
         [[fallthrough]];

@@ -2717,7 +2717,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self testDownloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:0 logFilePath:outFile logFileSize:(10 * 1024) expectation:expectation];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
+    [self waitForExpectations:@[ expectation ] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test030_DownloadNetworkDiagnosticsLog_NoTimeout
@@ -2730,7 +2730,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self testDownloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 logFilePath:outFile logFileSize:(4 * 1024) expectation:expectation];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
+    [self waitForExpectations:@[ expectation ] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test031_DownloadCrashLog_NoTimeout
@@ -2743,7 +2743,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self testDownloadLogOfType:MTRDiagnosticLogTypeCrash timeout:0 logFilePath:outFile logFileSize:(3 * 1024) expectation:expectation];
     });
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
+    [self waitForExpectations:@[ expectation ] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }
 
 - (void)test900_SubscribeAllAttributes

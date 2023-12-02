@@ -59,7 +59,7 @@ bool IsLogProviderDelegateNull(LogProviderDelegate * logProviderDelegate, Endpoi
     return false;
 }
 
-} // namespace
+} // anonymous namespace
 
 DiagnosticLogsServer DiagnosticLogsServer::sInstance;
 
@@ -97,7 +97,7 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     mIntent               = intent;
-    auto scopedPeerNodeId = ScopedNodeId();
+    ScopedNodeId scopedPeerNodeId;
     if (exchangeCtx->HasSessionHandle())
     {
         auto sessionHandle = exchangeCtx->GetSessionHandle();
@@ -193,7 +193,7 @@ void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * c
 
     bool isEOF = false;
 
-    // Get the log chunk of size kMaxLogContentSize to send in the response payload.
+    // Get the log chunk of size up to kMaxLogContentSize to send in the response payload.
     CHIP_ERROR err = logProviderDelegate->GetNextChunk(mLogSessionHandle, mutableBuffer, isEOF);
 
     if (err != CHIP_NO_ERROR)

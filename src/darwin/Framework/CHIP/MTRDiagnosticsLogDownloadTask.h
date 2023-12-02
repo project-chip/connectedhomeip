@@ -23,7 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * This class handles the task downloading a log file requested by the MTRDevice. It creates a new
+ * This class handles downloading a log file requested by the MTRDevice. It creates a new
  * MTRDiagnosticsLogTransferHandler to prepare for the BDX transfer session and handle the BDX
  * messages and transfer events and downloads the file.
  *

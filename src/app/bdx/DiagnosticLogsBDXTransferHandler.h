@@ -48,8 +48,8 @@ public:
      * It starts the BDX transfer session by calling InitiateTransfer of the which sends the SendInit BDX message
      * to the log requestor.
      *
-     * @param[in] exchangeMgr  The exchange manager from the command handler object for the RetreiveLogRequest command
-     * @param[in] sessionHandle The session handle from the command handler object for the RetreiveLogRequest command
+     * @param[in] exchangeMgr  The exchange manager from the command handler object for the RetrieveLogsRequest command
+     * @param[in] sessionHandle The session handle from the command handler object for the RetrieveLogsRequest command
      * @param[in] fabricIndex The fabric index of the requestor
      * @param[in] peerNodeId The node id of the requestor
      * @param[in] delegate The log provider delegate that will provide the log chunks
