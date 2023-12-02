@@ -25331,8 +25331,8 @@ struct Type
 {
 public:
     uint16_t transitionTime = static_cast<uint16_t>(0);
-    int16_t heatSetpoint    = static_cast<int16_t>(0);
-    int16_t coolSetpoint    = static_cast<int16_t>(0);
+    DataModel::Nullable<int16_t> heatSetpoint;
+    DataModel::Nullable<int16_t> coolSetpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -25364,11 +25364,6 @@ struct Type;
 struct DecodableType;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-struct Type;
-struct DecodableType;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 struct Type;
 struct DecodableType;
@@ -25378,11 +25373,6 @@ namespace ClearWeeklySchedule {
 struct Type;
 struct DecodableType;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-struct Type;
-struct DecodableType;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 
@@ -25426,7 +25416,7 @@ namespace GetWeeklyScheduleResponse {
 enum class Fields : uint8_t
 {
     kNumberOfTransitionsForSequence = 0,
-    kDayOfWeekforSequence           = 1,
+    kDayOfWeekForSequence           = 1,
     kModeForSequence                = 2,
     kTransitions                    = 3,
 };
@@ -25439,7 +25429,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekforSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
 
@@ -25457,7 +25447,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekforSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -25467,7 +25457,7 @@ namespace SetWeeklySchedule {
 enum class Fields : uint8_t
 {
     kNumberOfTransitionsForSequence = 0,
-    kDayOfWeekforSequence           = 1,
+    kDayOfWeekForSequence           = 1,
     kModeForSequence                = 2,
     kTransitions                    = 3,
 };
@@ -25480,7 +25470,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekforSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::List<const Structs::WeeklyScheduleTransitionStruct::Type> transitions;
 
@@ -25498,59 +25488,12 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence                      = static_cast<uint8_t>(0);
-    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekforSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
     chip::BitMask<ScheduleModeBitmap> modeForSequence           = static_cast<chip::BitMask<ScheduleModeBitmap>>(0);
     DataModel::DecodableList<Structs::WeeklyScheduleTransitionStruct::DecodableType> transitions;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
-namespace GetRelayStatusLogResponse {
-enum class Fields : uint8_t
-{
-    kTimeOfDay            = 0,
-    kRelayStatus          = 1,
-    kLocalTemperature     = 2,
-    kHumidityInPercentage = 3,
-    kSetPoint             = 4,
-    kUnreadEntries        = 5,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint16_t timeOfDay                          = static_cast<uint16_t>(0);
-    chip::BitMask<RelayStateBitmap> relayStatus = static_cast<chip::BitMask<RelayStateBitmap>>(0);
-    DataModel::Nullable<int16_t> localTemperature;
-    DataModel::Nullable<uint8_t> humidityInPercentage;
-    int16_t setPoint       = static_cast<int16_t>(0);
-    uint16_t unreadEntries = static_cast<uint16_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    uint16_t timeOfDay                          = static_cast<uint16_t>(0);
-    chip::BitMask<RelayStateBitmap> relayStatus = static_cast<chip::BitMask<RelayStateBitmap>>(0);
-    DataModel::Nullable<int16_t> localTemperature;
-    DataModel::Nullable<uint8_t> humidityInPercentage;
-    int16_t setPoint       = static_cast<int16_t>(0);
-    uint16_t unreadEntries = static_cast<uint16_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetRelayStatusLogResponse
 namespace GetWeeklySchedule {
 enum class Fields : uint8_t
 {
@@ -25614,34 +25557,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearWeeklySchedule
-namespace GetRelayStatusLog {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLog::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetRelayStatusLog
 } // namespace Commands
 
 namespace Attributes {
@@ -25754,6 +25669,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PIHeatingDemand
+namespace HVACSystemTypeConfiguration {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HVACSystemTypeConfiguration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HVACSystemTypeConfiguration
 namespace LocalTemperatureCalibration {
 struct TypeInfo
 {
@@ -26276,6 +26203,7 @@ struct TypeInfo
         Attributes::AbsMaxCoolSetpointLimit::TypeInfo::DecodableType absMaxCoolSetpointLimit         = static_cast<int16_t>(0);
         Attributes::PICoolingDemand::TypeInfo::DecodableType PICoolingDemand                         = static_cast<uint8_t>(0);
         Attributes::PIHeatingDemand::TypeInfo::DecodableType PIHeatingDemand                         = static_cast<uint8_t>(0);
+        Attributes::HVACSystemTypeConfiguration::TypeInfo::DecodableType HVACSystemTypeConfiguration = static_cast<uint8_t>(0);
         Attributes::LocalTemperatureCalibration::TypeInfo::DecodableType localTemperatureCalibration = static_cast<int8_t>(0);
         Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableType occupiedCoolingSetpoint         = static_cast<int16_t>(0);
         Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableType occupiedHeatingSetpoint         = static_cast<int16_t>(0);

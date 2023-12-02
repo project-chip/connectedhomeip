@@ -27518,6 +27518,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="absMaxCoolSetpointLimit", Tag=0x00000006, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="PICoolingDemand", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIHeatingDemand", Tag=0x00000008, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="HVACSystemTypeConfiguration", Tag=0x00000009, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="localTemperatureCalibration", Tag=0x00000010, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="occupiedCoolingSetpoint", Tag=0x00000011, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="occupiedHeatingSetpoint", Tag=0x00000012, Type=typing.Optional[int]),
@@ -27574,6 +27575,7 @@ class Thermostat(Cluster):
     absMaxCoolSetpointLimit: 'typing.Optional[int]' = None
     PICoolingDemand: 'typing.Optional[uint]' = None
     PIHeatingDemand: 'typing.Optional[uint]' = None
+    HVACSystemTypeConfiguration: 'typing.Optional[uint]' = None
     localTemperatureCalibration: 'typing.Optional[int]' = None
     occupiedCoolingSetpoint: 'typing.Optional[int]' = None
     occupiedHeatingSetpoint: 'typing.Optional[int]' = None
@@ -27765,16 +27767,11 @@ class Thermostat(Cluster):
             kCoilSensorFail = 0x8
             kFanFail = 0x10
 
-        class AlarmCodeBitmap(IntFlag):
-            kInitialization = 0x1
-            kHardware = 0x2
-            kSelfCalibration = 0x4
-
         class Feature(IntFlag):
             kHeating = 0x1
             kCooling = 0x2
             kOccupancy = 0x4
-            kZigbeeScheduleConfiguration = 0x8
+            kScheduleConfiguration = 0x8
             kSetback = 0x10
             kAutoMode = 0x20
             kLocalTemperatureNotExposed = 0x40
@@ -27826,13 +27823,13 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="transitionTime", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="heatSetpoint", Tag=1, Type=int),
-                        ClusterObjectFieldDescriptor(Label="coolSetpoint", Tag=2, Type=int),
+                        ClusterObjectFieldDescriptor(Label="heatSetpoint", Tag=1, Type=typing.Union[Nullable, int]),
+                        ClusterObjectFieldDescriptor(Label="coolSetpoint", Tag=2, Type=typing.Union[Nullable, int]),
                     ])
 
             transitionTime: 'uint' = 0
-            heatSetpoint: 'int' = 0
-            coolSetpoint: 'int' = 0
+            heatSetpoint: 'typing.Union[Nullable, int]' = NullValue
+            coolSetpoint: 'typing.Union[Nullable, int]' = NullValue
 
     class Commands:
         @dataclass
@@ -27865,13 +27862,13 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = 0
-            dayOfWeekforSequence: 'uint' = 0
+            dayOfWeekForSequence: 'uint' = 0
             modeForSequence: 'uint' = 0
             transitions: 'typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]' = field(default_factory=lambda: [])
 
@@ -27887,41 +27884,15 @@ class Thermostat(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="numberOfTransitionsForSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="modeForSequence", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="transitions", Tag=3, Type=typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]),
                     ])
 
             numberOfTransitionsForSequence: 'uint' = 0
-            dayOfWeekforSequence: 'uint' = 0
+            dayOfWeekForSequence: 'uint' = 0
             modeForSequence: 'uint' = 0
             transitions: 'typing.List[Thermostat.Structs.WeeklyScheduleTransitionStruct]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class GetRelayStatusLogResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000001
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="timeOfDay", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="relayStatus", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="localTemperature", Tag=2, Type=typing.Union[Nullable, int]),
-                        ClusterObjectFieldDescriptor(Label="humidityInPercentage", Tag=3, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="setPoint", Tag=4, Type=int),
-                        ClusterObjectFieldDescriptor(Label="unreadEntries", Tag=5, Type=uint),
-                    ])
-
-            timeOfDay: 'uint' = 0
-            relayStatus: 'uint' = 0
-            localTemperature: 'typing.Union[Nullable, int]' = NullValue
-            humidityInPercentage: 'typing.Union[Nullable, uint]' = NullValue
-            setPoint: 'int' = 0
-            unreadEntries: 'uint' = 0
 
         @dataclass
         class GetWeeklySchedule(ClusterCommand):
@@ -27947,19 +27918,6 @@ class Thermostat(Cluster):
             command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
-
-        @dataclass
-        class GetRelayStatusLog(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000201
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'GetRelayStatusLogResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -28105,6 +28063,22 @@ class Thermostat(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class HVACSystemTypeConfiguration(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

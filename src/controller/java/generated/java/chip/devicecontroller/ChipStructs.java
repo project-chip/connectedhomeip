@@ -6235,16 +6235,16 @@ public static class DoorLockClusterCredentialStruct {
 }
 public static class ThermostatClusterWeeklyScheduleTransitionStruct {
   public Integer transitionTime;
-  public Integer heatSetpoint;
-  public Integer coolSetpoint;
+  public @Nullable Integer heatSetpoint;
+  public @Nullable Integer coolSetpoint;
   private static final long TRANSITION_TIME_ID = 0L;
   private static final long HEAT_SETPOINT_ID = 1L;
   private static final long COOL_SETPOINT_ID = 2L;
 
   public ThermostatClusterWeeklyScheduleTransitionStruct(
     Integer transitionTime,
-    Integer heatSetpoint,
-    Integer coolSetpoint
+    @Nullable Integer heatSetpoint,
+    @Nullable Integer coolSetpoint
   ) {
     this.transitionTime = transitionTime;
     this.heatSetpoint = heatSetpoint;
@@ -6254,8 +6254,8 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(TRANSITION_TIME_ID, new UIntType(transitionTime)));
-    values.add(new StructElement(HEAT_SETPOINT_ID, new IntType(heatSetpoint)));
-    values.add(new StructElement(COOL_SETPOINT_ID, new IntType(coolSetpoint)));
+    values.add(new StructElement(HEAT_SETPOINT_ID, heatSetpoint != null ? new IntType(heatSetpoint) : new NullType()));
+    values.add(new StructElement(COOL_SETPOINT_ID, coolSetpoint != null ? new IntType(coolSetpoint) : new NullType()));
 
     return new StructType(values);
   }
@@ -6265,8 +6265,8 @@ public static class ThermostatClusterWeeklyScheduleTransitionStruct {
       return null;
     }
     Integer transitionTime = null;
-    Integer heatSetpoint = null;
-    Integer coolSetpoint = null;
+    @Nullable Integer heatSetpoint = null;
+    @Nullable Integer coolSetpoint = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == TRANSITION_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

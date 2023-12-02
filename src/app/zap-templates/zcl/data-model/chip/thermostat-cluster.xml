@@ -21,7 +21,7 @@ limitations under the License.
     <field name="Heating" mask="0x1"/>
     <field name="Cooling" mask="0x2"/>
     <field name="Occupancy" mask="0x4"/>
-    <field name="ZigbeeScheduleConfiguration" mask="0x8"/>
+    <field name="ScheduleConfiguration" mask="0x8"/>
     <field name="Setback" mask="0x10"/>
     <field name="AutoMode" mask="0x20"/>
     <field name="LocalTemperatureNotExposed" mask="0x40"/>
@@ -34,13 +34,6 @@ limitations under the License.
     <field name="OutdoorSensorFail" mask="0x04"/>
     <field name="CoilSensorFail" mask="0x08"/>
     <field name="FanFail" mask="0x10"/>
-  </bitmap>
-
-  <bitmap name="AlarmCodeBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="Initialization" mask="0x01"/>
-    <field name="Hardware" mask="0x02"/>
-    <field name="SelfCalibration" mask="0x04"/>
   </bitmap>
 
   <bitmap name="HVACSystemTypeBitmap" type="bitmap8">
@@ -198,8 +191,8 @@ limitations under the License.
     <cluster code="0x0201"/>
     <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
     <item fieldId="0" name="TransitionTime" type="int16u" min="0" max="1439"/>
-    <item fieldId="1" name="HeatSetpoint" type="temperature"/>
-    <item fieldId="2" name="CoolSetpoint" type="temperature"/>
+    <item fieldId="1" name="HeatSetpoint" type="temperature" isNullable="true"/>
+    <item fieldId="2" name="CoolSetpoint" type="temperature" isNullable="true"/>
   </struct>
 
   <cluster>
@@ -211,26 +204,31 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="6"/>
-    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" writable="false" reportable="true" optional="false" isNullable="true" default="0x8000">LocalTemperature</attribute>
-    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" writable="false" optional="true" isNullable="true" default="0x8000">OutdoorTemperature</attribute>
+    <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
+    <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="bitmap8" writable="false" default="1" optional="true">Occupancy</attribute>
     <!-- OCCUPANCY -->
     
-    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="0x02BC" optional="true">AbsMinHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="0x0BB8" optional="true">AbsMaxHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="0x0640" optional="true">AbsMinCoolSetpointLimit</attribute>
-    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="0x0C80" optional="true">AbsMaxCoolSetpointLimit</attribute>
+    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="700" optional="true">AbsMinHeatSetpointLimit</attribute>
+    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="3000" optional="true">AbsMaxHeatSetpointLimit</attribute>
+    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="1600" optional="true">AbsMinCoolSetpointLimit</attribute>
+    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="3200" optional="true">AbsMaxCoolSetpointLimit</attribute>
     <attribute side="server" code="0x0007" define="PI_COOLING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PICoolingDemand</attribute>
     <attribute side="server" code="0x0008" define="PI_HEATING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PIHeatingDemand</attribute>
+    <attribute side="server" code="0x0009" define="HVAC_SYSTEM_TYPE_CONFIGURATION" type="bitmap8" min="0x00" max="0xFF" writable="true" optional="true">
+      <description>HVACSystemTypeConfiguration</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
     <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xE7" max="0x19" writable="true" default="0x00" optional="true">
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="temperature" writable="true" default="0x0A28" optional="true">OccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="temperature" writable="true" default="0x07D0" optional="true">OccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="temperature" writable="true" default="0x0A28" optional="true">UnoccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="temperature" writable="true" default="0x07D0" optional="true">UnoccupiedHeatingSetpoint</attribute>
-    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="true" default="0x02BC" optional="true">
+    <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">OccupiedCoolingSetpoint</attribute>
+    <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">OccupiedHeatingSetpoint</attribute>
+    <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">UnoccupiedCoolingSetpoint</attribute>
+    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">UnoccupiedHeatingSetpoint</attribute>    
+    <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="true" default="700" optional="true">
       <description>MinHeatSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -246,7 +244,7 @@ limitations under the License.
       <description>MaxCoolSetpointLimit</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0x00" max="0x19" writable="true" default="0x19" optional="true">
+    <attribute side="server" code="0x0019" define="MIN_SETPOINT_DEAD_BAND" type="int8s" min="0" max="25" writable="true" default="25" optional="true">
       <description>MinSetpointDeadBand</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -262,7 +260,7 @@ limitations under the License.
       <description>SystemMode</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ThermostatRunningModeEnum" min="0x0" max="0x9" writable="false" optional="true" default="0">ThermostatRunningMode</attribute>
+    <attribute side="server" code="0x001E" define="THERMOSTAT_RUNNING_MODE" type="ThermostatRunningModeEnum" min="0x0" max="0x4" writable="false" optional="true" default="0">ThermostatRunningMode</attribute>
     <attribute side="server" code="0x0020" define="START_OF_WEEK" type="StartOfWeekEnum" min="0x0" max="0x6" writable="false" optional="true">StartOfWeek</attribute>
     <attribute side="server" code="0x0021" define="NUMBER_OF_WEEKLY_TRANSITIONS" type="int8u" writable="false" optional="true" default="0">NumberOfWeeklyTransitions</attribute>
     <attribute side="server" code="0x0022" define="NUMBER_OF_DAILY_TRANSITIONS" type="int8u" writable="false" optional="true" default="0">NumberOfDailyTransitions</attribute>
@@ -286,14 +284,14 @@ limitations under the License.
       <description>OccupiedSetback</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0035" define="OCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">OccupiedSetbackMin</attribute>
-    <attribute side="server" code="0x0036" define="OCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">OccupiedSetbackMax</attribute>
-    <attribute side="server" code="0x0037" define="UNOCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">
+    <attribute side="server" code="0x0035" define="OCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true">OccupiedSetbackMin</attribute>
+    <attribute side="server" code="0x0036" define="OCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true">OccupiedSetbackMax</attribute>
+    <attribute side="server" code="0x0037" define="UNOCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true">
       <description>UnoccupiedSetback</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">UnoccupiedSetbackMin</attribute>
-    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">UnoccupiedSetbackMax</attribute>
+    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMin</attribute>
+    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMax</attribute>
     <attribute side="server" code="0x003A" define="EMERGENCY_HEAT_DELTA" type="int8u" writable="true" optional="true" default="0xFF">
       <description>EmergencyHeatDelta</description>
       <access op="write" privilege="manage"/>
@@ -340,7 +338,7 @@ limitations under the License.
       </description>
       <access op="invoke" privilege="manage"/>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
       <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
     </command>
@@ -351,7 +349,7 @@ limitations under the License.
       <arg name="DaysToReturn" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeToReturn" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
     </command>
-    <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true" disableDefaultResponse="true">
+    <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true">
       <description>
         The Clear Weekly Schedule command is used to clear the weekly schedule.
       </description>
@@ -362,21 +360,9 @@ limitations under the License.
         The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
       </description>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
       <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
-    </command>
-    <command source="server" code="0x01" name="GetRelayStatusLogResponse" optional="true">
-      <description>This command is sent from the thermostat cluster server in response to the Get Relay Status Log. After the Relay Status Entry is sent over the air to the requesting client, the specific entry will be cleared from the thermostat internal log.</description>
-      <arg name="TimeOfDay" type="int16u" min="0" max="1439"/>
-      <arg name="RelayStatus" type="RelayStateBitmap" min="0x0" max="0x7F"/>
-      <arg name="LocalTemperature" type="temperature" isNullable="true"/>
-      <arg name="HumidityInPercentage" type="int8u" isNullable="true" min="0" max="100"/>
-      <arg name="SetPoint" type="temperature"/>
-      <arg name="UnreadEntries" type="int16u"/>
-    </command>
-    <command source="client" code="0x04" name="GetRelayStatusLog" optional="true" response="GetRelayStatusLogResponse">
-      <description>This command is used to query the thermostat internal relay status log. This command has no payload.</description>
     </command>
   </cluster>
 

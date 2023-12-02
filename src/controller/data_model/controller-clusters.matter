@@ -5523,17 +5523,11 @@ cluster Thermostat = 513 {
     kFanFail = 0x10;
   }
 
-  bitmap AlarmCodeBitmap : bitmap8 {
-    kInitialization = 0x1;
-    kHardware = 0x2;
-    kSelfCalibration = 0x4;
-  }
-
   bitmap Feature : bitmap32 {
     kHeating = 0x1;
     kCooling = 0x2;
     kOccupancy = 0x4;
-    kZigbeeScheduleConfiguration = 0x8;
+    kScheduleConfiguration = 0x8;
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
@@ -5586,8 +5580,8 @@ cluster Thermostat = 513 {
 
   struct WeeklyScheduleTransitionStruct {
     int16u transitionTime = 0;
-    temperature heatSetpoint = 1;
-    temperature coolSetpoint = 2;
+    nullable temperature heatSetpoint = 1;
+    nullable temperature coolSetpoint = 2;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -5599,11 +5593,12 @@ cluster Thermostat = 513 {
   readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
   readonly attribute optional int8u PICoolingDemand = 7;
   readonly attribute optional int8u PIHeatingDemand = 8;
+  attribute access(write: manage) optional bitmap8 HVACSystemTypeConfiguration = 9;
   attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
-  attribute optional temperature occupiedCoolingSetpoint = 17;
-  attribute optional temperature occupiedHeatingSetpoint = 18;
-  attribute optional temperature unoccupiedCoolingSetpoint = 19;
-  attribute optional temperature unoccupiedHeatingSetpoint = 20;
+  attribute optional int16s occupiedCoolingSetpoint = 17;
+  attribute optional int16s occupiedHeatingSetpoint = 18;
+  attribute optional int16s unoccupiedCoolingSetpoint = 19;
+  attribute optional int16s unoccupiedHeatingSetpoint = 20;
   attribute access(write: manage) optional temperature minHeatSetpointLimit = 21;
   attribute access(write: manage) optional temperature maxHeatSetpointLimit = 22;
   attribute access(write: manage) optional temperature minCoolSetpointLimit = 23;
@@ -5652,25 +5647,16 @@ cluster Thermostat = 513 {
 
   response struct GetWeeklyScheduleResponse = 0 {
     int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
     ScheduleModeBitmap modeForSequence = 2;
     WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
   request struct SetWeeklyScheduleRequest {
     int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
     ScheduleModeBitmap modeForSequence = 2;
     WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  response struct GetRelayStatusLogResponse = 1 {
-    int16u timeOfDay = 0;
-    RelayStateBitmap relayStatus = 1;
-    nullable temperature localTemperature = 2;
-    nullable int8u humidityInPercentage = 3;
-    temperature setPoint = 4;
-    int16u unreadEntries = 5;
   }
 
   request struct GetWeeklyScheduleRequest {
@@ -5686,8 +5672,6 @@ cluster Thermostat = 513 {
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** This command is used to query the thermostat internal relay status log. This command has no payload. */
-  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */

@@ -10388,6 +10388,7 @@ public class ClusterIDMapping {
             AbsMaxCoolSetpointLimit(6L),
             PICoolingDemand(7L),
             PIHeatingDemand(8L),
+            HVACSystemTypeConfiguration(9L),
             LocalTemperatureCalibration(16L),
             OccupiedCoolingSetpoint(17L),
             OccupiedHeatingSetpoint(18L),
@@ -10476,8 +10477,7 @@ public class ClusterIDMapping {
             SetpointRaiseLower(0L),
             SetWeeklySchedule(1L),
             GetWeeklySchedule(2L),
-            ClearWeeklySchedule(3L),
-            GetRelayStatusLog(4L),;
+            ClearWeeklySchedule(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10512,7 +10512,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetWeeklyScheduleCommandField {NumberOfTransitionsForSequence(0),DayOfWeekforSequence(1),ModeForSequence(2),Transitions(3),;
+                }public enum SetWeeklyScheduleCommandField {NumberOfTransitionsForSequence(0),DayOfWeekForSequence(1),ModeForSequence(2),Transitions(3),;
                     private final int id;
                     SetWeeklyScheduleCommandField(int id) {
                         this.id = id;

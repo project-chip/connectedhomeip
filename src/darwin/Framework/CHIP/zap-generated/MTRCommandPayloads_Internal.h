@@ -1318,12 +1318,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRThermostatClusterGetRelayStatusLogResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &)decodableStruct;
-
-@end
-
 @interface MTRThermostatClusterGetWeeklyScheduleParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1331,12 +1325,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRThermostatClusterClearWeeklyScheduleParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRThermostatClusterGetRelayStatusLogParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

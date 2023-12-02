@@ -5490,9 +5490,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _heatSetpoint = @(0);
+        _heatSetpoint = nil;
 
-        _coolSetpoint = @(0);
+        _coolSetpoint = nil;
     }
     return self;
 }

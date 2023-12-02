@@ -11642,50 +11642,18 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekforSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
+    public void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo numberOfTransitionsForSequenceResponseValue = new CommandResponseInfo("numberOfTransitionsForSequence", "Integer");
       responseValues.put(numberOfTransitionsForSequenceResponseValue, numberOfTransitionsForSequence);
-      CommandResponseInfo dayOfWeekforSequenceResponseValue = new CommandResponseInfo("dayOfWeekforSequence", "Integer");
-      responseValues.put(dayOfWeekforSequenceResponseValue, dayOfWeekforSequence);
+      CommandResponseInfo dayOfWeekForSequenceResponseValue = new CommandResponseInfo("dayOfWeekForSequence", "Integer");
+      responseValues.put(dayOfWeekForSequenceResponseValue, dayOfWeekForSequence);
       CommandResponseInfo modeForSequenceResponseValue = new CommandResponseInfo("modeForSequence", "Integer");
       responseValues.put(modeForSequenceResponseValue, modeForSequence);
       // transitions: WeeklyScheduleTransitionStruct
       // Conversion from this type to Java is not properly implemented yet
 
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedThermostatClusterGetRelayStatusLogResponseCallback implements ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer timeOfDay, Integer relayStatus, @Nullable Integer localTemperature, @Nullable Integer humidityInPercentage, Integer setPoint, Integer unreadEntries) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-
-      CommandResponseInfo timeOfDayResponseValue = new CommandResponseInfo("timeOfDay", "Integer");
-      responseValues.put(timeOfDayResponseValue, timeOfDay);
-      CommandResponseInfo relayStatusResponseValue = new CommandResponseInfo("relayStatus", "Integer");
-      responseValues.put(relayStatusResponseValue, relayStatus);
-      CommandResponseInfo localTemperatureResponseValue = new CommandResponseInfo("localTemperature", "Integer");
-      responseValues.put(localTemperatureResponseValue, localTemperature);
-      CommandResponseInfo humidityInPercentageResponseValue = new CommandResponseInfo("humidityInPercentage", "Integer");
-      responseValues.put(humidityInPercentageResponseValue, humidityInPercentage);
-      CommandResponseInfo setPointResponseValue = new CommandResponseInfo("setPoint", "Integer");
-      responseValues.put(setPointResponseValue, setPoint);
-      CommandResponseInfo unreadEntriesResponseValue = new CommandResponseInfo("unreadEntries", "Integer");
-      responseValues.put(unreadEntriesResponseValue, unreadEntries);
       callback.onSuccess(responseValues);
     }
 
@@ -23243,8 +23211,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo = new CommandParameterInfo("numberOfTransitionsForSequence", Integer.class, Integer.class);
     thermostatsetWeeklyScheduleCommandParams.put("numberOfTransitionsForSequence",thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo);
 
-    CommandParameterInfo thermostatsetWeeklyScheduledayOfWeekforSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekforSequence", Integer.class, Integer.class);
-    thermostatsetWeeklyScheduleCommandParams.put("dayOfWeekforSequence",thermostatsetWeeklyScheduledayOfWeekforSequenceCommandParameterInfo);
+    CommandParameterInfo thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekForSequence", Integer.class, Integer.class);
+    thermostatsetWeeklyScheduleCommandParams.put("dayOfWeekForSequence",thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo);
 
     CommandParameterInfo thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo = new CommandParameterInfo("modeForSequence", Integer.class, Integer.class);
     thermostatsetWeeklyScheduleCommandParams.put("modeForSequence",thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo);
@@ -23256,7 +23224,7 @@ public class ClusterInfoMapping {
         , (Integer)
         commandArguments.get("numberOfTransitionsForSequence")
         , (Integer)
-        commandArguments.get("dayOfWeekforSequence")
+        commandArguments.get("dayOfWeekForSequence")
         , (Integer)
         commandArguments.get("modeForSequence")
         , (ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct>)
@@ -23303,18 +23271,6 @@ public class ClusterInfoMapping {
         thermostatclearWeeklyScheduleCommandParams
     );
     thermostatClusterInteractionInfoMap.put("clearWeeklySchedule", thermostatclearWeeklyScheduleInteractionInfo);
-
-    Map<String, CommandParameterInfo> thermostatgetRelayStatusLogCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo thermostatgetRelayStatusLogInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster)
-          .getRelayStatusLog((ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback) callback
-            );
-        },
-        () -> new DelegatedThermostatClusterGetRelayStatusLogResponseCallback(),
-        thermostatgetRelayStatusLogCommandParams
-      );
-    thermostatClusterInteractionInfoMap.put("getRelayStatusLog", thermostatgetRelayStatusLogInteractionInfo);
 
     commandMap.put("thermostat", thermostatClusterInteractionInfoMap);
 

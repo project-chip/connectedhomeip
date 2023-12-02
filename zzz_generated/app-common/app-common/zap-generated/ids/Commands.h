@@ -1174,10 +1174,6 @@ namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace GetRelayStatusLogResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace GetRelayStatusLogResponse
-
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
 } // namespace GetWeeklySchedule
@@ -1185,10 +1181,6 @@ static constexpr CommandId Id = 0x00000002;
 namespace ClearWeeklySchedule {
 static constexpr CommandId Id = 0x00000003;
 } // namespace ClearWeeklySchedule
-
-namespace GetRelayStatusLog {
-static constexpr CommandId Id = 0x00000004;
-} // namespace GetRelayStatusLog
 
 } // namespace Commands
 } // namespace Thermostat

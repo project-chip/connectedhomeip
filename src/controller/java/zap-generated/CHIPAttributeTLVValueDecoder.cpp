@@ -23712,6 +23712,22 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
+        case Attributes::HVACSystemTypeConfiguration::Id: {
+            using TypeInfo = Attributes::HVACSystemTypeConfiguration::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            std::string valueClassName     = "java/lang/Integer";
+            std::string valueCtorSignature = "(I)V";
+            jint jnivalue                  = static_cast<jint>(cppValue);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
+                                                                       value);
+            return value;
+        }
         case Attributes::LocalTemperatureCalibration::Id: {
             using TypeInfo = Attributes::LocalTemperatureCalibration::TypeInfo;
             TypeInfo::DecodableType cppValue;

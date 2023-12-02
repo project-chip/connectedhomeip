@@ -4344,6 +4344,10 @@ namespace PIHeatingDemand {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace PIHeatingDemand
 
+namespace HVACSystemTypeConfiguration {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace HVACSystemTypeConfiguration
+
 namespace LocalTemperatureCalibration {
 static constexpr AttributeId Id = 0x00000010;
 } // namespace LocalTemperatureCalibration

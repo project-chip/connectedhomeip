@@ -9579,6 +9579,17 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+    case Attributes::HVACSystemTypeConfiguration::Id: {
+        using TypeInfo = Attributes::HVACSystemTypeConfiguration::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
     case Attributes::LocalTemperatureCalibration::Id: {
         using TypeInfo = Attributes::LocalTemperatureCalibration::TypeInfo;
         TypeInfo::DecodableType cppValue;

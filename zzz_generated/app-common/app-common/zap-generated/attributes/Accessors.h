@@ -2813,28 +2813,33 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace PIHeatingDemand
 
+namespace HVACSystemTypeConfiguration {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace HVACSystemTypeConfiguration
+
 namespace LocalTemperatureCalibration {
 EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
 EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
 } // namespace LocalTemperatureCalibration
 
 namespace OccupiedCoolingSetpoint {
-EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // temperature
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace OccupiedCoolingSetpoint
 
 namespace OccupiedHeatingSetpoint {
-EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // temperature
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace OccupiedHeatingSetpoint
 
 namespace UnoccupiedCoolingSetpoint {
-EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // temperature
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace UnoccupiedCoolingSetpoint
 
 namespace UnoccupiedHeatingSetpoint {
-EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // temperature
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace UnoccupiedHeatingSetpoint
 
