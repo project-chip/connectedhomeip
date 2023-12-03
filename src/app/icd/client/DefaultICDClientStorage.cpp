@@ -24,6 +24,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <limits>
+#include <protocols/secure_channel/CheckinMessage.h>
 
 namespace {
 // FabricIndex is uint8_t, the tlv size with anonymous tag is 1(control bytes) + 1(value) = 2
@@ -460,10 +461,11 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t * counter)
 {
-    // TODO: Need to implement default decription code using CheckinMessage::ParseCheckinMessagePayload
-    return CHIP_NO_ERROR;
+    MutableByteSpan appData;
+    return chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload, *counter,
+                                                                                      appData);
 }
 } // namespace app
 } // namespace chip

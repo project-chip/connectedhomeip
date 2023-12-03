@@ -30,7 +30,7 @@
 #include <lib/support/CodeUtils.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/CheckinMessage.h>
+
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -42,10 +42,12 @@ CheckInMessageHandler * CheckInMessageHandler::GetInstance()
     return &sCheckInMessageHandler.get();
 }
 
-CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager)
+CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mExchangeManager = exchangeManager;
+    VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mExchangeManager  = exchangeManager;
+    mICDClientStorage = static_cast<DefaultICDClientStorage *>(clientStorage);
     ReturnErrorOnFailure(
         exchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this));
 
@@ -54,7 +56,6 @@ CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeMana
 
 void CheckInMessageHandler::Shutdown()
 {
-    // TODO : If any timers are added in the future, they need to be cleared here
     if (mExchangeManager)
     {
         mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
@@ -73,16 +74,24 @@ CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHead
 CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                     System::PacketBufferHandle && payload)
 {
-    // TODO : Pass the parsed payload to ICDClientManagement via callback
     VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_ERROR_INVALID_ARGUMENT);
 
-    Crypto::Aes128KeyHandle key;
-    chip::Protocols::SecureChannel::CounterType counter;
-    MutableByteSpan appData;
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
-    chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(key, payloadByteSpan, counter, appData);
-
-    return CHIP_NO_ERROR;
+    auto * iterator = mICDClientStorage->IterateICDClientInfo();
+    CHIP_ERROR err;
+    uint32_t counter;
+    ICDClientInfo clientInfo;
+    while (iterator->Next(clientInfo))
+    {
+        err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, &counter);
+        if (err == CHIP_NO_ERROR)
+        {
+            // TODO-1 : Check if the counter received is in range. If yes, proceed to TODO-2
+            // TODO-2 : Call the callback registered by the application to inform about the incoming checkin message
+            return err;
+        }
+    }
+    return err;
 }
 
 void CheckInMessageHandler::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
