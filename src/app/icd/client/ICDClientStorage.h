@@ -89,7 +89,7 @@ public:
      * @param[in] payload received checkIn Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
      */
-    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) = 0;
+    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t * counter) = 0;
 };
 } // namespace app
 } // namespace chip

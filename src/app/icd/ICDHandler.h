@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <client/DefaultICDClientStorage.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -50,7 +51,7 @@ public:
      */
     static CheckInMessageHandler * GetInstance(void);
 
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage);
     void Shutdown();
 
 protected:
@@ -67,6 +68,7 @@ protected:
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mExchangeManager; }
+    DefaultICDClientStorage * mICDClientStorage = nullptr;
 };
 
 } // namespace app

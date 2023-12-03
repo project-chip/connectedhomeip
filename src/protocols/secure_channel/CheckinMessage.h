@@ -65,7 +65,7 @@ public:
      *                  GetAppDataSize(payload) + sizeof(CounterType)
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
+    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, const ByteSpan & payload, CounterType & counter,
                                                  MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
@@ -76,7 +76,7 @@ public:
      * @param payload   The undecrypted payload
      * @return size_t size in byte of the application data from the payload
      */
-    static size_t GetAppDataSize(ByteSpan & payload);
+    static size_t GetAppDataSize(const ByteSpan & payload);
 
     static constexpr uint16_t sMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
