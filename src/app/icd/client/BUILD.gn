@@ -39,7 +39,7 @@ source_set("handler") {
     "ICDHandler.cpp",
     "ICDHandler.h",
   ]
-
+ deps = ["DefaultICDClientStorage.h"]
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",
