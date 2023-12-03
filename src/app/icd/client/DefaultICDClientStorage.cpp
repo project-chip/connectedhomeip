@@ -40,6 +40,10 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 
 namespace chip {
 namespace app {
+
+inline constexpr uint32_t kCheckInCounterMax       = UINT32_MAX;
+inline constexpr uint32_t kCheckInRolloverConstant = (1U << 31);
+
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
@@ -438,11 +442,34 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t * counter)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
 {
+    uint32_t counter;
     MutableByteSpan appData;
-    return chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload, *counter,
-                                                                                      appData);
+    VerifyOrReturnError(chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
+                            clientInfo.shared_key, payload, counter, appData) == CHIP_NO_ERROR,
+                        CHIP_ERROR_INVALID_ARGUMENT);
+    auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
+
+    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_ARGUMENT);
+    clientInfo.offset = counter - clientInfo.start_icd_counter;
+    if (checkInCounter > kCheckInRolloverConstant)
+    {
+        RefreshKeyAndRegisterClient(clientInfo);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultICDClientStorage::RefreshKeyAndRegisterClient(ICDClientInfo & clientInfo)
+{
+    uint8_t randomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    chip::Optional<chip::ByteSpan> icdSymmetricKey;
+    chip::Crypto::DRBG_get_bytes(randomGeneratedICDSymmetricKey, sizeof(randomGeneratedICDSymmetricKey));
+    icdSymmetricKey.SetValue(ByteSpan(randomGeneratedICDSymmetricKey));
+    ReturnErrorOnFailure(SetKey(clientInfo, icdSymmetricKey.Value()));
+    ReturnErrorOnFailure(StoreEntry(clientInfo));
+    // TODO - Register client with new key and node ID
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

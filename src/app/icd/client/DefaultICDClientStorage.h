@@ -62,7 +62,9 @@ public:
 
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t * counter) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
+
+    CHIP_ERROR RefreshKeyAndRegisterClient(ICDClientInfo & clientInfo);
 
 protected:
     enum class ClientInfoTag : uint8_t
