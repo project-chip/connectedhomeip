@@ -25,12 +25,9 @@
 
 #pragma once
 
-<<<<<<<< HEAD:src/app/icd/client/CheckInHandler.h
 #include <app/icd/client/CheckInDelegate.h>
+#include <app/icd/client/CheckInHandler.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
-========
-#include <DefaultICDClientStorage.h>
->>>>>>>> 4201f08818 (ICDHandler initialization):src/app/icd/client/ICDHandler.h
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
