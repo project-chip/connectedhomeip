@@ -31,6 +31,7 @@ source_set("manager") {
     "${chip_root}/src/protocols",
   ]
 }
+
 # ICD Handler source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDHandler need to go in this source-set
 source_set("handler") {
