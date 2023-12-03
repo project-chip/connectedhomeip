@@ -33,10 +33,11 @@
 
 #include <protocols/secure_channel/Constants.h>
 
-#define PWRTWO(exp) (1UL << (exp))
-
 namespace chip {
 namespace app {
+
+inline constexpr uint32_t kCheckInCounterMax       = UINT32_MAX;
+inline constexpr uint32_t kCheckInRolloverConstant = (1U << 31);
 
 static Global<CheckInMessageHandler> sCheckInMessageHandler;
 CheckInMessageHandler * CheckInMessageHandler::GetInstance()
@@ -88,12 +89,12 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
         err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, &counter);
         if (err == CHIP_NO_ERROR)
         {
-            auto checkInCounter = (counter - clientInfo.start_icd_counter) % (PWRTWO(32));
+            auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
             // TAk - If this condition fails, do we notify the application through callback with an error?
             if (checkInCounter > clientInfo.offset)
             {
                 clientInfo.offset = counter - clientInfo.start_icd_counter;
-                if (checkInCounter > (uint32_t) PWRTWO(31))
+                if (checkInCounter > kCheckInRolloverConstant)
                 {
                     // TODO - refresh key
                 }
