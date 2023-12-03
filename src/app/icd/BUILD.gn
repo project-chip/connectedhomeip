@@ -120,9 +120,9 @@ source_set("handler") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app/icd/client",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
-    "${chip_root}/src/app/icd/client",
   ]
 }
