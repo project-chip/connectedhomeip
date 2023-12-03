@@ -33,6 +33,8 @@
 
 #include <protocols/secure_channel/Constants.h>
 
+#define PWRTWO(exp) (1 << (exp))
+
 namespace chip {
 namespace app {
 
@@ -78,7 +80,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     auto * iterator = mICDClientStorage->IterateICDClientInfo();
-    CHIP_ERROR err;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     uint32_t counter;
     ICDClientInfo clientInfo;
     while (iterator->Next(clientInfo))
@@ -86,9 +88,18 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
         err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, &counter);
         if (err == CHIP_NO_ERROR)
         {
-            // TODO-1 : Check if the counter received is in range. If yes, proceed to TODO-2
-            // TODO-2 : Call the callback registered by the application to inform about the incoming checkin message
-            return err;
+            auto checkInCounter = (counter - clientInfo.start_icd_counter) % (PWRTWO(32));
+            // TAk - If this condition fails, do we notify the application through callback with an error?
+            if (checkInCounter > clientInfo.offset)
+            {
+                clientInfo.offset = counter - clientInfo.start_icd_counter;
+                if (checkInCounter > PWRTWO(31))
+                {
+                    // TODO - refresh key
+                }
+                // TODO - Notify the application through callback
+                return err;
+            }
         }
     }
     return err;
