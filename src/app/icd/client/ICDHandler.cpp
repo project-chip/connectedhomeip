@@ -33,7 +33,7 @@
 
 #include <protocols/secure_channel/Constants.h>
 
-#define PWRTWO(exp) (1 << (exp))
+#define PWRTWO(exp) (1UL << (exp))
 
 namespace chip {
 namespace app {
@@ -93,7 +93,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
             if (checkInCounter > clientInfo.offset)
             {
                 clientInfo.offset = counter - clientInfo.start_icd_counter;
-                if (checkInCounter > PWRTWO(31))
+                if (checkInCounter > (uint32_t) PWRTWO(31))
                 {
                     // TODO - refresh key
                 }
