@@ -43,7 +43,7 @@ constexpr uint8_t ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE = 254;
 {{#if (unifySupportedCluster code)}}
 
 {{#zcl_bitmaps}}
-{{#if (unifyMatchStringValue this "Feature")}}
+{{#if (matterAppendClusterToAttrType parent.label name)}}
 constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 {{else}}
@@ -53,7 +53,7 @@ constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITM
 {{/zcl_bitmaps}}
 
 {{#zcl_enums}}
-{{#if (unifyAppendClusterToAttrType parent.label name)}}
+{{#if (matterAppendClusterToAttrType parent.label name)}}
 constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
 {{else}}
@@ -81,8 +81,12 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
         {
          {{#zcl_attributes_server}}
             case {{asUpperCamelCase parent.label}}::Attributes::{{asUpperCamelCase label}}::Id: {
+              {{#if (matterAppendClusterToAttrType parent.label type)}}
+              return {ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES, ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES_SIZE};
+              {{else}}
               return {ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES, ZCL_{{asDelimitedMacro type}}_ATTRIBUTE_TYPES_SIZE};
-             }
+              {{/if}}
+            }
          {{/zcl_attributes_server}}
         default:
           return {ZCL_BOOLEAN_ATTRIBUTE_TYPES, 0x01};

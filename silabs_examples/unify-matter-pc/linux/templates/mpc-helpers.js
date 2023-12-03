@@ -19,16 +19,16 @@ function isUnifyEnumNameDifferent(n)
 {
   if (n == "EffectIdentifierEnum")
     return true
-    if (n == "MoveMode") return true
-    if (n == "StepMode") return true
+    if (n == "MoveModeEnum") return true
+    if (n == "StepModeEnum") return true
     else return false
 }
 function unifyEnumName(n)
 {
   console.log(n)
   if (n == "EffectIdentifierEnum") return "OffWithEffectEffectIdentifier"
-  if (n == "MoveMode") return "MoveStepMode"
-  if (n == "StepMode") return "MoveStepMode"
+  if (n == "MoveModeEnum") return "MoveStepMode"
+  if (n == "StepModeEnum") return "MoveStepMode"
   else return n
 }
 

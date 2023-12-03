@@ -218,7 +218,7 @@ static sl_status_t mpc_level_cluster_move_to_level_command(const dotdot_unid_t u
 }
 
 static sl_status_t mpc_level_cluster_move_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t move_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, MoveStepMode move_mode,
 
     uint8_t rate,
 
@@ -246,7 +246,7 @@ static sl_status_t mpc_level_cluster_move_command(const dotdot_unid_t unid, dotd
 }
 
 static sl_status_t mpc_level_cluster_step_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t step_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type, MoveStepMode step_mode,
 
     uint8_t step_size,
 
@@ -328,7 +328,8 @@ static sl_status_t mpc_level_cluster_move_to_level_with_on_off_command(const dot
 }
 
 static sl_status_t mpc_level_cluster_move_with_on_off_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t move_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type,
+    MoveStepMode move_mode,
 
     uint8_t rate,
 
@@ -356,7 +357,8 @@ static sl_status_t mpc_level_cluster_move_with_on_off_command(const dotdot_unid_
 }
 
 static sl_status_t mpc_level_cluster_step_with_on_off_command(const dotdot_unid_t unid, dotdot_endpoint_id_t endpoint,
-    uic_mqtt_dotdot_callback_call_type_t callback_type, uint8_t step_mode,
+    uic_mqtt_dotdot_callback_call_type_t callback_type,
+    MoveStepMode step_mode,
 
     uint8_t step_size,
 

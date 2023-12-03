@@ -43,9 +43,37 @@ function matterClusterAttributeName(clusterID,attributesID) {
   }
 }
 
+
+// List of Cluster whose attributes/enum need cluster name append at start
+const attribute_type_need_cluster_name_append = {
+  "On/Off": {
+    "Feature": true,
+    "EffectIdentifierEnum": true,
+  },
+  "*": {
+    "Feature": true,
+    "NameSupportBitmap": true,
+  },
+};
+
+function matterAppendClusterToAttrType(clusterName, attributeType) {
+  const attributeTypeName = String(attributeType);
+
+  if (!attribute_type_need_cluster_name_append.hasOwnProperty(clusterName)) {
+    clusterName = '*';
+  }
+
+  if (attribute_type_need_cluster_name_append[clusterName].hasOwnProperty(attributeTypeName)) {
+    return true;
+  }
+
+  return false;
+}
+
 exports.matterSupportedCluster = matterSupportedCluster
 exports.matterClusterName = matterClusterName
 exports.matterSupportedClusterCommand = matterSupportedClusterCommand
 exports.matterClusterCommandName = matterClusterCommandName
 exports.matterSupportedClusterAttribute = matterSupportedClusterAttribute
 exports.matterClusterAttributeName = matterClusterAttributeName
+exports.matterAppendClusterToAttrType = matterAppendClusterToAttrType
