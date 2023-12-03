@@ -188,7 +188,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType structType;
     ReturnErrorOnFailure(reader.EnterContainer(structType));
@@ -203,7 +203,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     clientInfoSize = static_cast<size_t>(tempClientInfoSize);
 
     ReturnErrorOnFailure(reader.ExitContainer(structType));
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector,
@@ -224,7 +224,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
@@ -273,7 +273,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         return err;
     }
 
-    return reader.ExitContainer(arrayType);
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
