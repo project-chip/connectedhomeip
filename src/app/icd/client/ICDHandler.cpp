@@ -36,9 +36,6 @@
 namespace chip {
 namespace app {
 
-inline constexpr uint32_t kCheckInCounterMax       = UINT32_MAX;
-inline constexpr uint32_t kCheckInRolloverConstant = (1U << 31);
-
 static Global<CheckInMessageHandler> sCheckInMessageHandler;
 CheckInMessageHandler * CheckInMessageHandler::GetInstance()
 {
@@ -82,25 +79,14 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     auto * iterator = mICDClientStorage->IterateICDClientInfo();
     CHIP_ERROR err  = CHIP_NO_ERROR;
-    uint32_t counter;
     ICDClientInfo clientInfo;
     while (iterator->Next(clientInfo))
     {
-        err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, &counter);
+        err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo);
         if (err == CHIP_NO_ERROR)
         {
-            auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-            // TAk - If this condition fails, do we notify the application through callback with an error?
-            if (checkInCounter > clientInfo.offset)
-            {
-                clientInfo.offset = counter - clientInfo.start_icd_counter;
-                if (checkInCounter > kCheckInRolloverConstant)
-                {
-                    // TODO - refresh key
-                }
-                // TODO - Notify the application through callback
-                return err;
-            }
+            // TODO - Notify checkin complete to the application through callback
+            return err;
         }
     }
     return err;
