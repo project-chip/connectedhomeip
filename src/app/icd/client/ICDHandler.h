@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <client/DefaultICDClientStorage.h>
+#include <DefaultICDClientStorage.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>

@@ -114,19 +114,3 @@ source_set("configuration-data") {
     "${chip_root}/src/lib/core",
   ]
 }
-
-# ICD Handler source-set is broken out of the main source-set to enable unit tests
-# All sources and configurations used by the ICDHandler need to go in this source-set
-source_set("handler") {
-  sources = [
-    "ICDHandler.cpp",
-    "ICDHandler.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/app/icd/client:manager",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols",
-  ]
-}
