@@ -40,7 +40,7 @@ source_set("handler") {
     "ICDHandler.h",
   ]
   public_deps = [
-    ":manager"
+    ":manager",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
