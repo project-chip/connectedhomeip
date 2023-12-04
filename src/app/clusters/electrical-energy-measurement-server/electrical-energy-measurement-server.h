@@ -32,6 +32,8 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Struct
 bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
                                   const Optional<Structs::EnergyMeasurementStruct::Type> & energyExported);
 
+CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const Structs::MeasurementAccuracyStruct::Type & accuracy);
+
 } // namespace ElectricalEnergyMeasurement
 } // namespace Clusters
 } // namespace app

@@ -21,6 +21,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -124,6 +125,19 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
+
+CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
+{
+
+    MeasurementData * data = MeasurementDataForEndpoint(endpointId);
+    VerifyOrReturnError(data != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    data->measurementAccuracy = accuracy;
+
+    MatterReportingAttributeChangeCallback(endpointId, ElectricalEnergyMeasurement::Id, Accuracy::Id);
+
+    return CHIP_NO_ERROR;
+}
 
 bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
                                     const Optional<EnergyMeasurementStruct::Type> & energyExported)
