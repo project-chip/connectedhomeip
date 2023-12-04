@@ -386,7 +386,7 @@ public:
         virtual void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         /**
-         * Gets called when a fabric is added to Fabric Table, by AddingNewPendingFabricCommon.
+         * Gets called when a fabric is newly added to Fabric Table.
          **/
         virtual void OnFabricAdded(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 

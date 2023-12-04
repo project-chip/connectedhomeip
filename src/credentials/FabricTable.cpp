@@ -1730,6 +1730,7 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
     // Notify that NOC was added (at least transiently)
     *outNewFabricIndex = fabricIndexToUse;
     NotifyFabricAdded(fabricIndexToUse);
+    NotifyFabricUpdated(fabricIndexToUse);
 
     return CHIP_NO_ERROR;
 }
