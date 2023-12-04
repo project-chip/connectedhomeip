@@ -36,10 +36,10 @@ config("includes") {
 
 executable("chip-energy-management-app") {
   sources = [
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyManagementManager.cpp",
-    "${chip_root}/examples/energy-management-app/energy-management-common/src/EVSEManufacturerImpl.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
   ]
@@ -59,8 +59,8 @@ executable("chip-energy-management-app") {
   }
 
   include_dirs = [
-   "include",
-   "${chip_root}/examples/energy-management-app/energy-management-common/include"
+    "include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
   ]
 
   if (chip_enable_pw_rpc) {
@@ -96,10 +96,10 @@ executable("chip-energy-management-app") {
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:elec_service.nanopb_rpc",
-      "${chip_root}/examples/common/pigweed:evse_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:elec_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:evse_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:rpc_services",
     ]
