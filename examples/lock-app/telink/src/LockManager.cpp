@@ -455,11 +455,13 @@ bool LockManager::ReadConfigValues()
 
     for (uint8_t i = 0; i < kNumCredentialTypes; i++)
     {
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_Credential[i], reinterpret_cast<uint8_t *>(&mLockCredentials[i]),
-                sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials, outLen);
+        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_Credential[i],
+                                         reinterpret_cast<uint8_t *>(&mLockCredentials[i]),
+                                         sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials, outLen);
 
-        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData[i], reinterpret_cast<uint8_t *>(mCredentialData[i]),
-                kMaxCredentials * kMaxCredentialSize, outLen);
+        ZephyrConfig::ReadConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData[i],
+                                         reinterpret_cast<uint8_t *>(mCredentialData[i]), kMaxCredentials * kMaxCredentialSize,
+                                         outLen);
     }
 
     return true;
@@ -668,23 +670,27 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     for (uint8_t i = 0; i < kNumCredentialTypes; i++)
     {
         // Save credential information in NVM flash
-        err = ZephyrConfig::WriteConfigValueBin(
-                LockSettingsStorage::kConfigKey_Credential[i], reinterpret_cast<const uint8_t *>(&mLockCredentials[i]),
-                sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials);
+        err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_Credential[i],
+                                                reinterpret_cast<const uint8_t *>(&mLockCredentials[i]),
+                                                sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl,
-                    "Failed to write kConfigKey_Credential(%d). User data will be resetted during reboot. Not enough storage space \n", i);
+            ChipLogError(
+                Zcl,
+                "Failed to write kConfigKey_Credential(%d). User data will be resetted during reboot. Not enough storage space \n",
+                i);
             break;
         }
 
-        err = ZephyrConfig::WriteConfigValueBin(
-                LockSettingsStorage::kConfigKey_CredentialData[i],reinterpret_cast<const uint8_t *>(&mCredentialData[i]),
-                kMaxCredentials * kMaxCredentialSize);
+        err = ZephyrConfig::WriteConfigValueBin(LockSettingsStorage::kConfigKey_CredentialData[i],
+                                                reinterpret_cast<const uint8_t *>(&mCredentialData[i]),
+                                                kMaxCredentials * kMaxCredentialSize);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl,
-                    "Failed to write kConfigKey_CredentialData(%d). User data will be resetted during reboot. Not enough storage space \n", i);
+                         "Failed to write kConfigKey_CredentialData(%d). User data will be resetted during reboot. Not enough "
+                         "storage space \n",
+                         i);
             break;
         }
     }
