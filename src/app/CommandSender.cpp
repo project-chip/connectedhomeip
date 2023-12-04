@@ -430,8 +430,6 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     bool canAddAnotherCommand = mState == State::AddedCommand && mBatchCommandsEnabled;
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
-    // TODO what is the best error to give here? I thought CHIP_ERROR_SENTINEL might be an indicator for the called to then
-    // batch call send such that we can then try sending another InvokeRequest once we have processed all of Responses.
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
     if (mBatchCommandsEnabled)
