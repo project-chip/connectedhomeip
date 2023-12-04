@@ -203,13 +203,10 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId);
         CHIP_ERROR err = CHIP_NO_ERROR;
         SecureSession * session = sessionHandle->AsSecureSession();
-        if (session == nullptr)
-        {
-            return CHIP_ERROR_NOT_CONNECTED;
-        }
+        VerifyOrReturnError(session == nullptr, CHIP_ERROR_NOT_CONNECTED);
         if (session->GetPeerAddress().GetTransportType() == Transport::Type::kTcp) {
             // support large payloads
-            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message, kLargePayloadMaxSizeBytes);
+            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message, kLargePayloadMaxMessageSizeBytes);
         } else {
             err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message, kMaxAppMessageLen);
         }
