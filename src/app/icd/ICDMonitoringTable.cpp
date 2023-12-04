@@ -76,7 +76,8 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another key in storage and will cause
                 // key leakage in some implementation.
-                memcpy(key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+                memcpy(key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+                       sizeof(Crypto::Symmetric128BitsKeyByteArray));
                 keyHandleValid = true;
             }
             break;

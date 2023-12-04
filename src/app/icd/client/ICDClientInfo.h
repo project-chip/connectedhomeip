@@ -45,7 +45,8 @@ struct ICDClientInfo
         offset            = other.offset;
         monitored_subject = other.monitored_subject;
         ByteSpan buf(other.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
-        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         return *this;
     }
 };

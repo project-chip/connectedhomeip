@@ -263,7 +263,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
         VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        memcpy(clientInfo.shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
