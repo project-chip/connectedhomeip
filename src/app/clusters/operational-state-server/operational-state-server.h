@@ -151,8 +151,8 @@ public:
 private:
     Delegate * mDelegate;
 
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
+    const EndpointId mEndpointId;
+    const ClusterId mClusterId;
 
     // Attribute Data Store
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
