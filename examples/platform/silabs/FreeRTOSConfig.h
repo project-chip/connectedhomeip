@@ -122,7 +122,7 @@ extern uint32_t SystemCoreClock;
 #include "sl_component_catalog.h"
 #endif
 
-#if SL_SYSTEM_VIEW
+#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW_FreeRTOS.h"
 #endif
 
