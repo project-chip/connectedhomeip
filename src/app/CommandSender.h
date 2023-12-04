@@ -130,6 +130,10 @@ public:
 
     struct AdditionalCommandDataElements
     {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        AdditionalCommandDataElements() {}
+
         AdditionalCommandDataElements & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
         {
             mStartOrEndDataStruct = aStartOrEndDataStruct;
@@ -244,7 +248,8 @@ public:
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandDataElements & aOptionalArgs);
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**

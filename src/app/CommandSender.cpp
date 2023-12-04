@@ -498,7 +498,7 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
 }
 
 CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                        const AdditionalCommandDataElements & aOptionalArgs)
+                                        AdditionalCommandDataElements aOptionalArgs)
 {
     ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
