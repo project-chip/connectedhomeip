@@ -19,12 +19,50 @@
 
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <app/AttributeAccessInterface.h>
 #include <app/EventLogging.h>
+#include <app/util/attribute-storage.h>
 
 using chip::Protocols::InteractionModel::Status;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 
-void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
+namespace {
+
+using namespace chip;
+
+class ElectricalEnergyMeasurementAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    ElectricalEnergyMeasurementAttrAccess() :
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id)
+    {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+};
+
+CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
+                                                       app::AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == app::Clusters::ElectricalEnergyMeasurement::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case CumulativeEnergyImported::Id:
+    case CumulativeEnergyExported::Id:
+    case PeriodicEnergyImported::Id:
+    case PeriodicEnergyExported::Id:
+        // TODO: this needs implementation
+        aEncoder.EncodeNull();
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+ElectricalEnergyMeasurementAttrAccess gAttrAccess;
+
+} // namespace
 
 namespace chip {
 namespace app {
@@ -79,3 +117,8 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+void MatterElectricalEnergyMeasurementPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
+}
