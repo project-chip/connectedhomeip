@@ -192,6 +192,8 @@ private:
 
     /**
      * Handle Command: Resume.
+     * If the current state is not resume-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
+     * Otherwise, this method calls the delegate's HandleResumeStateCallback.
      */
     void HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req);
 };

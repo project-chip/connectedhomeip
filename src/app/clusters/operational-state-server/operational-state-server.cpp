@@ -411,11 +411,25 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint8_t opState = GetCurrentOperationalState();
 
-    if (opState != to_underlying(OperationalStateEnum::kPaused) && opState != to_underlying(OperationalStateEnum::kRunning))
+    // Handle Operational State Resume-incompatible states.
+    if (opState == to_underlying(OperationalStateEnum::kStopped) ||
+        opState == to_underlying(OperationalStateEnum::kError))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
-    else if (opState == to_underlying(OperationalStateEnum::kPaused))
+
+    // Handle Resume-incompatible states for derived clusters.
+    switch (mClusterId)
+    {
+    case RvcOperationalState::Id:
+        if (opState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+        {
+            err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
+        }
+    }
+
+    // If the error is still NoError, we can call the delegate's handle function.
+    if (err.errorStateID == 0)
     {
         mDelegate->HandleResumeStateCallback(err);
     }
