@@ -28,7 +28,7 @@
 #include <transport/raw/MessageHeader.h>
 
 constexpr uint16_t kMaxLineLen    = 4096;
-constexpr const char * jsonPrefix = "    json\t";
+constexpr const char jsonPrefix[] = "    json\t";
 
 namespace chip {
 namespace trace {

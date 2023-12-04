@@ -26,7 +26,7 @@
 
 #include "DeviceCallbacks.h"
 
-static const char * TAG = "bridge-devicecallbacks";
+static const char TAG[] = "bridge-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::app;
