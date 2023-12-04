@@ -208,3 +208,22 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeTagsByIndex(uint8_t modeIndex, Lis
 
     return CHIP_NO_ERROR;
 }
+
+
+/*
+ * An example to present device
+ */
+static constexpr EndpointId kDemoEndpointId = 1;
+
+Platform::UniquePtr<ExampleMicrowaveOvenDevice> gMicrowaveOvenDevice;
+
+void MatterMicrowaveOvenServerInit()
+{
+    gMicrowaveOvenDevice = Platform::MakeUnique<ExampleMicrowaveOvenDevice>(kDemoEndpointId);
+    gMicrowaveOvenDevice.get()->MicrowaveOvenInit();
+}
+
+void MatterMicrowaveOvenServerShutdown()
+{
+    gMicrowaveOvenDevice = nullptr;
+}
