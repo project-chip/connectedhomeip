@@ -427,7 +427,8 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     }
 
     // If the error is still NoError, we can call the delegate's handle function.
-    if (err.errorStateID == 0)
+    // If the current state is Running we can skip this call.
+    if (err.errorStateID == 0 && opState != to_underlying(OperationalStateEnum::kRunning))
     {
         mDelegate->HandleResumeStateCallback(err);
     }
