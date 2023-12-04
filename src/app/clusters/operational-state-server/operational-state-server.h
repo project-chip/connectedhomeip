@@ -174,6 +174,9 @@ private:
 
     /**
      * Handle Command: Pause.
+     * If the current state is not pause-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
+     * If the current state is pause, this method responds with an ErrorStateId of NoError but takes no action.
+     * Otherwise, this method calls the delegate's HandlePauseStateCallback.
      */
     void HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req);
 
