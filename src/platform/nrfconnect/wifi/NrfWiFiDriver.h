@@ -48,8 +48,8 @@ class NrfWiFiDriver final : public WiFiDriver
 public:
     // Define non-volatile storage keys for SSID and password.
     // The naming convention is aligned with DefaultStorageKeyAllocator class.
-    static constexpr const char * kSsidKey = "g/wi/s";
-    static constexpr const char * kPassKey = "g/wi/p";
+    static constexpr char kSsidKey[] = "g/wi/s";
+    static constexpr char kPassKey[] = "g/wi/p";
 
     class WiFiNetworkIterator final : public NetworkIterator
     {

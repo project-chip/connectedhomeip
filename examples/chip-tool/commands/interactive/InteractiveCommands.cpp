@@ -22,12 +22,12 @@
 
 #include <editline.h>
 
-constexpr const char * kInteractiveModePrompt          = ">>> ";
-constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
-constexpr const char * kInteractiveModeStopCommand     = "quit()";
-constexpr const char * kCategoryError                  = "Error";
-constexpr const char * kCategoryProgress               = "Info";
-constexpr const char * kCategoryDetail                 = "Debug";
+constexpr char kInteractiveModePrompt[]          = ">>> ";
+constexpr char kInteractiveModeHistoryFilePath[] = "/tmp/chip_tool_history";
+constexpr char kInteractiveModeStopCommand[]     = "quit()";
+constexpr char kCategoryError[]                  = "Error";
+constexpr char kCategoryProgress[]               = "Info";
+constexpr char kCategoryDetail[]                 = "Debug";
 
 namespace {
 
