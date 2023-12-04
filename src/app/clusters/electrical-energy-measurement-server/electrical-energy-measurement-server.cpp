@@ -41,7 +41,8 @@ struct MeasurementData
     Optional<EnergyMeasurementStruct::Type> periodicExported;
 };
 
-MeasurementData gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT];
+MeasurementData
+    gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
 {
