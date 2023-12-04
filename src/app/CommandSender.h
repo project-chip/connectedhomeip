@@ -114,6 +114,20 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
+    // While today there is only one item in this struct, this was added to make providing future elements easier.
+    struct ConfigParams
+    {
+        ConfigParams & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
+        {
+            mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
+            return *this;
+        }
+
+        // If mRemoteMaxPathsPerInvoke is 1, this will allow the CommandSender client to contain only one command and
+        // doesn't enforce other batch commands requirements.
+        uint16_t mRemoteMaxPathsPerInvoke = 1;
+    };
+
     // While today there is only one item in this struct, this was added to make providing future elements of
     // CommandData easier.
     struct AdditionalCommandDataElements
@@ -153,12 +167,11 @@ public:
     ~CommandSender();
 
     /**
-     * Enables CommandSender to send batch commands up until the number of supported by remote peer.
+     * Enables aspects of CommandSender, for example sending batch commands.
      *
-     * It ensures that commands contain all required elements while building such that sending the
-     * InvokeRequestMessage has a high likeihood to succeed. Must be called before PrepareCommand.
-     * If aRemoteMaxPathsPerInvoke is 1, this will allow the call to contain only one command and
-     * doesn't enforce other batch commands requirements (similar to have never calling this method.
+     * In the case of enabling batch commands, once set it ensures that commands contain all
+     * required data elements while building the InvokeRequestMessage such that it adhears to the
+     * spec. This must be called before PrepareCommand.
      *
      * @param [in] aRemoteMaxPathsPerInvoke max number of paths per invoke supported by remote peer.
      *
@@ -169,7 +182,7 @@ public:
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
      *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
      */
-    CHIP_ERROR SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvoke);
+    CHIP_ERROR SetCommandSenderConfig(ConfigParams & aConfigParams);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true,
                               AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());

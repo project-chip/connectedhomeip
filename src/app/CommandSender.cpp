@@ -326,10 +326,10 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         bool commandRefExpected = (mFinishedCommandCount > 1);
         bool hasDataResponse    = false;
         TLV::TLVReader commandDataReader;
+        mAdditionalResponseElements = AdditionalInvokeResponseElements();
 
         CommandStatusIB::Parser commandStatus;
-        err                         = aInvokeResponse.GetStatus(&commandStatus);
-        mAdditionalResponseElements = AdditionalInvokeResponseElements();
+        err = aInvokeResponse.GetStatus(&commandStatus);
         if (CHIP_NO_ERROR == err)
         {
             CommandPathIB::Parser commandPath;
@@ -406,14 +406,14 @@ CHIP_ERROR CommandSender::GetAdditionalInvokeResponseElements(AdditionalInvokeRe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SetBatchCommandsConfig(uint16_t aRemoteMaxPathsPerInvoke)
+CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & aConfigParams)
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(aRemoteMaxPathsPerInvoke, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
-    mBatchCommandsEnabled    = (aRemoteMaxPathsPerInvoke > 1);
+    mRemoteMaxPathsPerInvoke = aConfigParams.mRemoteMaxPathsPerInvoke;
+    mBatchCommandsEnabled    = (aConfigParams.mRemoteMaxPathsPerInvoke > 1);
     return CHIP_NO_ERROR;
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
@@ -432,7 +432,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     // TODO what is the best error to give here? I thought CHIP_ERROR_SENTINEL might be an indicator for the called to then
     // batch call send such that we can then try sending another InvokeRequest once we have processed all of Responses.
-    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_SENTINEL);
+    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
     if (mBatchCommandsEnabled)
     {

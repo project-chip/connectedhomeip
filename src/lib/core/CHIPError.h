@@ -1522,7 +1522,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB             CHIP_CORE_ERROR(0xba)
 
-// AVAILABLE: 0xbb
+/**
+ * @def CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED
+ *
+ * @brief
+ *   Caller is trying to add more invoke command paths
+ *   than what the remote node reports supporting.
+ */
+#define CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED           CHIP_CORE_ERROR(0xbb)
 
 /**
  * @def CHIP_ERROR_PEER_NODE_NOT_FOUND
