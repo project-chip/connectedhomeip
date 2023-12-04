@@ -416,7 +416,8 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & a
     mBatchCommandsEnabled    = (aConfigParams.mRemoteMaxPathsPerInvoke > 1);
     return CHIP_NO_ERROR;
 #else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    return CHIP_NO_ERROR;
 #endif
 }
 
