@@ -134,7 +134,10 @@ public interface OTAProviderDelegate {
     @Nullable Long delayedActionTime = null;
 
     public QueryImageResponse(
-        @Nullable Long softwareVersion, @Nullable String softwareVersionString, String filePath, Boolean userConsentNeeded) {
+        @Nullable Long softwareVersion,
+        @Nullable String softwareVersionString,
+        String filePath,
+        Boolean userConsentNeeded) {
       this.status = QueryImageResponseStatusEnum.UpdateAvailable;
       this.softwareVersion = softwareVersion;
       this.softwareVersionString = softwareVersionString;
@@ -142,7 +145,8 @@ public interface OTAProviderDelegate {
       this.userConsentNeeded = userConsentNeeded;
     }
 
-    public QueryImageResponse(QueryImageResponseStatusEnum status, long delayedActionTime, Boolean userConsentNeeded) {
+    public QueryImageResponse(
+        QueryImageResponseStatusEnum status, long delayedActionTime, Boolean userConsentNeeded) {
       this.status = status;
       this.delayedActionTime = delayedActionTime;
       this.userConsentNeeded = userConsentNeeded;
@@ -181,7 +185,10 @@ public interface OTAProviderDelegate {
   // See Refer CompatEnumNames.h
   public enum QueryImageResponseStatusEnum {
     // Enum for QueryImageResponseStatusEnum
-    UpdateAvailable(0x00), Busy(0x01), NotAvailable(0x02), DownloadProtocolNotSupported(0x03);
+    UpdateAvailable(0x00),
+    Busy(0x01),
+    NotAvailable(0x02),
+    DownloadProtocolNotSupported(0x03);
 
     private int value;
 
