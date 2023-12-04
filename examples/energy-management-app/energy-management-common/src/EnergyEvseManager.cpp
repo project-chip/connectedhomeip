@@ -22,18 +22,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
+CHIP_ERROR EnergyEvseManager::Init()
+{
+    GetInstance()->Instance::Init();
+    return CHIP_NO_ERROR;
+}
+
 void EnergyEvseManager::Shutdown()
 {
     GetInstance()->Instance::Shutdown();
-    // TODO  delete mDelegate;
-    // TODO  delete mInstance;
-}
-
-CHIP_ERROR EnergyEvseManager::Init()
-{
-    // TODO - add custom initialization
-    GetInstance()->Instance::Init();
-    return CHIP_NO_ERROR;
 }
 
 void MatterEnergyEvsePluginServerInitCallback() {}
