@@ -34,6 +34,7 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 struct MeasurementData
 {
+    MeasurementAccuracyStruct::Type measurementAccuracy;
     Optional<EnergyMeasurementStruct::Type> cumulativeImported;
     Optional<EnergyMeasurementStruct::Type> cumulativeExported;
     Optional<EnergyMeasurementStruct::Type> periodicImported;
@@ -79,46 +80,36 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
 
     switch (aPath.mAttributeId)
     {
+    case Accuracy::Id:
+        if (data == nullptr)
+        {
+            return CHIP_ERROR_NOT_FOUND;
+        }
+        return aEncoder.Encode(data->measurementAccuracy);
     case CumulativeEnergyImported::Id:
         if ((data == nullptr) || !data->cumulativeImported.HasValue())
         {
-            aEncoder.EncodeNull();
+            return aEncoder.EncodeNull();
         }
-        else
-        {
-            aEncoder.Encode(data->cumulativeImported.Value());
-        }
-        break;
+        return aEncoder.Encode(data->cumulativeImported.Value());
     case CumulativeEnergyExported::Id:
         if ((data == nullptr) || !data->cumulativeExported.HasValue())
         {
-            aEncoder.EncodeNull();
+            return aEncoder.EncodeNull();
         }
-        else
-        {
-            aEncoder.Encode(data->cumulativeExported.Value());
-        }
-        break;
+        return aEncoder.Encode(data->cumulativeExported.Value());
     case PeriodicEnergyImported::Id:
         if ((data == nullptr) || !data->periodicImported.HasValue())
         {
-            aEncoder.EncodeNull();
+            return aEncoder.EncodeNull();
         }
-        else
-        {
-            aEncoder.Encode(data->periodicImported.Value());
-        }
-        break;
+        return aEncoder.Encode(data->periodicImported.Value());
     case PeriodicEnergyExported::Id:
         if ((data == nullptr) || !data->periodicExported.HasValue())
         {
-            aEncoder.EncodeNull();
+            return aEncoder.EncodeNull();
         }
-        else
-        {
-            aEncoder.Encode(data->periodicExported.Value());
-        }
-        break;
+        return aEncoder.Encode(data->periodicExported.Value());
     }
 
     return CHIP_NO_ERROR;
