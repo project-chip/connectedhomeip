@@ -87,7 +87,7 @@ tests:
 
     - label:
           "Step 5: TH reads from the DUT the SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.A0004
+      PICS: TCTL.S.A0004 && TCTL.S.C00.Rsp
       command: "readAttribute"
       attribute: "SelectedTemperatureLevel"
       response:
