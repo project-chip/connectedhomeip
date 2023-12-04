@@ -133,7 +133,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     jstring jSoftwareVersionString = nullptr;
     jstring jFilePath              = nullptr;
 
-    jint jStatus = 0;
+    jint jStatus   = 0;
     uint8_t status = 0;
 
     bool hasUpdate = false;
@@ -183,7 +183,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     if (!isBDXProtocolSupported)
     {
         response.status = OTAQueryStatus::kDownloadProtocolNotSupported;
-        err                  = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        err             = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
         ExitNow();
     }
 
@@ -236,7 +236,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     if (!hasUpdate)
     {
         response.status = OTAQueryStatus::kNotAvailable;
-        err                  = CHIP_ERROR_INTERNAL;
+        err             = CHIP_ERROR_INTERNAL;
         ExitNow();
     }
 
@@ -254,16 +254,19 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     err = JniReferences::GetInstance().FindMethod(env, jResponse, "getStatus", "()I", &getStatushMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getStatus method"));
 
-    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getDelayedActionTime", "()Ljava/lang/Long;", &getDelayedActionTimeMethod);
+    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getDelayedActionTime", "()Ljava/lang/Long;",
+                                                  &getDelayedActionTimeMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getDelayedActionTime method"));
 
-    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getUserConsentNeeded", "()Ljava/lang/Boolean;", &getUserConsentNeededMethod);
+    err = JniReferences::GetInstance().FindMethod(env, jResponse, "getUserConsentNeeded", "()Ljava/lang/Boolean;",
+                                                  &getUserConsentNeededMethod);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find getUserConsentNeeded method"));
 
     jStatus                = env->CallIntMethod(jResponse, getStatushMethod);
     boxedUserConsentNeeded = env->CallObjectMethod(jResponse, getUserConsentNeededMethod);
 
-    // UserConsentNeeded Field, if present, SHALL only be interpreted if the OTA Requestor had previously indicated a value of True in the RequestorCanConsent field of the QueryImageRequest.
+    // UserConsentNeeded Field, if present, SHALL only be interpreted if the OTA Requestor had previously indicated a value of True
+    // in the RequestorCanConsent field of the QueryImageRequest.
     if (boxedUserConsentNeeded != nullptr)
     {
         jboolean userConsentNeeded = JniReferences::GetInstance().BooleanToPrimitive(boxedUserConsentNeeded);
@@ -273,16 +276,17 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     status = static_cast<uint8_t>(jStatus);
     if (status == static_cast<uint8_t>(OTAQueryStatus::kNotAvailable))
     {
-        err = CHIP_ERROR_INTERNAL;
+        err             = CHIP_ERROR_INTERNAL;
         response.status = OTAQueryStatus::kNotAvailable;
         ExitNow();
     }
     else if (status == static_cast<uint8_t>(OTAQueryStatus::kBusy))
     {
-        err = CHIP_ERROR_BUSY;
-        response.status = OTAQueryStatus::kBusy;
+        err                    = CHIP_ERROR_BUSY;
+        response.status        = OTAQueryStatus::kBusy;
         boxedDelayedActionTime = env->CallObjectMethod(jResponse, getDelayedActionTimeMethod);
-        response.delayedActionTime.SetValue(static_cast<uint32_t>(JniReferences::GetInstance().LongToPrimitive(boxedDelayedActionTime)));
+        response.delayedActionTime.SetValue(
+            static_cast<uint32_t>(JniReferences::GetInstance().LongToPrimitive(boxedDelayedActionTime)));
         ExitNow();
     }
 
@@ -348,8 +352,7 @@ void OTAProviderDelegateBridge::HandleQueryImage(CommandHandler * commandObj, co
     return;
 
 exit:
-    ChipLogError(Controller, "OTA Query Failure : %u, %" CHIP_ERROR_FORMAT, static_cast<uint8_t>(response.status),
-                 err.Format());
+    ChipLogError(Controller, "OTA Query Failure : %u, %" CHIP_ERROR_FORMAT, static_cast<uint8_t>(response.status), err.Format());
     commandObj->AddResponse(cachedCommandPath, response);
     sendOTAQueryFailure(static_cast<uint8_t>(response.status));
 }
