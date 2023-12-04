@@ -128,13 +128,13 @@ public:
         uint16_t mRemoteMaxPathsPerInvoke = 1;
     };
 
-    struct AdditionalCommandDataElements
+    struct AdditionalCommandParameters
     {
         // gcc bug requires us to have the constructor below
         // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
-        AdditionalCommandDataElements() {}
+        AdditionalCommandParameters() {}
 
-        AdditionalCommandDataElements & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
+        AdditionalCommandParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
         {
             mStartOrEndDataStruct = aStartOrEndDataStruct;
             return *this;
@@ -195,22 +195,22 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParams & aConfigParams);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandDataElements aOptionalArgs);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters aOptionalArgs);
 
-    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandDataElements")]] CHIP_ERROR
+    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR
     PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
     {
-        AdditionalCommandDataElements optionalArgs = AdditionalCommandDataElements();
+        AdditionalCommandParameters optionalArgs = AdditionalCommandParameters();
         optionalArgs.SetStartOrEndDataStruct(aStartDataStruct);
         return PrepareCommand(aCommandPathParams, optionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(AdditionalCommandDataElements aOptionalArgs);
+    CHIP_ERROR FinishCommand(AdditionalCommandParameters aOptionalArgs);
 
-    [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandDataElements")]] CHIP_ERROR
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandParameters")]] CHIP_ERROR
     FinishCommand(bool aEndDataStruct = true)
     {
-        AdditionalCommandDataElements optionalArgs = AdditionalCommandDataElements();
+        AdditionalCommandParameters optionalArgs = AdditionalCommandParameters();
         optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
         return FinishCommand(optionalArgs);
     }
@@ -226,7 +226,7 @@ public:
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
+                              AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
     {
         return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
     }
@@ -239,7 +239,7 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
+                              AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
@@ -249,7 +249,7 @@ public:
     }
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
+                             AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -260,7 +260,7 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                           const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                          AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
+                                          AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
     {
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
@@ -278,7 +278,7 @@ private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                       const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                      const AdditionalCommandDataElements & aOptionalArgs)
+                                      const AdditionalCommandParameters & aOptionalArgs)
     {
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();

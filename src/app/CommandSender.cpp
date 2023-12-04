@@ -421,7 +421,7 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & a
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandDataElements aOptionalArgs)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
@@ -454,7 +454,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(AdditionalCommandDataElements aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(AdditionalCommandParameters aOptionalArgs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -497,8 +497,7 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                        AdditionalCommandDataElements aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters aOptionalArgs)
 {
     ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
