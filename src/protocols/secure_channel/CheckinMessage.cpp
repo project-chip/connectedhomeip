@@ -43,7 +43,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle
     chip::Crypto::HMAC_sha shaHandler;
     uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
 
-    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), appDataStartPtr,
+    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), appDataStartPtr,
                                                 sizeof(CounterType), nonceWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
 
     static_assert(sizeof(nonceWorkBuffer) >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, "We're reading off the end of our buffer.");

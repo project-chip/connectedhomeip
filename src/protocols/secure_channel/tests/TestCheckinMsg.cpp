@@ -56,7 +56,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Aes128KeyByteArray keyMaterial;
+        Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle;
@@ -87,7 +87,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
         uint8_t gargantuaBuffer[2 * CheckinMessage::sMaxAppDataSize] = { 0 };
 
-        Aes128KeyByteArray keyMaterial;
+        Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle;
@@ -137,7 +137,7 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
     userData                         = chip::ByteSpan(data);
     const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
 
-    Aes128KeyByteArray keyMaterial;
+    Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, test.key, test.key_len);
 
     Aes128KeyHandle keyHandle;
@@ -180,7 +180,7 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Aes128KeyByteArray keyMaterial;
+        Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle;

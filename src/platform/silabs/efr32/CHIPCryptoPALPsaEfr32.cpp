@@ -185,12 +185,12 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     psa_crypto_init();
 
     psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
-    psa_set_key_bits(&attr, sizeof(Aes128KeyByteArray) * 8);
+    psa_set_key_bits(&attr, sizeof(Symmetric128BitsKeyByteArray) * 8);
     psa_set_key_algorithm(&attr, PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8));
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_ENCRYPT);
 
     status = psa_driver_wrapper_aead_encrypt(
-        &attr, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
+        &attr, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
         Uint8::to_const_uchar(nonce), nonce_length, Uint8::to_const_uchar(aad), aad_length, Uint8::to_const_uchar(plaintext),
         plaintext_length, allocated_buffer ? buffer : ciphertext, plaintext_length + tag_length, &output_length);
 
@@ -240,7 +240,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     psa_crypto_init();
 
     psa_set_key_type(&attr, PSA_KEY_TYPE_AES);
-    psa_set_key_bits(&attr, sizeof(Aes128KeyByteArray) * 8);
+    psa_set_key_bits(&attr, sizeof(Symmetric128BitsKeyByteArray) * 8);
     psa_set_key_algorithm(&attr, PSA_ALG_AEAD_WITH_AT_LEAST_THIS_LENGTH_TAG(PSA_ALG_CCM, 8));
     psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_DECRYPT);
 
@@ -251,7 +251,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     }
 
     status = psa_driver_wrapper_aead_decrypt(
-        &attr, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
+        &attr, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), PSA_ALG_AEAD_WITH_SHORTENED_TAG(PSA_ALG_CCM, tag_length),
         Uint8::to_const_uchar(nonce), nonce_length, Uint8::to_const_uchar(aad), aad_len, allocated_buffer ? buffer : ciphertext,
         ciphertext_len + tag_length, plaintext, ciphertext_len, &output_length);
 
