@@ -341,7 +341,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
-            ReturnErrorOnFailure(GetRef(commandStatus, mAdditionalResponseElements.commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandStatus, mAdditionalResponseElements.mCommandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -353,7 +353,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
-            ReturnErrorOnFailure(GetRef(commandData, mAdditionalResponseElements.commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandData, mAdditionalResponseElements.mCommandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -421,8 +421,7 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & a
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct,
-                                         AdditionalCommandDataElements aOptionalArgs)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandDataElements aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
@@ -435,7 +434,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
 
     if (mBatchCommandsEnabled)
     {
-        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -445,7 +444,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     ReturnErrorOnFailure(invokeRequest.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
-    if (aStartDataStruct)
+    if (aOptionalArgs.mStartOrEndDataStruct)
     {
         ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
@@ -455,7 +454,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct, AdditionalCommandDataElements aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(AdditionalCommandDataElements aOptionalArgs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -463,7 +462,7 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct, AdditionalCommandDa
 
     CommandDataIB::Builder & commandData = mInvokeRequestBuilder.GetInvokeRequests().GetCommandData();
 
-    if (aEndDataStruct)
+    if (aOptionalArgs.mStartOrEndDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
@@ -472,12 +471,12 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct, AdditionalCommandDa
     {
         // If error below triggers, whatever provided aOptionalArgs to PerpareCommand has changed it's
         // values since calling PrepareCommand.
-        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (aOptionalArgs.commandRef.HasValue())
+    if (aOptionalArgs.mCommandRef.HasValue())
     {
-        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.commandRef.Value()));
+        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.mCommandRef.Value()));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
@@ -499,9 +498,9 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
 }
 
 CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                        AdditionalCommandDataElements aOptionalArgs)
+                                        const AdditionalCommandDataElements & aOptionalArgs)
 {
-    ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false, aOptionalArgs));
+    ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
     {
         mTimedInvokeTimeoutMs = aTimedInvokeTimeoutMs;

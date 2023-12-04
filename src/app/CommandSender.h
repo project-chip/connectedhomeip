@@ -128,18 +128,23 @@ public:
         uint16_t mRemoteMaxPathsPerInvoke = 1;
     };
 
-    // While today there is only one item in this struct, this was added to make providing future elements of
-    // CommandData easier.
     struct AdditionalCommandDataElements
     {
-        Optional<uint16_t> commandRef;
+        AdditionalCommandDataElements & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
+        {
+            mStartOrEndDataStruct = aStartOrEndDataStruct;
+            return *this;
+        }
+
+        Optional<uint16_t> mCommandRef;
+        bool mStartOrEndDataStruct = false;
     };
 
     // While today there is only one item in this struct, this was added to make providing future elements of
     // InvokeResponse easier.
     struct AdditionalInvokeResponseElements
     {
-        Optional<uint16_t> commandRef;
+        Optional<uint16_t> mCommandRef;
     };
 
     /**
@@ -167,13 +172,15 @@ public:
     ~CommandSender();
 
     /**
-     * Enables aspects of CommandSender, for example sending batch commands.
+     * Enables additional features of CommandSender, for example sending batch commands.
      *
      * In the case of enabling batch commands, once set it ensures that commands contain all
      * required data elements while building the InvokeRequestMessage such that it adhears to the
      * spec. This must be called before PrepareCommand.
      *
-     * @param [in] aRemoteMaxPathsPerInvoke max number of paths per invoke supported by remote peer.
+     * @param [in] aConfigParams contains information to config CommandSender to perform addtional
+     *                      functionality such as such as allowing max number paths per invoke
+     *                      to the number supported by remote peer.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
      *                      If device has previously called `PrepareCommand`.
@@ -184,10 +191,25 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParams & aConfigParams);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true,
-                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
-    CHIP_ERROR FinishCommand(bool aEndDataStruct                         = true,
-                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandDataElements aOptionalArgs);
+
+    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandDataElements")]] CHIP_ERROR
+    PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
+    {
+        AdditionalCommandDataElements optionalArgs = AdditionalCommandDataElements();
+        optionalArgs.SetStartOrEndDataStruct(aStartDataStruct);
+        return PrepareCommand(aCommandPathParams, optionalArgs);
+    }
+
+    CHIP_ERROR FinishCommand(AdditionalCommandDataElements aOptionalArgs);
+
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandDataElements")]] CHIP_ERROR
+    FinishCommand(bool aEndDataStruct = true)
+    {
+        AdditionalCommandDataElements optionalArgs = AdditionalCommandDataElements();
+        optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
+        return FinishCommand(optionalArgs);
+    }
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
     /**
      * API for adding a data request.  The template parameter T is generally
@@ -199,9 +221,10 @@ public:
      * @param [in] aData         The data for the request.
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
-    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
     {
-        return AddRequestData(aCommandPath, aData, NullOptional);
+        return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
     }
 
     /**
@@ -215,12 +238,13 @@ public:
                               AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements())
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
+        VerifyOrReturnError(aOptionalArgs.mStartOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
 
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                             AdditionalCommandDataElements aOptionalArgs = AdditionalCommandDataElements());
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandDataElements & aOptionalArgs);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -248,9 +272,10 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandDataElements aOptionalArgs)
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                      const AdditionalCommandDataElements & aOptionalArgs)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false, aOptionalArgs));
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
