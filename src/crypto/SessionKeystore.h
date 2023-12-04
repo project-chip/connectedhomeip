@@ -45,7 +45,7 @@ public:
      * If the method returns no error, the application is responsible for destroying the handle
      * using DestroyKey() method when the key is no longer needed.
      */
-    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) = 0;
+    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128BitsKeyHandle & key) = 0;
 
     /**
      * @brief Derive key from a shared secret.
@@ -56,7 +56,7 @@ public:
      * using DestroyKey() method when the key is no longer needed.
      */
     virtual CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
-                                 Aes128KeyHandle & key) = 0;
+                                 Aes128BitsKeyHandle & key) = 0;
 
     /**
      * @brief Derive session keys from a shared secret.
@@ -69,7 +69,7 @@ public:
      * release all handles that it allocated so far.
      */
     virtual CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
-                                         Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                         Aes128BitsKeyHandle & i2rKey, Aes128BitsKeyHandle & r2iKey,
                                          AttestationChallenge & attestationChallenge) = 0;
 
     /**
@@ -78,7 +78,7 @@ public:
      * The method can take an uninitialized handle in which case it is a no-op.
      * As a result of calling this method, the handle is put in the uninitialized state.
      */
-    virtual void DestroyKey(Aes128KeyHandle & key) = 0;
+    virtual void DestroyKey(Aes128BitsKeyHandle & key) = 0;
 };
 
 /**
@@ -90,11 +90,11 @@ public:
     explicit AutoReleaseSessionKey(SessionKeystore & keystore) : mKeystore(keystore) {}
     ~AutoReleaseSessionKey() { mKeystore.DestroyKey(mKeyHandle); }
 
-    Aes128KeyHandle & KeyHandle() { return mKeyHandle; }
+    Aes128BitsKeyHandle & KeyHandle() { return mKeyHandle; }
 
 private:
     SessionKeystore & mKeystore;
-    Aes128KeyHandle mKeyHandle;
+    Aes128BitsKeyHandle mKeyHandle;
 };
 
 } // namespace Crypto

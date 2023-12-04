@@ -193,7 +193,7 @@ public:
     ~TestAesKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Aes128KeyHandle key;
+    Aes128BitsKeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
