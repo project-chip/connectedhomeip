@@ -338,8 +338,7 @@ void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::Dec
     uint8_t opState = GetCurrentOperationalState();
 
     // Handle Operational State Pause-incompatible states.
-    if (opState == to_underlying(OperationalStateEnum::kStopped) ||
-        opState == to_underlying(OperationalStateEnum::kError))
+    if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kError))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
@@ -412,8 +411,7 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     uint8_t opState = GetCurrentOperationalState();
 
     // Handle Operational State Resume-incompatible states.
-    if (opState == to_underlying(OperationalStateEnum::kStopped) ||
-        opState == to_underlying(OperationalStateEnum::kError))
+    if (opState == to_underlying(OperationalStateEnum::kStopped) || opState == to_underlying(OperationalStateEnum::kError))
     {
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     }
