@@ -209,7 +209,6 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetModeTagsByIndex(uint8_t modeIndex, Lis
     return CHIP_NO_ERROR;
 }
 
-
 /*
  * An example to present device
  */
