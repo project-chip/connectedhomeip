@@ -35,7 +35,7 @@ CHIP_ERROR CreateChipAttributePath(JNIEnv * env, const app::ConcreteDataAttribut
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
 {
-    GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback);
+    GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback, const char * callbackClassSignature = "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback");
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -45,6 +45,9 @@ struct GetConnectedDeviceCallback
     Callback::Callback<OperationalSessionSetup::OnSetupFailure> mOnFailure;
     JniGlobalReference mWrapperCallbackRef;
     JniGlobalReference mJavaCallbackRef;
+
+private:
+    const char * mCallbackClassSignature;
 };
 
 struct ReportCallback : public app::ClusterStateCache::Callback

@@ -62,6 +62,7 @@ shared_library("jni") {
     "CHIPDeviceController-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
+    "MatterInteractionClient-JNI.cpp",
   ]
 
   deps = [

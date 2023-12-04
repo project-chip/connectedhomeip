@@ -51,7 +51,7 @@ import matter.controller.model.EventState
 import matter.controller.model.NodeState
 
 /** Controller to interact with the CHIP device. */
-class MatterControllerImpl(params: ControllerParams) : MatterController {
+class MatterControllerImpl(params: ControllerParams) : InteractionClientImpl(), MatterController {
   private val deviceController: ChipDeviceController
   private var nodeId: Long? = null
 
@@ -83,410 +83,410 @@ class MatterControllerImpl(params: ControllerParams) : MatterController {
     deviceController.establishPaseConnection(nodeId, address, port, setupPincode)
   }
 
-  override fun subscribe(request: SubscribeRequest): Flow<SubscriptionState> {
-    // To prevent potential issues related to concurrent modification, assign
-    // the value of the mutable property 'nodeId' to a temporary variable.
-    val nodeId = this.nodeId
-    check(nodeId != null) { "nodeId has not been initialized yet" }
+  // override fun subscribe(request: SubscribeRequest): Flow<SubscriptionState> {
+  //   // To prevent potential issues related to concurrent modification, assign
+  //   // the value of the mutable property 'nodeId' to a temporary variable.
+  //   val nodeId = this.nodeId
+  //   check(nodeId != null) { "nodeId has not been initialized yet" }
 
-    val attributePaths = generateAttributePaths(request)
-    val eventPaths = generateEventPaths(request)
-    val successes = mutableListOf<ReadData>()
-    val failures = mutableListOf<ReadFailure>()
+  //   val attributePaths = generateAttributePaths(request)
+  //   val eventPaths = generateEventPaths(request)
+  //   val successes = mutableListOf<ReadData>()
+  //   val failures = mutableListOf<ReadFailure>()
 
-    return callbackFlow {
-        val devicePtr: Long = getConnectedDevicePointer(nodeId)
-        val subscriptionEstablishedHandler = SubscriptionEstablishedCallback {
-          logger.log(Level.INFO, "Subscription to device established")
+  //   return callbackFlow {
+  //       val devicePtr: Long = getConnectedDevicePointer(nodeId)
+  //       val subscriptionEstablishedHandler = SubscriptionEstablishedCallback {
+  //         logger.log(Level.INFO, "Subscription to device established")
 
-          trySendBlocking(SubscriptionState.SubscriptionEstablished).onFailure { ex ->
-            logger.log(
-              Level.SEVERE,
-              "Error sending SubscriptionCompletedNotification to subscriber: %s",
-              ex
-            )
-          }
-        }
+  //         trySendBlocking(SubscriptionState.SubscriptionEstablished).onFailure { ex ->
+  //           logger.log(
+  //             Level.SEVERE,
+  //             "Error sending SubscriptionCompletedNotification to subscriber: %s",
+  //             ex
+  //           )
+  //         }
+  //       }
 
-        val resubscriptionAttemptHandler =
-          ResubscriptionAttemptCallback { terminationCause, nextResubscribeIntervalMsec ->
-            logger.log(
-              Level.WARNING,
-              "ResubscriptionAttempt terminationCause:${terminationCause}, " +
-                "nextResubscribeIntervalMsec:${nextResubscribeIntervalMsec}"
-            )
+  //       val resubscriptionAttemptHandler =
+  //         ResubscriptionAttemptCallback { terminationCause, nextResubscribeIntervalMsec ->
+  //           logger.log(
+  //             Level.WARNING,
+  //             "ResubscriptionAttempt terminationCause:${terminationCause}, " +
+  //               "nextResubscribeIntervalMsec:${nextResubscribeIntervalMsec}"
+  //           )
 
-            trySendBlocking(
-                SubscriptionState.SubscriptionErrorNotification(terminationCause.toUInt())
-              )
-              .onFailure { ex ->
-                logger.log(
-                  Level.SEVERE,
-                  "Error sending ResubscriptionNotification to subscriber: %s",
-                  ex
-                )
-              }
-          }
+  //           trySendBlocking(
+  //               SubscriptionState.SubscriptionErrorNotification(terminationCause.toUInt())
+  //             )
+  //             .onFailure { ex ->
+  //               logger.log(
+  //                 Level.SEVERE,
+  //                 "Error sending ResubscriptionNotification to subscriber: %s",
+  //                 ex
+  //               )
+  //             }
+  //         }
 
-        val reportHandler =
-          object : ReportCallback {
-            override fun onReport(nodeState: chip.devicecontroller.model.NodeState) {
-              logger.log(Level.INFO, "Received subscribe update report")
+  //       val reportHandler =
+  //         object : ReportCallback {
+  //           override fun onReport(nodeState: chip.devicecontroller.model.NodeState) {
+  //             logger.log(Level.INFO, "Received subscribe update report")
 
-              val tmpNodeState: NodeState = nodeState.wrap()
+  //             val tmpNodeState: NodeState = nodeState.wrap()
 
-              for (endpoint in tmpNodeState.endpoints) {
-                for (cluster in endpoint.value.clusters) {
-                  for (attribute in cluster.value.attributes) {
-                    val attributePath =
-                      AttributePath(
-                        endpointId = endpoint.key.toUShort(),
-                        clusterId = cluster.key.toUInt(),
-                        attributeId = attribute.key.toUInt()
-                      )
-                    val readData = ReadData.Attribute(attributePath, attribute.value.tlvValue)
-                    successes.add(readData)
-                  }
+  //             for (endpoint in tmpNodeState.endpoints) {
+  //               for (cluster in endpoint.value.clusters) {
+  //                 for (attribute in cluster.value.attributes) {
+  //                   val attributePath =
+  //                     AttributePath(
+  //                       endpointId = endpoint.key.toUShort(),
+  //                       clusterId = cluster.key.toUInt(),
+  //                       attributeId = attribute.key.toUInt()
+  //                     )
+  //                   val readData = ReadData.Attribute(attributePath, attribute.value.tlvValue)
+  //                   successes.add(readData)
+  //                 }
 
-                  for (eventList in cluster.value.events) {
-                    for (event in eventList.value) {
-                      val timestamp: Timestamp =
-                        when (event.timestampType) {
-                          chip.devicecontroller.model.EventState.MILLIS_SINCE_BOOT ->
-                            Timestamp.MillisSinceBoot(event.timestampValue)
-                          chip.devicecontroller.model.EventState.MILLIS_SINCE_EPOCH ->
-                            Timestamp.MillisSinceEpoch(event.timestampValue)
-                          else -> {
-                            logger.log(Level.SEVERE, "Unsupported event timestamp type - ignoring")
-                            break
-                          }
-                        }
+  //                 for (eventList in cluster.value.events) {
+  //                   for (event in eventList.value) {
+  //                     val timestamp: Timestamp =
+  //                       when (event.timestampType) {
+  //                         chip.devicecontroller.model.EventState.MILLIS_SINCE_BOOT ->
+  //                           Timestamp.MillisSinceBoot(event.timestampValue)
+  //                         chip.devicecontroller.model.EventState.MILLIS_SINCE_EPOCH ->
+  //                           Timestamp.MillisSinceEpoch(event.timestampValue)
+  //                         else -> {
+  //                           logger.log(Level.SEVERE, "Unsupported event timestamp type - ignoring")
+  //                           break
+  //                         }
+  //                       }
 
-                      val eventPath =
-                        EventPath(
-                          endpointId = endpoint.key.toUShort(),
-                          clusterId = cluster.key.toUInt(),
-                          eventId = eventList.key.toUInt()
-                        )
+  //                     val eventPath =
+  //                       EventPath(
+  //                         endpointId = endpoint.key.toUShort(),
+  //                         clusterId = cluster.key.toUInt(),
+  //                         eventId = eventList.key.toUInt()
+  //                       )
 
-                      val readData =
-                        ReadData.Event(
-                          path = eventPath,
-                          eventNumber = event.eventNumber.toULong(),
-                          priorityLevel = event.priorityLevel.toUByte(),
-                          timeStamp = timestamp,
-                          data = event.tlvValue
-                        )
-                      successes.add(readData)
-                    }
-                  }
-                }
-              }
+  //                     val readData =
+  //                       ReadData.Event(
+  //                         path = eventPath,
+  //                         eventNumber = event.eventNumber.toULong(),
+  //                         priorityLevel = event.priorityLevel.toUByte(),
+  //                         timeStamp = timestamp,
+  //                         data = event.tlvValue
+  //                       )
+  //                     successes.add(readData)
+  //                   }
+  //                 }
+  //               }
+  //             }
 
-              trySendBlocking(SubscriptionState.NodeStateUpdate(ReadResponse(successes, failures)))
-                .onFailure { ex ->
-                  logger.log(Level.SEVERE, "Error sending NodeStateUpdate to subscriber: %s", ex)
-                }
-            }
+  //             trySendBlocking(SubscriptionState.NodeStateUpdate(ReadResponse(successes, failures)))
+  //               .onFailure { ex ->
+  //                 logger.log(Level.SEVERE, "Error sending NodeStateUpdate to subscriber: %s", ex)
+  //               }
+  //           }
 
-            override fun onError(
-              attributePath: ChipAttributePath?,
-              eventPath: ChipEventPath?,
-              ex: Exception
-            ) {
-              attributePath?.let {
-                logger.log(Level.INFO, "Report error for attributePath:%s", it.toString())
-                val tmpAttributePath: AttributePath = attributePath.wrap()
-                val attributeFailure = ReadFailure.Attribute(path = tmpAttributePath, error = ex)
-                failures.add(attributeFailure)
-              }
-              eventPath?.let {
-                logger.log(Level.INFO, "Report error for eventPath:%s", it.toString())
-                val tmpEventPath: EventPath = eventPath.wrap()
-                val eventFailure = ReadFailure.Event(path = tmpEventPath, error = ex)
-                failures.add(eventFailure)
-              }
+  //           override fun onError(
+  //             attributePath: ChipAttributePath?,
+  //             eventPath: ChipEventPath?,
+  //             ex: Exception
+  //           ) {
+  //             attributePath?.let {
+  //               logger.log(Level.INFO, "Report error for attributePath:%s", it.toString())
+  //               val tmpAttributePath: AttributePath = attributePath.wrap()
+  //               val attributeFailure = ReadFailure.Attribute(path = tmpAttributePath, error = ex)
+  //               failures.add(attributeFailure)
+  //             }
+  //             eventPath?.let {
+  //               logger.log(Level.INFO, "Report error for eventPath:%s", it.toString())
+  //               val tmpEventPath: EventPath = eventPath.wrap()
+  //               val eventFailure = ReadFailure.Event(path = tmpEventPath, error = ex)
+  //               failures.add(eventFailure)
+  //             }
 
-              // The underlying subscription is terminated if both attributePath & eventPath are
-              // null
-              if (attributePath == null && eventPath == null) {
-                logger.log(Level.SEVERE, "The underlying subscription is terminated")
+  //             // The underlying subscription is terminated if both attributePath & eventPath are
+  //             // null
+  //             if (attributePath == null && eventPath == null) {
+  //               logger.log(Level.SEVERE, "The underlying subscription is terminated")
 
-                trySendBlocking(
-                    SubscriptionState.SubscriptionErrorNotification(CHIP_ERROR_UNEXPECTED_EVENT)
-                  )
-                  .onFailure { exception ->
-                    logger.log(
-                      Level.SEVERE,
-                      "Error sending SubscriptionErrorNotification to subscriber: %s",
-                      exception
-                    )
-                  }
-              }
-            }
+  //               trySendBlocking(
+  //                   SubscriptionState.SubscriptionErrorNotification(CHIP_ERROR_UNEXPECTED_EVENT)
+  //                 )
+  //                 .onFailure { exception ->
+  //                   logger.log(
+  //                     Level.SEVERE,
+  //                     "Error sending SubscriptionErrorNotification to subscriber: %s",
+  //                     exception
+  //                   )
+  //                 }
+  //             }
+  //           }
 
-            override fun onDone() {
-              logger.log(Level.INFO, "Subscription update completed")
-            }
-          }
+  //           override fun onDone() {
+  //             logger.log(Level.INFO, "Subscription update completed")
+  //           }
+  //         }
 
-        deviceController.subscribeToPath(
-          subscriptionEstablishedHandler,
-          resubscriptionAttemptHandler,
-          reportHandler,
-          devicePtr,
-          attributePaths,
-          eventPaths,
-          request.minInterval.seconds.toInt(),
-          request.maxInterval.seconds.toInt(),
-          request.keepSubscriptions,
-          request.fabricFiltered,
-          CHIP_IM_TIMEOUT_MS
-        )
+  //       deviceController.subscribeToPath(
+  //         subscriptionEstablishedHandler,
+  //         resubscriptionAttemptHandler,
+  //         reportHandler,
+  //         devicePtr,
+  //         attributePaths,
+  //         eventPaths,
+  //         request.minInterval.seconds.toInt(),
+  //         request.maxInterval.seconds.toInt(),
+  //         request.keepSubscriptions,
+  //         request.fabricFiltered,
+  //         CHIP_IM_TIMEOUT_MS
+  //       )
 
-        awaitClose { logger.log(Level.FINE, "Closing flow") }
-      }
-      .buffer(capacity = UNLIMITED)
-  }
+  //       awaitClose { logger.log(Level.FINE, "Closing flow") }
+  //     }
+  //     .buffer(capacity = UNLIMITED)
+  // }
 
-  override suspend fun read(request: ReadRequest): ReadResponse {
-    // To prevent potential issues related to concurrent modification, assign
-    // the value of the mutable property 'nodeId' to a temporary variable.
-    val nodeId = this.nodeId
-    check(nodeId != null) { "nodeId has not been initialized yet" }
+  // override suspend fun read(request: ReadRequest): ReadResponse {
+  //   // To prevent potential issues related to concurrent modification, assign
+  //   // the value of the mutable property 'nodeId' to a temporary variable.
+  //   val nodeId = this.nodeId
+  //   check(nodeId != null) { "nodeId has not been initialized yet" }
 
-    val devicePtr: Long = getConnectedDevicePointer(nodeId)
+  //   val devicePtr: Long = getConnectedDevicePointer(nodeId)
 
-    val chipAttributePaths =
-      request.attributePaths.map { attributePath ->
-        val endpointId = attributePath.endpointId.toInt()
-        val clusterId = attributePath.clusterId.toLong()
-        val attributeId = attributePath.attributeId.toLong()
-        ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
-      }
+  //   val chipAttributePaths =
+  //     request.attributePaths.map { attributePath ->
+  //       val endpointId = attributePath.endpointId.toInt()
+  //       val clusterId = attributePath.clusterId.toLong()
+  //       val attributeId = attributePath.attributeId.toLong()
+  //       ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+  //     }
 
-    val chipEventPaths =
-      request.eventPaths.map { eventPath ->
-        val endpointId = eventPath.endpointId.toInt()
-        val clusterId = eventPath.clusterId.toLong()
-        val eventId = eventPath.eventId.toLong()
-        ChipEventPath.newInstance(endpointId, clusterId, eventId)
-      }
+  //   val chipEventPaths =
+  //     request.eventPaths.map { eventPath ->
+  //       val endpointId = eventPath.endpointId.toInt()
+  //       val clusterId = eventPath.clusterId.toLong()
+  //       val eventId = eventPath.eventId.toLong()
+  //       ChipEventPath.newInstance(endpointId, clusterId, eventId)
+  //     }
 
-    val successes = mutableListOf<ReadData>()
-    val failures = mutableListOf<ReadFailure>()
+  //   val successes = mutableListOf<ReadData>()
+  //   val failures = mutableListOf<ReadFailure>()
 
-    return suspendCancellableCoroutine { continuation ->
-      val reportCallback =
-        object : ReportCallback {
-          override fun onReport(nodeState: chip.devicecontroller.model.NodeState) {
-            logger.log(Level.FINE, "Received read report")
+  //   return suspendCancellableCoroutine { continuation ->
+  //     val reportCallback =
+  //       object : ReportCallback {
+  //         override fun onReport(nodeState: chip.devicecontroller.model.NodeState) {
+  //           logger.log(Level.FINE, "Received read report")
 
-            val tmpNodeState: NodeState = nodeState.wrap()
+  //           val tmpNodeState: NodeState = nodeState.wrap()
 
-            for (endpoint in tmpNodeState.endpoints) {
-              for (cluster in endpoint.value.clusters) {
-                for (attribute in cluster.value.attributes) {
-                  val attributePath =
-                    AttributePath(
-                      endpointId = endpoint.key.toUShort(),
-                      clusterId = cluster.key.toUInt(),
-                      attributeId = attribute.key.toUInt()
-                    )
-                  val readData = ReadData.Attribute(attributePath, attribute.value.tlvValue)
-                  successes.add(readData)
-                }
+  //           for (endpoint in tmpNodeState.endpoints) {
+  //             for (cluster in endpoint.value.clusters) {
+  //               for (attribute in cluster.value.attributes) {
+  //                 val attributePath =
+  //                   AttributePath(
+  //                     endpointId = endpoint.key.toUShort(),
+  //                     clusterId = cluster.key.toUInt(),
+  //                     attributeId = attribute.key.toUInt()
+  //                   )
+  //                 val readData = ReadData.Attribute(attributePath, attribute.value.tlvValue)
+  //                 successes.add(readData)
+  //               }
 
-                for (eventList in cluster.value.events) {
-                  for (event in eventList.value) {
-                    val timestamp: Timestamp =
-                      when (event.timestampType) {
-                        chip.devicecontroller.model.EventState.MILLIS_SINCE_BOOT ->
-                          Timestamp.MillisSinceBoot(event.timestampValue)
-                        chip.devicecontroller.model.EventState.MILLIS_SINCE_EPOCH ->
-                          Timestamp.MillisSinceEpoch(event.timestampValue)
-                        else -> {
-                          logger.log(Level.SEVERE, "Unsupported event timestamp type - ignoring")
-                          break
-                        }
-                      }
-                    val eventPath =
-                      EventPath(
-                        endpointId = endpoint.key.toUShort(),
-                        clusterId = cluster.key.toUInt(),
-                        eventId = eventList.key.toUInt()
-                      )
+  //               for (eventList in cluster.value.events) {
+  //                 for (event in eventList.value) {
+  //                   val timestamp: Timestamp =
+  //                     when (event.timestampType) {
+  //                       chip.devicecontroller.model.EventState.MILLIS_SINCE_BOOT ->
+  //                         Timestamp.MillisSinceBoot(event.timestampValue)
+  //                       chip.devicecontroller.model.EventState.MILLIS_SINCE_EPOCH ->
+  //                         Timestamp.MillisSinceEpoch(event.timestampValue)
+  //                       else -> {
+  //                         logger.log(Level.SEVERE, "Unsupported event timestamp type - ignoring")
+  //                         break
+  //                       }
+  //                     }
+  //                   val eventPath =
+  //                     EventPath(
+  //                       endpointId = endpoint.key.toUShort(),
+  //                       clusterId = cluster.key.toUInt(),
+  //                       eventId = eventList.key.toUInt()
+  //                     )
 
-                    val readData =
-                      ReadData.Event(
-                        path = eventPath,
-                        eventNumber = event.eventNumber.toULong(),
-                        priorityLevel = event.priorityLevel.toUByte(),
-                        timeStamp = timestamp,
-                        data = event.tlvValue
-                      )
-                    successes.add(readData)
-                  }
-                }
-              }
-            }
-          }
+  //                   val readData =
+  //                     ReadData.Event(
+  //                       path = eventPath,
+  //                       eventNumber = event.eventNumber.toULong(),
+  //                       priorityLevel = event.priorityLevel.toUByte(),
+  //                       timeStamp = timestamp,
+  //                       data = event.tlvValue
+  //                     )
+  //                   successes.add(readData)
+  //                 }
+  //               }
+  //             }
+  //           }
+  //         }
 
-          override fun onError(
-            attributePath: ChipAttributePath?,
-            eventPath: ChipEventPath?,
-            ex: Exception
-          ) {
-            attributePath?.let {
-              logger.log(Level.INFO, "Report error for attributePath:%s", it.toString())
-              val tmpAttributePath: AttributePath = attributePath.wrap()
-              val attributeFailure = ReadFailure.Attribute(path = tmpAttributePath, error = ex)
-              failures.add(attributeFailure)
-            }
-            eventPath?.let {
-              logger.log(Level.INFO, "Report error for eventPath:%s", it.toString())
-              val tmpEventPath: EventPath = eventPath.wrap()
-              val eventFailure = ReadFailure.Event(path = tmpEventPath, error = ex)
-              failures.add(eventFailure)
-            }
+  //         override fun onError(
+  //           attributePath: ChipAttributePath?,
+  //           eventPath: ChipEventPath?,
+  //           ex: Exception
+  //         ) {
+  //           attributePath?.let {
+  //             logger.log(Level.INFO, "Report error for attributePath:%s", it.toString())
+  //             val tmpAttributePath: AttributePath = attributePath.wrap()
+  //             val attributeFailure = ReadFailure.Attribute(path = tmpAttributePath, error = ex)
+  //             failures.add(attributeFailure)
+  //           }
+  //           eventPath?.let {
+  //             logger.log(Level.INFO, "Report error for eventPath:%s", it.toString())
+  //             val tmpEventPath: EventPath = eventPath.wrap()
+  //             val eventFailure = ReadFailure.Event(path = tmpEventPath, error = ex)
+  //             failures.add(eventFailure)
+  //           }
 
-            // The underlying subscription is terminated if both attributePath & eventPath are null
-            if (attributePath == null && eventPath == null) {
-              continuation.resumeWithException(
-                Exception("Read command failed with error ${ex.message}")
-              )
-            }
-          }
+  //           // The underlying subscription is terminated if both attributePath & eventPath are null
+  //           if (attributePath == null && eventPath == null) {
+  //             continuation.resumeWithException(
+  //               Exception("Read command failed with error ${ex.message}")
+  //             )
+  //           }
+  //         }
 
-          override fun onDone() {
-            logger.log(Level.FINE, "read command completed")
-            continuation.resume(ReadResponse(successes, failures))
-          }
-        }
+  //         override fun onDone() {
+  //           logger.log(Level.FINE, "read command completed")
+  //           continuation.resume(ReadResponse(successes, failures))
+  //         }
+  //       }
 
-      deviceController.readPath(
-        reportCallback,
-        devicePtr,
-        chipAttributePaths,
-        chipEventPaths,
-        false,
-        CHIP_IM_TIMEOUT_MS,
-      )
-    }
-  }
+  //     deviceController.readPath(
+  //       reportCallback,
+  //       devicePtr,
+  //       chipAttributePaths,
+  //       chipEventPaths,
+  //       false,
+  //       CHIP_IM_TIMEOUT_MS,
+  //     )
+  //   }
+  // }
 
-  override suspend fun write(writeRequests: WriteRequests): WriteResponse {
-    // To prevent potential issues related to concurrent modification, assign
-    // the value of the mutable property 'nodeId' to a temporary variable.
-    val nodeId = this.nodeId
-    check(nodeId != null) { "nodeId has not been initialized yet" }
+  // override suspend fun write(writeRequests: WriteRequests): WriteResponse {
+  //   // To prevent potential issues related to concurrent modification, assign
+  //   // the value of the mutable property 'nodeId' to a temporary variable.
+  //   val nodeId = this.nodeId
+  //   check(nodeId != null) { "nodeId has not been initialized yet" }
 
-    val devicePtr: Long = getConnectedDevicePointer(nodeId)
+  //   val devicePtr: Long = getConnectedDevicePointer(nodeId)
 
-    val attributeWriteRequests =
-      writeRequests.requests.map { request ->
-        AttributeWriteRequest.newInstance(
-          ChipPathId.forId(request.attributePath.endpointId.toLong()),
-          ChipPathId.forId(request.attributePath.clusterId.toLong()),
-          ChipPathId.forId(request.attributePath.attributeId.toLong()),
-          request.tlvPayload
-        )
-      }
+  //   val attributeWriteRequests =
+  //     writeRequests.requests.map { request ->
+  //       AttributeWriteRequest.newInstance(
+  //         ChipPathId.forId(request.attributePath.endpointId.toLong()),
+  //         ChipPathId.forId(request.attributePath.clusterId.toLong()),
+  //         ChipPathId.forId(request.attributePath.attributeId.toLong()),
+  //         request.tlvPayload
+  //       )
+  //     }
 
-    val failures = mutableListOf<AttributeWriteError>()
+  //   val failures = mutableListOf<AttributeWriteError>()
 
-    return suspendCancellableCoroutine { continuation ->
-      val writeCallback =
-        object : WriteAttributesCallback {
-          override fun onResponse(attributePath: ChipAttributePath) {
-            logger.log(Level.INFO, "write success for attributePath:%s", attributePath.toString())
-          }
+  //   return suspendCancellableCoroutine { continuation ->
+  //     val writeCallback =
+  //       object : WriteAttributesCallback {
+  //         override fun onResponse(attributePath: ChipAttributePath) {
+  //           logger.log(Level.INFO, "write success for attributePath:%s", attributePath.toString())
+  //         }
 
-          override fun onError(attributePath: ChipAttributePath?, ex: Exception) {
-            logger.log(
-              Level.SEVERE,
-              "Failed to write attribute at path: %s",
-              attributePath.toString()
-            )
+  //         override fun onError(attributePath: ChipAttributePath?, ex: Exception) {
+  //           logger.log(
+  //             Level.SEVERE,
+  //             "Failed to write attribute at path: %s",
+  //             attributePath.toString()
+  //           )
 
-            if (attributePath == null) {
-              if (ex is ChipDeviceControllerException) {
-                continuation.resumeWithException(
-                  MatterControllerException(ex.errorCode, ex.message)
-                )
-              } else {
-                continuation.resumeWithException(ex)
-              }
-            } else {
-              failures.add(AttributeWriteError(attributePath.wrap(), ex))
-            }
-          }
+  //           if (attributePath == null) {
+  //             if (ex is ChipDeviceControllerException) {
+  //               continuation.resumeWithException(
+  //                 MatterControllerException(ex.errorCode, ex.message)
+  //               )
+  //             } else {
+  //               continuation.resumeWithException(ex)
+  //             }
+  //           } else {
+  //             failures.add(AttributeWriteError(attributePath.wrap(), ex))
+  //           }
+  //         }
 
-          override fun onDone() {
-            logger.log(Level.INFO, "writeAttributes onDone is received")
+  //         override fun onDone() {
+  //           logger.log(Level.INFO, "writeAttributes onDone is received")
 
-            if (failures.isNotEmpty()) {
-              continuation.resume(WriteResponse.PartialWriteFailure(failures))
-            } else {
-              continuation.resume(WriteResponse.Success)
-            }
-          }
-        }
+  //           if (failures.isNotEmpty()) {
+  //             continuation.resume(WriteResponse.PartialWriteFailure(failures))
+  //           } else {
+  //             continuation.resume(WriteResponse.Success)
+  //           }
+  //         }
+  //       }
 
-      deviceController.write(
-        writeCallback,
-        devicePtr,
-        attributeWriteRequests.toList(),
-        writeRequests.timedRequest?.toMillis()?.toInt() ?: 0,
-        CHIP_IM_TIMEOUT_MS,
-      )
-    }
-  }
+  //     deviceController.write(
+  //       writeCallback,
+  //       devicePtr,
+  //       attributeWriteRequests.toList(),
+  //       writeRequests.timedRequest?.toMillis()?.toInt() ?: 0,
+  //       CHIP_IM_TIMEOUT_MS,
+  //     )
+  //   }
+  // }
 
-  override suspend fun invoke(request: InvokeRequest): InvokeResponse {
-    // To prevent potential issues related to concurrent modification, assign
-    // the value of the mutable property 'nodeId' to a temporary variable.
-    val nodeId = this.nodeId
-    check(nodeId != null) { "nodeId has not been initialized yet" }
+  // override suspend fun invoke(request: InvokeRequest): InvokeResponse {
+  //   // To prevent potential issues related to concurrent modification, assign
+  //   // the value of the mutable property 'nodeId' to a temporary variable.
+  //   val nodeId = this.nodeId
+  //   check(nodeId != null) { "nodeId has not been initialized yet" }
 
-    val devicePtr: Long = getConnectedDevicePointer(nodeId)
+  //   val devicePtr: Long = getConnectedDevicePointer(nodeId)
 
-    val invokeRequest =
-      InvokeElement.newInstance(
-        ChipPathId.forId(request.commandPath.endpointId.toLong()),
-        ChipPathId.forId(request.commandPath.clusterId.toLong()),
-        ChipPathId.forId(request.commandPath.commandId.toLong()),
-        request.tlvPayload,
-        /* jsonString= */ null
-      )
+  //   val invokeRequest =
+  //     InvokeElement.newInstance(
+  //       ChipPathId.forId(request.commandPath.endpointId.toLong()),
+  //       ChipPathId.forId(request.commandPath.clusterId.toLong()),
+  //       ChipPathId.forId(request.commandPath.commandId.toLong()),
+  //       request.tlvPayload,
+  //       /* jsonString= */ null
+  //     )
 
-    return suspendCancellableCoroutine { continuation ->
-      var invokeCallback =
-        object : InvokeCallback {
-          override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
-            logger.log(Level.FINE, "Invoke onResponse is received")
-            val tlvByteArray = invokeElement?.getTlvByteArray() ?: byteArrayOf()
-            continuation.resume(InvokeResponse(tlvByteArray))
-          }
+  //   return suspendCancellableCoroutine { continuation ->
+  //     var invokeCallback =
+  //       object : InvokeCallback {
+  //         override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+  //           logger.log(Level.FINE, "Invoke onResponse is received")
+  //           val tlvByteArray = invokeElement?.getTlvByteArray() ?: byteArrayOf()
+  //           continuation.resume(InvokeResponse(tlvByteArray))
+  //         }
 
-          override fun onError(ex: Exception) {
-            if (ex is ChipDeviceControllerException) {
-              continuation.resumeWithException(MatterControllerException(ex.errorCode, ex.message))
-            } else {
-              continuation.resumeWithException(ex)
-            }
-          }
-        }
+  //         override fun onError(ex: Exception) {
+  //           if (ex is ChipDeviceControllerException) {
+  //             continuation.resumeWithException(MatterControllerException(ex.errorCode, ex.message))
+  //           } else {
+  //             continuation.resumeWithException(ex)
+  //           }
+  //         }
+  //       }
 
-      deviceController.invoke(
-        invokeCallback,
-        devicePtr,
-        invokeRequest,
-        request.timedRequest?.toMillis()?.toInt() ?: 0,
-        CHIP_IM_TIMEOUT_MS
-      )
-    }
-  }
+  //     deviceController.invoke(
+  //       invokeCallback,
+  //       devicePtr,
+  //       invokeRequest,
+  //       request.timedRequest?.toMillis()?.toInt() ?: 0,
+  //       CHIP_IM_TIMEOUT_MS
+  //     )
+  //   }
+  // }
 
   override fun close() {
     logger.log(Level.INFO, "MatterController is closed")

@@ -71,8 +71,8 @@ CHIP_ERROR ReportCallback::CreateChipEventPath(JNIEnv * env, const app::Concrete
     return CHIP_NO_ERROR;
 }
 
-GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
-    mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
+GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback, const char * callbackClassSignature) :
+    mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this), mCallbackClassSignature(callbackClassSignature)
 {
     VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Could not init mWrapperCallbackRef in %s", __func__));
@@ -98,8 +98,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     JniGlobalReference globalRef(std::move(self->mWrapperCallbackRef));
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetLocalClassRef(
-        env, "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback", getConnectedDeviceCallbackCls);
+    JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
 
@@ -127,8 +126,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
     JniLocalReferenceManager manager(env);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
-    JniReferences::GetInstance().GetLocalClassRef(
-        env, "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback", getConnectedDeviceCallbackCls);
+    JniReferences::GetInstance().GetLocalClassRef(env, self->mCallbackClassSignature, getConnectedDeviceCallbackCls);
     VerifyOrReturn(getConnectedDeviceCallbackCls != nullptr,
                    ChipLogError(Controller, "Could not find GetConnectedDeviceCallback class"));
 
