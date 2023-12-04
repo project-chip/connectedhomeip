@@ -2599,7 +2599,7 @@ TCTL.S.A0003=0
 TCTL.S.A0004=1
 TCTL.S.A0005=1
 TCC.M.ManuallyControlledTemperature=1
-TCTL.S.M.SupportsInvalidInMode=1
+TCTL.S.M.SupportsInvalidInMode=0
 TCTL.S.C00.Rsp=0
 TCTL.C.C00.Tx=0
 
