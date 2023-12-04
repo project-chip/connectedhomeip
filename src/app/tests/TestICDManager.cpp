@@ -314,6 +314,15 @@ public:
         // Check ICDManager is still in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT);
     }
+
+    static void TestICDCounter(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+        uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter();
+        ctx->mICDManager.IncrementCounter();
+        uint32_t counter2 = ICDConfigurationData::GetInstance().GetICDCounter();
+        NL_TEST_ASSERT(aSuite, (counter + 1) == counter2);
+    }
 };
 
 } // namespace app
@@ -329,6 +338,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestICDModeDurations",         TestICDManager::TestICDModeDurations),
     NL_TEST_DEF("TestKeepActivemodeRequests",   TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
+    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
     NL_TEST_SENTINEL()
 };
 // clang-format on

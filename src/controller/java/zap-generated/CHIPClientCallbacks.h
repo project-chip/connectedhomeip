@@ -988,6 +988,14 @@ typedef void (*TargetNavigatorEventListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*TargetNavigatorAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*MediaPlaybackAvailableAudioTracksListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::MediaPlayback::Structs::TrackStruct::DecodableType>> & data);
+typedef void (*MediaPlaybackAvailableTextTracksListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::MediaPlayback::Structs::TrackStruct::DecodableType>> & data);
 typedef void (*MediaPlaybackGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MediaPlaybackAcceptedCommandListListAttributeCallback)(
@@ -1072,6 +1080,30 @@ typedef void (*AccountLoginEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*AccountLoginAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ContentControlOnDemandRatingsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::RatingNameStruct::DecodableType> &
+        data);
+typedef void (*ContentControlScheduledContentRatingsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentControl::Structs::RatingNameStruct::DecodableType> &
+        data);
+typedef void (*ContentControlGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentControlAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentControlEventListListAttributeCallback)(void * context,
+                                                             const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ContentControlAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ContentAppObserverGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentAppObserverAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ContentAppObserverEventListListAttributeCallback)(void * context,
+                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ContentAppObserverAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(

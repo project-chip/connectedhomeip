@@ -109,7 +109,7 @@ limitations under the License.
             <description>MaxNetworks</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfoStruct" writable="false" optional="false">
+        <attribute side="server" code="0x0001" define="NETWORKS" type="array" entryType="NetworkInfoStruct" writable="false" optional="false">
             <description>Networks</description>
             <access op="read" privilege="administer"/>
         </attribute>
@@ -132,7 +132,7 @@ limitations under the License.
             <description>LastConnectErrorValue</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x0008" define="SUPPORTED_WIFI_BANDS" type="ARRAY" entryType="WiFiBandEnum" writable="false" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="0x0008" define="SUPPORTED_WIFI_BANDS" type="array" entryType="WiFiBandEnum" writable="false" optional="true" apiMaturity="provisional">
           <description>SupportedWiFiBands</description>
         </attribute>
         <attribute side="server" code="0x0009" define="SUPPORTED_THREAD_FEATURES" type="ThreadCapabilitiesBitmap" writable="false" optional="true" apiMaturity="provisional">
@@ -206,14 +206,14 @@ limitations under the License.
         </command>
         <command source="client" code="0x09" name="QueryIdentity" optional="true" response="QueryIdentityResponse" cli="chip network_commissioning queryidentity">
             <description>Retrieve details about and optionally proof of possession of a network client identity.</description>
-            <arg name="KeyIdentifier" type="OCTET_STRING" length="20"/>
-            <arg name="PossessionNonce" type="OCTET_STRING" length="32" optional="true"/>
+            <arg name="KeyIdentifier" type="octet_string" length="20"/>
+            <arg name="PossessionNonce" type="octet_string" length="32" optional="true"/>
             <access op="invoke" privilege="administer"/>
         </command>
         <command source="server" code="0x0a" name="QueryIdentityResponse" optional="true">
             <description>Command that contains details about a network client identity and optionally a proof of possession.</description>
-            <arg name="Identity" type="OCTET_STRING" length="140"/>
-            <arg name="PossessionSignature" type="OCTET_STRING" length="64" optional="true"/>
+            <arg name="Identity" type="octet_string" length="140"/>
+            <arg name="PossessionSignature" type="octet_string" length="64" optional="true"/>
         </command>
     </cluster>
 </configurator>

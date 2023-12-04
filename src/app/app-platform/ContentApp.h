@@ -27,6 +27,8 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/channel-server/channel-delegate.h>
+#include <app/clusters/content-app-observer/content-app-observer-delegate.h>
+#include <app/clusters/content-control-server/content-control-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
@@ -41,6 +43,8 @@ using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
 using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
 using ChannelDelegate             = app::Clusters::Channel::Delegate;
 using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using ContentAppObserverDelegate  = app::Clusters::ContentAppObserver::Delegate;
+using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
@@ -58,6 +62,8 @@ public:
     virtual ApplicationLauncherDelegate * GetApplicationLauncherDelegate() = 0;
     virtual ChannelDelegate * GetChannelDelegate()                         = 0;
     virtual ContentLauncherDelegate * GetContentLauncherDelegate()         = 0;
+    virtual ContentControlDelegate * GetContentControlDelegate()           = 0;
+    virtual ContentAppObserverDelegate * GetContentAppObserverDelegate()   = 0;
     virtual KeypadInputDelegate * GetKeypadInputDelegate()                 = 0;
     virtual MediaPlaybackDelegate * GetMediaPlaybackDelegate()             = 0;
     virtual TargetNavigatorDelegate * GetTargetNavigatorDelegate()         = 0;

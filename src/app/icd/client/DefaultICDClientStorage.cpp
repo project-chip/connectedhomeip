@@ -23,6 +23,7 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <limits>
 
 namespace {
 // FabricIndex is uint8_t, the tlv size with anonymous tag is 1(control bytes) + 1(value) = 2
@@ -31,6 +32,9 @@ constexpr size_t kFabricIndexTlvSize = 2;
 // The array itself has a control byte and an end-of-array marker.
 constexpr size_t kArrayOverHead  = 2;
 constexpr size_t kFabricIndexMax = 255;
+
+constexpr size_t kMaxFabricListTlvLength = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
+static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "Expected size for fabric list TLV is too large!");
 } // namespace
 
 namespace chip {
@@ -72,14 +76,12 @@ CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 CHIP_ERROR DefaultICDClientStorage::LoadFabricList()
 {
     Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    size_t len = kFabricIndexTlvSize * kFabricIndexMax + kArrayOverHead;
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(!backingBuffer.Calloc(len), CHIP_ERROR_NO_MEMORY);
-    uint16_t length = static_cast<uint16_t>(len);
+    ReturnErrorCodeIf(!backingBuffer.Calloc(kMaxFabricListTlvLength), CHIP_ERROR_NO_MEMORY);
+    uint16_t length = kMaxFabricListTlvLength;
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDFabricList().KeyName(), backingBuffer.Get(), length));
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
@@ -186,7 +188,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType structType;
     ReturnErrorOnFailure(reader.EnterContainer(structType));
@@ -201,7 +203,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     clientInfoSize = static_cast<size_t>(tempClientInfoSize);
 
     ReturnErrorOnFailure(reader.ExitContainer(structType));
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector,
@@ -222,7 +224,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
@@ -261,7 +263,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
         VerifyOrReturnError(buf.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.sharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        memcpy(clientInfo.shared_key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
@@ -271,7 +273,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         return err;
     }
 
-    return reader.ExitContainer(arrayType);
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
@@ -281,7 +284,7 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     Crypto::Aes128KeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Aes128KeyByteArray));
 
-    return mpKeyStore->CreateKey(keyMaterial, clientInfo.sharedKey);
+    return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
 }
 
 CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
@@ -297,7 +300,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ByteSpan buf(clientInfo.sharedKey.As<Crypto::Aes128KeyByteArray>());
+        ByteSpan buf(clientInfo.shared_key.As<Crypto::Aes128KeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
@@ -392,7 +395,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     {
         if (peerNode.GetNodeId() == it->peer_node.GetNodeId())
         {
-            mpKeyStore->DestroyKey(it->sharedKey);
+            mpKeyStore->DestroyKey(it->shared_key);
             it = clientInfoVector.erase(it);
             break;
         }
@@ -427,7 +430,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     IgnoreUnusedVariable(clientInfoSize);
     for (auto & clientInfo : clientInfoVector)
     {
-        mpKeyStore->DestroyKey(clientInfo.sharedKey);
+        mpKeyStore->DestroyKey(clientInfo.shared_key);
     }
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
