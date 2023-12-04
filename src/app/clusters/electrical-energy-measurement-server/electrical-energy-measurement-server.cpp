@@ -24,12 +24,41 @@
 #include <app/util/attribute-storage.h>
 
 using chip::Protocols::InteractionModel::Status;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 
 namespace {
 
 using namespace chip;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
+using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
+
+struct MeasurementData
+{
+    Optional<EnergyMeasurementStruct::Type> cumulativeImported;
+    Optional<EnergyMeasurementStruct::Type> cumulativeExported;
+    Optional<EnergyMeasurementStruct::Type> periodicImported;
+    Optional<EnergyMeasurementStruct::Type> periodicExported;
+};
+
+MeasurementData gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT];
+
+MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
+{
+    auto index = emberAfGetClusterServerEndpointIndex(endpointId, app::Clusters::ElectricalEnergyMeasurement::Id,
+                                                      EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return nullptr;
+    }
+
+    if (index >= EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
+        return nullptr;
+    }
+    return &gMeasurements[index];
+}
 
 class ElectricalEnergyMeasurementAttrAccess : public app::AttributeAccessInterface
 {
@@ -46,14 +75,49 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
 {
     VerifyOrDie(aPath.mClusterId == app::Clusters::ElectricalEnergyMeasurement::Id);
 
+    MeasurementData * data = MeasurementDataForEndpoint(aPath.mEndpointId);
+
     switch (aPath.mAttributeId)
     {
     case CumulativeEnergyImported::Id:
+        if ((data == nullptr) || !data->cumulativeImported.HasValue())
+        {
+            aEncoder.EncodeNull();
+        }
+        else
+        {
+            aEncoder.Encode(data->cumulativeImported.Value());
+        }
+        break;
     case CumulativeEnergyExported::Id:
+        if ((data == nullptr) || !data->cumulativeExported.HasValue())
+        {
+            aEncoder.EncodeNull();
+        }
+        else
+        {
+            aEncoder.Encode(data->cumulativeExported.Value());
+        }
+        break;
     case PeriodicEnergyImported::Id:
+        if ((data == nullptr) || !data->periodicImported.HasValue())
+        {
+            aEncoder.EncodeNull();
+        }
+        else
+        {
+            aEncoder.Encode(data->periodicImported.Value());
+        }
+        break;
     case PeriodicEnergyExported::Id:
-        // TODO: this needs implementation
-        aEncoder.EncodeNull();
+        if ((data == nullptr) || !data->periodicExported.HasValue())
+        {
+            aEncoder.EncodeNull();
+        }
+        else
+        {
+            aEncoder.Encode(data->periodicExported.Value());
+        }
         break;
     }
 
@@ -72,6 +136,13 @@ namespace ElectricalEnergyMeasurement {
 bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
                                     const Optional<EnergyMeasurementStruct::Type> & energyExported)
 {
+    MeasurementData * data = MeasurementDataForEndpoint(endpointId);
+    if (data != nullptr)
+    {
+        data->cumulativeImported = energyImported;
+        data->cumulativeExported = energyExported;
+    }
+
     Events::CumulativeEnergyMeasured::Type event;
 
     event.energyImported = energyImported;
@@ -94,6 +165,13 @@ bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Energy
 bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMeasurementStruct::Type> & energyImported,
                                   const Optional<EnergyMeasurementStruct::Type> & energyExported)
 {
+    MeasurementData * data = MeasurementDataForEndpoint(endpointId);
+    if (data != nullptr)
+    {
+        data->periodicImported = energyImported;
+        data->periodicExported = energyExported;
+    }
+
     Events::PeriodicEnergyMeasured::Type event;
 
     event.energyImported = energyImported;
