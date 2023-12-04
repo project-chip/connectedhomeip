@@ -410,7 +410,7 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & a
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
     mRemoteMaxPathsPerInvoke = aConfigParams.mRemoteMaxPathsPerInvoke;
     mBatchCommandsEnabled    = (aConfigParams.mRemoteMaxPathsPerInvoke > 1);
