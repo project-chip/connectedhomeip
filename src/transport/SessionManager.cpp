@@ -201,14 +201,19 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
         packetHeader.SetSessionId(keyContext->GetKeyHash());
         CryptoContext::NonceStorage nonce;
         CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), sourceNodeId);
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err          = CHIP_NO_ERROR;
         SecureSession * session = sessionHandle->AsSecureSession();
         VerifyOrReturnError(session == nullptr, CHIP_ERROR_NOT_CONNECTED);
-        if (session->GetPeerAddress().GetTransportType() == Transport::Type::kTcp) {
+        if (session->GetPeerAddress().GetTransportType() == Transport::Type::kTcp)
+        {
             // support large payloads
-            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message, kLargePayloadMaxMessageSizeBytes);
-        } else {
-            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message, kMaxAppMessageLen);
+            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message,
+                                              kLargePayloadMaxMessageSizeBytes);
+        }
+        else
+        {
+            err = SecureMessageCodec::Encrypt(CryptoContext(keyContext), nonce, payloadHeader, packetHeader, message,
+                                              kMaxAppMessageLen);
         }
         keyContext->Release();
         ReturnErrorOnFailure(err);

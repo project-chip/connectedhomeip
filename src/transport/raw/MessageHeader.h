@@ -72,7 +72,7 @@ static_assert(detail::kMaxApplicationPayloadAndMICSizeBytes > kMaxTagLen, "Need 
 // those in the header sizes.
 static constexpr size_t kMaxAppMessageLen = detail::kMaxApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 // large payload limit
-static constexpr size_t kLargePayloadMaxMessageSizeBytes   = 128000;
+static constexpr size_t kLargePayloadMaxMessageSizeBytes = 128000;
 
 static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 
