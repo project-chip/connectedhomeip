@@ -178,9 +178,9 @@ public:
      * required data elements while building the InvokeRequestMessage such that it adhears to the
      * spec. This must be called before PrepareCommand.
      *
-     * @param [in] aConfigParams contains information to config CommandSender to perform addtional
-     *                      functionality such as such as allowing max number paths per invoke
-     *                      to the number supported by remote peer.
+     * @param [in] aConfigParams contains information to config CommandSender to perform additional
+     *                      functionality such as such as allowing max number paths per invoke to
+     *                      the number supported by remote peer.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
      *                      If device has previously called `PrepareCommand`.
