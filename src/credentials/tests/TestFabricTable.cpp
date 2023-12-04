@@ -80,6 +80,42 @@ private:
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
 };
 
+class TestFabricTableDelegate : public chip::FabricTable::Delegate
+{
+public:
+    void FabricWillBeRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override {}
+
+    void OnFabricRemoved(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override { committedFabricCount--; }
+
+    void OnFabricCommitted(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        if (isNewPendingFabricAdded)
+        {
+            committedFabricCount++;
+        }
+        isPendingFabricUpdated  = false;
+        isNewPendingFabricAdded = false;
+        pendingFabricIndex      = chip::kUndefinedFabricIndex;
+    }
+
+    void OnFabricAdded(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        isNewPendingFabricAdded = true;
+        pendingFabricIndex      = fabricIndex;
+    }
+
+    void OnFabricUpdated(const chip::FabricTable & fabricTable, chip::FabricIndex fabricIndex) override
+    {
+        isPendingFabricUpdated = true;
+        pendingFabricIndex     = fabricIndex;
+    }
+
+    size_t committedFabricCount          = 0;
+    bool isNewPendingFabricAdded         = false;
+    bool isPendingFabricUpdated          = false;
+    chip::FabricIndex pendingFabricIndex = chip::kUndefinedFabricIndex;
+};
+
 /**
  * Load a single test fabric with with the Root01:ICA01:Node01_01 identity.
  */
@@ -508,6 +544,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     Credentials::TestOnlyLocalCertificateAuthority fabric44CertAuthority;
 
     chip::TestPersistentStorageDelegate storage;
+    TestFabricTableDelegate fabricTableDelegate;
 
     // Uncomment the next line for superior debugging powers if you blow-up this test
     // storage.SetLoggingLevel(chip::TestPersistentStorageDelegate::LoggingLevel::kLogMutation);
@@ -525,6 +562,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     ScopedFabricTable fabricTableHolder;
     NL_TEST_ASSERT(inSuite, fabricTableHolder.Init(&storage) == CHIP_NO_ERROR);
     FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+    fabricTable.AddFabricDelegate(&fabricTableDelegate);
 
     NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
 
@@ -584,12 +622,15 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
         bool keyIsExternallyOwned  = true;
 
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isNewPendingFabricAdded == false);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 0);
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabricTable.AddNewPendingFabricWithProvidedOpKey(noc, ByteSpan{}, kVendorId, &fabric11Node55Keypair,
                                                                                 keyIsExternallyOwned, &newFabricIndex));
         NL_TEST_ASSERT(inSuite, newFabricIndex == 1);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isNewPendingFabricAdded == true);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.pendingFabricIndex == 1);
         {
             // No more pending root cert; it's associated with a fabric now.
             MutableByteSpan fetchedSpan{ rcacBuf };
@@ -625,8 +666,12 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, saw1 == true);
         }
 
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 0);
+
         // Commit, now storage should have keys
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
+
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 1);
 
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == (numStorageKeysAtStart + 4)); // 2 opcerts + fabric metadata + index
 
@@ -716,10 +761,13 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         FabricIndex newFabricIndex = kUndefinedFabricIndex;
 
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isNewPendingFabricAdded == false);
         NL_TEST_ASSERT_SUCCESS(inSuite,
                                fabricTable.AddNewPendingFabricWithOperationalKeystore(noc, icac, kVendorId, &newFabricIndex));
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
         NL_TEST_ASSERT(inSuite, newFabricIndex == 2);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isNewPendingFabricAdded == true);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.pendingFabricIndex == 2);
         // No storage yet
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageAfterFirstAdd);
         // Next fabric index has not been updated yet.
@@ -729,9 +777,11 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT_EQUALS(inSuite, nextFabricIndex, 2);
         }
 
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 1);
         // Commit, now storage should have keys
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 2);
 
         NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(),
                               (numStorageAfterFirstAdd + 5)); // 3 opcerts + fabric metadata + 1 operational key
@@ -825,11 +875,14 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         ByteSpan rcac = fabric44CertAuthority.GetRcac();
         ByteSpan noc  = fabric44CertAuthority.GetNoc();
 
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isPendingFabricUpdated == false);
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
         NL_TEST_ASSERT_SUCCESS(
             inSuite,
             fabricTable.UpdatePendingFabricWithOperationalKeystore(2, noc, ByteSpan{}, FabricTable::AdvertiseIdentity::No));
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.isPendingFabricUpdated == true);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.pendingFabricIndex == 2);
 
         // No storage yet
         NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == numStorageAfterSecondAdd);
@@ -866,6 +919,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
         // Commit, now storage should have keys
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.CommitPendingFabricData());
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
+        NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 2);
 
         NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(), (numStorageAfterSecondAdd - 1)); // ICAC got deleted
 
@@ -974,8 +1028,10 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     {
         // Remove the fabric: no commit needed
         {
+            NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 2);
             NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
             NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.Delete(1));
+            NL_TEST_ASSERT(inSuite, fabricTableDelegate.committedFabricCount == 1);
             NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 1);
 
             NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(), (numStorageAfterUpdate - 3)); // Deleted NOC, RCAC, Metadata
