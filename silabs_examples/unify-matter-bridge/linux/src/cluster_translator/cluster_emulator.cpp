@@ -143,6 +143,22 @@ uint32_t ClusterEmulator::read_cluster_revision(const ConcreteReadAttributePath 
     }
 }
 
+Clusters::Globals::Attributes::EventList::TypeInfo::Type
+    ClusterEmulator::read_event_list(const ConcreteReadAttributePath & aPath) const
+{
+    sl_log_debug(LOG_TAG, "Reading Event list for cluster %d", aPath.mClusterId);
+    Clusters::Globals::Attributes::EventList::TypeInfo::Type eventList;
+    switch (aPath.mClusterId)
+    {
+    case DoorLock::Id: {
+        chip::EventId events[] = { DoorLock::Events::DoorLockAlarm::Id,
+                                   DoorLock::Events::LockOperation::Id };
+        eventList = events;
+    }
+    }
+    return eventList;
+}
+
 uint32_t ClusterEmulator::read_feature_map_revision(const ConcreteReadAttributePath & aPath) const
 {
     attribute_state_cache & cache = attribute_state_cache::get_instance();
@@ -225,6 +241,10 @@ void ClusterEmulator::add_emulated_commands_and_attributes(const node_state_moni
                                                                       chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
                                                                       2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
 
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(),
+                                                                      chip::app::Clusters::Globals::Attributes::EventList::Id,
+                                                                      4, ZAP_TYPE(EVENT_ID), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+
     // Add emulation for commands and attributes for the cluster
     auto it = cluster_emulators_string_map.find(unify_cluster.cluster_name);
     if (it != cluster_emulators_string_map.end())
@@ -252,9 +272,9 @@ bool ClusterEmulator::is_attribute_emulated(const ConcreteAttributePath & aPath)
     // Global attributes per Core Spec chapter 7.13
     switch (aPath.mAttributeId)
     {
-    case 0xFFFD: // Cluster Revision
-    case 0xFFFC: // FeatureMap
-    case 0xFFFE: // EventList
+    case chip::app::Clusters::Globals::Attributes::ClusterRevision::Id: // Cluster Revision
+    case chip::app::Clusters::Globals::Attributes::FeatureMap::Id: // FeatureMap
+    case chip::app::Clusters::Globals::Attributes::EventList::Id: // EventList
         return true;
     default:;
         ;
@@ -288,8 +308,8 @@ CHIP_ERROR ClusterEmulator::read_attribute(const ConcreteReadAttributePath & aPa
         return aEncoder.Encode(this->read_cluster_revision(aPath));
     case chip::app::Clusters::Globals::Attributes::FeatureMap::Id: // FeatureMap
         return aEncoder.Encode(this->read_feature_map_revision(aPath));
-    case 0xFFFE: // EventList
-        return aEncoder.Encode(0);
+    case chip::app::Clusters::Globals::Attributes::EventList::Id: // EventList
+        return aEncoder.Encode(this->read_event_list(aPath));
     default:;
         ;
     }

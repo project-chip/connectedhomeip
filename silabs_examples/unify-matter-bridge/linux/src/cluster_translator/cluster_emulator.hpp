@@ -99,6 +99,7 @@ private:
     // Emulation functions
     uint32_t read_feature_map_revision(const ConcreteReadAttributePath & aPath) const;
     uint32_t read_cluster_revision(const ConcreteReadAttributePath & aPath) const;
+    Clusters::Globals::Attributes::EventList::TypeInfo::Type read_event_list(const ConcreteReadAttributePath & aPath) const;
 
     std::map<std::pair<chip::ClusterId, chip::AttributeId>, std::shared_ptr<EmulatorInterface>> cluster_emulators_attribute_id_map;
     std::map<std::pair<chip::ClusterId, chip::CommandId>, std::shared_ptr<EmulatorInterface>> cluster_emulators_command_id_map;
