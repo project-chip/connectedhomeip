@@ -22,7 +22,7 @@
  *
  */
 
-#include "ICDHandler.h"
+#include "CheckInHandler.h"
 
 #include <cinttypes>
 
@@ -85,7 +85,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
         err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo);
         if (err == CHIP_NO_ERROR)
         {
-            // TODO - Notify checkin complete to the application through callback
+            OnCheckInComplete();
             return err;
         }
     }
