@@ -18,15 +18,15 @@
 #pragma once
 
 #include "ICDClientStorage.h"
+#include <lib/core/CHIPCore.h>
+
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/Pool.h>
 #include <vector>
 
@@ -48,16 +48,9 @@ class DefaultICDClientStorage : public ICDClientStorage
 public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
-    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
-
     CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore);
 
-    /**
-     * Iterate through persisted ICD Client Info
-     *
-     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
-     */
-    ICDClientInfoIterator * IterateICDClientInfo();
+    ICDClientInfoIterator * IterateICDClientInfo() override;
 
     CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 

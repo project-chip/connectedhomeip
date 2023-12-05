@@ -24,6 +24,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/CommonIterator.h>
 #include <stddef.h>
 
 namespace chip {
@@ -36,7 +37,16 @@ namespace app {
 class ICDClientStorage
 {
 public:
+    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
+
     virtual ~ICDClientStorage() = default;
+
+    /**
+     * Iterate through persisted ICD Client Info
+     *
+     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
+     */
+    virtual ICDClientInfoIterator * IterateICDClientInfo() = 0;
 
     /**
      * Called during ICD device registration in commissioning, commissioner/controller
