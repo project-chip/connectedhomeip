@@ -326,7 +326,7 @@ public:
     /**
      *  Wake up the sleeping subscription.
      *
-     *  When subscriptiing to ICD, the subscriber is expected to set the `mActivePeriod`
+     *  When subscripting to ICD, the subscriber is expected to set the `mActivePeriod`
      * in `ReadPrepareParams`.
      *
      *  @retval #others fail to send read request
