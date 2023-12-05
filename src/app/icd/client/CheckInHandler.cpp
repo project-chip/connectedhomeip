@@ -23,6 +23,7 @@
  */
 
 #include "CheckInHandler.h"
+#include "CheckInDelegate.h"
 
 #include <cinttypes>
 
