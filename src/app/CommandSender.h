@@ -53,10 +53,51 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    // CommandSender::Callback::OnResponse is public SDK API, so we cannot break source
+    // compatibility for it. To allow for additional values to be added at a future time
+    // without constantly changing the function's declaration parameter list, we are
+    // defining the struct AdditionalResponseData and adding that to the parameter list
+    // to allow for future extendability.
+    struct AdditionalResponseData
+    {
+        Optional<uint16_t> mCommandRef;
+    };
+
     class Callback
     {
     public:
         virtual ~Callback() = default;
+
+        /**
+         *
+         * Newer OnResponse that allows for additional will be called when a successful response from server has been received and
+         * processed. Specifically: OnResponse will be called when a successful response from server has been received and
+         * processed. Specifically:
+         *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *    that contains the data payload (callee will still need to open and process the container).
+         *
+         * This OnResponse is similar to OnResponse mentioned below, except it contains an additional parameter
+         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is more future extendable
+         * to provide additional response data that can be consumed by the client without changing the API declaration.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aPath           The command path field in invoke command response.
+         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
+         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
+         *                            be a generic SUCCESS status with no-cluster specific information.
+         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
+         * @param[in] aAdditionalResponseData
+         *                            Additional response data that comes within the InvokeResponseMessage.
+         */
+        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
+                                TLV::TLVReader * apData, const AdditionalResponseData & aAdditionalResponseData)
+        {
+            OnResponse(apCommandSender, aPath, aStatusIB, apData);
+        }
 
         /**
          * OnResponse will be called when a successful response from server has been received and processed. Specifically:
@@ -114,9 +155,10 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    // CommandSender methods are called outside of SDK. By having parameters passed using this
-    // struct we centralize defaults within the struct instead of the function's declaration
-    // parameters list.
+    // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
+    // for it. By having parameters to that API use this struct instead of individual
+    // function arguments, we centralize required changes to one file when adding new
+    // funtionality.
     struct ConfigParameters
     {
         ConfigParameters & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
@@ -130,9 +172,10 @@ public:
         uint16_t mRemoteMaxPathsPerInvoke = 1;
     };
 
-    // CommandSender methods are called outside of SDK. By having parameters passed using this
-    // struct we centralize defaults within the struct instead of the function's declaration
-    // parameters list.
+    // PrepareCommand and FinishCommand are public SDK APIs, so we cannot break source
+    // compatibility for it. By having parameters to those APIs use this struct instead
+    // of individual function arguments, we centralize required changes to one file
+    // when adding new functionality.
     struct AdditionalCommandParameters
     {
         // gcc bug requires us to have the constructor below
@@ -149,27 +192,6 @@ public:
         bool mStartOrEndDataStruct = false;
     };
 
-    // CommandSender methods are called outside of SDK. By having parameters passed using this
-    // struct we centralize defaults within the struct instead of the function's declaration
-    // parameters list.
-    struct AdditionalInvokeResponseElements
-    {
-        Optional<uint16_t> mCommandRef;
-    };
-
-    /**
-     * Called from CommandSender::Callback::OnResponse to get additional elements in InvokeResponseMessage.
-     *
-     * For legacy reasons we cannot change arguments passed through `OnResponse`, but we wanted to provide a
-     * way for elements to be queried going forward from within the `OnResponse` callback.
-     *
-     * @param [out] aInvokeReponseElements additional InvokeResponse elements.
-     *
-     * @return CHIP_ERROR_INCORRECT_STATE
-     *                      If CommandSender is not in ResponseReceived state.
-     */
-    CHIP_ERROR GetAdditionalInvokeResponseElements(AdditionalInvokeResponseElements & aInvokeReponseElements);
-
     /*
      * Constructor.
      *
@@ -185,12 +207,12 @@ public:
      * Enables additional features of CommandSender, for example sending batch commands.
      *
      * In the case of enabling batch commands, once set it ensures that commands contain all
-     * required data elements while building the InvokeRequestMessage such that it adhears to the
-     * spec. This must be called before PrepareCommand.
+     * required data elements while building the InvokeRequestMessage. This must be called
+     * before PrepareCommand.
      *
-     * @param [in] aConfigParams contains information to config CommandSender to perform additional
-     *                      functionality such as such as allowing max number of paths per invoke to
-     *                      the number supported by remote peer.
+     * @param [in] aConfigParams contains information to configure CommandSender behavior,
+     *                      such as such as allowing a max number of paths per invoke greater than one,
+     *                      based on how many paths the remote peer claims to support.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
      *                      If device has previously called `PrepareCommand`.
@@ -201,7 +223,7 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters aOptionalArgs);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, const AdditionalCommandParameters & aOptionalArgs);
 
     [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR
     PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
@@ -211,7 +233,7 @@ public:
         return PrepareCommand(aCommandPathParams, optionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(AdditionalCommandParameters aOptionalArgs);
+    CHIP_ERROR FinishCommand(const AdditionalCommandParameters & aOptionalArgs);
 
     [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandParameters")]] CHIP_ERROR
     FinishCommand(bool aEndDataStruct = true)
@@ -234,7 +256,7 @@ public:
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
+                              const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
     {
         return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
     }
@@ -247,7 +269,7 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                              AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
+                              const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
@@ -256,8 +278,13 @@ public:
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                             AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters());
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandParameters & aOptionalArgs);
+
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return FinishCommand(aTimedInvokeTimeoutMs, optionalArgs);
+    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -268,7 +295,7 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                           const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                          AdditionalCommandParameters aOptionalArgs = AdditionalCommandParameters())
+                                          const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
     {
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }

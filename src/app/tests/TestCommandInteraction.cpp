@@ -1108,7 +1108,13 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
 
     ctx.DrainAndServiceIO();
 
-    // Decrease CommandHandler refcount and send response
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
+    NL_TEST_ASSERT(apSuite, asyncCommand == false);
+
+    // Decrease CommandHandler refcount. No additional message should be sent since error response already sent.
     asyncCommandHandle = nullptr;
 
     ctx.DrainAndServiceIO();

@@ -398,14 +398,6 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::GetAdditionalInvokeResponseElements(AdditionalInvokeResponseElements & aInvokeReponseElements)
-{
-    VerifyOrReturnError(mState == State::ResponseReceived, CHIP_ERROR_INCORRECT_STATE);
-    aInvokeReponseElements = mAdditionalResponseElements;
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters & aConfigParams)
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
@@ -421,12 +413,13 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters aOptionalArgs)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
+                                         const AdditionalCommandParameters & aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
     //
-    // We must not be in the middle of preparing a command, or have already sent InvokeReponseMessage.
+    // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
     bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
@@ -454,7 +447,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(AdditionalCommandParameters aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOptionalArgs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -497,7 +490,8 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters aOptionalArgs)
+CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                        const AdditionalCommandParameters & aOptionalArgs)
 {
     ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
