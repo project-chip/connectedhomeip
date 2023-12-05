@@ -645,7 +645,7 @@ private:
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
     // mPeerActiveUntilTimestamp represents the active time for subscription for ICD device, when the liveness timeout fired after
-    // mPeerActiveUntilTimestamp`, the ReadClient will enter "IdleSubscription" state
+    // the mPeerActiveUntilTimestamp, the ReadClient will enter "IdleSubscription" state
     // until OnActiveModeNotification() is called. The Zero value means the device should always be active.
     System::Clock::Timeout mPeerActivePeriod           = System::Clock::kZero;
     System::Clock::Timestamp mPeerActiveUntilTimestamp = System::Clock::kZero;
