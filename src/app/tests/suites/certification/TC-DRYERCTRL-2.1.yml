@@ -9,14 +9,12 @@ config:
     endpoint: 1
 
 unsupportedSelectedDrynessLevel:
-  type: int8u
-  defaultValue: 4
-
-  SupportedDrynessLevel:
     type: int8u
-    defaultValue: 1
+    defaultValue: 4
 
-
+    SupportedDrynessLevel:
+        type: int8u
+        defaultValue: 1
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
@@ -36,7 +34,6 @@ tests:
               type: list
               maxLength: 16
 
-
     - label: "Step 3: Read the mandatory attribute: SelectedDrynessLevel"
       PICS: DRYERCTRL.S.A0001
       command: "readAttribute"
@@ -48,7 +45,8 @@ tests:
               maxValue: 15
 
     - label:
-          "Step 4:TH writes a supported SelectedDrynessLevel attribute that is within the list of SupportedDrynessLevels"
+          "Step 4:TH writes a supported SelectedDrynessLevel attribute that is
+          within the list of SupportedDrynessLevels"
       PICS: DRYERCTRL.S.A0001
       command: "writeAttribute"
       attribute: "SelectedDrynessLevel"
@@ -73,13 +71,13 @@ tests:
           constraints:
               type: int8u
 
-
     - label:
-          "Step 6: TH writes an unsupported SelectedDrynessLevel attribute that is not in list of SupportedDrynessLevels to DUT"
+          "Step 6: TH writes an unsupported SelectedDrynessLevel attribute that
+          is not in list of SupportedDrynessLevels to DUT"
       PICS: DRYERCTRL.S.A0001
       command: "writeAttribute"
       attribute: "SelectedDrynessLevel"
       arguments:
-          value:  unsupportedSelectedDrynessLevel
+          value: unsupportedSelectedDrynessLevel
       response:
           error: InvalidInState
