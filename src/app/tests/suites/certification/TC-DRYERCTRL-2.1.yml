@@ -15,9 +15,9 @@ unsupportedSelectedDrynessLevel:
   SupportedDrynessLevel:
     type: int8u
     defaultValue: 1
-    
 
-  
+
+
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -46,7 +46,7 @@ tests:
               type: int8u
               minValue: 0
               maxValue: 15
-    
+
     - label:
           "Step 4:TH writes a supported SelectedDrynessLevel attribute that is within the list of SupportedDrynessLevels"
       PICS: DRYERCTRL.S.A0001

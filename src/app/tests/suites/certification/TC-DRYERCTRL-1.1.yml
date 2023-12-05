@@ -16,7 +16,7 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-    
+
     - label: "Step2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
@@ -60,7 +60,7 @@ tests:
           value: []
           constraints:
               type: list
-    
+
     - label: "Step 6: Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
