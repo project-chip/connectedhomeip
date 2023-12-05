@@ -83,7 +83,7 @@ limitations under the License.
     <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/> <!-- Revision   -->
 
     <attribute side="server" code="0x0000" define="MEASURED" type="boolean" writable="false" default="false" optional="false">Measured</attribute>
     <attribute side="server" code="0x0001" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" default="false" optional="false">Accuracy</attribute>
