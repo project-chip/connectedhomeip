@@ -459,7 +459,8 @@ cluster TimeFormatLocalization = 44 {
   }
 
   attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  air_quality_support_write_throught_rpc
+  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -954,7 +955,15 @@ cluster AdministratorCommissioning = 60 {
     octet_string<32> salt = 4;
   }
 
+  request struct OpenBasicCommissioningWindowRequest {
+    int16u commissioningTimeout = 0;
+  }
+
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
+  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -2277,18 +2286,17 @@ endpoint 1 {
   }
 
   server cluster RadonConcentrationMeasurement {
-    callback attribute measuredValue default = 10;
-    callback attribute minMeasuredValue default = 5;
-    callback attribute maxMeasuredValue default = 100;
-    callback attribute peakMeasuredValue default = 36;
-    callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 20;
-    callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 3;
-
+    callback attribute measuredValue;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute peakMeasuredValue;
+    callback attribute peakMeasuredValueWindow;
+    callback attribute averageMeasuredValue;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
