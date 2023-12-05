@@ -114,7 +114,7 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
     else
     {
         /* check chargingEnabledUntil is in the future */
-        ChipLogError(NotSpecified, "Charging enabled until: %d", chargingEnabledUntil.Value());
+        ChipLogError(NotSpecified, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
         // TODO
         // if (checkChargingEnabled)
     }
