@@ -14,10 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/af-types.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/af-types.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
 
@@ -31,8 +31,9 @@
     defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
     defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
     defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
-EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                      uint8_t * buffer);
-EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                     uint8_t * buffer, uint16_t maxReadLength);
+EmberAfStatus chefConcentrationMeasurementWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                        const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
+EmberAfStatus chefConcentrationMeasurementReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                       const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                       uint16_t maxReadLength);
 #endif
