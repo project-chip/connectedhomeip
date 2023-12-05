@@ -41,7 +41,7 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-inline constexpr const char * kProtocolName = "UserDirectedCommissioning";
+inline constexpr char kProtocolName[] = "UserDirectedCommissioning";
 
 // Cache contains 16 clients. This may need to be tweaked.
 inline constexpr uint8_t kMaxUDCClients = 16;

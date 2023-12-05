@@ -75,7 +75,7 @@ extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_s
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
 #endif
 
-static const char * TAG = "light-app";
+static const char TAG[] = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
