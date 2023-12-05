@@ -67,12 +67,14 @@ public:
 protected:
     enum class ClientInfoTag : uint8_t
     {
-        kPeerNodeId       = 1,
-        kFabricIndex      = 2,
-        kStartICDCounter  = 3,
-        kOffset           = 4,
-        kMonitoredSubject = 5,
-        kSharedKey        = 6
+        kPeerNodeId                       = 1,
+        kFabricIndex                      = 2,
+        kStartICDCounter                  = 3,
+        kOffset                           = 4,
+        kMonitoredSubject                 = 5,
+        kUserActiveModeTriggerHint        = 6,
+        kUserActiveModeTriggerInstruction = 7,
+        kSharedKey                        = 8
     };
 
     enum class CounterTag : uint8_t
@@ -100,7 +102,8 @@ protected:
     {
         // All the fields added together
         return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+                                           sizeof(uint64_t), sizeof(uint32_t), kUserActiveModeTriggerInstructionSize,
+                                           sizeof(Crypto::Symmetric128BitsKeyByteArray));
     }
 
     static constexpr size_t MaxICDCounterSize()
