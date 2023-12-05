@@ -67,6 +67,7 @@ class ProjectArgProcessor:
         self.add_default('custom_toolchain', 'custom')
 
     def process_env(self):
+        self.add_env_arg('chip_code_pre_generated_directory', 'CHIP_PREGEN_DIR')
         self.add_env_arg('target_cc', 'CC', 'cc')
         self.add_env_arg('target_cxx', 'CXX', 'cxx')
         self.add_env_arg('target_ar', 'AR', 'ar')
