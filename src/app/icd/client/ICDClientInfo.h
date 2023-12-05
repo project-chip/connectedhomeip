@@ -59,7 +59,8 @@ struct ICDClientInfo
         }
         has_instruction = other.has_instruction;
         ByteSpan buf(other.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
-        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         return *this;
     }
 };
