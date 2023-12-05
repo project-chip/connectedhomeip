@@ -22,13 +22,13 @@ import subprocess
 import sys
 
 from hello_test import HelloTest
-from matter_testing_support import run_tests, MatterBaseTest, MatterTestConfig, TestInfo, get_test_info
-from multiprocessing import Process, Manager, Value
+from matter_testing_support import run_tests, MatterTestConfig, get_test_info
+from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
-except:
+except ImportError:
     class TestRunnerHooks:
         pass
 

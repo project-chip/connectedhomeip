@@ -29,7 +29,6 @@ import re
 import sys
 import typing
 import uuid
-from aenum import Enum
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -63,7 +62,7 @@ from mobly.test_runner import TestRunner
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
-except:
+except ImportError:
     class TestRunnerHooks:
         pass
 
@@ -260,7 +259,7 @@ class InternalTestRunnerHooks(TestRunnerHooks):
 
     def step_failure(self, logger, logs, duration: int, request, received):
         # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
-        logging.info(f'\t\t***** Test Failure : ')
+        logging.info('\t\t***** Test Failure : ')
 
     def step_unknown(self):
         """
@@ -817,7 +816,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             try:
                 steps = self.get_test_steps()
                 num = steps[self.current_step_index].test_plan_number
-            except:
+            except KeyError:
                 num = self.current_step_index
 
             if self.runner_hook:
@@ -850,7 +849,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         else:
             self.print_step(step, steps[self.current_step_index].description)
 
-        self.step_start_time = utc_native = datetime.now(tz=timezone.utc)
+        self.step_start_time = datetime.now(tz=timezone.utc)
         self.current_step_index = self.current_step_index + 1
         self.step_skipped = False
 

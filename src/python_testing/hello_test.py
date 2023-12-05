@@ -40,7 +40,6 @@ class HelloTest(MatterBaseTest):
         logging.info("Found VendorName: %s" % (vendor_name))
         asserts.assert_equal(vendor_name, "TEST_VENDOR", "VendorName must be TEST_VENDOR!")
 
-
     # To include individual steps and description for the TH, define a steps_ and desc_ function
     # for the test, then use self.step(#) to indicate how the test proceeds through the test plan.
     # Support for keeping the TH up to date is built into MatterBaseTest when you use the step()
@@ -48,11 +47,11 @@ class HelloTest(MatterBaseTest):
     def steps_failure_on_wrong_endpoint(self) -> list[TestStep]:
         steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
                  TestStep(2, "Read ProductName on endpoint 9999"),
-        ]
+                 ]
         return steps
+
     def desc_failure_on_wrong_endpoint(self) -> str:
         return '#.#.#. [TC-HELLO-x.x] Test Failure On Wrong Endpoint'
-
 
     @async_test_body
     async def test_failure_on_wrong_endpoint(self):
@@ -81,7 +80,7 @@ class HelloTest(MatterBaseTest):
 
     @async_test_body
     async def test_pics(self):
-        self.step(1) # commissioning
+        self.step(1)  # commissioning
         print('This should be run')
 
         self.step(2)
@@ -90,7 +89,6 @@ class HelloTest(MatterBaseTest):
 
         self.step(3)
         print('This should also be run')
-
 
 
 if __name__ == "__main__":
