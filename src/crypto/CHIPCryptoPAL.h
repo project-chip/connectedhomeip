@@ -562,7 +562,7 @@ protected:
     bool mInitialized = false;
 };
 
-using Aes128KeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
 /**
  * @brief Platform-specific AES key
