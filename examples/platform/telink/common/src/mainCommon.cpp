@@ -39,7 +39,7 @@ using namespace ::chip::DeviceLayer;
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
-static constexpr const char * kFactoryResetOnBootStoreKey = "TelinkFactoryResetOnBootCnt";
+static constexpr char kFactoryResetOnBootStoreKey[]       = "TelinkFactoryResetOnBootCnt";
 static constexpr uint32_t kFactoryResetUsualBootTimeoutMs = 5000;
 
 static k_timer FactoryResetUsualBootTimer;

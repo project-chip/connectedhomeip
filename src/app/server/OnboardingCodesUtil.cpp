@@ -219,7 +219,7 @@ static inline bool isCharUnreservedInRfc3986(const char c)
 
 CHIP_ERROR EncodeQRCodeToUrl(const char * aQRCode, size_t aLen, char * aUrl, size_t aMaxSize)
 {
-    const char upperHexDigits[] = "0123456789ABCDEF";
+    static const char upperHexDigits[] = "0123456789ABCDEF";
     size_t i = 0, j = 0;
 
     VerifyOrReturnError((aQRCode != nullptr) && (aUrl != nullptr), CHIP_ERROR_INVALID_ARGUMENT);

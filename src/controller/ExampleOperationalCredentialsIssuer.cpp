@@ -30,10 +30,10 @@
 namespace chip {
 namespace Controller {
 
-constexpr const char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
-constexpr const char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
-constexpr const char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
-constexpr const char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
+constexpr char kOperationalCredentialsIssuerKeypairStorage[]             = "ExampleOpCredsCAKey";
+constexpr char kOperationalCredentialsIntermediateIssuerKeypairStorage[] = "ExampleOpCredsICAKey";
+constexpr char kOperationalCredentialsRootCertificateStorage[]           = "ExampleCARootCert";
+constexpr char kOperationalCredentialsIntermediateCertificateStorage[]   = "ExampleCAIntermediateCert";
 
 using namespace Credentials;
 using namespace Crypto;
