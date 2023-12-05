@@ -98,7 +98,7 @@ static_library("Darwin") {
   deps = [
     ":logging",
     "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:platform_logging_header",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -132,21 +132,32 @@ static_library("Darwin") {
 }
 
 static_library("logging") {
-  sources = [
-    "Logging.h",
-    "Logging.mm",
-  ]
+  if (chip_force_stdio_logging) {
+    sources = [ "Logging.cpp" ]
+    deps = [
+      "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support:attributes",
+      "${chip_root}/src/lib/support:logging_constants",
+      "${chip_root}/src/platform:platform_config_header",
+      "${chip_root}/src/platform:platform_logging_header",
+    ]
+  } else {
+    sources = [
+      "Logging.h",
+      "Logging.mm",
+    ]
 
-  deps = [
-    "${chip_root}/src/lib/support:attributes",
-    "${chip_root}/src/lib/support:logging_constants",
-    "${chip_root}/src/lib/support:span",
-  ]
+    deps = [
+      "${chip_root}/src/lib/support:attributes",
+      "${chip_root}/src/lib/support:logging_constants",
+      "${chip_root}/src/lib/support:span",
+    ]
 
-  configs += [ "${chip_root}/src:includes" ]
-  cflags = [
-    "-fobjc-arc",
-    "-Wconversion",
-  ]
-  frameworks = [ "Foundation.framework" ]
+    configs += [ "${chip_root}/src:includes" ]
+    cflags = [
+      "-fobjc-arc",
+      "-Wconversion",
+    ]
+    frameworks = [ "Foundation.framework" ]
+  }
 }

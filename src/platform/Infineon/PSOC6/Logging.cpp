@@ -1,5 +1,5 @@
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 #include <stdio.h>
 
 namespace chip {

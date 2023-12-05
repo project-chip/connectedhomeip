@@ -65,7 +65,7 @@ static_library("CYW30739") {
 
   deps = [
     "${chip_root}/src/crypto",
-    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/platform:platform_logging_header",
   ]
 
   public = [

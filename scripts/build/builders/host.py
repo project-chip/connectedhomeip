@@ -298,7 +298,7 @@ class HostBuilder(GnBuilder):
                  interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
                  minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
-                 enable_test_event_triggers=None):
+                 enable_test_event_triggers=None, log_stdio=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -402,6 +402,9 @@ class HostBuilder(GnBuilder):
         if enable_test_event_triggers is not None:
             if 'EVSE' in enable_test_event_triggers:
                 self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
+
+        if log_stdio:
+            self.extra_gn_options.append('chip_force_stdio_logging=true')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:

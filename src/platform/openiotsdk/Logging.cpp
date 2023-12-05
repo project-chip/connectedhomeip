@@ -26,7 +26,7 @@
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/logging/Constants.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <stdio.h>
 #include <string.h>

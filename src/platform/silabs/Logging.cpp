@@ -1,5 +1,5 @@
 /* See Project CHIP LICENSE file for licensing information. */
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceConfig.h>

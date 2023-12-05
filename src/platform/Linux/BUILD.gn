@@ -80,7 +80,7 @@ static_library("Linux") {
 
   if (!chip_use_external_logging) {
     sources += [ "Logging.cpp" ]
-    deps += [ "${chip_root}/src/platform/logging:headers" ]
+    deps += [ "${chip_root}/src/platform:platform_logging_header" ]
   }
 
   if (chip_enable_openthread) {

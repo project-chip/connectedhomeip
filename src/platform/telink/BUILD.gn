@@ -58,7 +58,7 @@ static_library("telink") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:platform_logging_header" ]
 
   if (chip_enable_factory_data) {
     sources += [

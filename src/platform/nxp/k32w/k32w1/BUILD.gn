@@ -114,7 +114,7 @@ static_library("nxp_platform") {
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
-  deps = []
+  deps = [ "${chip_root}/src/platform:platform_logging_header" ]
 
   if (chip_enable_openthread) {
     sources += [

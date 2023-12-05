@@ -36,6 +36,19 @@ source_set("tracing") {
   ]
 }
 
+static_library("logging") {
+  sources = [ "Logging.cpp" ]
+  deps = [
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+    "${chip_root}/src/lib/support:logging_constants",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/platform:platform_logging_header",
+  ]
+
+  libs = [ "log" ]
+}
+
 static_library("android") {
   output_name = "libAndroidPlatform"
 
@@ -72,6 +85,7 @@ static_library("android") {
   ]
 
   deps = [
+    ":logging",
     ":tracing",
     "${chip_root}/src/lib/dnssd:platform_header",
     "${chip_root}/src/setup_payload",

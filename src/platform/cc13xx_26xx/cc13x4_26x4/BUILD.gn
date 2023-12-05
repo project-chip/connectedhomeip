@@ -48,7 +48,7 @@ static_library("cc13x4_26x4") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [ "${chip_root}/src/platform:platform_logging_header" ]
 
   public = [
     "${chip_root}/src/credentials/CHIPCert.h",

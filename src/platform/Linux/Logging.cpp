@@ -3,7 +3,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
-#include <platform/logging/LogV.h>
+#include <platform/LogV.h>
 
 #include <cinttypes>
 #include <cstdio>
