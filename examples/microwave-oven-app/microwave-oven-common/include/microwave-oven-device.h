@@ -228,7 +228,6 @@ private:
 
     Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
         Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
-
 };
 
 } // namespace Clusters
