@@ -8,7 +8,7 @@ config:
     cluster: "Laundry Dryer Controls"
     endpoint: 1
 
- unsupportedSelectedDrynessLevel:
+unsupportedSelectedDrynessLevel:
   type: int8u
   defaultValue: 4
 
@@ -27,7 +27,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-     - label: "Step 2: Read the mandatory attribute: SupportedDrynessLevels"
+    - label: "Step 2: Read the mandatory attribute: SupportedDrynessLevels"
       PICS: DRYERCTRL.S.A0000
       command: "readAttribute"
       attribute: "SupportedDrynessLevels"
@@ -83,4 +83,3 @@ tests:
           value:  unsupportedSelectedDrynessLevel
       response:
           error: InvalidInState
-    
