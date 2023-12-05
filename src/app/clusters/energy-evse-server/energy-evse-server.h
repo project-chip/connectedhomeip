@@ -130,7 +130,7 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mEndpointId(aEndpointId)
+        mDelegate(aDelegate)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -144,7 +144,6 @@ public:
 
 private:
     Delegate & mDelegate;
-    EndpointId mEndpointId;
     BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
