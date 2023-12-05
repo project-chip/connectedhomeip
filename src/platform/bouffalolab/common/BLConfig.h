@@ -34,48 +34,48 @@ public:
 
     /** Key definitions for well-known keys */
     /** Manufacturing config keys, which should be saved in a specified place */
-    static constexpr const char * kConfigKey_SerialNum             = ("serial-num");
-    static constexpr const char * kConfigKey_MfrDeviceId           = ("device-id");
-    static constexpr const char * kConfigKey_MfrDeviceCert         = ("device-cert");
-    static constexpr const char * kConfigKey_MfrDeviceICACerts     = ("device-ca-certs");
-    static constexpr const char * kConfigKey_MfrDevicePrivateKey   = ("device-key");
-    static constexpr const char * kConfigKey_ManufacturingDate     = ("mfg-date");
-    static constexpr const char * kConfigKey_SetupPinCode          = ("pin-code");
-    static constexpr const char * kConfigKey_SetupDiscriminator    = ("discriminator");
-    static constexpr const char * kConfigKey_Spake2pIterationCount = ("iteration-count");
-    static constexpr const char * kConfigKey_Spake2pSalt           = ("salt");
-    static constexpr const char * kConfigKey_Spake2pVerifier       = ("verifier");
-    static constexpr const char * kConfigKey_UniqueId              = ("unique-id");
+    static constexpr char kConfigKey_SerialNum[]             = ("serial-num");
+    static constexpr char kConfigKey_MfrDeviceId[]           = ("device-id");
+    static constexpr char kConfigKey_MfrDeviceCert[]         = ("device-cert");
+    static constexpr char kConfigKey_MfrDeviceICACerts[]     = ("device-ca-certs");
+    static constexpr char kConfigKey_MfrDevicePrivateKey[]   = ("device-key");
+    static constexpr char kConfigKey_ManufacturingDate[]     = ("mfg-date");
+    static constexpr char kConfigKey_SetupPinCode[]          = ("pin-code");
+    static constexpr char kConfigKey_SetupDiscriminator[]    = ("discriminator");
+    static constexpr char kConfigKey_Spake2pIterationCount[] = ("iteration-count");
+    static constexpr char kConfigKey_Spake2pSalt[]           = ("salt");
+    static constexpr char kConfigKey_Spake2pVerifier[]       = ("verifier");
+    static constexpr char kConfigKey_UniqueId[]              = ("unique-id");
 
     /** Config keys, which should be droped after a factory reset */
-    static constexpr const char * kConfigKey_FabricId                    = ("fabric-id");
-    static constexpr const char * kConfigKey_ServiceConfig               = ("service-config");
-    static constexpr const char * kConfigKey_PairedAccountId             = ("account-id");
-    static constexpr const char * kConfigKey_ServiceId                   = ("service-id");
-    static constexpr const char * kConfigKey_FabricSecret                = ("fabric-secret");
-    static constexpr const char * kConfigKey_HardwareVersion             = ("hardware-ver");
-    static constexpr const char * kConfigKey_LastUsedEpochKeyId          = ("last-ek-id");
-    static constexpr const char * kConfigKey_FailSafeArmed               = ("fail-safe-armed");
-    static constexpr const char * kConfigKey_OperationalDeviceId         = ("op-device-id");
-    static constexpr const char * kConfigKey_OperationalDeviceCert       = ("op-device-cert");
-    static constexpr const char * kConfigKey_OperationalDeviceICACerts   = ("op-device-ca-certs");
-    static constexpr const char * kConfigKey_OperationalDevicePrivateKey = ("op-device-key");
-    static constexpr const char * kConfigKey_RegulatoryLocation          = ("regulatory-location");
-    static constexpr const char * kConfigKey_CountryCode                 = ("country-code");
-    static constexpr const char * kConfigKey_ActiveLocale                = ("active-locale");
-    static constexpr const char * kConfigKey_Breadcrumb                  = ("breadcrumb");
-    static constexpr const char * kConfigKey_GroupKeyIndex               = ("group-key-index");
-    static constexpr const char * kConfigKey_LifeTimeCounter             = ("life-time-counter");
+    static constexpr char kConfigKey_FabricId[]                    = ("fabric-id");
+    static constexpr char kConfigKey_ServiceConfig[]               = ("service-config");
+    static constexpr char kConfigKey_PairedAccountId[]             = ("account-id");
+    static constexpr char kConfigKey_ServiceId[]                   = ("service-id");
+    static constexpr char kConfigKey_FabricSecret[]                = ("fabric-secret");
+    static constexpr char kConfigKey_HardwareVersion[]             = ("hardware-ver");
+    static constexpr char kConfigKey_LastUsedEpochKeyId[]          = ("last-ek-id");
+    static constexpr char kConfigKey_FailSafeArmed[]               = ("fail-safe-armed");
+    static constexpr char kConfigKey_OperationalDeviceId[]         = ("op-device-id");
+    static constexpr char kConfigKey_OperationalDeviceCert[]       = ("op-device-cert");
+    static constexpr char kConfigKey_OperationalDeviceICACerts[]   = ("op-device-ca-certs");
+    static constexpr char kConfigKey_OperationalDevicePrivateKey[] = ("op-device-key");
+    static constexpr char kConfigKey_RegulatoryLocation[]          = ("regulatory-location");
+    static constexpr char kConfigKey_CountryCode[]                 = ("country-code");
+    static constexpr char kConfigKey_ActiveLocale[]                = ("active-locale");
+    static constexpr char kConfigKey_Breadcrumb[]                  = ("breadcrumb");
+    static constexpr char kConfigKey_GroupKeyIndex[]               = ("group-key-index");
+    static constexpr char kConfigKey_LifeTimeCounter[]             = ("life-time-counter");
 
-    static constexpr const char * kConfigKey_WiFiSSID     = ("bl-wifi-ssid");
-    static constexpr const char * kConfigKey_WiFiPassword = ("bl-wifi-pass");
+    static constexpr char kConfigKey_WiFiSSID[]     = ("bl-wifi-ssid");
+    static constexpr char kConfigKey_WiFiPassword[] = ("bl-wifi-pass");
 
     /** Counter Keys, diagnostic information  */
-    static constexpr const char * kCounterKey_RebootCount           = ("reboot-count");
-    static constexpr const char * kCounterKey_TotalOperationalHours = ("total-hours");
-    static constexpr const char * kCounterKey_UpTime                = ("up-time");
+    static constexpr char kCounterKey_RebootCount[]           = ("reboot-count");
+    static constexpr char kCounterKey_TotalOperationalHours[] = ("total-hours");
+    static constexpr char kCounterKey_UpTime[]                = ("up-time");
 
-    static constexpr const char * kBLKey_factoryResetFlag = ("__factory_reset_pending");
+    static constexpr char kBLKey_factoryResetFlag[] = ("__factory_reset_pending");
 
     static void Init(void);
 
