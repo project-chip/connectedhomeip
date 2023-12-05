@@ -565,23 +565,28 @@ protected:
 using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
 /**
- * @brief Platform-specific AES key
+ * @brief Platform-specific Symmetric key handle
  *
- * The class represents AES key used by Matter stack either in the form of raw key material or key
+ * The class represents key used by Matter stack either in the form of raw key material or key
  * reference, depending on the platform. To achieve that, it contains an opaque context that can be
  * cast to a concrete representation used by the given platform. Note that currently Matter uses
  * 128-bit symmetric keys only.
+ *
+ * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
+ *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
+ *       Child classes only need to implement a constructor, implement a destructor and delete all the copy operators.
  */
-class Aes128BitsKeyHandle
+class Symmetric128BitsKeyHandle
 {
 public:
-    Aes128BitsKeyHandle() = default;
-    ~Aes128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+    Symmetric128BitsKeyHandle() = default;
+    // Destructor is implemented in the .cpp. It is pure virtual only to force the class to be abstract.
+    virtual ~Symmetric128BitsKeyHandle() = 0;
 
-    Aes128BitsKeyHandle(const Aes128BitsKeyHandle &) = delete;
-    Aes128BitsKeyHandle(Aes128BitsKeyHandle &&)      = delete;
-    void operator=(const Aes128BitsKeyHandle &)  = delete;
-    void operator=(Aes128BitsKeyHandle &&)       = delete;
+    Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
+    Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
+    void operator=(const Symmetric128BitsKeyHandle &)            = delete;
+    void operator=(Symmetric128BitsKeyHandle &&)                 = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation
@@ -608,6 +613,36 @@ private:
     {
         uint8_t mOpaque[kContextSize] = {};
     } mContext;
+};
+
+/**
+ * @brief Platform-specific AES key handle
+ */
+class Aes128BitsKeyHandle : public Symmetric128BitsKeyHandle
+{
+public:
+    Aes128BitsKeyHandle() = default;
+    virtual ~Aes128BitsKeyHandle() {}
+
+    Aes128BitsKeyHandle(const Aes128BitsKeyHandle &) = delete;
+    Aes128BitsKeyHandle(Aes128BitsKeyHandle &&)      = delete;
+    void operator=(const Aes128BitsKeyHandle &)      = delete;
+    void operator=(Aes128BitsKeyHandle &&)           = delete;
+};
+
+/**
+ * @brief Platform-specific HMAC key handle
+ */
+class Hmac128BitsKeyHandle : public Symmetric128BitsKeyHandle
+{
+public:
+    Hmac128BitsKeyHandle() = default;
+    virtual ~Hmac128BitsKeyHandle() {}
+
+    Hmac128BitsKeyHandle(const Hmac128BitsKeyHandle &) = delete;
+    Hmac128BitsKeyHandle(Hmac128BitsKeyHandle &&)      = delete;
+    void operator=(const Hmac128BitsKeyHandle &)       = delete;
+    void operator=(Hmac128BitsKeyHandle &&)            = delete;
 };
 
 /**

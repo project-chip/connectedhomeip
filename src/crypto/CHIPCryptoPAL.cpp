@@ -233,6 +233,11 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 
 } // namespace
 
+Symmetric128BitsKeyHandle::~Symmetric128BitsKeyHandle()
+{
+    ClearSecretData(mContext.mOpaque);
+}
+
 using HKDF_sha_crypto = HKDF_sha;
 
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
