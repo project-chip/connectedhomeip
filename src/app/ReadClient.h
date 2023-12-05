@@ -324,16 +324,16 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     /**
-     *  Wake up the sleeping subscription.
+     *  Activate the sleeping subscription.
      *
-     *  When subscripting to ICD, the subscriber is expected to set the `mActivePeriod`
+     *  When subscribing to ICD, the subscriber is expected to set the `mActivePeriod`
      * in `ReadPrepareParams`.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR Successfully waked up the subscription.
      *  @retval #CHIP_ERROR_INCORRECT_STATE The transcation is not an active subscription
      */
-    CHIP_ERROR WakeUp();
+    CHIP_ERROR OnActiveModeNotificaiton();
 
     /**
      *  Update the active period of the device. This method **will not** update the
@@ -347,7 +347,7 @@ public:
      *  Update the time used to determine whether the device is idle to the period from now.
      * This method **will not** update the active period for future wake-ups.
      *
-     *  A zero period means the device will sleep immediately.
+     *  A zero period means the device will become idle immediately.
      *
      *  @retval #CHIP_NO_ERROR Successfully updated the active time.
      *  @retval #others failed to update the active time.
@@ -644,8 +644,9 @@ private:
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
-    // When the liveness timeout fired after `mPeerActiveUntilTimestamp`, the ReadClient will enter "IdleSubscription" state
-    // until WakeUp() is called. The Zero value means the device should always be active.
+    // mPeerActiveUntilTimestamp represents the active time for subscription for ICD device, when the liveness timeout fired after
+    // mPeerActiveUntilTimestamp`, the ReadClient will enter "IdleSubscription" state
+    // until OnActiveModeNotificaiton() is called. The Zero value means the device should always be active.
     System::Clock::Timeout mPeerActivePeriod           = System::Clock::kZero;
     System::Clock::Timestamp mPeerActiveUntilTimestamp = System::Clock::kZero;
 

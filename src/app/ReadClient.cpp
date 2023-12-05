@@ -429,11 +429,11 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::WakeUp()
+CHIP_ERROR ReadClient::OnActiveModeNotificaiton()
 {
-    VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsSubscriptionType() && IsIdle(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPeerActivePeriod != System::Clock::kZero, CHIP_ERROR_INCORRECT_STATE);
-    MoveToState(ClientState::Idle);
+    // TODO: Add Better the error code to inform the ActiveModeWakeUp and trigger the subscription retry
     Close(CHIP_ERROR_TIMEOUT);
     return CHIP_NO_ERROR;
 }
@@ -923,7 +923,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     if (_this->mPeerActivePeriod != System::Clock::kZero)
     {
-        // If device is sleeping, we mark the subscription as "IdleSubscription", and trigger resubscription on `WakeUp`.
+        // If device is sleeping, we mark the subscription as "IdleSubscription", and trigger resubscription on
+        // `WakOnActiveModeWakeUpeUp`.
         System::Clock::Timestamp time;
         CHIP_ERROR error = System::SystemClock().GetClock_RealTimeMS(time);
         if (error != CHIP_NO_ERROR)
