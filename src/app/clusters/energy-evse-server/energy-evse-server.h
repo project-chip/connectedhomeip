@@ -128,8 +128,14 @@ protected:
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate);
-    ~Instance();
+    Instance(EndpointId aEndpointId, Delegate & aDelegate) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mEndpointId(aEndpointId)
+    {
+        /* set the base class delegates endpointId */
+        mDelegate.SetEndpointId(aEndpointId);
+    }
+    ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();

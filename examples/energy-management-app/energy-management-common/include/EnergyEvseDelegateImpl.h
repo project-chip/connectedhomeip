@@ -50,7 +50,7 @@ public:
      * @param maximumChargeCurrent (in mA)
      */
     Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
-                          const uint64_t & minimumChargeCurrent, const uint64_t & maximumChargeCurrent) override;
+                          const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) override;
 
     /**
      * @brief   Called when EVSE cluster receives EnableDischarging command
@@ -59,7 +59,7 @@ public:
      * @param maximumChargeCurrent (in mA)
      */
     Status EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
-                             const uint64_t & maximumDischargeCurrent) override;
+                             const int64_t & maximumDischargeCurrent) override;
 
     /**
      * @brief    Called when EVSE cluster receives StartDiagnostics command

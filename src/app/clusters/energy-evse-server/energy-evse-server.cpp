@@ -33,19 +33,6 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
-Instance::Instance(EndpointId aEndpointId, Delegate & aDelegate) :
-    AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-    mDelegate(aDelegate), mEndpointId(aEndpointId)
-{
-    /* set the base class delegates endpointId */
-    mDelegate.SetEndpointId(aEndpointId);
-}
-
-Instance::~Instance()
-{
-    Shutdown();
-}
-
 CHIP_ERROR Instance::Init()
 {
     registerAttributeAccessOverride(this);
