@@ -2696,7 +2696,7 @@ void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * 
         ctx.GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
 
-        err = readClient.WakeUp();
+        err = readClient.OnActiveModeNotification();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
