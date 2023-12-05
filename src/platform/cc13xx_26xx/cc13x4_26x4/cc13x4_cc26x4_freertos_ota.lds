@@ -61,7 +61,7 @@ REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-    /* interrupt vectors shifted to accomodate MCUBoot header */
+    /* interrupt vectors shifted to accommodate MCUBoot header */
     PROVIDE (_intvecs_base_address =
         DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x6080);
 

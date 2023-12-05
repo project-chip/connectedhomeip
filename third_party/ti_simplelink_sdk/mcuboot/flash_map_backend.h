@@ -2,7 +2,7 @@
  * Copyright (c) 2018 Nordic Semiconductor ASA
  * Copyright (c) 2015 Runtime Inc
  * Copyright (c) 2020 Cypress Semiconductor Corporation
- * Copyright (c) 2021 Texas Intruments
+ * Copyright (c) 2021 Texas Instruments
  *
  * SPDX-License-Identifier: Apache-2.0
  */
