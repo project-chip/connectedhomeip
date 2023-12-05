@@ -127,7 +127,7 @@ static bool writeExtFlashImgPages(NVS_Handle handle, ssize_t offset, MutableByte
             /* We have not downloaded past the Matter OTA header */
             return true;
         }
-        
+
         imageOffset = 0;
         data = block.data() + blockOffset;
         dataSize = block.size() - blockOffset;
