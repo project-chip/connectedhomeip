@@ -445,8 +445,6 @@ server cluster TimeFormatLocalization = 44 {
   }
 
   attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -906,12 +904,7 @@ server cluster AdministratorCommissioning = 60 {
     octet_string<32> salt = 4;
   }
 
-  request struct OpenBasicCommissioningWindowRequest {
-    int16u commissioningTimeout = 0;
-  }
-
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
@@ -1837,8 +1830,6 @@ endpoint 0 {
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
-    callback attribute supportedCalendarTypes;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1928,7 +1919,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 0x0001;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2019,9 +2009,9 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    persist  attribute measuredValue default = 0;
-    persist  attribute minMeasuredValue;
-    persist  attribute maxMeasuredValue default = 0x8000;
+    persist  attribute measuredValue default = 0x800;
+    persist  attribute minMeasuredValue default = 0x800;
+    persist  attribute maxMeasuredValue default = 0x800;
     persist  attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2225,17 +2215,17 @@ endpoint 1 {
   }
 
   server cluster RadonConcentrationMeasurement {
-    callback attribute measuredValue default = 5;
-    callback attribute minMeasuredValue default = 1;
+    callback attribute measuredValue default = 10;
+    callback attribute minMeasuredValue default = 5;
     callback attribute maxMeasuredValue default = 100;
-    callback attribute peakMeasuredValue default = 8;
+    callback attribute peakMeasuredValue default = 36;
     callback attribute peakMeasuredValueWindow default = 3600;
-    callback attribute averageMeasuredValue default = 2;
+    callback attribute averageMeasuredValue default = 20;
     callback attribute averageMeasuredValueWindow default = 3600;
-    callback attribute uncertainty default = 1;
-    callback attribute measurementUnit default = 1;
+    callback attribute uncertainty default = 0;
+    callback attribute measurementUnit default = 0;
     callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 1;
+    callback attribute levelValue default = 3;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
