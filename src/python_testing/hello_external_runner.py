@@ -37,6 +37,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+
 class TestTestRunnerHooks(TestRunnerHooks):
     def reset(self):
         self.start_called = False
@@ -48,6 +49,7 @@ class TestTestRunnerHooks(TestRunnerHooks):
         self.step_success_count = 0
         self.step_failure_count = 0
         self.step_unknown_count = 0
+
     def __init__(self):
         self.reset()
 
@@ -89,7 +91,8 @@ class TestTestRunnerHooks(TestRunnerHooks):
         print(f'step_failure_count = {self.step_failure_count}')
         print(f'step_unknown_count = {self.step_unknown_count}')
 
-def run_in_process(test_name:str, config: MatterTestConfig) -> None:
+
+def run_in_process(test_name: str, config: MatterTestConfig) -> None:
     BaseManager.register('TestTestRunnerHooks', TestTestRunnerHooks)
     manager = BaseManager()
     manager.start()
@@ -100,10 +103,13 @@ def run_in_process(test_name:str, config: MatterTestConfig) -> None:
     print(f'Results from test {test_name}:')
     print(my_hooks.summary())
 
+
 def commission() -> None:
     paa_path = os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
-    config = MatterTestConfig(commissioning_method="on-network", commission_only=True, discriminators=[3840], setup_passcodes=[20202021], dut_node_ids=[0x12344321], paa_trust_store_path=paa_path, storage_path='admin_storage.json')
+    config = MatterTestConfig(commissioning_method="on-network", commission_only=True, discriminators=[3840], setup_passcodes=[
+                              20202021], dut_node_ids=[0x12344321], paa_trust_store_path=paa_path, storage_path='admin_storage.json')
     run_in_process("commission", config)
+
 
 def one_test(test_name):
     # Run a test NOT using the default main. Pass in our own runner and make sure it
@@ -119,13 +125,14 @@ def one_test(test_name):
 
     run_in_process(test_name, config)
 
+
 def main():
 
     # Fire up an example app to test against
     # TODO: make factory reset and app path configurable, maybe the storage location too.
     subprocess.call("rm -rf /tmp/chip_* /tmp/repl* admin_storage.json", shell=True)
     app_path = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'out',
-                                                     'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test', 'chip-all-clusters-app'))
+                                            'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test', 'chip-all-clusters-app'))
     app_cmd = str(app_path)
     app_process = subprocess.Popen([app_cmd], stdout=sys.stdout, stderr=sys.stderr, bufsize=0)
 
@@ -137,6 +144,7 @@ def main():
     app_process.send_signal(signal.SIGINT.value)
     app_process.wait()
     print("app stopped")
+
 
 if __name__ == "__main__":
     main()

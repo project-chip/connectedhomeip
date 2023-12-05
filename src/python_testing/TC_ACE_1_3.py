@@ -47,7 +47,7 @@ class TC_ACE_1_3(MatterBaseTest):
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     def desc_TC_ACE_1_3(self) -> str:
-        return ""
+        return "[TC-ACE-1.3] Subjects"
 
     def steps_TC_ACE_1_3(self) -> list[TestStep]:
         steps = [

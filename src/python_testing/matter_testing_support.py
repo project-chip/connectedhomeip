@@ -558,7 +558,8 @@ class TestStep:
 class TestInfo:
     function: str
     desc: str
-    steps: typing.List[TestStep]
+    steps: list[TestStep]
+    pics: list[str]
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -569,7 +570,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.problems = []
         self.is_commissioning = False
 
-    def get_test_steps(self, test:str) -> list[TestStep]:
+    def get_test_steps(self, test: str) -> list[TestStep]:
         ''' Retrieves the test step list for the given test
 
             Test steps are defined in the function called steps_<functionname>.
@@ -583,9 +584,28 @@ class MatterBaseTest(base_test.BaseTestClass):
         steps = self._get_defined_test_steps(test)
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
-
     def _get_defined_test_steps(self, test: str) -> list[TestStep]:
         steps_name = 'steps_' + test[5:]
+        try:
+            fn = getattr(self, steps_name)
+            return fn()
+        except AttributeError:
+            return None
+
+    def get_test_pics(self, test: str) -> list[str]:
+        ''' Retrieves a list of top-level PICS that should be checked before running this test
+
+            An empty list means the test will always be run.
+
+            PICS are defined in a function called pics_<functionname>.
+            ex. for test test_TC_TEST_1_1, the pics are in a function called
+            pics_TC_TEST_1_1.
+        '''
+        pics = self._get_defined_pics(test)
+        return [] if pics is None else pics
+
+    def _get_defined_pics(self, test: str) -> list[TestStep]:
+        steps_name = 'pics_' + test[5:]
         try:
             fn = getattr(self, steps_name)
             return fn()
@@ -1292,6 +1312,7 @@ def async_test_body(body):
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
+
     def __init__(self, *args):
         super().__init__(*args)
         self.is_commissioning = True
@@ -1398,7 +1419,7 @@ def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConf
 
     info = []
     for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t)))
+        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
 
     return info
 
