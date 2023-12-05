@@ -333,7 +333,7 @@ public:
      *  @retval #CHIP_NO_ERROR Successfully waked up the subscription.
      *  @retval #CHIP_ERROR_INCORRECT_STATE The transcation is not an active subscription
      */
-    CHIP_ERROR OnActiveModeNotificaiton();
+    CHIP_ERROR OnActiveModeNotification();
 
     /**
      *  Update the active period of the device. This method **will not** update the

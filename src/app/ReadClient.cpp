@@ -924,7 +924,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
     if (_this->mPeerActivePeriod != System::Clock::kZero)
     {
         // If device is sleeping, we mark the subscription as "IdleSubscription", and trigger resubscription on
-        // `OnActiveModeNotificaiton`.
+        // `OnActiveModeNotification`.
         System::Clock::Timestamp time;
         CHIP_ERROR error = System::SystemClock().GetClock_RealTimeMS(time);
         if (error != CHIP_NO_ERROR)
