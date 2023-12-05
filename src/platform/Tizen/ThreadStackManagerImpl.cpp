@@ -61,6 +61,43 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace {
+// Return human readable error message for given Thread API error code.
+//
+// This is a temporary workaround for the fact that Tizen common API
+// does not return messages for all Thread API errors.
+//
+// TODO (a.bokowy): To be removed once Tizen fixes this issue.
+const char * get_error_message(int code)
+{
+    switch (code)
+    {
+    case THREAD_ERROR_NOT_INITIALIZED:
+        return "Not initialized";
+    case THREAD_ERROR_NOT_IN_PROGRESS:
+        return "Operation not in progress";
+    case THREAD_ERROR_ALREADY_DONE:
+        return "Operation already done";
+    case THREAD_ERROR_OPERATION_FAILED:
+        return "Operation failed";
+    case THREAD_ERROR_NOT_READY:
+        return "Resource not ready";
+    case THREAD_ERROR_NOT_ENABLED:
+        return "Not enabled";
+    case THREAD_ERROR_NOT_FOUND:
+        return "Not found";
+    case THREAD_ERROR_ALREADY_REGISTERED:
+        return "Already registered";
+    case THREAD_ERROR_DB_FAILED:
+        return "DB operation failed";
+    case THREAD_ERROR_NOT_REGISTERED:
+        return "Not registered";
+    default:
+        return ::get_error_message(code);
+    }
+}
+}; // namespace
+
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 constexpr char ThreadStackManagerImpl::kOpenthreadDeviceRoleDisabled[];
