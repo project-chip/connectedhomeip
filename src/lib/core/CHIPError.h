@@ -674,14 +674,7 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
-/**
- *  @def CHIP_ERROR_EMPTY
- *
- *  @brief
- *    A requested object is empty.
- *
- */
-#define CHIP_ERROR_EMPTY                                       CHIP_CORE_ERROR(0x1d)
+// AVAILABLE: 0x1d
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH

@@ -379,8 +379,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
-    const char charSpanData[]    = "a simple test string";
+    const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
+    static const char charSpanData[] = "a simple test string";
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;

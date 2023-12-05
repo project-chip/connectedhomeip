@@ -49,13 +49,14 @@ private:
 
 } // namespace
 
-CHIP_ERROR PSASessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key)
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
 
     AesKeyAttributes attrs;
-    psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial, sizeof(Aes128KeyByteArray), &key.AsMutable<psa_key_id_t>());
+    psa_status_t status =
+        psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;

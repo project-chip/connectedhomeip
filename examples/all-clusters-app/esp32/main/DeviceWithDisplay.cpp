@@ -28,7 +28,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static const char * TAG = "DeviceWithDisplay";
+static const char TAG[] = "DeviceWithDisplay";
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 

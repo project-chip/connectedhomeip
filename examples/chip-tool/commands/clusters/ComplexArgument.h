@@ -45,8 +45,8 @@
 
 #include "JsonParser.h"
 
-inline constexpr uint8_t kMaxLabelLength  = UINT8_MAX;
-inline constexpr const char kNullString[] = "null";
+inline constexpr uint8_t kMaxLabelLength = UINT8_MAX;
+inline constexpr char kNullString[]      = "null";
 
 class ComplexArgumentParser
 {

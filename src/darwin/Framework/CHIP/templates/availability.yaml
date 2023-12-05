@@ -7570,9 +7570,6 @@
                   - CalendarFormat
   provisional:
       attributes:
-          # New things, not quite finalized.
-          PowerSource:
-              - EndpointList
           Descriptor:
               - TagList
       structs:
@@ -7803,6 +7800,8 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          PowerSource:
+              - EndpointList
       commands:
           RVCRunMode:
               - ChangeToMode

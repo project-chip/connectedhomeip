@@ -23,7 +23,7 @@ using namespace chip::Dnssd;
 
 #if CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Ble;
-constexpr const char * kBleKey = "BLE";
+constexpr char kBleKey[] = "BLE";
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 CHIP_ERROR DeviceScanner::Start()
