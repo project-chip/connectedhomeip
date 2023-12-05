@@ -28,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -37,6 +37,7 @@ jobs:
             matrix:
                 build_variant: [no-ble-tsan-clang]
                 chip_tool: [""]
+            fail-fast: false
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
@@ -305,6 +306,7 @@ jobs:
             matrix:
                 build_variant: [no-ble-asan-clang, no-ble-tsan-clang]
                 chip_tool: [""]
+            fail-fast: false
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
@@ -513,6 +515,7 @@ jobs:
         strategy:
             matrix:
                 build_variant: [no-ble-no-wifi-tsan-clang]
+            fail-fast: false
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
             TSAN_OPTIONS: "halt_on_error=1"
