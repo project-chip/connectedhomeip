@@ -406,7 +406,7 @@ CHIP_ERROR CommandSender::GetAdditionalInvokeResponseElements(AdditionalInvokeRe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParams & aConfigParams)
+CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters & aConfigParams)
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
@@ -428,7 +428,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     // We must not be in the middle of preparing a command, or have already sent InvokeReponseMessage.
     //
-    bool canAddAnotherCommand = mState == State::AddedCommand && mBatchCommandsEnabled;
+    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
@@ -469,8 +469,8 @@ CHIP_ERROR CommandSender::FinishCommand(AdditionalCommandParameters aOptionalArg
 
     if (mBatchCommandsEnabled)
     {
-        // If error below triggers, whatever provided aOptionalArgs to PerpareCommand has changed it's
-        // values since calling PrepareCommand.
+        // If error below occurs, whatever provided aOptionalArgs to PerpareCommand has changed it's
+        // value for mCommandRef since calling PrepareCommand.
         VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -499,6 +499,7 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
 
 CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters aOptionalArgs)
 {
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
     {

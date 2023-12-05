@@ -114,10 +114,12 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    // While today there is only one item in this struct, this was added to make providing future elements easier.
-    struct ConfigParams
+    // CommandSender methods are called outside of SDK. By having parameters passed using this
+    // struct we centralize defaults within the struct instead of the function's declaration
+    // parameters list.
+    struct ConfigParameters
     {
-        ConfigParams & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
+        ConfigParameters & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
         {
             mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
             return *this;
@@ -128,6 +130,9 @@ public:
         uint16_t mRemoteMaxPathsPerInvoke = 1;
     };
 
+    // CommandSender methods are called outside of SDK. By having parameters passed using this
+    // struct we centralize defaults within the struct instead of the function's declaration
+    // parameters list.
     struct AdditionalCommandParameters
     {
         // gcc bug requires us to have the constructor below
@@ -144,18 +149,19 @@ public:
         bool mStartOrEndDataStruct = false;
     };
 
-    // While today there is only one item in this struct, this was added to make providing future elements of
-    // InvokeResponse easier.
+    // CommandSender methods are called outside of SDK. By having parameters passed using this
+    // struct we centralize defaults within the struct instead of the function's declaration
+    // parameters list.
     struct AdditionalInvokeResponseElements
     {
         Optional<uint16_t> mCommandRef;
     };
 
     /**
-     * Called from Callbacks to get additional elements in InvokeResponseMessage.
+     * Called from CommandSender::Callback::OnResponse to get additional elements in InvokeResponseMessage.
      *
      * For legacy reasons we cannot change arguments passed through `OnResponse`, but we wanted to provide a
-     * way for arguments to be queried going forward from within the `OnResponse` callback.
+     * way for elements to be queried going forward from within the `OnResponse` callback.
      *
      * @param [out] aInvokeReponseElements additional InvokeResponse elements.
      *
@@ -183,7 +189,7 @@ public:
      * spec. This must be called before PrepareCommand.
      *
      * @param [in] aConfigParams contains information to config CommandSender to perform additional
-     *                      functionality such as such as allowing max number paths per invoke to
+     *                      functionality such as such as allowing max number of paths per invoke to
      *                      the number supported by remote peer.
      *
      * @return CHIP_ERROR_INCORRECT_STATE
@@ -193,7 +199,7 @@ public:
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
      *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
      */
-    CHIP_ERROR SetCommandSenderConfig(ConfigParams & aConfigParams);
+    CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters aOptionalArgs);
 
@@ -214,7 +220,9 @@ public:
         optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
         return FinishCommand(optionalArgs);
     }
+
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
