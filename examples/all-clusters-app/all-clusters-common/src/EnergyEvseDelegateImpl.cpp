@@ -475,7 +475,8 @@ CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(uint32_t newValue)
     mChargingEnabledUntil = MakeNullable(newValue);
     if ((oldValue.IsNull()) || (oldValue.Value() != newValue))
     {
-        ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %d", mChargingEnabledUntil.Value());
+        ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu",
+                      static_cast<unsigned long int>(mChargingEnabledUntil.Value()));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
     }
     return CHIP_NO_ERROR;
@@ -492,7 +493,8 @@ CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(uint32_t newValue)
     mDischargingEnabledUntil = MakeNullable(newValue);
     if ((oldValue.IsNull()) || (oldValue.Value() != newValue))
     {
-        ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %d", mDischargingEnabledUntil.Value());
+        ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu",
+                      static_cast<unsigned long int>(mDischargingEnabledUntil.Value()));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
     }
     return CHIP_NO_ERROR;
@@ -624,7 +626,8 @@ CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
     mRandomizationDelayWindow = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "RandomizationDelayWindow updated to %d", mRandomizationDelayWindow);
+        ChipLogDetail(AppServer, "RandomizationDelayWindow updated to %lu",
+                      static_cast<unsigned long int>(mRandomizationDelayWindow));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
     }
     return CHIP_NO_ERROR;
