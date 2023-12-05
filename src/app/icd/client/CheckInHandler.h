@@ -43,15 +43,7 @@ class CheckInMessageHandler : public Messaging::ExchangeDelegate, public Messagi
     };
 
 public:
-    /**
-     * @brief Retrieve the singleton CheckIn handler
-     *
-     *  @return  A pointer to the shared CheckIn handler
-     *
-     */
-    static CheckInMessageHandler * GetInstance(void);
-
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate);
     void Shutdown();
 
 protected:
@@ -67,6 +59,7 @@ protected:
 
 private:
     Messaging::ExchangeManager * mExchangeManager = nullptr;
+    CheckInDelegate * mCheckInDelegate            = nullptr;
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mExchangeManager; }
     DefaultICDClientStorage * mICDClientStorage = nullptr;
 };

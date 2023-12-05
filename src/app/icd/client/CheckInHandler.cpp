@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,8 @@
  *
  */
 
-#include "CheckInHandler.h"
-#include "CheckInDelegate.h"
+#include <app/icd/client/CheckInDelegate.h>
+#include <app/icd/client/CheckInHandler.h>
 
 #include <cinttypes>
 
@@ -37,18 +37,14 @@
 namespace chip {
 namespace app {
 
-static Global<CheckInMessageHandler> sCheckInMessageHandler;
-CheckInMessageHandler * CheckInMessageHandler::GetInstance()
+CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
+                                       CheckInDelegate * delegate)
 {
-    return &sCheckInMessageHandler.get();
-}
-
-CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage)
-{
-    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeManager  = exchangeManager;
     mICDClientStorage = static_cast<DefaultICDClientStorage *>(clientStorage);
+    mCheckInDelegate  = delegate;
     ReturnErrorOnFailure(
         exchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this));
 
@@ -78,19 +74,13 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
-    auto * iterator = mICDClientStorage->IterateICDClientInfo();
-    CHIP_ERROR err  = CHIP_NO_ERROR;
     ICDClientInfo clientInfo;
-    while (iterator->Next(clientInfo))
-    {
-        err = mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo);
-        if (err == CHIP_NO_ERROR)
-        {
-            OnCheckInComplete();
-            return err;
-        }
-    }
-    return err;
+    bool needRefreshKey;
+
+    ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
+    VerifyOrReturnError(mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey));
+    mCheckInDelegate->OnCheckInComplete(clientInfo, needRefreshKey);
+    return CHIP_NO_ERROR;
 }
 
 void CheckInMessageHandler::OnResponseTimeout(Messaging::ExchangeContext * ec) {}

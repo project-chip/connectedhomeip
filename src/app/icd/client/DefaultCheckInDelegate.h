@@ -18,17 +18,17 @@
 
 #pragma once
 
-#include <app/icd/client/ICDClientInfo.h>
+#include <app/icd/client/CheckInDelegate.h>
 
 namespace chip {
 namespace app {
 
 /// Callbacks for check in protocol
-class DLL_EXPORT CheckInDelegate
+class DefaultCheckInDelegate : public CheckInDelegate
 {
 public:
-    virtual ~CheckInDelegate() {}
-    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRefreshKey) = 0;
+    virtual ~DefaultCheckInDelegate() {}
+    void OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRegisterICD) override;
 };
 
 } // namespace app
