@@ -489,9 +489,9 @@ CHIP_ERROR DefaultICDClientStorage::RefreshKeyAndRegisterClient(ICDClientInfo & 
     chip::Optional<chip::ByteSpan> icdSymmetricKey;
     chip::Crypto::DRBG_get_bytes(randomGeneratedICDSymmetricKey, sizeof(randomGeneratedICDSymmetricKey));
     icdSymmetricKey.SetValue(ByteSpan(randomGeneratedICDSymmetricKey));
+    // TODO - Register client with new key and node ID
     ReturnErrorOnFailure(SetKey(clientInfo, icdSymmetricKey.Value()));
     ReturnErrorOnFailure(StoreEntry(clientInfo));
-    // TODO - Register client with new key and node ID
     return CHIP_NO_ERROR;
 }
 } // namespace app

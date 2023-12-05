@@ -33,11 +33,11 @@ source_set("manager") {
 }
 
 # ICD Handler source-set is broken out of the main source-set to enable unit tests
-# All sources and configurations used by the ICDHandler need to go in this source-set
+# All sources and configurations used by the CheckInHandler need to go in this source-set
 source_set("handler") {
   sources = [
-    "ICDHandler.cpp",
-    "ICDHandler.h",
+    "CheckInHandler.cpp",
+    "CheckInHandler.h",
   ]
   public_deps = [
     ":manager",
