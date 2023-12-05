@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
- /*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -23,40 +23,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- /*******************************************************************************/
+/*******************************************************************************/
 
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
-#include "mcuboot_config/mcuboot_config.h"
 #include "flash_map_backend.h"
+#include "mcuboot_config/mcuboot_config.h"
 #include <sysflash/sysflash.h>
 
 #include "bootutil/bootutil_log.h"
 
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib/flash.h)
+#include DeviceFamily_constructPath(driverlib / flash.h)
 
 #ifndef DeviceFamily_CC23X0R5
-#include DeviceFamily_constructPath(driverlib/vims.h)
+#include DeviceFamily_constructPath(driverlib / vims.h)
 #endif
 
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
 #include <ext_flash.h>
 #endif /* TI_BOOT_USE_EXTERNAL_FLASH */
 
-#define FLASH_BASE_ADDRESS          0
+#define FLASH_BASE_ADDRESS 0
 
 #ifdef DeviceFamily_CC23X0R5
 /* Remap driverlib API names that changed only for cc23x0
  */
 #define FlashSectorSizeGet FlashGetSectorSize
-#define FlashSectorErase   FlashEraseSector
+#define FlashSectorErase FlashEraseSector
 #endif
 
-#define FLASH_ERASE_VALUE           0xFF
+#define FLASH_ERASE_VALUE 0xFF
 
 /* XXX: Someone defined assert backwards in this file. We've changed it back to
  * not conflict with the GCC assert.
@@ -66,64 +66,48 @@
 #include <assert.h>
 
 #ifdef TI_FLASH_MAP_EXT_DESC
-    /* Nothing to be there when external FlashMap Descriptors are used */
+/* Nothing to be there when external FlashMap Descriptors are used */
 #else
-    static const struct flash_area bootloader =
-    {
-        .fa_id = FLASH_AREA_BOOTLOADER,
-        .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-        .fa_off = BOOTLOADER_BASE_ADDRESS,
-        .fa_size = BOOT_BOOTLOADER_SIZE
-    };
+static const struct flash_area bootloader = { .fa_id        = FLASH_AREA_BOOTLOADER,
+                                              .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+                                              .fa_off       = BOOTLOADER_BASE_ADDRESS,
+                                              .fa_size      = BOOT_BOOTLOADER_SIZE };
 
-    static const struct flash_area primary_1 =
-    {
-        .fa_id = FLASH_AREA_IMAGE_PRIMARY(0),
-        .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-        .fa_off = BOOT_PRIMARY_1_BASE_ADDRESS,
-        .fa_size = BOOT_PRIMARY_1_SIZE
-    };
+static const struct flash_area primary_1 = { .fa_id        = FLASH_AREA_IMAGE_PRIMARY(0),
+                                             .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+                                             .fa_off       = BOOT_PRIMARY_1_BASE_ADDRESS,
+                                             .fa_size      = BOOT_PRIMARY_1_SIZE };
 
-    #if (MCUBOOT_IMAGE_NUMBER == 2)
-    static const struct flash_area primary_2 =
-    {
-        .fa_id = FLASH_AREA_IMAGE_PRIMARY(1),
-        .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-        .fa_off = BOOT_PRIMARY_2_BASE_ADDRESS,
-        .fa_size = BOOT_PRIMARY_2_SIZE
-    };
-    #endif
-
-    static const struct flash_area secondary_1 =
-    {
-        .fa_id = FLASH_AREA_IMAGE_SECONDARY(0),
-    #ifndef TI_BOOT_USE_EXTERNAL_FLASH
-        .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-    #else
-        .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
-    #endif
-        .fa_off = BOOT_SECONDARY_1_BASE_ADDRESS,
-        .fa_size = BOOT_SECONDARY_1_SIZE
-    };
-
-    #if (MCUBOOT_IMAGE_NUMBER == 2)
-    static const struct flash_area secondary_2 =
-    {
-        .fa_id = FLASH_AREA_IMAGE_SECONDARY(1),
-        #ifndef TI_BOOT_USE_EXTERNAL_FLASH
-            .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
-        #else
-            .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
-        #endif
-        .fa_off = BOOT_SECONDARY_2_BASE_ADDRESS,
-        .fa_size = BOOT_SECONDARY_2_SIZE
-    };
-     #endif
+#if (MCUBOOT_IMAGE_NUMBER == 2)
+static const struct flash_area primary_2 = { .fa_id        = FLASH_AREA_IMAGE_PRIMARY(1),
+                                             .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+                                             .fa_off       = BOOT_PRIMARY_2_BASE_ADDRESS,
+                                             .fa_size      = BOOT_PRIMARY_2_SIZE };
 #endif
 
-#if (MCUBOOT_IMAGE_NUMBER == 2) && \
-    (DeviceFamily_PARENT != DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
-    #error "MCUBOOT_IMAGE_NUMBER == 2 for current device not supported"
+static const struct flash_area secondary_1         = { .fa_id        = FLASH_AREA_IMAGE_SECONDARY(0),
+#ifndef TI_BOOT_USE_EXTERNAL_FLASH
+                                                       .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+#else
+                                               .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
+#endif
+                                                       .fa_off       = BOOT_SECONDARY_1_BASE_ADDRESS,
+                                                       .fa_size      = BOOT_SECONDARY_1_SIZE };
+
+#if (MCUBOOT_IMAGE_NUMBER == 2)
+static const struct flash_area secondary_2         = { .fa_id        = FLASH_AREA_IMAGE_SECONDARY(1),
+#ifndef TI_BOOT_USE_EXTERNAL_FLASH
+                                                       .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+#else
+                                               .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
+#endif
+                                                       .fa_off       = BOOT_SECONDARY_2_BASE_ADDRESS,
+                                                       .fa_size      = BOOT_SECONDARY_2_SIZE };
+#endif
+#endif
+
+#if (MCUBOOT_IMAGE_NUMBER == 2) && (DeviceFamily_PARENT != DeviceFamily_PARENT_CC13X4_CC26X3_CC26X4)
+#error "MCUBOOT_IMAGE_NUMBER == 2 for current device not supported"
 #endif
 
 #if (MCUBOOT_IMAGE_NUMBER > 2)
@@ -131,30 +115,23 @@
 #endif
 
 #ifdef MCUBOOT_SWAP_USING_SCRATCH
-static struct flash_area scratch =
-{
+static struct flash_area scratch = {
 #error "MCUBOOT_SWAP_USING_SCRATCH not supported"
 };
 #endif
 
 #ifdef TI_FLASH_MAP_EXT_DESC
 /* Use external Flash Map Descriptors */
-extern struct flash_area *boot_area_descs[];
+extern struct flash_area * boot_area_descs[];
 #else
-static const struct flash_area *boot_area_descs[] =
-{
-    &bootloader,
-    &primary_1,
-    &secondary_1,
+static const struct flash_area * boot_area_descs[] = { &bootloader, &primary_1,   &secondary_1,
 #if (MCUBOOT_IMAGE_NUMBER == 2) /* if dual-image */
-    &primary_2,
-    &secondary_2,
+                                                       &primary_2,  &secondary_2,
 #endif
 #ifdef MCUBOOT_SWAP_USING_SCRATCH
-    &scratch,
+                                                       &scratch,
 #endif
-    NULL
-};
+                                                       NULL };
 #endif
 
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
@@ -169,9 +146,11 @@ static uint8_t disableCache(void)
 
     VIMSLineBufDisable(VIMS_BASE);
 
-    if (mode != VIMS_MODE_DISABLED) {
+    if (mode != VIMS_MODE_DISABLED)
+    {
         VIMSModeSet(VIMS_BASE, VIMS_MODE_DISABLED);
-        while (VIMSModeGet(VIMS_BASE) != VIMS_MODE_DISABLED);
+        while (VIMSModeGet(VIMS_BASE) != VIMS_MODE_DISABLED)
+            ;
     }
 
     return (mode);
@@ -182,7 +161,8 @@ static uint8_t disableCache(void)
  */
 static void enableCache(uint8_t mode)
 {
-    if (mode != VIMS_MODE_DISABLED) {
+    if (mode != VIMS_MODE_DISABLED)
+    {
         VIMSModeSet(VIMS_BASE, VIMS_MODE_ENABLED);
     }
 
@@ -191,9 +171,10 @@ static void enableCache(uint8_t mode)
 #endif
 
 /* Returns device flash start based on supported fa_id */
-int flash_device_base(uint8_t fd_id, uintptr_t *ret)
+int flash_device_base(uint8_t fd_id, uintptr_t * ret)
 {
-    if ((fd_id != FLASH_DEVICE_INTERNAL_FLASH) || (fd_id != FLASH_DEVICE_EXTERNAL_FLASH(0))) {
+    if ((fd_id != FLASH_DEVICE_INTERNAL_FLASH) || (fd_id != FLASH_DEVICE_EXTERNAL_FLASH(0)))
+    {
         BOOT_LOG_ERR("invalid flash ID %d", fd_id);
         return -1;
     }
@@ -202,20 +183,22 @@ int flash_device_base(uint8_t fd_id, uintptr_t *ret)
 }
 
 /* Opens the area for use. id is one of the `fa_id`s */
-int flash_area_open(uint8_t id, const struct flash_area **fa)
+int flash_area_open(uint8_t id, const struct flash_area ** fa)
 {
-    int ret = -1;
+    int ret    = -1;
     uint32_t i = 0;
 
-    while(NULL != boot_area_descs[i])
+    while (NULL != boot_area_descs[i])
     {
-        if(id == boot_area_descs[i]->fa_id)
+        if (id == boot_area_descs[i]->fa_id)
         {
             *fa = boot_area_descs[i];
 
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
-            if (boot_area_descs[i]->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0)) {
-                if(!extFlashStatus){
+            if (boot_area_descs[i]->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0))
+            {
+                if (!extFlashStatus)
+                {
                     ret = !extFlashOpen();
                     // if the external flash has been opened, update the status
                     if (ret == 0)
@@ -242,25 +225,26 @@ int flash_area_open(uint8_t id, const struct flash_area **fa)
     return ret;
 }
 
-void flash_area_close(const struct flash_area *fa)
+void flash_area_close(const struct flash_area * fa)
 {
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
-    if (fa->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0)){
-        if (extFlashStatus){
+    if (fa->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0))
+    {
+        if (extFlashStatus)
+        {
             extFlashClose();
             extFlashStatus = false;
         }
     }
 #endif /* TI_BOOT_USE_EXTERNAL_FLASH */
 
-    (void)fa;/* Nothing to do there */
+    (void) fa; /* Nothing to do there */
 }
 
 /*
-* Reads `len` bytes of flash memory at `off` to the buffer at `dst`
-*/
-int flash_area_read(const struct flash_area *fa, uint32_t off, void *dst,
-                     uint32_t len)
+ * Reads `len` bytes of flash memory at `off` to the buffer at `dst`
+ */
+int flash_area_read(const struct flash_area * fa, uint32_t off, void * dst, uint32_t len)
 {
     int rc = 0;
     size_t addr;
@@ -274,7 +258,7 @@ int flash_area_read(const struct flash_area *fa, uint32_t off, void *dst,
     if (fa->fa_device_id == FLASH_DEVICE_INTERNAL_FLASH)
     {
         /* flash read by simple memory copying */
-        memcpy((void *)dst, (const void*)addr, (size_t)len);
+        memcpy((void *) dst, (const void *) addr, (size_t) len);
     }
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
     else if (fa->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0))
@@ -283,7 +267,8 @@ int flash_area_read(const struct flash_area *fa, uint32_t off, void *dst,
         if (!extFlashStatus)
         {
             rc = flash_area_open(fa->fa_id, &fa);
-            if (rc != 0) {
+            if (rc != 0)
+            {
                 return rc;
             }
         }
@@ -299,7 +284,7 @@ int flash_area_read(const struct flash_area *fa, uint32_t off, void *dst,
         }
 
         /* Read whole metadata header */
-        rc = !extFlashRead(addr, (size_t)len, (void *)dst);
+        rc = !extFlashRead(addr, (size_t) len, (void *) dst);
     }
 #endif /* TI_BOOT_USE_EXTERNAL_FLASH */
     else
@@ -308,17 +293,17 @@ int flash_area_read(const struct flash_area *fa, uint32_t off, void *dst,
         rc = -1;
     }
 
-    if (rc != 0) {
-        BOOT_LOG_ERR("Flash area read error, rc = %d", (int)rc);
+    if (rc != 0)
+    {
+        BOOT_LOG_ERR("Flash area read error, rc = %d", (int) rc);
     }
     return rc;
 }
 
 /*
-* Writes `len` bytes of flash memory at `off` from the buffer at `src`
+ * Writes `len` bytes of flash memory at `off` from the buffer at `src`
  */
-int flash_area_write(const struct flash_area *fa, uint32_t off,
-                     const void *src, uint32_t len)
+int flash_area_write(const struct flash_area * fa, uint32_t off, const void * src, uint32_t len)
 {
     int rc = -1;
     size_t write_start_addr;
@@ -336,8 +321,8 @@ int flash_area_write(const struct flash_area *fa, uint32_t off,
         uint8_t cacheState = disableCache();
 #endif
 
-        flashStat = FlashProgram((uint8_t *)src, write_start_addr, len);
-        if(flashStat == FAPI_STATUS_SUCCESS)
+        flashStat = FlashProgram((uint8_t *) src, write_start_addr, len);
+        if (flashStat == FAPI_STATUS_SUCCESS)
         {
             rc = 0;
         }
@@ -353,12 +338,13 @@ int flash_area_write(const struct flash_area *fa, uint32_t off,
         if (!extFlashStatus)
         {
             rc = flash_area_open(fa->fa_id, &fa);
-            if (rc != 0) {
+            if (rc != 0)
+            {
                 return rc;
             }
         }
 
-        rc = !extFlashWrite(write_start_addr, (size_t)len, (uint8_t *)src);
+        rc = !extFlashWrite(write_start_addr, (size_t) len, (uint8_t *) src);
     }
 #endif /* TI_BOOT_USE_EXTERNAL_FLASH */
     else
@@ -371,7 +357,7 @@ int flash_area_write(const struct flash_area *fa, uint32_t off,
 }
 
 /*< Erases `len` bytes of flash memory at `off` */
-int flash_area_erase(const struct flash_area *fa, uint32_t off, uint32_t len)
+int flash_area_erase(const struct flash_area * fa, uint32_t off, uint32_t len)
 {
     int rc = -1;
     size_t erase_start_addr;
@@ -394,10 +380,10 @@ int flash_area_erase(const struct flash_area *fa, uint32_t off, uint32_t len)
         uint8_t cacheState = disableCache();
 #endif
 
-        for(pageAddr = erase_start_addr; pageAddr < erase_start_addr + len; pageAddr+=sectorSize)
+        for (pageAddr = erase_start_addr; pageAddr < erase_start_addr + len; pageAddr += sectorSize)
         {
             flashStat = FlashSectorErase(pageAddr);
-            if(flashStat != FAPI_STATUS_SUCCESS)
+            if (flashStat != FAPI_STATUS_SUCCESS)
             {
 #ifndef DeviceFamily_CC23X0R5
                 enableCache(cacheState);
@@ -420,11 +406,12 @@ int flash_area_erase(const struct flash_area *fa, uint32_t off, uint32_t len)
         if (!extFlashStatus)
         {
             rc = flash_area_open(fa->fa_id, &fa);
-            if (rc != 0) {
+            if (rc != 0)
+            {
                 return rc;
             }
         }
-        rc = !extFlashErase(erase_start_addr, (size_t)len);
+        rc = !extFlashErase(erase_start_addr, (size_t) len);
     }
 #endif /* TI_BOOT_USE_EXTERNAL_FLASH */
     else
@@ -436,7 +423,7 @@ int flash_area_erase(const struct flash_area *fa, uint32_t off, uint32_t len)
 }
 
 /*< Returns this `flash_area`s alignment */
-size_t flash_area_align(const struct flash_area *fa)
+size_t flash_area_align(const struct flash_area * fa)
 {
     int ret = -1;
     if (fa->fa_device_id == FLASH_DEVICE_INTERNAL_FLASH)
@@ -459,14 +446,14 @@ size_t flash_area_align(const struct flash_area *fa)
 
 #ifndef MCUBOOT_USE_FLASH_AREA_GET_SECTORS
 /*< Initializes an array of flash_area elements for the slot's sectors */
-int     flash_area_to_sectors(int idx, int *cnt, struct flash_area *fa)
+int flash_area_to_sectors(int idx, int * cnt, struct flash_area * fa)
 {
     int rc = 0;
 
     if (fa->fa_device_id == FLASH_DEVICE_INTERNAL_FLASH)
     {
-        (void)idx;
-        (void)cnt;
+        (void) idx;
+        (void) cnt;
         rc = 0;
     }
     else
@@ -485,10 +472,14 @@ int     flash_area_to_sectors(int idx, int *cnt, struct flash_area *fa)
  */
 int flash_area_id_from_multi_image_slot(int image_index, int slot)
 {
-    switch (slot) {
-    case 0: return FLASH_AREA_IMAGE_PRIMARY(image_index);
-    case 1: return FLASH_AREA_IMAGE_SECONDARY(image_index);
-    case 2: return FLASH_AREA_IMAGE_SCRATCH;
+    switch (slot)
+    {
+    case 0:
+        return FLASH_AREA_IMAGE_PRIMARY(image_index);
+    case 1:
+        return FLASH_AREA_IMAGE_SECONDARY(image_index);
+    case 2:
+        return FLASH_AREA_IMAGE_SCRATCH;
     }
 
     return -1; /* flash_area_open will fail on that */
@@ -501,10 +492,12 @@ int flash_area_id_from_image_slot(int slot)
 
 int flash_area_id_to_multi_image_slot(int image_index, int area_id)
 {
-    if (area_id == FLASH_AREA_IMAGE_PRIMARY(image_index)) {
+    if (area_id == FLASH_AREA_IMAGE_PRIMARY(image_index))
+    {
         return 0;
     }
-    if (area_id == FLASH_AREA_IMAGE_SECONDARY(image_index)) {
+    if (area_id == FLASH_AREA_IMAGE_SECONDARY(image_index))
+    {
         return 1;
     }
 
@@ -516,7 +509,7 @@ int flash_area_id_to_image_slot(int area_id)
     return flash_area_id_to_multi_image_slot(0, area_id);
 }
 
-uint8_t flash_area_erased_val(const struct flash_area *fap)
+uint8_t flash_area_erased_val(const struct flash_area * fap)
 {
     int ret = 0;
 
@@ -526,26 +519,28 @@ uint8_t flash_area_erased_val(const struct flash_area *fap)
     }
     else
     {
-        assert(false) ;
+        assert(false);
     }
 
-    return ret ;
+    return ret;
 }
 
-int flash_area_read_is_empty(const struct flash_area *fa, uint32_t off,
-        void *dst, uint32_t len)
+int flash_area_read_is_empty(const struct flash_area * fa, uint32_t off, void * dst, uint32_t len)
 {
-    uint8_t *mem_dest;
+    uint8_t * mem_dest;
     int rc;
 
-    mem_dest = (uint8_t *)dst;
-    rc = flash_area_read(fa, off, dst, len);
-    if (rc) {
+    mem_dest = (uint8_t *) dst;
+    rc       = flash_area_read(fa, off, dst, len);
+    if (rc)
+    {
         return -1;
     }
 
-    for (uint8_t i = 0; i < len; i++) {
-        if (mem_dest[i] != flash_area_erased_val(fa)) {
+    for (uint8_t i = 0; i < len; i++)
+    {
+        if (mem_dest[i] != flash_area_erased_val(fa))
+        {
             return 0;
         }
     }
@@ -553,15 +548,15 @@ int flash_area_read_is_empty(const struct flash_area *fa, uint32_t off,
 }
 
 #ifdef MCUBOOT_USE_FLASH_AREA_GET_SECTORS
-int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret)
+int flash_area_get_sectors(int idx, uint32_t * cnt, struct flash_sector * ret)
 {
-    int rc = 0;
-    uint32_t i = 0;
-    struct flash_area *fa = NULL;
+    int rc                 = 0;
+    uint32_t i             = 0;
+    struct flash_area * fa = NULL;
 
-    while(NULL != boot_area_descs[i])
+    while (NULL != boot_area_descs[i])
     {
-        if(idx == boot_area_descs[i]->fa_id)
+        if (idx == boot_area_descs[i]->fa_id)
         {
             fa = (struct flash_area *) boot_area_descs[i];
             break;
@@ -569,16 +564,16 @@ int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret)
         i++;
     }
 
-    if(NULL != boot_area_descs[i])
+    if (NULL != boot_area_descs[i])
     {
         size_t sector_size = 0;
 
-        if(fa->fa_device_id == FLASH_DEVICE_INTERNAL_FLASH)
+        if (fa->fa_device_id == FLASH_DEVICE_INTERNAL_FLASH)
         {
             sector_size = FlashSectorSizeGet();
         }
 #ifdef TI_BOOT_USE_EXTERNAL_FLASH
-        else if(fa->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0))
+        else if (fa->fa_device_id == FLASH_DEVICE_EXTERNAL_FLASH(0))
         {
             sector_size = EXT_FLASH_PAGE_SIZE;
         }
@@ -588,20 +583,20 @@ int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret)
             rc = -1;
         }
 
-        if(0 == rc)
+        if (0 == rc)
         {
-            uint32_t addr = 0;
+            uint32_t addr    = 0;
             size_t sectors_n = 0;
 
             sectors_n = (fa->fa_size + (sector_size - 1)) / sector_size;
             assert(sectors_n <= *cnt);
 
             addr = fa->fa_off;
-            for(i = 0; i < sectors_n; i++)
+            for (i = 0; i < sectors_n; i++)
             {
-                ret[i].fs_size = sector_size ;
-                ret[i].fs_off = addr ;
-                addr += sector_size ;
+                ret[i].fs_size = sector_size;
+                ret[i].fs_off  = addr;
+                addr += sector_size;
             }
 
             *cnt = sectors_n;
@@ -628,7 +623,8 @@ int flash_area_get_sectors(int idx, uint32_t *cnt, struct flash_sector *ret)
  *
  */
 
-static void FlashProtectionSet(uint32_t address, uint32_t mode) {
+static void FlashProtectionSet(uint32_t address, uint32_t mode)
+{
     uint32_t sector_number;
     uint32_t sector_size = FlashSectorSizeGet();
     uint32_t mask;
@@ -637,19 +633,19 @@ static void FlashProtectionSet(uint32_t address, uint32_t mode) {
      * Check that address is within expected range, as in cc23x0r5
      * only the first 32 sectors can be individually locked.
      */
-    if ((address >= (FLASH_MAIN_BASE + (32 * sector_size))) ||
-        (0 != (address & (sector_size - 1)))) {
+    if ((address >= (FLASH_MAIN_BASE + (32 * sector_size))) || (0 != (address & (sector_size - 1))))
+    {
         return;
     }
 
     sector_number = (address - FLASH_MAIN_BASE) / sector_size;
-    mask = 1 << sector_number;
+    mask          = 1 << sector_number;
 
     HWREG(VIMS_BASE + VIMS_O_WEPRA) &= ~mask;
 }
 #endif
 
-void flash_area_lock(const struct flash_area *fa)
+void flash_area_lock(const struct flash_area * fa)
 {
     size_t addr;
 
