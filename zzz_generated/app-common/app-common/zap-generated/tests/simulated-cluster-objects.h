@@ -848,7 +848,7 @@ struct DiscoveryCommandResponse
                 break;
             case 14:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, supportsTcpServer));
-                break
+                break;
             case 15:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, numIPs));
                 break;
