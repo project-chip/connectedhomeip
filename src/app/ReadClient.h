@@ -324,7 +324,7 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     /**
-     *  Activate the sleeping subscription.
+     *  Activate the idle subscription.
      *
      *  When subscribing to ICD, the subscriber is expected to set the `mActivePeriod`
      * in `ReadPrepareParams`.
