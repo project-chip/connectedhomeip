@@ -56,14 +56,15 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
-               main/ZclDoorLockCallbacks.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-instances.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app

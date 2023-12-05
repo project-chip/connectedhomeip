@@ -300,9 +300,17 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     // an ack to the peer.
     else if (!payloadHeader.NeedsAck())
     {
-        // Using same error message for all errors to reduce code size.
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
-                     CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        // We can easily get standalone acks here: any time we fail to get a
+        // timely ack for the last message in an exchange and retransmit it,
+        // then get acks for both the message and the retransmit, the second ack
+        // will end up in this block.  That's not really an error condition, so
+        // there is no need to log an error in that case.
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            // Using same error message for all errors to reduce code size.
+            ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %" CHIP_ERROR_FORMAT,
+                         CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR.Format());
+        }
         return;
     }
 
@@ -364,8 +372,10 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
                                                 const SessionHandle & session, MessageFlags msgFlags,
                                                 System::PacketBufferHandle && msgBuf)
 {
-    // If we need to send a StandaloneAck, create a EphemeralExchange for the purpose to send the StandaloneAck
-    if (!payloadHeader.NeedsAck())
+
+    // If using the MRP protocol and we need to send a StandaloneAck, create an EphemeralExchange to send
+    // the StandaloneAck.
+    if (!session->AllowsMRP() || !payloadHeader.NeedsAck())
         return;
 
     // If rcvd msg is from initiator then this exchange is created as not Initiator.

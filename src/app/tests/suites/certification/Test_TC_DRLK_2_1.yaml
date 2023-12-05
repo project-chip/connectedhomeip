@@ -22,6 +22,10 @@ config:
     cluster: "Door Lock"
     endpoint: 1
 
+    WaitAfterLockAandUnlockDoor:
+        type: int16u
+        defaultValue: 5000
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -30,6 +34,57 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label: "Precondition: Create new user"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "SetUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "OperationType"
+                value: 0
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+
+    - label: "Precondition: Read the user back and verify its fields"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetUser"
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+      response:
+          values:
+              - name: "UserIndex"
+                value: 1
+              - name: "UserName"
+                value: "xxx"
+              - name: "UserUniqueID"
+                value: 6452
+              - name: "UserStatus"
+                value: 1
+              - name: "UserType"
+                value: 0
+              - name: "CredentialRule"
+                value: 0
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextUserIndex"
+                value: null
 
     - label: "Precondition: Create new PIN credential and lock/unlock user"
       PICS: DRLK.S.F00 && DRLK.S.F07
@@ -44,17 +99,39 @@ tests:
               - name: "CredentialData"
                 value: "123456"
               - name: "UserIndex"
-                value: null
-              - name: "UserStatus"
                 value: 1
+              - name: "UserStatus"
+                value: null
               - name: "UserType"
-                value: 0
+                value: null
       response:
           values:
               - name: "Status"
                 value: 0
+              - name: "UserIndex"
+                value: null
               - name: "NextCredentialIndex"
                 value: 2
+
+    - label: "Precondition: Verify created PIN credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "GetCredentialStatus"
+      arguments:
+          values:
+              - name: "Credential"
+                value: { CredentialType: 1, CredentialIndex: 1 }
+      response:
+          values:
+              - name: "CredentialExists"
+                value: true
+              - name: "UserIndex"
+                value: 1
+              - name: "CreatorFabricIndex"
+                value: 1
+              - name: "LastModifiedFabricIndex"
+                value: 1
+              - name: "NextCredentialIndex"
+                value: null
 
     - label: "Step 1a: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
@@ -84,11 +161,6 @@ tests:
           value: LockStateValue
 
     - label: "Step 1d: TH sends a Lock Door command to the DUT."
-      PICS: DRLK.S.C00.Rsp && !(DRLK.S.F00 && DRLK.S.F07)
-      command: "LockDoor"
-      timedInteractionTimeoutMs: 1000
-
-    - label: "Step 1d: TH sends a Lock Door command to the DUT."
       PICS: DRLK.S.C00.Rsp && DRLK.S.F00 && DRLK.S.F07
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
@@ -96,6 +168,20 @@ tests:
           values:
               - name: "PINCode"
                 value: "123456"
+
+    - label: "Step 1d: TH sends a Lock Door command to the DUT."
+      PICS: DRLK.S.C00.Rsp && !DRLK.S.F00 && !DRLK.S.F07
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 1000
+
+    - label: "Wait after Lock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
 
     - label: "Step 1d: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
@@ -105,7 +191,7 @@ tests:
           value: 1
 
     - label: "Step 1e: TH sends a Unlock Door command to the DUT."
-      PICS: DRLK.S.C01.Rsp && !(DRLK.S.F00 && DRLK.S.F07)
+      PICS: DRLK.S.C01.Rsp && !DRLK.S.F00 && !DRLK.S.F07
       command: "UnlockDoor"
       timedInteractionTimeoutMs: 1000
 
@@ -118,6 +204,15 @@ tests:
               - name: "PINCode"
                 value: "123456"
 
+    - label: "Wait after Unlock Door"
+      PICS: DRLK.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: WaitAfterLockAandUnlockDoor
+
     - label: "Step 1e: TH reads LockState attribute from DUT"
       PICS: DRLK.S.A0000
       command: "readAttribute"
@@ -127,7 +222,8 @@ tests:
 
     - label: "Step 1f: Simulate a not fully locked scenario on the DUT."
       PICS:
-          DRLK.S.A0000 && DRLK.S.Simulate.NotFullyLocked && PICS_SKIP_SAMPLE_APP
+          DRLK.S.A0000 && DRLK.S.M.SimulateNotFullyLocked &&
+          PICS_SKIP_SAMPLE_APP
       verification: |
           vendor will give instructions on how to simulate if applicable and if that is possible, then send the below command to read the lock state attribute.
 
@@ -152,7 +248,7 @@ tests:
               minValue: 0
               maxValue: 11
 
-    - label: "Step 2c: TH writes LockType attribute as 10"
+    - label: "Step 2b: TH writes LockType attribute as 10"
       PICS: DRLK.S.A0001
       command: "writeAttribute"
       attribute: "LockType"
@@ -233,7 +329,7 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 5b: TH writes DoorOpenEvents attribute as 0"
-      PICS: DRLK.S.A0004.Write
+      PICS: DRLK.S.A0004
       command: "writeAttribute"
       attribute: "DoorOpenEvents"
       arguments:
@@ -248,7 +344,7 @@ tests:
 
     #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 5c: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0004.Write && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0004 && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -287,7 +383,7 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 6b: TH writes DoorClosedEvents attribute as 0"
-      PICS: DRLK.S.A0005.Write
+      PICS: DRLK.S.A0005
       command: "writeAttribute"
       attribute: "DoorClosedEvents"
       arguments:
@@ -302,7 +398,7 @@ tests:
 
     #Test plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/2863
     - label: "Step 6c: TH reads DoorOpenEvents attribute from DUT"
-      PICS: DRLK.S.A0005.Write && PICS_SKIP_SAMPLE_APP
+      PICS: DRLK.S.A0005 && PICS_SKIP_SAMPLE_APP
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -658,29 +754,13 @@ tests:
     - label:
           "Step 18b: TH writes Credential RulesSupport attribute as bit 0 is set
           to 1"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.F08 && DRLK.S.A001b
-      verification: |
-          ./chip-tool doorlock write-by-id 27 1 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653636825.034667][3467:3472] CHIP:DMG:
-          [1653636825.034712][3467:3472] CHIP:DMG:                        StatusIB =
-          [1653636825.034758][3467:3472] CHIP:DMG:                        {
-          [1653636825.034804][3467:3472] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653636825.034851][3467:3472] CHIP:DMG:                        },
-          [1653636825.034896][3467:3472] CHIP:DMG:
-          [1653636825.034933][3467:3472] CHIP:DMG:                },
-          [1653636825.034977][3467:3472] CHIP:DMG:
-          [1653636825.035013][3467:3472] CHIP:DMG:        ],
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.F08 && DRLK.S.A001b
+      command: "writeAttribute"
+      attribute: "CredentialRulesSupport"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "Step 18c: TH reads Credential RulesSupport attribute from DUT"
       PICS: DRLK.S.F08 && DRLK.S.A001b
@@ -702,30 +782,30 @@ tests:
               maxLength: 3
 
     - label: "Step 19b: TH writes Language attribute as fr"
-      PICS: DRLK.S.A0021.Write
+      PICS: DRLK.S.A0021 && DRLK.S.M.LanguageAttributeWritable
       command: "writeAttribute"
       attribute: "Language"
       arguments:
           value: "fr"
 
     - label: "Step 19b: TH writes Language attribute as fr"
-      PICS: " !DRLK.S.A0021.Write "
+      PICS: DRLK.S.A0021 && !DRLK.S.M.LanguageAttributeWritable
       command: "writeAttribute"
       attribute: "Language"
       arguments:
           value: "fr"
       response:
-          error: UNSUPPORTED_WRITE]
+          error: UNSUPPORTED_WRITE
 
     - label: "Step 19c: TH reads Language attribute from DUT"
-      PICS: DRLK.S.A0021.Write
+      PICS: DRLK.S.A0021 && DRLK.S.M.LanguageAttributeWritable
       command: "readAttribute"
       attribute: "Language"
       response:
           value: "fr"
 
     - label: "Step 19c: TH reads Language attribute from DUT"
-      PICS: " !DRLK.S.A0021.Write "
+      PICS: DRLK.S.A0021 && !DRLK.S.M.LanguageAttributeWritable
       command: "readAttribute"
       attribute: "Language"
       response:
@@ -745,14 +825,14 @@ tests:
               maxValue: 2
 
     - label: "Step 20b: TH writes LEDSettings attribute as 2"
-      PICS: DRLK.S.A0022.Write
+      PICS: DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022
       command: "writeAttribute"
       attribute: "LEDSettings"
       arguments:
           value: 2
 
     - label: "Step 20b: TH writes LEDSettings attribute as 2"
-      PICS: " !DRLK.S.A0022.Write && DRLK.S.A0022 "
+      PICS: " !DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022 "
       command: "writeAttribute"
       attribute: "LEDSettings"
       arguments:
@@ -761,14 +841,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 20c: TH reads LEDSettings attribute from DUT"
-      PICS: DRLK.S.A0022.Write
+      PICS: DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022
       command: "readAttribute"
       attribute: "LEDSettings"
       response:
           value: 2
 
     - label: "Step 20c: TH reads LEDSettings attribute from DUT"
-      PICS: " !DRLK.S.A0022.Write && DRLK.S.A0022 "
+      PICS: " !DRLK.S.M.LEDSettingsAttributeWritable && DRLK.S.A0022 "
       command: "readAttribute"
       attribute: "LEDSettings"
       response:
@@ -788,14 +868,14 @@ tests:
               maxValue: 4294967294
 
     - label: "Step 21b: TH writes AutoRelockTime attribute as 180 seconds"
-      PICS: DRLK.S.A0023.Write
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
           value: 180
 
     - label: "Step 21b: TH writes AutoRelockTime attribute as 180 seconds"
-      PICS: " !DRLK.S.A0023.Write && DRLK.S.A0023 "
+      PICS: " !DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 "
       command: "writeAttribute"
       attribute: "AutoRelockTime"
       arguments:
@@ -804,14 +884,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 21c: TH reads AutoRelockTime attribute from DUT"
-      PICS: DRLK.S.A0023.Write
+      PICS: DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023
       command: "readAttribute"
       attribute: "AutoRelockTime"
       response:
           value: 180
 
     - label: "Step 21c: TH reads AutoRelockTime attribute from DUT"
-      PICS: " !DRLK.S.A0023.Write && DRLK.S.A0023 "
+      PICS: " !DRLK.S.M.AutoRelockTimeAttributeWritable && DRLK.S.A0023 "
       command: "readAttribute"
       attribute: "AutoRelockTime"
       response:
@@ -831,14 +911,14 @@ tests:
               maxValue: 3
 
     - label: "Step 22b: TH writes SoundVolume attribute as 3"
-      PICS: DRLK.S.A0024.Write
+      PICS: DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024
       command: "writeAttribute"
       attribute: "SoundVolume"
       arguments:
           value: 3
 
     - label: "Step 22b: TH writes SoundVolume attribute as 3"
-      PICS: " !DRLK.S.A0024.Write && DRLK.S.A0024 "
+      PICS: " !DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024 "
       command: "writeAttribute"
       attribute: "SoundVolume"
       arguments:
@@ -847,14 +927,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 22c: TH reads SoundVolume attribute from DUT"
-      PICS: DRLK.S.A0024.Write
+      PICS: DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024
       command: "readAttribute"
       attribute: "SoundVolume"
       response:
           value: 3
 
     - label: "Step 22c: TH reads SoundVolume attribute from DUT"
-      PICS: " !DRLK.S.A0024.Write && DRLK.S.A0024 "
+      PICS: " !DRLK.S.M.SoundVolumeAttributeWritable && DRLK.S.A0024 "
       command: "readAttribute"
       attribute: "SoundVolume"
       response:
@@ -883,28 +963,13 @@ tests:
     - label:
           "Step 23b: TH writes Supported OperatingModes attribute as bit 0 is
           set to 0"
-      PICS: PICS_SKIP_SAMPLE_APP && DRLK.S.A0026
-      verification: |
-          ./chip-tool doorlock write-by-id 38 0 1 1
-
-          Verify " DUT responds with UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1653637108.039160][3522:3527] CHIP:DMG:                        StatusIB =
-          [1653637108.039205][3522:3527] CHIP:DMG:                        {
-          [1653637108.039250][3522:3527] CHIP:DMG:                                status = 0x88 (UNSUPPORTED_WRITE),
-          [1653637108.039297][3522:3527] CHIP:DMG:                        },
-          [1653637108.039343][3522:3527] CHIP:DMG:
-          [1653637108.039380][3522:3527] CHIP:DMG:                },
-          [1653637108.039424][3522:3527] CHIP:DMG:
-          [1653637108.039460][3522:3527] CHIP:DMG:        ],
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A0026
+      command: "writeAttribute"
+      attribute: "SupportedOperatingModes"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label: "Step 23c: TH reads Supported OperatingModes attribute from DUT"
       PICS: DRLK.S.A0026
@@ -929,7 +994,7 @@ tests:
     - label:
           "Step 24b: TH writes OperatingMode attribute to a value as Normal and
           the new value is present in SupportedOperatingModes"
-      PICS: DRLK.S.A0025.Write
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
@@ -938,7 +1003,7 @@ tests:
     - label:
           "Step 24b: TH writes OperatingMode attribute to a value as Normal and
           the new value is present in SupportedOperatingModes"
-      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
@@ -950,7 +1015,7 @@ tests:
           "Step 24c: TH writes OperatingMode attribute to a value as
           NoRemoteLockUnlock and the new value is present in Supported
           OperatingModes"
-      PICS: DRLK.S.A0025.Write
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
@@ -960,7 +1025,7 @@ tests:
           "Step 24c: TH writes OperatingMode attribute to a value as
           NoRemoteLockUnlock and the new value is present in Supported
           OperatingModes"
-      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
       command: "writeAttribute"
       attribute: "OperatingMode"
       arguments:
@@ -969,7 +1034,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 24d: TH reads OperatingMode attribute from DUT"
-      PICS: DRLK.S.A0025.Write
+      PICS: DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025
       command: "readAttribute"
       attribute: "OperatingMode"
       response:
@@ -977,7 +1042,7 @@ tests:
               anyOf: [0, 3]
 
     - label: "Step 24d: TH reads OperatingMode attribute from DUT"
-      PICS: " !DRLK.S.A0025.Write && DRLK.S.A0025 "
+      PICS: " !DRLK.S.M.OperatingModeAttributeWritable && DRLK.S.A0025 "
       command: "readAttribute"
       attribute: "OperatingMode"
       response:
@@ -998,30 +1063,13 @@ tests:
     - label:
           "Step 25b: TH writes Default ConfigurationRegister attribute as bit 0
           is set to 1"
-      PICS: DRLK.S.A0027 && PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 39 1 1 1
-
-          Verify "DUT responds with UNSUPPORTED_WRITE " on the TH(Chip-tool) Log:
-
-          [1653637348.333879][3570:3575] CHIP:DMG:                        StatusIB =
-          [1653637348.333920][3570:3575] CHIP:DMG:                        {
-          [1653637348.333961][3570:3575] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1653637348.334007][3570:3575] CHIP:DMG:                        },
-          [1653637348.334048][3570:3575] CHIP:DMG:
-          [1653637348.334084][3570:3575] CHIP:DMG:                },
-          [1653637348.334124][3570:3575] CHIP:DMG:
-          [1653637348.334156][3570:3575] CHIP:DMG:        ],
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A0027
+      command: "writeAttribute"
+      attribute: "DefaultConfigurationRegister"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "Step 25c: TH reads Default ConfigurationRegister attribute from DUT"
@@ -1041,18 +1089,17 @@ tests:
           saveAs: Current_EnableLocal_Programming
           constraints:
               type: boolean
-              minValue: 0
-              maxValue: 1
 
     - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
-      PICS: DRLK.S.A0028.Write
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
       command: "writeAttribute"
       attribute: "EnableLocalProgramming"
       arguments:
           value: 0
 
     - label: "Step 26b: TH writes EnableLocalProgramming attribute as false"
-      PICS: " !DRLK.S.A0028.Write && DRLK.S.A0028 "
+      PICS:
+          " !DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028 "
       command: "writeAttribute"
       attribute: "EnableLocalProgramming"
       arguments:
@@ -1061,14 +1108,15 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 26c: TH reads EnableLocalProgramming attribute from DUT"
-      PICS: DRLK.S.A0028.Write
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
       command: "readAttribute"
       attribute: "EnableLocalProgramming"
       response:
           value: 0
 
     - label: "Step 26c: TH reads EnableLocalProgramming attribute from DUT"
-      PICS: " !DRLK.S.A0028.Write && DRLK.S.A0028 "
+      PICS:
+          " !DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028 "
       command: "readAttribute"
       attribute: "EnableLocalProgramming"
       response:
@@ -1081,8 +1129,6 @@ tests:
       response:
           constraints:
               type: boolean
-              minValue: 0
-              maxValue: 1
 
     - label: "Step 27b: TH writes EnableOneTouchLocking attribute as true"
       PICS: DRLK.S.A0029
@@ -1105,8 +1151,6 @@ tests:
       response:
           constraints:
               type: boolean
-              minValue: 0
-              maxValue: 1
 
     - label: "Step 28b: TH writes EnableInsideStatusLED attribute as true"
       PICS: DRLK.S.A002a
@@ -1129,8 +1173,6 @@ tests:
       response:
           constraints:
               type: boolean
-              minValue: 0
-              maxValue: 1
 
     - label: "Step 29b: TH writes EnablePrivacy ModeButton attribute as true"
       PICS: DRLK.S.A002b
@@ -1162,7 +1204,7 @@ tests:
     - label:
           "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
           DRLK.S.A0028(EnableLocalProgramming) is True."
-      PICS: DRLK.S.A002c && DRLK.S.A0028.ReadOnly
+      PICS: DRLK.S.A002c && DRLK.S.A0028
       command: "readAttribute"
       attribute: "LocalProgrammingFeatures"
       response:
@@ -1173,7 +1215,7 @@ tests:
     - label:
           "Step 30b: TH reads LocalProgrammingFeatures attribute from DUT.
           DRLK.S.A0028(EnableLocalProgramming) is False."
-      PICS: DRLK.S.A002c && !DRLK.S.A0028.ReadOnly
+      PICS: DRLK.S.A002c && !DRLK.S.A0028
       command: "readAttribute"
       attribute: "LocalProgrammingFeatures"
       response:
@@ -1184,214 +1226,89 @@ tests:
     - label:
           "Step 30c: TH writes to LocalProgrammingFeatures to disable all the
           features (Change all bits to 0)"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.ReadOnly && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 0 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987893.199449][2822:2827] CHIP:DMG:                        StatusIB =
-          [1658987893.199501][2822:2827] CHIP:DMG:                        {
-          [1658987893.199548][2822:2827] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987893.199598][2822:2827] CHIP:DMG:                        },
-          [1658987893.199643][2822:2827] CHIP:DMG:
-          [1658987893.199683][2822:2827] CHIP:DMG:                },
-          [1658987893.199726][2822:2827] CHIP:DMG:
-          [1658987893.199761][2822:2827] CHIP:DMG:        ],
-          [1658987893.199803][2822:2827] CHIP:DMG:
-          [1658987893.199839][2822:2827] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987893.199873][2822:2827] CHIP:DMG: }
-          [1658987893.199968][2822:2827] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658987893.200012][2822:2827] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable && DRLK.S.A0028
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 0
+
+    - label:
+          "Step 30c: TH reads LocalProgrammingFeatures attribute from DUT.
+          DRLK.S.A0028(EnableLocalProgramming) is False."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A0028
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
 
     - label: "Step 30d: TH sets the EnableLocalProgramming attribute to False"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write enable-local-programming 0 1 1
-
-          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
-
-          [1658988052.124227][2834:2839] CHIP:DMG:                        StatusIB =
-          [1658988052.124259][2834:2839] CHIP:DMG:                        {
-          [1658988052.124292][2834:2839] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988052.124323][2834:2839] CHIP:DMG:                        },
-          [1658988052.124353][2834:2839] CHIP:DMG:
-          [1658988052.124381][2834:2839] CHIP:DMG:                },
-          [1658988052.124410][2834:2839] CHIP:DMG:
-          [1658988052.124433][2834:2839] CHIP:DMG:        ],
-          [1658988052.124462][2834:2839] CHIP:DMG:
-          [1658988052.124486][2834:2839] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988052.124509][2834:2839] CHIP:DMG: }
-          [1658988052.124577][2834:2839] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988052.124608][2834:2839] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read local-programming-features 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: false
+
+    - label:
+          "Step 30d: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 0."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8]
 
     - label: "Step 30e: TH sets the EnableLocalProgramming attribute to True"
-      PICS:
-          DRLK.S.A002c && DRLK.S.A0028.Write && DRLK.S.A002c.Write &&
-          PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write enable-local-programming 1 1 1
-
-          Verify " EnableLocalProgramming" on the TH(Chip-tool) Log:
-
-          [1658988136.125747][2845:2850] CHIP:DMG:                        StatusIB =
-          [1658988136.125781][2845:2850] CHIP:DMG:                        {
-          [1658988136.125814][2845:2850] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988136.125847][2845:2850] CHIP:DMG:                        },
-          [1658988136.125879][2845:2850] CHIP:DMG:
-          [1658988136.125908][2845:2850] CHIP:DMG:                },
-          [1658988136.125941][2845:2850] CHIP:DMG:
-          [1658988136.125966][2845:2850] CHIP:DMG:        ],
-          [1658988136.125997][2845:2850] CHIP:DMG:
-          [1658988136.126022][2845:2850] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988136.126072][2845:2850] CHIP:DMG: }
-          [1658988136.126149][2845:2850] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988136.126183][2845:2850] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-
-
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock read local-programming-features 1 1
-
-          Verify "  LocalProgrammingFeatures" on the TH(Chip-tool) Log:
-
-          [1658987637.292491][2794:2799] CHIP:DMG:                                StatusIB =
-          [1658987637.292530][2794:2799] CHIP:DMG:                                {
-          [1658987637.292568][2794:2799] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658987637.292605][2794:2799] CHIP:DMG:                                },
-          [1658987637.292642][2794:2799] CHIP:DMG:
-          [1658987637.292675][2794:2799] CHIP:DMG:                        },
-          [1658987637.292713][2794:2799] CHIP:DMG:
-          [1658987637.292741][2794:2799] CHIP:DMG:                },
-          [1658987637.292774][2794:2799] CHIP:DMG:
-          [1658987637.292798][2794:2799] CHIP:DMG:        ],
-          [1658987637.292828][2794:2799] CHIP:DMG:
-          [1658987637.292852][2794:2799] CHIP:DMG:        SuppressResponse = true,
-          [1658987637.292878][2794:2799] CHIP:DMG:        InteractionModelRevision = 1
-          [1658987637.292901][2794:2799] CHIP:DMG: }
-          [1658987637.293006][2794:2799] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)"
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "EnableLocalProgramming"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: true
+
+    - label:
+          "Step 30e: Verify that all the 4 bits in the LocalProgrammingFeatures
+          is set to 1."
+      PICS: DRLK.S.M.EnableLocalProgrammingAttributeWritable && DRLK.S.A002c
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x1, 0x2, 0x4, 0x8]
 
     - label:
           "Step 30f: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c.Write && PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 2 1 1
-
-          Verify "  DUT sends SUCCESS response" on the TH(Chip-tool) Log:
-
-          [1658988308.728071][2866:2871] CHIP:DMG:                        StatusIB =
-          [1658988308.728110][2866:2871] CHIP:DMG:                        {
-          [1658988308.728152][2866:2871] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988308.728191][2866:2871] CHIP:DMG:                        },
-          [1658988308.728229][2866:2871] CHIP:DMG:
-          [1658988308.728263][2866:2871] CHIP:DMG:                },
-          [1658988308.728299][2866:2871] CHIP:DMG:
-          [1658988308.728328][2866:2871] CHIP:DMG:        ],
-          [1658988308.728364][2866:2871] CHIP:DMG:
-          [1658988308.728394][2866:2871] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988308.728423][2866:2871] CHIP:DMG: }
-          [1658988308.728500][2866:2871] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988308.728539][2866:2871] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c && DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 2
+
+    - label:
+          "Step 30f: Verify that the correct bit has been changed by doing a
+          Read on LocalProgrammingFeatures attribute.."
+      PICS: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+      command: "readAttribute"
+      attribute: "LocalProgrammingFeatures"
+      response:
+          constraints:
+              type: bitmap8
+              hasMasksSet: [0x2]
 
     - label:
           "Step 30g: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c && DRLK.S.A002c.ReadOnly && PICS_SKIP_SAMPLE_APP
-      verification: |
-          This is an Optional attribute, so its not compulsory to get the expected outcome
-
-          ./chip-tool doorlock write-by-id 44 3 1 1
-
-          Verify " DUT sends an UNSUPPORTED_WRITE" on the TH(Chip-tool) Log:
-
-          [1658988387.295252][2874:2879] CHIP:DMG:                        StatusIB =
-          [1658988387.295294][2874:2879] CHIP:DMG:                        {
-          [1658988387.295336][2874:2879] CHIP:DMG:                                status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1658988387.295378][2874:2879] CHIP:DMG:                        },
-          [1658988387.295419][2874:2879] CHIP:DMG:
-          [1658988387.295456][2874:2879] CHIP:DMG:                },
-          [1658988387.295499][2874:2879] CHIP:DMG:
-          [1658988387.295530][2874:2879] CHIP:DMG:        ],
-          [1658988387.295569][2874:2879] CHIP:DMG:
-          [1658988387.295601][2874:2879] CHIP:DMG:        InteractionModelRevision = 1
-          [1658988387.295632][2874:2879] CHIP:DMG: }
-          [1658988387.295719][2874:2879] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658988387.295760][2874:2879] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-      cluster: "LogCommands"
-      command: "UserPrompt"
+      PICS: DRLK.S.A002c
+      command: "writeAttribute"
+      attribute: "LocalProgrammingFeatures"
       arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+          value: 2
+      response:
+          error: UNSUPPORTED_WRITE
 
     - label:
           "Step 31a: TH reads WrongCodeEntry Limit attribute from DUT TH saves
@@ -1407,14 +1324,18 @@ tests:
               maxValue: 255
 
     - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030.Write
+      PICS:
+          ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
           value: 8
 
     - label: "Step 31b: TH writes WrongCodeEntryLimit attribute as 8"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0030.Write
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
@@ -1423,14 +1344,18 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0030.Write
+      PICS:
+          ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          DRLK.S.M.WrongCodeEntryLimitAttributeWritable
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
       response:
           value: 8
 
     - label: "Step 31c: TH reads WrongCode EntryLimit attribute"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0030.Write
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          !DRLK.S.M.WrongCodeEntryLimitAttributeWritable "
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
       response:
@@ -1450,14 +1375,18 @@ tests:
               maxValue: 255
 
     - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031.Write
+      PICS:
+          ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
           value: 120
 
     - label: "Step 32b: TH writes UserCodeTemporaryDisableTime attribute as 120"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0031.Write
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "writeAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       arguments:
@@ -1466,14 +1395,18 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && DRLK.S.A0031.Write
+      PICS:
+          ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
           value: 120
 
     - label: "Step 32c: TH reads UserCodeTemporary DisableTime attribute"
-      PICS: ( DRLK.S.F00 || DRLK.S.F01 ) && !DRLK.S.A0031.Write
+      PICS:
+          " ( DRLK.S.F00 || DRLK.S.F01 ) &&
+          !DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable "
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
       response:
@@ -1485,15 +1418,15 @@ tests:
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
+          saveAs: Current_RequirePINFor_RemoteOperation
           constraints:
               type: boolean
-              minValue: 0
-              maxValue: 1
-          saveAs: Current_RequirePINFor_RemoteOperation
 
     - label:
           "Step 33b: TH writes RequirePINfor RemoteOperation attribute as true"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      PICS:
+          DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -1501,7 +1434,9 @@ tests:
 
     - label:
           "Step 33b: TH writes RequirePINfor RemoteOperation attribute as true"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
+      PICS:
+          " DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          !DRLK.S.M.RequirePINForRemoteOperationAttributeWritable "
       command: "writeAttribute"
       attribute: "RequirePINforRemoteOperation"
       arguments:
@@ -1510,14 +1445,18 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 33c: TH reads RequirePINfor RemoteOperation attribute"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033.Write
+      PICS:
+          DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
           value: 1
 
     - label: "Step 33c: TH reads RequirePINfor RemoteOperation attribute"
-      PICS: DRLK.S.F07 && DRLK.S.F00 && !DRLK.S.A0033.Write
+      PICS:
+          " DRLK.S.F07 && DRLK.S.F00 && DRLK.S.A0033 &&
+          !DRLK.S.M.RequirePINForRemoteOperationAttributeWritable "
       command: "readAttribute"
       attribute: "RequirePINforRemoteOperation"
       response:
@@ -1537,14 +1476,18 @@ tests:
               maxValue: 2880
 
     - label: "Step 34b: TH writes ExpiringUserTimeout attribute as 10 minutes"
-      PICS: DRLK.S.F08 && DRLK.S.A0035.Write && DRLK.S.A0035
+      PICS:
+          DRLK.S.F08 && DRLK.S.A0035 &&
+          DRLK.S.M.ExpiringUserTimeOutAttributeWritable
       command: "writeAttribute"
       attribute: "ExpiringUserTimeout"
       arguments:
           value: 10
 
     - label: "Step 34b: TH writes ExpiringUserTimeout attribute as 10 minutes"
-      PICS: DRLK.S.F08 && !DRLK.S.A0035.Write && DRLK.S.A0035
+      PICS:
+          DRLK.S.F08 && !DRLK.S.M.ExpiringUserTimeOutAttributeWritable &&
+          DRLK.S.A0035
       command: "writeAttribute"
       attribute: "ExpiringUserTimeout"
       arguments:
@@ -1553,14 +1496,18 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 34c: TH reads ExpiringUserTimeout attribute"
-      PICS: DRLK.S.F08 && DRLK.S.A0035.Write && DRLK.S.A0035
+      PICS:
+          DRLK.S.F08 && DRLK.S.A0035 &&
+          DRLK.S.M.ExpiringUserTimeOutAttributeWritable
       command: "readAttribute"
       attribute: "ExpiringUserTimeout"
       response:
           value: 10
 
     - label: "Step 34c: TH reads ExpiringUserTimeout attribute"
-      PICS: DRLK.S.F08 && !DRLK.S.A0035.Write && DRLK.S.A0035
+      PICS:
+          " DRLK.S.F08 && DRLK.S.A0035 &&
+          !DRLK.S.M.ExpiringUserTimeOutAttributeWritable "
       command: "readAttribute"
       attribute: "ExpiringUserTimeout"
       response:
@@ -1599,8 +1546,17 @@ tests:
       response:
           value: NumberOfCredentialsSupportedPerUserValue
 
-    - label: "Clean the created credential/user"
+    - label: "Cleanup the created user"
       PICS: DRLK.S.F00 && DRLK.S.F07
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 1000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 1
+
+    - label: "Clean the created credential"
+      PICS: DRLK.S.F00 && DRLK.S.F07 && DRLK.S.C26.Rsp
       command: "ClearCredential"
       timedInteractionTimeoutMs: 1000
       arguments:

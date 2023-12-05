@@ -58,10 +58,7 @@ CHIP_ERROR BoltLockManager::Init()
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
 
-    mState              = kState_LockingCompleted;
-    mAutoLockTimerArmed = false;
-    mAutoRelock         = false;
-    mAutoLockDuration   = 0;
+    mState = kState_LockingCompleted;
 
     return CHIP_NO_ERROR;
 }
@@ -80,16 +77,6 @@ bool BoltLockManager::IsActionInProgress()
 bool BoltLockManager::IsUnlocked()
 {
     return (mState == kState_UnlockingCompleted);
-}
-
-void BoltLockManager::EnableAutoRelock(bool aOn)
-{
-    mAutoRelock = aOn;
-}
-
-void BoltLockManager::SetAutoLockDuration(uint32_t aDurationInSecs)
-{
-    mAutoLockDuration = aDurationInSecs;
 }
 
 bool BoltLockManager::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -224,15 +211,6 @@ bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
     if (action_initiated)
     {
-        if (mAutoLockTimerArmed && new_state == kState_LockingInitiated)
-        {
-            // If auto lock timer has been armed and someone initiates locking,
-            // cancel the timer and continue as normal.
-            mAutoLockTimerArmed = false;
-
-            CancelTimer();
-        }
-
         StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
 
         // Since the timer started successfully, update the state and trigger callback
@@ -285,33 +263,8 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = lock;
-    if (lock->mAutoLockTimerArmed)
-    {
-        event.Handler = AutoReLockTimerEventHandler;
-    }
-    else
-    {
-        event.Handler = ActuatorMovementTimerEventHandler;
-    }
+    event.Handler            = ActuatorMovementTimerEventHandler;
     GetAppTask().PostEvent(&event);
-}
-
-void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
-{
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
-    int32_t actor          = 0;
-
-    // Make sure auto lock timer is still armed.
-    if (!lock->mAutoLockTimerArmed)
-    {
-        return;
-    }
-
-    lock->mAutoLockTimerArmed = false;
-
-    ChipLogProgress(NotSpecified, "Auto Re-Lock has been triggered!");
-
-    lock->InitiateAction(actor, LOCK_ACTION);
 }
 
 void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -336,17 +289,6 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
         if (lock->mActionCompleted_CB)
         {
             lock->mActionCompleted_CB(actionCompleted);
-        }
-
-        if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
-        {
-            // Start the timer for auto relock
-            lock->StartTimer(lock->mAutoLockDuration * 1000);
-
-            lock->mAutoLockTimerArmed = true;
-
-            ChipLogProgress(NotSpecified, "Auto Re-lock enabled. Will be triggered in %" PRIu32 " seconds",
-                            lock->mAutoLockDuration);
         }
     }
 }

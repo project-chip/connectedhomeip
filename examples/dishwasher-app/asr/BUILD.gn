@@ -72,7 +72,6 @@ asr_executable("dishwasher_app") {
 
   sources = [
     "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegate-impl.cpp",
-    "${chip_root}/examples/dishwasher-app/dishwasher-common/src/operational-state-delegates.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
@@ -107,7 +106,7 @@ asr_executable("dishwasher_app") {
   defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
 
   if (chip_build_libshell) {
-    defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]
+    defines += [ "CONFIG_ENABLE_CHIP_SHELL" ]
     sources += [ "${examples_plat_dir}/shell/launch_shell.cpp" ]
     include_dirs += [ "${examples_plat_dir}/shell" ]
   }

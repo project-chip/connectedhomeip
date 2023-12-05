@@ -53,9 +53,14 @@ java-jni:
 java-class:
     inputs/several_clusters.matter:
         java/chip/devicecontroller/cluster/structs/SecondClusterFabricDescriptorStruct.kt: outputs/several_clusters/java/SecondClusterFabricDescriptorStruct.kt
+        java/chip/devicecontroller/ChipClusters.java: outputs/several_clusters/java/ChipClusters.java
+        java/chip/devicecontroller/ChipEventStructs.java: outputs/several_clusters/java/ChipEventStructs.java
+        java/chip/devicecontroller/ChipStructs.java: outputs/several_clusters/java/ChipStructs.java
+        java/chip/devicecontroller/ClusterInfoMapping.java: outputs/several_clusters/java/ClusterInfoMapping.java
         java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
         java/chip/devicecontroller/ClusterReadMapping.java: outputs/several_clusters/java/ClusterReadMapping.java
         java/chip/devicecontroller/ClusterIDMapping.java: outputs/several_clusters/java/ClusterIDMapping.java
+        java/chip/devicecontroller/cluster/files.gni: outputs/several_clusters/java/files.gni
 
 cpp-app:
     inputs/several_clusters.matter:
@@ -83,6 +88,3 @@ custom-example-proto:
         proto/first_cluster.proto: outputs/proto/first_cluster.proto
         proto/second_cluster.proto: outputs/proto/second_cluster.proto
         proto/third_cluster.proto: outputs/proto/third_cluster.proto
-
-    inputs/large_all_clusters_app.matter:
-        proto/ota_software_update_provider_cluster.proto: outputs/proto/ota_software_update_provider_cluster.proto

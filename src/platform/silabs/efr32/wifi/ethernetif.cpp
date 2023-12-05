@@ -31,7 +31,24 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
+#if (SIWX_917 | EXP_BOARD)
+#ifdef __cplusplus
+extern "C" {
 #endif
+#include "cmsis_os2.h"
+#include "sl_board_configuration.h"
+#include "sl_net.h"
+#include "sl_si91x_driver.h"
+#include "sl_si91x_host_interface.h"
+#include "sl_si91x_types.h"
+#include "sl_wifi_callback_framework.h"
+#include "sl_wifi_constants.h"
+#include "sl_wifi_types.h"
+#ifdef __cplusplus
+}
+#endif
+#endif // (SIWX_917 | EXP_BOARD)
+#endif // WF200_WIFI
 
 #include "wfx_host_events.h"
 #include "wifi_config.h"
@@ -333,13 +350,31 @@ static SemaphoreHandle_t ethout_sem;
  ******************************************************************************/
 static err_t low_level_output(struct netif * netif, struct pbuf * p)
 {
-    void * rsipkt;
+#if (SIWX_917 | EXP_BOARD)
+    sl_wifi_buffer_t * buffer;
+    sl_si91x_packet_t * packet;
+    sl_status_t status = SL_STATUS_OK;
+#else
+    void * packet;
+#endif
     struct pbuf * q;
-    uint16_t framelength;
-
+    uint16_t framelength = 0;
+    uint16_t datalength  = 0;
+#ifdef WIFI_DEBUG_ENABLED
+    SILABS_LOG("LWIP : low_level_output");
+#endif
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
     {
         return ERR_IF;
+    }
+    /* Calculate total packet size */
+    for (q = p, framelength = 0; q != NULL; q = q->next)
+    {
+        framelength += q->len;
+    }
+    if (framelength < LWIP_FRAME_ALIGNMENT)
+    {
+        framelength = LWIP_FRAME_ALIGNMENT;
     }
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("EN-RSI: Output");
@@ -351,29 +386,41 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
         return ERR_IF;
     }
     /* Confirm if packet is allocated */
-    rsipkt = wfx_rsi_alloc_pkt();
-    if (!rsipkt)
+#if (SIWX_917 | EXP_BOARD)
+    status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + framelength,
+                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
+    VERIFY_STATUS_AND_RETURN(status);
+    if (packet == NULL)
+#else  // RS9116
+    packet = wfx_rsi_alloc_pkt();
+    if (!packet)
+#endif // SIWX_917
     {
         SILABS_LOG("EN-RSI:No buf");
         xSemaphoreGive(ethout_sem);
+#if (SIWX_917 | EXP_BOARD)
+        return SL_STATUS_ALLOCATION_FAILED;
+    }
+    memset(packet->desc, 0, sizeof(packet->desc));
+#else  // RS9116
         return ERR_IF;
     }
-
+#endif // SIWX_917
 #ifdef WIFI_DEBUG_ENABLED
     uint8_t * b = (uint8_t *) p->payload;
     SILABS_LOG("EN-RSI: Out [%02x:%02x:%02x:%02x:%02x:%02x][%02x:%02x:%02x:%02x:%02x:%02x]type=%02x%02x", b[0], b[1], b[2], b[3],
                b[4], b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13]);
 #endif
     /* Generate the packet */
-    for (q = p, framelength = 0; q != NULL; q = q->next)
+    for (q = p, datalength = 0; q != NULL; q = q->next)
     {
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (q->payload), (uint16_t) q->len, framelength);
-        framelength += q->len;
+        wfx_rsi_pkt_add_data(packet, (uint8_t *) (q->payload), (uint16_t) q->len, datalength);
+        datalength += q->len;
     }
-    if (framelength < LWIP_FRAME_ALIGNMENT)
+    if (datalength < LWIP_FRAME_ALIGNMENT)
     {
         /* Add junk data to the end for frame alignment if framelength is less than 60 */
-        wfx_rsi_pkt_add_data(rsipkt, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - framelength, framelength);
+        wfx_rsi_pkt_add_data(packet, (uint8_t *) (p->payload), LWIP_FRAME_ALIGNMENT - datalength, datalength);
     }
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("EN-RSI: Sending %d", framelength);
@@ -382,7 +429,16 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     /* forward the generated packet to RSI to
      * send the data over wifi network
      */
-    if (wfx_rsi_send_data(rsipkt, framelength))
+#if (SIWX_917 | EXP_BOARD)
+    packet->length  = framelength & 0xFFF;
+    packet->command = RSI_SEND_RAW_DATA;
+    if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, 1000))
+#else
+    /* forward the generated packet to RSI to
+     * send the data over wifi network
+     */
+    if (wfx_rsi_send_data(packet, datalength))
+#endif
     {
         SILABS_LOG("*ERR*EN-RSI:Send fail");
         xSemaphoreGive(ethout_sem);
@@ -397,8 +453,9 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     return ERR_OK;
 }
 
+#if (SIWX_917 | EXP_BOARD)
 /*****************************************************************************
- *  @fn  void wfx_host_received_sta_frame_cb(uint8_t *buf, int len)
+ *  @fn  void sl_si91x_host_process_data_frame(uint8_t *buf, int len)
  *  @brief
  *    host received frame cb
  *
@@ -406,6 +463,33 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
  *
  * @param[in] len: length
  *
+ * @return
+ *    None
+ ******************************************************************************/
+sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface, sl_wifi_buffer_t * buffer)
+{
+    void * packet;
+    struct netif * ifp;
+    sl_si91x_packet_t * rsi_pkt;
+    packet  = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
+    rsi_pkt = (sl_si91x_packet_t *) packet;
+    /* get the network interface for STATION interface,
+     * and forward the received frame buffer to LWIP
+     */
+    if ((ifp = wfx_get_netif(SL_WFX_STA_INTERFACE)) != (struct netif *) 0)
+    {
+        low_level_input(ifp, rsi_pkt->data, rsi_pkt->length);
+    }
+    return SL_STATUS_OK;
+}
+#else
+
+/*****************************************************************************
+ *  @fn  void wfx_host_received_sta_frame_cb(uint8_t *buf, int len)
+ *  @brief
+ *    host received frame cb
+ *
+        @@ -409,17 +430,21 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
  * @return
  *    None
  ******************************************************************************/
@@ -421,6 +505,7 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
         low_level_input(ifp, buf, len);
     }
 }
+#endif
 
 #endif /* RS911x - with LWIP */
 

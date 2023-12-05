@@ -72,6 +72,27 @@ tests:
                                 },
                             ],
                     }
+              - name: "UseCurrentContext"
+                value: false
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Data"
@@ -120,6 +141,27 @@ tests:
                                                 Value: ExternalIdValue,
                                             },
                                         ],
+                                },
+                            ],
+                    }
+              - name: "UseCurrentContext"
+                value: false
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
                                 },
                             ],
                     }

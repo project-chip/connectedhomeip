@@ -98,6 +98,7 @@ static_library("Darwin") {
   deps = [
     ":logging",
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
 
@@ -137,10 +138,9 @@ static_library("logging") {
   ]
 
   deps = [
-    "${chip_root}/src/lib/core:chip_config_header",  # for lib/support/Span.h
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
-    "${nlassert_root}:nlassert",  # for lib/support/Span.h
+    "${chip_root}/src/lib/support:span",
   ]
 
   configs += [ "${chip_root}/src:includes" ]

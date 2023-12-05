@@ -91,6 +91,7 @@ tests:
       command: "readAttribute"
       attribute: "DataModelRevision"
       response:
+          value: 17
           saveAs: DataModelRevisionValue
           constraints:
               type: int16u

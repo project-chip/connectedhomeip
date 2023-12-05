@@ -29,6 +29,10 @@ config("includes") {
 
 executable("air-quality-sensor-app") {
   sources = [
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/air-quality-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/relative-humidity-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include/temperature-sensor-manager.h",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/src/air-quality-sensor-manager.cpp",
     "AirQualitySensorAppAttrUpdateDelegate.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
@@ -50,7 +54,10 @@ executable("air-quality-sensor-app") {
     ]
   }
 
-  include_dirs = [ "include" ]
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common/include",
+  ]
 
   cflags = [ "-Wconversion" ]
 

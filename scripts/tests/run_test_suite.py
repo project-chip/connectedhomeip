@@ -159,7 +159,9 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.CHIP_REPL_PYTHON:
-        all_tests = [test for test in chiptest.AllYamlTests()]
+        all_tests = [test for test in chiptest.AllReplYamlTests()]
+    elif runtime == TestRunTime.CHIP_TOOL_PYTHON and os.path.basename(chip_tool) != "darwin-framework-tool":
+        all_tests = [test for test in chiptest.AllChipToolYamlTests()]
     else:
         all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
 
@@ -167,11 +169,13 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     # If just defaults specified, do not run manual and in development
     # Specific target basically includes everything
-    if 'all' in target and not include_tags:
+    if 'all' in target and not include_tags and not exclude_tags:
         exclude_tags = {
             TestTag.MANUAL,
             TestTag.IN_DEVELOPMENT,
             TestTag.FLAKY,
+            TestTag.EXTRA_SLOW,
+            TestTag.PURPOSEFUL_FAILURE,
         }
 
         if runtime != TestRunTime.CHIP_TOOL_PYTHON:
@@ -248,6 +252,9 @@ def cmd_list(context):
     '--bridge-app',
     help='what bridge app to use')
 @click.option(
+    '--lit-icd-app',
+    help='what lit-icd app to use')
+@click.option(
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
 @click.option(
@@ -270,9 +277,19 @@ def cmd_list(context):
     default=None,
     type=int,
     help='If provided, fail if a test runs for longer than this time')
+@click.option(
+    '--expected-failures',
+    type=int,
+    default=0,
+    show_default=True,
+    help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
+            tv_app, bridge_app, lit_icd_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
+    if expected_failures != 0 and not keep_going:
+        logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
+        sys.exit(2)
+
     runner = chiptest.runner.Runner()
 
     paths_finder = PathsFinder()
@@ -295,11 +312,17 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if bridge_app is None:
         bridge_app = paths_finder.get('chip-bridge-app')
 
+    if lit_icd_app is None:
+        lit_icd_app = paths_finder.get('lit-icd-app')
+
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
     if chip_tool_with_python is None:
-        chip_tool_with_python = paths_finder.get('chiptool.py')
+        if context.obj.chip_tool and os.path.basename(context.obj.chip_tool) == "darwin-framework-tool":
+            chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
+        else:
+            chip_tool_with_python = paths_finder.get('chiptool.py')
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
@@ -310,6 +333,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app],
         bridge_app=[bridge_app],
+        lit_icd_app=[lit_icd_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
@@ -324,8 +348,14 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     apps_register = AppsRegister()
     apps_register.init()
 
+    def cleanup():
+        apps_register.uninit()
+        if sys.platform == 'linux':
+            chiptest.linux.ShutdownNamespaceForTestExecution()
+
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
+        observed_failures = 0
         for test in context.obj.tests:
             if context.obj.include_tags:
                 if not (test.tags & context.obj.include_tags):
@@ -341,26 +371,30 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             try:
                 if context.obj.dry_run:
                     logging.info("Would run test: %s" % test.name)
-                    continue
-
-                logging.info('%-20s - Starting test' % (test.name))
+                else:
+                    logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime)
-                test_end = time.monotonic()
-                logging.info('%-30s - Completed in %0.2f seconds' %
-                             (test.name, (test_end - test_start)))
+                if not context.obj.dry_run:
+                    test_end = time.monotonic()
+                    logging.info('%-30s - Completed in %0.2f seconds' %
+                                 (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %
                                   (test.name, (test_end - test_start)))
+                observed_failures += 1
                 if not keep_going:
-                    apps_register.uninit()
+                    cleanup()
                     sys.exit(2)
 
-    apps_register.uninit()
-    if sys.platform == 'linux':
-        chiptest.linux.ShutdownNamespaceForTestExecution()
+        if observed_failures != expected_failures:
+            logging.exception(f'Iteration {i}: expected failure count {expected_failures}, but got {observed_failures}')
+            cleanup()
+            sys.exit(2)
+
+    cleanup()
 
 
 # On linux, allow an execution shell to be prepared

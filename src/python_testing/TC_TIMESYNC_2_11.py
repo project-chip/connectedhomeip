@@ -108,14 +108,17 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         self.print_step(8, "TH waits for DSTStatus event until th_utc + 5s")
         self.wait_for_dst_status(th_utc, 5, True)
 
-        self.print_step(9, "TH waits until th_utc + 15s")
-        time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+        self.print_step(9, "If dst_list_size > 1, TH waits until th_utc + 15s")
+        if dst_list_size > 1:
+            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
 
-        self.print_step(10, "TH reads LocalTime")
-        await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
+        self.print_step(10, "If dst_list_size > 1, TH reads LocalTime")
+        if dst_list_size > 1:
+            await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
-        self.print_step(11, "TH waits for DSTStatus event until th_utc + 20s")
-        self.wait_for_dst_status(th_utc, 20, False)
+        self.print_step(11, "If dst_list_size > 1, TH waits for DSTStatus event until th_utc + 20s")
+        if dst_list_size > 1:
+            self.wait_for_dst_status(th_utc, 20, False)
 
         self.print_step(12, "If dst_list_size > 1, TH waits until th_utc + 30s")
         if dst_list_size > 1:
@@ -129,24 +132,12 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         if dst_list_size > 1:
             self.wait_for_dst_status(th_utc, 35, True)
 
-        self.print_step(15, "If dst_list_size > 1, TH waits until th_utc + 45s")
-        if dst_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 45))
-
-        self.print_step(16, "If dst_list_size > 1, TH reads the LocalTime")
-        if dst_list_size > 1:
-            await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
-
-        self.print_step(17, "If dst_list_size > 1, TH waits for a DSTStatus event until th_utc + 50s")
-        if dst_list_size > 1:
-            self.wait_for_dst_status(th_utc, 50, False)
-
-        self.print_step(18, "Set time zone back to 0")
+        self.print_step(15, "Set time zone back to 0")
         tz = [tz_struct(offset=0, validAt=0)]
         ret = await self.send_set_time_zone_cmd(tz)
         asserts.assert_true(ret.DSTOffsetRequired, "DSTOffsetRequired not set to true")
 
-        self.print_step(19, "Set DST back to 0")
+        self.print_step(16, "Set DST back to 0")
         dst = [dst_struct(offset=0, validStarting=0, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 

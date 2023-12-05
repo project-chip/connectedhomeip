@@ -133,7 +133,7 @@ private:
     }
 };
 
-}
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {

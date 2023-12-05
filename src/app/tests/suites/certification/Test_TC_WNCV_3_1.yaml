@@ -26,6 +26,22 @@ config:
     cluster: "Window Covering"
     endpoint: 1
 
+    Step1bWaitTime:
+        type: int16u
+        defaultValue: 10000
+    Step2bWaitTime:
+        type: int16u
+        defaultValue: 500
+    Step2eWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step4bWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step5aWaitTime:
+        type: int16u
+        defaultValue: 500
+
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -44,13 +60,13 @@ tests:
       PICS: WNCV.S.C01.Rsp
       command: "DownOrClose"
 
-    - label: "Step 1b: TH Waits for 10 seconds movement(s) on the device"
+    - label: "Step 1b: TH Waits for 5 - 15 seconds movement(s) on the device"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: Step1bWaitTime
 
     ###
     ### Mandatory Depends on the FeatureMap
@@ -62,7 +78,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -75,7 +91,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 1
               maxValue: 100
 
@@ -88,7 +104,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -101,21 +117,12 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 1
               maxValue: 100
 
     ######## UpOrOpen Command #######
     ### Step 2x -> Check UpOrOpen Fast effects
-
-    - label: "Step 2: Subscribe to DUT reports on OperationalStatus attribute"
-      command: "subscribeAttribute"
-      attribute: "OperationalStatus"
-      minInterval: 4
-      maxInterval: 5
-      response:
-          constraints:
-              type: bitmap8
 
     ### MANDATORY Command
     - label: "Step 2a: TH sends UpOrOpen command to DUT"
@@ -129,7 +136,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: Step2bWaitTime
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -151,96 +158,92 @@ tests:
       response:
           value: 0
 
-    - label: "Step 2e: TH leave the device moving for 2 seconds"
+    - label: "Step 2e: TH leave the device moving for 1-5 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: Step2eWaitTime
 
     ######## UpOrOpen Reports #######
     ### Step 3x -> Check UpOrOpen Mid term effects
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
     # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
-    - label: "Step 3a: TH reads OperationalStatus attribute's bit 0..1"
-      PICS: WNCV.S.A000a && PICS_SDK_CI_ONLY
+    - label: "Step 3a1: TH reads OperationalStatus attribute's bit 0..1"
+      PICS: WNCV.S.A000a
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
+          saveAs: OperationalStatusValue
           constraints:
               type: bitmap8
               hasMasksSet: [0x1]
               hasMasksClear: [0x2]
 
     - label:
-          "Step 3a: TH reads OperationalStatus attribute's bit 2..3
-          (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && WNCV.S.F00 && PICS_SDK_CI_ONLY
+          "Step 3a2: Write attribute BITMAP8 with OperationalStatusValue to do
+          the bits checks in upcoming OperationalStatus read steps."
+      PICS: WNCV.S.A000a
+      cluster: "Unit Testing"
+      command: "writeAttribute"
+      attribute: "bitmap8"
+      arguments:
+          value: OperationalStatusValue
+
+    - label:
+          "Step 3a3: TH checks OperationalStatus value bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && WNCV.S.F00
+      cluster: "Unit Testing"
       command: "readAttribute"
-      attribute: "OperationalStatus"
+      attribute: "bitmap8"
       response:
+          value: OperationalStatusValue
           constraints:
               type: bitmap8
               hasMasksSet: [0x4]
               hasMasksClear: [0x8]
 
     - label:
-          "Step 3a: TH reads OperationalStatus attribute's bit 2..3
-          (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && !WNCV.S.F00 && PICS_SDK_CI_ONLY
+          "Step 3a4: TH check OperationalStatus value bit 2..3 (WNCV.S.F00(LF))"
+      PICS: WNCV.S.A000a && !WNCV.S.F00
+      cluster: "Unit Testing"
       command: "readAttribute"
-      attribute: "OperationalStatus"
+      attribute: "bitmap8"
       response:
+          value: OperationalStatusValue
           constraints:
               type: bitmap8
               hasMasksClear: [0x4, 0x8]
 
     - label:
-          "Step 3a: TH reads OperationalStatus attribute's bit 4..5
-          (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && WNCV.S.F01 && PICS_SDK_CI_ONLY
+          "Step 3a5: TH checks OperationalStatus value bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && WNCV.S.F01
+      cluster: "Unit Testing"
       command: "readAttribute"
-      attribute: "OperationalStatus"
+      attribute: "bitmap8"
       response:
+          value: OperationalStatusValue
           constraints:
               type: bitmap8
               hasMasksSet: [0x10]
               hasMasksClear: [0x20]
 
     - label:
-          "Step 3a: TH reads OperationalStatus attribute's bit 4..5
-          (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && !WNCV.S.F01 && PICS_SDK_CI_ONLY
+          "Step 3a6: TH checks OperationalStatus value bit 4..5 (WNCV.S.F01(TL))"
+      PICS: WNCV.S.A000a && !WNCV.S.F01
+      cluster: "Unit Testing"
       command: "readAttribute"
-      attribute: "OperationalStatus"
+      attribute: "bitmap8"
       response:
+          value: OperationalStatusValue
           constraints:
               type: bitmap8
               hasMasksClear: [0x10, 0x20]
 
-    #Issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/509
-    - label: "Step 3a: TH reads OperationalStatus attribute from DUT"
-      verification: |
-          ./chip-tool windowcovering read operational-status 1 1
-
-          Verify "OperationalStatus " on the TH(Chip-tool) Log: is currently not zero and is in opening mode
-
-          [1650883032.948262][8712:8718] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0102 Attribute 0x0000_000A DataVersion: 366273196
-          [1650883032.948351][8712:8718] CHIP:TOO:   OperationalStatus: 21
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
-
     ### Depending on the DUT specs we might prefer a arguments here
-    - label: "Step 3a2: DUT updates its attributes"
+    - label: "Step 3a7: DUT updates its attributes"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -257,7 +260,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -270,7 +273,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 99
 
@@ -283,7 +286,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -296,7 +299,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 99
 
@@ -315,7 +318,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: Step4bWaitTime
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
@@ -335,7 +338,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: Step5aWaitTime
 
     ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionLiftPercent100ths
     - label:
@@ -346,7 +349,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -359,6 +362,6 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999

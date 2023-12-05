@@ -165,9 +165,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
         if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+            ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
         else
-            ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+            ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
 

@@ -37,7 +37,7 @@ tests:
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
-          saveAs: MinMeasuredValue
+          saveAs: MinMeasuredValueValue
           constraints:
               type: int16u
 
@@ -46,7 +46,7 @@ tests:
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
-          saveAs: MaxMeasuredValue
+          saveAs: MaxMeasuredValueValue
           constraints:
               type: int16u
 

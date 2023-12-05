@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class UnitTestingClusterTestListStructOctet(val member1: Long, val member2: ByteArray) {
+class UnitTestingClusterTestListStructOctet(val member1: ULong, val member2: ByteArray) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestListStructOctet {\n")
     append("\tmember1 : $member1\n")
@@ -30,9 +30,9 @@ class UnitTestingClusterTestListStructOctet(val member1: Long, val member2: Byte
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MEMBER1), member1)
       put(ContextSpecificTag(TAG_MEMBER2), member2)
       endStructure()
@@ -43,9 +43,9 @@ class UnitTestingClusterTestListStructOctet(val member1: Long, val member2: Byte
     private const val TAG_MEMBER1 = 0
     private const val TAG_MEMBER2 = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
-      tlvReader.enterStructure(tag)
-      val member1 = tlvReader.getLong(ContextSpecificTag(TAG_MEMBER1))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestListStructOctet {
+      tlvReader.enterStructure(tlvTag)
+      val member1 = tlvReader.getULong(ContextSpecificTag(TAG_MEMBER1))
       val member2 = tlvReader.getByteArray(ContextSpecificTag(TAG_MEMBER2))
 
       tlvReader.exitContainer()

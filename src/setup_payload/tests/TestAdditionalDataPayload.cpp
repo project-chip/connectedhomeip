@@ -118,7 +118,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceId(nlTestSuite * inSui
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
 
     char output[kAdditionalDataPayloadLength];
     NL_TEST_ASSERT(inSuite,
@@ -133,7 +133,7 @@ void TestGeneratingAdditionalDataPayloadWithRotatingDeviceIdAndMaxLifetimeCounte
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = std::numeric_limits<uint16_t>::max();
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
 
     char output[kAdditionalDataPayloadLength];
     NL_TEST_ASSERT(inSuite,
@@ -161,7 +161,7 @@ void TestGeneratingRotatingDeviceIdAsString(nlTestSuite * inSuite, void * inCont
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);
@@ -184,7 +184,7 @@ void TestGeneratingRotatingDeviceIdAsStringWithNullInputs(nlTestSuite * inSuite,
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = 0;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = MutableByteSpan{ nullptr, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan();
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);
@@ -198,7 +198,7 @@ void TestGeneratingRotatingDeviceIdWithSmallBuffer(nlTestSuite * inSuite, void *
     size_t rotatingDeviceIdValueOutputSize = 0;
     AdditionalDataPayloadGeneratorParams additionalDataPayloadParams;
     additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter = kLifetimeCounter;
-    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan{ kUniqueId, sizeof(kUniqueId) };
+    additionalDataPayloadParams.rotatingDeviceIdUniqueId        = ByteSpan(kUniqueId);
     err = AdditionalDataPayloadGenerator().generateRotatingDeviceIdAsHexString(
         additionalDataPayloadParams, rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer),
         rotatingDeviceIdValueOutputSize);

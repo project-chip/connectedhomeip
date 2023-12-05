@@ -33,10 +33,10 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
-#ifdef BL602
+#if CHIP_DEVICE_LAYER_TARGET_BL602
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #endif
-#ifdef BL702
+#if CHIP_DEVICE_LAYER_TARGET_BL702
 #include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
 #endif
 #endif
@@ -71,6 +71,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     mWiFiStationState = ConnectivityManager::kWiFiStationState_NotConnected;
     ReturnErrorOnFailure(SetWiFiStationMode(kWiFiStationMode_Enabled));
+
+    PlatformMgr().AddEventHandler(NetworkCommissioning::NetworkEventHandler, 0);
 #endif
 
     return CHIP_NO_ERROR;
@@ -98,10 +100,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifissid, (void *) ssid, 64, &ssidLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0);
     SuccessOrExit(err);
 
     return (ssidLen != 0);
@@ -148,10 +150,10 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kBLConfigKey_wifissid);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiSSID);
     SuccessOrExit(err);
 
-    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kBLConfigKey_wifipassword);
+    err = PersistedStorage::KeyValueStoreMgr().Delete(BLConfig::kConfigKey_WiFiPassword);
     SuccessOrExit(err);
 
 exit:
@@ -170,9 +172,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectProvisionedWiFiNetwork(void)
     size_t ssidLen = 0;
     size_t pskLen  = 0;
 
-    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifissid, (void *) ssid, 64, &ssidLen, 0));
-    ReturnErrorOnFailure(
-        PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kBLConfigKey_wifipassword, (void *) psk, 64, &pskLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, (void *) ssid, 64, &ssidLen, 0));
+    ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, (void *) psk, 64, &pskLen, 0));
 
     NetworkCommissioning::BLWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, ssidLen, psk, pskLen);
 
@@ -227,7 +228,7 @@ void ConnectivityManagerImpl::DriveStationState()
     }
     break;
     case ConnectivityManager::kWiFiStationState_Connected: {
-        ChipLogProgress(DeviceLayer, "Wi-Fi stattion connected.");
+        ChipLogProgress(DeviceLayer, "Wi-Fi station connected.");
         OnWiFiStationConnected();
         SystemLayer().ScheduleLambda([]() { NetworkCommissioning::BLWiFiDriver::GetInstance().OnConnectWiFiNetwork(true); });
     }
@@ -248,7 +249,7 @@ void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, 
 }
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET || CHIP_DEVICE_CONFIG_ENABLE_WIFI
 void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
 {
     bool haveIPv4Conn      = false;
@@ -309,11 +310,13 @@ void ConnectivityManagerImpl::OnConnectivityChanged(struct netif * interface)
 
         if (haveIPv4Conn != hadIPv4Conn)
         {
+            memset(&m_ip4addr, 0, sizeof(ip4_addr_t));
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
         }
 
         if (haveIPv6Conn != hadIPv6Conn)
         {
+            memset(&m_ip6addr, 0, sizeof(ip6_addr_t) * LWIP_IPV6_NUM_ADDRESSES);
             ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
         }
     }

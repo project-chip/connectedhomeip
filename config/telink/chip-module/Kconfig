@@ -16,9 +16,11 @@
 
 rsource "../../zephyr/Kconfig"
 
+if CHIP
+
 # See config/zephyr/Kconfig for full definition
 config CHIP_DEVICE_VENDOR_NAME
-	default "Telink semiconductor"
+	default "Telink Semiconductor"
 
 config CHIP_APP_LOG_LEVEL
 	int "Logging level in application"
@@ -33,17 +35,21 @@ config CHIP_APP_LOG_LEVEL
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
 	bool
-	default y
-	imply BOOTLOADER_MCUBOOT
-	imply IMG_MANAGER
+	select BOOTLOADER_MCUBOOT
+
+config BOOTLOADER_MCUBOOT
+	bool
+	select IMG_MANAGER
+	select STREAM_FLASH
+	select STREAM_FLASH_ERASE
 
 config CHIP_OTA_REQUESTOR_BUFFER_SIZE
 	int "OTA Requestor image buffer size"
 	default 256
 	depends on CHIP_OTA_REQUESTOR
 	help
-	  Configures size of the buffer used by OTA Requestor when downloading and
-	  writing a new firmware image to flash.
+	  Configures the size of the buffer used by OTA Requestor when downloading
+	  and writing a new firmware image to flash.
 
 config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	bool "Auto-reboot when firmware update is applied"
@@ -51,9 +57,9 @@ config CHIP_OTA_REQUESTOR_REBOOT_ON_APPLY
 	depends on CHIP_OTA_REQUESTOR
 	imply REBOOT
 	help
-	  When a user consents to apply a firmware update, and the update package is
-	  downloaded, reboot the device automatically to swap the old and the new
-	  firmware images.
+	  Reboots the device automatically after downloading a new firmware update
+	  to swap the old and the new firmware images. The reboot happens only when
+	  a user consents to apply the firmware update.
 
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_IMAGE_BUILD
@@ -147,11 +153,12 @@ endif #CHIP_FACTORY_DATA_BUILD
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_NVS
 	bool
-	default y
+	default n
+
+endif
 
 config CHIP_LOG_SIZE_OPTIMIZATION
 	bool "Disable some detailed logs to decrease flash usage"
-	default y
 	help
 	  Disables some log levels for specific Matter log modules that provide
 	  information that is too detailed to be used in most cases. You can find
@@ -188,26 +195,6 @@ config SHELL_BACKEND_SERIAL_RX_RING_BUFFER_SIZE
 	int
 	default 255 if SHELL_BACKEND_SERIAL
 
-config CHIP_ICD_SUBSCRIPTION_HANDLING
-	bool "Enables platform specific handling of ICD subscriptions"
-	default PM
-	help
-	  Enables platform specific implementation that handles ICD subscription requests
-	  and selects subscription report interval value considering maximum interval preferred
-	  by the publisher.
-
-config CHIP_MAX_PREFERRED_SUBSCRIPTION_REPORT_INTERVAL
-	int "Maximum preferred interval of sending subscription reports (s)"
-	default 60
-	help
-	  Provides maximum preferred interval to be used by a publisher for negotiation
-	  of the final maximum subscription report interval, after receiving a subscription
-	  request from the initiator. This value should be selected as a compromise between
-	  keeping the power consumption low due to not sending reports too often, and allowing
-	  the initiator device to detect the publisher absence reasonably fast due to not sending
-	  the reports too rarely. The current algorithm is to select bigger value from the one
-	  requested by the initiator and the one preferred by the publisher.
-
 config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 	bool "Enable power on factory reset sequence"
 	default n
@@ -215,3 +202,8 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 	  Enable power on factory reset sequence. If device power triggered off during
 	  first 5 seconds after power on and this sequence repeated 5 times - factory
 	  reset will be involved.
+
+config CHIP_USE_MARS_SENSOR
+	bool "Use Mars board sensor"
+	depends on SOC_SERIES_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
+	default n

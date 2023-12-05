@@ -159,30 +159,28 @@ void OnTriggerOffWithEffect(OnOffEffect * effect)
     auto effectVariant = effect->mEffectVariant;
 
     // Uses print outs until we can support the effects
-    if (effectId == Clusters::OnOff::OnOffEffectIdentifier::kDelayedAllOff)
+    if (effectId == Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff)
     {
-        auto typedEffectVariant = static_cast<Clusters::OnOff::OnOffDelayedAllOffEffectVariant>(effectVariant);
-        if (typedEffectVariant == Clusters::OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds)
+        auto typedEffectVariant = static_cast<Clusters::OnOff::DelayedAllOffEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade)
         {
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffFastFade");
         }
-        else if (typedEffectVariant == Clusters::OnOff::OnOffDelayedAllOffEffectVariant::kNoFade)
+        else if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kNoFade)
         {
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kNoFade");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kNoFade");
         }
-        else if (typedEffectVariant ==
-                 Clusters::OnOff::OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds)
+        else if (typedEffectVariant == Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade)
         {
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade");
         }
     }
-    else if (effectId == Clusters::OnOff::OnOffEffectIdentifier::kDyingLight)
+    else if (effectId == Clusters::OnOff::EffectIdentifierEnum::kDyingLight)
     {
-        auto typedEffectVariant = static_cast<Clusters::OnOff::OnOffDyingLightEffectVariant>(effectVariant);
-        if (typedEffectVariant ==
-            Clusters::OnOff::OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second)
+        auto typedEffectVariant = static_cast<Clusters::OnOff::DyingLightEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == Clusters::OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff)
         {
-            ChipLogProgress(Zcl, "OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second");
+            ChipLogProgress(Zcl, "DyingLightEffectVariantEnum::kDyingLightFadeOff");
         }
     }
 }
@@ -190,8 +188,8 @@ void OnTriggerOffWithEffect(OnOffEffect * effect)
 OnOffEffect gEffect = {
     chip::EndpointId{ 1 },
     OnTriggerOffWithEffect,
-    Clusters::OnOff::OnOffEffectIdentifier::kDelayedAllOff,
-    to_underlying(Clusters::OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds),
+    Clusters::OnOff::EffectIdentifierEnum::kDelayedAllOff,
+    to_underlying(Clusters::OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade),
 };
 
 } // namespace
@@ -259,15 +257,23 @@ void AppTask::InitServer(intptr_t arg)
     // Open commissioning after boot if no fabric was available
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
     {
-        PlatformMgr().ScheduleWork(OpenCommissioning, 0);
+        ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
+        AppTask::OpenCommissioning((intptr_t) 0);
     }
 }
 
 void AppTask::OpenCommissioning(intptr_t arg)
 {
     // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+
+    SystemLayer().ScheduleLambda([] {
+        CHIP_ERROR err;
+        err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+        }
+    });
 }
 
 CHIP_ERROR AppTask::Init()
@@ -488,10 +494,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             else
             {
                 // Enable BLE advertisements and pairing window
-                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
-                {
-                    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
-                }
+                AppTask::OpenCommissioning((intptr_t) 0);
+                ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
             }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)

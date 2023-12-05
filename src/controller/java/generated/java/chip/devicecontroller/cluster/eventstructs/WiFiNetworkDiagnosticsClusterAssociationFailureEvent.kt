@@ -17,46 +17,47 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailure: Int,
-  val status: Int
+  val associationFailureCause: UInt,
+  val status: UInt
 ) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
-    append("\tassociationFailure : $associationFailure\n")
+    append("\tassociationFailureCause : $associationFailureCause\n")
     append("\tstatus : $status\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
-      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE), associationFailure)
+      startStructure(tlvTag)
+      put(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE), associationFailureCause)
       put(ContextSpecificTag(TAG_STATUS), status)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ASSOCIATION_FAILURE = 0
+    private const val TAG_ASSOCIATION_FAILURE_CAUSE = 0
     private const val TAG_STATUS = 1
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
-      tlvReader.enterStructure(tag)
-      val associationFailure = tlvReader.getInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
-      val status = tlvReader.getInt(ContextSpecificTag(TAG_STATUS))
+      tlvReader.enterStructure(tlvTag)
+      val associationFailureCause =
+        tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
+      val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
 
       tlvReader.exitContainer()
 
-      return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailure, status)
+      return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailureCause, status)
     }
   }
 }

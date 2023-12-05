@@ -24,4 +24,4 @@
 
 #include <app/util/DataModelHandler.h>
 
-__attribute__((weak)) void InitDataModelHandler() {}
+void InitDataModelHandler() {}

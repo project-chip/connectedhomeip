@@ -21,8 +21,16 @@
 
 #pragma once
 
-#include "TimeSyncDataProvider.h"
+#ifndef TIME_SYNC_ENABLE_TSC_FEATURE
+#define TIME_SYNC_ENABLE_TSC_FEATURE 1
+#endif
 
+#include "TimeSyncDataProvider.h"
+#include "time-synchronization-delegate.h"
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+#include <app/ClusterStateCache.h>
+#endif
 #include <app/server/Server.h>
 #include <app/util/af-types.h>
 #include <app/util/config.h>
@@ -62,9 +70,15 @@ enum class TimeSyncEventFlag : uint8_t
 };
 
 class TimeSynchronizationServer : public FabricTable::Delegate
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    ,
+                                  public ReadClient::Callback
+#endif
 {
 public:
+    TimeSynchronizationServer();
     void Init();
+    void Shutdown();
 
     static TimeSynchronizationServer & Instance(void);
     TimeSyncDataProvider & GetDataProvider(void) { return mTimeSyncDataProvider; }
@@ -96,13 +110,30 @@ public:
     void ClearEventFlag(TimeSyncEventFlag flag);
 
     // Fabric Table delegate functions
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex);
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    // CASE connection functions
+    void OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    void OnDeviceConnectionFailureFn();
+
+    // ReadClient::Callback functions
+    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void OnDone(ReadClient * apReadClient) override;
+#endif
+
+    // Platform event handler functions
+    void OnPlatformEventFn(const DeviceLayer::ChipDeviceEvent & event);
+
+    void OnTimeSyncCompletionFn(TimeSourceEnum timeSource, GranularityEnum granularity);
+    void OnFallbackNTPCompletionFn(bool timeSyncSuccessful);
 
 private:
+    static constexpr size_t kMaxDefaultNTPSize = 128;
     DataModel::Nullable<Structs::TrustedTimeSourceStruct::Type> mTrustedTimeSource;
     TimeSyncDataProvider::TimeZoneObj mTimeZoneObj{ Span<TimeSyncDataProvider::TimeZoneStore>(mTz), 0 };
     TimeSyncDataProvider::DSTOffsetObj mDstOffsetObj{ DataModel::List<Structs::DSTOffsetStruct::Type>(mDst), 0 };
-    GranularityEnum mGranularity;
+    GranularityEnum mGranularity = GranularityEnum::kNoTimeGranularity;
 
     TimeSyncDataProvider::TimeZoneStore mTz[CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE];
     Structs::DSTOffsetStruct::Type mDst[CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE];
@@ -110,6 +141,33 @@ private:
     TimeSyncDataProvider mTimeSyncDataProvider;
     static TimeSynchronizationServer sTimeSyncInstance;
     TimeSyncEventFlag mEventFlag = TimeSyncEventFlag::kNone;
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    struct TimeReadInfo
+    {
+        TimeReadInfo(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr,
+                     ReadClient::Callback & apCallback, ReadClient::InteractionType aInteractionType) :
+            readClient(apImEngine, apExchangeMgr, apCallback, aInteractionType)
+        {
+            utcTime.SetNull();
+        }
+        Attributes::UTCTime::TypeInfo::DecodableType utcTime;
+        Attributes::Granularity::TypeInfo::DecodableType granularity = GranularityEnum::kNoTimeGranularity;
+        ReadClient readClient;
+    };
+    Platform::UniquePtr<TimeReadInfo> mTimeReadInfo;
+#endif
+    chip::Callback::Callback<OnTimeSyncCompletion> mOnTimeSyncCompletion;
+    chip::Callback::Callback<OnFallbackNTPCompletion> mOnFallbackNTPCompletion;
+
+    // Called when the platform is set up - attempts to get time using the recommended source list in the spec.
+    void AttemptToGetTime();
+    CHIP_ERROR AttemptToGetTimeFromTrustedNode();
+    // Attempts to get fallback NTP from the delegate (last available source)
+    // If successful, the function will set mGranulatiry and the time source
+    // If unsuccessful, it will emit a TimeFailure event.
+    void AttemptToGetFallbackNTPTimeFromDelegate();
 };
 
 } // namespace TimeSynchronization

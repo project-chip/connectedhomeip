@@ -21,7 +21,6 @@
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-#include <zap-generated/CHIPClusters.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -57,8 +56,8 @@ public:
                    CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName, credIssuerCmds),
-        mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
+        mPairingMode(mode), mNetworkType(networkType), mFilterType(filterType),
+        mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }, mComplex_TimeZones(&mTimeZoneList),
         mComplex_DSTOffsets(&mDSTOffsetList), mCurrentFabricRemoveCallback(OnCurrentFabricRemove, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);

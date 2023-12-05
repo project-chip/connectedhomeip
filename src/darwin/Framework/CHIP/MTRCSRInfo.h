@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Represents information relating to a certificate signing request for a Matter
  * operational certificate.
  */
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTROperationalCSRInfo : NSObject
 
 /**
@@ -75,7 +75,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (nullable instancetype)initWithCSRNonce:(NSData *)csrNonce
                            csrElementsTLV:(MTRTLVBytes)csrElementsTLV
                      attestationSignature:(NSData *)attestationSignature
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Initialize an MTROperationalCSRInfo by providing just the csrElementsTLV and
@@ -86,7 +86,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (nullable instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV
                            attestationSignature:(NSData *)attestationSignature
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Initialize an MTROperationalCSRInfo by providing an
@@ -94,7 +94,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * relevant fields from the response data.
  */
 - (nullable instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 MTR_DEPRECATED("Please use MTROperationalCSRInfo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))

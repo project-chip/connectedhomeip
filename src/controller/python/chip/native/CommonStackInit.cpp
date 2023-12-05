@@ -57,7 +57,7 @@ void pychip_CauseCrash()
 {
     uint8_t * ptr = nullptr;
     // NOLINTNEXTLINE(clang-analyzer-core.NullDereference): Intentionally trying to cause crash.
-    *ptr          = 0;
+    *ptr = 0;
 }
 
 PyChipError pychip_CommonStackInit(const PyCommonStackInitParams * aParams)

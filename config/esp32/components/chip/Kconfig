@@ -96,6 +96,22 @@ menu "CHIP Core"
             help
                 Link the application against CHIP interactive shell.
 
+        config CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH
+            int "Maximum command line buffer length of the chip shell"
+            depends on ENABLE_CHIP_SHELL
+            default 256
+            help
+                Maximum command line buffer length of the chip shell. The command strings might be received
+                incompletely in the command handlers if they are longer than this buffer length.
+
+        config CHIP_SHELL_CMD_LINE_ARG_MAX_COUNT
+            int "Maximum command line arguments count of the chip shell"
+            depends on ENABLE_CHIP_SHELL
+            default 32
+            help
+                Maximum command line arguments count of the chip shell. The command arguments might be ignored
+                if they are more than this count.
+
         config ENABLE_CHIP_CONTROLLER_BUILD
             bool "Enable chip-controller build"
             default n
@@ -185,6 +201,17 @@ menu "CHIP Core"
             default y
             help
                 Enable this option to use LwIP default IPv6 route hook for Route Information Option(RIO) feature.
+
+        config ENABLE_LWIP_THREAD_SAFETY
+            bool "Enable LwIP Thread safety options"
+            default y
+            select LWIP_TCPIP_CORE_LOCKING
+            select LWIP_CHECK_THREAD_SAFETY
+            help
+                CHIP SDK performs LwIP core locking before calling an LwIP API.
+                To make the calls thread safe we have to enable LWIP_TCPIP_CORE_LOCKING.
+                Here, we are also enabling LWIP_CHECK_THREAD_SAFETY which will assert when
+                LwIP code gets called from any other context or without holding the LwIP lock.
 
     endmenu # "Networking Options"
 
@@ -299,8 +326,8 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables ICD server
 
-        config ICD_SLOW_POLL_INTERVAL
-            int "ICD Slow Polling Interval"
+        config ICD_SLOW_POLL_INTERVAL_MS
+            int "ICD Slow Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 5000
             help
@@ -308,14 +335,46 @@ menu "CHIP Device Layer"
                 messages in Idle Mode. The Slow Polling interval MAY be the same as the Idle Mode
                 Interval.
 
-        config ICD_FAST_POLL_INTERVAL
-            int "ICD Fast Polling Interval"
+        config ICD_FAST_POLL_INTERVAL_MS
+            int "ICD Fast Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 200
             help
                 Fast Polling defines the fastest frequency at which the device can receive messages
                 in Active Mode. The Fast Polling interval SHALL be smaller than the Active Mode
                 Interval.
+
+        config ICD_IDLE_MODE_INTERVAL_SEC
+            int "ICD Idle Mode Interval(sec)"
+            depends on ENABLE_ICD_SERVER
+            default 2
+            help
+                This value indicates the maximum interval in seconds the server can stay in idle
+                mode.
+
+        config ICD_ACTIVE_MODE_INTERVAL_MS
+            int "ICD Active Mode Interval(ms)"
+            depends on ENABLE_ICD_SERVER
+            default 300
+            help
+                This value indicates the minimum interval in milliseconds the server can stay in
+                active mode.
+
+        config ICD_ACTIVE_MODE_THRESHOLD_MS
+            int "ICD Active Mode Threshold(ms)"
+            depends on ENABLE_ICD_SERVER
+            default 300
+            help
+                This value indicates the minimum amount of time in milliseconds the server typically
+                will stay active after network activity when in active mode.
+
+        config ICD_CLIENTS_SUPPORTED_PER_FABRIC
+            int "ICD Clients Number Supported Per Fabric"
+            depends on ENABLE_ICD_SERVER
+            default 1
+            help
+                This value indicates the maximum number of entries that the ICD server is able to store
+                for each fabric in the RegisteredClients attribute.
 
         config ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
@@ -581,6 +640,16 @@ menu "CHIP Device Layer"
 
                 When set, WoBLE advertisements will stop while a WoBLE connection is active.
 
+        config CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
+            int "Enable CHIPoBLE advertising start automatically after device power-up"
+            range 0 1
+            default 0
+            depends on ENABLE_CHIPOBLE
+            help
+                CHIPs device may start advertising automatically only if its all primary device
+                functions are within a CHIP network. Device providing unrelated to CHIP functionalities
+                should not start advertising automatically after power-up.
+
         config USE_BLE_ONLY_FOR_COMMISSIONING
 	    bool "Use BLE only for commissioning"
 	    default y
@@ -798,6 +867,15 @@ menu "CHIP Device Layer"
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
+       config ENABLE_ESP_INSIGHTS_TRACE
+           bool "Enable Matter ESP Insights"
+           depends on ESP_INSIGHTS_ENABLED
+           default y
+           help
+               ESP Insights is a remote diagnostics solution to monitor the health of ESP devices in the field.
+               Enabling the above option will enable the esp32 specific tracing functionality and report the
+               diagnostic information to the insights cloud.
+
     endmenu
 
 
@@ -1014,6 +1092,15 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable esp32 as a BLE Commissioner.
+
+    endmenu
+
+    menu "Enable Matter Event List"
+        config ENABLE_MATTER_EVENT_LIST
+            bool "Enable Matter support Event List attribute"
+            default n
+            help
+                Enable Matter support Event List attribute.
 
     endmenu
 

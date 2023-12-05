@@ -100,6 +100,7 @@ chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
 chip::Platform::ScopedMemoryBuffer<char> sDefaultNTPBuf;
 app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
 app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf;
+chip::Platform::ScopedMemoryBuffer<char> sTimeZoneNameBuf;
 chip::Controller::CommissioningParameters sCommissioningParameters;
 
 } // namespace
@@ -140,10 +141,11 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
                                                  DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
-PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt);
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char * name);
 PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validStarting, uint64_t validUntil);
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
+PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check);
 PyChipError pychip_DeviceController_ResetCommissioningParameters();
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
@@ -189,6 +191,8 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::DeviceCommissioner * devCtrl,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback);
 PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
     chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
 
@@ -506,10 +510,22 @@ PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt)
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char * name)
 {
     sTimeZoneBuf.offset  = offset;
     sTimeZoneBuf.validAt = validAt;
+    if (strcmp(name, "") == 0)
+    {
+        sTimeZoneNameBuf.Free();
+        sTimeZoneBuf.name = NullOptional;
+    }
+    else
+    {
+        size_t len = strlen(name);
+        ReturnErrorCodeIf(!sTimeZoneNameBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
+        memcpy(sTimeZoneNameBuf.Get(), name, len);
+        sTimeZoneBuf.name.SetValue(CharSpan(sTimeZoneNameBuf.Get(), len));
+    }
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> list(&sTimeZoneBuf, 1);
     sCommissioningParameters.SetTimeZone(list);
     return ToPyChipError(CHIP_NO_ERROR);
@@ -538,6 +554,12 @@ PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, ch
                                                                                                                 .endpoint =
                                                                                                                     endpoint };
     sCommissioningParameters.SetTrustedTimeSource(chip::app::DataModel::MakeNullable(timeSource));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetCheckMatchingFabric(bool check)
+{
+    sCommissioningParameters.SetCheckForMatchingFabric(check);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
@@ -690,6 +712,13 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallb
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback)
 {
     sPairingDelegate.SetCommissioningStatusUpdateCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError
+pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback(chip::Controller::DevicePairingDelegate_OnFabricCheckFunct callback)
+{
+    sPairingDelegate.SetFabricCheckCallback(callback);
     return ToPyChipError(CHIP_NO_ERROR);
 }
 

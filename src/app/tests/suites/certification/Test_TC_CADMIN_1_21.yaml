@@ -24,6 +24,9 @@ config:
     nodeId: 0x12344321
     timeout: 950
     endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -45,6 +48,17 @@ tests:
                 value: "y"
 
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -66,6 +80,7 @@ tests:
                 value: 900
 
     - label: "Step 3: Wait 901 seconds for commissioning Window to be closed"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

@@ -34,13 +34,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -186,6 +186,16 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-contact-sensor-no-ble-with-ui \
                         build"
+            - name: Build example Air Purifier
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-air-purifier \
+                        build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug air-purifier-app \
+                    out/linux-x64-air-purifier/chip-air-purifier-app \
+                    /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}

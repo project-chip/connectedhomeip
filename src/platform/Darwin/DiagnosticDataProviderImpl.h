@@ -43,6 +43,7 @@ public:
     // ===== Methods that implement the DiagnosticDataProvider abstract interface.
     bool SupportsWatermarks() override { return true; }
     CHIP_ERROR ResetWatermarks() override;
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
 };
 
 /**

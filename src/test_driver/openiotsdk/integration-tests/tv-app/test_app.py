@@ -86,7 +86,7 @@ def test_commissioning(device, controller):
 
 SHELL_MAIN_COMMANDS_NAME = ["base64", "exit", "help", "version",
                             "config", "device", "onboardingcodes", "dns",
-                            "app"]
+                            "app", "stat"]
 
 SHELL_APP_COMMANDS_NAME = ["help", "add", "remove", "setpin",
                            "add-admin-vendor"]
@@ -282,7 +282,7 @@ def test_tv_ctrl(device, controller):
                                     catalogVendorID=TV_CTRL_TEST_APP_ADMIN_VENDOR_ID, applicationID=application_id)),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ApplicationLauncher.Enums.ApplicationLauncherStatusEnum.kSuccess
+    assert res.status == ApplicationLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ApplicationLauncherManager::HandleLaunchApp")
     assert ret is not None and len(ret) > 0
 
@@ -291,7 +291,7 @@ def test_tv_ctrl(device, controller):
                                     catalogVendorID=TV_CTRL_TEST_APP_ADMIN_VENDOR_ID, applicationID=application_id)),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ApplicationLauncher.Enums.ApplicationLauncherStatusEnum.kSuccess
+    assert res.status == ApplicationLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ApplicationLauncherManager::HandleStopApp")
     assert ret is not None and len(ret) > 0
 
@@ -300,7 +300,7 @@ def test_tv_ctrl(device, controller):
                                     catalogVendorID=TV_CTRL_TEST_APP_ADMIN_VENDOR_ID, applicationID=application_id)),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ApplicationLauncher.Enums.ApplicationLauncherStatusEnum.kSuccess
+    assert res.status == ApplicationLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ApplicationLauncherManager::HandleHideApp")
     assert ret is not None and len(ret) > 0
 
@@ -326,7 +326,7 @@ def test_tv_ctrl(device, controller):
                                 dict(match=channels[1].name),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == Channel.Enums.ChannelStatusEnum.kSuccess
+    assert res.status == Channel.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "Channel", "CurrentChannel", nodeId, endpoint)
     assert err == 0
@@ -359,7 +359,7 @@ def test_tv_ctrl(device, controller):
 
     err, res = read_zcl_attribute(devCtrl, "ContentLauncher", "SupportedStreamingProtocols", nodeId, endpoint)
     assert err == 0
-    assert res.value == ContentLauncher.Bitmaps.SupportedStreamingProtocol.kDash | ContentLauncher.Bitmaps.SupportedStreamingProtocol.kHls
+    assert res.value == ContentLauncher.Bitmaps.SupportedProtocolsBitmap.kDash | ContentLauncher.Bitmaps.SupportedProtocolsBitmap.kHls
 
     err, res = send_zcl_command(devCtrl, "ContentLauncher", "LaunchContent", nodeId, endpoint,
                                 dict(search=ContentLauncher.Structs.ContentSearchStruct(parameterList=[
@@ -373,7 +373,7 @@ def test_tv_ctrl(device, controller):
                                     autoPlay=True, data=None),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ContentLauncher.Enums.ContentLaunchStatusEnum.kSuccess
+    assert res.status == ContentLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchContent")
     assert ret is not None and len(ret) > 0
     ret = device.wait_for_output("TEST CASE found match=TV Show Example type={}".format(TV_CTRL_TEST_CONTENT_PARAMETER_TYPE_1))
@@ -394,7 +394,7 @@ def test_tv_ctrl(device, controller):
                                      )),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == ContentLauncher.Enums.ContentLaunchStatusEnum.kSuccess
+    assert res.status == ContentLauncher.Enums.StatusEnum.kSuccess
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchUrl")
     assert ret is not None and len(ret) > 0
     ret = device.wait_for_output("ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL={} DisplayString={} BrandingInformation.ProviderName={}".format(
@@ -408,13 +408,13 @@ def test_tv_ctrl(device, controller):
         err, res = send_zcl_command(devCtrl, "KeypadInput", "SendKey", nodeId, endpoint,
                                     dict(keyCode=keyCode), requestTimeoutMs=1000)
         assert err == 0
-        assert res.status == KeypadInput.Enums.KeypadInputStatusEnum.kSuccess
+        assert res.status == KeypadInput.Enums.StatusEnum.kSuccess
 
     err, res = send_zcl_command(devCtrl, "KeypadInput", "SendKey", nodeId, endpoint,
                                 dict(keyCode=TV_CTRL_TEST_KEY_PAD_UNSUPPORTED_KEY),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == KeypadInput.Enums.KeypadInputStatusEnum.kUnsupportedKey
+    assert res.status == KeypadInput.Enums.StatusEnum.kUnsupportedKey
 
     # TargetNavigator
     err, res = read_zcl_attribute(devCtrl, "TargetNavigator", "TargetList", nodeId, endpoint)
@@ -431,7 +431,7 @@ def test_tv_ctrl(device, controller):
                                 dict(target=current_target_id, data=None),
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == TargetNavigator.Enums.TargetNavigatorStatusEnum.kSuccess
+    assert res.status == TargetNavigator.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "TargetNavigator", "CurrentTarget", nodeId, endpoint)
     assert err == 0
@@ -527,7 +527,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
@@ -537,7 +537,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
@@ -547,7 +547,7 @@ def test_tv_ctrl(device, controller):
                                 None,
                                 requestTimeoutMs=1000)
     assert err == 0
-    assert res.status == MediaPlayback.Enums.MediaPlaybackStatusEnum.kSuccess
+    assert res.status == MediaPlayback.Enums.StatusEnum.kSuccess
 
     err, res = read_zcl_attribute(devCtrl, "MediaPlayback", "CurrentState", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
@@ -564,6 +564,6 @@ def test_tv_ctrl(device, controller):
     # WakeOnLan
     err, res = read_zcl_attribute(devCtrl, "WakeOnLan", "MACAddress", nodeId, TV_CTRL_TEST_APP_ENDPOINT_ID)
     assert err == 0
-    assert res.value == "0000000000"
+    assert res.value == "000000000000"
 
     assert disconnect_device(devCtrl, nodeId)

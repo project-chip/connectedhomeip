@@ -18,6 +18,7 @@
 #pragma once
 
 #include <dns_sd.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/platform/Dnssd.h>
 
 #include "DnssdHostNameRegistrar.h"
@@ -62,10 +63,10 @@ struct ResolveContext;
 class MdnsContexts
 {
 public:
-    MdnsContexts(const MdnsContexts &) = delete;
+    MdnsContexts(const MdnsContexts &)             = delete;
     MdnsContexts & operator=(const MdnsContexts &) = delete;
     ~MdnsContexts();
-    static MdnsContexts & GetInstance() { return sInstance; }
+    static MdnsContexts & GetInstance() { return sInstance.get(); }
 
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
@@ -82,12 +83,13 @@ public:
      *                      Example:
      *                        _matterc._udp,_V65521,_S15,_L3840,_CM
      *                        _matter._tcp,_I4CEEAD044CC35B63
+     * @param[in]  name     The instance name for the service.
      * @param[out] context  A reference to the context previously registered
      *
      * @return     On success, the context parameter will point to the previously
      *             registered context.
      */
-    CHIP_ERROR GetRegisterContextOfType(const char * type, RegisterContext ** context);
+    CHIP_ERROR GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context);
 
     /**
      * Return a pointer to an existing ResolveContext for the given
@@ -127,8 +129,9 @@ public:
     }
 
 private:
-    MdnsContexts(){};
-    static MdnsContexts sInstance;
+    MdnsContexts() = default;
+    friend class Global<MdnsContexts>;
+    static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
 };
@@ -146,7 +149,7 @@ struct RegisterContext : public GenericContext
     void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
-    bool matches(const char * sType) { return mType.compare(sType) == 0; }
+    bool matches(const char * type, const char * name) { return mType == type && mInstanceName == name; }
 };
 
 struct BrowseHandler : public GenericContext

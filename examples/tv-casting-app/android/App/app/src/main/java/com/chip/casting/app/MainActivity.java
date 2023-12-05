@@ -8,9 +8,9 @@ import androidx.fragment.app.FragmentTransaction;
 import com.chip.casting.AppParameters;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.util.DACProviderStub;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.InitializationExample;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
@@ -27,7 +27,10 @@ public class MainActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    boolean ret = initJni();
+    boolean ret =
+        GlobalCastingConstants.ChipCastingSimplified
+            ? InitializationExample.initAndStart(this.getApplicationContext()).hasNoError()
+            : initJni();
     if (!ret) {
       Log.e(TAG, "Failed to initialize Matter TV casting library");
       return;
@@ -78,7 +81,7 @@ public class MainActivity extends AppCompatActivity
   private boolean initJni() {
     tvCastingApp = TvCastingApp.getInstance();
 
-    tvCastingApp.setDACProvider(new DACProviderStub());
+    tvCastingApp.setDACProvider(new com.chip.casting.util.DACProviderStub());
 
     AppParameters appParameters = new AppParameters();
     appParameters.setConfigurationManager(

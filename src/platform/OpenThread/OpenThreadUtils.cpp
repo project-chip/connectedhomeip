@@ -26,7 +26,7 @@
 
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -126,9 +126,10 @@ void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags)
         }
 #if CHIP_CONFIG_SECURITY_TEST_MODE
         {
-            const otNetworkKey * otKey = otThreadGetNetworkKey(otInst);
+            otNetworkKey otKey;
+            otThreadGetNetworkKey(otInst, &otKey);
             for (int i = 0; i < OT_NETWORK_KEY_SIZE; i++)
-                snprintf(&strBuf[i * 2], 3, "%02X", otKey->m8[i]);
+                snprintf(&strBuf[i * 2], 3, "%02X", otKey.m8[i]);
             ChipLogDetail(DeviceLayer, "   Network Key: %s", strBuf);
         }
 #endif // CHIP_CONFIG_SECURITY_TEST_MODE

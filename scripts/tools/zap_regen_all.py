@@ -338,7 +338,7 @@ def setupArgumentsParser():
         description='Generate content from ZAP files')
     parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
-    parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
+    parser.add_argument('--tests', default='all', choices=['all', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
     parser.add_argument('--dry-run', default=False, action='store_true',
                         help="Don't do any generation, just log what targets would be generated (default: False)")
@@ -433,16 +433,22 @@ def getCodegenTemplates():
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="src/controller/java/generated"))
 
+    targets.append(JinjaCodegenTarget(
+        generator="kotlin-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
+
+    targets.append(JinjaCodegenTarget(
+        generator="summary-markdown",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="docs"))
+
     return targets
 
 
 def getTestsTemplatesTargets(test_target):
     zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
     templates = {
-        'chip-tool': {
-            'template': 'examples/chip-tool/templates/tests/templates.json',
-            'output_dir': 'zzz_generated/chip-tool/zap-generated'
-        },
         'darwin-framework-tool': {
             'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
             'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'

@@ -25,6 +25,8 @@ void ethernetInterface_init(void);
 void ethernetInterface_eventGotIP(struct netif * interface);
 struct netif * deviceInterface_getNetif(void);
 
+void network_netif_ext_callback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
+
 #ifdef __cplusplus
 }
 #endif

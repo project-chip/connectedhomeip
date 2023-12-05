@@ -595,7 +595,8 @@ CHIP_ERROR MdnsAvahi::StopPublish()
 }
 
 CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                             chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                             intptr_t * browseIdentifier)
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
@@ -609,16 +610,38 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
+    browseContext->mInterface     = avahiInterface;
+    browseContext->mProtocol      = GetFullType(type, protocol);
+    browseContext->mBrowseRetries = 0;
+    browseContext->mStopped.store(false);
 
-    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
+    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, browseContext->mProtocol.c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
         chip::Platform::Delete(browseContext);
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(browseContext);
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MdnsAvahi::StopBrowse(intptr_t browseIdentifier)
+{
+    BrowseContext * browseContext = reinterpret_cast<BrowseContext *>(browseIdentifier);
+    if (browseContext == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    // Any running timers here will check mStopped before rescheduling. Leave the timer running
+    // so we don't race on deletion of the browse context.
+    browseContext->mStopped.store(true);
+    return CHIP_NO_ERROR;
 }
 
 DnssdServiceProtocol GetProtocolInType(const char * type)
@@ -662,6 +685,27 @@ void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
     }
 }
 
+void MdnsAvahi::BrowseRetryCallback(chip::System::Layer * aLayer, void * appState)
+{
+    BrowseContext * context = static_cast<BrowseContext *>(appState);
+    // Don't schedule anything new if we've stopped.
+    if (context->mStopped.load())
+    {
+        chip::Platform::Delete(context);
+        return;
+    }
+    AvahiServiceBrowser * newBrowser =
+        avahi_service_browser_new(context->mInstance->mClient, context->mInterface, AVAHI_PROTO_UNSPEC, context->mProtocol.c_str(),
+                                  nullptr, static_cast<AvahiLookupFlags>(0), HandleBrowse, context);
+    if (newBrowser == nullptr)
+    {
+        // If we failed to create the browser, this browse context is effectively done. We need to call the final callback and
+        // delete the context.
+        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        chip::Platform::Delete(context);
+    }
+}
+
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags /*flags*/,
                              void * userdata)
@@ -695,12 +739,30 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             context->mServices.push_back(service);
         }
         break;
-    case AVAHI_BROWSER_ALL_FOR_NOW:
+    case AVAHI_BROWSER_ALL_FOR_NOW: {
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
-        context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), true, CHIP_NO_ERROR);
+        bool needRetries = context->mBrowseRetries++ < kMaxBrowseRetries && !context->mStopped.load();
+        // If we were already asked to stop, no need to send a callback - no one is listening.
+        if (!context->mStopped.load())
+        {
+            context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), !needRetries,
+                               CHIP_NO_ERROR);
+        }
         avahi_service_browser_free(browser);
-        chip::Platform::Delete(context);
+        if (needRetries)
+        {
+            context->mNextRetryDelay *= 2;
+            // Hand the ownership of the context over to the timer. It will either schedule a new browse on the context,
+            // triggering this function, or it will delete and not reschedule (if stopped).
+            DeviceLayer::SystemLayer().StartTimer(context->mNextRetryDelay / 2, BrowseRetryCallback, context);
+        }
+        else
+        {
+            // We didn't schedule a timer, so we're responsible for deleting the context
+            chip::Platform::Delete(context);
+        }
         break;
+    }
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
@@ -717,18 +779,69 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     }
 }
 
+MdnsAvahi::ResolveContext * MdnsAvahi::AllocateResolveContext()
+{
+    ResolveContext * context = chip::Platform::New<ResolveContext>();
+    if (context == nullptr)
+    {
+        return nullptr;
+    }
+
+    context->mNumber = mResolveCount++;
+    mAllocatedResolves.push_back(context);
+
+    return context;
+}
+
+MdnsAvahi::ResolveContext * MdnsAvahi::ResolveContextForHandle(size_t handle)
+{
+    for (auto it : mAllocatedResolves)
+    {
+        if (it->mNumber == handle)
+        {
+            return it;
+        }
+    }
+    return nullptr;
+}
+
+void MdnsAvahi::FreeResolveContext(size_t handle)
+{
+    for (auto it = mAllocatedResolves.begin(); it != mAllocatedResolves.end(); it++)
+    {
+        if ((*it)->mNumber == handle)
+        {
+            chip::Platform::Delete(*it);
+            mAllocatedResolves.erase(it);
+            return;
+        }
+    }
+}
+
+void MdnsAvahi::StopResolve(const char * name)
+{
+    auto truncate_end = std::remove_if(mAllocatedResolves.begin(), mAllocatedResolves.end(),
+                                       [name](ResolveContext * ctx) { return strcmp(ctx->mName, name) == 0; });
+
+    for (auto it = truncate_end; it != mAllocatedResolves.end(); it++)
+    {
+        (*it)->mCallback((*it)->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_CANCELLED);
+        chip::Platform::Delete(*it);
+    }
+
+    mAllocatedResolves.erase(truncate_end, mAllocatedResolves.end());
+}
+
 CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
                               Inet::IPAddressType transportType, Inet::InterfaceId interface, DnssdResolveCallback callback,
                               void * context)
 {
-    AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
-    ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
+    ResolveContext * resolveContext = AllocateResolveContext();
     CHIP_ERROR error                = CHIP_NO_ERROR;
-
-    resolveContext->mInstance = this;
-    resolveContext->mCallback = callback;
-    resolveContext->mContext  = context;
+    resolveContext->mInstance       = this;
+    resolveContext->mCallback       = callback;
+    resolveContext->mContext        = context;
 
     if (!interface.IsPresent())
     {
@@ -741,15 +854,17 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mAddressType = ToAvahiProtocol(addressType);
     resolveContext->mFullType    = GetFullType(type, protocol);
 
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name,
-                                          resolveContext->mFullType.c_str(), nullptr, resolveContext->mAddressType,
-                                          static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
+    AvahiServiceResolver * resolver =
+        avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name, resolveContext->mFullType.c_str(),
+                                   nullptr, resolveContext->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve,
+                                   reinterpret_cast<void *>(resolveContext->mNumber));
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
         chip::Platform::Delete(resolveContext);
     }
+    resolveContext->mResolver = resolver;
 
     return error;
 }
@@ -759,8 +874,15 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata)
 {
-    ResolveContext * context = reinterpret_cast<ResolveContext *>(userdata);
+    size_t handle            = reinterpret_cast<size_t>(userdata);
+    ResolveContext * context = sInstance.ResolveContextForHandle(handle);
     std::vector<TextEntry> textEntries;
+
+    if (context == nullptr)
+    {
+        ChipLogError(Discovery, "Invalid context for handling resolves: %ld", static_cast<long>(handle));
+        return;
+    }
 
     switch (event)
     {
@@ -769,14 +891,14 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         {
             ChipLogProgress(DeviceLayer, "Re-trying resolve");
             avahi_service_resolver_free(resolver);
-            resolver = avahi_service_resolver_new(context->mInstance->mClient, context->mInterface, context->mTransport,
-                                                  context->mName, context->mFullType.c_str(), nullptr, context->mAddressType,
-                                                  static_cast<AvahiLookupFlags>(0), HandleResolve, context);
-            if (resolver == nullptr)
+            context->mResolver = avahi_service_resolver_new(
+                context->mInstance->mClient, context->mInterface, context->mTransport, context->mName, context->mFullType.c_str(),
+                nullptr, context->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, context);
+            if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
                 context->mCallback(context->mContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INTERNAL);
-                chip::Platform::Delete(context);
+                sInstance.FreeResolveContext(handle);
             }
             return;
         }
@@ -868,8 +990,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     }
 
-    avahi_service_resolver_free(resolver);
-    chip::Platform::Delete(context);
+    sInstance.FreeResolveContext(handle);
 }
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
@@ -908,13 +1029,12 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
                            chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
                            intptr_t * browseIdentifier)
 {
-    *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
-    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context);
+    return MdnsAvahi::GetInstance().Browse(type, protocol, addressType, interface, callback, context, browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return MdnsAvahi::GetInstance().StopBrowse(browseIdentifier);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -927,7 +1047,10 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId
                                             browseResult->mAddressType, Inet::IPAddressType::kAny, interface, callback, context);
 }
 
-void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName)
+{
+    MdnsAvahi::GetInstance().StopResolve(instanceName);
+}
 
 CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
 {

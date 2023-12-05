@@ -239,7 +239,7 @@ DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters
 // =================================================================================
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
@@ -739,10 +739,6 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     return true;
 }
 
-void ApplicationInit() {}
-
-void ApplicationShutdown() {}
-
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
@@ -891,7 +887,7 @@ void * bridge_polling_thread(void * context)
     return nullptr;
 }
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
     // Clear out the device database
     memset(gDevices, 0, sizeof(gDevices));
@@ -933,26 +929,6 @@ int main(int argc, char * argv[])
     ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
-
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
-    // Init Data Model and CHIP App Server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-#if CHIP_DEVICE_ENABLE_PORT_PARAMS
-    // use a different service port to make testing possible with other sample devices running on same host
-    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
-#endif
-
-    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
@@ -1022,11 +998,17 @@ int main(int argc, char * argv[])
         }
     }
 
-    // Run CHIP
-
-    ApplicationInit();
     registerAttributeAccessOverride(&gPowerAttrAccess);
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+}
 
+void ApplicationShutdown() {}
+
+int main(int argc, char * argv[])
+{
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
+    ChipLinuxAppMainLoop();
     return 0;
 }

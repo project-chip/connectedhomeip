@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
@@ -76,6 +77,7 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
     VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
+    VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, Status::NotFound);
@@ -89,6 +91,8 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
     }
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return Status::Success;
     }
 
@@ -108,6 +112,8 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
     CHIP_ERROR err = provider->RemoveEndpoint(fabricIndex, groupId, endpointId);
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -321,7 +327,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 
     provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
     status = Status::Success;
-
+    MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:
     commandObj->AddStatus(commandPath, status);
     if (Status::Success != status)
@@ -351,11 +357,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
         status = GroupAdd(fabricIndex, endpointId, groupId, groupName);
     }
 
-    CHIP_ERROR sendErr = commandObj->AddStatus(commandPath, status);
-    if (CHIP_NO_ERROR != sendErr)
-    {
-        ChipLogDetail(Zcl, "Groups: failed to send %s: %" CHIP_ERROR_FORMAT, "status_response", sendErr.Format());
-    }
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 

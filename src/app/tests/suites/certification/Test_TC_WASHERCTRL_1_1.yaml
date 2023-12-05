@@ -11,66 +11,130 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 256.1.1. [TC-WASHERCTRL-1.1] Global attributes with server as DUT
+name: 186.1.1. [TC-WASHERCTRL-1.1] Global attributes with server as DUT
 
 PICS:
     - WASHERCTRL.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Laundry Washer Controls"
+    endpoint: 1
 
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read cluster-revision 1 1
-
-          On TH(Chip-tool) Verify the cluster-revision value is 1
-      disabled: true
-
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read feature-map 1 1
-
-          On TH(chip-tool), verify that DUT sends  FeatureMap attribute
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-      disabled: true
-
-    - label: "Step 4: TH reads from the DUT the AttributeList attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read attribute-list 1 1
-
-          Verify we are getting supported attribute list sent in the above command on TH(chip-tool) log
-          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the (0xFFFA) EventList attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read event-list 1 1
-
-          ON TH(Chip-tool) verify the Event-list value is 0 entries
-      disabled: true
-
-    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read accepted-command-list 1 1
-
-          ON TH(Chip-tool) verify the Accepted-command-list value is 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
     - label:
-          "Step 7: TH reads from the DUT the (0xFFF8) GeneratedCommandList
-          attribute"
-      verification: |
-          ./chip-tool laundrywashercontrols read generated-command-list 1 1
+          "Step 3: TH reads from the DUT the FeatureMap attribute. If
+          WASHERCTRL.S.F00(SPIN) & WASHERCTRL.S.F01(RINSE) are false"
+      PICS: "!WASHERCTRL.S.F00 && !WASHERCTRL.S.F01"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          ON TH(Chip-tool) verify the Generated-command-list value is 0 entries
-      disabled: true
+    - label:
+          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0 set to
+          1 if the DUT is capable of controlling the washer using the spin
+          attributes (WASHERCTRL.S.F00(SPIN) is true)"
+      PICS: WASHERCTRL.S.F00
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 1 set to
+          1 if the DUT supports rinse attributes (WASHERCTRL.S.F01(RINSE) is
+          true)"
+      PICS: WASHERCTRL.S.F01
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: Read the feature dependent(WASHERCTRL.S.F00) attributes in
+          AttributeList from DUT."
+      PICS: WASHERCTRL.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
+
+    - label:
+          "Step 4c: Read the feature dependent(WASHERCTRL.S.F01) attributes in
+          AttributeList from DUT."
+      PICS: WASHERCTRL.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 3]
+
+    - label: "Step 5: TH reads EventList attribute from DUT"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads AcceptedCommandList attribute from DUT"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH reads GeneratedCommandList attribute from DUT"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

@@ -28,8 +28,8 @@
 
 namespace chip {
 
-constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-constexpr uint16_t kIPKSize                    = Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
+inline constexpr uint16_t kSigmaParamRandomNumberSize = 32;
+inline constexpr uint16_t kIPKSize                    = Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
 CHIP_ERROR GenerateCaseDestinationId(const ByteSpan & ipk, const ByteSpan & initiatorRandom, const ByteSpan & rootPubKey,
                                      FabricId fabricId, NodeId nodeId, MutableByteSpan & outDestinationId);

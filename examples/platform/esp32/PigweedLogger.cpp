@@ -23,6 +23,10 @@
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+#include <esp_diagnostics.h>
+#endif
+
 namespace PigweedLogger {
 namespace {
 
@@ -126,6 +130,10 @@ extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, co
     }
 #endif
 
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+    esp_diag_log_writev(level, tag, format, v);
+#endif
+
     va_end(v);
 }
 
@@ -152,6 +160,10 @@ extern "C" void __wrap_esp_log_writev(esp_log_level_t level, const char * tag, c
         const char * logResetColor = LOG_RESET_COLOR "\n";
         PigweedLogger::putString(logResetColor, strlen(logResetColor));
     }
+#endif
+
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE && CONFIG_DIAG_USE_EXTERNAL_LOG_WRAP
+    esp_diag_log_write(level, tag, format, v);
 #endif
 }
 

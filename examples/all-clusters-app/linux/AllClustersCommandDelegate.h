@@ -88,6 +88,16 @@ private:
      * sequence, after it has been detected that the sequence has ended.
      */
     void OnSwitchMultiPressCompleteHandler(uint8_t previousPosition, uint8_t count);
+
+    /**
+     * Should be called when it is necessary to change the mode to manual operation.
+     */
+    void OnModeChangeHandler(std::string device, std::string type, chip::app::DataModel::Nullable<uint8_t> mode);
+
+    /**
+     * Should be called when it is necessary to change the air quality attribute.
+     */
+    void OnAirQualityChange(uint32_t aEnum);
 };
 
 class AllClustersCommandDelegate : public NamedPipeCommandDelegate

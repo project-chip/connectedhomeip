@@ -24,6 +24,15 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1 DUT - DUT as OTA-R device type.
+          2 TH - Test harness1 as Administrator to perform read/write operations.
+          3 TH2 - Test harness2 as OTA-P on first fabric.
+          4 TH3 - Test harness3 as OTA-P on second fabric.
+          5 TH4 - Test harness4 as second OTA-P on first fabric.
+      disabled: true
+
     - label:
           "Step 1: TH sends a write request for the DefaultOTAProviders
           Attribute on the first fabric to the DUT. TH2 is set as the default

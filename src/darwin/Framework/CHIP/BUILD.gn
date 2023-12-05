@@ -27,7 +27,6 @@ static_library("framework") {
   sources = [
     "${chip_root}/src/app/clusters/ota-provider/ota-provider.cpp",
     "MTRError.mm",
-    "MTRIMDispatch.mm",
   ]
 
   public_deps = [

@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class TimeSynchronizationClusterDSTOffsetStruct(
   val offset: Long,
-  val validStarting: Long,
-  val validUntil: Long?
+  val validStarting: ULong,
+  val validUntil: ULong?
 ) {
   override fun toString(): String = buildString {
     append("TimeSynchronizationClusterDSTOffsetStruct {\n")
@@ -35,9 +35,9 @@ class TimeSynchronizationClusterDSTOffsetStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OFFSET), offset)
       put(ContextSpecificTag(TAG_VALID_STARTING), validStarting)
       if (validUntil != null) {
@@ -54,13 +54,13 @@ class TimeSynchronizationClusterDSTOffsetStruct(
     private const val TAG_VALID_STARTING = 1
     private const val TAG_VALID_UNTIL = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTOffsetStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterDSTOffsetStruct {
+      tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validStarting = tlvReader.getLong(ContextSpecificTag(TAG_VALID_STARTING))
+      val validStarting = tlvReader.getULong(ContextSpecificTag(TAG_VALID_STARTING))
       val validUntil =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_VALID_UNTIL))
+          tlvReader.getULong(ContextSpecificTag(TAG_VALID_UNTIL))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
           null

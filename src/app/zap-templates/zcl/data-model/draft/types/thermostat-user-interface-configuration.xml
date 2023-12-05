@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="TemperatureDisplayMode" type="ENUM8">
+  <enum name="TemperatureDisplayMode" type="enum8">
     <item name="celsius" value="0x0"/>
     <item name="fahrenheit" value="0x1"/>
   </enum>
 
-  <enum name="KeypadLockout" type="ENUM8">
+  <enum name="KeypadLockout" type="enum8">
     <item name="noLockout" value="0x0"/>
     <item name="levelOneLockout" value="0x1"/>
     <item name="levelTwoLockout" value="0x2"/>

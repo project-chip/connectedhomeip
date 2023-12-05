@@ -29,6 +29,8 @@ static_library("secure_channel") {
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
+    "CheckinMessage.cpp",
+    "CheckinMessage.h",
     "DefaultSessionResumptionStorage.cpp",
     "DefaultSessionResumptionStorage.h",
     "PASESession.cpp",
@@ -50,6 +52,7 @@ static_library("secure_channel") {
 
   public_deps = [
     ":type_definitions",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -58,4 +61,6 @@ static_library("secure_channel") {
     "${chip_root}/src/tracing:macros",
     "${chip_root}/src/transport",
   ]
+
+  deps = [ "${chip_root}/src/app:revision_info" ]
 }

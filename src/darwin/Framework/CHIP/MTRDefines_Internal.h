@@ -27,3 +27,36 @@
 #else
 #define MTR_DIRECT_MEMBERS
 #endif
+
+#ifdef DEBUG
+#define MTR_TESTABLE MTR_EXPORT
+#else
+#define MTR_TESTABLE MTR_HIDDEN
+#endif
+
+// clang-format off
+/// Creates a weak shadow copy of the variable `local`
+#define mtr_weakify(local)                                      \
+    __weak typeof(local) _mtr_weak_##local = local
+
+/// Copies the weak shadow copy of `local` created by `mtr_weakify`
+/// back into a strong variable of the same name.
+#define mtr_strongify(local)                                    \
+    _Pragma("clang diagnostic push")                            \
+    _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
+    __strong typeof(local) _Nullable local = _mtr_weak_##local  \
+    _Pragma("clang diagnostic pop")
+
+/// Declares an unused local of unspecified type, to prevent accidental
+/// references to a shadowed variable of the same name. Note that hiding
+/// `self` does not prevent implicit references to self due to ivar access.
+#define mtr_hide(local)                                         \
+    _Pragma("clang diagnostic push")                            \
+    _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
+    __attribute__((unused)) variable_hidden_by_mtr_hide local;  \
+    _Pragma("clang diagnostic pop")
+typedef struct {} variable_hidden_by_mtr_hide;
+// clang-format on
+
+// Default timed interaction timeout, in ms, if another one is not provided.
+#define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000

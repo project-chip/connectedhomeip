@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1: TH commissions DUT using admin node ID N1"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -40,20 +40,21 @@ tests:
                 saveAs: CommissionerNodeId
 
     - label:
-          "Step 2: TH reads DUT Endpoint 0 OperationalCredentials cluster
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
-          "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"
       event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value:
               {
@@ -66,16 +67,16 @@ tests:
                           AuthMode: 2,
                           Subjects: [CommissionerNodeId],
                           Targets: null,
-                          FabricIndex: CurrentFabricIndex,
+                          FabricIndex: CurrentFabricIndexValue,
                       },
-                  FabricIndex: CurrentFabricIndex,
+                  FabricIndex: CurrentFabricIndexValue,
               }
 
     - label:
-          "Step 4: TH writes DUT Endpoint 0 AccessControl cluster ACL attribute,
-          value is list of AccessControlEntryStruct containing 2 elements
-          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
-          Subjects field: [N1] Targets field: null 2struct Privilege field:
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2struct Privilege field:
           Operate (3) AuthMode field: Group (3) Subjects field: null Targets
           field: null"
       PICS: ACL.S.E00
@@ -89,116 +90,82 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: null,
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 5: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
-      verification: |
-          ./chip-tool  accesscontrol  read-event  access-control-entry-changed  1 0
-
-          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event   containing at least 3 new elements
-
-          [1661181829.402498][19315:19320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1661181829.402502][19315:19320] CHIP:TOO:   Event number: 3
-          [1661181829.402504][19315:19320] CHIP:TOO:   Priority: Info
-          [1661181829.402506][19315:19320] CHIP:TOO:   Timestamp: 31085832
-          [1661181829.402536][19315:19320] CHIP:TOO:   AccessControlEntryChanged: {
-          [1661181829.402543][19315:19320] CHIP:TOO:     AdminNodeID: null
-          [1661181829.402548][19315:19320] CHIP:TOO:     AdminPasscodeID: 0
-          [1661181829.402551][19315:19320] CHIP:TOO:     ChangeType: 1
-          [1661181829.402554][19315:19320] CHIP:TOO:     LatestValue: {
-          [1661181829.402557][19315:19320] CHIP:TOO:       Privilege: 5
-          [1661181829.402560][19315:19320] CHIP:TOO:       AuthMode: 2
-          [1661181829.402564][19315:19320] CHIP:TOO:       Subjects: 1 entries
-          [1661181829.402569][19315:19320] CHIP:TOO:         [1]: 112233
-          [1661181829.402572][19315:19320] CHIP:TOO:       Targets: null
-          [1661181829.402575][19315:19320] CHIP:TOO:       FabricIndex: 1
-          [1661181829.402578][19315:19320] CHIP:TOO:      }
-          [1661181829.402581][19315:19320] CHIP:TOO:     FabricIndex: 1
-          [1661181829.402584][19315:19320] CHIP:TOO:    }
-          [1661181829.402609][19315:19320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1661181829.402612][19315:19320] CHIP:TOO:   Event number: 4
-          [1661181829.402615][19315:19320] CHIP:TOO:   Priority: Info
-          [1661181829.402617][19315:19320] CHIP:TOO:   Timestamp: 31297570
-          [1661181829.402624][19315:19320] CHIP:TOO:   AccessControlEntryChanged: {
-          [1661181829.402627][19315:19320] CHIP:TOO:     AdminNodeID: 112233
-          [1661181829.402630][19315:19320] CHIP:TOO:     AdminPasscodeID: null
-          [1661181829.402633][19315:19320] CHIP:TOO:     ChangeType: 2
-          [1661181829.402635][19315:19320] CHIP:TOO:     LatestValue: {
-          [1661181829.402638][19315:19320] CHIP:TOO:       Privilege: 5
-          [1661181829.402641][19315:19320] CHIP:TOO:       AuthMode: 2
-          [1661181829.402644][19315:19320] CHIP:TOO:       Subjects: 1 entries
-          [1661181829.402647][19315:19320] CHIP:TOO:         [1]: 112233
-          [1661181829.402650][19315:19320] CHIP:TOO:       Targets: null
-          [1661181829.402653][19315:19320] CHIP:TOO:       FabricIndex: 1
-          [1661181829.402656][19315:19320] CHIP:TOO:      }
-          [1661181829.402658][19315:19320] CHIP:TOO:     FabricIndex: 1
-          [1661181829.402661][19315:19320] CHIP:TOO:    }
-          [1661181829.402687][19315:19320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1661181829.402689][19315:19320] CHIP:TOO:   Event number: 5
-          [1661181829.402692][19315:19320] CHIP:TOO:   Priority: Info
-          [1661181829.402694][19315:19320] CHIP:TOO:   Timestamp: 31297570
-          [1661181829.402699][19315:19320] CHIP:TOO:   AccessControlEntryChanged: {
-          [1661181829.402702][19315:19320] CHIP:TOO:     AdminNodeID: 112233
-          [1661181829.402704][19315:19320] CHIP:TOO:     AdminPasscodeID: null
-          [1661181829.402707][19315:19320] CHIP:TOO:     ChangeType: 1
-          [1661181829.402710][19315:19320] CHIP:TOO:     LatestValue: {
-          [1661181829.402713][19315:19320] CHIP:TOO:       Privilege: 5
-          [1661181829.402715][19315:19320] CHIP:TOO:       AuthMode: 2
-          [1661181829.402718][19315:19320] CHIP:TOO:       Subjects: 1 entries
-          [1661181829.402722][19315:19320] CHIP:TOO:         [1]: 112233
-          [1661181829.402724][19315:19320] CHIP:TOO:       Targets: null
-          [1661181829.402727][19315:19320] CHIP:TOO:       FabricIndex: 1
-          [1661181829.402729][19315:19320] CHIP:TOO:      }
-          [1661181829.402732][19315:19320] CHIP:TOO:     FabricIndex: 1
-          [1661181829.402735][19315:19320] CHIP:TOO:    }
-          [1661181829.402758][19315:19320] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1661181829.402761][19315:19320] CHIP:TOO:   Event number: 6
-          [1661181829.402763][19315:19320] CHIP:TOO:   Priority: Info
-          [1661181829.402765][19315:19320] CHIP:TOO:   Timestamp: 31297571
-          [1661181829.402770][19315:19320] CHIP:TOO:   AccessControlEntryChanged: {
-          [1661181829.402773][19315:19320] CHIP:TOO:     AdminNodeID: 112233
-          [1661181829.402775][19315:19320] CHIP:TOO:     AdminPasscodeID: null
-          [1661181829.402778][19315:19320] CHIP:TOO:     ChangeType: 1
-          [1661181829.402780][19315:19320] CHIP:TOO:     LatestValue: {
-          [1661181829.402783][19315:19320] CHIP:TOO:       Privilege: 3
-          [1661181829.402786][19315:19320] CHIP:TOO:       AuthMode: 3
-          [1661181829.402789][19315:19320] CHIP:TOO:       Subjects: null
-          [1661181829.402791][19315:19320] CHIP:TOO:       Targets: null
-          [1661181829.402794][19315:19320] CHIP:TOO:       FabricIndex: 1
-          [1661181829.402796][19315:19320] CHIP:TOO:      }
-          [1661181829.402799][19315:19320] CHIP:TOO:     FabricIndex: 1
-          [1661181829.402801][19315:19320] CHIP:TOO:    }
-          [1661181829.402840][19315:19320] CHIP:EM: Sending Standalone Ack for MessageCounter:139733206 on exchange 44167i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E00
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 3,
+                                  AuthMode: 3,
+                                  Subjects: null,
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
 
     - label:
-          "Step 6: TH writes DUT Endpoint 0 AccessControl cluster ACL attribute,
-          value is list of AccessControlEntryStruct containing 2 elements. The
-          first item is valid, the second item is invalid due to group ID 0
-          being used, which is illegal. 1.struct Privilege field: Administer (5)
-          AuthMode field: CASE (2) Subjects field: [N1] Targets field: null
-          2.struct Privilege field: Operate (3) AuthMode field: Group (3)
-          Subjects field: [0] Targets field: null"
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements. The first item is valid, the second item is invalid due to
+          group ID 0 being used, which is illegal. 1.struct Privilege field:
+          Administer (5) AuthMode field: CASE (2) Subjects field: [N1] Targets
+          field: null 2.struct Privilege field: Operate (3) AuthMode field:
+          Group (3) Subjects field: [0] Targets field: null"
       PICS: ACL.S.E00
       command: "writeAttribute"
       attribute: "ACL"
@@ -210,87 +177,72 @@ tests:
                       AuthMode: 2,
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
                   {
                       Privilege: 3,
                       AuthMode: 3,
                       Subjects: [0],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
           error: CONSTRAINT_ERROR
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 7: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
-      verification: |
-          ./chip-tool accesscontrol read-event access-control-entry-changed 1 0
-
-          On TH1(Chiptool) , Verify AccessControl cluster AccessControlEntryChanged event containing
-           at least 3 new elements and MUST NOT contain an added event for second entry written at step 6
-
-          [1662107335.746678][89356:89361] CHIP:TOO:   Event number: 10
-          [1662107335.746688][89356:89361] CHIP:TOO:   Priority: Info
-          [1662107335.746698][89356:89361] CHIP:TOO:   Timestamp: 370685212
-          [1662107335.746722][89356:89361] CHIP:TOO:   AccessControlEntryChanged: {
-          [1662107335.746736][89356:89361] CHIP:TOO:     AdminNodeID: 112233
-          [1662107335.746750][89356:89361] CHIP:TOO:     AdminPasscodeID: null
-          [1662107335.746763][89356:89361] CHIP:TOO:     ChangeType: 2
-          [1662107335.746774][89356:89361] CHIP:TOO:     LatestValue: {
-          [1662107335.746786][89356:89361] CHIP:TOO:       Privilege: 3
-          [1662107335.746797][89356:89361] CHIP:TOO:       AuthMode: 3
-          [1662107335.746810][89356:89361] CHIP:TOO:       Subjects: null
-          [1662107335.746823][89356:89361] CHIP:TOO:       Targets: null
-          [1662107335.746837][89356:89361] CHIP:TOO:       FabricIndex: 1
-          [1662107335.746850][89356:89361] CHIP:TOO:      }
-          [1662107335.746863][89356:89361] CHIP:TOO:     FabricIndex: 1
-          [1662107335.746875][89356:89361] CHIP:TOO:    }
-          [1662107335.746995][89356:89361] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1662107335.747009][89356:89361] CHIP:TOO:   Event number: 11
-          [1662107335.747020][89356:89361] CHIP:TOO:   Priority: Info
-          [1662107335.747032][89356:89361] CHIP:TOO:   Timestamp: 370685213
-          [1662107335.747058][89356:89361] CHIP:TOO:   AccessControlEntryChanged: {
-          [1662107335.747073][89356:89361] CHIP:TOO:     AdminNodeID: 112233
-          [1662107335.747085][89356:89361] CHIP:TOO:     AdminPasscodeID: null
-          [1662107335.747097][89356:89361] CHIP:TOO:     ChangeType: 2
-          [1662107335.747108][89356:89361] CHIP:TOO:     LatestValue: {
-          [1662107335.747119][89356:89361] CHIP:TOO:       Privilege: 5
-          [1662107335.747130][89356:89361] CHIP:TOO:       AuthMode: 2
-          [1662107335.747144][89356:89361] CHIP:TOO:       Subjects: 1 entries
-          [1662107335.747160][89356:89361] CHIP:TOO:         [1]: 112233
-          [1662107335.747175][89356:89361] CHIP:TOO:       Targets: null
-          [1662107335.747188][89356:89361] CHIP:TOO:       FabricIndex: 1
-          [1662107335.747201][89356:89361] CHIP:TOO:      }
-          [1662107335.747214][89356:89361] CHIP:TOO:     FabricIndex: 1
-          [1662107335.747226][89356:89361] CHIP:TOO:    }
-          [1662107335.747348][89356:89361] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0000
-          [1662107335.747362][89356:89361] CHIP:TOO:   Event number: 12
-          [1662107335.747374][89356:89361] CHIP:TOO:   Priority: Info
-          [1662107335.747385][89356:89361] CHIP:TOO:   Timestamp: 370685215
-          [1662107335.747412][89356:89361] CHIP:TOO:   AccessControlEntryChanged: {
-          [1662107335.747426][89356:89361] CHIP:TOO:     AdminNodeID: 112233
-          [1662107335.747438][89356:89361] CHIP:TOO:     AdminPasscodeID: null
-          [1662107335.747450][89356:89361] CHIP:TOO:     ChangeType: 1
-          [1662107335.747461][89356:89361] CHIP:TOO:     LatestValue: {
-          [1662107335.747473][89356:89361] CHIP:TOO:       Privilege: 5
-          [1662107335.747484][89356:89361] CHIP:TOO:       AuthMode: 2
-          [1662107335.747500][89356:89361] CHIP:TOO:       Subjects: 1 entries
-          [1662107335.747516][89356:89361] CHIP:TOO:         [1]: 112233
-          [1662107335.747530][89356:89361] CHIP:TOO:       Targets: null
-          [1662107335.747543][89356:89361] CHIP:TOO:       FabricIndex: 1
-          [1662107335.747554][89356:89361] CHIP:TOO:      }
-          [1662107335.747565][89356:89361] CHIP:TOO:     FabricIndex: 1
-          [1662107335.747576][89356:89361] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E00
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E00
+      command: "readEvent"
+      event: "AccessControlEntryChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 3,
+                                  AuthMode: 3,
+                                  Subjects: null,
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Privilege: 5,
+                                  AuthMode: 2,
+                                  Subjects: [CommissionerNodeId],
+                                  Targets: null,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }

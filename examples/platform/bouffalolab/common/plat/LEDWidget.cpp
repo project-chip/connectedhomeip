@@ -15,50 +15,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <stdio.h>
 
-#include <bl_gpio.h>
-#include <bl_sys.h>
-#include <board.h>
 #include <demo_pwm.h>
-#include <hosal_gpio.h>
+#include <mboard.h>
 
 #include "LEDWidget.h"
-
-void LEDWidget::Init()
-{
-#ifdef LED1_PIN
-    mPin = LED1_PIN;
-
-    hosal_gpio_dev_t gpio_led = { .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
-    gpio_led.port             = mPin;
-
-    hosal_gpio_init(&gpio_led);
-#endif
-    SetOnoff(false);
-}
-
-void LEDWidget::Toggle(void)
-{
-    SetOnoff(1 - mOnoff);
-}
-
-void LEDWidget::SetOnoff(bool state)
-{
-#ifdef LED1_PIN
-    hosal_gpio_dev_t gpio_led = { .port = mPin, .config = OUTPUT_OPEN_DRAIN_NO_PULL, .priv = NULL };
-
-    mOnoff = state;
-
-    if (state)
-    {
-        hosal_gpio_output_set(&gpio_led, 1);
-    }
-    else
-    {
-        hosal_gpio_output_set(&gpio_led, 0);
-    }
-#endif
-}
 
 bool LEDWidget::GetOnoff(void)
 {
@@ -70,8 +32,8 @@ void DimmableLEDWidget::Init()
     mOnoff = light_v = 0;
 
 #ifdef MAX_PWM_CHANNEL
-    demo_hosal_pwm_init();
-    demo_hosal_pwm_start();
+    demo_pwm_init();
+    demo_pwm_start();
 #endif
 }
 
@@ -115,8 +77,8 @@ void ColorLEDWidget::Init()
 {
     mOnoff = light_v = light_s = light_h = 0;
 #ifdef MAX_PWM_CHANNEL
-    demo_hosal_pwm_init();
-    demo_hosal_pwm_start();
+    demo_pwm_init();
+    demo_pwm_start();
 #endif
 }
 

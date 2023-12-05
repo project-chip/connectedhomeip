@@ -23,6 +23,10 @@
 
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_USB_DEVICE_STACK
+#include <zephyr/usb/usb_device.h>
+#endif /* CONFIG_USB_DEVICE_STACK */
+
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
@@ -35,7 +39,7 @@ using namespace ::chip::DeviceLayer;
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
-static constexpr const char * kFactoryResetOnBootStoreKey = "TelinkFactoryResetOnBootCnt";
+static constexpr char kFactoryResetOnBootStoreKey[]       = "TelinkFactoryResetOnBootCnt";
 static constexpr uint32_t kFactoryResetUsualBootTimeoutMs = 5000;
 
 static k_timer FactoryResetUsualBootTimer;
@@ -94,6 +98,10 @@ static void FactoryResetOnBoot(void)
 
 int main(void)
 {
+#if defined(CONFIG_USB_DEVICE_STACK) && !defined(CONFIG_CHIP_PW_RPC)
+    usb_enable(NULL);
+#endif /* CONFIG_USB_DEVICE_STACK */
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #ifdef CONFIG_CHIP_PW_RPC
@@ -130,12 +138,14 @@ int main(void)
         goto exit;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_ROUTER)
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+#error THREAD_DEVICE_ROLE not selected
 #endif
     if (err != CHIP_NO_ERROR)
     {

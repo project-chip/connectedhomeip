@@ -14,17 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="RelativeHumidityMode" type="ENUM8">
+  <enum name="RelativeHumidityMode" type="enum8">
     <item name="measureLocally" value="0x0"/>
     <item name="updatedOverTheNetwork" value="0x1"/>
   </enum>
 
-  <enum name="DehumidifcationLockout" type="ENUM8">
+  <enum name="DehumidifcationLockout" type="enum8">
     <item name="notAllowed" value="0x0"/>
     <item name="allowed" value="0x1"/>
   </enum>
 
-  <enum name="RelativeHumidityDisplay" type="ENUM8">
+  <enum name="RelativeHumidityDisplay" type="enum8">
     <item name="notDisplayed" value="0x0"/>
     <item name="displayed" value="0x1"/>
   </enum>

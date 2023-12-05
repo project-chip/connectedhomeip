@@ -17,10 +17,12 @@
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"
 #include "lwip/netif.h"
+#include "lwip/opt.h"
 #include "lwip/prot/icmp6.h"
 #include "lwip/prot/ip6.h"
 #include "lwip/prot/nd6.h"
 #include "lwip/raw.h"
+#include "lwip/tcpip.h"
 
 #define HOPLIM_MAX 255
 #define PIO_FLAG_ON_LINK (1 << 7)
@@ -57,12 +59,12 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
         return;
     }
     icmp_payload += sizeof(struct ra_header);
-    payload_len = (uint16_t)(payload_len - sizeof(struct ra_header));
+    payload_len = (uint16_t) (payload_len - sizeof(struct ra_header));
 
     while (payload_len >= 2)
     {
         uint8_t opt_type = icmp_payload[0];
-        uint8_t opt_len  = (uint8_t)(icmp_payload[1] << 3);
+        uint8_t opt_len  = (uint8_t) (icmp_payload[1] << 3);
 
         if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && opt_len >= sizeof(route_option_t) - sizeof(ip6_addr_p_t) &&
             !is_self_address(netif, src_addr) && payload_len >= opt_len)
@@ -75,9 +77,9 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             {
                 break;
             }
-            uint8_t prefix_len_bytes = (uint8_t)((route_option.prefix_length + 7) / 8);
-            int8_t preference        = (int8_t)(-2 * ((route_option.preference >> 4) & 1) + (((route_option.preference) >> 3) & 1));
-            uint8_t rio_data_len     = (uint8_t)(opt_len - sizeof(route_option) + sizeof(ip6_addr_p_t));
+            uint8_t prefix_len_bytes = (uint8_t) ((route_option.prefix_length + 7) / 8);
+            int8_t preference    = (int8_t) (-2 * ((route_option.preference >> 4) & 1) + (((route_option.preference) >> 3) & 1));
+            uint8_t rio_data_len = (uint8_t) (opt_len - sizeof(route_option) + sizeof(ip6_addr_p_t));
 
             ESP_LOGI(TAG, "Received RIO");
             if (rio_data_len >= prefix_len_bytes)
@@ -101,7 +103,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             }
         }
         icmp_payload += opt_len;
-        payload_len = (uint16_t)(payload_len - opt_len);
+        payload_len = (uint16_t) (payload_len - opt_len);
     }
 }
 
@@ -136,7 +138,7 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
         return 0;
     }
 
-    icmp_payload_len = (uint16_t)(p->tot_len - sizeof(struct ip6_hdr));
+    icmp_payload_len = (uint16_t) (p->tot_len - sizeof(struct ip6_hdr));
     icmp_payload     = p->payload + sizeof(struct ip6_hdr);
 
     icmp6_header = (struct icmp6_hdr *) icmp_payload;
@@ -155,25 +157,41 @@ esp_err_t esp_route_hook_init(esp_netif_t * netif)
     esp_err_t ret           = ESP_OK;
 
     ESP_RETURN_ON_FALSE(netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
+
+    LOCK_TCPIP_CORE();
+
     int netif_idx = esp_netif_get_netif_impl_index(netif);
     if (netif_idx < 0 || netif_idx > UINT8_MAX)
     {
+        UNLOCK_TCPIP_CORE();
         return ESP_ERR_INVALID_SIZE;
     }
     lwip_netif = netif_get_by_index((uint8_t) netif_idx);
-    ESP_RETURN_ON_FALSE(lwip_netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
+
+    if (lwip_netif == NULL)
+    {
+        UNLOCK_TCPIP_CORE();
+        ESP_LOGE(TAG, "Invalid network interface");
+        return ESP_ERR_INVALID_ARG;
+    }
 
     for (esp_route_hook_t * iter = s_hooks; iter != NULL; iter = iter->next)
     {
         if (iter->netif == lwip_netif)
         {
+            UNLOCK_TCPIP_CORE();
             ESP_LOGI(TAG, "Hook already installed on netif, skip...");
             return ESP_OK;
         }
     }
 
     hook = (esp_route_hook_t *) malloc(sizeof(esp_route_hook_t));
-    ESP_RETURN_ON_FALSE(hook != NULL, ESP_ERR_NO_MEM, TAG, "Cannot allocate hook");
+    if (hook == NULL)
+    {
+        UNLOCK_TCPIP_CORE();
+        ESP_LOGE(TAG, "Cannot allocate hook");
+        return ESP_ERR_NO_MEM;
+    }
 
     ESP_GOTO_ON_FALSE(mld6_joingroup_netif(lwip_netif, ip_2_ip6(&router_group)) == ESP_OK, ESP_FAIL, exit, TAG,
                       "Failed to join multicast group");
@@ -189,6 +207,9 @@ esp_err_t esp_route_hook_init(esp_netif_t * netif)
     s_hooks    = hook;
 
 exit:
+
+    UNLOCK_TCPIP_CORE();
+
     if (ret != ESP_OK && hook != NULL)
     {
         free(hook);

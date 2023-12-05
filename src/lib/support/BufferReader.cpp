@@ -92,6 +92,7 @@ Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
 }
 
 // Explicit Read instantiations for the data types we want to support.
+template void Reader::RawReadLowLevelBeCareful(char *);
 template void Reader::RawReadLowLevelBeCareful(bool *);
 template void Reader::RawReadLowLevelBeCareful(int8_t *);
 template void Reader::RawReadLowLevelBeCareful(int16_t *);

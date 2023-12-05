@@ -21,8 +21,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
-#include "FreeRTOS.h"
-#include <lwip/tcpip.h>
+#include <FreeRTOS.h>
 
 extern "C" {
 #include <bl_sys.h>

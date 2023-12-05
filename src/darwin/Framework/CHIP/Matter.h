@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define MTR_INCLUDED_FROM_UMBRELLA_HEADER
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
@@ -40,7 +42,9 @@
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRDeviceControllerDelegate.h>
 #import <Matter/MTRDeviceControllerFactory.h>
+#import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
@@ -55,3 +59,5 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+
+#undef MTR_INCLUDED_FROM_UMBRELLA_HEADER

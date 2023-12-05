@@ -23,8 +23,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <chip_porting.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/AmebaUtils.h>
@@ -40,10 +40,45 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 
 CHIP_ERROR AmebaUtils::StartWiFi(void)
 {
-    // Ensure that the WiFi layer is started.
-    int32_t error  = matter_wifi_on(RTW_MODE_STA);
-    CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
+    bool staEnabled;
+    int32_t error;
+    CHIP_ERROR err;
+
+    if (wifi_mode == RTW_MODE_AP)
+    {
+        ChipLogError(DeviceLayer, "StartWiFi(): Does not support RTW_MODE_AP, change to RTW_MODE_STA_AP");
+        error = matter_wifi_set_mode(RTW_MODE_STA_AP);
+        err   = MapError(error, AmebaErrorType::kWiFiError);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "matter_wifi_on(RTW_MODE_STA_AP) failed");
+            return err;
+        }
+    }
+
+    if (!(IsStationInterfaceUp()))
+    {
+        ChipLogError(DeviceLayer, "StartWiFi() setting Wi-Fi interface");
+        error = matter_wifi_set_mode(RTW_MODE_STA);
+        err   = MapError(error, AmebaErrorType::kWiFiError);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "matter_wifi_set_mode(RTW_MODE_STA) failed");
+            return err;
+        }
+    }
+exit:
     return CHIP_NO_ERROR; // will fail if wifi is already initialized, let it pass
+}
+
+bool AmebaUtils::IsStationInterfaceUp(void)
+{
+    /* Station mode will only be setup in Interface 0 in both station only and concurrent mode
+     * Thus, only check Interface 0 for station mode
+     */
+    return matter_wifi_is_up(RTW_STA_INTERFACE);
 }
 
 CHIP_ERROR AmebaUtils::IsStationEnabled(bool & staEnabled)
@@ -56,6 +91,19 @@ bool AmebaUtils::IsStationProvisioned(void)
 {
     rtw_wifi_config_t WiFiConfig = { 0 };
     return ((GetWiFiConfig(&WiFiConfig) == CHIP_NO_ERROR) && (WiFiConfig.ssid[0] != 0));
+}
+
+CHIP_ERROR AmebaUtils::IsStationIPLinked(bool & linked)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    linked         = (matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE) == RTW_SUCCESS) ? 1 : 0;
+    return err;
+}
+
+bool AmebaUtils::IsStationOpenSecurity(void)
+{
+    bool is_open_security = (matter_wifi_is_open_security()) ? 1 : 0;
+    return is_open_security;
 }
 
 CHIP_ERROR AmebaUtils::IsStationConnected(bool & connected)
@@ -149,7 +197,7 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
     GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
     int32_t error  = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
-                                        strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
+                                         strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
 
     vPortFree(config);
@@ -160,7 +208,7 @@ CHIP_ERROR AmebaUtils::WiFiConnect(const char * ssid, const char * password)
 {
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) ssid);
     int32_t error  = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
-                                        strlen(password), 0, nullptr);
+                                         strlen(password), 0, nullptr);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     return err;
 }
@@ -182,6 +230,7 @@ CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
         if (!memcmp(config.ssid, pSetting.ssid, strlen((const char *) pSetting.ssid) + 1))
         {
             ChipLogProgress(DeviceLayer, "STA Wi-Fi Info exist, do nothing");
+            matter_set_autoreconnect(0);
             goto exit;
         }
         else
@@ -194,6 +243,7 @@ CHIP_ERROR AmebaUtils::SetCurrentProvisionedNetwork()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "SetWiFiConfig() failed");
+                matter_set_autoreconnect(0);
                 goto exit;
             }
         }

@@ -27,7 +27,7 @@ declare_args() {
 if (chip_device_platform != "none" && chip_device_platform != "fake") {
   import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  chip_test_suite("tests") {
+  chip_test_suite_using_nltest("tests") {
     output_name = "libPlatformTests"
 
     test_sources = []

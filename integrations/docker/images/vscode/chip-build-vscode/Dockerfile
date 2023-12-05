@@ -52,13 +52,17 @@ COPY --from=k32w /opt/sdk /opt/k32w
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 
-COPY --from=ti /opt/ti/sysconfig_1.15.0 /opt/ti/sysconfig_1.15.0
+COPY --from=ti /opt/ti/sysconfig_1.16.2 /opt/ti/sysconfig_1.16.2
 
 COPY --from=openiotsdk /opt/FVP_Corstone_SSE-300/ /opt/FVP_Corstone_SSE-300/
 
 COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 COPY --from=asr /opt/asr /opt/asr
+
+COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=efr32 /opt/silabs/wiseconnect-wifi-bt-sdk /opt/silabs/wiseconnect-wifi-bt-sdk
+COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
@@ -68,29 +72,29 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
-# Required for the Tizen SDK
+# Required for the Tizen SDK:
+#   - zip
+# Required for the Open IoT SDK platform
+#   - expect
+#   - telnet
+#   - srecord
+# For java builds:
+#   - openjdk-8-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && : # last line
-
-# Required for the Open IoT SDK platform
-RUN set -x \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     expect \
     telnet \
     srecord \
+    openjdk-8-jdk \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
 # Required for the Bouffalolab platform
 RUN set -x \
-    && pip3 install bflb-iot-tool \
+    && pip3 install bflb-iot-tool==1.8.6 \
     && : # last line
 
 ENV PATH $PATH:/usr/lib/kotlinc/bin
@@ -99,6 +103,9 @@ ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r23c
 ENV CY_TOOLS_PATHS="/opt/ModusToolbox/tools_2.4"
 ENV SILABS_BOARD=BRD4161A
+ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
+ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
+ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk
 ENV IDF_PATH=/opt/espressif/esp-idf/
 ENV IDF_TOOLS_PATH=/opt/espressif/tools
 ENV IMX_SDK_ROOT=/opt/fsl-imx-xwayland/6.1-langdale
@@ -113,9 +120,9 @@ ENV QEMU_ESP32_DIR=/opt/espressif/qemu
 ENV SYSROOT_AARCH64=/opt/ubuntu-22.04.1-aarch64-sysroot
 ENV TELINK_ZEPHYR_BASE=/opt/telink/zephyrproject/zephyr
 ENV TELINK_ZEPHYR_SDK_DIR=/opt/telink/zephyr-sdk-0.16.1
-ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.15.0
+ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.16.2
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
-ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.0
+ENV ZEPHYR_SDK_INSTALL_DIR=/opt/NordicSemiconductor/nRF5_tools/zephyr-sdk-0.16.1
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
 ENV TIZEN_VERSION 7.0

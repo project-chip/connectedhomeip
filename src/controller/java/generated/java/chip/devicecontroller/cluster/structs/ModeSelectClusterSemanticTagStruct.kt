@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class ModeSelectClusterSemanticTagStruct(val mfgCode: Int, val value: Int) {
+class ModeSelectClusterSemanticTagStruct(val mfgCode: UInt, val value: UInt) {
   override fun toString(): String = buildString {
     append("ModeSelectClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -30,9 +30,9 @@ class ModeSelectClusterSemanticTagStruct(val mfgCode: Int, val value: Int) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MFG_CODE), mfgCode)
       put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
@@ -43,10 +43,10 @@ class ModeSelectClusterSemanticTagStruct(val mfgCode: Int, val value: Int) {
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ModeSelectClusterSemanticTagStruct {
-      tlvReader.enterStructure(tag)
-      val mfgCode = tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE))
-      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ModeSelectClusterSemanticTagStruct {
+      tlvReader.enterStructure(tlvTag)
+      val mfgCode = tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

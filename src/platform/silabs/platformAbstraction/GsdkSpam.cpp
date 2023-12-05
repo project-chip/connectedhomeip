@@ -48,7 +48,7 @@ extern "C" {
 #include "uart.h"
 #endif
 
-#if SL_SYSTEM_VIEW
+#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW.h"
 #endif
 }
@@ -68,13 +68,12 @@ SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
 CHIP_ERROR SilabsPlatform::Init(void)
 {
     sl_system_init();
-    sl_mbedtls_init();
 
 #if CHIP_ENABLE_OPENTHREAD
     sl_ot_sys_init();
 #endif
 
-#if SL_SYSTEM_VIEW
+#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
 #endif

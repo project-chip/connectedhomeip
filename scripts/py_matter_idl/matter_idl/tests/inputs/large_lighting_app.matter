@@ -1,11 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -108,25 +103,25 @@ server cluster Groups = 4 {
 }
 
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap OnOffControl : BITMAP8 {
@@ -145,13 +140,13 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+    EffectIdentifierEnum effectId = 0;
+    DelayedAllOffEffectVariantEnum effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -392,13 +387,13 @@ server cluster BasicInformation = 40 {
 }
 
 client cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
+  enum ApplyUpdateActionEnum : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
+  enum DownloadProtocolEnum : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHttps = 2;
@@ -418,7 +413,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     vendor_id vendorId = 0;
     INT16U productId = 1;
     INT32U softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
+    DownloadProtocolEnum protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
     optional CHAR_STRING<2> location = 5;
     optional BOOLEAN requestorCanConsent = 6;
@@ -447,7 +442,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
+    ApplyUpdateActionEnum action = 0;
     INT32U delayedActionTime = 1;
   }
 
@@ -457,13 +452,13 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 }
 
 server cluster OtaSoftwareUpdateRequestor = 42 {
-  enum OTAAnnouncementReason : ENUM8 {
+  enum AnnouncementReasonEnum : ENUM8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
     kUrgentUpdateAvailable = 2;
   }
 
-  enum OTAChangeReasonEnum : ENUM8 {
+  enum ChangeReasonEnum : ENUM8 {
     kUnknown = 0;
     kSuccess = 1;
     kFailure = 2;
@@ -471,7 +466,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayByProvider = 4;
   }
 
-  enum OTAUpdateStateEnum : ENUM8 {
+  enum UpdateStateEnum : ENUM8 {
     kUnknown = 0;
     kIdle = 1;
     kQuerying = 2;
@@ -490,9 +485,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    OTAUpdateStateEnum previousState = 0;
-    OTAUpdateStateEnum newState = 1;
-    OTAChangeReasonEnum reason = 2;
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
   }
 
@@ -510,7 +505,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
   attribute ProviderLocation defaultOtaProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
-  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -518,7 +513,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
     vendor_id vendorId = 1;
-    OTAAnnouncementReason announcementReason = 2;
+    AnnouncementReasonEnum announcementReason = 2;
     optional OCTET_STRING<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
@@ -1418,12 +1413,22 @@ server cluster GroupKeyManagement = 63 {
 }
 
 server cluster FixedLabel = 64 {
+  struct LabelStruct {
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
+  }
+
   readonly attribute LabelStruct labelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster UserLabel = 65 {
+  struct LabelStruct {
+    CHAR_STRING<16> label = 0;
+    CHAR_STRING<16> value = 1;
+  }
+
   attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;

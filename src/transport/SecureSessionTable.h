@@ -26,8 +26,8 @@
 namespace chip {
 namespace Transport {
 
-constexpr uint16_t kMaxSessionID       = UINT16_MAX;
-constexpr uint16_t kUnsecuredSessionId = 0;
+inline constexpr uint16_t kMaxSessionID       = UINT16_MAX;
+inline constexpr uint16_t kUnsecuredSessionId = 0;
 
 /**
  * Handles a set of sessions.
@@ -206,7 +206,7 @@ private:
      * the session that is most ahead as the best candidate for eviction:
      *
      *  - Key1:  Sessions on fabrics that have more sessions in the table are placed ahead of sessions on fabrics
-     *           with lesser sessions. We conclusively know that if a particular fabric has more sessions in the table
+     *           with fewer sessions. We conclusively know that if a particular fabric has more sessions in the table
      *           than another, then that fabric is definitely over minimas (assuming a minimally sized session table
      *           conformant to spec minimas).
      *

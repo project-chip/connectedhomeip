@@ -85,7 +85,7 @@ static CHIP_ERROR Iterate(TLVReader & aReader, size_t aDepth, IterateHandler aHa
     {
         const TLVType theType = aReader.GetType();
 
-        ReturnErrorOnFailure((aHandler)(aReader, aDepth, aContext));
+        ReturnErrorOnFailure((aHandler) (aReader, aDepth, aContext));
 
         if (aRecurse && TLVTypeIsContainer(theType))
         {

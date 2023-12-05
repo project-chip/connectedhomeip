@@ -26,6 +26,8 @@ static_library("ASR") {
     "../SingletonConfigurationManager.cpp",
     "ASRConfig.cpp",
     "ASRConfig.h",
+    "ASRFactoryDataParser.cpp",
+    "ASRFactoryDataParser.h",
     "ASRFactoryDataProvider.cpp",
     "ASRUtils.cpp",
     "ASRUtils.h",
@@ -72,6 +74,7 @@ static_library("ASR") {
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/src/setup_payload",
   ]
 

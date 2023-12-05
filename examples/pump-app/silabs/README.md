@@ -101,7 +101,7 @@ Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32/ ./out/pump-app BRD4187C
+          ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/ ./out/pump-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -110,7 +110,7 @@ Labs platform.
 
     OR use GN/Ninja directly
 
-          $ cd ~/connectedhomeip/examples/pump-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/pump-app/silabs
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -119,12 +119,12 @@ Labs platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/pump-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/pump-app/silabs
           $ rm -rf out/
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-          $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32/ ./out/pump-app_ICD BRD4187C --icd
+          $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/ ./out/pump-app_ICD BRD4187C --icd
 
     or use gn as previously mentioned but adding the following arguments:
 
@@ -132,11 +132,11 @@ Labs platform.
 
 *   Build the example with pigweed RPC
 
-          $ ./scripts/examples/gn_silabs_example.sh examples/pump-app/silabs/efr32/ out/pump_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_silabs_example.sh examples/pump-app/silabs/ out/pump_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
 
     or use GN/Ninja Directly
 
-          $ cd ~/connectedhomeip/examples/pump-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/pump-app/silabs
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export SILABS_BOARD=BRD4187C
@@ -152,7 +152,7 @@ arguments
 
 -   On the command line:
 
-          $ cd ~/connectedhomeip/examples/pump-app/silabs/efr32
+          $ cd ~/connectedhomeip/examples/pump-app/silabs
           $ python3 out/debug/matter-silabs-pump-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
@@ -317,7 +317,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
@@ -345,19 +345,19 @@ passed to the build scripts.
 
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32 ./out/pump-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs ./out/pump-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 `is_debug`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32 ./out/pump-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs ./out/pump-app BRD4164A "is_debug=false"
 
 ### Disabling LCD
 
 `show_qr_code`
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32 ./out/pump-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs ./out/pump-app BRD4164A "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -366,4 +366,4 @@ passed to the build scripts.
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs/efr32 ./out/pump-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_silabs_example.sh ./examples/pump-app/silabs ./out/pump-app BRD4164A kvs_max_entries=50

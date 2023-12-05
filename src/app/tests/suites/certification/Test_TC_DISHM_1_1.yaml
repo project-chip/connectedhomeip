@@ -35,17 +35,17 @@ tests:
       verification: |
           ./chip-tool dishwashermode read cluster-revision 1 1
 
-          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 1 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
+          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number (2) on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1690365584.246794][27436:27438] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFD DataVersion: 1130015440
-          [1690365584.246860][27436:27438] CHIP:TOO:   ClusterRevision: 1
+          [1690365584.246860][27436:27438] CHIP:TOO:   ClusterRevision: 2
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       verification: |
           ./chip-tool dishwashermode read feature-map 1 1
 
-          On the TH(Chip-tool) Log, Verify featureMap value is 1 If TCCM.S.F00(DEPONOFF) true, Otherwise 0,  T and below is the sample log provided for the raspi platform:
+          On the TH(Chip-tool) Log, Verify featureMap value is 1 If DISHM.S.F00(DEPONOFF) is true, Otherwise 0,  and below is the sample log provided for the raspi platform:
 
           [1690365613.351850][27441:27443] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFC DataVersion: 1130015440
           [1690365613.351911][27441:27443] CHIP:TOO:   FeatureMap: 1
@@ -56,9 +56,9 @@ tests:
           ./chip-tool dishwashermode read attribute-list 1 1
 
           Verify the "AttributeList " should include the mandatory attributes (values 0, 1),
-          - global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
-          - list may include optional attribute(value 0x0002), if MOD.S.A0004(StartUpMode) supports,
-          - list contains feature dependent attribute (values 0x0003), if MOD.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          - Global attributes  (value 65533, 65532, 65531, 65530, 65529 and 65528) and
+          - List may include optional attribute(value 0x0002), if DISHM.S.A0002(StartUpMode) supports,
+          - List contains feature dependent attribute (values 0x0003), if DISHM.S.F00(DEPONOFF) is true  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1689930814.439457][300741:300743] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFFB DataVersion: 2031856391
           [1689930814.439500][300741:300743] CHIP:TOO:   AttributeList: 10 entries
@@ -99,7 +99,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read generated-command-list 1 1
 
-          Verify "GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
+          Verify " GeneratedCommandList" contains a list of mandatory commands (value 1)  on the TH(Chip-tool) Log and below is the sample log provided for the raspi platform:
 
           [1689997224.280302][360025:360027] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_FFF8 DataVersion: 1427220838
           [1689997224.280330][360025:360027] CHIP:TOO:   GeneratedCommandList: 1 entries

@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Roll docker versions
         run: ./scripts/helpers/roll_docker_version.sh --reason="Automated roll by GitHub Action"
       - uses: EndBug/add-and-commit@v9

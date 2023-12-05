@@ -63,11 +63,8 @@ if (chip_enable_wifi) {
   import("${chip_root}/src/platform/silabs/wifi_args.gni")
 
   if (use_rs9116) {
-    wiseconnect_sdk_root =
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
     import("rs911x/rs911x.gni")
   } else if (use_SiWx917) {
-    wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
     import("rs911x/rs9117.gni")
   }
   if (use_wf200) {
@@ -95,33 +92,6 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
   ]
-}
-
-if (enable_dic) {
-  config("efr32_dic_config") {
-    include_dirs = [
-      "${chip_root}/third_party/silabs/mqtt/stack",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/include",
-      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/include",
-    ]
-  }
-
-  source_set("efr32-dic") {
-    sources = [
-      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/MQTT_transport.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_alloc.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tcp.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls.c",
-      "${chip_root}/third_party/silabs/mqtt/mqtt_transport_interface/src/altcp_tls_mbedtls_mem.c",
-    ]
-    public_deps = [
-      "${chip_root}/src/inet",
-      "${chip_root}/src/lwip",
-    ]
-    public_configs = [ ":efr32_dic_config" ]
-  }
 }
 
 source_set("openthread_core_config_efr32_chip_examples") {
@@ -160,11 +130,6 @@ source_set("efr-matter-shell") {
 
 config("attestation-credentials-config") {
   include_dirs = [ "${chip_root}" ]
-
-  defines = [
-    # Set to 1 to enable EFR32 attestation credentials
-    "SILABS_ATTESTATION_CREDENTIALS",
-  ]
 }
 
 source_set("efr32-attestation-credentials") {
@@ -257,11 +222,20 @@ source_set("efr32-common") {
   public_configs = [
     ":efr32-common-config",
     "${efr32_sdk_build_root}:silabs_config",
+    ":chip_examples_project_config",
   ]
 
-  # MQTT
+  # DIC
   if (enable_dic) {
-    deps += [ "${examples_plat_dir}:efr32-dic" ]
+    public_deps +=
+        [ "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-dic" ]
+  }
+
+  # AWS SDK OTA
+  if (aws_sdk_ota) {
+    public_deps += [
+      "${silabs_common_plat_dir}/DIC/matter_abs_interface:silabs-aws-sdk-ota",
+    ]
   }
 
   include_dirs = [ "." ]
@@ -329,9 +303,7 @@ source_set("efr32-common") {
   }
 
   # Attestation Credentials
-  if (chip_build_platform_attestation_credentials_provider) {
-    public_deps += [ ":efr32-attestation-credentials" ]
-  }
+  public_deps += [ ":efr32-attestation-credentials" ]
 
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {

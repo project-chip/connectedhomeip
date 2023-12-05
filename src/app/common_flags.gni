@@ -16,4 +16,5 @@ declare_args() {
   # Temporary flag for interaction model and echo protocols, set it to true to enable
   chip_app_use_echo = false
   chip_enable_read_client = true
+  chip_build_controller_dynamic_server = false
 }

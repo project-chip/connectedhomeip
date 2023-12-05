@@ -17,22 +17,22 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UnitTestingClusterTestFabricScoped(
-  val fabricSensitiveInt8u: Int,
-  val optionalFabricSensitiveInt8u: Optional<Int>,
-  val nullableFabricSensitiveInt8u: Int?,
-  val nullableOptionalFabricSensitiveInt8u: Optional<Int>?,
+  val fabricSensitiveInt8u: UInt,
+  val optionalFabricSensitiveInt8u: Optional<UInt>,
+  val nullableFabricSensitiveInt8u: UInt?,
+  val nullableOptionalFabricSensitiveInt8u: Optional<UInt>?,
   val fabricSensitiveCharString: String,
   val fabricSensitiveStruct: UnitTestingClusterSimpleStruct,
-  val fabricSensitiveInt8uList: List<Int>,
-  val fabricIndex: Int
+  val fabricSensitiveInt8uList: List<UInt>,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestFabricScoped {\n")
@@ -47,9 +47,9 @@ class UnitTestingClusterTestFabricScoped(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U), fabricSensitiveInt8u)
       if (optionalFabricSensitiveInt8u.isPresent) {
         val optoptionalFabricSensitiveInt8u = optionalFabricSensitiveInt8u.get()
@@ -76,11 +76,11 @@ class UnitTestingClusterTestFabricScoped(
       }
       put(ContextSpecificTag(TAG_FABRIC_SENSITIVE_CHAR_STRING), fabricSensitiveCharString)
       fabricSensitiveStruct.toTlv(ContextSpecificTag(TAG_FABRIC_SENSITIVE_STRUCT), this)
-      startList(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U_LIST))
+      startArray(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U_LIST))
       for (item in fabricSensitiveInt8uList.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -96,18 +96,18 @@ class UnitTestingClusterTestFabricScoped(
     private const val TAG_FABRIC_SENSITIVE_INT8U_LIST = 7
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScoped {
-      tlvReader.enterStructure(tag)
-      val fabricSensitiveInt8u = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScoped {
+      tlvReader.enterStructure(tlvTag)
+      val fabricSensitiveInt8u = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U))
       val optionalFabricSensitiveInt8u =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_FABRIC_SENSITIVE_INT8U))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_OPTIONAL_FABRIC_SENSITIVE_INT8U)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OPTIONAL_FABRIC_SENSITIVE_INT8U)))
         } else {
           Optional.empty()
         }
       val nullableFabricSensitiveInt8u =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_FABRIC_SENSITIVE_INT8U))
+          tlvReader.getUInt(ContextSpecificTag(TAG_NULLABLE_FABRIC_SENSITIVE_INT8U))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_NULLABLE_FABRIC_SENSITIVE_INT8U))
           null
@@ -118,7 +118,7 @@ class UnitTestingClusterTestFabricScoped(
             tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U))
           ) {
             Optional.of(
-              tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U))
+              tlvReader.getUInt(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_FABRIC_SENSITIVE_INT8U))
             )
           } else {
             Optional.empty()
@@ -135,14 +135,14 @@ class UnitTestingClusterTestFabricScoped(
           tlvReader
         )
       val fabricSensitiveInt8uList =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U_LIST))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_FABRIC_SENSITIVE_INT8U_LIST))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getInt(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

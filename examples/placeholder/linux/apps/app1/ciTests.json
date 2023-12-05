@@ -14,7 +14,6 @@
         "Test_TC_CC_7_5_Simulated",
         "Test_TC_CC_9_4_Simulated",
         "Test_TC_DGTHREAD_3_4_Simulated",
-        "Test_TC_LVL_2_3_Simulated",
         "Test_TC_OO_3_2_Simulated"
     ],
     "collection": ["Test"]

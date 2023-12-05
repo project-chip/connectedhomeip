@@ -17,11 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  * {{description}}
  */
 {{availability (asUpperCamelCase name preserveAcronyms=true)}}
-@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
-
-- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericBaseCluster
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
@@ -61,7 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
   Completion:
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/if}}
@@ -75,6 +72,18 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
+
+/**
+ * For all instance methods (reads, writes, commands) that take a completion,
+ * the completion will be called on the provided queue.
+ */
+- (instancetype _Nullable)initWithDevice:(MTRBaseDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
 @end
 {{/if}}
@@ -155,7 +164,12 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
    {{/if}}
    {{/if}}
    {{/inline}}
-   {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{! The cluster or the bitmap or the value could have been renamed, so this is a bit of a pain...  Just cover the cases that matter to us for now }}
+   {{#if (hasOldName ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+     {{> oldNameItemDecl oldItemName=(oldName ../clusterName bitmap=../bitmapName bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{else if (hasOldName (asUpperCamelCase ../../name preserveAcronyms=true) bitmap=(asUpperCamelCase ../name preserveAcronyms=true) bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+     {{> oldNameItemDecl oldItemName=(oldName (asUpperCamelCase ../../name preserveAcronyms=true) bitmap=(asUpperCamelCase ../name preserveAcronyms=true) bitmapValue=(asUpperCamelCase label preserveAcronyms=true))}}
+   {{/if}}
    {{/zcl_bitmap_items}}
 }
 {{/inline}}
@@ -229,7 +243,8 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" fabricScopedDeprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams:completion:") nonFabricScopedDeprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithCompletion:") type=type}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue:completion:")}};
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value params:(MTRWriteParams * _Nullable)params completionHandler:(MTRStatusCompletion)completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue:params:completion:")}};
 {{/if}}

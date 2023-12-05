@@ -29,6 +29,9 @@ namespace app {
 namespace Clusters {
 namespace TimeSynchronization {
 
+typedef void (*OnTimeSyncCompletion)(void * context, TimeSourceEnum timeSource, GranularityEnum granularity);
+typedef void (*OnFallbackNTPCompletion)(void * context, bool timeSyncSuccessful);
+
 /** @brief
  *    Defines methods for implementing application-specific logic for the Time Synchronization Cluster.
  */
@@ -73,6 +76,34 @@ public:
      * @param ntp NTP address
      */
     virtual bool IsNTPAddressDomain(const CharSpan ntp) = 0;
+
+    /**
+     * @brief Delegate should attempt to get time from a platform-defined source using the ordering defined in the
+     * Time source prioritization spec section. Delegate may skip any unsupported sources
+     * Order: GNSS -> trusted high-resolution external source (PTP, trusted network NTP, cloud) ->
+     * local network defined NTP (DHCPv6 -> DHCP -> DNS-SD sources)
+     * If the delegate is unable to support any source, it may return an error immediately. If the delegate is going
+     * to attempt to obtain time from any source, it returns CHIP_NO_ERROR and calls the callback on completion.
+     * If the delegate has a time available at the time of this call, it may call the callback synchronously from within
+     * this function.
+     * If the delegate needs to reach out asynchronously to obtain a time, it saves this callback to call asynchronously.
+     * The delegate should track these callbacks in a CallbackDeque to ensure they can be properly cancelled.
+     * If the delegate is successful in obtaining the time, it sets the time using the platform time API (SetClock_RealTime)
+     * and calls the callback with the time source and granularity set as appropriate.
+     * If the delegate is unsuccessful in obtaining the time, it calls the callback with timeSource set to kNone and
+     * granularity set to kNoTimeGranularity.
+     */
+    virtual CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) = 0;
+
+    /**
+     * @brief If the delegate supports NTP, it should attempt to update its time using the provided fallbackNTP source.
+     * If the delegate is successful in obtaining a time from the fallbackNTP, it updates the system time (ex using
+     * System::SystemClock().SetClock_RealTime) and calls the callback. If the delegate is going to attempt to update
+     * the time and call the callback, it returns CHIP_NO_ERROR. If the delegate does not support NTP, it may return
+     * a CHIP_ERROR.
+     */
+    virtual CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
+                                                  chip::Callback::Callback<OnFallbackNTPCompletion> * callback) = 0;
 
     virtual ~Delegate() = default;
 

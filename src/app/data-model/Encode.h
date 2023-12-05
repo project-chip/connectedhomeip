@@ -37,10 +37,10 @@ template <typename Enum, Enum value>
 using VoidType = void;
 
 template <typename, typename = void>
-constexpr bool HasUnknownValue = false;
+inline constexpr bool HasUnknownValue = false;
 
 template <typename T>
-constexpr bool HasUnknownValue<T, VoidType<T, T::kUnknownEnumValue>> = true;
+inline constexpr bool HasUnknownValue<T, VoidType<T, T::kUnknownEnumValue>> = true;
 } // namespace detail
 
 /*

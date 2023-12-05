@@ -17,13 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UnitTestingClusterNestedStruct(
-  val a: Int,
+  val a: UInt,
   val b: Boolean,
   val c: UnitTestingClusterSimpleStruct
 ) {
@@ -35,9 +35,9 @@ class UnitTestingClusterNestedStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_A), a)
       put(ContextSpecificTag(TAG_B), b)
       c.toTlv(ContextSpecificTag(TAG_C), this)
@@ -50,9 +50,9 @@ class UnitTestingClusterNestedStruct(
     private const val TAG_B = 1
     private const val TAG_C = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStruct {
-      tlvReader.enterStructure(tag)
-      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStruct {
+      tlvReader.enterStructure(tlvTag)
+      val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
 

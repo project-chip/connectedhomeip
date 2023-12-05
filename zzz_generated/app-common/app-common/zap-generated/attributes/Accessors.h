@@ -84,6 +84,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace Scenes {
 namespace Attributes {
 
+namespace SceneCount {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace SceneCount
+
 namespace CurrentScene {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
@@ -100,8 +105,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace SceneValid
 
 namespace NameSupport {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap> * value); // NameSupportBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap> value);
 } // namespace NameSupport
 
 namespace LastConfiguredBy {
@@ -154,11 +160,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace StartUpOnOff {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value); // OnOffStartUpOnOff
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::OnOffStartUpOnOff value);
+                  DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value); // StartUpOnOffEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OnOff::StartUpOnOffEnum value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value);
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value);
 } // namespace StartUpOnOff
 
 namespace FeatureMap {
@@ -242,8 +248,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace Options {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> * value); // LevelControlOptions
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value);
+                  chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> * value); // OptionsBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::OptionsBitmap> value);
 } // namespace Options
 
 namespace OnOffTransitionTime {
@@ -303,17 +309,17 @@ namespace BinaryInputBasic {
 namespace Attributes {
 
 namespace ActiveText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ActiveText
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
 namespace InactiveText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace InactiveText
 
@@ -384,11 +390,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace FeatureMap
 
-namespace ClusterRevision {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClusterRevision
-
 } // namespace Attributes
 } // namespace Descriptor
 
@@ -416,11 +417,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace FeatureMap
 
-namespace ClusterRevision {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClusterRevision
-
 } // namespace Attributes
 } // namespace AccessControl
 
@@ -428,7 +424,7 @@ namespace Actions {
 namespace Attributes {
 
 namespace SetupURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SetupURL
 
@@ -449,7 +445,7 @@ namespace BasicInformation {
 namespace Attributes {
 
 namespace NodeLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace NodeLabel
 
@@ -502,8 +498,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace UpdateState {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum * value); // OTAUpdateStateEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+                  chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum * value); // UpdateStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value);
 } // namespace UpdateState
 
 namespace UpdateStateProgress {
@@ -530,7 +526,7 @@ namespace LocalizationConfiguration {
 namespace Attributes {
 
 namespace ActiveLocale {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ActiveLocale
 
@@ -626,7 +622,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace Order
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
@@ -715,7 +711,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace BatPresent
 
 namespace BatReplacementDescription {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatReplacementDescription
 
@@ -726,12 +722,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
 } // namespace BatCommonDesignation
 
 namespace BatANSIDesignation {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatANSIDesignation
 
 namespace BatIECDesignation {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatIECDesignation
 
@@ -857,6 +853,19 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value);
 } // namespace LastConnectErrorValue
 
+namespace SupportedThreadFeatures {
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> * value); // ThreadCapabilitiesBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value);
+} // namespace SupportedThreadFeatures
+
+namespace ThreadVersion {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ThreadVersion
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -909,11 +918,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace SoftwareDiagnostics {
 namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1012,7 +1016,7 @@ namespace BridgedDeviceBasicInformation {
 namespace Attributes {
 
 namespace VendorName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
@@ -1022,12 +1026,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ProductName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductName
 
 namespace NodeLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace NodeLabel
 
@@ -1037,7 +1041,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace HardwareVersion
 
 namespace HardwareVersionString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace HardwareVersionString
 
@@ -1047,32 +1051,32 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace SoftwareVersion
 
 namespace SoftwareVersionString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SoftwareVersionString
 
 namespace ManufacturingDate {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ManufacturingDate
 
 namespace PartNumber {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace PartNumber
 
 namespace ProductURL {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductURL
 
 namespace ProductLabel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ProductLabel
 
 namespace SerialNumber {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace SerialNumber
 
@@ -1082,7 +1086,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Reachable
 
 namespace UniqueID {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace UniqueID
 
@@ -1163,19 +1167,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace OperationalCredentials
 
 namespace GroupKeyManagement {
-namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClusterRevision
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace GroupKeyManagement
 
 namespace FixedLabel {
@@ -1295,11 +1287,118 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace IcdManagement
 
+namespace Timer {
+namespace Attributes {
+
+namespace SetTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace SetTime
+
+namespace TimeRemaining {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace TimeRemaining
+
+namespace TimerState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerStatusEnum * value); // TimerStatusEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Timer::TimerStatusEnum value);
+} // namespace TimerState
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Timer
+
+namespace OvenCavityOperationalState {
+namespace Attributes {
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OvenCavityOperationalState
+
+namespace OvenMode {
+namespace Attributes {
+
+namespace CurrentMode {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace CurrentMode
+
+namespace StartUpMode {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
+} // namespace StartUpMode
+
+namespace OnMode {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value);
+} // namespace OnMode
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace OvenMode
+
+namespace LaundryDryerControls {
+namespace Attributes {
+
+namespace SelectedDrynessLevel {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value); // DrynessLevelEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryDryerControls::DrynessLevelEnum> & value);
+} // namespace SelectedDrynessLevel
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace LaundryDryerControls
+
 namespace ModeSelect {
 namespace Attributes {
 
 namespace Description {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Description
 
@@ -1345,11 +1444,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LaundryWasherMode {
 namespace Attributes {
 
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -1360,11 +1454,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace RefrigeratorAndTemperatureControlledCabinetMode {
 namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1406,11 +1495,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace RvcRunMode {
 namespace Attributes {
 
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -1421,11 +1505,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace RvcCleanMode {
 namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1510,11 +1589,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace DishwasherMode {
 namespace Attributes {
 
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -1525,16 +1599,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace AirQuality {
 namespace Attributes {
-
-namespace AirQuality {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum * value); // AirQualityEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::AirQuality::AirQualityEnum value);
-} // namespace AirQuality
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -1662,6 +1726,58 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenMode {
+namespace Attributes {
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MicrowaveOvenMode
+
+namespace MicrowaveOvenControl {
+namespace Attributes {
+
+namespace CookTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace CookTime
+
+namespace PowerSetting {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace PowerSetting
+
+namespace MinPower {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MinPower
+
+namespace MaxPower {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MaxPower
+
+namespace PowerStep {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace PowerStep
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MicrowaveOvenControl
+
 namespace OperationalState {
 namespace Attributes {
 
@@ -1697,11 +1813,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace HepaFilterMonitoring {
 namespace Attributes {
 
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -1713,6 +1824,41 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ActivatedCarbonFilterMonitoring {
 namespace Attributes {
 
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ActivatedCarbonFilterMonitoring
+
+namespace BooleanSensorConfiguration {
+namespace Attributes {
+
+namespace SensitivityLevel {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum * value); // SensitivityEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum value);
+} // namespace SensitivityLevel
+
+namespace AlarmsActive {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value); // AlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value);
+} // namespace AlarmsActive
+
+namespace AlarmsSuppressed {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value); // AlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value);
+} // namespace AlarmsSuppressed
+
+namespace AlarmsEnabled {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value); // AlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value);
+} // namespace AlarmsEnabled
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1724,7 +1870,303 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace ActivatedCarbonFilterMonitoring
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Attributes {
+
+namespace OpenDuration {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace OpenDuration
+
+namespace AutoCloseTime {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
+} // namespace AutoCloseTime
+
+namespace RemainingDuration {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace RemainingDuration
+
+namespace CurrentState {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value); // ValveStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value);
+} // namespace CurrentState
+
+namespace TargetState {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value); // ValveStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value);
+} // namespace TargetState
+
+namespace StartUpState {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum * value); // ValveStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value);
+} // namespace StartUpState
+
+namespace CurrentLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
+} // namespace CurrentLevel
+
+namespace TargetLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
+} // namespace TargetLevel
+
+namespace OpenLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
+} // namespace OpenLevel
+
+namespace ValveFault {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> * value); // ValveFaultBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value);
+} // namespace ValveFault
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ValveConfigurationAndControl
+
+namespace DemandResponseLoadControl {
+namespace Attributes {
+
+namespace NumberOfLoadControlPrograms {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace NumberOfLoadControlPrograms
+
+namespace NumberOfEventsPerProgram {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace NumberOfEventsPerProgram
+
+namespace NumberOfTransitions {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace NumberOfTransitions
+
+namespace DefaultRandomStart {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace DefaultRandomStart
+
+namespace DefaultRandomDuration {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace DefaultRandomDuration
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace DemandResponseLoadControl
+
+namespace EnergyEvse {
+namespace Attributes {
+
+namespace State {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::EnergyEvse::StateEnum> & value); // StateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EnergyEvse::StateEnum value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::EnergyEvse::StateEnum> & value);
+} // namespace State
+
+namespace SupplyState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EnergyEvse::SupplyStateEnum * value); // SupplyStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EnergyEvse::SupplyStateEnum value);
+} // namespace SupplyState
+
+namespace FaultState {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::EnergyEvse::FaultStateEnum * value); // FaultStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::EnergyEvse::FaultStateEnum value);
+} // namespace FaultState
+
+namespace ChargingEnabledUntil {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace ChargingEnabledUntil
+
+namespace DischargingEnabledUntil {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace DischargingEnabledUntil
+
+namespace CircuitCapacity {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace CircuitCapacity
+
+namespace MinimumChargeCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace MinimumChargeCurrent
+
+namespace MaximumChargeCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace MaximumChargeCurrent
+
+namespace MaximumDischargeCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace MaximumDischargeCurrent
+
+namespace UserMaximumChargeCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace UserMaximumChargeCurrent
+
+namespace RandomizationDelayWindow {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace RandomizationDelayWindow
+
+namespace NumberOfWeeklyTargets {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace NumberOfWeeklyTargets
+
+namespace NumberOfDailyTargets {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace NumberOfDailyTargets
+
+namespace NextChargeStartTime {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace NextChargeStartTime
+
+namespace NextChargeTargetTime {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace NextChargeTargetTime
+
+namespace NextChargeRequiredEnergy {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value);
+} // namespace NextChargeRequiredEnergy
+
+namespace NextChargeTargetSoC {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
+} // namespace NextChargeTargetSoC
+
+namespace ApproximateEVEfficiency {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
+} // namespace ApproximateEVEfficiency
+
+namespace StateOfCharge {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
+} // namespace StateOfCharge
+
+namespace BatteryCapacity {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value);
+} // namespace BatteryCapacity
+
+namespace VehicleID {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
+} // namespace VehicleID
+
+namespace SessionID {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace SessionID
+
+namespace SessionDuration {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace SessionDuration
+
+namespace SessionEnergyCharged {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace SessionEnergyCharged
+
+namespace SessionEnergyDischarged {
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+} // namespace SessionEnergyDischarged
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EnergyEvse
 
 namespace DoorLock {
 namespace Attributes {
@@ -1834,7 +2276,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace NumberOfCredentialsSupportedPerUser
 
 namespace Language {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Language
 
@@ -1984,14 +2426,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 } // namespace ConfigStatus
 
 namespace CurrentPositionLiftPercentage {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace CurrentPositionLiftPercentage
 
 namespace CurrentPositionTiltPercentage {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
@@ -2004,14 +2446,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 } // namespace OperationalStatus
 
 namespace TargetPositionLiftPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace TargetPositionLiftPercent100ths
 
 namespace TargetPositionTiltPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
@@ -2023,14 +2465,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
 } // namespace EndProductType
 
 namespace CurrentPositionLiftPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace CurrentPositionLiftPercent100ths
 
 namespace CurrentPositionTiltPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
@@ -2617,14 +3059,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
 } // namespace FanModeSequence
 
 namespace PercentSetting {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace PercentSetting
 
 namespace PercentCurrent {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 } // namespace PercentCurrent
 
@@ -2687,18 +3129,25 @@ namespace ThermostatUserInterfaceConfiguration {
 namespace Attributes {
 
 namespace TemperatureDisplayMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum * value); // TemperatureDisplayModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value);
 } // namespace TemperatureDisplayMode
 
 namespace KeypadLockout {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum * value); // KeypadLockoutEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value);
 } // namespace KeypadLockout
 
 namespace ScheduleProgrammingVisibility {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum *
+                      value); // ScheduleProgrammingVisibilityEnum
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum value);
 } // namespace ScheduleProgrammingVisibility
 
 namespace FeatureMap {
@@ -2748,7 +3197,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace DriftCompensation
 
 namespace CompensationText {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace CompensationText
 
@@ -3026,8 +3475,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace PhysicalMaxLevel
 
 namespace BallastStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> * value); // BallastStatusBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value);
 } // namespace BallastStatus
 
 namespace MinLevel {
@@ -3060,12 +3510,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace LampQuantity
 
 namespace LampType {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampType
 
 namespace LampManufacturer {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LampManufacturer
 
@@ -3084,8 +3534,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace LampBurnHours
 
 namespace LampAlarmMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> * value); // LampAlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value);
 } // namespace LampAlarmMode
 
 namespace LampBurnHoursTripPoint {
@@ -3164,21 +3615,21 @@ namespace TemperatureMeasurement {
 namespace Attributes {
 
 namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // int16s
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
 } // namespace MeasuredValue
 
 namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // int16s
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
 } // namespace MinMeasuredValue
 
 namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // int16s
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & value); // temperature
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value);
@@ -3442,82 +3893,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace CarbonMonoxideConcentrationMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -3528,81 +3903,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace CarbonDioxideConcentrationMeasurement {
 namespace Attributes {
-
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -3615,82 +3915,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace NitrogenDioxideConcentrationMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -3701,79 +3925,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace OzoneConcentrationMeasurement {
 namespace Attributes {
-
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -3786,79 +3937,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace Pm25ConcentrationMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -3869,81 +3947,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace FormaldehydeConcentrationMeasurement {
 namespace Attributes {
-
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -3956,79 +3959,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace Pm1ConcentrationMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -4039,79 +3969,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace Pm10ConcentrationMeasurement {
 namespace Attributes {
-
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -4124,85 +3981,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 namespace Attributes {
 
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum *
-                      value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus
-Get(chip::EndpointId endpoint,
-    chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -4213,79 +3991,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace RadonConcentrationMeasurement {
 namespace Attributes {
-
-namespace MeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MeasuredValue
-
-namespace MinMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MinMeasuredValue
-
-namespace MaxMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace MaxMeasuredValue
-
-namespace PeakMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace PeakMeasuredValue
-
-namespace PeakMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace PeakMeasuredValueWindow
-
-namespace AverageMeasuredValue {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value);
-} // namespace AverageMeasuredValue
-
-namespace AverageMeasuredValueWindow {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace AverageMeasuredValueWindow
-
-namespace Uncertainty {
-EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
-EmberAfStatus Set(chip::EndpointId endpoint, float value);
-} // namespace Uncertainty
-
-namespace MeasurementUnit {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum * value); // MeasurementUnitEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum value);
-} // namespace MeasurementUnit
-
-namespace MeasurementMedium {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum * value); // MeasurementMediumEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum value);
-} // namespace MeasurementMedium
-
-namespace LevelValue {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum * value); // LevelValueEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum value);
-} // namespace LevelValue
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -4299,9 +4004,14 @@ namespace WakeOnLan {
 namespace Attributes {
 
 namespace MACAddress {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace MACAddress
+
+namespace LinkLocalAddress {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+} // namespace LinkLocalAddress
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -4464,8 +4174,10 @@ namespace ContentLauncher {
 namespace Attributes {
 
 namespace SupportedStreamingProtocols {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> * value); // SupportedProtocolsBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap> value);
 } // namespace SupportedStreamingProtocols
 
 namespace FeatureMap {
@@ -4522,7 +4234,7 @@ namespace ApplicationBasic {
 namespace Attributes {
 
 namespace VendorName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace VendorName
 
@@ -4532,7 +4244,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value);
 } // namespace VendorID
 
 namespace ApplicationName {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ApplicationName
 
@@ -4548,7 +4260,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBas
 } // namespace Status
 
 namespace ApplicationVersion {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace ApplicationVersion
 
@@ -4580,6 +4292,68 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace AccountLogin
+
+namespace ContentControl {
+namespace Attributes {
+
+namespace Enabled {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace Enabled
+
+namespace OnDemandRatingThreshold {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace OnDemandRatingThreshold
+
+namespace ScheduledContentRatingThreshold {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace ScheduledContentRatingThreshold
+
+namespace ScreenDailyTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace ScreenDailyTime
+
+namespace RemainingScreenTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace RemainingScreenTime
+
+namespace BlockUnrated {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace BlockUnrated
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ContentControl
+
+namespace ContentAppObserver {
+namespace Attributes {
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ContentAppObserver
 
 namespace ElectricalMeasurement {
 namespace Attributes {
@@ -5370,22 +5144,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value);
 } // namespace FloatDouble
 
 namespace OctetString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 } // namespace OctetString
 
 namespace LongOctetString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // long_octet_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // long_octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 } // namespace LongOctetString
 
 namespace CharString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace CharString
 
 namespace LongCharString {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // long_char_string
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // long_char_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace LongCharString
 
@@ -5706,6 +5480,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace FaultInjection
+
+namespace SampleMei {
+namespace Attributes {
+
+namespace FlipFlop {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace FlipFlop
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

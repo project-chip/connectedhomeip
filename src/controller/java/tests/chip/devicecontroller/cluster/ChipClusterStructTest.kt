@@ -22,10 +22,10 @@ import chip.devicecontroller.cluster.structs.UnitTestingClusterNullablesAndOptio
 import chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct
 import chip.devicecontroller.cluster.structs.UnitTestingClusterTestFabricScoped
 import chip.devicecontroller.cluster.structs.UnitTestingClusterTestListStructOctet
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -35,28 +35,28 @@ class ChipClusterStructTest {
   @Test
   fun doubleNestedStructTlvTest() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val simpleStruct2 =
-      UnitTestingClusterSimpleStruct(8, false, 9, byteArrayOf(0x02, 0x03), "test2", 4, 5.6f, 7.8)
+      UnitTestingClusterSimpleStruct(8U, false, 9U, byteArrayOf(0x02, 0x03), "test2", 4U, 5.6f, 7.8)
     val nestedStructList =
       UnitTestingClusterNestedStructList(
-        1,
+        1U,
         true,
         simpleStruct,
         listOf(simpleStruct, simpleStruct2),
-        listOf(1L, 2L),
+        listOf(1UL, 2UL),
         listOf(byteArrayOf(0x02, 0x03), byteArrayOf(0x03, 0x04)),
-        listOf(1, 2)
+        listOf(1U, 2U)
       )
     val nestedStructList2 =
       UnitTestingClusterNestedStructList(
-        2,
+        2U,
         false,
         simpleStruct2,
         listOf(simpleStruct2, simpleStruct),
-        listOf(3L, 4L),
+        listOf(3UL, 4UL),
         listOf(byteArrayOf(0x04, 0x05), byteArrayOf(0x06, 0x07)),
-        listOf(3, 4, 5)
+        listOf(3U, 4U, 5U)
       )
     val testStruct =
       UnitTestingClusterDoubleNestedStructList(listOf(nestedStructList, nestedStructList2))
@@ -82,21 +82,21 @@ class ChipClusterStructTest {
   @Test
   fun nullablesAndOptionalsStructTlvTest1() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterNullablesAndOptionalsStruct(
-        1,
-        Optional.of(2),
-        Optional.of(3),
+        1U,
+        Optional.of(2U),
+        Optional.of(3U),
         "test4",
         Optional.of("test5"),
         Optional.of("test6"),
         simpleStruct,
         Optional.of(simpleStruct),
         Optional.of(simpleStruct),
-        listOf(1, 2, 3),
-        Optional.of(listOf(4, 5, 6)),
-        Optional.of(listOf(7, 8, 9))
+        listOf(1U, 2U, 3U),
+        Optional.of(listOf(4U, 5U, 6U)),
+        Optional.of(listOf(7U, 8U, 9U))
       )
 
     val tlvWriter = TlvWriter()
@@ -121,10 +121,10 @@ class ChipClusterStructTest {
   // Optional Check - 1
   fun nullablesAndOptionalsStructTlvTest2() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterNullablesAndOptionalsStruct(
-        1,
+        1U,
         Optional.empty(),
         Optional.empty(),
         "test4",
@@ -133,9 +133,9 @@ class ChipClusterStructTest {
         simpleStruct,
         Optional.empty(),
         Optional.empty(),
-        listOf(1, 2, 3),
-        Optional.of(listOf(4, 5, 6)),
-        Optional.of(listOf(7, 8, 9))
+        listOf(1U, 2U, 3U),
+        Optional.of(listOf(4U, 5U, 6U)),
+        Optional.of(listOf(7U, 8U, 9U))
       )
 
     val tlvWriter = TlvWriter()
@@ -160,19 +160,19 @@ class ChipClusterStructTest {
   // Optional Check - 2
   fun nullablesAndOptionalsStructTlvTest3() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterNullablesAndOptionalsStruct(
-        1,
-        Optional.of(2),
-        Optional.of(3),
+        1U,
+        Optional.of(2U),
+        Optional.of(3U),
         "test4",
         Optional.empty(),
         Optional.empty(),
         simpleStruct,
         Optional.of(simpleStruct),
         Optional.of(simpleStruct),
-        listOf(1, 2, 3),
+        listOf(1U, 2U, 3U),
         Optional.empty(),
         Optional.empty()
       )
@@ -199,10 +199,10 @@ class ChipClusterStructTest {
   // Nullable check - 1
   fun nullablesAndOptionalsStructTlvTest4() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterNullablesAndOptionalsStruct(
-        1,
+        1U,
         Optional.empty(),
         null,
         null,
@@ -212,8 +212,8 @@ class ChipClusterStructTest {
         Optional.empty(),
         null,
         null,
-        Optional.of(listOf(4, 5, 6)),
-        Optional.of(listOf(7, 8, 9))
+        Optional.of(listOf(4U, 5U, 6U)),
+        Optional.of(listOf(7U, 8U, 9U))
       )
 
     val tlvWriter = TlvWriter()
@@ -238,19 +238,19 @@ class ChipClusterStructTest {
   // Nullable check - 2
   fun nullablesAndOptionalsStructTlvTest5() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterNullablesAndOptionalsStruct(
         null,
-        Optional.of(2),
-        Optional.of(3),
+        Optional.of(2U),
+        Optional.of(3U),
         "test4",
         Optional.empty(),
         null,
         null,
         Optional.of(simpleStruct),
         Optional.of(simpleStruct),
-        listOf(1, 2, 3),
+        listOf(1U, 2U, 3U),
         Optional.empty(),
         null
       )
@@ -276,17 +276,17 @@ class ChipClusterStructTest {
   @Test
   fun testFabricScopedTlvTest1() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterTestFabricScoped(
-        1,
-        Optional.of(2),
-        3,
-        Optional.of(4),
+        1U,
+        Optional.of(2U),
+        3U,
+        Optional.of(4U),
         "test1",
         simpleStruct,
-        listOf(1, 2, 3),
-        4
+        listOf(1U, 2U, 3U),
+        4U
       )
 
     val tlvWriter = TlvWriter()
@@ -309,17 +309,17 @@ class ChipClusterStructTest {
   @Test
   fun testFabricScopedTlvTest2() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterTestFabricScoped(
-        1,
+        1U,
         Optional.empty(),
-        3,
+        3U,
         null,
         "test1",
         simpleStruct,
-        listOf(1, 2, 3),
-        4
+        listOf(1U, 2U, 3U),
+        4U
       )
 
     val tlvWriter = TlvWriter()
@@ -342,17 +342,17 @@ class ChipClusterStructTest {
   @Test
   fun testFabricScopedTlvTest3() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val struct =
       UnitTestingClusterTestFabricScoped(
-        1,
-        Optional.of(2),
+        1U,
+        Optional.of(2U),
         null,
         Optional.empty(),
         "test1",
         simpleStruct,
-        listOf(1, 2, 3),
-        4
+        listOf(1U, 2U, 3U),
+        4U
       )
 
     val tlvWriter = TlvWriter()
@@ -374,7 +374,7 @@ class ChipClusterStructTest {
 
   @Test
   fun testListStructOctetTlvTest() {
-    val struct = UnitTestingClusterTestListStructOctet(1L, byteArrayOf(0x01, 0x02, 0x03))
+    val struct = UnitTestingClusterTestListStructOctet(1UL, byteArrayOf(0x01, 0x02, 0x03))
 
     val tlvWriter = TlvWriter()
     struct.toTlv(AnonymousTag, tlvWriter)

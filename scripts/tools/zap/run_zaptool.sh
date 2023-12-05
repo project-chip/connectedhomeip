@@ -31,6 +31,10 @@ SCRIPT_PATH="$(_get_fullpath "$0")"
 CHIP_ROOT="${SCRIPT_PATH%/scripts/tools/zap/run_zaptool.sh}"
 [[ -n "$1" ]] && ZAP_ARGS="-i \"$(_get_fullpath "$1")\"" || ZAP_ARGS=""
 
+if [[ -z "$ZAP_INSTALL_PATH" && -n "$PW_ZAP_CIPD_INSTALL_DIR" ]]; then
+    ZAP_INSTALL_PATH="$PW_ZAP_CIPD_INSTALL_DIR"
+fi
+
 if [ ! -z "$ZAP_DEVELOPMENT_PATH" ]; then
     WORKING_DIR=$ZAP_DEVELOPMENT_PATH
     ZAP_CMD="node src-script/zap-start.js"

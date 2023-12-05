@@ -36,10 +36,37 @@ namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
 
+// forward declarations
+class Delegate;
+
 class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 
 public:
+    /**
+     * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
+     * called by the interaction model at the appropriate times.
+     *
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
+     * @param aFeatureMap                       The feature map of the cluster.
+     * @param aDegradationDirection             The degradation direction of the cluster.
+     * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
+     */
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
+             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
+             bool aResetConditionCommandSupported);
+
+    ~Instance() override;
+
+    // Not copyable or movable
+    Instance(const Instance &)             = delete;
+    Instance & operator=(const Instance &) = delete;
+    Instance(Instance &&)                  = delete;
+    Instance & operator=(Instance &&)      = delete;
+
     /**
      * Initialise the Resource Monitoring cluster.
      *
@@ -79,32 +106,69 @@ public:
     DataModel::Nullable<uint32_t> GetLastChangedTime() const;
 
     EndpointId GetEndpointId() const { return mEndpointId; }
+    ClusterId GetClusterId() const { return mClusterId; }
+
+private:
+    Delegate * mDelegate;
+
+    EndpointId mEndpointId{};
+    ClusterId mClusterId{};
+
+    // attribute Data Store
+    chip::Percent mCondition                       = 100;
+    DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
+    ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
+    bool mInPlaceIndicator                         = true;
+    DataModel::Nullable<uint32_t> mLastChangedTime;
+    ReplacementProductListManager * mReplacementProductListManager = nullptr;
+
+    uint32_t mFeatureMap;
+
+    bool mResetConditionCommandSupported = false;
+
+    ReplacementProductListManager * GetReplacementProductListManagerInstance();
+
+    CHIP_ERROR ReadReplaceableProductList(AttributeValueEncoder & aEncoder);
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
+
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    template <typename RequestT, typename FuncT>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func);
+
+    void LoadPersistentAttributes();
 
     /**
-     * Creates a resource monitoring cluster instance. The Init() method needs to be called for this instance to be registered and
-     * called by the interaction model at the appropriate times.
-     * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId                        The ID of the ResourceMonitoring aliased cluster to be instantiated.
-     * @param aFeatureMap                       The feature map of the cluster.
-     * @param aDegradationDirection             The degradation direction of the cluster.
-     * @param aResetConditionCommandSupported   Whether the ResetCondition command is supported by the cluster.
+     * Internal method to handle the ResetCondition command.
      */
-    Instance(EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeatureMap,
-             ResourceMonitoring::Attributes::DegradationDirection::TypeInfo::Type aDegradationDirection,
-             bool aResetConditionCommandSupported) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId), mEndpointId(aEndpointId), mClusterId(aClusterId),
-        mDegradationDirection(aDegradationDirection), mFeatureMap(aFeatureMap),
-        mResetConditionCommandSupported(aResetConditionCommandSupported)
-    {}
+    void HandleResetCondition(HandlerContext & ctx,
+                              const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
+}; // class Instance
 
-    ~Instance() = default;
+class Delegate
+{
+    friend class Instance;
 
-    // Not copyable or movable
-    Instance(const Instance &) = delete;
-    Instance & operator=(const Instance &) = delete;
-    Instance(Instance &&)                  = delete;
-    Instance & operator=(Instance &&) = delete;
+private:
+    Instance * mInstance = nullptr;
+
+    /**
+     * This method is used by the SDK to set the instance pointer. This is done during the instantiation of an Instance object.
+     * @param aInstance A pointer to the Instance object related to this delegate object.
+     */
+    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
+
+protected:
+    Instance * GetInstance() { return mInstance; }
+
+public:
+    Delegate()          = default;
+    virtual ~Delegate() = default;
 
     // The following methods should be overridden by the SDK user to implement the business logic of their application
 
@@ -116,7 +180,7 @@ public:
      * @return CHIP_NO_ERROR    If the application was initialized successfully. All other values will cause the initialization to
      * fail.
      */
-    virtual CHIP_ERROR AppInit() = 0;
+    virtual CHIP_ERROR Init() = 0;
 
     /**
      * This method may be overwritten by the SDK User, if the default behaviour is not desired.
@@ -154,51 +218,6 @@ public:
      *                              the failure.
      */
     virtual chip::Protocols::InteractionModel::Status PostResetCondition();
-
-private:
-    EndpointId mEndpointId{};
-    ClusterId mClusterId{};
-
-    // attribute Data Store
-    chip::Percent mCondition                       = 100;
-    DegradationDirectionEnum mDegradationDirection = DegradationDirectionEnum::kDown;
-    ChangeIndicationEnum mChangeIndication         = ChangeIndicationEnum::kOk;
-    bool mInPlaceIndicator                         = true;
-    DataModel::Nullable<uint32_t> mLastChangedTime;
-    ReplacementProductListManager * mReplacementProductListManager = nullptr;
-
-    uint32_t mFeatureMap;
-
-    bool mResetConditionCommandSupported = false;
-
-    ReplacementProductListManager * GetReplacementProductListManagerInstance();
-
-    CHIP_ERROR ReadReplacableProductList(AttributeValueEncoder & aEncoder);
-
-    // CommandHandlerInterface
-    void InvokeCommand(HandlerContext & ctx) override;
-    CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
-
-    // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
-
-    template <typename RequestT, typename FuncT>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func);
-
-    void LoadPersistentAttributes();
-
-    /**
-     * This checks if the clusters instance is a valid ResourceMonitoring cluster based on the AliasedClusters list.
-     * @return true     if the cluster is a valid ResourceMonitoring cluster.
-     */
-    bool IsValidAliasCluster() const;
-
-    /**
-     * Internal method to handle the ResetCondition command.
-     */
-    void HandleResetCondition(HandlerContext & ctx,
-                              const ResourceMonitoring::Commands::ResetCondition::DecodableType & commandData);
 };
 
 } // namespace ResourceMonitoring

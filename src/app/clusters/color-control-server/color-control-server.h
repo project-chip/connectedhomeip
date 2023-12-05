@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
@@ -70,12 +71,12 @@ public:
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
     using Feature      = chip::app::Clusters::ColorControl::Feature;
 
-    enum ColorMode
+    enum EnhancedColorMode : uint8_t
     {
-        COLOR_MODE_HSV         = 0x00,
-        COLOR_MODE_CIE_XY      = 0x01,
-        COLOR_MODE_TEMPERATURE = 0x02,
-        COLOR_MODE_EHSV        = 0x03
+        kCurrentHueAndCurrentSaturation         = 0,
+        kCurrentXAndCurrentY                    = 1,
+        kColorTemperature                       = 2,
+        kEnhancedCurrentHueAndCurrentSaturation = 3,
     };
 
     enum Conversion
@@ -132,6 +133,8 @@ public:
      * Functions Definitions
      *********************************************************/
     static ColorControlServer & Instance();
+
+    chip::scenes::SceneHandler * GetSceneHandler();
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
@@ -207,6 +210,10 @@ private:
     void cancelEndpointTimerCallback(EmberEventControl * control);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+    chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
+                                                               chip::EndpointId endpoint);
+    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                                                     bool isEnhanced, chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
     uint8_t getSaturation(chip::EndpointId endpoint);
@@ -225,6 +232,8 @@ private:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+    chip::Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
+                                                          chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
@@ -262,6 +271,8 @@ private:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
+
+    friend class DefaultColorControlSceneHandler;
 };
 
 /**********************************************************

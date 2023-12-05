@@ -46,7 +46,7 @@ choice OPENTHREAD_DEVICE_TYPE
 	default OPENTHREAD_MTD
 endchoice
 
-config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+config CHIP_ENABLE_ICD_SUPPORT
 	bool
 	default y
 
@@ -58,9 +58,6 @@ config NRF_WIFI_LOW_POWER
 	default y
 
 endif # CHIP_WIFI
-
-config CHIP_ICD_SUBSCRIPTION_HANDLING
-	default y
 
 rsource "../../../config/nrfconnect/chip-module/Kconfig.features"
 rsource "../../../config/nrfconnect/chip-module/Kconfig.defaults"

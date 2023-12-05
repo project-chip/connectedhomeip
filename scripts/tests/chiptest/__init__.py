@@ -15,6 +15,7 @@
 #
 
 import json
+import logging
 import os
 import subprocess
 from dataclasses import dataclass
@@ -47,6 +48,9 @@ INVALID_TESTS = {
     "PICS_Example.yaml",
     "Response_Example.yaml",
     "Test_Example.yaml",
+    "Test_Example_1.yaml",
+    "Test_Example_2.yaml",
+    "Test_Example_3.yaml",
 }
 
 
@@ -127,33 +131,32 @@ def _GetSlowTests() -> Set[str]:
     }
 
 
+def _GetExtraSlowTests() -> Set[str]:
+    """Generally tests using sleep() so much they should never run in CI.
+
+       1 minute seems like a good threshold to consider something extra slow
+    """
+    return {
+        "Test_TC_DGGEN_2_1.yaml",                         # > 2 hours
+    }
+
+
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
-        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
-        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
-        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
         "Test_TC_SMOKECO_2_2.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_3.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_4.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
-                                             # TestEventTriggersEnabled is true, which it's not in CI. Also, test
-                                             # has wrong key for eventNumber: because using the right key leads to
-                                             # codegen that does not compile.
-        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test uses unknown
-                                             # keepSubscriptions key in the YAML. Also, test has wrong key for eventNumber:
-                                             # because using the right key leads to codegen that does not compile.
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_SMOKECO_2_5.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
+        "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
+                                             # TestEventTriggersEnabled is true, which it's not in CI.
     }
 
 
@@ -161,6 +164,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
     """Tests that fail in chip-repl for some reason"""
     return {
         "Test_AddNewFabricFromExistingFabric.yaml",     # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
+        "Test_TC_OPCREDS_3_7.yaml",         # chip-repl does not support GetCommissionerRootCertificate and IssueNocChain command
         "TestEqualities.yaml",              # chip-repl does not support pseudo-cluster commands that return a value
         "TestExampleCluster.yaml",          # chip-repl does not load custom pseudo clusters
         "TestAttributesById.yaml",           # chip-repl does not support AnyCommands (06/06/2023)
@@ -170,13 +174,35 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_DRLK_2_8.yaml",   # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27011#issuecomment-1593339855
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
-        "Test_TC_DRLK_2_2.yaml",             # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
-        "Test_TC_DRLK_2_3.yaml",             # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
-        "Test_TC_DRLK_2_12.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster (08/04/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
-        "Test_TC_S_2_2.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_3.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_4.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_MOD_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_MOD_3_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_BRBINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_DGGEN_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_DGGEN_2_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_LWM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCTL_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
+        "TestClusterMultiFabric.yaml",
+        "Test_TC_ACL_2_5.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
+        "Test_TC_ACL_2_6.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
+        "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+    }
+
+
+def _GetPurposefulFailureTests() -> Set[str]:
+    """Tests that fail in YAML on purpose."""
+    return {
+        "TestPurposefulFailureEqualities.yaml"
     }
 
 
@@ -207,32 +233,36 @@ def target_for_name(name: str):
         return TestTarget.LOCK
     if name.startswith("OTA_"):
         return TestTarget.OTA
-    if name.startswith("Test_TC_BRBINFO_"):
+    if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
         return TestTarget.BRIDGE
+    if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
+        return TestTarget.LIT_ICD
     return TestTarget.ALL_CLUSTERS
 
 
-def tests_with_command(chip_tool: str, is_manual: bool, is_chip_tool_python_only: bool = False):
+def tests_with_command(chip_tool: str, is_manual: bool):
     """Executes `chip_tool` binary to see what tests are available, using cmd
     to get the list.
     """
     cmd = "list"
     if is_manual:
         cmd += "-manual"
-    elif is_chip_tool_python_only:
-        cmd += "-python-runner-only"
 
-    result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
+    cmd = [chip_tool, "tests", cmd]
+    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
+    if result.returncode != 0:
+        logging.error(f'Failed to run {cmd}:')
+        logging.error('STDOUT: ' + result.stdout)
+        logging.error('STDERR: ' + result.stderr)
+        result.check_returncode()
 
     test_tags = set()
     if is_manual:
         test_tags.add(TestTag.MANUAL)
-    if is_chip_tool_python_only:
-        test_tags.add(TestTag.CHIP_TOOL_PYTHON_ONLY)
 
     in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
 
-    for name in result.stdout.decode("utf8").split("\n"):
+    for name in result.stdout.split("\n"):
         if not name:
             continue
 
@@ -246,14 +276,17 @@ def tests_with_command(chip_tool: str, is_manual: bool, is_chip_tool_python_only
         )
 
 
-# TODO We will move away from hardcoded list of yamltests to run all file when yamltests
-# parser/runner reaches parity with the code gen version.
-def _hardcoded_python_yaml_tests():
+def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short_run_name: bool):
+    """
+    use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
+    """
     manual_tests = _GetManualTests()
     flaky_tests = _GetFlakyTests()
     slow_tests = _GetSlowTests()
+    extra_slow_tests = _GetExtraSlowTests()
     in_development_tests = _GetInDevelopmentTests()
     chip_repl_unsupported_tests = _GetChipReplUnsupportedTests()
+    purposeful_failure_tests = _GetPurposefulFailureTests()
 
     for path in _AllYamlTests():
         if not _IsValidYamlTest(path.name):
@@ -269,22 +302,38 @@ def _hardcoded_python_yaml_tests():
         if path.name in slow_tests:
             tags.add(TestTag.SLOW)
 
+        if path.name in extra_slow_tests:
+            tags.add(TestTag.EXTRA_SLOW)
+
         if path.name in in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
-        if path.name in chip_repl_unsupported_tests:
+        if path.name in purposeful_failure_tests:
+            tags.add(TestTag.PURPOSEFUL_FAILURE)
+
+        if treat_repl_unsupported_as_in_development and path.name in chip_repl_unsupported_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
+        if use_short_run_name:
+            run_name = path.stem  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
+        else:
+            run_name = str(path)
+
         yield TestDefinition(
-            run_name=str(path),
+            run_name=run_name,
             name=path.stem,  # `path.stem` converts "some/path/Test_ABC_1.2.yaml" to "Test_ABC.1.2"
             target=target_for_name(path.name),
             tags=tags,
         )
 
 
-def AllYamlTests():
-    for test in _hardcoded_python_yaml_tests():
+def AllReplYamlTests():
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=True, use_short_run_name=False):
+        yield test
+
+
+def AllChipToolYamlTests():
+    for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, use_short_run_name=True):
         yield test
 
 
@@ -293,9 +342,6 @@ def AllChipToolTests(chip_tool: str):
         yield test
 
     for test in tests_with_command(chip_tool, is_manual=True):
-        yield test
-
-    for test in tests_with_command(chip_tool, is_manual=False, is_chip_tool_python_only=True):
         yield test
 
 

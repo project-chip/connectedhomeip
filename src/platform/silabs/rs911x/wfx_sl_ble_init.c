@@ -21,13 +21,14 @@
  *    limitations under the License.
  */
 #include "wfx_sl_ble_init.h"
-#include "rsi_ble_config.h"
-
+#include "ble_config.h"
+#include "cmsis_os2.h"
+#include "silabs_utils.h"
 // Global Variables
-rsi_ble_event_conn_status_t conn_event_to_app;
 rsi_ble_t att_list;
 sl_wfx_msg_t event_msg;
-extern rsi_semaphore_handle_t sl_ble_event_sem;
+
+extern osSemaphoreId_t sl_ble_event_sem;
 
 // Memory to initialize driver
 uint8_t bt_global_buf[BT_GLOBAL_BUFF_LEN];
@@ -185,7 +186,7 @@ int32_t rsi_ble_app_get_event(void)
 void rsi_ble_app_set_event(uint32_t event_num)
 {
     event_msg.ble_app_event_map |= BIT(event_num);
-    rsi_semaphore_post(&sl_ble_event_sem);
+    osSemaphoreRelease(sl_ble_event_sem);
     return;
 }
 
@@ -207,7 +208,6 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
     { //! Check for max data length for the characteristic value
-        LOG_PRINT("\r\n no data memory for att rec values \r\n");
         return;
     }
 
@@ -349,10 +349,10 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 
 uint32_t rsi_ble_add_matter_service(void)
 {
-    uuid_t custom_service    = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
-    custom_service.size      = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
-    custom_service.val.val16 = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
-    uint8_t data[230]        = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
+    uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
+    custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
+    custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
+    uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
     static const uuid_t custom_characteristic_RX = { .size             = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
                                                      .reserved         = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },

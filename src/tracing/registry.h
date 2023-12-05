@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <matter/tracing/build_config.h>
 #include <tracing/backend.h>
 
 namespace chip {

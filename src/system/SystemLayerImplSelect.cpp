@@ -66,8 +66,10 @@ CHIP_ERROR LayerImplSelect::Init()
     mHandleSelectThread = PTHREAD_NULL;
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Create an event to allow an arbitrary thread to wake the thread in the select loop.
     ReturnErrorOnFailure(mWakeEvent.Open(*this));
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -113,13 +115,18 @@ void LayerImplSelect::Shutdown()
     mTimerPool.ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     mWakeEvent.Close(*this);
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
 }
 
 void LayerImplSelect::Signal()
 {
+#if CHIP_SYSTEM_CONFIG_USE_LIBEV
+    ChipLogError(DeviceLayer, "Signal() should not be called in CHIP_SYSTEM_CONFIG_USE_LIBEV builds (might be ok in tests)");
+#else
     /*
      * Wake up the I/O thread by writing a single byte to the wake pipe.
      *
@@ -143,6 +150,7 @@ void LayerImplSelect::Signal()
 
         ChipLogError(chipSystemLayer, "System wake event notify failed: %" CHIP_ERROR_FORMAT, status.Format());
     }
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
 }
 
 CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
@@ -184,7 +192,14 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
     ev_timer_init(&timer->mLibEvTimer, &LayerImplSelect::HandleLibEvTimer, 1, 0);
     timer->mLibEvTimer.data = timer;
     auto t                  = Clock::Milliseconds64(delay).count();
-    ev_timer_set(&timer->mLibEvTimer, static_cast<double>(t) / 1E3, 0.);
+    // Note: libev uses the time when events started processing as the "now" reference for relative timers,
+    //   for efficiency reasons. This point in time is represented by ev_now().
+    //   The real time is represented by ev_time().
+    //   Without correction, this leads to timers firing a bit too early relative to the time StartTimer()
+    //   is called. So the relative value passed to ev_timer_set() is adjusted (increased) here.
+    // Note: Still, slightly early (and of course, late) firing timers are something the caller MUST be prepared for,
+    //   because edge cases like system clock adjustments may cause them even with the correction applied here.
+    ev_timer_set(&timer->mLibEvTimer, (static_cast<double>(t) / 1E3) + ev_time() - ev_now(mLibEvLoopP), 0.);
     (void) mTimerList.Add(timer);
     ev_timer_start(mLibEvLoopP, &timer->mLibEvTimer);
     return CHIP_NO_ERROR;
@@ -269,7 +284,10 @@ void LayerImplSelect::CancelTimer(TimerCompleteCallback onComplete, void * appSt
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH/LIBEV
 
     mTimerPool.Release(timer);
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+    // LIBEV has no I/O wakeup thread, so must not call Signal()
     Signal();
+#endif
 }
 
 CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void * appState)

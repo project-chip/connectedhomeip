@@ -31,8 +31,8 @@ def test_smoke_test(device):
 
 
 def test_echo(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
-    status, payload = pw_client.rpcs.pw.rpc.EchoService.Echo(
-        msg=PW_ECHO_TEST_MESSAGE)
-    assert status.ok() is True
-    assert payload.msg == PW_ECHO_TEST_MESSAGE
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
+        status, payload = pw_client.rpcs.pw.rpc.EchoService.Echo(
+            msg=PW_ECHO_TEST_MESSAGE)
+        assert status.ok() is True
+        assert payload.msg == PW_ECHO_TEST_MESSAGE

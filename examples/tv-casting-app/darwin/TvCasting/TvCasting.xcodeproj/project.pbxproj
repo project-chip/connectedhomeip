@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3C69204A2AA1368F00D0F613 /* MTRInitializationExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C6920492AA1368F00D0F613 /* MTRInitializationExample.swift */; };
 		3C81C75328F8C79E001CB9D1 /* StartFromCacheView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C75228F8C79E001CB9D1 /* StartFromCacheView.swift */; };
 		3C81C75528F8C7B6001CB9D1 /* StartFromCacheViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C75428F8C7B6001CB9D1 /* StartFromCacheViewModel.swift */; };
 		3C81C75728F8E418001CB9D1 /* ConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C81C75628F8E418001CB9D1 /* ConnectionView.swift */; };
@@ -46,6 +47,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3C6920492AA1368F00D0F613 /* MTRInitializationExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MTRInitializationExample.swift; sourceTree = "<group>"; };
 		3C75075E284C1DF800D7DB3A /* TvCasting.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TvCasting.entitlements; sourceTree = "<group>"; };
 		3C7507AC285299DF00D7DB3A /* CommissionerDiscoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissionerDiscoveryView.swift; sourceTree = "<group>"; };
 		3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommissioningView.swift; sourceTree = "<group>"; };
@@ -115,9 +117,10 @@
 			children = (
 				3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */,
 				3C75075E284C1DF800D7DB3A /* TvCasting.entitlements */,
+				3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */,
+				3C6920492AA1368F00D0F613 /* MTRInitializationExample.swift */,
 				EAF14298296D561900E17793 /* CertTestView.swift */,
 				EAF1429A296D57DF00E17793 /* CertTestViewModel.swift */,
-				3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */,
 				3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */,
 				3C81C75228F8C79E001CB9D1 /* StartFromCacheView.swift */,
 				3C81C75428F8C7B6001CB9D1 /* StartFromCacheViewModel.swift */,
@@ -236,6 +239,7 @@
 				3C81C75928F8E42D001CB9D1 /* ConnectionViewModel.swift in Sources */,
 				3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */,
 				EAF14299296D561900E17793 /* CertTestView.swift in Sources */,
+				3C69204A2AA1368F00D0F613 /* MTRInitializationExample.swift in Sources */,
 				3CCB8747286A5D0F00771BAD /* CommissioningView.swift in Sources */,
 				3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */,
 				3CAC955B29BA948700BEA5C3 /* ExampleDAC.swift in Sources */,

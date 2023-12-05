@@ -173,8 +173,8 @@ CHIP_ERROR ExampleSe05xDACProviderv2::SignWithDeviceAttestationKey(const ByteSpa
     CHIP_ERROR err                                                   = CHIP_NO_ERROR;
     uint8_t signature_se05x[Crypto::kMax_ECDSA_Signature_Length_Der] = { 0 };
     size_t signature_se05x_len                                       = sizeof(signature_se05x);
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ChipLogDetail(Crypto, "Sign using DA key from se05x (Using internal sign)");
 

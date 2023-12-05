@@ -15,8 +15,12 @@
  *    limitations under the License.
  */
 
-#include <app/reporting/reporting.h>
+#include <app/icd/ICDConfig.h>
 #include <app/server/CommissioningWindowManager.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
+#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <lib/dnssd/Advertiser.h>
@@ -24,10 +28,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-using namespace chip::DeviceLayer;
-#endif
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -67,7 +67,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
-#if CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
     }
@@ -85,6 +86,13 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         app::DnssdServer::Instance().AdvertiseOperational();
         ChipLogProgress(AppServer, "Operational advertising enabled");
     }
+#if CONFIG_NETWORK_LAYER_BLE
+    else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
+    {
+        ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+    }
+#endif
 }
 
 void CommissioningWindowManager::Shutdown()
@@ -102,24 +110,7 @@ void CommissioningWindowManager::ResetState()
     mECMIterations    = 0;
     mECMSaltLength    = 0;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (mSEDActiveModeEnabled)
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-        mSEDActiveModeEnabled = false;
-    }
-#endif
-
     UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    // Recover Router device role.
-    if (mRecoverRouterDeviceRole)
-    {
-        ThreadStackMgr().SetRouterPromotion(true);
-        mRecoverRouterDeviceRole = false;
-    }
-#endif
 
     UpdateOpenerFabricIndex(NullNullable);
     UpdateOpenerVendorId(NullNullable);
@@ -249,17 +240,6 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 
     mCommissioningTimeoutTimerArmed = true;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    // Block device role changing into Router if commissioning window opened and device not yet Router.
-    // AdvertiseAndListenForPASE fails doesn't matter, because if it does the callers of OpenCommissioningWindow
-    // will end up calling ResetState, which will reset the boolean.
-    if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
-    {
-        ThreadStackMgr().SetRouterPromotion(false);
-        mRecoverRouterDeviceRole = true;
-    }
-#endif
-
     return AdvertiseAndListenForPASE();
 }
 
@@ -268,14 +248,6 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mSEDActiveModeEnabled)
-    {
-        mSEDActiveModeEnabled = true;
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));
@@ -583,13 +555,14 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
-        event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
-        CHIP_ERROR err                       = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (err != CHIP_NO_ERROR)
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
+        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
         {
-            ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+        }
+        else
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }

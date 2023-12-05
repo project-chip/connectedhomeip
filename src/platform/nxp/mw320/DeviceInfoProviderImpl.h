@@ -18,7 +18,7 @@
 
 #include <lib/support/EnforceFormat.h>
 #include <platform/DeviceInfoProvider.h>
-//#include <platform/nxp/mw320/MW320Config.h>
+// #include <platform/nxp/mw320/MW320Config.h>
 
 namespace chip {
 namespace DeviceLayer {

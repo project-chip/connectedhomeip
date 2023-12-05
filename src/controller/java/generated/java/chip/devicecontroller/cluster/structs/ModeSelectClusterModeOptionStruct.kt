@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ModeSelectClusterModeOptionStruct(
   val label: String,
-  val mode: Int,
+  val mode: UInt,
   val semanticTags: List<ModeSelectClusterSemanticTagStruct>
 ) {
   override fun toString(): String = buildString {
@@ -36,16 +36,16 @@ class ModeSelectClusterModeOptionStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_MODE), mode)
-      startList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+      startArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
       for (item in semanticTags.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -55,13 +55,13 @@ class ModeSelectClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_SEMANTIC_TAGS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ModeSelectClusterModeOptionStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ModeSelectClusterModeOptionStruct {
+      tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
       val semanticTags =
         buildList<ModeSelectClusterSemanticTagStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+          tlvReader.enterArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
           while (!tlvReader.isEndOfContainer()) {
             add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
           }

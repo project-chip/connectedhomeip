@@ -67,7 +67,7 @@ public:
      *  Only one pending operational keypair is supported at a time.
      *
      * @param fabricIndex - FabricIndex for which a new keypair must be made available
-     * @param outCertificateSigningRequest - Buffer to contain the CSR. Must be at least `kMAX_CSR_Length` large.
+     * @param outCertificateSigningRequest - Buffer to contain the CSR. Must have size at least `kMIN_CSR_Buffer_Size`.
      *
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outCertificateSigningRequest` buffer is too small

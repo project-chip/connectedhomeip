@@ -797,7 +797,7 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
         // The socket being writable indicates the connection has completed (successfully or otherwise).
         if (events.Has(System::SocketEventFlags::kWrite))
         {
-#if !__MBED__
+#ifndef __MBED__
             // Get the connection result from the socket.
             int osConRes;
             socklen_t optLen = sizeof(osConRes);
@@ -805,11 +805,11 @@ void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
             {
                 osConRes = errno;
             }
-#else
-            // On Mbed OS, connect blocks and never returns EINPROGRESS
-            // The socket option SO_ERROR is not available.
+#else  // __MBED__
+       // On Mbed OS, connect blocks and never returns EINPROGRESS
+       // The socket option SO_ERROR is not available.
             int osConRes     = 0;
-#endif
+#endif // !__MBED__
             CHIP_ERROR conRes = CHIP_ERROR_POSIX(osConRes);
 
             // Process the connection result.

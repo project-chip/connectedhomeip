@@ -117,7 +117,7 @@ public class ChipClusters {
   }
 
   public static class IdentifyCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 3L;
+    public static final long CLUSTER_ID = 0x00000003L;
 
     public IdentifyCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -338,7 +338,7 @@ public class ChipClusters {
   }
 
   public static class GroupsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 4L;
+    public static final long CLUSTER_ID = 0x00000004L;
 
     public GroupsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -611,7 +611,7 @@ public class ChipClusters {
   }
 
   public static class ScenesCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 5L;
+    public static final long CLUSTER_ID = 0x00000005L;
 
     public ScenesCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -1108,7 +1108,7 @@ public class ChipClusters {
   }
 
   public static class OnOffCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 6L;
+    public static final long CLUSTER_ID = 0x00000006L;
 
     public OnOffCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -1465,7 +1465,7 @@ public class ChipClusters {
   }
 
   public static class OnOffSwitchConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 7L;
+    public static final long CLUSTER_ID = 0x00000007L;
 
     public OnOffSwitchConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -1658,7 +1658,7 @@ public class ChipClusters {
   }
 
   public static class LevelControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 8L;
+    public static final long CLUSTER_ID = 0x00000008L;
 
     public LevelControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -2289,7 +2289,7 @@ public class ChipClusters {
   }
 
   public static class BinaryInputBasicCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 15L;
+    public static final long CLUSTER_ID = 0x0000000FL;
 
     public BinaryInputBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -2660,7 +2660,7 @@ public class ChipClusters {
   }
 
   public static class PulseWidthModulationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 28L;
+    public static final long CLUSTER_ID = 0x0000001CL;
 
     public PulseWidthModulationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -2806,7 +2806,7 @@ public class ChipClusters {
   }
 
   public static class DescriptorCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 29L;
+    public static final long CLUSTER_ID = 0x0000001DL;
 
     public DescriptorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -3072,7 +3072,7 @@ public class ChipClusters {
   }
 
   public static class BindingCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 30L;
+    public static final long CLUSTER_ID = 0x0000001EL;
 
     public BindingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -3259,7 +3259,7 @@ public class ChipClusters {
   }
 
   public static class AccessControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 31L;
+    public static final long CLUSTER_ID = 0x0000001FL;
 
     public AccessControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -3544,7 +3544,7 @@ public class ChipClusters {
   }
 
   public static class ActionsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 37L;
+    public static final long CLUSTER_ID = 0x00000025L;
 
     public ActionsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -3925,7 +3925,7 @@ public class ChipClusters {
   }
 
   public static class BasicInformationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 40L;
+    public static final long CLUSTER_ID = 0x00000028L;
 
     public BasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -4473,7 +4473,7 @@ public class ChipClusters {
   }
 
   public static class OtaSoftwareUpdateProviderCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 41L;
+    public static final long CLUSTER_ID = 0x00000029L;
 
     public OtaSoftwareUpdateProviderCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -4673,7 +4673,7 @@ public class ChipClusters {
   }
 
   public static class OtaSoftwareUpdateRequestorCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 42L;
+    public static final long CLUSTER_ID = 0x0000002AL;
 
     public OtaSoftwareUpdateRequestorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -4936,7 +4936,7 @@ public class ChipClusters {
   }
 
   public static class LocalizationConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 43L;
+    public static final long CLUSTER_ID = 0x0000002BL;
 
     public LocalizationConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -5134,7 +5134,7 @@ public class ChipClusters {
   }
 
   public static class TimeFormatLocalizationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 44L;
+    public static final long CLUSTER_ID = 0x0000002CL;
 
     public TimeFormatLocalizationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -5360,7 +5360,7 @@ public class ChipClusters {
   }
 
   public static class UnitLocalizationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 45L;
+    public static final long CLUSTER_ID = 0x0000002DL;
 
     public UnitLocalizationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -5534,7 +5534,7 @@ public class ChipClusters {
   }
 
   public static class PowerSourceConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 46L;
+    public static final long CLUSTER_ID = 0x0000002EL;
 
     public PowerSourceConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -5704,7 +5704,7 @@ public class ChipClusters {
   }
 
   public static class PowerSourceCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 47L;
+    public static final long CLUSTER_ID = 0x0000002FL;
 
     public PowerSourceCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -6518,7 +6518,7 @@ public class ChipClusters {
   }
 
   public static class GeneralCommissioningCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 48L;
+    public static final long CLUSTER_ID = 0x00000030L;
 
     public GeneralCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -6809,7 +6809,7 @@ public class ChipClusters {
   }
 
   public static class NetworkCommissioningCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 49L;
+    public static final long CLUSTER_ID = 0x00000031L;
 
     public NetworkCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -7238,7 +7238,7 @@ public class ChipClusters {
   }
 
   public static class DiagnosticLogsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 50L;
+    public static final long CLUSTER_ID = 0x00000032L;
 
     public DiagnosticLogsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -7404,7 +7404,7 @@ public class ChipClusters {
   }
 
   public static class GeneralDiagnosticsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 51L;
+    public static final long CLUSTER_ID = 0x00000033L;
 
     public GeneralDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -7576,6 +7576,18 @@ public class ChipClusters {
       subscribeTestEventTriggersEnabledAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readAverageWearCountAttribute(
+      LongAttributeCallback callback
+    ) {
+      readAverageWearCountAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAverageWearCountAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeAverageWearCountAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
       GeneratedCommandListAttributeCallback callback
     ) {
@@ -7711,6 +7723,13 @@ public class ChipClusters {
         BooleanAttributeCallback callback
 , int minInterval, int maxInterval);
 
+    private native void readAverageWearCountAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeAverageWearCountAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
+
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
         GeneratedCommandListAttributeCallback callback
     );
@@ -7755,7 +7774,7 @@ public class ChipClusters {
   }
 
   public static class SoftwareDiagnosticsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 52L;
+    public static final long CLUSTER_ID = 0x00000034L;
 
     public SoftwareDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -7996,7 +8015,7 @@ public class ChipClusters {
   }
 
   public static class ThreadNetworkDiagnosticsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 53L;
+    public static final long CLUSTER_ID = 0x00000035L;
 
     public ThreadNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -9405,7 +9424,7 @@ public class ChipClusters {
   }
 
   public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 54L;
+    public static final long CLUSTER_ID = 0x00000036L;
 
     public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -9877,7 +9896,7 @@ public class ChipClusters {
   }
 
   public static class EthernetNetworkDiagnosticsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 55L;
+    public static final long CLUSTER_ID = 0x00000037L;
 
     public EthernetNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -10223,7 +10242,7 @@ public class ChipClusters {
   }
 
   public static class TimeSynchronizationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 56L;
+    public static final long CLUSTER_ID = 0x00000038L;
 
     public TimeSynchronizationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -10698,7 +10717,7 @@ public class ChipClusters {
   }
 
   public static class BridgedDeviceBasicInformationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 57L;
+    public static final long CLUSTER_ID = 0x00000039L;
 
     public BridgedDeviceBasicInformationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -11138,7 +11157,7 @@ public class ChipClusters {
   }
 
   public static class SwitchCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 59L;
+    public static final long CLUSTER_ID = 0x0000003BL;
 
     public SwitchCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -11341,7 +11360,7 @@ public class ChipClusters {
   }
 
   public static class AdministratorCommissioningCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 60L;
+    public static final long CLUSTER_ID = 0x0000003CL;
 
     public AdministratorCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -11584,7 +11603,7 @@ public class ChipClusters {
   }
 
   public static class OperationalCredentialsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 62L;
+    public static final long CLUSTER_ID = 0x0000003EL;
 
     public OperationalCredentialsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12011,7 +12030,7 @@ public class ChipClusters {
   }
 
   public static class GroupKeyManagementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 63L;
+    public static final long CLUSTER_ID = 0x0000003FL;
 
     public GroupKeyManagementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12336,7 +12355,7 @@ public class ChipClusters {
   }
 
   public static class FixedLabelCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 64L;
+    public static final long CLUSTER_ID = 0x00000040L;
 
     public FixedLabelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12506,7 +12525,7 @@ public class ChipClusters {
   }
 
   public static class UserLabelCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 65L;
+    public static final long CLUSTER_ID = 0x00000041L;
 
     public UserLabelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12685,7 +12704,7 @@ public class ChipClusters {
   }
 
   public static class ProxyConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 66L;
+    public static final long CLUSTER_ID = 0x00000042L;
 
     public ProxyConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12831,7 +12850,7 @@ public class ChipClusters {
   }
 
   public static class ProxyDiscoveryCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 67L;
+    public static final long CLUSTER_ID = 0x00000043L;
 
     public ProxyDiscoveryCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -12977,7 +12996,7 @@ public class ChipClusters {
   }
 
   public static class ProxyValidCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 68L;
+    public static final long CLUSTER_ID = 0x00000044L;
 
     public ProxyValidCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -13123,7 +13142,7 @@ public class ChipClusters {
   }
 
   public static class BooleanStateCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 69L;
+    public static final long CLUSTER_ID = 0x00000045L;
 
     public BooleanStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -13288,7 +13307,7 @@ public class ChipClusters {
   }
 
   public static class IcdManagementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 70L;
+    public static final long CLUSTER_ID = 0x00000046L;
 
     public IcdManagementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -13609,7 +13628,7 @@ public class ChipClusters {
   }
 
   public static class ModeSelectCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 80L;
+    public static final long CLUSTER_ID = 0x00000050L;
 
     public ModeSelectCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -13921,7 +13940,7 @@ public class ChipClusters {
   }
 
   public static class LaundryWasherModeCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 81L;
+    public static final long CLUSTER_ID = 0x00000051L;
 
     public LaundryWasherModeCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -14196,7 +14215,7 @@ public class ChipClusters {
   }
 
   public static class RefrigeratorAndTemperatureControlledCabinetModeCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 82L;
+    public static final long CLUSTER_ID = 0x00000052L;
 
     public RefrigeratorAndTemperatureControlledCabinetModeCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -14471,7 +14490,7 @@ public class ChipClusters {
   }
 
   public static class LaundryWasherControlsCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 83L;
+    public static final long CLUSTER_ID = 0x00000053L;
 
     public LaundryWasherControlsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -14726,7 +14745,7 @@ public class ChipClusters {
   }
 
   public static class RvcRunModeCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 84L;
+    public static final long CLUSTER_ID = 0x00000054L;
 
     public RvcRunModeCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -15001,7 +15020,7 @@ public class ChipClusters {
   }
 
   public static class RvcCleanModeCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 85L;
+    public static final long CLUSTER_ID = 0x00000055L;
 
     public RvcCleanModeCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -15276,7 +15295,7 @@ public class ChipClusters {
   }
 
   public static class TemperatureControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 86L;
+    public static final long CLUSTER_ID = 0x00000056L;
 
     public TemperatureControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -15555,7 +15574,7 @@ public class ChipClusters {
   }
 
   public static class RefrigeratorAlarmCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 87L;
+    public static final long CLUSTER_ID = 0x00000057L;
 
     public RefrigeratorAlarmCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -15758,7 +15777,7 @@ public class ChipClusters {
   }
 
   public static class DishwasherModeCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 89L;
+    public static final long CLUSTER_ID = 0x00000059L;
 
     public DishwasherModeCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -16033,7 +16052,7 @@ public class ChipClusters {
   }
 
   public static class AirQualityCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 91L;
+    public static final long CLUSTER_ID = 0x0000005BL;
 
     public AirQualityCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -16198,7 +16217,7 @@ public class ChipClusters {
   }
 
   public static class SmokeCoAlarmCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 92L;
+    public static final long CLUSTER_ID = 0x0000005CL;
 
     public SmokeCoAlarmCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -16614,7 +16633,7 @@ public class ChipClusters {
   }
 
   public static class DishwasherAlarmCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 93L;
+    public static final long CLUSTER_ID = 0x0000005DL;
 
     public DishwasherAlarmCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -16864,7 +16883,7 @@ public class ChipClusters {
   }
 
   public static class OperationalStateCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 96L;
+    public static final long CLUSTER_ID = 0x00000060L;
 
     public OperationalStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -17187,7 +17206,7 @@ public class ChipClusters {
   }
 
   public static class RvcOperationalStateCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 97L;
+    public static final long CLUSTER_ID = 0x00000061L;
 
     public RvcOperationalStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -17510,7 +17529,7 @@ public class ChipClusters {
   }
 
   public static class HepaFilterMonitoringCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 113L;
+    public static final long CLUSTER_ID = 0x00000071L;
 
     public HepaFilterMonitoringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -17803,7 +17822,7 @@ public class ChipClusters {
   }
 
   public static class ActivatedCarbonFilterMonitoringCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 114L;
+    public static final long CLUSTER_ID = 0x00000072L;
 
     public ActivatedCarbonFilterMonitoringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -18095,8 +18114,707 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 
+  public static class BooleanSensorConfigurationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 0x00000080L;
+
+    public BooleanSensorConfigurationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void supressRequest(DefaultClusterCallback callback
+      , Integer alarmsToSuppress) {
+      supressRequest(chipClusterPtr, callback, alarmsToSuppress, null);
+    }
+
+    public void supressRequest(DefaultClusterCallback callback
+      , Integer alarmsToSuppress
+      , int timedInvokeTimeoutMs) {
+      supressRequest(chipClusterPtr, callback, alarmsToSuppress, timedInvokeTimeoutMs);
+    }
+    private native void supressRequest(long chipClusterPtr, DefaultClusterCallback Callback
+      , Integer alarmsToSuppress
+      , @Nullable Integer timedInvokeTimeoutMs);
+
+      public interface GeneratedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AcceptedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface EventListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AttributeListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+
+    public void readSensitivityLevelAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readSensitivityLevelAttribute(chipClusterPtr, callback);
+    }
+    public void writeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeSensitivityLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeSensitivityLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeSensitivityLevelAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeSensitivityLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAlarmsActiveAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readAlarmsActiveAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAlarmsActiveAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeAlarmsActiveAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAlarmsSuppressedAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readAlarmsSuppressedAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAlarmsSuppressedAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeAlarmsSuppressedAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAlarmsEnabledAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readAlarmsEnabledAttribute(chipClusterPtr, callback);
+    }
+    public void writeAlarmsEnabledAttribute(DefaultClusterCallback callback, Integer value) {
+      writeAlarmsEnabledAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeAlarmsEnabledAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeAlarmsEnabledAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeAlarmsEnabledAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeAlarmsEnabledAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+      GeneratedCommandListAttributeCallback callback
+    ) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+      AcceptedCommandListAttributeCallback callback
+    ) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+      EventListAttributeCallback callback
+    ) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+      AttributeListAttributeCallback callback
+    ) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+      LongAttributeCallback callback
+    ) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readSensitivityLevelAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+
+    private native void writeSensitivityLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeSensitivityLevelAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readAlarmsActiveAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeAlarmsActiveAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readAlarmsSuppressedAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeAlarmsSuppressedAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readAlarmsEnabledAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+
+    private native void writeAlarmsEnabledAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeAlarmsEnabledAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+    );
+    private native void subscribeGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+    );
+    private native void subscribeAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+    );
+    private native void subscribeEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+    );
+    private native void subscribeAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+  }
+
+  public static class ValveConfigurationAndControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 0x00000081L;
+
+    public ValveConfigurationAndControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void open(DefaultClusterCallback callback
+      , Optional<Long> openDuration) {
+      open(chipClusterPtr, callback, openDuration, null);
+    }
+
+    public void open(DefaultClusterCallback callback
+      , Optional<Long> openDuration
+      , int timedInvokeTimeoutMs) {
+      open(chipClusterPtr, callback, openDuration, timedInvokeTimeoutMs);
+    }
+
+    public void close(DefaultClusterCallback callback
+      ) {
+      close(chipClusterPtr, callback, null);
+    }
+
+    public void close(DefaultClusterCallback callback
+      
+      , int timedInvokeTimeoutMs) {
+      close(chipClusterPtr, callback, timedInvokeTimeoutMs);
+    }
+
+    public void setLevel(DefaultClusterCallback callback
+      , Integer level, Optional<Long> openDuration) {
+      setLevel(chipClusterPtr, callback, level, openDuration, null);
+    }
+
+    public void setLevel(DefaultClusterCallback callback
+      , Integer level, Optional<Long> openDuration
+      , int timedInvokeTimeoutMs) {
+      setLevel(chipClusterPtr, callback, level, openDuration, timedInvokeTimeoutMs);
+    }
+    private native void open(long chipClusterPtr, DefaultClusterCallback Callback
+      , Optional<Long> openDuration
+      , @Nullable Integer timedInvokeTimeoutMs);
+    private native void close(long chipClusterPtr, DefaultClusterCallback Callback
+      
+      , @Nullable Integer timedInvokeTimeoutMs);
+    private native void setLevel(long chipClusterPtr, DefaultClusterCallback Callback
+      , Integer level, Optional<Long> openDuration
+      , @Nullable Integer timedInvokeTimeoutMs);
+
+      public interface OpenDurationAttributeCallback {
+        void onSuccess(@Nullable Long value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AutoCloseTimeAttributeCallback {
+        void onSuccess(@Nullable Long value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface RemainingDurationAttributeCallback {
+        void onSuccess(@Nullable Long value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface CurrentStateAttributeCallback {
+        void onSuccess(@Nullable Integer value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface TargetStateAttributeCallback {
+        void onSuccess(@Nullable Integer value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface CurrentLevelAttributeCallback {
+        void onSuccess(@Nullable Integer value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface TargetLevelAttributeCallback {
+        void onSuccess(@Nullable Integer value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface OpenLevelAttributeCallback {
+        void onSuccess(@Nullable Integer value);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface GeneratedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AcceptedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface EventListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AttributeListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+
+    public void readOpenDurationAttribute(
+      OpenDurationAttributeCallback callback
+    ) {
+      readOpenDurationAttribute(chipClusterPtr, callback);
+    }
+    public void writeOpenDurationAttribute(DefaultClusterCallback callback, Long value) {
+      writeOpenDurationAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeOpenDurationAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
+      writeOpenDurationAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeOpenDurationAttribute(
+        OpenDurationAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeOpenDurationAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAutoCloseTimeAttribute(
+      AutoCloseTimeAttributeCallback callback
+    ) {
+      readAutoCloseTimeAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAutoCloseTimeAttribute(
+        AutoCloseTimeAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAutoCloseTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readRemainingDurationAttribute(
+      RemainingDurationAttributeCallback callback
+    ) {
+      readRemainingDurationAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeRemainingDurationAttribute(
+        RemainingDurationAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeRemainingDurationAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readCurrentStateAttribute(
+      CurrentStateAttributeCallback callback
+    ) {
+      readCurrentStateAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeCurrentStateAttribute(
+        CurrentStateAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeCurrentStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTargetStateAttribute(
+      TargetStateAttributeCallback callback
+    ) {
+      readTargetStateAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeTargetStateAttribute(
+        TargetStateAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeTargetStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readStartUpStateAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readStartUpStateAttribute(chipClusterPtr, callback);
+    }
+    public void writeStartUpStateAttribute(DefaultClusterCallback callback, Integer value) {
+      writeStartUpStateAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeStartUpStateAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeStartUpStateAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeStartUpStateAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeStartUpStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readCurrentLevelAttribute(
+      CurrentLevelAttributeCallback callback
+    ) {
+      readCurrentLevelAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeCurrentLevelAttribute(
+        CurrentLevelAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeCurrentLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTargetLevelAttribute(
+      TargetLevelAttributeCallback callback
+    ) {
+      readTargetLevelAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeTargetLevelAttribute(
+        TargetLevelAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeTargetLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readOpenLevelAttribute(
+      OpenLevelAttributeCallback callback
+    ) {
+      readOpenLevelAttribute(chipClusterPtr, callback);
+    }
+    public void writeOpenLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeOpenLevelAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeOpenLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      writeOpenLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeOpenLevelAttribute(
+        OpenLevelAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeOpenLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readValveFaultAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readValveFaultAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeValveFaultAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeValveFaultAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+      GeneratedCommandListAttributeCallback callback
+    ) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+      AcceptedCommandListAttributeCallback callback
+    ) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+      EventListAttributeCallback callback
+    ) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+      AttributeListAttributeCallback callback
+    ) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+      LongAttributeCallback callback
+    ) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readOpenDurationAttribute(long chipClusterPtr,
+        OpenDurationAttributeCallback callback
+    );
+
+    private native void writeOpenDurationAttribute(long chipClusterPtr, DefaultClusterCallback callback, Long value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeOpenDurationAttribute(long chipClusterPtr,
+        OpenDurationAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAutoCloseTimeAttribute(long chipClusterPtr,
+        AutoCloseTimeAttributeCallback callback
+    );
+    private native void subscribeAutoCloseTimeAttribute(long chipClusterPtr,
+        AutoCloseTimeAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readRemainingDurationAttribute(long chipClusterPtr,
+        RemainingDurationAttributeCallback callback
+    );
+    private native void subscribeRemainingDurationAttribute(long chipClusterPtr,
+        RemainingDurationAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readCurrentStateAttribute(long chipClusterPtr,
+        CurrentStateAttributeCallback callback
+    );
+    private native void subscribeCurrentStateAttribute(long chipClusterPtr,
+        CurrentStateAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readTargetStateAttribute(long chipClusterPtr,
+        TargetStateAttributeCallback callback
+    );
+    private native void subscribeTargetStateAttribute(long chipClusterPtr,
+        TargetStateAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readStartUpStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+
+    private native void writeStartUpStateAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeStartUpStateAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readCurrentLevelAttribute(long chipClusterPtr,
+        CurrentLevelAttributeCallback callback
+    );
+    private native void subscribeCurrentLevelAttribute(long chipClusterPtr,
+        CurrentLevelAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readTargetLevelAttribute(long chipClusterPtr,
+        TargetLevelAttributeCallback callback
+    );
+    private native void subscribeTargetLevelAttribute(long chipClusterPtr,
+        TargetLevelAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readOpenLevelAttribute(long chipClusterPtr,
+        OpenLevelAttributeCallback callback
+    );
+
+    private native void writeOpenLevelAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeOpenLevelAttribute(long chipClusterPtr,
+        OpenLevelAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readValveFaultAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeValveFaultAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+    );
+    private native void subscribeGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+    );
+    private native void subscribeAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+    );
+    private native void subscribeEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+    );
+    private native void subscribeAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+  }
+
   public static class DoorLockCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 257L;
+    public static final long CLUSTER_ID = 0x00000101L;
 
     public DoorLockCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -19368,7 +20086,7 @@ public class ChipClusters {
   }
 
   public static class WindowCoveringCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 258L;
+    public static final long CLUSTER_ID = 0x00000102L;
 
     public WindowCoveringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -20079,7 +20797,7 @@ public class ChipClusters {
   }
 
   public static class BarrierControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 259L;
+    public static final long CLUSTER_ID = 0x00000103L;
 
     public BarrierControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -20497,7 +21215,7 @@ public class ChipClusters {
   }
 
   public static class PumpConfigurationAndControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 512L;
+    public static final long CLUSTER_ID = 0x00000200L;
 
     public PumpConfigurationAndControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -21206,7 +21924,7 @@ public class ChipClusters {
   }
 
   public static class ThermostatCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 513L;
+    public static final long CLUSTER_ID = 0x00000201L;
 
     public ThermostatCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -22643,7 +23361,7 @@ public class ChipClusters {
   }
 
   public static class FanControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 514L;
+    public static final long CLUSTER_ID = 0x00000202L;
 
     public FanControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -23104,7 +23822,7 @@ public class ChipClusters {
   }
 
   public static class ThermostatUserInterfaceConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 516L;
+    public static final long CLUSTER_ID = 0x00000204L;
 
     public ThermostatUserInterfaceConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -23334,7 +24052,7 @@ public class ChipClusters {
   }
 
   public static class ColorControlCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 768L;
+    public static final long CLUSTER_ID = 0x00000300L;
 
     public ColorControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -24906,7 +25624,7 @@ public class ChipClusters {
   }
 
   public static class BallastConfigurationCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 769L;
+    public static final long CLUSTER_ID = 0x00000301L;
 
     public BallastConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -25433,7 +26151,7 @@ public class ChipClusters {
   }
 
   public static class IlluminanceMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1024L;
+    public static final long CLUSTER_ID = 0x00000400L;
 
     public IlluminanceMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -25694,7 +26412,7 @@ public class ChipClusters {
   }
 
   public static class TemperatureMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1026L;
+    public static final long CLUSTER_ID = 0x00000402L;
 
     public TemperatureMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -25931,7 +26649,7 @@ public class ChipClusters {
   }
 
   public static class PressureMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1027L;
+    public static final long CLUSTER_ID = 0x00000403L;
 
     public PressureMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -26278,7 +26996,7 @@ public class ChipClusters {
   }
 
   public static class FlowMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1028L;
+    public static final long CLUSTER_ID = 0x00000404L;
 
     public FlowMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -26515,7 +27233,7 @@ public class ChipClusters {
   }
 
   public static class RelativeHumidityMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1029L;
+    public static final long CLUSTER_ID = 0x00000405L;
 
     public RelativeHumidityMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -26752,7 +27470,7 @@ public class ChipClusters {
   }
 
   public static class OccupancySensingCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1030L;
+    public static final long CLUSTER_ID = 0x00000406L;
 
     public OccupancySensingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -27207,7 +27925,7 @@ public class ChipClusters {
   }
 
   public static class CarbonMonoxideConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1036L;
+    public static final long CLUSTER_ID = 0x0000040CL;
 
     public CarbonMonoxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -27587,7 +28305,7 @@ public class ChipClusters {
   }
 
   public static class CarbonDioxideConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1037L;
+    public static final long CLUSTER_ID = 0x0000040DL;
 
     public CarbonDioxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -27967,7 +28685,7 @@ public class ChipClusters {
   }
 
   public static class NitrogenDioxideConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1043L;
+    public static final long CLUSTER_ID = 0x00000413L;
 
     public NitrogenDioxideConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -28347,7 +29065,7 @@ public class ChipClusters {
   }
 
   public static class OzoneConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1045L;
+    public static final long CLUSTER_ID = 0x00000415L;
 
     public OzoneConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -28727,7 +29445,7 @@ public class ChipClusters {
   }
 
   public static class Pm25ConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1066L;
+    public static final long CLUSTER_ID = 0x0000042AL;
 
     public Pm25ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -29107,7 +29825,7 @@ public class ChipClusters {
   }
 
   public static class FormaldehydeConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1067L;
+    public static final long CLUSTER_ID = 0x0000042BL;
 
     public FormaldehydeConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -29487,7 +30205,7 @@ public class ChipClusters {
   }
 
   public static class Pm1ConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1068L;
+    public static final long CLUSTER_ID = 0x0000042CL;
 
     public Pm1ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -29867,7 +30585,7 @@ public class ChipClusters {
   }
 
   public static class Pm10ConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1069L;
+    public static final long CLUSTER_ID = 0x0000042DL;
 
     public Pm10ConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -30247,7 +30965,7 @@ public class ChipClusters {
   }
 
   public static class TotalVolatileOrganicCompoundsConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1070L;
+    public static final long CLUSTER_ID = 0x0000042EL;
 
     public TotalVolatileOrganicCompoundsConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -30627,7 +31345,7 @@ public class ChipClusters {
   }
 
   public static class RadonConcentrationMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1071L;
+    public static final long CLUSTER_ID = 0x0000042FL;
 
     public RadonConcentrationMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -31007,7 +31725,7 @@ public class ChipClusters {
   }
 
   public static class WakeOnLanCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1283L;
+    public static final long CLUSTER_ID = 0x00000503L;
 
     public WakeOnLanCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -31172,7 +31890,7 @@ public class ChipClusters {
   }
 
   public static class ChannelCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1284L;
+    public static final long CLUSTER_ID = 0x00000504L;
 
     public ChannelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -31390,7 +32108,7 @@ public class ChipClusters {
   }
 
   public static class TargetNavigatorCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1285L;
+    public static final long CLUSTER_ID = 0x00000505L;
 
     public TargetNavigatorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -31599,7 +32317,7 @@ public class ChipClusters {
   }
 
   public static class MediaPlaybackCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1286L;
+    public static final long CLUSTER_ID = 0x00000506L;
 
     public MediaPlaybackCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -32039,7 +32757,7 @@ public class ChipClusters {
   }
 
   public static class MediaInputCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1287L;
+    public static final long CLUSTER_ID = 0x00000507L;
 
     public MediaInputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -32284,7 +33002,7 @@ public class ChipClusters {
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1288L;
+    public static final long CLUSTER_ID = 0x00000508L;
 
     public LowPowerCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -32444,7 +33162,7 @@ public class ChipClusters {
   }
 
   public static class KeypadInputCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1289L;
+    public static final long CLUSTER_ID = 0x00000509L;
 
     public KeypadInputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -32610,7 +33328,7 @@ public class ChipClusters {
   }
 
   public static class ContentLauncherCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1290L;
+    public static final long CLUSTER_ID = 0x0000050AL;
 
     public ContentLauncherCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -32842,7 +33560,7 @@ public class ChipClusters {
   }
 
   public static class AudioOutputCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1291L;
+    public static final long CLUSTER_ID = 0x0000050BL;
 
     public AudioOutputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -33059,7 +33777,7 @@ public class ChipClusters {
   }
 
   public static class ApplicationLauncherCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1292L;
+    public static final long CLUSTER_ID = 0x0000050CL;
 
     public ApplicationLauncherCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -33277,7 +33995,7 @@ public class ChipClusters {
   }
 
   public static class ApplicationBasicCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1293L;
+    public static final long CLUSTER_ID = 0x0000050DL;
 
     public ApplicationBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -33561,7 +34279,7 @@ public class ChipClusters {
   }
 
   public static class AccountLoginCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 1294L;
+    public static final long CLUSTER_ID = 0x0000050EL;
 
     public AccountLoginCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -33743,7 +34461,7 @@ public class ChipClusters {
   }
 
   public static class ElectricalMeasurementCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 2820L;
+    public static final long CLUSTER_ID = 0x00000B04L;
 
     public ElectricalMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -36433,7 +37151,7 @@ public class ChipClusters {
   }
 
   public static class UnitTestingCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 4294048773L;
+    public static final long CLUSTER_ID = 0xFFF1FC05L;
 
     public UnitTestingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -39390,7 +40108,7 @@ public class ChipClusters {
   }
 
   public static class FaultInjectionCluster extends BaseChipCluster {
-    public static final long CLUSTER_ID = 4294048774L;
+    public static final long CLUSTER_ID = 0xFFF1FC06L;
 
     public FaultInjectionCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -39519,6 +40237,214 @@ public class ChipClusters {
       int minInterval, int maxInterval) {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
+
+    private native void readGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+    );
+    private native void subscribeGeneratedCommandListAttribute(long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+    );
+    private native void subscribeAcceptedCommandListAttribute(long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+    );
+    private native void subscribeEventListAttribute(long chipClusterPtr,
+        EventListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+    );
+    private native void subscribeAttributeListAttribute(long chipClusterPtr,
+        AttributeListAttributeCallback callback
+      , int minInterval, int maxInterval);
+
+    private native void readFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+    );
+    private native void subscribeFeatureMapAttribute(long chipClusterPtr,
+        LongAttributeCallback callback
+, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+    );
+    private native void subscribeClusterRevisionAttribute(long chipClusterPtr,
+        IntegerAttributeCallback callback
+, int minInterval, int maxInterval);
+  }
+
+  public static class SampleMeiCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 0xFFF1FC20L;
+
+    public SampleMeiCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void ping(DefaultClusterCallback callback
+      ) {
+      ping(chipClusterPtr, callback, null);
+    }
+
+    public void ping(DefaultClusterCallback callback
+      
+      , int timedInvokeTimeoutMs) {
+      ping(chipClusterPtr, callback, timedInvokeTimeoutMs);
+    }
+
+    public void addArguments(AddArgumentsResponseCallback callback
+      , Integer arg1, Integer arg2) {
+      addArguments(chipClusterPtr, callback, arg1, arg2, null);
+    }
+
+    public void addArguments(AddArgumentsResponseCallback callback
+      , Integer arg1, Integer arg2
+      , int timedInvokeTimeoutMs) {
+      addArguments(chipClusterPtr, callback, arg1, arg2, timedInvokeTimeoutMs);
+    }
+    private native void ping(long chipClusterPtr, DefaultClusterCallback Callback
+      
+      , @Nullable Integer timedInvokeTimeoutMs);
+    private native void addArguments(long chipClusterPtr, AddArgumentsResponseCallback Callback
+      , Integer arg1, Integer arg2
+      , @Nullable Integer timedInvokeTimeoutMs);
+    public interface AddArgumentsResponseCallback {
+      void onSuccess(Integer returnValue);
+
+      void onError(Exception error);
+    }
+
+
+      public interface GeneratedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AcceptedCommandListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface EventListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+      public interface AttributeListAttributeCallback {
+        void onSuccess( List<Long> valueList);
+        void onError(Exception ex);
+        default void onSubscriptionEstablished(long subscriptionId) {}
+      }
+
+    public void readFlipFlopAttribute(
+      BooleanAttributeCallback callback
+    ) {
+      readFlipFlopAttribute(chipClusterPtr, callback);
+    }
+    public void writeFlipFlopAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeFlipFlopAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeFlipFlopAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      writeFlipFlopAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
+    }
+    public void subscribeFlipFlopAttribute(
+        BooleanAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeFlipFlopAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(
+      GeneratedCommandListAttributeCallback callback
+    ) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(
+      AcceptedCommandListAttributeCallback callback
+    ) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(
+      EventListAttributeCallback callback
+    ) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(
+      AttributeListAttributeCallback callback
+    ) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback
+      ,
+      int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(
+      LongAttributeCallback callback
+    ) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(
+      IntegerAttributeCallback callback
+    ) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback
+,
+      int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readFlipFlopAttribute(long chipClusterPtr,
+        BooleanAttributeCallback callback
+    );
+
+    private native void writeFlipFlopAttribute(long chipClusterPtr, DefaultClusterCallback callback, Boolean value, @Nullable Integer timedWriteTimeoutMs);
+    private native void subscribeFlipFlopAttribute(long chipClusterPtr,
+        BooleanAttributeCallback callback
+, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr,
         GeneratedCommandListAttributeCallback callback

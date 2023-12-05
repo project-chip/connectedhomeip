@@ -139,9 +139,11 @@ public:
     const FabricInfo * GetAliceFabric() { return mFabricTable.FindFabricWithIndex(mAliceFabricIndex); }
     const FabricInfo * GetBobFabric() { return mFabricTable.FindFabricWithIndex(mBobFabricIndex); }
 
-    CHIP_ERROR CreateSessionBobToAlice();
-    CHIP_ERROR CreateSessionAliceToBob();
-    CHIP_ERROR CreateSessionBobToFriends();
+    CHIP_ERROR CreateSessionBobToAlice(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionBobToAlice();
+    CHIP_ERROR CreateSessionAliceToBob(); // Creates PASE session
+    CHIP_ERROR CreateCASESessionAliceToBob();
+    CHIP_ERROR CreateSessionBobToFriends(); // Creates PASE session
     CHIP_ERROR CreatePASESessionCharlieToDavid();
     CHIP_ERROR CreatePASESessionDavidToCharlie();
 

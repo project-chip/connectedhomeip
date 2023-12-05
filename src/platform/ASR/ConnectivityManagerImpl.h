@@ -132,7 +132,6 @@ private:
     CHIP_ERROR ConfigureWiFiAP(void);
     void ChangeWiFiAPState(WiFiAPState newState);
     void UpdateInternetConnectivityState(void);
-    static void lega_wifi_scan_ind(lega_wlan_scan_result_t * result);
     static void lega_wifi_connect_state(lega_wifi_event_e stat);
     static void lega_wifi_get_ip_ind(lega_wlan_ip_stat_t * pnet);
     static void lega_wifi_get_ip6_ind(lega_wlan_ip_stat_t * pnet);

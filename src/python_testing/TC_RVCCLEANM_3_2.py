@@ -45,6 +45,30 @@ class TC_RVCCLEANM_3_2(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.RvcCleanMode.Attributes.StartUpMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to StartUpMode failed")
 
+    async def check_preconditions(self, endpoint):
+        # check whether the StartUpMode will be overridden by the OnMode attribute
+
+        if not self.check_pics("RVCCLEANM.S.F00"):
+            return True
+
+        logging.info("RVCCLEANM.S.F00: 1")
+
+        cluster = Clusters.Objects.OnOff
+        attr = Clusters.OnOff.Attributes.StartUpOnOff
+        startUpOnOff = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("StartUpOnOff: %s" % (startUpOnOff))
+        if startUpOnOff == NullValue or startUpOnOff == 0:
+            return True
+
+        cluster = Clusters.Objects.RvcCleanMode
+        attr = Clusters.RvcCleanMode.Attributes.OnMode
+        onMode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("OnMode: %s" % (onMode))
+        if onMode == NullValue:
+            return True
+
+        return False
+
     @async_test_body
     async def test_TC_RVCCLEANM_3_2(self):
 
@@ -59,6 +83,12 @@ class TC_RVCCLEANM_3_2(MatterBaseTest):
         asserts.assert_true(self.check_pics("RVCCLEANM.S.A0002"), "RVCCLEANM.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("RVCCLEANM.S.C00.Rsp"), "RVCCLEANM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("RVCCLEANM.S.C01.Tx"), "RVCCLEANM.S.C01.Tx must be supported")
+
+        depOnOffKey = "RVCCLEANM.S.F00"
+        asserts.assert_true(depOnOffKey in self.matter_test_config.pics, "%s must be provided" % (depOnOffKey))
+
+        ret = await self.check_preconditions(self.endpoint)
+        asserts.assert_true(ret, "invalid preconditions - StartUpMode overridden by OnMode")
 
         attributes = Clusters.RvcCleanMode.Attributes
 

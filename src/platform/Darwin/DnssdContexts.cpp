@@ -28,7 +28,7 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
-constexpr const char * kLocalDot            = "local.";
+constexpr char kLocalDot[]                  = "local.";
 
 bool IsLocalDomain(const char * domain)
 {
@@ -268,14 +268,14 @@ CHIP_ERROR MdnsContexts::Has(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR MdnsContexts::GetRegisterContextOfType(const char * type, RegisterContext ** context)
+CHIP_ERROR MdnsContexts::GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context)
 {
     bool found = false;
     std::vector<GenericContext *>::iterator iter;
 
     for (iter = mContexts.begin(); iter != mContexts.end(); iter++)
     {
-        if ((*iter)->type == ContextType::Register && (static_cast<RegisterContext *>(*iter))->matches(type))
+        if ((*iter)->type == ContextType::Register && (static_cast<RegisterContext *>(*iter))->matches(type, name))
         {
             *context = static_cast<RegisterContext *>(*iter);
             found    = true;

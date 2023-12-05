@@ -20,6 +20,7 @@ import("${bouffalolab_iot_sdk_build_root}/bl602/bl_iot_sdk.gni")
 import("${bouffalolab_iot_sdk_build_root}/common/bouffalolab_executable.gni")
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/src/app/chip_data_model.gni")
@@ -31,10 +32,8 @@ if (chip_enable_pw_rpc) {
 
 assert(current_os == "freertos")
 
-example_common_dir = "${chip_root}/examples/lighting-app/bouffalolab/common"
-example_dir = "${chip_root}/examples/lighting-app/bouffalolab/bl602"
-examples_plat_common_dir = "${chip_root}/examples/platform/bouffalolab/common"
-examples_plat_dir = "${chip_root}/examples/platform/bouffalolab/bl602"
+example_dir = "${chip_root}/examples/lighting-app/bouffalolab"
+examples_plat_dir = "${chip_root}/examples/platform/bouffalolab"
 
 declare_args() {
   # Dump memory usage at link time.
@@ -59,12 +58,15 @@ declare_args() {
 
 bl_iot_sdk("sdk") {
   include_dirs = [
+    "${example_dir}/bl602",
+    "${examples_plat_dir}/bl602",
+    "${examples_plat_dir}/bl602/lwipopts",
+    "${examples_plat_dir}/common/route_hook",
     "${chip_root}/src/platform/bouffalolab/BL602",
-    "${example_dir}",
-    "${example_dir}/include",
+    "${chip_root}/src/platform/bouffalolab/common",
   ]
 
-  freertos_config = "${examples_plat_dir}/FreeRTOSConfig.h"
+  freertos_config = "${examples_plat_dir}/bl602/FreeRTOSConfig.h"
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
@@ -74,19 +76,20 @@ bl_iot_sdk("sdk") {
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
+    "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
   ]
 
+  defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
   if (chip_enable_pw_rpc) {
-    include_dirs += [ "${examples_plat_common_dir}/rpc" ]
-    defines += [ "PW_RPC_ENABLED=1" ]
+    include_dirs += [ "${examples_plat_dir}/common/rpc" ]
     defines += [ "DISABLE_PRINT=1" ]
   } else if (chip_build_libshell) {
-    include_dirs += [ "${examples_plat_common_dir}/plat" ]
+    include_dirs += [ "${examples_plat_dir}/common/plat" ]
   }
 }
 
 chip_data_model("bouffalolab-lighting") {
-  zap_file = "${example_dir}/../data_model/lighting-app-wifi.zap"
+  zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
 
   zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
   is_server = true
@@ -98,7 +101,6 @@ bouffalolab_executable("lighting_app") {
   defines = [
     "APP_TASK_STACK_SIZE=2044",
     "CHIP_UART_BAUDRATE=${baudrate}",
-    "BL602_ENABLE",
     "START_ENTRY=bfl_main",
     "SYS_AOS_LOOP_ENABLE",
   ]
@@ -107,10 +109,17 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=8" ]
   }
 
+  defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
+  defines +=
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  defines += [
+    "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}",
+  ]
+
   bl_plat_name = "bl602"
   sources = [
-    "${examples_plat_common_dir}/route_hook/bl_route_hook.c",
-    "${examples_plat_common_dir}/route_hook/bl_route_table.c",
+    "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
+    "${examples_plat_dir}/common/route_hook/bl_route_table.c",
   ]
 
   if ("BL602-IoT-Matter-V1" == board) {
@@ -121,15 +130,16 @@ bouffalolab_executable("lighting_app") {
 
   sources += [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "${example_common_dir}/AppTask.cpp",
-    "${example_common_dir}/ZclCallbacks.cpp",
-    "${examples_plat_common_dir}/plat/LEDWidget.cpp",
-    "${examples_plat_common_dir}/plat/OTAConfig.cpp",
-    "${examples_plat_common_dir}/plat/aos_task.c",
-    "${examples_plat_common_dir}/plat/demo_pwm.c",
-    "${examples_plat_common_dir}/plat/main.cpp",
-    "${examples_plat_common_dir}/plat/platform.cpp",
-    "${examples_plat_common_dir}/plat/uart.c",
+    "${example_dir}/common/AppTask.cpp",
+    "${example_dir}/common/ZclCallbacks.cpp",
+    "${examples_plat_dir}/common/iot_sdk/aos_task.c",
+    "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
+    "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
+    "${examples_plat_dir}/common/iot_sdk/uart.cpp",
+    "${examples_plat_dir}/common/plat/LEDWidget.cpp",
+    "${examples_plat_dir}/common/plat/OTAConfig.cpp",
+    "${examples_plat_dir}/common/plat/main.cpp",
+    "${examples_plat_dir}/common/plat/platform.cpp",
   ]
 
   deps = [
@@ -143,15 +153,18 @@ bouffalolab_executable("lighting_app") {
 
   include_dirs = [
     "${chip_root}/src/platform/bouffalolab/BL602",
-    "${example_common_dir}",
-    "${examples_plat_common_dir}/route_hook",
-    "${examples_plat_common_dir}/plat",
-    "${examples_plat_dir}",
+    "${example_dir}/common",
+    "${example_dir}/bl602",
+    "${examples_plat_dir}/bl602/lwipopts",
+    "${examples_plat_dir}/common/route_hook",
+    "${examples_plat_dir}/common/plat",
+    "${examples_plat_dir}/common/iot_sdk",
   ]
 
+  defines += [ "CONFIG_ENABLE_CHIP_SHELL=${chip_build_libshell}" ]
+  defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
   if (chip_enable_pw_rpc) {
     defines += [
-      "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
@@ -164,8 +177,8 @@ bouffalolab_executable("lighting_app") {
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/bouffalolab/PigweedLoggerMutex.cpp",
-      "${examples_plat_common_dir}/rpc/PigweedLogger.cpp",
-      "${examples_plat_common_dir}/rpc/Rpc.cpp",
+      "${examples_plat_dir}/common/rpc/PigweedLogger.cpp",
+      "${examples_plat_dir}/common/rpc/Rpc.cpp",
     ]
 
     deps += [
@@ -183,7 +196,7 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
-      "${examples_plat_common_dir}/rpc/pw_sys_io:pw_sys_io",
+      "${examples_plat_dir}/common/rpc/pw_sys_io:pw_sys_io",
     ]
 
     public_deps = [
@@ -198,8 +211,6 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed/bouffalolab",
     ]
   } else if (chip_build_libshell) {
-    defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]
-
     deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
 
     include_dirs += [
@@ -208,13 +219,13 @@ bouffalolab_executable("lighting_app") {
     ]
   }
 
+  defines += [ "HEAP_MONITORING=${enable_heap_monitoring}" ]
   if (enable_heap_monitoring) {
-    sources += [ "${examples_plat_common_dir}/plat/MemMonitoring.cpp" ]
-    defines += [ "HEAP_MONITORING=1" ]
+    sources += [ "${examples_plat_dir}/common/plat/MemMonitoring.cpp" ]
   }
 
   cflags_c = [ "-Wno-sign-compare" ]
-  ldscript = "${examples_plat_dir}/ldscripts/flash_rom.ld"
+  ldscript = "${examples_plat_dir}/bl602/ldscripts/flash_rom.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 

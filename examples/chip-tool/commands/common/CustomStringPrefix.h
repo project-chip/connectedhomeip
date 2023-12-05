@@ -22,17 +22,17 @@
 
 #include <lib/support/CodeUtils.h>
 
-static constexpr char kJsonStringPrefix[] = "json:";
-constexpr size_t kJsonStringPrefixLen     = ArraySize(kJsonStringPrefix) - 1; // Don't count the null
+static constexpr char kJsonStringPrefix[]    = "json:";
+inline constexpr size_t kJsonStringPrefixLen = ArraySize(kJsonStringPrefix) - 1; // Don't count the null
 
-static constexpr char kBase64StringPrefix[] = "base64:";
-constexpr size_t kBase64StringPrefixLen     = ArraySize(kBase64StringPrefix) - 1; // Don't count the null
+static constexpr char kBase64StringPrefix[]    = "base64:";
+inline constexpr size_t kBase64StringPrefixLen = ArraySize(kBase64StringPrefix) - 1; // Don't count the null
 
-static constexpr char kHexStringPrefix[] = "hex:";
-constexpr size_t kHexStringPrefixLen     = ArraySize(kHexStringPrefix) - 1; // Don't count the null
+static constexpr char kHexStringPrefix[]    = "hex:";
+inline constexpr size_t kHexStringPrefixLen = ArraySize(kHexStringPrefix) - 1; // Don't count the null
 
-static constexpr char kStrStringPrefix[] = "str:";
-constexpr size_t kStrStringPrefixLen     = ArraySize(kStrStringPrefix) - 1; // Don't count the null
+static constexpr char kStrStringPrefix[]    = "str:";
+inline constexpr size_t kStrStringPrefixLen = ArraySize(kStrStringPrefix) - 1; // Don't count the null
 
 inline bool IsJsonString(const char * str)
 {

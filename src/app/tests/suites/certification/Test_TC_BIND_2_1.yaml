@@ -41,11 +41,19 @@ tests:
 
     - label: "Pre-Conditions"
       verification: |
-          TH2 supports On/Off server on Endpoint 1.
+          1 TH2 supports On/Off server on Endpoint 1.
 
-          TH3 supports On/Off server on Endpoint 2.
+          2 TH3 supports On/Off server on Endpoint 2.
 
-          DUT supports On/Off client.
+          3 DUT supports On/Off client.
+
+          1. TH1 - Test Harness1 as Commissioner
+
+          2. TH2 - Test Harness2 as Controlee
+
+          3. TH3 - Test Harness3 as Controlee
+
+          4. DUT - Controller
       disabled: true
 
     - label: "Step 1: Factory Reset DUT"

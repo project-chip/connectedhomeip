@@ -21,7 +21,6 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.SensorClientFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
-import com.google.chip.chiptool.util.TlvParseUtil
 import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
 import com.jjoe64.graphview.series.DataPoint
@@ -31,6 +30,8 @@ import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
 
 class SensorClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -224,7 +225,7 @@ class SensorClientFragment : Fragment() {
         // TODO : Need to be implement poj-to-tlv
         val value =
           try {
-            TlvParseUtil.decodeInt(tlv)
+            TlvReader(tlv).getInt(AnonymousTag)
           } catch (ex: Exception) {
             showMessage(R.string.sensor_client_read_error_text, "value is null")
             return

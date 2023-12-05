@@ -22,7 +22,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
-@class MTRAsyncCallbackWorkQueue;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,
@@ -46,7 +45,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * and MTRAsyncCallbackQueue.
  */
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID
-                     controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                     controller:(MTRDeviceController *)controller MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The current state of the device.
@@ -76,7 +75,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * If events are always reported with calendar time, then this property will return nil.
  */
 @property (nonatomic, readonly, nullable)
-    NSDate * estimatedStartTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+    NSDate * estimatedStartTime MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+
+/**
+ * The controller this device was created for.  May return nil if that
+ * controller has been shut down.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_NEWLY_AVAILABLE;
+
+/**
+ * The node ID of the node this device corresponds to.
+ */
+@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -86,16 +96,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Read attribute in a designated attribute path
+ * Read attribute in a designated attribute path.  If there is no value available
+ * for the attribute, whether because the device does not implement it or
+ * because the subscription priming read has not yet gotten to this attribute,
+ * nil will be returned.
  *
- * TODO: Need to document that this returns "the system's best guess" of attribute values.
+ * TODO: Need to fully document that this returns "the system's best guess" of attribute values.
  *
- * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler
+ * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler,
+ *         or nil if there is no value.
  */
-- (NSDictionary<NSString *, id> *)readAttributeWithEndpointID:(NSNumber *)endpointID
-                                                    clusterID:(NSNumber *)clusterID
-                                                  attributeID:(NSNumber *)attributeID
-                                                       params:(MTRReadParams * _Nullable)params;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                                              clusterID:(NSNumber *)clusterID
+                                                            attributeID:(NSNumber *)attributeID
+                                                                 params:(MTRReadParams * _Nullable)params;
 
 /**
  * Write to attribute in a designated attribute path
@@ -127,32 +141,56 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 /**
  * Invoke a command with a designated command path
  *
- * @param commandFields   command fields object. The object must be a data-value NSDictionary object
- *                      as described in the MTRDeviceResponseHandler.
- *                      The attribute must be a Structure, i.e.,
- *                      the NSDictionary MTRTypeKey key must have the value MTRStructureValueType.
+ * @param commandFields command fields object. If not nil, the object must be a data-value
+ *                      NSDictionary object as described in the MTRDeviceResponseHandler
+ *                      documentation. The value must be a Structure, i.e., the NSDictionary
+ *                      MTRTypeKey key must have the value MTRStructureValueType.
  *
- * @param expectedValues  array of dictionaries containing the expected values in the same format as
- *                       attribute read completion handler. Requires MTRAttributePathKey values.
- *                       See MTRDeviceResponseHandler definition for dictionary details.
+ *                      If commandFields is nil, it will be treated as a Structure with no fields.
+ *
+ * @param expectedValues The expected values of attributes that will be affected by the command, if
+ *                       any.  If these are provided, the relevant attributes will have the provided
+ *                       values when read until one of the following happens:
+ *
+ *                       1. Something (another invoke or a write) sets different expected values.
+ *                       2. expectedValueInterval elapses without the device reporting the
+ *                          attributes changing their values to the expected values.
+ *                       3. The command invoke fails.
+ *                       4. The device reports some other values for these attributes.
+ *
+ *                       The dictionaries in this array are expected to be response-value
+ *                       dictionaries as documented in the documentation of
+ *                       MTRDeviceResponseHandler, and each one must have an MTRAttributePathKey.
+ *
  *                       The expectedValues and expectedValueInterval arguments need to be both
  *                       nil or both non-nil, or both will be both ignored.
  *
- * TODO: document better the expectedValues is how this command is expected to change attributes when read, and that the next
- * readAttribute will get these values
- *
- * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. If the value is less than 1, both this value and expectedValues will be ignored.
-            If this value is greater than UINT32_MAX, it will be clamped to UINT32_MAX.
- *
- * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
- * to this range.
+ * @param expectedValueInterval  maximum interval in milliseconds during which reads of the
+ *                               attributes that had expected values provided will return the
+ *                               expected values. If the value is less than 1, both this value and
+ *                               expectedValues will be ignored. If this value is greater than
+ *                               UINT32_MAX, it will be clamped to UINT32_MAX.
  *
  * @param completion  response handler will receive either values or error.  A
  *                    path-specific error status from the command invocation
  *                    will result in an error being passed to the completion, so
  *                    values will only be passed in when the command succeeds.
+ *
+ *                    If values are passed, the array length will always be 1 and the single
+ *                    response-value in it will have an MTRCommandPathKey.  If the command
+ *                    response is just a success status, there will be no MTRDataKey.  If the
+ *                    command response has data fields, there will be an MTRDataKey, whose value
+ *                    will be of type MTRStructureValueType and describe the response payload.
  */
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
@@ -162,7 +200,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Open a commissioning window on the device.
@@ -183,7 +221,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Open a commissioning window on the device, using a random setup passcode.
@@ -200,7 +238,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 
@@ -245,7 +283,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * This can be used as a hint that now is a good time to send commands to the
  * device, especially if the device is sleepy and might not be active very often.
  */
-- (void)deviceBecameActive:(MTRDevice *)device API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 

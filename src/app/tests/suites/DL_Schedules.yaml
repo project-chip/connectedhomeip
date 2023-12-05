@@ -58,7 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           value: 10
 
     - label:
@@ -67,7 +67,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUserValue
           value: 10
 
     - label:
@@ -76,14 +76,14 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfYearDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfYearDaySchedulesSupportedPerUser
+          saveAs: NumberOfYearDaySchedulesSupportedPerUserValue
           value: 10
 
     - label: "Get Max number of Holiday schedules and verify default value"
       command: "readAttribute"
       attribute: "NumberOfHolidaySchedulesSupported"
       response:
-          saveAs: NumberOfHolidaySchedulesSupported
+          saveAs: NumberOfHolidaySchedulesSupportedValue
           value: 10
 
     #
@@ -115,7 +115,7 @@ tests:
       arguments:
           values:
               - name: "WeekDayIndex"
-                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
               - name: "DaysMask"
@@ -159,7 +159,7 @@ tests:
               - name: "WeekDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
               - name: "DaysMask"
                 value: 0x01
               - name: "StartHour"
@@ -427,13 +427,13 @@ tests:
       arguments:
           values:
               - name: "WeekDayIndex"
-                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
       response:
           values:
               - name: "WeekDayIndex"
-                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
               - name: "Status"
@@ -463,13 +463,13 @@ tests:
               - name: "WeekDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           values:
               - name: "WeekDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
               - name: "Status"
                 value: 0x85
 
@@ -488,7 +488,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise SetYearDay schedules with invalid parameters
@@ -513,7 +513,7 @@ tests:
       arguments:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
               - name: "LocalStartTime"
@@ -545,7 +545,7 @@ tests:
               - name: "YearDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
               - name: "LocalStartTime"
                 value: 12345
               - name: "LocalEndTime"
@@ -625,13 +625,13 @@ tests:
       arguments:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
       response:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
               - name: "Status"
@@ -661,13 +661,13 @@ tests:
               - name: "YearDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           values:
               - name: "YearDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
               - name: "Status"
                 value: 0x85
 
@@ -686,7 +686,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     #
     # Excercise Set Holiday schedules with invalid parameters
@@ -711,7 +711,7 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported + 1
+                value: NumberOfHolidaySchedulesSupportedValue + 1
               - name: "LocalStartTime"
                 value: 12345
               - name: "LocalEndTime"
@@ -785,11 +785,11 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported + 1
+                value: NumberOfHolidaySchedulesSupportedValue + 1
       response:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported + 1
+                value: NumberOfHolidaySchedulesSupportedValue + 1
               - name: "Status"
                 value: 0x85
 
@@ -925,7 +925,7 @@ tests:
       arguments:
           values:
               - name: "WeekDayIndex"
-                value: NumberOfWeekDaySchedulesSupportedPerUser + 1
+                value: NumberOfWeekDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
       response:
@@ -949,7 +949,7 @@ tests:
               - name: "WeekDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           error: INVALID_COMMAND
 
@@ -1050,7 +1050,7 @@ tests:
       arguments:
           values:
               - name: "YearDayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
               - name: "UserIndex"
                 value: 1
       response:
@@ -1074,7 +1074,7 @@ tests:
               - name: "YearDayIndex"
                 value: 1
               - name: "UserIndex"
-                value: NumberOfTotalUsersSupported + 1
+                value: NumberOfTotalUsersSupportedValue + 1
       response:
           error: INVALID_COMMAND
 
@@ -1171,7 +1171,7 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfYearDaySchedulesSupportedPerUser + 1
+                value: NumberOfYearDaySchedulesSupportedPerUserValue + 1
       response:
           error: INVALID_COMMAND
 
@@ -1799,7 +1799,7 @@ tests:
               - name: "UserIndex"
                 value: 1
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing first user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1816,7 +1816,7 @@ tests:
               - name: "UserIndex"
                 value: 1
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing second user also cleared week day schedules"
       command: "GetWeekDaySchedule"
@@ -1833,7 +1833,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     - label: "Make sure clearing second user also cleared year day schedules"
       command: "GetYearDaySchedule"
@@ -1850,7 +1850,7 @@ tests:
               - name: "UserIndex"
                 value: 2
               - name: "Status"
-                value: 0x01
+                value: 0x8B
 
     # Make sure that all the manipulations did not affect the holiday schedules
     - label: "Make sure that first holiday schedule was not deleted"
@@ -1896,7 +1896,7 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
               - name: "LocalStartTime"
                 value: 1
               - name: "LocalEndTime"
@@ -1909,11 +1909,11 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
       response:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
               - name: "Status"
                 value: 0x0
               - name: "LocalStartTime"
@@ -2027,11 +2027,11 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
       response:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
               - name: "Status"
                 value: 0x0
               - name: "LocalStartTime"
@@ -2129,11 +2129,11 @@ tests:
       arguments:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
       response:
           values:
               - name: "HolidayIndex"
-                value: NumberOfHolidaySchedulesSupported
+                value: NumberOfHolidaySchedulesSupportedValue
               - name: "Status"
                 value: 0x8B
 

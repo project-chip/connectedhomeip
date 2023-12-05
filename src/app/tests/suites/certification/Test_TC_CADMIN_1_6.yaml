@@ -39,6 +39,9 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -60,6 +63,17 @@ tests:
                 value: "y"
 
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1a: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -77,43 +91,25 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
-    #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
-      verification: |
-          On TH_CR1 send the below command
-
-          avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 05EB1D3652D2F544                              _matterc._udp        local
-          +   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
-          =   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
-            hostname = [E45F010F27530000.local]
-            address = [fe80::e65f:1ff:fe0f:2753]
-            port = [5540]
-            txt = ["PI=" "PH=33" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-          =   eth0 IPv6 05EB1D3652D2F544                              _matterc._udp        local
-            hostname = [E45F010F27530000.local]
-            address = [fe80::e65f:1ff:fe0f:2753]
-            port = [5540]
-            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
           values:
-              - name: "message"
-                value: "enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "commissioningMode"
+                value: 1
 
     - label: "Wait for PIXIT.CADMIN.CwDuration + 10"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 190000
+                value: ( PIXIT.CADMIN.CwDuration + 10 ) * 1000
 
     - label: "Step 4: TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -137,9 +133,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -203,9 +200,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -222,7 +220,7 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
       response:
           error: FAILURE
           clusterError: 2

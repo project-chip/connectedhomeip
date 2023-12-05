@@ -26,7 +26,7 @@
 #include "TargetEndpointInfo.h"
 #include "TargetVideoPlayerInfo.h"
 
-constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
+inline constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
 CHIP_ERROR ProcessClusterCommand(int argc, char ** argv);
 

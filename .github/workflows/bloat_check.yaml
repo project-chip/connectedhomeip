@@ -33,11 +33,11 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Report
               run: |
                   scripts/tools/memory/gh_report.py \

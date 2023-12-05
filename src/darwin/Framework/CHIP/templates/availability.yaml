@@ -74,10 +74,10 @@
 
 - release: "Initial release"
   versions:
-      ios: "16.1"
-      macos: "13.0"
-      watchos: "9.1"
-      tvos: "16.1"
+      iOS: "16.1"
+      macOS: "13.0"
+      watchOS: "9.1"
+      tvOS: "16.1"
   introduced:
       clusters:
           - Identify
@@ -3062,13 +3062,24 @@
               - EffectVariantEnum
               - IdentifyTypeEnum
           OnOff:
-              - OnOffDelayedAllOffEffectVariant
-              - OnOffDyingLightEffectVariant
-              - OnOffEffectIdentifier
-              - OnOffStartUpOnOff
+              # DelayedOnOffEffectVariantEnum, DyingLightEffectVariantEnum,
+              # EffectIdentifierEnum, and StartUpOnOffEnum were originally named
+              # OnOffDelayedAllOffEffectVariant,
+              # OnOffDelayedAllOffEffectVariant, OnOffEffectIdentifier, and
+              # OnOffStartUpOnOff, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - DelayedAllOffEffectVariantEnum
+              - DyingLightEffectVariantEnum
+              - EffectIdentifierEnum
+              - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3232,18 +3243,30 @@
               # end, so the name can just change here.
               - LightSensorTypeEnum
           Channel:
-              - ChannelStatusEnum
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
-              - TargetNavigatorStatusEnum
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           MediaPlayback:
-              - MediaPlaybackStatusEnum
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
               - PlaybackStateEnum
           MediaInput:
               - InputTypeEnum
           KeypadInput:
               - CecKeyCode
-              - KeypadInputStatusEnum
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           ContentLauncher:
               - ContentLaunchStatusEnum
               - MetricTypeEnum
@@ -3251,7 +3274,10 @@
           AudioOutput:
               - OutputTypeEnum
           ApplicationLauncher:
-              - ApplicationLauncherStatusEnum
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              - StatusEnum
           ApplicationBasic:
               - ApplicationStatusEnum
           TestCluster:
@@ -3283,24 +3309,35 @@
                   - Display
                   - Actuator
           OnOff:
-              OnOffDelayedAllOffEffectVariant:
+              # DelayedOnOffEffectVariantEnum, DyingLightEffectVariantEnum,
+              # EffectIdentifierEnum, and StartUpOnOffEnum were originally named
+              # OnOffDelayedAllOffEffectVariant,
+              # OnOffDelayedAllOffEffectVariant, OnOffEffectIdentifier, and
+              # OnOffStartUpOnOff, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              DelayedAllOffEffectVariantEnum:
                   - FadeToOffIn0p8Seconds
                   - NoFade
                   - 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
-              OnOffDyingLightEffectVariant:
+              DyingLightEffectVariantEnum:
                   - 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
-              OnOffEffectIdentifier:
+              EffectIdentifierEnum:
                   - DelayedAllOff
                   - DyingLight
-              OnOffStartUpOnOff:
+              StartUpOnOffEnum:
                   - Off
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -3962,19 +3999,28 @@
                   - Photodiode
                   - CMOS
           Channel:
-              ChannelStatusEnum:
+              # StatusEnum was originally named ChannelStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - MultipleMatches
                   - NoMatches
               LineupInfoTypeEnum:
                   - Mso
           TargetNavigator:
-              TargetNavigatorStatusEnum:
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - TargetNotFound
                   - NotAllowed
           MediaPlayback:
-              MediaPlaybackStatusEnum:
+              # StatusEnum was originally named MediaPlaybackStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - InvalidStateForCommand
                   - NotAllowed
@@ -4088,7 +4134,10 @@
                   - F4Yellow
                   - F5
                   - Data
-              KeypadInputStatusEnum:
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
@@ -4123,7 +4172,10 @@
                   - Internal
                   - Other
           ApplicationLauncher:
-              ApplicationLauncherStatusEnum:
+              # StatusEnum was originally named ApplicationLauncherStatusEnum, but we
+              # generate the same API for the names with/without the cluster name at the
+              # beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - AppNotAvailable
                   - SystemBusy
@@ -4708,10 +4760,10 @@
 
 - release: "First dot-release"
   versions:
-      ios: "16.2"
-      macos: "13.1"
-      watchos: "9.2"
-      tvos: "16.2"
+      iOS: "16.2"
+      macOS: "13.1"
+      watchOS: "9.2"
+      tvOS: "16.2"
   introduced:
       attributes:
           TestCluster:
@@ -4764,10 +4816,10 @@
 
 - release: "First major API revamp"
   versions:
-      ios: "16.4"
-      macos: "13.3"
-      watchos: "9.4"
-      tvos: "16.4"
+      iOS: "16.4"
+      macOS: "13.3"
+      watchOS: "9.4"
+      tvOS: "16.4"
   introduced:
       clusters:
           - OTASoftwareUpdateProvider
@@ -6317,6 +6369,13 @@
       commands:
           BasicInformation:
               - MfgSpecificPing
+      command fields:
+          # Cases where the cluster/command got renamed and the fields got
+          # renamed, so the old command name never had the new fields.
+          OtaSoftwareUpdateProvider:
+              QueryImage:
+                  - vendorID
+                  - productID
       enums:
           # DoorLockUserStatus (non-spec) and UserStatusEnum (from the spec) end
           # up with the same enum name (MTRDoorLockUserStatus), so just remove
@@ -6702,10 +6761,10 @@
 
 - release: "First after major API revamp"
   versions:
-      ios: "16.5"
-      macos: "13.4"
-      watchos: "9.5"
-      tvos: "16.5"
+      iOS: "16.5"
+      macOS: "13.4"
+      watchOS: "9.5"
+      tvOS: "16.5"
   introduced:
       ids:
           attributes:
@@ -7010,10 +7069,10 @@
 
 - release: "Fall 2023"
   versions:
-      ios: "17.0"
-      macos: "14.0"
-      watchos: "10.0"
-      tvos: "17.0"
+      iOS: "17.0"
+      macOS: "14.0"
+      watchOS: "10.0"
+      tvOS: "17.0"
   introduced:
       attributes:
           BasicInformation:
@@ -7394,153 +7453,17 @@
           - ICDManagement
           - LaundryWasherMode
           - RefrigeratorAndTemperatureControlledCabinetMode
-          - RVCRunMode
-          - RVCCleanMode
           - DishwasherMode
           - LaundryWasherControls
-          - RVCOperationalState
           - DishwasherAlarm
+          - SampleMEI
       attributes:
-          # EventList generally not stable yet.
           Scenes:
-              - EventList
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
-          OnOff:
-              - EventList
-          OnOffSwitchConfiguration:
-              - EventList
-          LevelControl:
-              - EventList
-          BinaryInputBasic:
-              - EventList
-          PulseWidthModulation:
-              - EventList
-          Descriptor:
-              - EventList
-          Binding:
-              - EventList
-          Identify:
-              - EventList
-          AccessControl:
-              - EventList
-          Actions:
-              - EventList
-          OTASoftwareUpdateProvider:
-              - EventList
-          OTASoftwareUpdateRequestor:
-              - EventList
-          LocalizationConfiguration:
-              - EventList
-          TimeFormatLocalization:
-              - EventList
-          UnitLocalization:
-              - EventList
-          PowerSourceConfiguration:
-              - EventList
-          PowerSource:
-              - EventList
-          GeneralCommissioning:
-              - EventList
-          NetworkCommissioning:
-              - EventList
-          DiagnosticLogs:
-              - EventList
-          GeneralDiagnostics:
-              - EventList
-          SoftwareDiagnostics:
-              - EventList
-          ThreadNetworkDiagnostics:
-              - EventList
-          WiFiNetworkDiagnostics:
-              - EventList
-          EthernetNetworkDiagnostics:
-              - EventList
-          TimeSynchronization:
-              - EventList
-          Switch:
-              - EventList
-          AdministratorCommissioning:
-              - EventList
-          OperationalCredentials:
-              - EventList
-          GroupKeyManagement:
-              - EventList
-          FixedLabel:
-              - EventList
-          UserLabel:
-              - EventList
-          BooleanState:
-              - EventList
-          ModeSelect:
-              - EventList
-          DoorLock:
-              - EventList
-          WindowCovering:
-              - EventList
-          BarrierControl:
-              - EventList
-          PumpConfigurationAndControl:
-              - EventList
           FanControl:
-              - EventList
               # New Fan Control bits not stable yet.
               - AirflowDirection
-          ThermostatUserInterfaceConfiguration:
-              - EventList
-          ColorControl:
-              - EventList
-          BallastConfiguration:
-              - EventList
-          IlluminanceMeasurement:
-              - EventList
-          TemperatureMeasurement:
-              - EventList
-          PressureMeasurement:
-              - EventList
-          Thermostat:
-              - EventList
-          FlowMeasurement:
-              - EventList
-          RelativeHumidityMeasurement:
-              - EventList
-          OccupancySensing:
-              - EventList
-          WakeOnLAN:
-              - EventList
-          Channel:
-              - EventList
-          Groups:
-              - EventList
-          TargetNavigator:
-              - EventList
-          MediaPlayback:
-              - EventList
-          MediaInput:
-              - EventList
-          LowPower:
-              - EventList
-          KeypadInput:
-              - EventList
-          ContentLauncher:
-              - EventList
-          AudioOutput:
-              - EventList
-          ApplicationLauncher:
-              - EventList
-          ApplicationBasic:
-              - EventList
-          AccountLogin:
-              - EventList
-          ElectricalMeasurement:
-              - EventList
-          UnitTesting:
-              - EventList
-          BasicInformation:
-              - EventList
-          BridgedDeviceBasicInformation:
-              - EventList
       commands:
           FanControl:
               # Not stable yet
@@ -7548,6 +7471,10 @@
           DoorLock:
               # Not stable yet
               - UnboltDoor
+          RVCOperationalState:
+              # Disallowed in the spec, but present in our XML?
+              - Start
+              - Stop
       enums:
           FanControl:
               # Not stable yet.
@@ -7591,7 +7518,7 @@
                   - AirflowDirection
       global attributes:
           - EventList
-      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
+      # Once we actually unmark TimeSynchronization as provisional, all these bits except EventList should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:
           attributes:
@@ -7599,6 +7526,15 @@
                   - TimeZoneListMaxSize
                   - DSTOffsetListMaxSize
                   - SupportsDNSResolve
+                  # Because we are special-casing ids for TimeSynchronization
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
+              PulseWidthModulation:
+                  # Because we are special-casing ids for PulseWidthModulation
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
           commands:
               TimeSynchronization:
                   - SetUTCTime
@@ -7615,18 +7551,33 @@
                   - TimeFailure
                   - MissingTrustedTimeSource
 
-- release: "Future"
-  versions: "future"
+- release: "Fall 2023 #2"
+  versions:
+      iOS: "17.1"
+      macOS: "14.1"
+      watchOS: "10.1"
+      tvOS: "17.1"
   introduced:
+      bitmaps:
+          TimeFormatLocalization:
+              - Feature
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+          TimeFormatLocalization:
+              Feature:
+                  - CalendarFormat
+  provisional:
       attributes:
-          PowerSource:
-              - EndpointList
           Descriptor:
               - TagList
       structs:
+          # New things, not quite finalized.
           Descriptor:
               - SemanticTagStruct
       struct fields:
+          # New things, not quite finalized.
           Descriptor:
               SemanticTagStruct:
                   - mfgCode
@@ -7634,20 +7585,27 @@
                   - tag
                   - label
       bitmaps:
+          # CacheAndSync is provisional in the spec.
           GroupKeyManagement:
               - Feature
+          # New things, not quite finalized.
           Descriptor:
               - Feature
       bitmap values:
-          OnOff:
-              Feature:
-                  - DeadFront
-          GroupKeyManagement:
-              Feature:
-                  - CacheAndSync
+          # New things, not quite finalized.
           Descriptor:
               Feature:
                   - TagList
+          # CacheAndSync is provisional in the spec.
+          GroupKeyManagement:
+              Feature:
+                  - CacheAndSync
+          # Scenes are generally provisional for now.
+          Scenes:
+              Feature:
+                  - Explicit
+                  - TableSize
+                  - FabricScenes
   removed:
       clusters:
           # Clusters that really should just not be exposed, even if they're in our XML.
@@ -7657,3 +7615,631 @@
           - ProxyConfiguration
           - ProxyDiscovery
           - ProxyValid
+
+- release: "Fall 2023 #3"
+  versions:
+      iOS: "17.2"
+      macOS: "14.2"
+      watchOS: "10.2"
+      tvOS: "17.2"
+  introduced:
+      command payloads:
+          TimeSynchronization:
+              - SetUTCTime
+      command fields:
+          TimeSynchronization:
+              SetUTCTime:
+                  - utcTime
+                  - granularity
+                  - timeSource
+      enums:
+          OTASoftwareUpdateProvider:
+              - StatusEnum
+              - ApplyUpdateActionEnum
+              - DownloadProtocolEnum
+          OTASoftwareUpdateRequestor:
+              - AnnouncementReasonEnum
+              - UpdateStateEnum
+              - ChangeReasonEnum
+      enum values:
+          OTASoftwareUpdateProvider:
+              StatusEnum:
+                  - UpdateAvailable
+                  - Busy
+                  - NotAvailable
+                  - DownloadProtocolNotSupported
+              ApplyUpdateActionEnum:
+                  - Proceed
+                  - AwaitNextAction
+                  - Discontinue
+              DownloadProtocolEnum:
+                  - BDXSynchronous
+                  - BDXAsynchronous
+                  - HTTPS
+                  - VendorSpecific
+          OTASoftwareUpdateRequestor:
+              AnnouncementReasonEnum:
+                  - SimpleAnnouncement
+                  - UpdateAvailable
+                  - UrgentUpdateAvailable
+              UpdateStateEnum:
+                  - Unknown
+                  - Idle
+                  - Querying
+                  - DelayedOnQuery
+                  - Downloading
+                  - Applying
+                  - DelayedOnApply
+                  - RollingBack
+                  - DelayedOnUserConsent
+              ChangeReasonEnum:
+                  - Unknown
+                  - Success
+                  - Failure
+                  - TimeOut
+                  - DelayByProvider
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  - DelayedOffFastFade
+                  - DelayedOffSlowFade
+              DyingLightEffectVariantEnum:
+                  - DyingLightFadeOff
+              StartUpOnOffEnum:
+                  - Toggle
+      bitmaps:
+          OnOff:
+              - OnOffControlBitmap
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFrontBehavior
+              OnOffControlBitmap:
+                  - AcceptOnlyWhenOn
+  deprecated:
+      enums:
+          OTASoftwareUpdateProvider:
+              - OTAQueryStatus
+              - OTAApplyUpdateAction
+              - OTADownloadProtocol
+          OTASoftwareUpdateRequestor:
+              - OTAAnnouncementReason
+              - OTAUpdateStateEnum
+              - OTAChangeReasonEnum
+      enum values:
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  - FadeToOffIn0p8Seconds
+                  - 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+              DyingLightEffectVariantEnum:
+                  - 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+              StartUpOnOffEnum:
+                  - TogglePreviousOnOff
+      bitmaps:
+          OnOff:
+              - OnOffControl
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+  provisional:
+      bitmaps:
+          BarrierControl:
+              - BarrierControlCapabilities
+              - BarrierControlSafetyStatus
+          BallastConfiguration:
+              # The BallastConfiguration cluster is provisional for now, but not marked that way.
+              - BallastStatusBitmap
+              - LampAlarmModeBitmap
+      attributes:
+          GeneralDiagnostics:
+              # Not in the spec yet.
+              - AverageWearCount
+              # New things, not quite finalized.
+  renames:
+      enums:
+          OTASoftwareUpdateProvider:
+              StatusEnum: OTAQueryStatus
+              ApplyUpdateActionEnum: OTAApplyUpdateAction
+              DownloadProtocolEnum: OTADownloadProtocol
+          OTASoftwareUpdateRequestor:
+              AnnouncementReasonEnum: OTAAnnouncementReason
+              UpdateStateEnum: OTAUpdateStateEnum
+              ChangeReasonEnum: OTAChangeReasonEnum
+      enum values:
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  DelayedOffFastFade: FadeToOffIn0p8Seconds
+                  DelayedOffSlowFade: 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+              DyingLightEffectVariantEnum:
+                  DyingLightFadeOff: 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+              StartUpOnOffEnum:
+                  Toggle: TogglePreviousOnOff
+      bitmaps:
+          OnOff:
+              OnOffControlBitmap: OnOffControl
+      bitmap values:
+          OnOff:
+              Feature:
+                  DeadFrontBehavior: DeadFront
+
+- release: "Future"
+  versions: "future"
+  introduced:
+      clusters:
+          - RVCRunMode
+          - RVCCleanMode
+          - RVCOperationalState
+      attributes:
+          RVCRunMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCCleanMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerSource:
+              - EndpointList
+      commands:
+          RVCRunMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCCleanMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+      command fields:
+          RVCRunMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCCleanMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+      structs:
+          RVCOperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          RVCRunMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          RVCCleanMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+      struct fields:
+          RVCOperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          RVCRunMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          RVCCleanMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+      events:
+          RVCOperationalState:
+              - OperationalError
+              - OperationCompletion
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailureCause
+          RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+      enums:
+          ContentLauncher:
+              - StatusEnum
+          KeypadInput:
+              - CECKeyCodeEnum
+          ThermostatUserInterfaceConfiguration:
+              - KeypadLockoutEnum
+              - ScheduleProgrammingVisibilityEnum
+              - TemperatureDisplayModeEnum
+          RVCOperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          RVCRunMode:
+              - ModeTag
+              - StatusCode
+          RVCCleanMode:
+              - ModeTag
+              - StatusCode
+      enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffHighAuto
+                  - OffHigh
+          KeypadInput:
+              CECKeyCodeEnum:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
+          ThermostatUserInterfaceConfiguration:
+              KeypadLockoutEnum:
+                  - NoLockout
+                  - Lockout1
+                  - Lockout2
+                  - Lockout3
+                  - Lockout4
+                  - Lockout5
+              ScheduleProgrammingVisibilityEnum:
+                  - ScheduleProgrammingPermitted
+                  - ScheduleProgrammingDenied
+              TemperatureDisplayModeEnum:
+                  - Celsius
+                  - Fahrenheit
+          RVCOperationalState:
+              OperationalStateEnum:
+                  - SeekingCharger
+                  - Charging
+                  - Docked
+              ErrorStateEnum:
+                  - FailedToFindChargingDock
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+          RVCRunMode:
+              ModeTag:
+                  - Idle
+                  - Cleaning
+              StatusCode:
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+                  - BatteryLow
+          RVCCleanMode:
+              ModeTag:
+                  - DeepClean
+                  - Vacuum
+                  - Mop
+              StatusCode:
+                  - CleaningInProgress
+      bitmaps:
+          Scenes:
+              - CopyModeBitmap
+          AdministratorCommissioning:
+              - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
+          RVCRunMode:
+              - Feature
+          RVCCleanMode:
+              - Feature
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - SupplyFault
+          Scenes:
+              CopyModeBitmap:
+                  - CopyAllScenes
+          SoftwareDiagnostics:
+              Feature:
+                  - Watermarks
+          AdministratorCommissioning:
+              Feature:
+                  - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
+          RVCRunMode:
+              Feature:
+                  - OnOff
+          RVCCleanMode:
+              Feature:
+                  - OnOff
+  deprecated:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
+          KeypadInput:
+              - CecKeyCode
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffOnAuto
+                  - OffOn
+      bitmaps:
+          Scenes:
+              - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  - WaterMarks
+  provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - MicrowaveOvenControl
+          - MicrowaveOvenMode
+          - DemandResponseLoadControl
+          - BooleanSensorConfiguration
+          - ValveConfigurationAndControl
+          - Timer
+          - OvenMode
+          - LaundryDryerControls
+          - EnergyEVSE
+          - OvenCavityOperationalState
+      attributes:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - SupportedWiFiBands
+              - SupportedThreadFeatures
+              - ThreadVersion
+          WakeOnLAN:
+              # Targeting Spring 2024 Matter release
+              - LinkLocalAddress
+          BasicInformation:
+              # Targeting Spring 2024 Matter release
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
+      commands:
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - TimeSnapshot
+              - TimeSnapshotResponse
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - QueryIdentity
+              - QueryIdentityResponse
+      command fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              AddOrUpdateWiFiNetwork:
+                  - networkIdentity
+                  - clientIdentifier
+                  - possessionNonce
+              NetworkConfigResponse:
+                  - clientIdentity
+                  - possessionSignature
+              QueryIdentity:
+                  - keyIdentifier
+                  - possessionNonce
+              QueryIdentityResponse:
+                  - identity
+                  - possessionSignature
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
+      struct fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              NetworkInfoStruct:
+                  - networkIdentifier
+                  - clientIdentifier
+      bitmaps:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - ThreadCapabilitiesBitmap
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - NameSupportBitmap
+      bitmap values:
+          OnOff:
+              Feature:
+                  # Targeting Spring 2024 Matter release
+                  - OffOnly
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - PerDeviceCredentials
+              WiFiSecurityBitmap:
+                  - WPA3MatterPDC
+  renames:
+      event fields:
+          WiFiNetworkDiagnostics:
+              AssociationFailure:
+                  associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
+          KeypadInput:
+              CECKeyCodeEnum: CecKeyCode
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
+          FanControl:
+              FanModeSequenceEnum:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+              # FanModeSequenceType is the old name of
+              # FanModeSequenceEnum; we need this rename annotation
+              # here so we don't lose the old values under that old
+              # name.
+              FanModeSequenceType:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+      bitmaps:
+          Scenes:
+              CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  SupplyFault: Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable

@@ -83,6 +83,10 @@ enum
     kDeviceOption_TestEventTriggerEnableKey             = 0x101f,
     kCommissionerOption_FabricID                        = 0x1020,
     kTraceTo                                            = 0x1021,
+    kOptionSimulateNoInternalTime                       = 0x1022,
+#if defined(PW_RPC_ENABLED)
+    kOptionRpcServerPort = 0x1023,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -135,6 +139,10 @@ OptionDef sDeviceOptionDefs[] = {
     { "commissioner-fabric-id", kArgumentRequired, kCommissionerOption_FabricID },
 #if ENABLE_TRACING
     { "trace-to", kArgumentRequired, kTraceTo },
+#endif
+    { "simulate-no-internal-time", kNoArgument, kOptionSimulateNoInternalTime },
+#if defined(PW_RPC_ENABLED)
+    { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
 #endif
     {}
 };
@@ -249,6 +257,12 @@ const char * sDeviceOptionHelp =
 #if ENABLE_TRACING
     "  --trace-to <destination>\n"
     "       Trace destinations, comma separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")\n"
+#endif
+    "  --simulate-no-internal-time\n"
+    "       Time cluster does not use internal platform time\n"
+#if defined(PW_RPC_ENABLED)
+    "  --rpc-server-port\n"
+    "       Start RPC server on specified port\n"
 #endif
     "\n";
 
@@ -498,6 +512,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if ENABLE_TRACING
     case kTraceTo:
         LinuxDeviceOptions::GetInstance().traceTo.push_back(aValue);
+        break;
+#endif
+    case kOptionSimulateNoInternalTime:
+        LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime = true;
+        break;
+#if defined(PW_RPC_ENABLED)
+    case kOptionRpcServerPort:
+        LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(atoi(aValue));
         break;
 #endif
     default:

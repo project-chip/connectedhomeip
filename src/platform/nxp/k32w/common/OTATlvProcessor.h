@@ -39,13 +39,14 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
 #define CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
 #define CHIP_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
-#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
 // Descriptor constants
-constexpr size_t kVersionStringSize = 64;
-constexpr size_t kBuildDateSize     = 64;
+inline constexpr size_t kVersionStringSize = 64;
+inline constexpr size_t kBuildDateSize     = 64;
 
-constexpr uint16_t requestedOtaMaxBlockSize = 1024;
+inline constexpr uint16_t requestedOtaMaxBlockSize = 1024;
 
 /**
  * Used alongside RegisterDescriptorCallback to register

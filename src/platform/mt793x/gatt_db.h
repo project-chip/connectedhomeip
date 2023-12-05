@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-//#include "sli_bt_gattdb_def.h"
+// #include "sli_bt_gattdb_def.h"
 
 // extern const sli_bt_gattdb_t gattdb;
 

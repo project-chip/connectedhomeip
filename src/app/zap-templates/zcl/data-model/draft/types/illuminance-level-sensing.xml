@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="LevelStatus" type="ENUM8">
+  <enum name="LevelStatus" type="enum8">
     <item name="OnTarget" value="0x0"/>
     <item name="BelowTarget" value="0x1"/>
     <item name="AboveTarget" value="0x2"/>

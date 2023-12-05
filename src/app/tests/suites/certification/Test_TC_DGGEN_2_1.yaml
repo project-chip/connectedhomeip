@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 88.2.1. [TC-DGGEN-2.1] Attributes [DUT as Server]
 
@@ -22,9 +21,17 @@ config:
     nodeId: 0x12344321
     cluster: "General Diagnostics"
     endpoint: 0
+    timeout: 11500
+
+    TEST_EVENT_ENABLE_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_KEY:
+        type: int64u
+        defaultValue: "0x0000000000000003"
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,53 +39,54 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads NetworkInterfaces structure attribute from DUT."
-      PICS: DGGEN.S.A0000
-      command: "readAttribute"
-      attribute: "NetworkInterfaces"
-      response:
-          constraints:
-              type: list
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
 
-    - label: "Step 3: TH reads a RebootCount attribute value from DUT."
+    - label: "Step 1a: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 1b: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2a: TH reads a RebootCount attribute value from DUT."
       PICS: DGGEN.S.A0001
       command: "readAttribute"
       attribute: "RebootCount"
       response:
+          saveAs: boot_count1
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65535
+              maxValue: 1
 
-    - label: "Step 3a: Reboot target device"
+    - label: "Step 2b: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Step 3b: Reboot target device(DUT)"
+    - label: "Step 2b: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
-          values:
-              - name: "message"
-                value: "Please reboot the DUT and enter 'y' after DUT starts"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 3c: Reboot target device"
-      PICS: PICS_SDK_CI_ONLY
-      cluster: "SystemCommands"
-      command: "Reboot"
-
-    - label: "Step 3d: Reboot target device(DUT)"
-      verification: |
-          Did the DUT successfully reboot?
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -95,36 +103,123 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 4: DUT reboots and TH reads a UpTime attribute value of DUT
-          since some arbitrary start time of DUT rebooting."
-      PICS: DGGEN.S.A0002
+          "Step 2b: TH reads a RebootCount attribute value from DUT. Verify that
+          boot_count2 is greater than boot_count1."
+      PICS: DGGEN.S.A0001
+      command: "readAttribute"
+      attribute: "RebootCount"
+      response:
+          constraints:
+              type: int16u
+              minValue: boot_count1 + 1
+              maxValue: 65535
+
+    #Not possible in YAML. what extact values to be checked
+    - label: "Step 3: TH reads NetworkInterfaces structure attribute from DUT."
+      verification: |
+          ./chip-tool generaldiagnostics read network-interfaces 1 0
+          On TH(chip-tool), Verify that The NetworkInterfaces attribute SHALL be a list of NetworkInterface structs, i.e The read data type( NetworkInterface struct) must match the value listed below
+              • Name(interface name)
+              • IsOperational (indicates the node is operational in the fabric)
+              • OffPremiseServicesReachableIPv4(Ability to reach off-premise services it uses by utilizing IPv4, if not NULL)
+              • OffPremiseServicesReachableIPv6(Ability to reach off-premise services it uses by utilizing IPv6, if not NULL)
+              • HardwareAddress(MAC-layer address for a 802.3 or IEEE 802.11-2020 network interface, or 802.15.4)
+              •  IPv4Addresses and IPv6Addresses (a list of the unicast IPv6 addresses that are GUA and ULA)
+              • Type(Interface types).
+
+          Below is the example value which is observed in the RPI platform the value may be differ based on the dut implementation.
+
+
+          [1685950177.429619][36103:36105] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0000 DataVersion: 234312508
+          [1685950177.429734][36103:36105] CHIP:TOO:   NetworkInterfaces: 3 entries
+          [1685950177.430061][36103:36105] CHIP:TOO:     [1]: {
+          [1685950177.430075][36103:36105] CHIP:TOO:       Name: docker0
+          [1685950177.430084][36103:36105] CHIP:TOO:       IsOperational: FALSE
+          [1685950177.430105][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1685950177.430114][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1685950177.430124][36103:36105] CHIP:TOO:       HardwareAddress: 024238D9D191
+          [1685950177.430145][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1685950177.430158][36103:36105] CHIP:TOO:         [1]: AC110001
+          [1685950177.430168][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1685950177.430177][36103:36105] CHIP:TOO:         [1]:
+          [1685950177.430186][36103:36105] CHIP:TOO:       Type: 0
+          [1685950177.430194][36103:36105] CHIP:TOO:      }
+          [1685950177.430221][36103:36105] CHIP:TOO:     [2]: {
+          [1685950177.430229][36103:36105] CHIP:TOO:       Name: wlp0s20f3
+          [1685950177.430236][36103:36105] CHIP:TOO:       IsOperational: TRUE
+          [1685950177.430244][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1685950177.430251][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1685950177.430260][36103:36105] CHIP:TOO:       HardwareAddress: 8C1D96786A13
+          [1685950177.430269][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1685950177.430280][36103:36105] CHIP:TOO:         [1]: C0A80065
+          [1685950177.430290][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1685950177.430300][36103:36105] CHIP:TOO:         [1]: FE80000000000000E9F62C082794357D
+          [1685950177.430309][36103:36105] CHIP:TOO:       Type: 1
+          [1685950177.430316][36103:36105] CHIP:TOO:      }
+          [1685950177.430337][36103:36105] CHIP:TOO:     [3]: {
+          [1685950177.430345][36103:36105] CHIP:TOO:       Name: lo
+          [1685950177.430352][36103:36105] CHIP:TOO:       IsOperational: TRUE
+          [1685950177.430360][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv4: null
+          [1685950177.430368][36103:36105] CHIP:TOO:       OffPremiseServicesReachableIPv6: null
+          [1685950177.430376][36103:36105] CHIP:TOO:       HardwareAddress: 000000000000
+          [1685950177.430385][36103:36105] CHIP:TOO:       IPv4Addresses: 1 entries
+          [1685950177.430395][36103:36105] CHIP:TOO:         [1]: 7F000001
+          [1685950177.430405][36103:36105] CHIP:TOO:       IPv6Addresses: 1 entries
+          [1685950177.430415][36103:36105] CHIP:TOO:         [1]: 00000000000000000000000000000001
+          [1685950177.430424][36103:36105] CHIP:TOO:       Type: 0
+          [1685950177.430431][36103:36105] CHIP:TOO:      }
+          [1685950177.430535][36103:36105] CHIP:EM: <<< [E:29275i S:57421 M:236457298 (Ack:61012080)] (S) Msg TX to 1:0000000000000001 [6ADE] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1685950177.430558][36103:36105] CHIP:IN: (S) Sending msg 236457298 on secure session with LSID: 57421
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && DGGEN.S.A0000
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
+          in uptime1"
       command: "readAttribute"
       attribute: "UpTime"
       response:
+          saveAs: uptime1
           constraints:
               type: int64u
 
-    - label: "TH reads a TotalOperationalHours attribute value from DUT."
-      PICS: DGGEN.S.A0003
-      command: "readAttribute"
-      attribute: "TotalOperationalHours"
-      response:
-          constraints:
-              type: int32u
-              minValue: 0x0
-              maxValue: 0xFFFFFFFE
+    - label: "Wait 10 seconds"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
 
-    - label: "Step 6a: Reboot target device"
+    - label:
+          "Step 4b: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime2. Verify that uptime2 is greater than uptime1."
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime2
+          constraints:
+              type: int64u
+              minValue: uptime1
+
+    - label: "Step 4c: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
       command: "Reboot"
 
-    - label: "Reboot target device(DUT)"
+    - label: "Step 4c:Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
       verification: |
           Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -140,7 +235,44 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 6: TH reads BootReason attribute value from DUT."
+    - label:
+          "Step 4c: TH reads a Uptime attribute value of DUT. Store the value in
+          uptime3. Verify that uptime3 is lesser than uptime2."
+      command: "readAttribute"
+      attribute: "UpTime"
+      response:
+          saveAs: uptime3
+          constraints:
+              type: int64u
+              maxValue: uptime2
+
+    - label: "Step 5a: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 5a: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
+      verification: |
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 5b: TH reads BootReason attribute value from DUT."
       PICS: DGGEN.S.A0004
       command: "readAttribute"
       attribute: "BootReason"
@@ -149,184 +281,229 @@ tests:
               minValue: 0
               maxValue: 6
 
-    #issue #13029
-    - label: "Step 7: TH reads ActiveHardwareFaults attribute value from DUT."
+    - label: "Step 6a: TH subscribes to ActiveHardwareFaults attribute from DUT"
+      PICS: DGGEN.S.A0005
+      command: "subscribeAttribute"
+      attribute: "ActiveHardwareFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 6b: TH reads ActiveHardwareFaults attribute value from DUT."
+      PICS: DGGEN.S.A0005
+      command: "readAttribute"
+      attribute: "ActiveHardwareFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 11
+
+    - label: "Step 7a: TH subscribes to ActiveRadioFaults attribute from DUT"
+      PICS: DGGEN.S.A0006
+      command: "subscribeAttribute"
+      attribute: "ActiveRadioFaults"
+      minInterval: 10
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 7b: TH reads ActiveRadioFaults attribute value from DUT."
+      PICS: DGGEN.S.A0006
+      command: "readAttribute"
+      attribute: "ActiveRadioFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 7
+
+    - label: "Step 8a: TH subscribes to ActiveNetworkFaults attribute from DUT"
+      PICS: DGGEN.S.A0007
+      command: "subscribeAttribute"
+      attribute: "ActiveNetworkFaults"
+      minInterval: 100
+      maxInterval: 1000
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 8b: TH reads ActiveNetworkFaults attribute value from DUT."
+      PICS: DGGEN.S.A0007
+      command: "readAttribute"
+      attribute: "ActiveNetworkFaults"
+      response:
+          constraints:
+              type: list
+              minLength: 0
+              maxLength: 4
+
+    - label: "Step 9a: TH reads TestEventTriggersEnabled attribute value"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          saveAs: TestEventTriggersEnabledValue
+
+    - label:
+          "Step 9b: Verify TestEventTriggersEnabled attribute value is set to
+          True"
+      PICS: DGGEN.S.A0008
+      cluster: "EqualityCommands"
+      command: "BooleanEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: true
+              - name: "Value2"
+                value: TestEventTriggersEnabledValue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 9c: When configured TRUE, Node has been configured with one or
+          more test event triggers by virtue of the internally programmed non
+          zero EnableKey value"
+      runIf: IsExpectedValue
+      PICS: DGGEN.S.C00.Rsp
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_ENABLE_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_KEY
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Store the value in operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          saveAs: operational_hours1
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFE
+
+    - label: "Wait for 2 hours and 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 7500000
+
+    - label:
+          "Step 10a: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that operational_hours2 is greater than operational_hours1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          constraints:
+              type: int32u
+              minValue: operational_hours1
+              maxValue: 0xFFFFFFFE
+
+    - label: "Step 10b: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Step 10b: Reset Devices to factory defaults"
+      PICS: PICS_USER_PROMPT
       verification: |
-          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
-
-          ./chip-tool generaldiagnostics read active-hardware-faults 1 0
-
-          On TH(chip-tool), Verify that ActiveHardwareFaults attribute the attribute response should be empty. But when a hardware fault occurs, the return attribute value must match the value listed in the HardwareFault ENUM table 11.11.6.1.
-          [1654682785.894724][33006:33011] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 804003636
-          [1654682785.894846][33006:33011] CHIP:TOO:   ActiveHardwareFaults: 0 entries
-          [1654682785.894952][33006:33011] CHIP:EM: Sending Standalone Ack for MessageCounter:30803984 on exchange 62441i
-
-
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-
-          generaldiagnostics subscribe  active-hardware-faults 0 100 1 0
-
-          Verify in TH(chip-tool) log
-
-          [1657539676.878976][10068:10073] CHIP:DMG: ReportDataMessage =
-          [1657539676.879047][10068:10073] CHIP:DMG: {
-          [1657539676.879109][10068:10073] CHIP:DMG:         SubscriptionId = 0xd985fd71,
-          [1657539676.879215][10068:10073] CHIP:DMG:         AttributeReportIBs =
-          [1657539676.879302][10068:10073] CHIP:DMG:         [
-          [1657539676.879366][10068:10073] CHIP:DMG:                 AttributeReportIB =
-          [1657539676.879490][10068:10073] CHIP:DMG:                 {
-          [1657539676.879588][10068:10073] CHIP:DMG:                         AttributeDataIB =
-          [1657539676.879833][10068:10073] CHIP:DMG:                         {
-          [1657539676.879952][10068:10073] CHIP:DMG:                                 DataVersion = 0x3dc6b482,
-          [1657539676.880061][10068:10073] CHIP:DMG:                                 AttributePathIB =
-          [1657539676.880175][10068:10073] CHIP:DMG:                                 {
-          [1657539676.880291][10068:10073] CHIP:DMG:                                         Endpoint = 0x0,
-          [1657539676.880410][10068:10073] CHIP:DMG:                                         Cluster = 0x33,
-          [1657539676.880528][10068:10073] CHIP:DMG:                                         Attribute = 0x0000_0005,
-          [1657539676.880639][10068:10073] CHIP:DMG:                                 }
-          [1657539676.880758][10068:10073] CHIP:DMG:
-          [1657539676.880870][10068:10073] CHIP:DMG:                                 Data = [
-          [1657539676.880981][10068:10073] CHIP:DMG:
-          [1657539676.881097][10068:10073] CHIP:DMG:                                 ],
-          [1657539676.881205][10068:10073] CHIP:DMG:                         },
-          [1657539676.881321][10068:10073] CHIP:DMG:
-          [1657539676.881415][10068:10073] CHIP:DMG:                 },
-          [1657539676.881523][10068:10073] CHIP:DMG:
-          [1657539676.881589][10068:10073] CHIP:DMG:         ],
-          [1657539676.881667][10068:10073] CHIP:DMG:
-          [1657539676.881728][10068:10073] CHIP:DMG:         InteractionModelRevision = 1
-          [1657539676.881816][10068:10073] CHIP:DMG: }
-          [1657539676.882117][10068:10073] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0005 DataVersion: 1036432514
-          [1657539676.882225][10068:10073] CHIP:TOO:   ActiveHardwareFaults: 0 entries
-          [1657539676.882319][10068:10073] CHIP:DMG: MoveToState ReadClient[0xffff70009ef0]: Moving to [AwaitingSu]
-          [1657539676.882445][10068:10073] CHIP:EM: Piggybacking Ack for MessageCounter:144228832 on exchange: 14723i
-          [1657539676.882594][10068:10073] CHIP:IN: Prepared secure message 0xffff700046b8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 14723i with MessageCounter:6634271.
-          [1657539676.882686][10068:10073] CHIP:IN: Sending encrypted msg 0xffff700046b8 with MessageCounter:6634271 to 0x0000000000000001 (1) at monotonic time: 00000000016FEF43 msec
-          [1657539676.884825][10068:10073] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:144228833 on exchange 14723i
-          [1657539676.884920][10068:10073] CHIP:EM: Found matching exchange: 14723i, Delegate: 0xffff70009ef0
-          [1657539676.885002][10068:10073] CHIP:EM: Rxd Ack; Removing MessageCounter:6634271 from Retrans Table on exchange 14723i
-          [1657539676.885062][10068:10073] CHIP:EM: Removed CHIP MessageCounter:6634271 from RetransTable on exchange 14723i
-          [1657539676.885171][10068:10073] CHIP:DMG: SubscribeResponseMessage =
-          [1657539676.885237][10068:10073] CHIP:DMG: {
-          [1657539676.885298][10068:10073] CHIP:DMG:         SubscriptionId = 0xd985fd71,
-          [1657539676.885407][10068:10073] CHIP:DMG:         MaxInterval = 0x64,
-          [1657539676.885477][10068:10073] CHIP:DMG:         InteractionModelRevision = 1
-          [1657539676.885549][10068:10073] CHIP:DMG: }
-          [1657539676.885617][10068:10073] CHIP:DMG: Subscription established with SubscriptionID = 0xd985fd71 MinInterval = 20s MaxInterval = 100s Peer = 01:0000000000000001
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGGEN.S.A0005
       arguments:
           values:
               - name: "message"
-                value: "Please enter 'y' for success"
+                value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 8: TH reads ActiveRadioFaults attribute value from DUT."
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 10b: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 0."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 0
+          constraints:
+              type: int32u
+
+    - label: "Wait for 1 hour 5 minutes."
+      PICS: DGGEN.S.A0003
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3900000
+
+    - label:
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 1
+          constraints:
+              type: int32u
+
+    - label: "Step 10d: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 10d: Reboot target device(DUT)"
+      PICS: PICS_USER_PROMPT
       verification: |
-          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
-
-          ./chip-tool generaldiagnostics read active-radio-faults 1 0
-          On TH(chip-tool), Verify that ActiveRadioFaults attribute response should be empty. But when a radio fault occurs, the return attribute value must match the value listed in the RadioFault ENUM table. 11.11.6.2.
-
-          [1654682886.109092][33026:33031] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
-          [1654682886.109197][33026:33031] CHIP:TOO:   ActiveRadioFaults: 0 entries
-          [1654682886.109321][33026:33031] CHIP:EM: Sending Standalone Ack for MessageCounter:174138703 on exchange 49820i
-
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-          generaldiagnostics subscribe active-radio-faults 100 1000 1 0
-
-          Verify in TH(chip-tool) Log
-          [1654682933.931539][33037:33042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0006 DataVersion: 804003636
-          [1654682933.931617][33037:33042] CHIP:TOO:   ActiveRadioFaults: 0 entries
-          [1654682933.931659][33037:33042] CHIP:DMG: MoveToState ReadClient[0xffff7c0042e0]: Moving to [AwaitingSu]
-          [1654682933.931711][33037:33042] CHIP:EM: Piggybacking Ack for MessageCounter:4435222 on exchange: 32960i
-          [1654682933.931773][33037:33042] CHIP:IN: Prepared secure message 0xaaab093c04b8 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 32960i with MessageCounter:3568188.
-          [1654682933.931813][33037:33042] CHIP:IN: Sending encrypted msg 0xaaab093c04b8 with MessageCounter:3568188 to 0x0000000000000001 (1) at monotonic time: 0000000000CD8AFA msec
-          [1654682933.933165][33037:33042] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:4435223 on exchange 32960i
-          [1654682933.933260][33037:33042] CHIP:EM: Found matching exchange: 32960i, Delegate: 0xffff7c0042e0
-          [1654682933.933312][33037:33042] CHIP:EM: Rxd Ack; Removing MessageCounter:3568188 from Retrans Table on exchange 32960i
-          [1654682933.933345][33037:33042] CHIP:EM: Removed CHIP MessageCounter:3568188 from RetransTable on exchange 32960i
-          [1654682933.933408][33037:33042] CHIP:DMG: SubscribeResponseMessage =
-          [1654682933.933445][33037:33042] CHIP:DMG: {
-          [1654682933.933478][33037:33042] CHIP:DMG:         SubscriptionId = 0xc5357d7e,
-          [1654682933.933513][33037:33042] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1654682933.933548][33037:33042] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1654682933.933583][33037:33042] CHIP:DMG:         InteractionModelRevision = 1
-          [1654682933.933615][33037:33042] CHIP:DMG: }
-          [1654682933.933655][33037:33042] CHIP:DMG: Subscription established with SubscriptionID = 0xc5357d7e MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
+          Did the DUT successfully reboot?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGGEN.S.A0006
       arguments:
           values:
               - name: "message"
-                value: "Please enter 'y' for success"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 9: TH reads ActiveNetworkFaults attribute value from DUT."
-      verification: |
-          This is optional attribute implemented in RPI, may vary based on DUT implementation on TH(chip-tool) log
-
-          ./chip-tool generaldiagnostics read active-network-faults 1 0
-
-          On TH(chip-tool), Verify that ActiveNetworkFaults attribute value attribute response should be empty. But when a network fault occurs, the return attribute value must match the value listed in the NetworkFault ENUM table 11.11.6.3
-
-          [1654683004.591353][33044:33049] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
-          [1654683004.591438][33044:33049] CHIP:TOO:   ActiveNetworkFaults: 0 entries
-          [1654683004.591526][33044:33049] CHIP:EM: Sending Standalone Ack for MessageCounter:113863817 on exchange 44900i
-
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
-          generaldiagnostics subscribe active-network-faults 100 1000 1 0
-
-          Verify on TH(chip-tool)
-          [1654683075.593822][33054:33059] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0007 DataVersion: 804003636
-          [1654683075.593966][33054:33059] CHIP:TOO:   ActiveNetworkFaults: 0 entries
-          [1654683075.594038][33054:33059] CHIP:DMG: MoveToState ReadClient[0xffff80004340]: Moving to [AwaitingSu]
-          [1654683075.594125][33054:33059] CHIP:EM: Piggybacking Ack for MessageCounter:222691244 on exchange: 29895i
-          [1654683075.594231][33054:33059] CHIP:IN: Prepared secure message 0xaaaadcf2ae78 to 0x0000000000000001 (1)  of type 0x1 and protocolId (0, 1) on exchange 29895i with MessageCounter:9439431.
-          [1654683075.594299][33054:33059] CHIP:IN: Sending encrypted msg 0xaaaadcf2ae78 with MessageCounter:9439431 to 0x0000000000000001 (1) at monotonic time: 0000000000CFB459 msec
-          [1654683075.595402][33054:33059] CHIP:EM: Received message of type 0x4 with protocolId (0, 1) and MessageCounter:222691245 on exchange 29895i
-          [1654683075.595461][33054:33059] CHIP:EM: Found matching exchange: 29895i, Delegate: 0xffff80004340
-          [1654683075.595522][33054:33059] CHIP:EM: Rxd Ack; Removing MessageCounter:9439431 from Retrans Table on exchange 29895i
-          [1654683075.595568][33054:33059] CHIP:EM: Removed CHIP MessageCounter:9439431 from RetransTable on exchange 29895i
-          [1654683075.595649][33054:33059] CHIP:DMG: SubscribeResponseMessage =
-          [1654683075.595700][33054:33059] CHIP:DMG: {
-          [1654683075.595743][33054:33059] CHIP:DMG:         SubscriptionId = 0x41507073,
-          [1654683075.595792][33054:33059] CHIP:DMG:         MinIntervalFloorSeconds = 0x64,
-          [1654683075.595840][33054:33059] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x3e8,
-          [1654683075.595886][33054:33059] CHIP:DMG:         InteractionModelRevision = 1
-          [1654683075.595929][33054:33059] CHIP:DMG: }
-          [1654683075.595984][33054:33059] CHIP:DMG: Subscription established with SubscriptionID = 0x41507073 MinInterval = 100s MaxInterval = 1000s Peer = 01:0000000000000001
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGGEN.S.A0007
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
       arguments:
           values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "nodeId"
+                value: nodeId
 
-    - label: "Step 10: TH reads TestEventTriggersEnabled attribute value"
-      verification: |
-          ./chip-tool generaldiagnostics read   test-event-triggers-enabled  1 0
-          On TH(chip-tool), Verify that TestEventTriggersEnabled attribute value should be data type bool on TH(chip-tool) log
-
-          [1655188892.957794][2868:2873] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0008 DataVersion: 3562689442
-          [1655188892.957869][2868:2873] CHIP:TOO:   TestEventTriggersEnabled: FALSE
-          [1655188892.957999][2868:2873] CHIP:EM: Sending Standalone Ack for MessageCounter:133140817 on exchange 23176i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGGEN.S.A0008
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+    - label:
+          "Step 10c: TH reads the TotalOperationalHours attribute from the DUT.
+          Verify that the value of 'TotalOperationalHours' is 1."
+      PICS: DGGEN.S.A0003
+      command: "readAttribute"
+      attribute: "TotalOperationalHours"
+      response:
+          value: 1
+          constraints:
+              type: int32u

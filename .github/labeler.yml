@@ -84,6 +84,8 @@ tools:
 #  Tests
 ############################################################
 tests:
+    - src/python_testing/*
+    - src/python_testing/**/*
     - src/app/tests/*
     - src/app/tests/**/*
 
@@ -123,6 +125,12 @@ core:
 protocols:
     - src/lib/protocols/*
     - src/lib/protocols/**/*
+    - src/protocols/*
+    - src/protocols/**/*
+
+messaging:
+    - src/messaging/*
+    - src/messaging/**/*
 
 shell:
     - src/lib/shell/*

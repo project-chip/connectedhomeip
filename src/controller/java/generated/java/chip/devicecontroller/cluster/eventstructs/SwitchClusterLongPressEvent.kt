@@ -17,21 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class SwitchClusterLongPressEvent(val newPosition: Int) {
+class SwitchClusterLongPressEvent(val newPosition: UInt) {
   override fun toString(): String = buildString {
     append("SwitchClusterLongPressEvent {\n")
     append("\tnewPosition : $newPosition\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NEW_POSITION), newPosition)
       endStructure()
     }
@@ -40,9 +40,9 @@ class SwitchClusterLongPressEvent(val newPosition: Int) {
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterLongPressEvent {
-      tlvReader.enterStructure(tag)
-      val newPosition = tlvReader.getInt(ContextSpecificTag(TAG_NEW_POSITION))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterLongPressEvent {
+      tlvReader.enterStructure(tlvTag)
+      val newPosition = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_POSITION))
 
       tlvReader.exitContainer()
 

@@ -29,7 +29,7 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/Beken/BekenConfig.h>
 #include <platform/Beken/NetworkCommissioningDriver.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>

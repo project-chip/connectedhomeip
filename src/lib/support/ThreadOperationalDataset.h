@@ -29,16 +29,16 @@ namespace Thread {
 
 class ThreadTLV;
 
-constexpr size_t kChannel_NotSpecified = UINT8_MAX;
-constexpr size_t kPANId_NotSpecified   = UINT16_MAX;
+inline constexpr size_t kChannel_NotSpecified = UINT8_MAX;
+inline constexpr size_t kPANId_NotSpecified   = UINT16_MAX;
 
-constexpr size_t kSizeOperationalDataset = 254;
+inline constexpr size_t kSizeOperationalDataset = 254;
 
-constexpr size_t kSizeNetworkName     = 16;
-constexpr size_t kSizeExtendedPanId   = 8;
-constexpr size_t kSizeMasterKey       = 16;
-constexpr size_t kSizeMeshLocalPrefix = 8;
-constexpr size_t kSizePSKc            = 16;
+inline constexpr size_t kSizeNetworkName     = 16;
+inline constexpr size_t kSizeExtendedPanId   = 8;
+inline constexpr size_t kSizeMasterKey       = 16;
+inline constexpr size_t kSizeMeshLocalPrefix = 8;
+inline constexpr size_t kSizePSKc            = 16;
 
 /**
  * This class provides methods to manipulate Thread operational dataset.

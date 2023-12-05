@@ -75,8 +75,8 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & messageToSig
     Crypto::P256Keypair keypair;
     Crypto::P256SerializedKeypair serializedKeypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     /* Get private key of DAC certificate from reserved section */

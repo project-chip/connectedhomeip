@@ -53,10 +53,10 @@ namespace Inet {
 class DLL_EXPORT UDPEndPoint : public EndPointBasis<UDPEndPoint>
 {
 public:
-    UDPEndPoint(const UDPEndPoint &) = delete;
-    UDPEndPoint(UDPEndPoint &&)      = delete;
+    UDPEndPoint(const UDPEndPoint &)             = delete;
+    UDPEndPoint(UDPEndPoint &&)                  = delete;
     UDPEndPoint & operator=(const UDPEndPoint &) = delete;
-    UDPEndPoint & operator=(UDPEndPoint &&) = delete;
+    UDPEndPoint & operator=(UDPEndPoint &&)      = delete;
 
     /**
      * Type of message text reception event handling function.
@@ -301,7 +301,7 @@ protected:
 template <>
 struct EndPointProperties<UDPEndPoint>
 {
-    static constexpr const char * kName   = "UDP";
+    static constexpr char kName[]         = "UDP";
     static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_UDP_ENDPOINTS;
     static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumUDPEps;
 };

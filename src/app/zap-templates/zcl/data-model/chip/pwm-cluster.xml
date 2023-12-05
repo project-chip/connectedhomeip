@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" />
 
-    <cluster>
+    <cluster apiMaturity="provisional">
         <domain>General</domain>
         <name>Pulse Width Modulation</name>
         <code>0x001c</code>

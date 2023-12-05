@@ -14,8 +14,10 @@
 #    limitations under the License.
 
 import copy
+import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Optional
 
 from . import fixes
 from .constraints import get_constraints, is_typed_constraint
@@ -189,6 +191,8 @@ class _TestStepWithPlaceholders:
         self.group_id = _value_or_config(test, 'groupId', config)
         self.cluster = _value_or_config(test, 'cluster', config)
         self.command = _value_or_config(test, 'command', config)
+        if not self.command:
+            self.command = _value_or_config(test, 'wait', config)
         self.attribute = _value_or_none(test, 'attribute')
         self.event = _value_or_none(test, 'event')
         self.endpoint = _value_or_config(test, 'endpoint', config)
@@ -199,6 +203,7 @@ class _TestStepWithPlaceholders:
         self.fabric_filtered = _value_or_none(test, 'fabricFiltered')
         self.min_interval = _value_or_none(test, 'minInterval')
         self.max_interval = _value_or_none(test, 'maxInterval')
+        self.keep_subscriptions = _value_or_none(test, 'keepSubscriptions')
         self.timed_interaction_timeout_ms = _value_or_none(
             test, 'timedInteractionTimeoutMs')
         self.timeout = _value_or_none(test, 'timeout')
@@ -486,7 +491,7 @@ class _TestStepWithPlaceholders:
                         # the the value type for the target field.
                         if is_typed_constraint(constraint):
                             value[key][constraint] = self._update_value_with_definition(
-                                constraint_value, mapping_type)
+                                constraint_value, mapping)
                 else:
                     # This key, value pair does not rely on cluster specifications.
                     pass
@@ -588,6 +593,10 @@ class TestStep:
                 self._test.event)
             self._test.endpoint = self._config_variable_substitution(
                 self._test.endpoint)
+            self._test.group_id = self._config_variable_substitution(
+                self._test.group_id)
+            self._test.node_id = self._config_variable_substitution(
+                self._test.node_id)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
@@ -660,6 +669,10 @@ class TestStep:
         return self._test.max_interval
 
     @property
+    def keep_subscriptions(self):
+        return self._test.keep_subscriptions
+
+    @property
     def timed_interaction_timeout_ms(self):
         return self._test.timed_interaction_timeout_ms
 
@@ -683,9 +696,35 @@ class TestStep:
     def event_number(self):
         return self._test.event_number
 
+    @event_number.setter
+    def event_number(self, value):
+        self._test.event_number = value
+
     @property
     def pics(self):
         return self._test.pics
+
+    def _get_last_event_number(self, responses) -> Optional[int]:
+        if not self.is_event:
+            return None
+
+        # find the largest event number in all responses
+        # This iterates over everything (not just last element) since some commands like
+        # `chip-tool any read-all` may return multiple replies
+        event_number = None
+
+        for response in responses:
+            if not isinstance(response, dict):
+                continue
+            received_event_number = response.get('eventNumber')
+
+            if not isinstance(received_event_number, int):
+                continue
+
+            if (event_number is None) or (event_number < received_event_number):
+                event_number = received_event_number
+
+        return event_number
 
     def post_process_response(self, received_responses):
         result = PostProcessResponseResult()
@@ -698,6 +737,18 @@ class TestStep:
 
         if self._test.save_response_as:
             self._runtime_config_variable_storage[self._test.save_response_as] = received_responses
+
+        if self.is_event:
+            last_event_number = self._get_last_event_number(received_responses)
+            if last_event_number:
+                if 'LastReceivedEventNumber' in self._runtime_config_variable_storage:
+                    if self._runtime_config_variable_storage['LastReceivedEventNumber'] > last_event_number:
+                        logging.warning(
+                            "Received an older event than expected: received %r < %r",
+                            last_event_number,
+                            self._runtime_config_variable_storage['LastReceivedEventNumber']
+                        )
+                self._runtime_config_variable_storage['LastReceivedEventNumber'] = last_event_number
 
         if self.wait_for is not None:
             self._response_cluster_wait_validation(received_responses, result)
@@ -777,8 +828,12 @@ class TestStep:
             expected_wait_type
         ]
 
+        wait_for_str = received_response.get('wait_for')
+        if not wait_for_str:
+            wait_for_str = received_response.get('command')
+
         received_values = [
-            received_response.get('wait_for'),
+            wait_for_str,
             received_response.get('endpoint'),
             received_response.get('cluster'),
             received_wait_type
@@ -867,7 +922,7 @@ class TestStep:
     def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
-        error_failure = 'The test expectation "{name} == {value}" is false'
+        error_failure = 'The test expectation "{name} ({actual}) == {value}" is false'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
         error_value_does_not_exist = 'The test expects a value but it does not exists in the response."'
 
@@ -898,7 +953,7 @@ class TestStep:
                     name=expected_name, value=expected_value))
             else:
                 result.error(check_type, error_failure.format(
-                    name=expected_name, value=expected_value))
+                    name=expected_name, actual=received_value, value=expected_value))
 
     def _response_value_validation(self, expected_value, received_value):
         if isinstance(expected_value, list):
@@ -1029,9 +1084,8 @@ class TestStep:
                     variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
-                    if variable_info is not None:
-                        tokens[idx] = variable_info
-                        substitution_occured = True
+                    tokens[idx] = variable_info
+                    substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]
@@ -1146,6 +1200,10 @@ class TestParser:
         self.__apply_legacy_config_if_missing(config, 'endpoint', '')
         self.__apply_legacy_config_if_missing(config, 'cluster', '')
         self.__apply_legacy_config_if_missing(config, 'timeout', 90)
+
+        # These values are default runtime values (non-legacy)
+        self.__apply_legacy_config_if_missing(
+            config, 'LastReceivedEventNumber', 0)
 
     def __apply_legacy_config_if_missing(self, config, key, value):
         if key not in config:

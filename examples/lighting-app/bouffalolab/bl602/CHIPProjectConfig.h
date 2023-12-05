@@ -27,16 +27,6 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default Chip device id and credentials if no device id
- * is found in Chip NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -123,12 +113,4 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 128
-
 #define CHIP_BLE_DEVICE_NAME "MatterLight"
-
-/** Please contact Bouffalo Lab for how to use factory data provider */
-// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE 1
-// uncomment out the following macro to use factory test data
-// when CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE sets to 1
-// #define CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST

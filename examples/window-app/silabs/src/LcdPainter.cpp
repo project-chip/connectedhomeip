@@ -141,12 +141,12 @@ uint8_t IconPainter::Color(uint32_t x, uint32_t y)
 
 uint8_t VerticalShadePainter::Color(uint32_t x, uint32_t y)
 {
-    return (y % 2) && y < (uint32_t)(LCD_FRAME_SIZE + mLift);
+    return (y % 2) && y < (uint32_t) (LCD_FRAME_SIZE + mLift);
 }
 
 uint8_t HorizontalShadePainter::Color(uint32_t x, uint32_t y)
 {
-    return (x % 2) && x < (uint32_t)(LCD_FRAME_SIZE + mLift);
+    return (x % 2) && x < (uint32_t) (LCD_FRAME_SIZE + mLift);
 }
 
 VerticalBlindPainter::VerticalBlindPainter(uint16_t lift, uint16_t tilt) : PixelPainter(lift, tilt)

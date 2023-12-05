@@ -15,9 +15,6 @@ overrides:
     ############################################################
     #  Draft PRs
     ############################################################
-    - if: "draft or 'WIP' in title"
-      status: pending
-      explanation: "PR is draft, pending review"
     - if: "draft"
       status: pending
       explanation: "PR is draft, pending review"

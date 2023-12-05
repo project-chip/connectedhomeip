@@ -52,7 +52,7 @@
 #include <system/SystemPacketBuffer.h>
 
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
-constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
+inline constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
 namespace chip {
 namespace app {

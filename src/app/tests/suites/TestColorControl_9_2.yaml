@@ -233,7 +233,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       response:
-          saveAs: ColorLoopStartEnhancedHue
+          saveAs: ColorLoopStartEnhancedHueValue2
 
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
@@ -241,7 +241,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueValue2
               maxValue: 65535
 
     - label: "Wait for 5S"
@@ -258,7 +258,7 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: ColorLoopStartEnhancedHue
+              minValue: ColorLoopStartEnhancedHueValue2
               maxValue: 65535
 
     - label:
@@ -294,13 +294,13 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopStoredEnhancedHue"
       response:
-          saveAs: ColorLoopStoredEnhancedHueValue
+          saveAs: ColorLoopStoredEnhancedHueValue3
 
     - label: "Read EnhancedCurrentHue attribute from DUT."
       command: "readAttribute"
       attribute: "EnhancedCurrentHue"
       response:
-          value: ColorLoopStoredEnhancedHueValue
+          value: ColorLoopStoredEnhancedHueValue3
 
     - label: "Turn off light for color control tests"
       cluster: "On/Off"

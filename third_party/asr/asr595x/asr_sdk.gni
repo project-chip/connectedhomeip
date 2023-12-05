@@ -123,9 +123,6 @@ template("asr_sdk_sources") {
       "projects/alto_demo/ble_demo/duet_hl_matter/app.c",
       "projects/alto_demo/ble_demo/duet_hl_matter/user_platform.c",
 
-      #matter
-      "matter/asr_factory_config.c",
-
       #lwip
       "../../components/lwip_2.1.2/netif/ethernet.c",
       "../../components/lwip_2.1.2/port/sys_arch.c",

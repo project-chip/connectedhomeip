@@ -52,7 +52,8 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
             logging.info("SupportedModes: %s" % (supported_modes))
 
-            asserts.assert_greater_equal(len(supported_modes), 1, "SupportedModes must have at least one entry!")
+            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least 2 entries!")
+            asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
             modes = []
             for m in supported_modes:

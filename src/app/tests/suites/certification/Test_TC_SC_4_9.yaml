@@ -27,6 +27,17 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          1. TH_CR1 is a Commissioner, working over Ethernet or Wi-Fi transport, able to commission DUT into a given Fabric and implementing RFC-4191
+          2. TH_CR2 is a Commissioner/Controller Thread 1.3 device (only on Thread, not on Wi-Fi or Ethernet), joined to the PAN of the BR and already commissioned on the same Fabric
+          3. DUT_CE is a Commissionee Ethernet or Wi-Fi device and implementing RFC-4191
+          4. DUT_CE will adopt an address on the GUA prefix e.g. 2001:12ab::/64 and use it as default route (::/0)
+          5. DUT_CE sees the RA w/ RIO and adds the off-mesh prefix preferred route, so that any messages for that off-mesh prefix routes there INSTEAD of the default gateway
+          6. BR is a Thread 1.3 border router, with link to DUT over Wi-Fi or Ethernet, in the same VLAN
+          7. RT is a Wi-Fi or Ethernet router advertising a default route (i,e, against ::/0 prefix) with a GUA prefix advertised. That prefix MUST also route to the public internet to avoid the different entities bailing out of having this prefix because it’s an invalid environment detected to be artificial.
+      disabled: true
+
     - label:
           "Step 1: Using TH_CR1, commission the DUT_CE onto the Matter network"
       verification: |

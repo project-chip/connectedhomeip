@@ -42,7 +42,7 @@ public class NsdManagerServiceBrowser implements ServiceBrowser {
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
     this.multicastLock =
-        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+        ((WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipBrowseMulticastLock");
     this.multicastLock.setReferenceCounted(true);
     callbackMap = new HashMap<>();

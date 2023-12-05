@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 178.2.1. [TC-TCTL-2.1] Attributes with DUT as Server
 
@@ -22,28 +21,86 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Temperature Control"
+    endpoint: 1
 
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Step 2: TH reads from the DUT the MinTemperature attribute"
+      PICS: TCTL.S.A0001
+      command: "readAttribute"
+      attribute: "MinTemperature"
+      response:
+          saveAs: MinTemperatureValue
+          constraints:
+              type: temperature
 
-    - label: "Step 2: TH reads from the DUT the TCTL.S.A0003(Step) attribute"
+    - label: "Step 3: TH reads from the DUT the MaxTemperature attribute"
+      PICS: TCTL.S.A0002
+      command: "readAttribute"
+      attribute: "MaxTemperature"
+      response:
+          saveAs: MaxTemperatureValue
+          constraints:
+              type: temperature
+
+    - label: "Step 4: TH reads from the DUT the Step attribute"
       PICS: TCTL.S.A0003
-      verification: |
-          ./chip-tool temperaturecontrol read step 1 1
+      command: "readAttribute"
+      attribute: "Step"
+      response:
+          saveAs: StepValue
+          constraints:
+              type: temperature
+              maxValue: MaxTemperatureValue - MinTemperatureValue
 
-          On TH(chip-tool), Verify that the DUT response contains a temperature value <= TCTL.S.A0002(MaxTemperature) - TCTL.S.A0001(MinTemperature)
-          and (TCTL.S.A0002(MaxTemperature) - TCTL.S.A0001(MinTemperature)) % TCTL.S.A0003(Step) == 0
+    - label:
+          "Verify that the DUT response (maxTemperature - minTemperature) % the
+          received value of the Step attribute == 0."
+      PICS: TCTL.S.A0003 && TCTL.S.A0002 && TCTL.S.A0001
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ( MaxTemperatureValue - MinTemperatureValue ) % StepValue
+              - name: "Value2"
+                value: 0
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
 
+    - label: "Step 5: TH reads from the DUT the TemperatureSetpoint attribute"
+      PICS: TCTL.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          saveAs: temperatureValue
+          constraints:
+              minValue: MinTemperatureValue
+              maxValue: MaxTemperatureValue
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0003 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   step: 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+    - label:
+          "Verify that the DUT response (temperature value - minTemperature) %
+          the received value of the Step attribute from step 4 == 0."
+      PICS: TCTL.S.A0000 && TCTL.S.A0001
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ( temperatureValue - MinTemperatureValue ) % StepValue
+              - name: "Value2"
+                value: 0
+      response:
+          - values:
+                - name: "Equals"
+                  value: true

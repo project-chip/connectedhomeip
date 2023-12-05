@@ -37,8 +37,9 @@ download_jar "repo1.maven.org" "com/google/code/gson/gson/2.9.1" "gson-2.9.1.jar
 download_jar "repo1.maven.org" "com/google/protobuf/protobuf-java/3.22.0" "protobuf-java-3.22.0.jar"
 download_jar "repo1.maven.org" "com/google/truth/truth/1.1.3" "truth-1.1.3.jar"
 download_jar "repo1.maven.org" "junit/junit/4.13.2" "junit-4.13.2.jar"
-download_jar "repo1.maven.org" "org/jetbrains/kotlin/kotlin-stdlib/1.8.10" "kotlin-stdlib-1.8.10.jar"
-download_jar "repo1.maven.org" "org/jetbrains/kotlin/kotlin-test/1.8.10" "kotlin-test-1.8.10.jar"
+download_jar "repo1.maven.org" "org/jetbrains/kotlin/kotlin-stdlib/1.8.20" "kotlin-stdlib-1.8.20.jar"
+download_jar "repo1.maven.org" "org/jetbrains/kotlin/kotlin-test/1.8.20" "kotlin-test-1.8.20.jar"
+download_jar "repo1.maven.org" "org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.7.3" "kotlinx-coroutines-core-jvm-1.7.3.jar"
 download_jar "repo1.maven.org" "org/json/json/20220924" "json-20220924.jar"
 
 # Unit test requirements

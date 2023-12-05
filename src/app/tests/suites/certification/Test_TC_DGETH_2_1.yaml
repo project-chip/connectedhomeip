@@ -38,8 +38,7 @@ tests:
       response:
           constraints:
               type: enum8
-              minValue: 0
-              maxValue: 9
+              anyOf: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, null]
 
     - label: "Step 3: Read FullDuplex attribute constraints"
       PICS: DGETH.S.A0001
@@ -48,8 +47,8 @@ tests:
       response:
           constraints:
               type: boolean
+              anyOf: [0, 1, null]
 
-    #issue #13648
     - label: "Step 4a: Read PacketRxCount attribute constraints"
       PICS: DGETH.S.A0002
       command: "readAttribute"
@@ -57,20 +56,41 @@ tests:
       response:
           constraints:
               type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
 
-    - label:
-          "Step 4b: Read PacketRxCount value from DUT and verify the number of
-          packets received on ethernet network interface"
+    - label: "Step 4b: Reboot target device"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "Reboot"
+
+    - label: "Step 4c: Reboot target device(DUT)"
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read packet-rx-count 1 0
+          Did the DUT successfully reboot?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please reboot the DUT and enter 'y' after DUT starts"
+              - name: "expectedValue"
+                value: "y"
 
-          Verify the value of PacketRxCount is in range uint64 on TH(chip-tool) log
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          [1687347048.760521][160021:160023] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0002 DataVersion: 2942806365
-          [1687347048.760567][160021:160023] CHIP:TOO:   PacketRxCount: 286
-          [1687347048.760621][160021:160023] CHIP:EM: <<< [E:20760i S:62442 M:2940871 (Ack:194995517)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347048.760632][160021:160023] CHIP:IN: (S) Sending msg 2940871 on secure session with LSID: 62442
-          [1687347048.760681][160021:160023] CHIP:EM: Flushed pending ack for MessageCounter:194995517 on exchange 20760i
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
+    - label:
+          "Step 4d: Upon a node reboot, PacketRxCount attribute value will be
+          reset to 0"
+      verification: |
+          Upon a node reboot, the value will be reset to 0.
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGETH.S.A0002
@@ -88,21 +108,15 @@ tests:
       response:
           constraints:
               type: int64u
+              minValue: 0
+              maxValue: "18446744073709551615"
 
+    #Test-plan issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3413
     - label:
-          "Step 5b: Read PacketTxCount value from DUT and verify the number of
-          packets received on ethernet network interface"
+          "Step 5b: Read PacketTxCount attribute constraints, Upon a node
+          reboot, the value will be reset to 0"
       verification: |
-          ./chip-tool ethernetnetworkdiagnostics read packet-tx-count 1 0
-
-          Verify the value of PacketTxCount is in range uint64 on TH(chip-tool) Log
-
-          [1687347066.917105][160026:160028] CHIP:DMG: }
-          [1687347066.917138][160026:160028] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0003 DataVersion: 2942806365
-          [1687347066.917163][160026:160028] CHIP:TOO:   PacketTxCount: 610
-          [1687347066.917187][160026:160028] CHIP:EM: <<< [E:25784i S:60435 M:6319619 (Ack:183312357)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347066.917192][160026:160028] CHIP:IN: (S) Sending msg 6319619 on secure session with LSID: 60435
-          [1687347066.917217][160026:160028] CHIP:EM: Flushed pending ack for MessageCounter:183312357 on exchange 25784i
+          Upon a node reboot, the value will be reset to 0.
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && DGETH.S.A0003
@@ -113,159 +127,52 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 6a: Read TxErrCount attribute constraints"
+    - label:
+          "Step 6: Read TxErrCount attribute constraints, Upon a node reboot,
+          the value will be reset to 0"
       PICS: DGETH.S.A0004
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
     - label:
-          "Step 6b: Read TxErrCount value from DUT and verify value indicates
-          the number of failed packet transmission on ethernet network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
-
-          Verify the value of TxErrCount is in range uint64 on TH(chip-tool) Log
-
-          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 3872576452
-          [1649663843.295395][8123:8128] CHIP:TOO:   TxErrCount: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0004
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 7a: Read CollisionCount attribute constraints"
+          "Step 7: Read CollisionCount attribute , Upon a node reboot, the value
+          will be reset to 0"
       PICS: DGETH.S.A0005
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
-    - label:
-          "Step 7b: Read CollisionCount value from DUT and verify value
-          indicates the number of collision occurred while transmitting packets
-          on ethernet network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read tx-err-count 1 0
-
-          Verify the value of TxErrCount is in range uint64 on TH(chip-tool) Log
-          [1687347083.503598][160029:160031] CHIP:DMG: }
-          [1687347083.503668][160029:160031] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0004 DataVersion: 2942806365
-          [1687347083.503714][160029:160031] CHIP:TOO:   TxErrCount: 0
-          [1687347083.503797][160029:160031] CHIP:EM: <<< [E:52218i S:59742 M:235974545 (Ack:86510465)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347083.503811][160029:160031] CHIP:IN: (S) Sending msg 235974545 on secure session with LSID: 59742
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0005
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 8a: Read OverrunCount attribute constraints"
+    - label: "Step 8: Read OverrunCount attribute constraints"
       PICS: DGETH.S.A0006
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
+          value: 0
           constraints:
               type: int64u
 
-    - label:
-          "Step 8b: Read OverrunCount value from DUT and verify value indicates
-          the number of packets dropped due to lack of buffer memory on ethernet
-          network interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read overrun-count 1 0
-
-          Verify the value of OverrunCount is in range uint64 on TH(chip-tool) Log
-
-          [1687347120.446609][160039:160041] CHIP:DMG: }
-          [1687347120.446640][160039:160041] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0006 DataVersion: 2942806365
-          [1687347120.446659][160039:160041] CHIP:TOO:   OverrunCount: 0
-          [1687347120.446682][160039:160041] CHIP:EM: <<< [E:16803i S:59128 M:141104124 (Ack:148139165)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347120.446686][160039:160041] CHIP:IN: (S) Sending msg 141104124 on secure session with LSID: 59128
-          [1687347120.446707][160039:160041] CHIP:EM: Flushed pending ack for MessageCounter:148139165 on exchange 16803i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0006
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 9a: Read CarrierDetect attribute constraints"
+    - label: "Step 9: Read CarrierDetect attribute constraints"
       PICS: DGETH.S.A0007
       command: "readAttribute"
       attribute: "CarrierDetect"
       response:
           constraints:
               type: boolean
+              anyOf: [0, 1, null]
 
-    - label:
-          "Step 9b: Read CarrierDetect value from DUT and verify value indicates
-          the presence of carrier detect control signal on ethernet network
-          interface"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read carrier-detect 1 0
-
-          Verify the value of CarrierDetect is either bool or if the interface is not configured or operational, NULL should be read,  this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
-
-          [1687347138.406057][160043:160045] CHIP:DMG: }
-          [1687347138.406124][160043:160045] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0007 DataVersion: 2942806365
-          [1687347138.406151][160043:160045] CHIP:TOO:   CarrierDetect: null
-          [1687347138.406212][160043:160045] CHIP:EM: <<< [E:63037i S:51494 M:51175683 (Ack:138099847)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347138.406225][160043:160045] CHIP:IN: (S) Sending msg 51175683 on secure session with LSID: 51494
-          [1687347138.406267][160043:160045] CHIP:EM: Flushed pending ack for MessageCounter:138099847 on exchange 63037i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0007
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 10a: Read TimeSinceReset attribute constraints"
+    - label: "Step 10: Read TimeSinceReset attribute constraints"
       PICS: DGETH.S.A0008
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
           constraints:
               type: int64u
-
-    - label:
-          "Step 10b: Read TimeSinceReset value from DUT and verify the value
-          indicates the duration of time, in minutes"
-      verification: |
-          ./chip-tool ethernetnetworkdiagnostics read  time-since-reset 1 0
-
-          Verify the value of TimeSinceReset is in range uint64, If the interface is not configured or operational, NULL should be read, this is optional attribute implemented in RPI, may vary based on DUT implementation  on TH(chip-tool) Log:
-
-          [1687347156.459485][160053:160055] CHIP:DMG: }
-          [1687347156.459542][160053:160055] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0037 Attribute 0x0000_0008 DataVersion: 2942806365
-          [1687347156.459573][160053:160055] CHIP:TOO:   TimeSinceReset: 228
-          [1687347156.459644][160053:160055] CHIP:EM: <<< [E:9032i S:5312 M:202808493 (Ack:150717838)] (S) Msg TX to 1:0000000000000001 [096C] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1687347156.459656][160053:160055] CHIP:IN: (S) Sending msg 202808493 on secure session with LSID: 5312
-          [1687347156.459701][160053:160055] CHIP:EM: Flushed pending ack for MessageCounter:150717838 on exchange 9032i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DGETH.S.A0008
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+              minValue: 0
+              maxValue: "18446744073709551615"

@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 130.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
+name: 142.2.1. [TC-BRBINFO-2.1] Attributes [DUT-Server]
 
 PICS:
     - BRBINFO.S
@@ -23,6 +22,8 @@ config:
     cluster: "Bridged Device Basic Information"
     endpoint: 3
 
+    BRBINFO.ClusterId: 0x0039
+
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -31,6 +32,22 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
+
+    - label:
+          "Step 2: TH reads attribute ID 0 from the DUT (matches in ID to
+          DataModelRevision in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0000
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 5: TH reads VendorName from the DUT."
       PICS: BRBINFO.S.A0001
@@ -123,6 +140,22 @@ tests:
       response:
           value: ProductNameValue
 
+    - label:
+          "Step 14: TH reads attribute ID 4 from the DUT (matches in ID to
+          ProductID in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0004
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 17: TH reads NodeLabel from the DUT"
       PICS: BRBINFO.S.A0005
       command: "readAttribute"
@@ -139,7 +172,9 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
 
-          Verify response has unsupported write on TH(chip-tool) Log:
+          Via the TH (chip-tool), verify the SUCCESS response for NodeLabel attribute write function.
+
+          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
 
           NOTE the quotes: single-quote/double-quote/string/double-quote/single-quote
 
@@ -148,7 +183,7 @@ tests:
           [1660839701.840505][2444:2449] CHIP:DMG:
           [1660839701.840578][2444:2449] CHIP:DMG:                         StatusIB =
           [1660839701.840661][2444:2449] CHIP:DMG:                         {
-          [1660839701.840742][2444:2449] CHIP:DMG:                                 status = 0x88 (UNSUPPORTED_WRITE),
+          [1660839701.840742][2444:2449] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1660839701.840827][2444:2449] CHIP:DMG:                         },
           [1660839701.840905][2444:2449] CHIP:DMG:
           [1660839701.840973][2444:2449] CHIP:DMG:                 },
@@ -166,11 +201,12 @@ tests:
       verification: |
           ./chip-tool bridgeddevicebasicinformation read node-label 1 3
 
-          Verify the value of node-label is type of string and contains length between 0 and 32 in TH(chip-tool) Log:
-          Note: If the write  access is implemented then the value of the of the Nodelabel will be changed into "newnode"
+          Via the TH (chip-tool), verify that the NodeLabel attribute value is changed to newnode.
+
+          Current sample apps do not have this implementation. However, if the vendor has implemented it, the below response will be displayed.
 
           [1657696463.081741][15476:15481] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0039 Attribute 0x0000_0005 DataVersion: 2577979325
-          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
+          [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: newnode
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -179,6 +215,22 @@ tests:
                 value: "Please enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label:
+          "Step 20: TH reads attribute ID 6 from the DUT (matches in ID to
+          Location in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0006
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 21: TH reads HardwareVersion from the DUT"
       PICS: BRBINFO.S.A0007
@@ -456,6 +508,22 @@ tests:
       response:
           value: SerialNumberValue
 
+    - label:
+          "Step 48: TH reads attribute ID 0x0010 from the DUT (matches in ID to
+          LocalConfigDisabled in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0010
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
     - label: "Step 51: TH reads Reachable from the DUT."
       PICS: BRBINFO.S.A0011
       command: "readAttribute"
@@ -510,6 +578,22 @@ tests:
       attribute: "UniqueID"
       response:
           value: UniqueIDValue
+
+    - label:
+          "Step 56: TH reads attribute ID 0x0013 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0013
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Step 59: TH reads ProductAppearance from the DUT."
       PICS: BRBINFO.S.A0014

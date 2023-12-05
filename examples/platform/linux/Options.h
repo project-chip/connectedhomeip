@@ -32,6 +32,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -66,7 +67,10 @@ struct LinuxDeviceOptions
     uint8_t testEventTriggerEnableKey[16] = { 0 };
     chip::FabricId commissionerFabricId   = chip::kUndefinedFabricId;
     std::vector<std::string> traceTo;
-
+    bool mSimulateNoInternalTime = false;
+#if defined(PW_RPC_ENABLED)
+    uint16_t rpcServerPort = 33000;
+#endif
     static LinuxDeviceOptions & GetInstance();
 };
 

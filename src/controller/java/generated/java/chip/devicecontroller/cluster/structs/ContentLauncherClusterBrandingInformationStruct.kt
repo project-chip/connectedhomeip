@@ -17,11 +17,11 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ContentLauncherClusterBrandingInformationStruct(
   val providerName: String,
@@ -42,9 +42,9 @@ class ContentLauncherClusterBrandingInformationStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PROVIDER_NAME), providerName)
       if (background.isPresent) {
         val optbackground = background.get()
@@ -78,8 +78,11 @@ class ContentLauncherClusterBrandingInformationStruct(
     private const val TAG_SPLASH = 4
     private const val TAG_WATER_MARK = 5
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterBrandingInformationStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ContentLauncherClusterBrandingInformationStruct {
+      tlvReader.enterStructure(tlvTag)
       val providerName = tlvReader.getString(ContextSpecificTag(TAG_PROVIDER_NAME))
       val background =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_BACKGROUND))) {

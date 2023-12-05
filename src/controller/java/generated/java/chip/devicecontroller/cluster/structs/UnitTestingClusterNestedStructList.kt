@@ -17,20 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UnitTestingClusterNestedStructList(
-  val a: Int,
+  val a: UInt,
   val b: Boolean,
   val c: UnitTestingClusterSimpleStruct,
   val d: List<UnitTestingClusterSimpleStruct>,
-  val e: List<Long>,
+  val e: List<ULong>,
   val f: List<ByteArray>,
-  val g: List<Int>
+  val g: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNestedStructList {\n")
@@ -44,32 +44,32 @@ class UnitTestingClusterNestedStructList(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_A), a)
       put(ContextSpecificTag(TAG_B), b)
       c.toTlv(ContextSpecificTag(TAG_C), this)
-      startList(ContextSpecificTag(TAG_D))
+      startArray(ContextSpecificTag(TAG_D))
       for (item in d.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_E))
+      endArray()
+      startArray(ContextSpecificTag(TAG_E))
       for (item in e.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_F))
+      endArray()
+      startArray(ContextSpecificTag(TAG_F))
       for (item in f.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_G))
+      endArray()
+      startArray(ContextSpecificTag(TAG_G))
       for (item in g.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -83,40 +83,40 @@ class UnitTestingClusterNestedStructList(
     private const val TAG_F = 5
     private const val TAG_G = 6
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStructList {
-      tlvReader.enterStructure(tag)
-      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterNestedStructList {
+      tlvReader.enterStructure(tlvTag)
+      val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
       val c = UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_C), tlvReader)
       val d =
         buildList<UnitTestingClusterSimpleStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_D))
+          tlvReader.enterArray(ContextSpecificTag(TAG_D))
           while (!tlvReader.isEndOfContainer()) {
             add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
         }
       val e =
-        buildList<Long> {
-          tlvReader.enterList(ContextSpecificTag(TAG_E))
+        buildList<ULong> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_E))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getLong(AnonymousTag))
+            add(tlvReader.getULong(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val f =
         buildList<ByteArray> {
-          tlvReader.enterList(ContextSpecificTag(TAG_F))
+          tlvReader.enterArray(ContextSpecificTag(TAG_F))
           while (!tlvReader.isEndOfContainer()) {
             add(tlvReader.getByteArray(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val g =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_G))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_G))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getInt(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

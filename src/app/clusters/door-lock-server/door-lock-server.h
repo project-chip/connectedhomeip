@@ -228,6 +228,20 @@ public:
      */
     void ResetWrongCodeEntryAttempts(chip::EndpointId endpointId);
 
+    /**
+     * @brief Handles a local lock operation error. This method allows handling a wrong attempt of providing
+     *        user credential entry that has been provided locally by the user. The method will emit the LockOperationEvent
+     *        to inform the controller that a local wrong attempt occurred, and also call HandleWrongEntry method to
+     *        increment wrong entry counter.
+     *
+     * @param endpointId
+     * @param opType Operation source to be registered in the LockOperationEvent.
+     * @param opSource source of the operation to be registered in the LockOperationEvent.
+     * @param userId Optional user id to be registered in the LockOperationEvent
+     */
+    void HandleLocalLockOperationError(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
+                                       Nullable<uint16_t> userId);
+
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     chip::NodeId getNodeId(const chip::app::CommandHandler * commandObj);
@@ -422,8 +436,8 @@ private:
 
     bool engageLockout(chip::EndpointId endpointId);
 
-    static CHIP_ERROR sendClusterResponse(chip::app::CommandHandler * commandObj,
-                                          const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status);
+    static void sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                    EmberAfStatus status);
 
     /**
      * @brief Common handler for LockDoor, UnlockDoor, UnlockWithTimeout commands

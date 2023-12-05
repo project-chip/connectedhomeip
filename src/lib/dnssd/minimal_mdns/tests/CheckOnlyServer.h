@@ -38,7 +38,7 @@ namespace mdns {
 namespace Minimal {
 namespace test {
 
-constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
+inline constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
 namespace {
 bool StringMatches(const BytesRange & br, const char * str)
 {
@@ -311,7 +311,7 @@ private:
             found = false;
         }
     };
-    static constexpr size_t kMaxExpectedTxt = 12;
+    static constexpr size_t kMaxExpectedTxt = 13;
     KV mExpectedTxt[kMaxExpectedTxt];
     size_t mNumExpectedTxtRecords = 0;
     size_t mNumReceivedTxtRecords = 0;

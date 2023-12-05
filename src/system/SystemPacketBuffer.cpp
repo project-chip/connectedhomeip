@@ -501,7 +501,7 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     lPacket = static_cast<PacketBuffer *>(
-        pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE));
+        pbuf_alloc(PBUF_RAW, static_cast<uint16_t>(lAllocSize), CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE));
 
     SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 

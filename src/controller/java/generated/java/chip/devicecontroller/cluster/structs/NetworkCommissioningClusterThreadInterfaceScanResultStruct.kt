@@ -17,20 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
-  val panId: Int,
-  val extendedPanId: Long,
+  val panId: UInt,
+  val extendedPanId: ULong,
   val networkName: String,
-  val channel: Int,
-  val version: Int,
+  val channel: UInt,
+  val version: UInt,
   val extendedAddress: ByteArray,
   val rssi: Int,
-  val lqi: Int
+  val lqi: UInt
 ) {
   override fun toString(): String = buildString {
     append("NetworkCommissioningClusterThreadInterfaceScanResultStruct {\n")
@@ -45,9 +45,9 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PAN_ID), panId)
       put(ContextSpecificTag(TAG_EXTENDED_PAN_ID), extendedPanId)
       put(ContextSpecificTag(TAG_NETWORK_NAME), networkName)
@@ -71,18 +71,18 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
     private const val TAG_LQI = 7
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): NetworkCommissioningClusterThreadInterfaceScanResultStruct {
-      tlvReader.enterStructure(tag)
-      val panId = tlvReader.getInt(ContextSpecificTag(TAG_PAN_ID))
-      val extendedPanId = tlvReader.getLong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
+      tlvReader.enterStructure(tlvTag)
+      val panId = tlvReader.getUInt(ContextSpecificTag(TAG_PAN_ID))
+      val extendedPanId = tlvReader.getULong(ContextSpecificTag(TAG_EXTENDED_PAN_ID))
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
-      val channel = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
-      val version = tlvReader.getInt(ContextSpecificTag(TAG_VERSION))
+      val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
+      val version = tlvReader.getUInt(ContextSpecificTag(TAG_VERSION))
       val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
-      val lqi = tlvReader.getInt(ContextSpecificTag(TAG_LQI))
+      val lqi = tlvReader.getUInt(ContextSpecificTag(TAG_LQI))
 
       tlvReader.exitContainer()
 

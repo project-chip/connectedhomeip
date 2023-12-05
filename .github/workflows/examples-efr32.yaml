@@ -38,12 +38,12 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: ghcr.io/project-chip/chip-build-efr32:1
+      image: ghcr.io/project-chip/chip-build-efr32:26
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
       - name: Checkout
-        uses: actions/checkout@v3        
+        uses: actions/checkout@v4
       - name: Checkout submodules & Bootstrap
         uses: ./.github/actions/checkout-submodules-and-bootstrap
         with:
@@ -58,9 +58,9 @@ jobs:
       - name: Test SLC gen
         timeout-minutes: 30
         run: |
-           scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
-           scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
-           rm -rf ./out/
+          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4187C --slc_generate --docker
+          scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs ./out/light-app BRD4164A --slc_generate --docker
+          rm -rf ./out/
       - name: Build some BRD4187C variants (1)
         run: |
           ./scripts/run_in_build_env.sh \

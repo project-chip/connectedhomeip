@@ -26,11 +26,15 @@ java_prebuilt("json") {
 }
 
 java_prebuilt("kotlin-stdlib") {
-  jar_path = "artifacts/kotlin-stdlib-1.8.10.jar"
+  jar_path = "artifacts/kotlin-stdlib-1.8.20.jar"
 }
 
 java_prebuilt("kotlin-test") {
-  jar_path = "artifacts/kotlin-test-1.8.10.jar"
+  jar_path = "artifacts/kotlin-test-1.8.20.jar"
+}
+
+java_prebuilt("kotlinx-coroutines-core-jvm") {
+  jar_path = "artifacts/kotlinx-coroutines-core-jvm-1.7.3.jar"
 }
 
 java_prebuilt("protobuf-java") {

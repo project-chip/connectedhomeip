@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+  <TextView
+      android:id="@+id/titleText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/group_setting_add_access_control_text"
+      android:textSize="22sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  <EditText
+      android:id="@+id/groupIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/group_setting_group_id_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/titleText"
+      app:layout_constraintBottom_toTopOf="@+id/nodeIdEd"/>
+
+  <EditText
+      android:id="@+id/nodeIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/ota_provider_node_id_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/groupIdEd"
+      app:layout_constraintBottom_toTopOf="@+id/accessControlEntryTv"/>
+
+  <TextView
+      android:id="@+id/accessControlEntryTv"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="@string/group_setting_access_control_entry_text"
+      android:textSize="16sp"
+      android:layout_marginTop="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/nodeIdEd"
+      app:layout_constraintBottom_toTopOf="@id/accessControlEntrySp"
+      />
+
+  <Spinner
+      android:id="@+id/accessControlEntrySp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:spinnerMode="dropdown"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/accessControlEntryTv"
+      app:layout_constraintBottom_toTopOf="@+id/addAccessControlBtn"/>
+
+  <Button
+      android:id="@+id/addAccessControlBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/group_setting_add_btn_text"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

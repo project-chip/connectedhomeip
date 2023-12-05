@@ -14,8 +14,12 @@
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    132.2.6. [TC-S-2.6] RemainingCapacity functionality with DUT as Server -
+    135.2.6. [TC-S-2.6] RemainingCapacity functionality with DUT as Server -
     Multi-Fabric
+
+PICS:
+    - S.S
+    - S.S.F03
 
 config:
     nodeId: 0x12344321
@@ -23,6 +27,13 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          - TH1, TH2, and TH3 should be on separate, distinct fabrics.
+          - A given fabric SHALL NOT consume more than half (rounded down towards 0) of the Scene Table entries (as indicated in the SceneTableSize attribute).
+          - MaxRemainingCapacity is SceneTableSize/2.
+      disabled: true
+
     - label:
           "Step 1a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
           field set to 0x0000."
@@ -54,29 +65,11 @@ tests:
       disabled: true
 
     - label:
-          "Step 2b: TH1 sends a subscription request action for
-          RemainingCapacity to the DUT."
+          "Step 2b: TH1 sends a subscription request action for FabricSceneInfo
+          to the DUT."
       PICS: S.S.A0007
       verification: |
-          ./chip-tool interactive start
 
-          >> scenes subscribe remaining-capacity 10 100 1 1  --keepSubscriptions 1
-
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 8
-          CHIP:DMG: MoveToState ReadClient[0xffff94002990]: Moving to [AwaitingSu]
-          CHIP:EM: <<< [E:32066i S:31983 M:88286544 (Ack:232770518)] (S) Msg TX to 1:0000000000000001 [573B] --- Type 0001:01 (IM:StatusResponse)
-          CHIP:IN: (S) Sending msg 88286544 on secure session with LSID: 31983
-          CHIP:EM: >>> [E:32066i S:31983 M:232770519 (Ack:88286544)] (S) Msg RX from 1:0000000000000001 [573B] --- Type 0001:04 (IM:SubscribeResponse)
-          CHIP:EM: Found matching exchange: 32066i, Delegate: 0xffff940029a0
-          CHIP:EM: Rxd Ack; Removing MessageCounter:88286544 from Retrans Table on exchange 32066i
-          CHIP:DMG: SubscribeResponse is received
-          CHIP:DMG: SubscribeResponseMessage =
-          CHIP:DMG: {
-          CHIP:DMG:         SubscriptionId = 0xf2e8c40c,
-          CHIP:DMG:         MaxInterval = 0x64,
-          CHIP:DMG:         InteractionModelRevision = 1
-          CHIP:DMG: }
       disabled: true
 
     - label:
@@ -113,15 +106,25 @@ tests:
       disabled: true
 
     - label:
+          "Step 3b: Verify that the DUT sends a report data to TH1 for
+          FabricSceneInfo after the MinIntervalFloor time; store the
+          RemainingCapacity field from this fabric’s entry reported in
+          FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
+          equals (MaxRemainingCapacity-1)."
+      PICS: S.S.A0007
+      verification: |
+
+      disabled: true
+
+    - label:
           "Step 4a: TH1 sends AddScene command to DUT with same GroupID and
           SceneID value starting at 2 and incrementing for each iteration for
-          RemainingCapacity1 more times until reported value to TH1 (after
-          MinIntervalFloor) for RemainingCapacity becomes 0."
+          Remaining1stCapacity more times until reported value to TH1 (after
+          MinIntervalFloor) for RemainingCapacity field from FabricSceneInfo
+          becomes 0."
       PICS: S.S.C00.Rsp && S.S.A0007
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x2 0x0014 scene2 [] 1 1
 
-          Repeat till RemainingCapacity is 0
       disabled: true
 
     - label:
@@ -151,21 +154,6 @@ tests:
           CHIP:TOO:     groupID: 0
           CHIP:TOO:     sceneID: 1
           CHIP:TOO:    }
-
-          TH2:
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 7
-          TH3:
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 7
-
-          Repeat on TH2 till RemainingCapacity reaches 0
-          TH2:
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 0
-          TH3:
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 0
       disabled: true
 
     - label: "Step 5b: Repeat Step 4b with TH2"
@@ -213,9 +201,10 @@ tests:
 
     - label:
           "Step 7b: Verify that the DUT sends a report data to TH1 for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity1; verify RemainingCapacity1 equals
-          (MaxRemainingCapacity)."
+          FabricSceneInfo after the MinIntervalFloor time; store the
+          RemainingCapacity field from this fabrics entry the reported in
+          FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
+          equals (MaxRemainingCapacity)."
       PICS: S.S.A0007
       verification: |
           CHIP:DMG: ReportDataMessage =
@@ -246,7 +235,5 @@ tests:
           (MaxRemainingCapacity)."
       PICS: S.S.A0007
       verification: |
-          TH2:
-          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0007 DataVersion: 2793536968
-          CHIP:TOO:   RemainingCapacity: 8
+
       disabled: true

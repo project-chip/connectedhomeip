@@ -33,7 +33,7 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <functional>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -966,7 +966,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
                     &readCallback,
                     Instruction{ .chunksize      = 2,
                                  .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 2), WriteAttrOp(AttrOnEp5<Attr2>, 2),
-                                               WriteAttrOp(AttrOnEp5<Attr3>, 2) },
+                                                     WriteAttrOp(AttrOnEp5<Attr3>, 2) },
                                  .expectedValues = { { AttrOnEp5<Attr1>, 2 }, { AttrOnEp5<Attr2>, 2 }, { AttrOnEp5<Attr3>, 3 } },
                                  .attributesWithSameDataVersion = { { AttrOnEp5<Attr1>, AttrOnEp5<Attr2>, AttrOnEp5<Attr3> } } });
             }
@@ -1032,7 +1032,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
             DoTest(&readCallback,
                    Instruction{ .chunksize      = 1,
                                 .preworks       = { WriteAttrOp(AttrOnEp5<Attr1>, 3), WriteAttrOp(AttrOnEp5<Attr2>, 3),
-                                              WriteAttrOp(AttrOnEp5<Attr3>, 3) },
+                                                    WriteAttrOp(AttrOnEp5<Attr3>, 3) },
                                 .expectedValues = { { AttrOnEp5<Attr1>, 3 }, { AttrOnEp5<Attr2>, 3 }, { AttrOnEp5<Attr3>, 3 } } });
 
             // The attribute failed to catch last report will be picked by this report.

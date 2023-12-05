@@ -259,7 +259,7 @@ CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndexWithCode(NodeId remoteId, uin
     {
         auto commissioningParams = GetCommissioningParameters();
         err                      = CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload, commissioningParams,
-                                               DiscoveryType::kDiscoveryNetworkOnly, MakeOptional(resolutionData));
+                                                                    DiscoveryType::kDiscoveryNetworkOnly, MakeOptional(resolutionData));
     }
     return err;
 #else

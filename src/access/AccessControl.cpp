@@ -23,18 +23,19 @@
 
 #include "AccessControl.h"
 
+#include <lib/core/Global.h>
+
 namespace chip {
 namespace Access {
 
 using chip::CATValues;
 using chip::FabricIndex;
 using chip::NodeId;
-using namespace chip::Access;
 
 namespace {
 
-AccessControl defaultAccessControl;
-AccessControl * globalAccessControl = &defaultAccessControl;
+Global<AccessControl> defaultAccessControl;
+AccessControl * globalAccessControl = nullptr; // lazily defaulted to defaultAccessControl in GetAccessControl
 
 static_assert(((unsigned(Privilege::kAdminister) & unsigned(Privilege::kManage)) == 0) &&
                   ((unsigned(Privilege::kAdminister) & unsigned(Privilege::kOperate)) == 0) &&
@@ -123,11 +124,11 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
     //   2 for 0x prefix
     //   8 for 32-bit hex value
     //   1 for null terminator (at end)
-    constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
-    constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
-    constexpr int countWithoutComma  = 10;
-    constexpr int countWithComma     = countWithoutComma + 1;
-    bool withComma                   = false;
+    static constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
+    static constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
+    constexpr int countWithoutComma         = 10;
+    constexpr int countWithComma            = countWithoutComma + 1;
+    bool withComma                          = false;
     for (auto cat : cats.values)
     {
         if (cat == chip::kUndefinedCAT)
@@ -174,8 +175,8 @@ char GetPrivilegeStringForLogging(Privilege privilege)
 
 } // namespace
 
-AccessControl::Entry::Delegate AccessControl::Entry::mDefaultDelegate;
-AccessControl::EntryIterator::Delegate AccessControl::EntryIterator::mDefaultDelegate;
+Global<AccessControl::Entry::Delegate> AccessControl::Entry::mDefaultDelegate;
+Global<AccessControl::EntryIterator::Delegate> AccessControl::EntryIterator::mDefaultDelegate;
 
 CHIP_ERROR AccessControl::Init(AccessControl::Delegate * delegate, DeviceTypeResolver & deviceTypeResolver)
 {
@@ -329,7 +330,9 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
         {
 #if CHIP_CONFIG_ACCESS_CONTROL_POLICY_LOGGING_VERBOSITY > 0
             ChipLogProgress(DataManagement, "AccessControl: %s (delegate)",
-                            (result == CHIP_NO_ERROR) ? "allowed" : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied" : "error");
+                            (result == CHIP_NO_ERROR)                  ? "allowed"
+                                : (result == CHIP_ERROR_ACCESS_DENIED) ? "denied"
+                                                                       : "error");
 #else
             if (result != CHIP_NO_ERROR)
             {
@@ -631,7 +634,7 @@ void AccessControl::NotifyEntryChanged(const SubjectDescriptor * subjectDescript
 
 AccessControl & GetAccessControl()
 {
-    return *globalAccessControl;
+    return (globalAccessControl) ? *globalAccessControl : defaultAccessControl.get();
 }
 
 void SetAccessControl(AccessControl & accessControl)
@@ -642,7 +645,7 @@ void SetAccessControl(AccessControl & accessControl)
 
 void ResetAccessControlToDefault()
 {
-    globalAccessControl = &defaultAccessControl;
+    globalAccessControl = nullptr;
 }
 
 } // namespace Access

@@ -100,7 +100,7 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Not defined
-    TimerData(const TimerData &) = delete;
+    TimerData(const TimerData &)             = delete;
     TimerData & operator=(const TimerData &) = delete;
 };
 

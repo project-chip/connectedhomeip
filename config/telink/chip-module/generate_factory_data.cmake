@@ -69,7 +69,7 @@ else()
 endif()
 
 # find chip cert tool
-find_program(chip_cert_exe NAMES chip-cert PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(chip_cert_exe NAMES chip-cert PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--chip-cert-path ${chip_cert_exe}\n")
 
 # for development purpose user can use default certs instead of generating or providing them
@@ -99,7 +99,7 @@ else()
 endif()
 
 # find chip tool requied for generating QRCode
-find_program(chip_tool_exe NAMES chip-tool PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(chip_tool_exe NAMES chip-tool PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--chip-tool-path ${chip_tool_exe}\n")
 
 # add Password-Authenticated Key Exchange parameters
@@ -108,13 +108,24 @@ string(APPEND script_args "--discriminator ${CONFIG_CHIP_DEVICE_DISCRIMINATOR}\n
 string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 
 # request spake2p to generate a new spake2_verifier
-find_program(spake_exe NAMES spake2p PATHS ${CHIP_ROOT}/out/telink REQUIRED)
+find_program(spake_exe NAMES spake2p PATHS ${CHIP_ROOT}/out REQUIRED)
 string(APPEND script_args "--spake2-path ${spake_exe}\n")
 
 if(CONFIG_CHIP_DEVICE_ENABLE_KEY)
 # Add optional EnableKey that triggers user-specific action.
 string(APPEND script_args "--enable-key \"${CONFIG_CHIP_DEVICE_ENABLE_KEY}\"\n")
 endif()
+
+# get code-partition factory_partition address
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_addr(factory_off PATH ${dts_partition_path})
+
+# get code-partition factory_partition size
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_size(factory_size PATH ${dts_partition_path})
+
+string(APPEND script_args "--offset ${factory_off}\n")
+string(APPEND script_args "--size ${factory_size}\n")
 
 string(APPEND script_args "--output \"${output_path}\"/factory\n")
 

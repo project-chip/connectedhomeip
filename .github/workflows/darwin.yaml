@@ -36,7 +36,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               run: brew install python@3.9
             - name: Checkout submodules & Bootstrap
@@ -51,18 +51,14 @@ jobs:
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
             - name: Run iOS Build Debug
               working-directory: src/darwin/Framework
-              # For now disable unguarded-availability-new warnings because we
-              # internally use APIs that we are annotating as only available on
-              # new enough versions.  Maybe we should change out deployment
-              # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Debug GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Run iOS Build Release
               working-directory: src/darwin/Framework
-              # For now disable unguarded-availability-new warnings because we
-              # internally use APIs that we are annotating as only available on
-              # new enough versions.  Maybe we should change out deployment
-              # target versions instead?
-              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Release OTHER_CFLAGS='${inherited} -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk iphoneos -configuration Release GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
@@ -77,10 +73,9 @@ jobs:
               # Enable -Wconversion by hand as well, because it seems to not be
               # enabled by default in the Xcode config.
               #
-              # Disable -Wunguarded-availability-new because we internally use
-              # APIs we added after our deployment target version.  Maybe we
-              # should change the deployment target version instead?
-              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building a system
+              # Matter.framework.
+              run: xcodebuild -target "Matter" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
               working-directory: src/darwin/Framework
             - name: Clean Build
               run: xcodebuild clean
@@ -95,15 +90,9 @@ jobs:
             - name: Build example OTA Provider
               run: |
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-            - name: Build OTA image files with software version number 5 and 10
-              run: |
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=5 chip_device_config_device_software_version_string='"5.0"'
-                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v5
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0 chip_device_config_device_software_version=10 chip_device_config_device_software_version_string='"10.0"'
-                  cp out/debug/chip-ota-requestor-app /tmp/ota-raw-image-v10
             - name: Build example OTA Requestor
               run: |
-                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
+                  scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug/ota-requestor-app chip_config_network_layer_ble=false non_spec_compliant_ota_action_delay_floor=0
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
@@ -116,22 +105,19 @@ jobs:
                   mkdir -p /tmp/darwin/framework-tests
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 > >(tee /tmp/darwin/framework-tests/all-cluster-app.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-err.log >&2) &
                   ../../../out/debug/chip-all-clusters-app --interface-id -1 --dac_provider ../../../credentials/development/commissioner_dut/struct_cd_origin_pid_vid_correct/test_case_vector.json --product-id 32768 --discriminator 3839 --secured-device-port 5539 --KVS /tmp/chip-all-clusters-app-kvs2 > >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid.log) 2> >(tee /tmp/darwin/framework-tests/all-cluster-app-origin-vid-err.log >&2) &
-                  # Make sure each ota-requestor is using a different port, discriminator, and KVS from
-                  # all-clusters-app and from other requestors.
-                  #
-                  # And a different port from the test harness too; the test harness uses port 5541.
-                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image1 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
-                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image2 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
-                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5544 --discriminator 1113 --KVS /tmp/chip-ota-requestor-kvs3 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image3 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-3.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-3.log >&2) &
                   # Disable BLE because the app does not have the permission to use
                   # it and that may crash the CI.
                   #
                   # -enableUndefinedBehaviorSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_UBSAN=YES
-                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'> >(tee /tmp/darwin/framework-tests/darwin-tests-asan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-err.log >&2)
+                  # And the same thing, but with MTR_PER_CONTROLLER_STORAGE_ENABLED turned off, so we test that it does not break for now.
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1 MTR_PER_CONTROLLER_STORAGE_ENABLED=0' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-controller-storage-err.log >&2)
+                  # And the same thing, but with MTR_NO_AVAILABILITY not turned on.  This requires -Wno-unguarded-availability-new to avoid availability errors.
+                  TEST_RUNNER_ASAN_OPTIONS=__CURRENT_VALUE__:detect_stack_use_after_return=1 xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableAddressSanitizer YES -enableUndefinedBehaviorSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_UBSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited}' > >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-asan-with-availability-annotations-err.log >&2)
                   # -enableThreadSanitizer instruments the code in Matter.framework,
                   # but to instrument the code in the underlying libCHIP we need to pass CHIP_IS_TSAN=YES
-                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-unguarded-availability-new' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
+                  xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx -enableThreadSanitizer YES OTHER_CFLAGS='${inherited} -Werror -Wconversion' CHIP_IS_TSAN=YES CHIP_IS_BLE=NO GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1' > >(tee /tmp/darwin/framework-tests/darwin-tests-tsan.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-tsan-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Build Matter TV Casting Bridge
               run: |

@@ -161,7 +161,7 @@ class NrfConnectBuilder(Builder):
                 zephyr_base = os.environ['ZEPHYR_BASE']
                 nrfconnect_sdk = os.path.dirname(zephyr_base)
                 zephyr_sdk_dir = os.environ.get('ZEPHYR_SDK_INSTALL_DIR') or os.path.join(
-                    os.environ['NRF5_TOOLS_ROOT'], 'zephyr-sdk-0.16.0')
+                    os.environ['NRF5_TOOLS_ROOT'], 'zephyr-sdk-0.16.1')
 
                 # NRF builds will both try to change .west/config in nrfconnect and
                 # overall perform a git fetch on that location

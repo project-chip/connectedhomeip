@@ -220,7 +220,7 @@ using namespace chip::Credentials;
             break;
         }
 
-        uint8_t buf[kMAX_CSR_Length];
+        uint8_t buf[kMIN_CSR_Buffer_Size];
         MutableByteSpan csr(buf);
         err = GenerateCertificateSigningRequest(&keypairBridge, csr);
         if (err != CHIP_NO_ERROR) {

@@ -60,8 +60,10 @@ target_sources(${APP_TARGET} PRIVATE
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${MBED_COMMON}/util/DFUManager.cpp
                ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+               ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
-               ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-instances.cpp
+               ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
                ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp

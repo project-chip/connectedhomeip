@@ -23,6 +23,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
@@ -373,8 +374,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -942,6 +943,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         else
         {
             shutdownEndpoint(&(emAfEndpoints[index]));
+            emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
         }
 
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
@@ -960,11 +962,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
         MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
-    }
-
-    if (!enable)
-    {
-        emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     }
 
     return true;
@@ -1088,6 +1085,19 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::Endp
     return emAfEndpoints[endpointIndex].deviceTypeList;
 }
 
+CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
+                                            Clusters::Descriptor::Structs::SemanticTagStruct::Type & tag)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+
+    if (endpointIndex == 0xFFFF || index >= emAfEndpoints[endpointIndex].tagList.size())
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    tag = emAfEndpoints[endpointIndex].tagList[index];
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1097,6 +1107,18 @@ CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDevic
     }
 
     emAfEndpoints[endpointIndex].deviceTypeList = deviceTypeList;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    emAfEndpoints[endpointIndex].tagList = tagList;
     return CHIP_NO_ERROR;
 }
 
@@ -1287,7 +1309,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // At this point, ptr either points to a default value, or is NULL, in which case
                         // it should be treated as if it is pointing to an array of all zeroes.
 
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
                         // The default values for attributes that are less than or equal to
                         // defaultValueSizeForBigEndianNudger in bytes are stored in an
                         // uint32_t.  On big-endian platforms, a pointer to the default value

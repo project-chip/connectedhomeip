@@ -49,7 +49,7 @@ public:
     CryptoContext(const CryptoContext &) = delete;
     explicit CryptoContext(Crypto::SymmetricKeyContext * context) : mKeyContext(context) {}
     CryptoContext & operator=(const CryptoContext &) = delete;
-    CryptoContext & operator=(CryptoContext &&) = delete;
+    CryptoContext & operator=(CryptoContext &&)      = delete;
 
     /**
      *    Whether the current node initiated the session, or it is responded to a session request.

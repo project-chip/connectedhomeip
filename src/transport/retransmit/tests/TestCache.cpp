@@ -38,7 +38,7 @@ public:
      * Convenience add when types are trivially copyable, so no actual
      * reference needs to be created.
      */
-    template <typename = std::enable_if<std::is_trivially_copyable<PayloadType>::value, int>>
+    template <std::enable_if_t<std::is_trivially_copyable<PayloadType>::value, int> = 0>
     CHIP_ERROR AddValue(const KeyType & key, PayloadType payload)
     {
         return chip::Retransmit::Cache<KeyType, PayloadType, N>::Add(key, payload);

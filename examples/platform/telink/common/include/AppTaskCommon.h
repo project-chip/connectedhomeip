@@ -25,8 +25,12 @@
 #include "LEDWidget.h"
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 #include "PWMDevice.h"
+#endif
+
+#ifdef CONFIG_WS2812_STRIP
+#include "WS2812Device.h"
 #endif
 
 #include <zephyr/drivers/gpio.h>
@@ -53,11 +57,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr EndpointId kExampleEndpointId = 1;
-constexpr uint8_t kDefaultMinLevel      = 0;
-constexpr uint8_t kDefaultMaxLevel      = 254;
-constexpr uint8_t kButtonPushEvent      = 1;
-constexpr uint8_t kButtonReleaseEvent   = 0;
+inline constexpr EndpointId kExampleEndpointId = 1;
+inline constexpr uint8_t kDefaultMinLevel      = 0;
+inline constexpr uint8_t kDefaultMaxLevel      = 254;
+inline constexpr uint8_t kButtonPushEvent      = 1;
+inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
 class AppTaskCommon
@@ -76,8 +80,12 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
+#if APP_USE_THREAD_START_BUTTON
         kButtonId_StartThread,
+#endif
+#if APP_USE_BLE_START_BUTTON
         kButtonId_StartBleAdv
+#endif
     } ButtonId;
 #endif
 
@@ -94,10 +102,12 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
+#if APP_USE_BLE_START_BUTTON
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
+#endif
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
 #endif
@@ -111,7 +121,7 @@ protected:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     PWMDevice mPwmIdentifyLed;
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);

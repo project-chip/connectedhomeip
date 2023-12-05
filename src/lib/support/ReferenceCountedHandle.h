@@ -39,7 +39,7 @@ public:
     ReferenceCountedHandle(ReferenceCountedHandle && that) : mTarget(that.mTarget) { mTarget.Retain(); }
 
     ReferenceCountedHandle & operator=(const ReferenceCountedHandle & that) = delete;
-    ReferenceCountedHandle & operator=(ReferenceCountedHandle && that) = delete;
+    ReferenceCountedHandle & operator=(ReferenceCountedHandle && that)      = delete;
 
     bool operator==(const ReferenceCountedHandle & that) const { return &mTarget == &that.mTarget; }
     bool operator!=(const ReferenceCountedHandle & that) const { return !(*this == that); }

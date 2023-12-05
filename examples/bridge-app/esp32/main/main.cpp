@@ -60,7 +60,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
-const char * TAG = "bridge-app";
+extern const char TAG[] = "bridge-app";
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
@@ -153,7 +153,7 @@ DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
  */
 
 #define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (2u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 

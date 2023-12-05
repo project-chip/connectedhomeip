@@ -196,14 +196,14 @@ TestHarnessDACProvider::TestHarnessDACProvider()
 
 void TestHarnessDACProvider::Init(const char * filepath)
 {
-    constexpr const char kDacCertKey[]      = "dac_cert";
-    constexpr const char kDacPrivateKey[]   = "dac_private_key";
-    constexpr const char kDacPublicKey[]    = "dac_public_key";
-    constexpr const char kPaiCertKey[]      = "pai_cert";
-    constexpr const char kCertDecKey[]      = "certification_declaration";
-    constexpr const char kFirmwareInfoKey[] = "firmware_information";
-    constexpr const char kIsSuccessKey[]    = "is_success_case";
-    constexpr const char kDescription[]     = "description";
+    static constexpr char kDacCertKey[]      = "dac_cert";
+    static constexpr char kDacPrivateKey[]   = "dac_private_key";
+    static constexpr char kDacPublicKey[]    = "dac_public_key";
+    static constexpr char kPaiCertKey[]      = "pai_cert";
+    static constexpr char kCertDecKey[]      = "certification_declaration";
+    static constexpr char kFirmwareInfoKey[] = "firmware_information";
+    static constexpr char kIsSuccessKey[]    = "is_success_case";
+    static constexpr char kDescription[]     = "description";
 
     std::ifstream json(filepath, std::ifstream::binary);
     if (!json)
@@ -315,8 +315,8 @@ CHIP_ERROR TestHarnessDACProvider::SignWithDeviceAttestationKey(const ByteSpan &
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because

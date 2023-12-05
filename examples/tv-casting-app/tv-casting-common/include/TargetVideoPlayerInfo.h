@@ -25,7 +25,11 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-constexpr size_t kMaxNumberOfEndpoints = 5;
+#include <string.h>
+#include <system/SystemClock.h>
+#include <system/SystemLayer.h>
+
+inline constexpr size_t kMaxNumberOfEndpoints = 5;
 
 class TargetVideoPlayerInfo;
 class VideoPlayerConnectionContext
@@ -84,6 +88,34 @@ public:
     bool IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData);
     bool IsSameAs(const char * hostName, const char * deviceName, size_t numIPs, const chip::Inet::IPAddress * ipAddresses);
 
+    uint16_t GetPort() const { return mPort; }
+    const char * GetInstanceName() const { return mInstanceName; }
+    chip::CharSpan * GetMACAddress() { return &mMACAddress; }
+    void SetIsAsleep(bool isAsleep) { mIsAsleep = isAsleep; }
+    bool IsAsleep() { return mIsAsleep; }
+    void SetMACAddress(chip::CharSpan MACAddress)
+    {
+        memcpy(mMACAddressBuf, MACAddress.data(), sizeof(mMACAddressBuf));
+        mMACAddress = chip::CharSpan(mMACAddressBuf, sizeof(mMACAddressBuf));
+    }
+    chip::System::Clock::Timestamp GetLastDiscovered() { return mLastDiscovered; }
+    void SetLastDiscovered(chip::System::Clock::Timestamp lastDiscovered) { mLastDiscovered = lastDiscovered; }
+    bool WasRecentlyDiscoverable()
+    {
+#ifdef CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS
+        // it was recently discoverable if its mLastDiscovered.count is within
+        // CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS of current time
+        chip::System::Clock::Timestamp currentUnixTimeMS = chip::System::Clock::kZero;
+        VerifyOrReturnValue(chip::System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS) == CHIP_NO_ERROR, true);
+        ChipLogProgress(AppServer, "WasRecentlyDiscoverable currentUnixTimeMS: %lu mLastDiscovered: %lu",
+                        static_cast<unsigned long>(currentUnixTimeMS.count()), static_cast<unsigned long>(mLastDiscovered.count()));
+        return mLastDiscovered.count() >
+            currentUnixTimeMS.count() - CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS * 60 * 60 * 1000;
+#else
+        return true;
+#endif // CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS
+    }
+
     chip::OperationalDeviceProxy * GetOperationalDeviceProxy()
     {
         if (mDeviceProxy != nullptr && mDeviceProxy->ConnectionReady())
@@ -97,7 +129,9 @@ public:
                           std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                           std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId = 0, uint16_t productId = 0,
                           chip::DeviceTypeId deviceType = 0, const char * deviceName = {}, const char * hostName = {},
-                          size_t numIPs = 0, chip::Inet::IPAddress * ipAddressList = nullptr);
+                          size_t numIPs = 0, chip::Inet::IPAddress * ipAddressList = nullptr, uint16_t port = 0,
+                          const char * instanceName                     = {},
+                          chip::System::Clock::Timestamp lastDiscovered = chip::System::Clock::kZero);
     CHIP_ERROR FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                           std::function<void(CHIP_ERROR)> onConnectionFailure);
     TargetEndpointInfo * GetOrAddEndpoint(chip::EndpointId endpointId);
@@ -174,5 +208,11 @@ private:
     char mHostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
     size_t mNumIPs                                       = 0; // number of valid IP addresses
     chip::Inet::IPAddress mIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
+    char mInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
+    uint16_t mPort;
+    chip::CharSpan mMACAddress;
+    char mMACAddressBuf[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
+    chip::System::Clock::Timestamp mLastDiscovered;
+    bool mIsAsleep    = false;
     bool mInitialized = false;
 };

@@ -30,6 +30,7 @@
 #include <lib/support/JniTypeWrappers.h>
 
 #include <app/AttributePathParams.h>
+#include <app/DataVersionFilter.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
@@ -39,19 +40,26 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/java/AndroidClusterExceptions.h>
+#include <controller/java/GroupDeviceProxy.h>
 #include <credentials/CHIPCert.h>
 #include <jni.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
 #include <pthread.h>
 #include <system/SystemClock.h>
 #include <vector>
+
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#include <app/dynamic_server/AccessControl.h>
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -86,6 +94,10 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
 CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
                           bool & outIsUrgent);
+CHIP_ERROR ParseDataVersionFilter(jobject dataVersionFilter, EndpointId & outEndpointId, ClusterId & outClusterId,
+                                  DataVersion & outDataVersion);
+static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
+                                             std::vector<app::DataVersionFilter> & outDataVersionFilterList);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 
 namespace {
@@ -133,6 +145,10 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     err = AndroidChipPlatformJNI_OnLoad(jvm, reserved);
     SuccessOrExit(err);
 #endif // JAVA_MATTER_CONTROLLER_TEST
+
+#ifdef CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::app::dynamic_server::InitAccessControl();
+#endif // CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -534,6 +550,48 @@ exit:
     }
 }
 
+JNI_METHOD(void, startOTAProvider)(JNIEnv * env, jobject self, jlong handle, jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "startOTAProvider() called");
+    err = wrapper->StartOTAProvider(otaProviderDelegate);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to start OTA Provider. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
+JNI_METHOD(void, finishOTAProvider)(JNIEnv * env, jobject self, jlong handle)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrExit(wrapper != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ChipLogProgress(Controller, "finishOTAProvider() called");
+
+    err = wrapper->FinishOTAProvider();
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to finish OTA Provider. : %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+#endif
+}
+
 JNI_METHOD(void, commissionDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jbyteArray csrNonce, jobject networkCredentials)
 {
@@ -906,7 +964,7 @@ JNI_METHOD(jbyteArray, createRootCertificate)
     if (fabricId != nullptr)
     {
         jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
-        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+        fabric          = MakeOptional(static_cast<FabricId>(jfabricId));
     }
 
     {
@@ -969,7 +1027,7 @@ JNI_METHOD(jbyteArray, createIntermediateCertificate)
     if (fabricId != nullptr)
     {
         jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
-        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+        fabric          = MakeOptional(static_cast<FabricId>(jfabricId));
     }
 
     {
@@ -1271,6 +1329,354 @@ JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jl
     }
 }
 
+JNI_METHOD(jlong, getGroupDevicePointer)(JNIEnv * env, jobject self, jlong handle, jint groupId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, 0, ChipLogError(Controller, "wrapper is null"));
+
+    GroupDeviceProxy * device = new GroupDeviceProxy(static_cast<GroupId>(groupId), wrapper->Controller()->GetFabricIndex(),
+                                                     wrapper->Controller()->ExchangeMgr());
+
+    if (device == nullptr)
+    {
+        CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+        ChipLogError(Controller, "GroupDeviceProxy handle is nullptr: %s", ErrorStr(err));
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return 0;
+    }
+
+    return reinterpret_cast<jlong>(device);
+}
+
+JNI_METHOD(void, releaseGroupDevicePointer)(JNIEnv * env, jobject self, jlong devicePtr)
+{
+    chip::DeviceLayer::StackLock lock;
+    GroupDeviceProxy * device = reinterpret_cast<GroupDeviceProxy *>(devicePtr);
+    if (device != NULL)
+    {
+        delete device;
+    }
+}
+
+JNI_METHOD(jobject, getAvailableGroupIds)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+
+    jobject groupIds;
+    err = chip::JniReferences::GetInstance().CreateArrayList(groupIds);
+
+    chip::Credentials::GroupDataProvider::GroupInfo group;
+
+    if (it)
+    {
+        while (it->Next(group))
+        {
+            jobject jGroupId;
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                       static_cast<jint>(group.group_id), jGroupId);
+            chip::JniReferences::GetInstance().AddToList(groupIds, jGroupId);
+        }
+    }
+
+    return groupIds;
+}
+
+JNI_METHOD(jstring, getGroupName)(JNIEnv * env, jobject self, jlong handle, jint jGroupId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto it = groupDataProvider->IterateGroupInfo(wrapper->Controller()->GetFabricIndex());
+
+    GroupId groupId = static_cast<GroupId>(jGroupId);
+    chip::Credentials::GroupDataProvider::GroupInfo group;
+
+    if (it)
+    {
+        while (it->Next(group))
+        {
+            if (group.group_id == groupId)
+            {
+                return env->NewStringUTF(group.name);
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+JNI_METHOD(jobject, findKeySetId)(JNIEnv * env, jobject self, jlong handle, jint jGroupId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto iter = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    chip::Credentials::GroupDataProvider::GroupKey groupKey;
+    GroupId groupId = static_cast<GroupId>(jGroupId);
+    jobject wrapperKeyId;
+
+    if (iter)
+    {
+        while (iter->Next(groupKey))
+        {
+            if (groupKey.group_id == groupId)
+            {
+                jobject jKeyId;
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                           static_cast<jint>(groupKey.keyset_id), jKeyId);
+                chip::JniReferences::GetInstance().CreateOptional(jKeyId, wrapperKeyId);
+                iter->Release();
+                return wrapperKeyId;
+            }
+        }
+        iter->Release();
+    }
+    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyId);
+    return wrapperKeyId;
+}
+
+JNI_METHOD(jboolean, addGroup)(JNIEnv * env, jobject self, jlong handle, jint jGroupId, jstring groupName)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    chip::Credentials::GroupDataProvider::GroupInfo group;
+
+    chip::JniUtfString jniGroupName(env, groupName);
+    group.SetName(jniGroupName.charSpan());
+    group.group_id = static_cast<GroupId>(jGroupId);
+
+    CHIP_ERROR err = groupDataProvider->SetGroupInfo(wrapper->Controller()->GetFabricIndex(), group);
+
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+}
+
+JNI_METHOD(jboolean, removeGroup)(JNIEnv * env, jobject self, jlong handle, jint jGroupId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    CHIP_ERROR err = groupDataProvider->RemoveGroupInfo(wrapper->Controller()->GetFabricIndex(), static_cast<GroupId>(jGroupId));
+
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+}
+
+JNI_METHOD(jobject, getKeySetIds)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+
+    jobject keySetIds;
+    err = chip::JniReferences::GetInstance().CreateArrayList(keySetIds);
+
+    chip::Credentials::GroupDataProvider::KeySet keySet;
+
+    if (it)
+    {
+        while (it->Next(keySet))
+        {
+            jobject jKeySetId;
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                       static_cast<jint>(keySet.keyset_id), jKeySetId);
+            chip::JniReferences::GetInstance().AddToList(keySetIds, jKeySetId);
+        }
+        it->Release();
+    }
+
+    return keySetIds;
+}
+
+JNI_METHOD(jobject, getKeySecurityPolicy)(JNIEnv * env, jobject self, jlong handle, int jKeySetId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto it = groupDataProvider->IterateKeySets(wrapper->Controller()->GetFabricIndex());
+
+    chip::Credentials::GroupDataProvider::KeySet keySet;
+
+    uint16_t keySetId = static_cast<uint16_t>(jKeySetId);
+    jobject wrapperKeyPolicy;
+
+    if (it)
+    {
+        while (it->Next(keySet))
+        {
+            if (keySet.keyset_id == keySetId)
+            {
+                jobject jKeyPolicy;
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V",
+                                                                           static_cast<jint>(keySet.policy), jKeyPolicy);
+                chip::JniReferences::GetInstance().CreateOptional(jKeyPolicy, wrapperKeyPolicy);
+                it->Release();
+                return wrapperKeyPolicy;
+            }
+        }
+        it->Release();
+    }
+    chip::JniReferences::GetInstance().CreateOptional(nullptr, wrapperKeyPolicy);
+    return wrapperKeyPolicy;
+}
+
+JNI_METHOD(jboolean, bindKeySet)(JNIEnv * env, jobject self, jlong handle, jint jGroupId, jint jKeySetId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto iter            = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t current_count = iter->Count();
+
+    iter->Release();
+    CHIP_ERROR err = groupDataProvider->SetGroupKeyAt(
+        wrapper->Controller()->GetFabricIndex(), current_count,
+        chip::Credentials::GroupDataProvider::GroupKey(static_cast<uint16_t>(jGroupId), static_cast<uint16_t>(jKeySetId)));
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+}
+
+JNI_METHOD(jboolean, unbindKeySet)(JNIEnv * env, jobject self, jlong handle, jint jGroupId, jint jKeySetId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    size_t index                                             = 0;
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    auto iter       = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    size_t maxCount = iter->Count();
+    chip::Credentials::GroupDataProvider::GroupKey groupKey;
+
+    GroupId groupId   = static_cast<GroupId>(jGroupId);
+    uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
+
+    while (iter->Next(groupKey))
+    {
+        if (groupKey.group_id == groupId && groupKey.keyset_id == keysetId)
+        {
+            break;
+        }
+        index++;
+    }
+    iter->Release();
+    if (index >= maxCount)
+    {
+        return JNI_FALSE;
+    }
+
+    CHIP_ERROR err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
+
+    return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+}
+
+JNI_METHOD(jboolean, addKeySet)
+(JNIEnv * env, jobject self, jlong handle, jint jKeySetId, jint jKeyPolicy, jlong validityTime, jbyteArray epochKey)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+    uint8_t compressed_fabric_id[sizeof(chip::FabricId)];
+    chip::MutableByteSpan compressed_fabric_id_span(compressed_fabric_id);
+    VerifyOrReturnValue(wrapper->Controller()->GetCompressedFabricIdBytes(compressed_fabric_id_span) == CHIP_NO_ERROR, JNI_FALSE);
+
+    chip::Credentials::GroupDataProvider::SecurityPolicy keyPolicy =
+        static_cast<chip::Credentials::GroupDataProvider::SecurityPolicy>(jKeyPolicy);
+    chip::JniByteArray jniEpochKey(env, epochKey);
+    size_t epochKeySize = static_cast<size_t>(jniEpochKey.size());
+    if ((keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kCacheAndSync &&
+         keyPolicy != chip::Credentials::GroupDataProvider::SecurityPolicy::kTrustFirst) ||
+        epochKeySize != chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes)
+    {
+        return JNI_FALSE;
+    }
+
+    chip::Credentials::GroupDataProvider::KeySet keySet(static_cast<uint16_t>(jKeySetId), keyPolicy, 1);
+    chip::Credentials::GroupDataProvider::EpochKey epoch_key;
+    epoch_key.start_time = static_cast<uint64_t>(validityTime);
+    memcpy(epoch_key.key, jniEpochKey.byteSpan().data(), chip::Credentials::GroupDataProvider::EpochKey::kLengthBytes);
+    memcpy(keySet.epoch_keys, &epoch_key, sizeof(chip::Credentials::GroupDataProvider::EpochKey));
+
+    VerifyOrReturnValue(groupDataProvider->SetKeySet(wrapper->Controller()->GetFabricIndex(), compressed_fabric_id_span, keySet) ==
+                            CHIP_NO_ERROR,
+                        JNI_FALSE);
+
+    return JNI_TRUE;
+}
+
+JNI_METHOD(jboolean, removeKeySet)(JNIEnv * env, jobject self, jlong handle, jint jKeySetId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    VerifyOrReturnValue(wrapper != nullptr, JNI_FALSE, ChipLogError(Controller, "wrapper is null"));
+
+    CHIP_ERROR err                                           = CHIP_NO_ERROR;
+    chip::Credentials::GroupDataProvider * groupDataProvider = chip::Credentials::GetGroupDataProvider();
+
+    size_t index      = 0;
+    auto iter         = groupDataProvider->IterateGroupKeys(wrapper->Controller()->GetFabricIndex());
+    uint16_t keysetId = static_cast<uint16_t>(jKeySetId);
+    chip::Credentials::GroupDataProvider::GroupKey groupKey;
+    if (iter)
+    {
+        while (iter->Next(groupKey))
+        {
+            if (groupKey.keyset_id == keysetId)
+            {
+                err = groupDataProvider->RemoveGroupKeyAt(wrapper->Controller()->GetFabricIndex(), index);
+                if (err != CHIP_NO_ERROR)
+                {
+                    break;
+                }
+            }
+            index++;
+        }
+        iter->Release();
+        if (err == CHIP_NO_ERROR)
+        {
+            err = groupDataProvider->RemoveKeySet(wrapper->Controller()->GetFabricIndex(), keysetId);
+        }
+        return err == CHIP_NO_ERROR ? JNI_TRUE : JNI_FALSE;
+    }
+
+    return JNI_FALSE;
+}
+
 JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1401,6 +1807,15 @@ JNI_METHOD(jlong, getCompressedFabricId)(JNIEnv * env, jobject self, jlong handl
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     return wrapper->Controller()->GetCompressedFabricId();
+}
+
+JNI_METHOD(jlong, getControllerNodeId)(JNIEnv * env, jobject self, jlong handle)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    return wrapper->Controller()->GetNodeId();
 }
 
 JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)
@@ -1592,7 +2007,7 @@ JNI_METHOD(void, shutdownCommissioning)
     StopIOThread();
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    wrapper->Controller()->Shutdown();
+    wrapper->Shutdown();
 }
 
 JNI_METHOD(jbyteArray, getAttestationChallenge)
@@ -1682,14 +2097,16 @@ exit:
 }
 
 JNI_METHOD(void, subscribe)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
+ jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     app::ReadClient * readClient = nullptr;
     jint numAttributePaths       = 0;
     jint numEventPaths           = 0;
+    jint numDataVersionFilters   = 0;
     auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
     DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
@@ -1729,6 +2146,30 @@ JNI_METHOD(void, subscribe)
         params.mpAttributePathParamsList    = attributePaths.get();
         params.mAttributePathParamsListSize = numAttributePaths;
         attributePaths.release();
+    }
+
+    if (dataVersionFilterList != nullptr)
+    {
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(dataVersionFilterList, numDataVersionFilters));
+    }
+
+    if (numDataVersionFilters > 0)
+    {
+        std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataVersionFilters]);
+        for (uint8_t i = 0; i < numDataVersionFilters; i++)
+        {
+            jobject dataVersionFilterItem = nullptr;
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(dataVersionFilterList, i, dataVersionFilterItem));
+
+            EndpointId endpointId;
+            ClusterId clusterId;
+            DataVersion dataVersion;
+            SuccessOrExit(err = ParseDataVersionFilter(dataVersionFilterItem, endpointId, clusterId, dataVersion));
+            dataVersionFilters[i] = chip::app::DataVersionFilter(endpointId, clusterId, dataVersion);
+        }
+        params.mpDataVersionFilterList    = dataVersionFilters.get();
+        params.mDataVersionFilterListSize = numDataVersionFilters;
+        dataVersionFilters.release();
     }
 
     if (eventMin != nullptr)
@@ -1791,8 +2232,8 @@ exit:
 }
 
 JNI_METHOD(void, read)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1800,6 +2241,7 @@ JNI_METHOD(void, read)
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
     std::vector<app::AttributePathParams> attributePathParamsList;
     std::vector<app::EventPathParams> eventPathParamsList;
+    std::vector<app::DataVersionFilter> versionList;
     app::ReadClient * readClient = nullptr;
     DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
@@ -1812,11 +2254,17 @@ JNI_METHOD(void, read)
 
     SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
     SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
+    SuccessOrExit(err = ParseDataVersionFilterList(dataVersionFilterList, versionList));
     VerifyOrExit(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
     params.mpEventPathParamsList        = eventPathParamsList.data();
     params.mEventPathParamsListSize     = eventPathParamsList.size();
+    if (versionList.size() != 0)
+    {
+        params.mpDataVersionFilterList    = versionList.data();
+        params.mDataVersionFilterListSize = versionList.size();
+    }
 
     params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
     params.mTimeout          = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
@@ -1854,8 +2302,38 @@ exit:
     }
 }
 
+// Convert Json to Tlv, and remove the outer structure
+CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSpan & data)
+{
+    Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
+    VerifyOrReturnError(buf.Calloc(data.size()), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan dataWithStruct(buf.Get(), buf.AllocatedSize());
+    ReturnErrorOnFailure(JsonToTlv(json, dataWithStruct));
+    TLV::TLVReader tlvReader;
+    TLV::TLVType outerContainer = TLV::kTLVType_Structure;
+    tlvReader.Init(dataWithStruct);
+    ReturnErrorOnFailure(tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(outerContainer));
+    ReturnErrorOnFailure(tlvReader.Next());
+
+    TLV::TLVWriter tlvWrite;
+    tlvWrite.Init(data);
+    ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
+    ReturnErrorOnFailure(tlvWrite.Finalize());
+    data.reduce_size(tlvWrite.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::ConcreteDataAttributePath & path, const ByteSpan & data)
+{
+    TLV::TLVReader reader;
+    reader.Init(data);
+    ReturnErrorOnFailure(reader.Next());
+    return writeClient.PutPreencodedAttribute(path, reader);
+}
+
 JNI_METHOD(void, write)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
@@ -1889,16 +2367,15 @@ JNI_METHOD(void, write)
         jmethodID hasDataVersionMethod    = nullptr;
         jmethodID getDataVersionMethod    = nullptr;
         jmethodID getTlvByteArrayMethod   = nullptr;
+        jmethodID getJsonStringMethod     = nullptr;
         jobject endpointIdObj             = nullptr;
         jobject clusterIdObj              = nullptr;
         jobject attributeIdObj            = nullptr;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
         Optional<DataVersion> dataVersion = Optional<DataVersion>();
-        ;
-        jbyte * tlvBytesObjBytes = nullptr;
-        jsize length             = 0;
-        TLV::TLVReader reader;
+
+        bool isGroupSession = false;
 
         SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
         SuccessOrExit(err = JniReferences::GetInstance().FindMethod(
@@ -1915,9 +2392,20 @@ JNI_METHOD(void, write)
         SuccessOrExit(
             err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
 
-        endpointIdObj = env->CallObjectMethod(attributeItem, getEndpointIdMethod);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        isGroupSession = device->GetSecureSession().Value()->IsGroupSession();
+
+        if (isGroupSession)
+        {
+            endpointId = kInvalidEndpointId;
+        }
+        else
+        {
+            endpointIdObj = env->CallObjectMethod(attributeItem, getEndpointIdMethod);
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
+        }
 
         clusterIdObj = env->CallObjectMethod(attributeItem, getClusterIdMethod);
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
@@ -1927,7 +2415,6 @@ JNI_METHOD(void, write)
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
         VerifyOrExit(attributeIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
         SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
         SuccessOrExit(err = GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId));
 
@@ -1942,20 +2429,34 @@ JNI_METHOD(void, write)
 
         tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        app::ConcreteDataAttributePath path(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
+                                            static_cast<AttributeId>(attributeId), dataVersion);
+        if (tlvBytesObj != nullptr)
+        {
+            JniByteArray tlvByteArray(env, tlvBytesObj);
+            SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, tlvByteArray.byteSpan()));
+        }
+        else
+        {
+            SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getJsonString", "()Ljava/lang/String;",
+                                                                        &getJsonStringMethod));
+            jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(attributeItem, getJsonStringMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(jsonJniString != nullptr, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            JniUtfString jsonUtfJniString(env, jsonJniString);
+            std::string jsonString = std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size());
 
-        tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        length = env->GetArrayLength(tlvBytesObj);
-        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-        reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
-        reader.Next();
-        SuccessOrExit(
-            err = writeClient->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
-                                                     static_cast<AttributeId>(attributeId), dataVersion),
-                reader));
+            // Context: Chunk write is supported in sdk, oversized list could be chunked in multiple message. When transforming
+            // JSON to TLV, we need know the actual size for tlv blob when handling JsonToTlv
+            // TODO: Implement memory auto-grow to get the actual size needed for tlv blob when transforming tlv to json.
+            // Workaround: Allocate memory using json string's size, which is large enough to hold the corresponding tlv blob
+            Platform::ScopedMemoryBufferWithSize<uint8_t> tlvBytes;
+            size_t length = jsonUtfJniString.size();
+            VerifyOrExit(tlvBytes.Calloc(length), err = CHIP_ERROR_NO_MEMORY);
+            MutableByteSpan data(tlvBytes.Get(), tlvBytes.AllocatedSize());
+            SuccessOrExit(err = ConvertJsonToTlvWithoutStruct(jsonString, data));
+            SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, data));
+        }
     }
 
     err = writeClient->SendWriteRequest(device->GetSecureSession().Value(),
@@ -1964,7 +2465,6 @@ JNI_METHOD(void, write)
     callback->mWriteClient = writeClient;
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Write Error: %s", err.AsString());
@@ -1985,31 +2485,47 @@ exit:
     }
 }
 
+CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::CommandPathParams & path, const ByteSpan & data)
+{
+    // PrepareCommand does nott create the struct container with kFields and copycontainer below sets the
+    // kFields container already
+    ReturnErrorOnFailure(commandSender.PrepareCommand(path, false /* aStartDataStruct */));
+    TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    TLV::TLVReader reader;
+    reader.Init(data);
+    ReturnErrorOnFailure(reader.Next());
+    return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
+}
+
 JNI_METHOD(void, invoke)
-(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    auto callback                      = reinterpret_cast<InvokeCallback *>(callbackHandle);
-    app::CommandSender * commandSender = nullptr;
-    uint32_t endpointId                = 0;
-    uint32_t clusterId                 = 0;
-    uint32_t commandId                 = 0;
-    jmethodID getEndpointIdMethod      = nullptr;
-    jmethodID getClusterIdMethod       = nullptr;
-    jmethodID getCommandIdMethod       = nullptr;
-    jmethodID getTlvByteArrayMethod    = nullptr;
-    jobject endpointIdObj              = nullptr;
-    jobject clusterIdObj               = nullptr;
-    jobject commandIdObj               = nullptr;
-    jbyteArray tlvBytesObj             = nullptr;
-    jbyte * tlvBytesObjBytes           = nullptr;
-    jsize length                       = 0;
-    TLV::TLVReader reader;
-    TLV::TLVWriter * writer                 = nullptr;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    auto callback                           = reinterpret_cast<InvokeCallback *>(callbackHandle);
+    app::CommandSender * commandSender      = nullptr;
+    uint32_t endpointId                     = 0;
+    uint32_t clusterId                      = 0;
+    uint32_t commandId                      = 0;
+    uint16_t groupId                        = 0;
+    bool isEndpointIdValid                  = false;
+    bool isGroupIdValid                     = false;
+    jmethodID getEndpointIdMethod           = nullptr;
+    jmethodID getClusterIdMethod            = nullptr;
+    jmethodID getCommandIdMethod            = nullptr;
+    jmethodID getGroupIdMethod              = nullptr;
+    jmethodID getTlvByteArrayMethod         = nullptr;
+    jmethodID getJsonStringMethod           = nullptr;
+    jmethodID isEndpointIdValidMethod       = nullptr;
+    jmethodID isGroupIdValidMethod          = nullptr;
+    jobject endpointIdObj                   = nullptr;
+    jobject clusterIdObj                    = nullptr;
+    jobject commandIdObj                    = nullptr;
+    jobject groupIdObj                      = nullptr;
+    jbyteArray tlvBytesObj                  = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
-
     ChipLogDetail(Controller, "IM invoke() called");
 
     DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
@@ -2024,12 +2540,40 @@ JNI_METHOD(void, invoke)
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId",
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getCommandIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getGroupId", "()Ljava/util/Optional;",
+                                                                &getGroupIdMethod));
+    SuccessOrExit(
+        err = JniReferences::GetInstance().FindMethod(env, invokeElement, "isEndpointIdValid", "()Z", &isEndpointIdValidMethod));
+    SuccessOrExit(err =
+                      JniReferences::GetInstance().FindMethod(env, invokeElement, "isGroupIdValid", "()Z", &isGroupIdValidMethod));
     SuccessOrExit(
         err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
 
-    endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    isEndpointIdValid = (env->CallBooleanMethod(invokeElement, isEndpointIdValidMethod) == JNI_TRUE);
+    isGroupIdValid    = (env->CallBooleanMethod(invokeElement, isGroupIdValidMethod) == JNI_TRUE);
+
+    if (isEndpointIdValid)
+    {
+        endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
+    }
+
+    if (isGroupIdValid)
+    {
+        VerifyOrExit(device->GetSecureSession().Value()->IsGroupSession(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        groupIdObj = env->CallObjectMethod(invokeElement, getGroupIdMethod);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(groupIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        jobject boxedGroupId = nullptr;
+
+        SuccessOrExit(err = JniReferences::GetInstance().GetOptionalValue(groupIdObj, boxedGroupId));
+        VerifyOrExit(boxedGroupId != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+        groupId = static_cast<uint16_t>(JniReferences::GetInstance().IntegerToPrimitive(boxedGroupId));
+    }
 
     clusterIdObj = env->CallObjectMethod(invokeElement, getClusterIdMethod);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
@@ -2039,42 +2583,50 @@ JNI_METHOD(void, invoke)
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrExit(commandIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
     SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
     SuccessOrExit(err = GetChipPathIdValue(commandIdObj, kInvalidCommandId, commandId));
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    length = env->GetArrayLength(tlvBytesObj);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    SuccessOrExit(err = commandSender->PrepareCommand(app::CommandPathParams(static_cast<EndpointId>(endpointId), /* group id */ 0,
-                                                                             static_cast<ClusterId>(clusterId),
-                                                                             static_cast<CommandId>(commandId),
-                                                                             app::CommandPathFlags::kEndpointIdValid),
-                                                      false));
-
-    writer = commandSender->GetCommandDataIBTLVWriter();
-    VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
-    reader.Next();
-    SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader));
+    {
+        uint16_t id = isEndpointIdValid ? static_cast<uint16_t>(endpointId) : groupId;
+        app::CommandPathFlags flag =
+            isEndpointIdValid ? app::CommandPathFlags::kEndpointIdValid : app::CommandPathFlags::kGroupIdValid;
+        app::CommandPathParams path(id, static_cast<ClusterId>(clusterId), static_cast<CommandId>(commandId), flag);
+        if (tlvBytesObj != nullptr)
+        {
+            JniByteArray tlvBytesObjBytes(env, tlvBytesObj);
+            SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvBytesObjBytes.byteSpan()));
+        }
+        else
+        {
+            SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getJsonString", "()Ljava/lang/String;",
+                                                                        &getJsonStringMethod));
+            jstring jsonJniString = static_cast<jstring>(env->CallObjectMethod(invokeElement, getJsonStringMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            VerifyOrExit(jsonJniString != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+            JniUtfString jsonUtfJniString(env, jsonJniString);
+            // The invoke does not support chunk, kMaxSecureSduLengthBytes should be enough for command json blob
+            uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
+            MutableByteSpan tlvEncodingLocal{ tlvBytes };
+            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size()), tlvEncodingLocal));
+            SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvEncodingLocal));
+        }
+    }
     SuccessOrExit(err = commandSender->FinishCommand(convertedTimedRequestTimeoutMs != 0
                                                          ? Optional<uint16_t>(convertedTimedRequestTimeoutMs)
                                                          : Optional<uint16_t>::Missing()));
 
-    SuccessOrExit(err =
-                      commandSender->SendCommandRequest(device->GetSecureSession().Value(),
-                                                        imTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
-                                                                         : Optional<System::Clock::Timeout>::Missing()));
+    SuccessOrExit(err = device->GetSecureSession().Value()->IsGroupSession()
+                      ? commandSender->SendGroupCommandRequest(device->GetSecureSession().Value())
+                      : commandSender->SendCommandRequest(device->GetSecureSession().Value(),
+                                                          imTimeoutMs != 0
+                                                              ? MakeOptional(System::Clock::Milliseconds32(imTimeoutMs))
+                                                              : Optional<System::Clock::Timeout>::Missing()));
 
     callback->mCommandSender = commandSender;
 
 exit:
-
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JNI IM Invoke Error: %s", err.AsString());
@@ -2228,6 +2780,66 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     outEventId    = static_cast<EventId>(eventId);
     outIsUrgent   = (isUrgent == JNI_TRUE);
 
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * Takes objects in dataVersionFilterList, converts them to app:DataVersionFilter, and appends them to outDataVersionFilterList.
+ */
+CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList, std::vector<app::DataVersionFilter> & outDataVersionFilterList)
+{
+    jint listSize;
+
+    if (dataVersionFilterList == nullptr)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    ReturnErrorOnFailure(JniReferences::GetInstance().GetListSize(dataVersionFilterList, listSize));
+
+    for (uint8_t i = 0; i < listSize; i++)
+    {
+        jobject dataVersionFilterItem = nullptr;
+        ReturnErrorOnFailure(JniReferences::GetInstance().GetListItem(dataVersionFilterList, i, dataVersionFilterItem));
+
+        EndpointId endpointId;
+        ClusterId clusterId;
+        DataVersion dataVersion;
+        ReturnErrorOnFailure(ParseDataVersionFilter(dataVersionFilterItem, endpointId, clusterId, dataVersion));
+        outDataVersionFilterList.push_back(app::DataVersionFilter(endpointId, clusterId, dataVersion));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseDataVersionFilter(jobject versionFilter, EndpointId & outEndpointId, ClusterId & outClusterId,
+                                  DataVersion & outDataVersion)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jmethodID getEndpointIdMethod  = nullptr;
+    jmethodID getClusterIdMethod   = nullptr;
+    jmethodID getDataVersionMethod = nullptr;
+
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, versionFilter, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
+        env, versionFilter, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
+    ReturnErrorOnFailure(
+        JniReferences::GetInstance().FindMethod(env, versionFilter, "getDataVersion", "()J", &getDataVersionMethod));
+
+    jobject endpointIdObj = env->CallObjectMethod(versionFilter, getEndpointIdMethod);
+    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    uint32_t endpointId = 0;
+    ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
+    outEndpointId        = static_cast<EndpointId>(endpointId);
+    jobject clusterIdObj = env->CallObjectMethod(versionFilter, getClusterIdMethod);
+    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    uint32_t clusterId = 0;
+    ReturnErrorOnFailure(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
+    outClusterId = static_cast<ClusterId>(clusterId);
+
+    outDataVersion = static_cast<DataVersion>(env->CallLongMethod(versionFilter, getDataVersionMethod));
     return CHIP_NO_ERROR;
 }
 

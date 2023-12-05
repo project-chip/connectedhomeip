@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 
@@ -36,6 +37,8 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
 {
     VerifyOrDie(nullptr != mTimerDelegate);
 }
+
+void ReportSchedulerImpl::OnTransitionToIdle() {}
 
 /// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
 ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
@@ -70,9 +73,9 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     newNode = mNodesPool.CreateObject(aReadHandler, this, now);
 
     ChipLogProgress(DataManagement,
-                    "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
-                    " and system Timestamp %" PRIu64 ".",
-                    newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
+                    "Registered a ReadHandler that will schedule a report between system Timestamp: 0x" ChipLogFormatX64
+                    " and system Timestamp 0x" ChipLogFormatX64 ".",
+                    ChipLogValueX64(newNode->GetMinTimestamp().count()), ChipLogValueX64(newNode->GetMaxTimestamp().count()));
 }
 
 /// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
@@ -95,11 +98,13 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
 
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
 
+    node->SetCanBeSynced(false);
     node->SetIntervalTimeStamps(aReadHandler, now);
     Milliseconds32 newTimeout;
+    // Reset the EngineRunScheduled flag so that the next report is scheduled correctly
+    node->SetEngineRunScheduled(false);
     CalculateNextReportTimeout(newTimeout, node, now);
     ScheduleReport(newTimeout, node, now);
-    node->SetEngineRunScheduled(false);
 }
 
 /// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report

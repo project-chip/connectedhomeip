@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.5.3. [TC-MOD-3.4] OnMode Overwriting StartUpMode with DUT as Server
+name: 80.3.4. [TC-MOD-3.4] OnMode Overwriting StartUpMode (DUT as Server)
 
 PICS:
     - MOD.S.A0004
@@ -22,202 +21,114 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Mode Select"
+    endpoint: 1
+    #Configure newmode value
+    Step2dOnModeValue:
+        type: int8u
+        defaultValue: 4
 
 tests:
-    - label: "Note"
-      verification: |
-          To Execute the TC-MOD-3.4 test case using reboot in raspi device we followed the below suggested way:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          To run a reboot test case on raspi, run the app with --KVS flag with a file in local directory and pass that file to the command to launch the app. Steps
-
-
-            step-1:  create a file using touch command , something like touch mytest.txt
-            step-2:  chmod 777 mytest.txt
-            step-3:  launch the app ./chip-all-clusters-app --KVS ./mytest.txt
-
-          if you launch the app with the above commands and provision the app, even when you reboot the app with 'sudo reboot' , next time you launch the app with 'sudo ./out/all-clusters-app/chip-all-clusters-app --KVS ./mytest.txt' , you can run read/write attribs and commands without reprovisioning the device.
-
-          To execute this test case set onmode to any integer value because as default it value has null.
-
-          ./chip-tool modeselect write on-mode 4 1 1
-      disabled: true
-
-    - label: "Preconditions"
-      verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
-      disabled: true
-
-    - label: "Step 1: TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 1: TH reads from the DUT the StartUpMode attribute."
       PICS: MOD.S.A0004
-      verification: |
-          ./chip-tool modeselect read start-up-mode 1 1
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          saveAs: startup_mode_dut
 
-          On TH(chip-tool) log, Verify DUT response is an integer.
-          - Record this value for usage in step 2,  below is the sample log provided for the raspi platform:
-
-          [1651099663211] [82177:7560652] CHIP: [TOO] Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0004 DataVersion: 2609052118
-          [1651099663212] [82177:7560652] CHIP: [TOO]   StartUpMode: 0
-      disabled: true
-
-    - label: "Step 2a: TH reads the OnMode attribute from the DUT"
+    - label: "Step 2a: TH reads from the DUT the OnMode attribute."
       PICS: MOD.S.A0005
-      verification: |
-          ./chip-tool modeselect read on-mode 1 1
-
-          On TH(chip-tool) log, Verify OnMode attribute value is an integer different from StartUpMode
-          Save the value for usage in step 2b and below is the sample log provided for the raspi platform:
-
-          Note : If startup_mode_dut is equal to old_on_mode_dut proceed to step 4. Else proceed to step 6.
-
-          [1654780979.979743][61542:61547] CHIP:DMG: }
-          [1654780979.980040][61542:61547] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 235764160
-          [1654780979.980202][61542:61547] CHIP:TOO:   OnMode: 4
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
 
     - label:
           "Step 2b: If the StartUpMode and OnMode attributes have the same
           value, proceed to step 2c, Otherwise proceed to step 3."
       PICS: MOD.S.A0004 && MOD.S.A0005
-      verification: |
-          If the StartUpMode and OnMode attributes have the same value, proceed to step 2c, Otherwise proceed to step 3.
-      disabled: true
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: startup_mode_dut
+              - name: "Value2"
+                value: on_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
     - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
+      runIf: IsExpectedValue
       PICS: MOD.S.A0002
-      verification: |
-          ./chip-tool modeselect read supported-modes 1 1
-
-          On TH(chip-tool) log, Verify DUT response contains a list of supported modes
-          Save the Mode values for usage in step 2d,  below is the sample log provided for the raspi platform:
-
-          [1685020074.437287][16950:16952] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0002 DataVersion: 3898153349
-          [1685020074.437313][16950:16952] CHIP:TOO:   SupportedModes: 3 entries
-          [1685020074.437620][16950:16952] CHIP:TOO:     [1]: {
-          [1685020074.437632][16950:16952] CHIP:TOO:       Label: Black
-          [1685020074.437635][16950:16952] CHIP:TOO:       Mode: 0
-          [1685020074.437823][16950:16952] CHIP:TOO:       SemanticTags: 1 entries
-          [1685020074.437834][16950:16952] CHIP:TOO:         [1]: {
-          [1685020074.437838][16950:16952] CHIP:TOO:           MfgCode: 0
-          [1685020074.437841][16950:16952] CHIP:TOO:           Value: 0
-          [1685020074.437843][16950:16952] CHIP:TOO:          }
-          [1685020074.437846][16950:16952] CHIP:TOO:      }
-          [1685020074.437852][16950:16952] CHIP:TOO:     [2]: {
-          [1685020074.437854][16950:16952] CHIP:TOO:       Label: Cappuccino
-          [1685020074.437857][16950:16952] CHIP:TOO:       Mode: 4
-          [1685020074.437861][16950:16952] CHIP:TOO:       SemanticTags: 1 entries
-          [1685020074.437865][16950:16952] CHIP:TOO:         [1]: {
-          [1685020074.437868][16950:16952] CHIP:TOO:           MfgCode: 0
-          [1685020074.437870][16950:16952] CHIP:TOO:           Value: 0
-          [1685020074.437873][16950:16952] CHIP:TOO:          }
-          [1685020074.437876][16950:16952] CHIP:TOO:      }
-          [1685020074.437881][16950:16952] CHIP:TOO:     [3]: {
-          [1685020074.437883][16950:16952] CHIP:TOO:       Label: Espresso
-          [1685020074.437885][16950:16952] CHIP:TOO:       Mode: 7
-          [1685020074.437889][16950:16952] CHIP:TOO:       SemanticTags: 1 entries
-          [1685020074.437892][16950:16952] CHIP:TOO:         [1]: {
-          [1685020074.437895][16950:16952] CHIP:TOO:           MfgCode: 0
-          [1685020074.437897][16950:16952] CHIP:TOO:           Value: 0
-          [1685020074.437900][16950:16952] CHIP:TOO:          }
-          [1685020074.437902][16950:16952] CHIP:TOO:      }
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
 
     - label:
           "Step 2d: Select a value from the list in step 2c with a different
           value than the StartUpMode value read in step 1. TH sends a write
           command for OnMode to the DUT with the selected value."
+      runIf: IsExpectedValue
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
-      verification: |
-          ./chip-tool modeselect write on-mode 7 1 1
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: Step2dOnModeValue
 
-          On TH(chip-tool) log, Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          [1651099941884] [84269:7567211] CHIP: [DMG] WriteResponseMessage =
-          [1651099941884] [84269:7567211] CHIP: [DMG] {
-          [1651099941884] [84269:7567211] CHIP: [DMG]         AttributeStatusIBs =
-          [1651099941884] [84269:7567211] CHIP: [DMG]         [
-          [1651099941884] [84269:7567211] CHIP: [DMG]                 AttributeStatusIB =
-          [1651099941884] [84269:7567211] CHIP: [DMG]                 {
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         AttributePathIB =
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         {
-          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Endpoint = 0x1,
-          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Cluster = 0x50,
-          [1651099941887] [84269:7567211] CHIP: [DMG]                                 Attribute = 0x0000_0005,
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         }
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         StatusIB =
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         {
-          [1651099941887] [84269:7567211] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651099941887] [84269:7567211] CHIP: [DMG]                         },
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG]                 },
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG]         ],
-          [1651099941887] [84269:7567211] CHIP: [DMG]
-          [1651099941887] [84269:7567211] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651099941887] [84269:7567211] CHIP: [DMG] }
-      disabled: true
-
-    - label: "Step 3: TH reads the OnMode attribute from the DUT"
-      PICS: MOD.S.F00 && MOD.S.A0005
-      verification: |
-          ./chip-tool modeselect read on-mode 1 1
-
-          On TH(chip-tool) log, Verify OnMode attribute value is an integer.
-          Save the value and below is the sample log provided for the raspi platform:
-
-          [1669190858.739158][4187:4189] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0005 DataVersion: 4107771634
-          [1669190858.739222][4187:4189] CHIP:TOO:   OnMode: 7
-      disabled: true
+    - label: "Step 3: TH reads from the DUT the OnMode attribute."
+      PICS: MOD.S.A0005 && MOD.S.F00
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: Step3OnModeValue
 
     - label:
           "Step 4: TH writes 1 to StartUpOnOff attribute of the OnOff Cluster of
           the DUT"
       PICS: OO.S.A4003
-      verification: |
-          ./chip-tool onoff write start-up-on-off 1 1 1
+      cluster: "On/Off"
+      command: "writeAttribute"
+      attribute: "StartUpOnOff"
+      arguments:
+          value: 1
 
-          On TH(chip-tool) log, Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          [1651101661959] [90832:7598169] CHIP: [DMG] WriteResponseMessage =
-          [1651101661959] [90832:7598169] CHIP: [DMG] {
-          [1651101661959] [90832:7598169] CHIP: [DMG]         AttributeStatusIBs =
-          [1651101661959] [90832:7598169] CHIP: [DMG]         [
-          [1651101661959] [90832:7598169] CHIP: [DMG]                 AttributeStatusIB =
-          [1651101661959] [90832:7598169] CHIP: [DMG]                 {
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         AttributePathIB =
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         {
-          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Endpoint = 0x1,
-          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Cluster = 0x6,
-          [1651101661960] [90832:7598169] CHIP: [DMG]                                 Attribute = 0x0000_4003,
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         }
-          [1651101661960] [90832:7598169] CHIP: [DMG]
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         StatusIB =
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         {
-          [1651101661960] [90832:7598169] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
-          [1651101661960] [90832:7598169] CHIP: [DMG]                         },
-          [1651101661960] [90832:7598169] CHIP: [DMG]
-          [1651101661960] [90832:7598169] CHIP: [DMG]                 },
-          [1651101661960] [90832:7598169] CHIP: [DMG]
-          [1651101661960] [90832:7598169] CHIP: [DMG]         ],
-          [1651101661960] [90832:7598169] CHIP: [DMG]
-          [1651101661960] [90832:7598169] CHIP: [DMG]         InteractionModelRevision = 1
-          [1651101661960] [90832:7598169] CHIP: [DMG] }
-      disabled: true
-
-    - label: "Step 5: Physically power cycle the device."
+    - label: "Step 5: Physically power cycle the device"
       verification: |
           Physically power cycle the device.
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 6: TH reads the CurrentMode attribute from the DUT"
-      PICS: MOD.S.A0003
-      verification: |
-          ./chip-tool modeselect read current-mode 1 1
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-          On TH(chip-tool), Verify CurrentMode attribute value is an integer and value is value recorded in step 3, below is the sample log provided for the raspi platform:
-
-          [1669190936.869804][4194:4196] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0050 Attribute 0x0000_0003 DataVersion: 3908583538
-          [1669190936.869875][4194:4196] CHIP:TOO:   CurrentMode: 7
-      disabled: true
+    - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
+      PICS: MOD.S.A0003 && PICS_USER_PROMPT
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: Step3OnModeValue

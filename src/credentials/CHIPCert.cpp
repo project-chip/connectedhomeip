@@ -31,7 +31,7 @@
 
 #include <stddef.h>
 
-#include <credentials/CHIPCert.h>
+#include <credentials/CHIPCert_Internal.h>
 #include <credentials/CHIPCertificateSet.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
@@ -45,9 +45,6 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 
 namespace chip {
 namespace Credentials {
@@ -56,9 +53,6 @@ using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
 using namespace chip::Crypto;
-
-extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData);
-extern CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData);
 
 ChipCertificateSet::ChipCertificateSet()
 {
@@ -140,76 +134,21 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const ByteSpan chipCert, BitFlags<CertDe
     TLVReader reader;
 
     reader.Init(chipCert);
-
-    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
-
     return LoadCert(reader, decodeFlags, chipCert);
 }
 
 CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, ByteSpan chipCert)
 {
-    ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
-                       // validation, which should be performed on the TBS data encoded in ASN.1 DER form.
     ChipCertificateData cert;
-    cert.Clear();
+    ReturnErrorOnFailure(DecodeChipCert(reader, cert, decodeFlags));
 
-    // Must be positioned on the structure element representing the certificate.
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_INVALID_ARGUMENT);
+    // Verify the cert has both the Subject Key Id and Authority Key Id extensions present.
+    // Only certs with both these extensions are supported for the purposes of certificate validation.
+    VerifyOrReturnError(cert.mCertFlags.HasAll(CertFlags::kExtPresent_SubjectKeyId, CertFlags::kExtPresent_AuthKeyId),
+                        CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
-    cert.mCertificate = chipCert;
-
-    {
-        TLVType containerType;
-
-        // Enter the certificate structure...
-        ReturnErrorOnFailure(reader.EnterContainer(containerType));
-
-        // If requested to generate the TBSHash.
-        if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
-        {
-            chip::Platform::ScopedMemoryBuffer<uint8_t> asn1TBSBuf;
-            ReturnErrorCodeIf(!asn1TBSBuf.Alloc(kMaxCHIPCertDecodeBufLength), CHIP_ERROR_NO_MEMORY);
-
-            // Initialize an ASN1Writer and convert the TBS (to-be-signed) portion of the certificate to ASN.1 DER
-            // encoding. At the same time, parse various components within the certificate and set the corresponding
-            // fields in the CertificateData object.
-            writer.Init(asn1TBSBuf.Get(), kMaxCHIPCertDecodeBufLength);
-            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
-
-            // Generate a SHA hash of the encoded TBS certificate.
-            chip::Crypto::Hash_SHA256(asn1TBSBuf.Get(), writer.GetLengthWritten(), cert.mTBSHash);
-
-            cert.mCertFlags.Set(CertFlags::kTBSHashPresent);
-        }
-        else
-        {
-            // Initialize an ASN1Writer as a NullWriter.
-            writer.InitNullWriter();
-            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, cert));
-        }
-
-        // Verify the cert has both the Subject Key Id and Authority Key Id extensions present.
-        // Only certs with both these extensions are supported for the purposes of certificate validation.
-        VerifyOrReturnError(cert.mCertFlags.HasAll(CertFlags::kExtPresent_SubjectKeyId, CertFlags::kExtPresent_AuthKeyId),
-                            CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-
-        // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
-        VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
-
-        // Decode the certificate's signature...
-        ReturnErrorOnFailure(DecodeECDSASignature(reader, cert));
-
-        // Verify no more elements in the certificate.
-        ReturnErrorOnFailure(reader.VerifyEndOfContainer());
-
-        ReturnErrorOnFailure(reader.ExitContainer(containerType));
-    }
-
-    // If requested by the caller, mark the certificate as trusted.
-    if (decodeFlags.Has(CertDecodeFlags::kIsTrustAnchor))
-    {
-        cert.mCertFlags.Set(CertFlags::kIsTrustAnchor);
-    }
+    // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
+    VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
 
     // Check if this cert matches any currently loaded certificates
     for (uint32_t i = 0; i < mCertCount; i++)
@@ -287,20 +226,29 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
+    VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    return VerifyCertSignature(*cert, *caCert);
+}
+
+CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCertificateData & signer)
+{
+    VerifyOrReturnError(cert.mCertFlags.Has(CertFlags::kTBSHashPresent), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+
 #ifdef ENABLE_HSM_ECDSA_VERIFY
-    P256PublicKeyHSM caPublicKey;
+    P256PublicKeyHSM signerPublicKey;
 #else
-    P256PublicKey caPublicKey;
+    P256PublicKey signerPublicKey;
 #endif
     P256ECDSASignature signature;
 
-    VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
-    memcpy(signature.Bytes(), cert->mSignature.data(), cert->mSignature.size());
+    ReturnErrorOnFailure(signature.SetLength(cert.mSignature.size()));
+    memcpy(signature.Bytes(), cert.mSignature.data(), cert.mSignature.size());
 
-    memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
+    memcpy(signerPublicKey, signer.mPublicKey.data(), signer.mPublicKey.size());
 
-    ReturnErrorOnFailure(caPublicKey.ECDSA_validate_hash_signature(cert->mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature));
+    ReturnErrorOnFailure(
+        signerPublicKey.ECDSA_validate_hash_signature(cert.mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature));
 
     return CHIP_NO_ERROR;
 }
@@ -309,7 +257,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 {
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     const ChipCertificateData * caCert = nullptr;
-    uint8_t certType;
+    CertType certType;
 
     err = cert->mSubjectDN.GetCertType(certType);
     SuccessOrExit(err);
@@ -328,7 +276,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
         // Verify that the certificate type is set to Root or ICA.
-        VerifyOrExit(certType == kCertType_ICA || certType == kCertType_Root, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        VerifyOrExit(certType == CertType::kICA || certType == CertType::kRoot, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
         // If a path length constraint was included, verify the cert depth vs. the specified constraint.
         //
@@ -365,7 +313,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         }
 
         // If a required certificate type has been specified, verify it against the current certificate's type.
-        if (context.mRequiredCertType != kCertType_NotSpecified)
+        if (context.mRequiredCertType != CertType::kNotSpecified)
         {
             VerifyOrExit(certType == context.mRequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
         }
@@ -457,10 +405,6 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     // recursion in such a case.
     VerifyOrExit(depth < mCertCount, err = CHIP_ERROR_CERT_PATH_TOO_LONG);
 
-    // Verify that a hash of the 'to-be-signed' portion of the certificate has been computed. We will need this to
-    // verify the cert's signature below.
-    VerifyOrExit(cert->mCertFlags.Has(CertFlags::kTBSHashPresent), err = CHIP_ERROR_INVALID_ARGUMENT);
-
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
     err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
@@ -471,7 +415,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Verify signature of the current certificate against public key of the CA certificate. If signature verification
     // succeeds, the current certificate is valid.
-    err = VerifySignature(cert, caCert);
+    err = VerifyCertSignature(*cert, *caCert);
     SuccessOrExit(err);
 
 exit:
@@ -488,23 +432,17 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
     // Default error if we don't find any matching cert.
     err = (depth > 0) ? CHIP_ERROR_CA_CERT_NOT_FOUND : CHIP_ERROR_CERT_NOT_FOUND;
 
-    // Fail immediately if neither of the input criteria are specified.
-    if (subjectDN.IsEmpty() && subjectKeyId.empty())
-    {
-        ExitNow();
-    }
-
     // For each cert in the set...
     for (uint8_t i = 0; i < mCertCount; i++)
     {
         ChipCertificateData * candidateCert = &mCerts[i];
 
         // Skip the certificate if its subject DN and key id do not match the input criteria.
-        if (!subjectDN.IsEmpty() && !candidateCert->mSubjectDN.IsEqual(subjectDN))
+        if (!candidateCert->mSubjectDN.IsEqual(subjectDN))
         {
             continue;
         }
-        if (!subjectKeyId.empty() && !candidateCert->mSubjectKeyId.data_equal(subjectKeyId))
+        if (!candidateCert->mSubjectKeyId.data_equal(subjectKeyId))
         {
             continue;
         }
@@ -530,6 +468,7 @@ ChipCertificateData::~ChipCertificateData() {}
 
 void ChipCertificateData::Clear()
 {
+    mSerialNumber = ByteSpan();
     mSubjectDN.Clear();
     mIssuerDN.Clear();
     mSubjectKeyId      = CertificateKeyId();
@@ -569,7 +508,7 @@ void ValidationContext::Reset()
     mValidityPolicy = nullptr;
     mRequiredKeyUsages.ClearAll();
     mRequiredKeyPurposes.ClearAll();
-    mRequiredCertType = kCertType_NotSpecified;
+    mRequiredCertType = CertType::kNotSpecified;
 }
 
 bool ChipRDN::IsEqual(const ChipRDN & other) const
@@ -667,40 +606,47 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, CharSpan val, bool isPrinta
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
+CHIP_ERROR ChipDN::GetCertType(CertType & certType) const
 {
-    uint8_t lCertType    = kCertType_NotSpecified;
+    CertType lCertType   = CertType::kNotSpecified;
     bool fabricIdPresent = false;
     bool catsPresent     = false;
     uint8_t rdnCount     = RDNCount();
 
-    certType = kCertType_NotSpecified;
+    if (rdnCount == 1 && rdn[0].mAttrOID == kOID_AttributeType_CommonName && !rdn[0].mAttrIsPrintableString &&
+        rdn[0].mString.data_equal(kNetworkIdentityCN))
+    {
+        certType = CertType::kNetworkIdentity;
+        return CHIP_NO_ERROR;
+    }
+
+    certType = CertType::kNotSpecified;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
         if (rdn[i].mAttrOID == kOID_AttributeType_MatterRCACId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_Root;
+            lCertType = CertType::kRoot;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterICACId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_ICA;
+            lCertType = CertType::kICA;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterNodeId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
             VerifyOrReturnError(IsOperationalNodeId(rdn[i].mChipVal), CHIP_ERROR_WRONG_NODE_ID);
-            lCertType = kCertType_Node;
+            lCertType = CertType::kNode;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFirmwareSigningId)
         {
-            VerifyOrReturnError(lCertType == kCertType_NotSpecified, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(lCertType == CertType::kNotSpecified, CHIP_ERROR_WRONG_CERT_DN);
 
-            lCertType = kCertType_FirmwareSigning;
+            lCertType = CertType::kFirmwareSigning;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_MatterFabricId)
         {
@@ -717,7 +663,7 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
         }
     }
 
-    if (lCertType == kCertType_Node)
+    if (lCertType == CertType::kNode)
     {
         VerifyOrReturnError(fabricIdPresent, CHIP_ERROR_WRONG_CERT_DN);
     }
@@ -734,6 +680,7 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
 {
     uint8_t rdnCount = RDNCount();
+    bool foundId     = false;
 
     chipId = 0;
 
@@ -745,15 +692,17 @@ CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
         case kOID_AttributeType_MatterICACId:
         case kOID_AttributeType_MatterNodeId:
         case kOID_AttributeType_MatterFirmwareSigningId:
-            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_DN);
+            VerifyOrReturnError(!foundId, CHIP_ERROR_WRONG_CERT_DN);
 
-            chipId = rdn[i].mChipVal;
+            chipId  = rdn[i].mChipVal;
+            foundId = true;
             break;
         default:
             break;
         }
     }
 
+    VerifyOrReturnError(foundId, CHIP_ERROR_WRONG_CERT_DN);
     return CHIP_NO_ERROR;
 }
 
@@ -1146,12 +1095,19 @@ DLL_EXPORT CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1Un
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR ValidateCertificateType(const ChipCertificateData & certData, CertType expectedType)
+{
+    CertType certType;
+    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == expectedType, CHIP_ERROR_WRONG_CERT_TYPE);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 {
     ChipCertificateSet certSet;
     ChipCertificateData certData;
     ValidationContext validContext;
-    uint8_t certType;
 
     // Note that this function doesn't check RCAC NotBefore / NotAfter time validity.
     // It is assumed that RCAC should be valid at the time of installation by definition.
@@ -1160,8 +1116,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 
     ReturnErrorOnFailure(certSet.LoadCert(rcac, CertDecodeFlags::kGenerateTBSHash));
 
-    ReturnErrorOnFailure(certData.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Root, CHIP_ERROR_WRONG_CERT_TYPE);
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kRoot));
 
     VerifyOrReturnError(certData.mSubjectDN.IsEqual(certData.mIssuerDN), CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -1175,7 +1130,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 
     VerifyOrReturnError(certData.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign), CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
-    return ChipCertificateSet::VerifySignature(&certData, &certData);
+    return VerifyCertSignature(certData, certData);
 }
 
 CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint16_t rawIntLen)
@@ -1208,12 +1163,11 @@ CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint1
 
 CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, MutableByteSpan & derSig)
 {
+    VerifyOrReturnError(derSig.size() >= kMax_ECDSA_Signature_Length_Der, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     ASN1Writer writer;
-
     writer.Init(derSig);
-
     ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(rawSig, writer));
-
     derSig.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
@@ -1223,8 +1177,6 @@ CHIP_ERROR ConvertECDSASignatureRawToDER(P256ECDSASignatureSpan rawSig, ASN1Writ
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t derInt[kP256_FE_Length + kEmitDerIntegerWithoutTagOverhead];
-
-    VerifyOrReturnError(!rawSig.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Ecdsa-Sig-Value ::= SEQUENCE
     ASN1_START_SEQUENCE
@@ -1337,10 +1289,10 @@ CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
 CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
 {
     uint8_t catCount = 0;
-    uint8_t certType;
+    CertType certType;
 
     ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Node, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kNode, CHIP_ERROR_INVALID_ARGUMENT);
 
     const ChipDN & subjectDN = opcert.mSubjectDN;
     for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
@@ -1369,78 +1321,48 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
 
 CHIP_ERROR ExtractFabricIdFromCert(const ByteSpan & opcert, FabricId * fabricId)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+    ReturnErrorOnFailure(DecodeChipCert(opcert, certData));
     return ExtractFabricIdFromCert(certData, fabricId);
 }
 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-
-    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
-
+    ReturnErrorOnFailure(DecodeChipCert(opcert, certData));
     return ExtractNodeIdFabricIdFromOpCert(certData, nodeId, fabricId);
 }
 
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-
-    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
-
+    ReturnErrorOnFailure(DecodeChipCert(chipCert, certData));
     publicKey = certData.mPublicKey;
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExtractNotBeforeFromChipCert(const ByteSpan & chipCert, chip::System::Clock::Seconds32 & notBeforeChipEpochTime)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-
-    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
-
+    ReturnErrorOnFailure(DecodeChipCert(chipCert, certData));
     notBeforeChipEpochTime = chip::System::Clock::Seconds32(certData.mNotBeforeTime);
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-
-    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
-
+    ReturnErrorOnFailure(DecodeChipCert(chipCert, certData));
+    VerifyOrReturnError(certData.mCertFlags.Has(CertFlags::kExtPresent_AuthKeyId), CHIP_ERROR_NOT_FOUND);
     skid = certData.mSubjectKeyId;
-
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExtractSubjectDNFromChipCert(const ByteSpan & chipCert, ChipDN & dn)
 {
-    ChipCertificateSet certSet;
     ChipCertificateData certData;
-
-    ReturnErrorOnFailure(certSet.Init(&certData, 1));
-
-    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
-
+    ReturnErrorOnFailure(DecodeChipCert(chipCert, certData));
     dn = certData.mSubjectDN;
-
     return CHIP_NO_ERROR;
 }
 
@@ -1509,6 +1431,117 @@ CHIP_ERROR CertificateValidityPolicy::ApplyDefaultPolicy(const ChipCertificateDa
     default:
         return CHIP_ERROR_INTERNAL;
     }
+}
+
+void InitNetworkIdentitySubject(ChipDN & name)
+{
+    name.Clear();
+    CHIP_ERROR err = name.AddAttribute_CommonName(kNetworkIdentityCN, /* not printable */ false);
+    VerifyOrDie(err == CHIP_NO_ERROR); // AddAttribute can't fail in this case
+}
+
+static CHIP_ERROR CalculateKeyIdentifierSha256(const P256PublicKeySpan & publicKey, MutableCertificateKeyId outKeyId)
+{
+    uint8_t hash[kSHA256_Hash_Length];
+    static_assert(outKeyId.size() <= sizeof(hash)); // truncating 32 bytes down to 20
+    ReturnErrorOnFailure(Hash_SHA256(publicKey.data(), publicKey.size(), hash));
+    memcpy(outKeyId.data(), hash, outKeyId.size());
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ValidateChipNetworkIdentity(const ChipCertificateData & certData)
+{
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
+
+    VerifyOrReturnError(certData.mSerialNumber.data_equal(kNetworkIdentitySerialNumberBytes), CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certData.mNotBeforeTime == kNetworkIdentityNotBeforeTime, CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certData.mNotAfterTime == kNetworkIdentityNotAfterTime, CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certData.mIssuerDN.IsEqual(certData.mSubjectDN), CHIP_ERROR_WRONG_CERT_TYPE);
+
+    VerifyOrReturnError(certData.mCertFlags.Has(CertFlags::kExtPresent_BasicConstraints) &&
+                            !certData.mCertFlags.Has(CertFlags::kIsCA),
+                        CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certData.mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) &&
+                            certData.mKeyUsageFlags == kNetworkIdentityKeyUsage,
+                        CHIP_ERROR_WRONG_CERT_TYPE);
+    VerifyOrReturnError(certData.mCertFlags.Has(CertFlags::kExtPresent_ExtendedKeyUsage) &&
+                            certData.mKeyPurposeFlags == kNetworkIdentityKeyPurpose,
+                        CHIP_ERROR_WRONG_CERT_TYPE);
+
+    ReturnErrorOnFailure(VerifyCertSignature(certData, certData));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
+    ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ValidateChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash));
+    ReturnErrorOnFailure(ValidateChipNetworkIdentity(certData));
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, outKeyId));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractIdentifierFromChipNetworkIdentity(const ByteSpan & cert, MutableCertificateKeyId outKeyId)
+{
+    ChipCertificateData certData;
+    ReturnErrorOnFailure(DecodeChipCert(cert, certData));
+    ReturnErrorOnFailure(ValidateCertificateType(certData, CertType::kNetworkIdentity));
+    ReturnErrorOnFailure(CalculateKeyIdentifierSha256(certData.mPublicKey, outKeyId));
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR GenerateNetworkIdentitySignature(const P256Keypair & keypair, P256ECDSASignature & signature)
+{
+    // Create a buffer and writer to capture the TBS (to-be-signed) portion of the certificate.
+    chip::Platform::ScopedMemoryBuffer<uint8_t> asn1TBSBuf;
+    VerifyOrReturnError(asn1TBSBuf.Alloc(kNetworkIdentityTBSLength), CHIP_ERROR_NO_MEMORY);
+
+    ASN1Writer writer;
+    writer.Init(asn1TBSBuf.Get(), kNetworkIdentityTBSLength);
+
+    // Generate the TBSCertificate and sign it
+    ReturnErrorOnFailure(EncodeNetworkIdentityTBSCert(keypair.Pubkey(), writer));
+    ReturnErrorOnFailure(keypair.ECDSA_sign_msg(asn1TBSBuf.Get(), writer.GetLengthWritten(), signature));
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR EncodeCompactIdentityCert(TLVWriter & writer, Tag tag, const P256PublicKeySpan & publicKey,
+                                            const P256ECDSASignatureSpan & signature)
+{
+    TLVType containerType;
+    ReturnErrorOnFailure(writer.StartContainer(tag, kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurvePublicKey), publicKey));
+    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_ECDSASignature), signature));
+    ReturnErrorOnFailure(writer.EndContainer(containerType));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert)
+{
+    VerifyOrReturnError(!outCompactCert.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(CanCastTo<uint32_t>(outCompactCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
+
+    Crypto::P256ECDSASignature signature;
+    ReturnErrorOnFailure(GenerateNetworkIdentitySignature(keypair, signature));
+
+    TLVWriter writer;
+    writer.Init(outCompactCert);
+
+    P256PublicKeySpan publicKeySpan(keypair.Pubkey().ConstBytes());
+    P256ECDSASignatureSpan signatureSpan(signature.ConstBytes());
+    ReturnErrorOnFailure(EncodeCompactIdentityCert(writer, AnonymousTag(), publicKeySpan, signatureSpan));
+
+    outCompactCert.reduce_size(writer.GetLengthWritten());
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Credentials

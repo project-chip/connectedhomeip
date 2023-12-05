@@ -55,17 +55,20 @@ tests:
 
           ./chip-tool descriptor read device-type-list 1 0
 
-          on TH (Chip-tool) log, Verify "DeviceTypeList" count is at least one entry and
-          - The entry should contain one Root Node Device Type, here 22(In hex 0x0016) is a Root Node Device Type
+          on TH (Chip-tool) log, Verify that the DeviceTypeList contains one Root Node Device Type and may only contain other Node Device Types (device types with scope=node, it can be any of the following Power Source, OTA Requestor, OTA Provider) next to the Root Node Device Type. (here DeviceType: 17 is power source )
           - Revision value is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552598.748946][21129:21131] CHIP:DMG: }
-          [1674552598.749017][21129:21131] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2963153058
-          [1674552598.749027][21129:21131] CHIP:TOO:   DeviceTypeList: 1 entries
-          [1674552598.749036][21129:21131] CHIP:TOO:     [1]: {
-          [1674552598.749042][21129:21131] CHIP:TOO:       DeviceType: 22
-          [1674552598.749045][21129:21131] CHIP:TOO:       Revision: 1
-          [1674552598.749048][21129:21131] CHIP:TOO:      }
+          [[1692617243.785786][31325:31327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1437984882
+          [1692617243.785840][31325:31327] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692617243.785862][31325:31327] CHIP:TOO:     [1]: {
+          [1692617243.785881][31325:31327] CHIP:TOO:       DeviceType: 17
+          [1692617243.785892][31325:31327] CHIP:TOO:       Revision: 1
+          [1692617243.785901][31325:31327] CHIP:TOO:      }
+          [1692617243.785917][31325:31327] CHIP:TOO:     [2]: {
+          [1692617243.785926][31325:31327] CHIP:TOO:       DeviceType: 22
+          [1692617243.785936][31325:31327] CHIP:TOO:       Revision: 1
+          [1692617243.785944][31325:31327] CHIP:TOO:      }
       disabled: true
 
     - label:
@@ -88,16 +91,20 @@ tests:
           On TH (Chip-tool) log, Verify that
           - If PartsLists count is 0 then, DeviceTypeList count is at least one.
           - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
-          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.
+          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
           -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
           [1674552599.264189][21135:21137] CHIP:DMG: }
-          [1674552599.264258][21135:21137] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2605122001
-          [1674552599.264268][21135:21137] CHIP:TOO:   DeviceTypeList: 1 entries
-          [1674552599.264277][21135:21137] CHIP:TOO:     [1]: {
-          [1674552599.264284][21135:21137] CHIP:TOO:       DeviceType: 256
-          [1674552599.264287][21135:21137] CHIP:TOO:       Revision: 1
-          [1674552599.264290][21135:21137] CHIP:TOO:      }
+          [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
+          [1692617790.900398][31584:31586] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692617790.900410][31584:31586] CHIP:TOO:     [1]: {
+          [1692617790.900413][31584:31586] CHIP:TOO:       DeviceType: 256
+          [1692617790.900416][31584:31586] CHIP:TOO:       Revision: 1
+          [1692617790.900419][31584:31586] CHIP:TOO:      }
+          [1692617790.900423][31584:31586] CHIP:TOO:     [2]: {
+          [1692617790.900425][31584:31586] CHIP:TOO:       DeviceType: 17
+          [1692617790.900428][31584:31586] CHIP:TOO:       Revision: 1
+          [1692617790.900430][31584:31586] CHIP:TOO:      }
 
           ./chip-tool descriptor read  parts-list 1 2
 
@@ -106,21 +113,24 @@ tests:
           [1660127879.565330][46472:46477] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0003 DataVersion: 1237610137
           [1660127879.565473][46472:46477] CHIP:TOO:   parts list: 0 entries
 
-
           ./chip-tool descriptor read device-type-list 1 2
 
           On TH (Chip-tool) log, Verify that
           - If PartsLists count is 0 then, DeviceTypeList count is at least one.
           - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
-          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.
+          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
           -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
 
-          [1674552599.786124][21141:21143] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4029338401
-          [1674552599.786141][21141:21143] CHIP:TOO:   DeviceTypeList: 1 entries
-          [1674552599.786155][21141:21143] CHIP:TOO:     [1]: {
-          [1674552599.786164][21141:21143] CHIP:TOO:       DeviceType: 256
-          [1674552599.786168][21141:21143] CHIP:TOO:       Revision: 1
-          [1674552599.786171][21141:21143] CHIP:TOO:      }
+          [1692618454.794870][31669:31671] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1103199808
+          [1692618454.794946][31669:31671] CHIP:TOO:   DeviceTypeList: 2 entries
+          [1692618454.794990][31669:31671] CHIP:TOO:     [1]: {
+          [1692618454.795027][31669:31671] CHIP:TOO:       DeviceType: 256
+          [1692618454.795038][31669:31671] CHIP:TOO:       Revision: 1
+          [1692618454.795048][31669:31671] CHIP:TOO:      }
+          [1692618454.795063][31669:31671] CHIP:TOO:     [2]: {
+          [1692618454.795072][31669:31671] CHIP:TOO:       DeviceType: 17
+          [1692618454.795080][31669:31671] CHIP:TOO:       Revision: 1
+          [1692618454.795089][31669:31671] CHIP:TOO:      }
       disabled: true
 
     - label: "Step 2: TH reads 'ServerList' attribute."
@@ -130,81 +140,94 @@ tests:
 
           ./chip-tool descriptor read server-list 1 1
 
-          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, Here ServerList entries are 69.
+          Verify ServerList entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform, Here ServerList entries are 70.
 
-          [1689762254.556272][4639:4641] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1164998279
-          [1689762254.556406][4639:4641] CHIP:TOO:   ServerList: 71 entries
-          [1689762254.556437][4639:4641] CHIP:TOO:     [1]: 3
-          [1689762254.556462][4639:4641] CHIP:TOO:     [2]: 4
-          [1689762254.556486][4639:4641] CHIP:TOO:     [3]: 5
-          [1689762254.556511][4639:4641] CHIP:TOO:     [4]: 6
-          [1689762254.556535][4639:4641] CHIP:TOO:     [5]: 7
-          [1689762254.556559][4639:4641] CHIP:TOO:     [6]: 8
-          [1689762254.556583][4639:4641] CHIP:TOO:     [7]: 15
-          [1689762254.556608][4639:4641] CHIP:TOO:     [8]: 29
-          [1689762254.556632][4639:4641] CHIP:TOO:     [9]: 30
-          [1689762254.556657][4639:4641] CHIP:TOO:     [10]: 37
-          [1689762254.556681][4639:4641] CHIP:TOO:     [11]: 47
-          [1689762254.556705][4639:4641] CHIP:TOO:     [12]: 59
-          [1689762254.556730][4639:4641] CHIP:TOO:     [13]: 64
-          [1689762254.556782][4639:4641] CHIP:TOO:     [14]: 65
-          [1689762254.556810][4639:4641] CHIP:TOO:     [15]: 69
-          [1689762254.556834][4639:4641] CHIP:TOO:     [16]: 80
-          [1689762254.556858][4639:4641] CHIP:TOO:     [17]: 87
-          [1689762254.556883][4639:4641] CHIP:TOO:     [18]: 91
-          [1689762254.556907][4639:4641] CHIP:TOO:     [19]: 92
-          [1689762254.556931][4639:4641] CHIP:TOO:     [20]: 96
-          [1689762254.556955][4639:4641] CHIP:TOO:     [21]: 113
-          [1689762254.556980][4639:4641] CHIP:TOO:     [22]: 114
-          [1689762254.557004][4639:4641] CHIP:TOO:     [23]: 115
-          [1689762254.557028][4639:4641] CHIP:TOO:     [24]: 116
-          [1689762254.557052][4639:4641] CHIP:TOO:     [25]: 117
-          [1689762254.557077][4639:4641] CHIP:TOO:     [26]: 118
-          [1689762254.557101][4639:4641] CHIP:TOO:     [27]: 119
-          [1689762254.557125][4639:4641] CHIP:TOO:     [28]: 120
-          [1689762254.557149][4639:4641] CHIP:TOO:     [29]: 121
-          [1689762254.557173][4639:4641] CHIP:TOO:     [30]: 122
-          [1689762254.557198][4639:4641] CHIP:TOO:     [31]: 123
-          [1689762254.557222][4639:4641] CHIP:TOO:     [32]: 124
-          [1689762254.557246][4639:4641] CHIP:TOO:     [33]: 257
-          [1689762254.557270][4639:4641] CHIP:TOO:     [34]: 258
-          [1689762254.557295][4639:4641] CHIP:TOO:     [35]: 259
-          [1689762254.557319][4639:4641] CHIP:TOO:     [36]: 512
-          [1689762254.557343][4639:4641] CHIP:TOO:     [37]: 513
-          [1689762254.557368][4639:4641] CHIP:TOO:     [38]: 514
-          [1689762254.557392][4639:4641] CHIP:TOO:     [39]: 516
-          [1689762254.557416][4639:4641] CHIP:TOO:     [40]: 768
-          [1689762254.557440][4639:4641] CHIP:TOO:     [41]: 769
-          [1689762254.557465][4639:4641] CHIP:TOO:     [42]: 1024
-          [1689762254.557489][4639:4641] CHIP:TOO:     [43]: 1026
-          [1689762254.557514][4639:4641] CHIP:TOO:     [44]: 1027
-          [1689762254.557538][4639:4641] CHIP:TOO:     [45]: 1028
-          [1689762254.557562][4639:4641] CHIP:TOO:     [46]: 1029
-          [1689762254.557587][4639:4641] CHIP:TOO:     [47]: 1030
-          [1689762254.557611][4639:4641] CHIP:TOO:     [48]: 1036
-          [1689762254.557635][4639:4641] CHIP:TOO:     [49]: 1037
-          [1689762254.557659][4639:4641] CHIP:TOO:     [50]: 1043
-          [1689762254.557684][4639:4641] CHIP:TOO:     [51]: 1045
-          [1689762254.557708][4639:4641] CHIP:TOO:     [52]: 1066
-          [1689762254.557732][4639:4641] CHIP:TOO:     [53]: 1067
-          [1689762254.557757][4639:4641] CHIP:TOO:     [54]: 1068
-          [1689762254.557781][4639:4641] CHIP:TOO:     [55]: 1069
-          [1689762254.557805][4639:4641] CHIP:TOO:     [56]: 1070
-          [1689762254.557829][4639:4641] CHIP:TOO:     [57]: 1071
-          [1689762254.557853][4639:4641] CHIP:TOO:     [58]: 1283
-          [1689762254.557878][4639:4641] CHIP:TOO:     [59]: 1284
-          [1689762254.557902][4639:4641] CHIP:TOO:     [60]: 1285
-          [1689762254.557926][4639:4641] CHIP:TOO:     [61]: 1286
-          [1689762254.557950][4639:4641] CHIP:TOO:     [62]: 1287
-          [1689762254.557975][4639:4641] CHIP:TOO:     [63]: 1288
-          [1689762254.557999][4639:4641] CHIP:TOO:     [64]: 1289
-          [1689762254.558024][4639:4641] CHIP:TOO:     [65]: 1290
-          [1689762254.558048][4639:4641] CHIP:TOO:     [66]: 1291
-          [1689762254.558072][4639:4641] CHIP:TOO:     [67]: 1292
-          [1689762254.558097][4639:4641] CHIP:TOO:     [68]: 1293
-          [1689762254.558121][4639:4641] CHIP:TOO:     [69]: 1294
-          [1689762254.558145][4639:4641] CHIP:TOO:     [70]: 2820
-          [1689762254.558170][4639:4641] CHIP:TOO:     [71]: 4294048773
+          [1693218196.392903][13451:13453] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 3853201227
+          [1693218196.393030][13451:13453] CHIP:TOO:   ServerList: 70 entries
+          [1693218196.393047][13451:13453] CHIP:TOO:     [1]: 3
+          [1693218196.393059][13451:13453] CHIP:TOO:     [2]: 4
+          [1693218196.393071][13451:13453] CHIP:TOO:     [3]: 5
+          [1693218196.393081][13451:13453] CHIP:TOO:     [4]: 6
+          [1693218196.393092][13451:13453] CHIP:TOO:     [5]: 7
+          [1693218196.393103][13451:13453] CHIP:TOO:     [6]: 8
+          [1693218196.393114][13451:13453] CHIP:TOO:     [7]: 15
+          [1693218196.393125][13451:13453] CHIP:TOO:     [8]: 29
+          [1693218196.393136][13451:13453] CHIP:TOO:     [9]: 30
+          [1693218196.393147][13451:13453] CHIP:TOO:     [10]: 37
+          [1693218196.393159][13451:13453] CHIP:TOO:     [11]: 47
+          [1693218196.393169][13451:13453] CHIP:TOO:     [12]: 59
+          [1693218196.393180][13451:13453] CHIP:TOO:     [13]: 64
+          [1693218196.393191][13451:13453] CHIP:TOO:     [14]: 65
+          [1693218196.393201][13451:13453] CHIP:TOO:     [15]: 69
+          [1693218196.393212][13451:13453] CHIP:TOO:     [16]: 80
+          [1693218196.393222][13451:13453] CHIP:TOO:     [17]: 81
+          [1693218196.393233][13451:13453] CHIP:TOO:     [18]: 82
+          [1693218196.393244][13451:13453] CHIP:TOO:     [19]: 83
+          [1693218196.393254][13451:13453] CHIP:TOO:     [20]: 84
+          [1693218196.393265][13451:13453] CHIP:TOO:     [21]: 85
+          [1693218196.393276][13451:13453] CHIP:TOO:     [22]: 86
+          [1693218196.393286][13451:13453] CHIP:TOO:     [23]: 87
+          [1693218196.393297][13451:13453] CHIP:TOO:     [24]: 89
+          [1693218196.393308][13451:13453] CHIP:TOO:     [25]: 91
+          [1693218196.393318][13451:13453] CHIP:TOO:     [26]: 92
+          [1693218196.393329][13451:13453] CHIP:TOO:     [27]: 93
+          [1693218196.393340][13451:13453] CHIP:TOO:     [28]: 96
+          [1693218196.393350][13451:13453] CHIP:TOO:     [29]: 97
+          [1693218196.393362][13451:13453] CHIP:TOO:     [30]: 113
+          [1693218196.393373][13451:13453] CHIP:TOO:     [31]: 114
+          [1693218196.393384][13451:13453] CHIP:TOO:     [32]: 257
+          [1693218196.393394][13451:13453] CHIP:TOO:     [33]: 258
+          [1693218196.393405][13451:13453] CHIP:TOO:     [34]: 259
+          [1693218196.393416][13451:13453] CHIP:TOO:     [35]: 512
+          [1693218196.393427][13451:13453] CHIP:TOO:     [36]: 513
+          [1693218196.393437][13451:13453] CHIP:TOO:     [37]: 514
+          [1693218196.393448][13451:13453] CHIP:TOO:     [38]: 516
+          [1693218196.393459][13451:13453] CHIP:TOO:     [39]: 768
+          [1693218196.393470][13451:13453] CHIP:TOO:     [40]: 769
+          [1693218196.393481][13451:13453] CHIP:TOO:     [41]: 1024
+          [1693218196.393492][13451:13453] CHIP:TOO:     [42]: 1026
+          [1693218196.393503][13451:13453] CHIP:TOO:     [43]: 1027
+          [1693218196.393514][13451:13453] CHIP:TOO:     [44]: 1028
+          [1693218196.393525][13451:13453] CHIP:TOO:     [45]: 1029
+          [1693218196.393536][13451:13453] CHIP:TOO:     [46]: 1030
+          [1693218196.393546][13451:13453] CHIP:TOO:     [47]: 1036
+          [1693218196.393557][13451:13453] CHIP:TOO:     [48]: 1037
+          [1693218196.393568][13451:13453] CHIP:TOO:     [49]: 1043
+          [1693218196.393579][13451:13453] CHIP:TOO:     [50]: 1045
+          [1693218196.393590][13451:13453] CHIP:TOO:     [51]: 1066
+          [1693218196.393601][13451:13453] CHIP:TOO:     [52]: 1067
+          [1693218196.393611][13451:13453] CHIP:TOO:     [53]: 1068
+          [1693218196.393622][13451:13453] CHIP:TOO:     [54]: 1069
+          [1693218196.393633][13451:13453] CHIP:TOO:     [55]: 1070
+          [1693218196.393643][13451:13453] CHIP:TOO:     [56]: 1071
+          [1693218196.393654][13451:13453] CHIP:TOO:     [57]: 1283
+          [1693218196.393664][13451:13453] CHIP:TOO:     [58]: 1284
+          [1693218196.393675][13451:13453] CHIP:TOO:     [59]: 1285
+          [1693218196.393686][13451:13453] CHIP:TOO:     [60]: 1286
+          [1693218196.393697][13451:13453] CHIP:TOO:     [61]: 1287
+          [1693218196.393708][13451:13453] CHIP:TOO:     [62]: 1288
+          [1693218196.393718][13451:13453] CHIP:TOO:     [63]: 1289
+          [1693218196.393729][13451:13453] CHIP:TOO:     [64]: 1290
+          [1693218196.393740][13451:13453] CHIP:TOO:     [65]: 1291
+          [1693218196.393750][13451:13453] CHIP:TOO:     [66]: 1292
+          [1693218196.393761][13451:13453] CHIP:TOO:     [67]: 1293
+          [1693218196.393772][13451:13453] CHIP:TOO:     [68]: 1294
+          [1693218196.393783][13451:13453] CHIP:TOO:     [69]: 2820
+          [1693218196.393794][13451:13453] CHIP:TOO:     [70]: 4294048773
+
+          ./chip-tool descriptor read server-list 1 2
+
+          Verify ServerList entries on TH (Chip-tool) Log and below is the sample log provided for the raspi platform, Here ServerList entries are 7.
+
+          [1692618559.962829][31688:31690] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1103199808
+          [1692618559.962884][31688:31690] CHIP:TOO:   ServerList: 7 entries
+          [1692618559.962910][31688:31690] CHIP:TOO:     [1]: 3
+          [1692618559.962922][31688:31690] CHIP:TOO:     [2]: 4
+          [1692618559.962933][31688:31690] CHIP:TOO:     [3]: 5
+          [1692618559.962945][31688:31690] CHIP:TOO:     [4]: 6
+          [1692618559.962955][31688:31690] CHIP:TOO:     [5]: 29
+          [1692618559.962966][31688:31690] CHIP:TOO:     [6]: 47
+          [1692618559.962978][31688:31690] CHIP:TOO:     [7]: 1030
       disabled: true
 
     - label: "Step 3: TH reads 'ClientList' attribute"
@@ -246,5 +269,34 @@ tests:
     - label: "Step 5: TH reads from the DUT the 'TagList' attribute."
       PICS: DESC.S.A0004
       verification: |
-          SDK has to implement the Taglist attribute
+          ./chip-tool descriptor read tag-list 1 0
+
+          - Verify that the DUT response contains a TagList and SHALL contain at least one element.
+          - Read each TagStruct from the list and check for the following:
+            - Number of entries in TagList is in the range of 1 to 6 and each entry contains at least a NamespaceID and a Tag property. Confirm that each entry is unique (i.e. no duplicate tags).
+            - If the MfgCode field is not null, confirm that it is the Vendor ID of the manufacturer who has defined a certain namespace and that the NamespaceID field indicates which namespace from the manufacturer is associated with the Tag field.
+            - Confirm that each non-manufacturer specific tag is from a namespace defined in the spec (either from an common namespace or from a namespace for the particular device type).
+            - If a manufacturer specific Tag field is indicated, at least one standardized tag which is not from any manufacturer’s namespace shall be included in the TagList.
+            - Tag field is the ID of a semantic tag within the namespace indicated by the NamespaceID property.
+
+          [1692959866.253223][12664:12666] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0004 DataVersion: 2088189574
+          [1692959866.253237][12664:12666] CHIP:TOO:   TagList: 2 entries
+          [1692959866.253248][12664:12666] CHIP:TOO:     [1]: {
+          [1692959866.253251][12664:12666] CHIP:TOO:       MfgCode: null
+          [1692959866.253255][12664:12666] CHIP:TOO:       NamespaceID: 7
+          [1692959866.253257][12664:12666] CHIP:TOO:       Tag: 0
+          [1692959866.253260][12664:12666] CHIP:TOO:      }
+          [1692959866.253265][12664:12666] CHIP:TOO:     [2]: {
+          [1692959866.253267][12664:12666] CHIP:TOO:       MfgCode: null
+          [1692959866.253270][12664:12666] CHIP:TOO:       NamespaceID: 8
+          [1692959866.253272][12664:12666] CHIP:TOO:       Tag: 3
+          [1692959866.253274][12664:12666] CHIP:TOO:      }
+      disabled: true
+
+    - label:
+          "Step 5: The cluster tests applicable to each Device Type should be
+          executed to make sure all mandatory (and applicable optional)
+          attributes/commands are implemented."
+      verification: |
+          This step is redundant as during certification the appropriate tests are being run
       disabled: true

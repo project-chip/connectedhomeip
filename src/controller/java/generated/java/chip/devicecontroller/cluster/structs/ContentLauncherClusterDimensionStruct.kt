@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ContentLauncherClusterDimensionStruct(
   val width: Double,
   val height: Double,
-  val metric: Int
+  val metric: UInt
 ) {
   override fun toString(): String = buildString {
     append("ContentLauncherClusterDimensionStruct {\n")
@@ -35,9 +35,9 @@ class ContentLauncherClusterDimensionStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_WIDTH), width)
       put(ContextSpecificTag(TAG_HEIGHT), height)
       put(ContextSpecificTag(TAG_METRIC), metric)
@@ -50,11 +50,11 @@ class ContentLauncherClusterDimensionStruct(
     private const val TAG_HEIGHT = 1
     private const val TAG_METRIC = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterDimensionStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterDimensionStruct {
+      tlvReader.enterStructure(tlvTag)
       val width = tlvReader.getDouble(ContextSpecificTag(TAG_WIDTH))
       val height = tlvReader.getDouble(ContextSpecificTag(TAG_HEIGHT))
-      val metric = tlvReader.getInt(ContextSpecificTag(TAG_METRIC))
+      val metric = tlvReader.getUInt(ContextSpecificTag(TAG_METRIC))
 
       tlvReader.exitContainer()
 

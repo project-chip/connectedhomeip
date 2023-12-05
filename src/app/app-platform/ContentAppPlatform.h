@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
@@ -49,9 +48,9 @@ EmberAfStatus AppPlatformExternalAttributeReadCallback(EndpointId endpoint, Clus
 EmberAfStatus AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
-constexpr EndpointId kTargetBindingClusterEndpointId = 0;
-constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
-constexpr EndpointId kLocalSpeakerEndpointId         = 2;
+inline constexpr EndpointId kTargetBindingClusterEndpointId = 0;
+inline constexpr EndpointId kLocalVideoPlayerEndpointId     = 1;
+inline constexpr EndpointId kLocalSpeakerEndpointId         = 2;
 
 class DLL_EXPORT ContentAppFactory
 {

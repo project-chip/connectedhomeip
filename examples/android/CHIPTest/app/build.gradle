@@ -8,7 +8,7 @@ println 'matterBuildSrcDir='+matterBuildSrcDir
 println 'matterUTestLib='+matterUTestLib
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
     buildToolsVersion "30.0.3"
     ndkPath System.getenv("ANDROID_NDK_HOME")
 

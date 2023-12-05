@@ -42,6 +42,16 @@
 namespace chip {
 namespace DeviceLayer {
 
+enum
+{
+    kWiFiOnInitDone = DeviceEventType::kRange_PublicPlatformSpecific,
+    kWiFiOnScanDone,
+    kWiFiOnConnected,
+    kGotIpAddress,
+    kGotIpv6Address,
+    kWiFiOnDisconnected,
+};
+
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
                                       public Internal::GenericConnectivityManagerImpl_UDP<ConnectivityManagerImpl>,
@@ -79,7 +89,7 @@ public:
     void OnWiFiStationDisconnected(void);
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     void OnConnectivityChanged(struct netif * interface);
     void OnIPv4AddressAvailable();
     void OnIPv6AddressAvailable();
@@ -100,9 +110,10 @@ private:
     void _ClearWiFiStationProvision();
     void _OnWiFiStationProvisionChange();
     CHIP_ERROR ConnectProvisionedWiFiNetwork();
-#elif !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    enum class ConnectivityFlags : uint16_t
-    {
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    enum class ConnectivityFlags : uint16_t{
         kHaveIPv4InternetConnectivity = 0x0001,
         kHaveIPv6InternetConnectivity = 0x0002,
         kAwaitingConnectivity         = 0x0010,
@@ -110,7 +121,7 @@ private:
     BitFlags<ConnectivityFlags> mConnectivityFlag;
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     ip4_addr_t m_ip4addr;
     ip6_addr_t m_ip6addr[LWIP_IPV6_NUM_ADDRESSES];
 #endif

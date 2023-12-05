@@ -24,6 +24,7 @@
 #pragma once
 
 #include <new>
+#include <type_traits>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/core/InPlace.h>
@@ -35,7 +36,7 @@ struct NullOptionalType
 {
     explicit NullOptionalType() = default;
 };
-constexpr NullOptionalType NullOptional{};
+inline constexpr NullOptionalType NullOptional{};
 
 /**
  * Pairs an object with a boolean value to determine if the object value
@@ -70,6 +71,28 @@ public:
         if (mHasValue)
         {
             new (&mValue.mData) T(other.mValue.mData);
+        }
+    }
+
+    // Converts an Optional of an implicitly convertible type
+    template <class U, std::enable_if_t<!std::is_same_v<T, U> && std::is_convertible_v<const U, T>, bool> = true>
+    constexpr Optional(const Optional<U> & other) : mHasValue(other.HasValue())
+    {
+        if (mHasValue)
+        {
+            new (&mValue.mData) T(other.Value());
+        }
+    }
+
+    // Converts an Optional of a type that requires explicit conversion
+    template <class U,
+              std::enable_if_t<!std::is_same_v<T, U> && !std::is_convertible_v<const U, T> && std::is_constructible_v<T, const U &>,
+                               bool> = true>
+    constexpr explicit Optional(const Optional<U> & other) : mHasValue(other.HasValue())
+    {
+        if (mHasValue)
+        {
+            new (&mValue.mData) T(other.Value());
         }
     }
 

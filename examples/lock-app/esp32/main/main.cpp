@@ -68,7 +68,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
-static const char * TAG = "lock-app";
+static const char TAG[] = "lock-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 

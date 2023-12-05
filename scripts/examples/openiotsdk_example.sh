@@ -268,7 +268,7 @@ function run_test() {
     fi
 
     set +e
-    pytest --json-report --json-report-summary --json-report-file="$EXAMPLE_TEST_PATH"/test_report_"$EXAMPLE".json --binaryPath="$EXAMPLE_EXE_PATH" --fvp="$FVP_BIN" --fvpConfig="$FVP_CONFIG_FILE" "${TEST_OPTIONS[@]}" "$EXAMPLE_TEST_PATH"/test_app.py
+    pytest --log-level=INFO --json-report --json-report-summary --json-report-file="$EXAMPLE_TEST_PATH"/test_report_"$EXAMPLE".json --binaryPath="$EXAMPLE_EXE_PATH" --fvp="$FVP_BIN" --fvpConfig="$FVP_CONFIG_FILE" "${TEST_OPTIONS[@]}" "$EXAMPLE_TEST_PATH"/test_app.py
     set -e
 
     if [[ ! -f $EXAMPLE_TEST_PATH/test_report_$EXAMPLE.json ]]; then

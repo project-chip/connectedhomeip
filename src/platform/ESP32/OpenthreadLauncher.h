@@ -19,15 +19,10 @@
 
 #include <esp_err.h>
 #include <esp_openthread_types.h>
+#include <lib/core/CHIPError.h>
+#include <memory>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void set_openthread_platform_config(esp_openthread_platform_config_t * config);
+esp_err_t set_openthread_platform_config(esp_openthread_platform_config_t * config);
 esp_err_t openthread_init_stack(void);
 esp_err_t openthread_launch_task(void);
-
-#ifdef __cplusplus
-}
-#endif
+CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> && cli_str);

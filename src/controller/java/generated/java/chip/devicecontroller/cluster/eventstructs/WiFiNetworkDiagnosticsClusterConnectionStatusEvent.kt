@@ -17,21 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: Int) {
+class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UInt) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
     append("\tconnectionStatus : $connectionStatus\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CONNECTION_STATUS), connectionStatus)
       endStructure()
     }
@@ -41,11 +41,11 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: I
     private const val TAG_CONNECTION_STATUS = 0
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
-      tlvReader.enterStructure(tag)
-      val connectionStatus = tlvReader.getInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
+      tlvReader.enterStructure(tlvTag)
+      val connectionStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
 
       tlvReader.exitContainer()
 

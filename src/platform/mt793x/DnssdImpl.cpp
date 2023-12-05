@@ -52,9 +52,9 @@ extern void mDNSPlatformWriteLogRedirect(void (*)(const char *, const char *));
 }
 
 namespace {
-constexpr const char * kLocalDot        = "local.";
-constexpr const char * kProtocolTcp     = "._tcp";
-constexpr const char * kProtocolUdp     = "._udp";
+constexpr char kLocalDot[]              = "local.";
+constexpr char kProtocolTcp[]           = "._tcp";
+constexpr char kProtocolUdp[]           = "._udp";
 static constexpr uint32_t kTimeoutMilli = 3000;
 static constexpr size_t kMaxResults     = 20;
 
@@ -71,7 +71,7 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return interfaceId.IsPresent() ? (uint32_t)(void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
+    return interfaceId.IsPresent() ? (uint32_t) (void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
 
 std::string GetFullType(const char * type, DnssdServiceProtocol protocol)

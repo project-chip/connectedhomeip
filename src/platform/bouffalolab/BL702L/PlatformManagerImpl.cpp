@@ -24,7 +24,9 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/tcpip.h>
+#endif
 
 extern "C" {
 #include <bl_sec.h>
@@ -36,7 +38,7 @@ namespace chip {
 namespace DeviceLayer {
 
 extern "C" void (*ot_otrNotifyEvent_ptr)(ot_system_event_t sevent);
-extern "C" void bl_rand_stream(unsigned char *, int);
+extern "C" int bl_rand_stream(unsigned char *, int);
 extern "C" void otrNotifyEvent(ot_system_event_t sevent);
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
@@ -68,11 +70,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
+#endif
 
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);

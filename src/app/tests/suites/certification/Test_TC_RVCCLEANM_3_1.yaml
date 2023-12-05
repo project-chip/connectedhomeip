@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 92.4.1. [TC-RVCCLEANM-3.1] On Mode functionality with DUT as Server
 
@@ -20,138 +19,106 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "RVC Clean Mode"
+    endpoint: 1
+    new_mode_th:
+        type: int8u
+        defaultValue: 1
 
 tests:
-    - label: "Precondition"
-      verification: |
-          This test case is verified after the device is provisioned. Pls provision device first, Pass appropriate nodeID in the below command
-      disabled: true
-
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)."
-      verification: |
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
+    - label: "Precondition: TH writes from the DUT the OnMode attribute."
+      PICS: RVCCLEANM.S.A0003 && RVCCLEANM.S.F00
+      command: "writeAttribute"
+      attribute: "OnMode"
+      arguments:
+          value: 0
 
     - label: "Step 2: TH reads from the DUT the OnMode attribute."
       PICS: RVCCLEANM.S.A0003 && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool  rvccleanmode read on-mode 1 1
-
-          On TH(chip-tool), Verify that OnMode attribute value is an integer or Null
-          Save the value as on_mode_dut and below is the sample log provided for the raspi platform, here OnMode value is 0
-
-          [1690183202.686514][15123:15125] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0003 DataVersion: 3145953012
-          [1690183202.686550][15123:15125] CHIP:TOO:   OnMode: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          saveAs: on_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: RVCCLEANM.S.A0001 && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool  rvccleanmode read current-mode 1 1
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          saveAs: old_current_mode_dut
+          constraints:
+              type: int8u
+              minValue: 0
+              maxValue: 254
 
-          On TH(chip-tool), Verify that CurrentMode attribute is an integer.
-          Save the value as old_current_mode_dut and below is the sample log provided for the raspi platform, Here CurrentMode value is 0
-
-          NOTE: If startup_mode_dut is equal to old_current_mode_dut proceed to step 4. Else proceed to step 6.
-
-          [1690183300.914668][15159:15161] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0001 DataVersion: 4196861832
-          [1690183300.914716][15159:15161] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+    - label:
+          "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
+          Else proceed to step 6."
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: on_mode_dut
+              - name: "Value2"
+                value: old_current_mode_dut
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
+      runIf: IsExpectedValue
       PICS: RVCCLEANM.S.A0000 && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool  rvccleanmode read supported-modes 1 1
-
-          On TH(chip-tool) log, Verify DUT response contains a list of ModeOptionsStruct entries
-          - Verify that the list has two or more entries
-          - Save the Mode field values as supported_modes_dut
-          - Select a value from supported_modes_dut different from on_mode_dut. Save the value as new_mode_th, below is the sample log provided for the raspi platform:
-
-          [1690182376.583167][14996:14998] CHIP:DMG: }
-          [1690182376.583260][14996:14998] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0000 DataVersion: 3145953005
-          [1690182376.583288][14996:14998] CHIP:TOO:   SupportedModes: 3 entries
-          [1690182376.583301][14996:14998] CHIP:TOO:     [1]: {
-          [1690182376.583304][14996:14998] CHIP:TOO:       Label: Vacuum
-          [1690182376.583307][14996:14998] CHIP:TOO:       Mode: 0
-          [1690182376.583311][14996:14998] CHIP:TOO:       ModeTags: 1 entries
-          [1690182376.583316][14996:14998] CHIP:TOO:         [1]: {
-          [1690182376.583319][14996:14998] CHIP:TOO:           Value: 16385
-          [1690182376.583322][14996:14998] CHIP:TOO:          }
-          [1690182376.583325][14996:14998] CHIP:TOO:      }
-          [1690182376.583331][14996:14998] CHIP:TOO:     [2]: {
-          [1690182376.583333][14996:14998] CHIP:TOO:       Label: Wash
-          [1690182376.583336][14996:14998] CHIP:TOO:       Mode: 1
-          [1690182376.583340][14996:14998] CHIP:TOO:       ModeTags: 1 entries
-          [1690182376.583344][14996:14998] CHIP:TOO:         [1]: {
-          [1690182376.583347][14996:14998] CHIP:TOO:           Value: 16386
-          [1690182376.583349][14996:14998] CHIP:TOO:          }
-          [1690182376.583352][14996:14998] CHIP:TOO:      }
-          [1690182376.583357][14996:14998] CHIP:TOO:     [3]: {
-          [1690182376.583360][14996:14998] CHIP:TOO:       Label: Deep clean
-          [1690182376.583362][14996:14998] CHIP:TOO:       Mode: 2
-          [1690182376.583366][14996:14998] CHIP:TOO:       ModeTags: 2 entries
-          [1690182376.583369][14996:14998] CHIP:TOO:         [1]: {
-          [1690182376.583372][14996:14998] CHIP:TOO:           Value: 7
-          [1690182376.583375][14996:14998] CHIP:TOO:          }
-          [1690182376.583378][14996:14998] CHIP:TOO:         [2]: {
-          [1690182376.583380][14996:14998] CHIP:TOO:           Value: 16384
-          [1690182376.583383][14996:14998] CHIP:TOO:          }
-          [1690182376.583385][14996:14998] CHIP:TOO:      }
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          constraints:
+              type: list
+              minLength: 2
 
     - label:
           "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
+      runIf: IsExpectedValue
       PICS: RVCCLEANM.S.C00.Rsp && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool  rvccleanmode change-to-mode 1 1 1
+      command: "ChangeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: new_mode_th
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
 
-          Verify on TH(chip-tool) log, DUT responds contains a ChangeToModeResponse command with a SUCCESS (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          1690183395.641002][15168:15170] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Command 0x0000_0001
-          [1690183395.641020][15168:15170] CHIP:TOO:   ChangeToModeResponse: {
-          [1690183395.641025][15168:15170] CHIP:TOO:     status: 0
-          [1690183395.641028][15168:15170] CHIP:TOO:    }
-      disabled: true
-
-    - label: "Step 6: TH sends a Off command to the DUT"
+    - label: "Step 6:TH sends a Off command to the DUT"
       PICS: OO.S.C00.Rsp && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool onoff off 1 1
+      cluster: "On/Off"
+      command: "Off"
 
-          On TH(chip-tool) log,  Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          [1684931101.118656][20709:20711] CHIP:DMG:                                 StatusIB =
-          [1684931101.118659][20709:20711] CHIP:DMG:                                 {
-          [1684931101.118663][20709:20711] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1684931101.118665][20709:20711] CHIP:DMG:                                 },
-      disabled: true
-
-    - label: "Step 7: TH sends a On command to the DUT"
+    - label: "Step 7:TH sends a On command to the DUT"
       PICS: OO.S.C01.Rsp && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool onoff on 1 1
-
-          On TH(chip-tool) log, Verify DUT responds with a successful (value 0x00) status response and below is the sample log provided for the raspi platform:
-
-          [1684931217.055514][20729:20731] CHIP:DMG:                                 StatusIB =
-          [1684931217.055517][20729:20731] CHIP:DMG:                                 {
-          [1684931217.055520][20729:20731] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1684931217.055523][20729:20731] CHIP:DMG:                                 },
-      disabled: true
+      cluster: "On/Off"
+      command: "On"
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: RVCCLEANM.S.A0001 && RVCCLEANM.S.F00
-      verification: |
-          ./chip-tool  rvccleanmode read current-mode 1 1
-
-          On TH(chip-tool), Verify that CurrentMode attribute value is an integer value and equal to  on_mode_dut,  below is the sample log provided for the raspi platform, here CurrentMode attribute value is 0
-
-          [1690183444.048684][15184:15186] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0055 Attribute 0x0000_0001 DataVersion: 4196861834
-          [1690183444.048697][15184:15186] CHIP:TOO:   CurrentMode: 0
-      disabled: true
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: on_mode_dut

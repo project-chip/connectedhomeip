@@ -26,8 +26,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "cmsis_os2.h"
 #include <platform/internal/BLEManager.h>
-
 #ifndef SIWX_917
 #include "rail.h"
 #endif
@@ -42,7 +42,9 @@ extern "C" {
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 #include "wfx_sl_ble_init.h"
+#if !(SIWX_917 | EXP_BOARD)
 #include <rsi_driver.h>
+#endif
 #include <rsi_utils.h>
 #include <stdbool.h>
 #ifdef __cplusplus
@@ -63,8 +65,9 @@ extern "C" {
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
-rsi_semaphore_handle_t sl_rs_ble_init_sem;
-rsi_semaphore_handle_t sl_ble_event_sem;
+
+osSemaphoreId_t sl_ble_event_sem;
+osSemaphoreId_t sl_rs_ble_init_sem;
 
 /* wfxRsi Task will use as its stack */
 StackType_t wfxBLETaskStack[WFX_RSI_TASK_SZ] = { 0 };
@@ -103,7 +106,7 @@ void sl_ble_event_handling_task(void)
     int32_t event_id;
 
     //! This semaphore is waiting for wifi module initialization.
-    rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
+    osSemaphoreAcquire(sl_rs_ble_init_sem, osWaitForever);
 
     // This function initialize BLE and start BLE advertisement.
     sl_ble_init();
@@ -111,11 +114,14 @@ void sl_ble_event_handling_task(void)
     // Application event map
     while (1)
     {
-        //! This semaphore is waiting for next ble event task
-        rsi_semaphore_wait(&sl_ble_event_sem, 0);
-
         // checking for events list
         event_id = rsi_ble_app_get_event();
+        if (event_id == -1)
+        {
+            //! This semaphore is waiting for next ble event task
+            osSemaphoreAcquire(sl_ble_event_sem, osWaitForever);
+            continue;
+        }
         switch (event_id)
         {
         case RSI_BLE_CONN_EVENT: {
@@ -124,6 +130,7 @@ void sl_ble_event_handling_task(void)
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
+            rsi_ble_set_data_len(event_msg.resp_enh_conn.dev_addr, RSI_BLE_TX_OCTETS, RSI_BLE_TX_TIME);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
@@ -207,7 +214,7 @@ namespace {
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                         0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
+                                               0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[]  = { 0xF6, 0xFF };
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -221,8 +228,9 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
-    rsi_semaphore_create(&sl_ble_event_sem, 0);
+
+    sl_rs_ble_init_sem = osSemaphoreNew(1, 0, NULL);
+    sl_ble_event_sem   = osSemaphoreNew(1, 0, NULL);
 
     wfx_rsi.ble_task = xTaskCreateStatic((TaskFunction_t) sl_ble_event_handling_task, "rsi_ble", WFX_RSI_TASK_SZ, NULL, 1,
                                          wfxBLETaskStack, &rsiBLETaskStruct);

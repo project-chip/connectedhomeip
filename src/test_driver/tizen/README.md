@@ -12,7 +12,7 @@ image from hub.docker.com or build it locally using the provided Dockerfile in
 
 ```sh
 # Pull the image from hub.docker.com
-docker pull ghcr.io/project-chip/chip-build-tizen-qemu:1
+docker pull ghcr.io/project-chip/chip-build-tizen-qemu:26
 ```
 
 ## Building and Running Tests on QEMU
@@ -21,7 +21,7 @@ All steps described below should be done inside the docker container.
 
 ```sh
 docker run -it --rm --name chip-tizen-qemu \
-    ghcr.io/project-chip/chip-build-tizen-qemu:1 /bin/bash
+    ghcr.io/project-chip/chip-build-tizen-qemu:26 /bin/bash
 ```
 
 ### Clone the connectedhomeip repository
@@ -55,3 +55,20 @@ gn gen --check --fail-on-unused-args \
 # Run Tizen QEMU-based tests
 ninja -C out/tizen-check check
 ```
+
+## Debugging Tests on QEMU
+
+When running tests with `ninja -C out/tizen-check check`, the test driver prints
+the command to run the test on QEMU. Please search for the following line in the
+output of the `ninja` command: `INFO:root:run: qemu-system-arm`. Make sure that
+your terminal does not limit the number of lines printed, or simply redirect the
+output to a file as follows:
+
+```sh
+ninja -C out/tizen-check check > ninja-tizen-check.log 2>&1
+```
+
+Then, use the run command and add the `rootshell` keyword to kernel arguments
+passed to QEMU (the string after the `-append` option). This will run QEMU, but
+instead of running the test, it will drop you to the shell. From there, you can
+run the test manually by typing `/mnt/chip/runner.sh`.

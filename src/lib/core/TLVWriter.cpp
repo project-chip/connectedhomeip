@@ -33,6 +33,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/utf8.h>
 
 #include <stdarg.h>
 #include <stdint.h>
@@ -252,10 +253,30 @@ CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf)
 
 CHIP_ERROR TLVWriter::PutString(Tag tag, const char * buf, uint32_t len)
 {
+#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE
+    // Spec requirement: A.11.2. UTF-8 and Octet Strings
+    //
+    // For UTF-8 strings, the value octets SHALL encode a valid
+    // UTF-8 character (code points) sequence.
+    //
+    // Senders SHALL NOT include a terminating null character to
+    // mark the end of a string.
+
+    if (!Utf8::IsValid(CharSpan(buf, len)))
+    {
+        return CHIP_ERROR_INVALID_UTF8;
+    }
+
+    if ((len > 0) && (buf[len - 1] == 0))
+    {
+        return CHIP_ERROR_INVALID_TLV_CHAR_STRING;
+    }
+#endif // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+
     return WriteElementWithData(kTLVType_UTF8String, tag, reinterpret_cast<const uint8_t *>(buf), len);
 }
 
-CHIP_ERROR TLVWriter::PutString(Tag tag, Span<const char> str)
+CHIP_ERROR TLVWriter::PutString(Tag tag, CharSpan str)
 {
     if (!CanCastTo<uint32_t>(str.size()))
     {
@@ -301,8 +322,6 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
     size_t skipLen;
     size_t writtenBytes;
 #elif CONFIG_HAVE_VCBPRINTF
-#elif CONFIG_TLV_TRUNCATE
-    size_t maxLen;
 #else
     char * tmpBuf;
 #endif
@@ -323,17 +342,6 @@ CHIP_ERROR TLVWriter::VPutStringF(Tag tag, const char * fmt, va_list ap)
         lenFieldSize = kTLVFieldSize_2Byte;
     else
         lenFieldSize = kTLVFieldSize_4Byte;
-
-#if !(CONFIG_HAVE_VCBPRINTF) && !(CONFIG_HAVE_VSNPRINTF_EX) && CONFIG_TLV_TRUNCATE
-    // no facilities for splitting the stream across multiple buffers,
-    // just write however much fits in the current buffer.
-    // assume conservative tag length at this time (8 bytes)
-    maxLen = mRemainingLen -
-        (1 + 8 + (1 << static_cast<uint8_t>(lenFieldSize)) +
-         1); // 1 : control byte, 8 : tag length, stringLen + 1 for null termination
-    if (maxLen < dataLen)
-        dataLen = maxLen;
-#endif
 
     // write length.
     err = WriteElementHead(

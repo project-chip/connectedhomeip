@@ -28,6 +28,10 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#ifdef DIC_ENABLE
+#include "dic_control.h"
+#endif // DIC_ENABLE
+
 using namespace ::chip;
 using namespace ::chip::app::Clusters;
 
@@ -46,5 +50,8 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     else if (clusterId == Thermostat::Id)
     {
         TempMgr().AttributeChangeHandler(attributePath.mEndpointId, attributeId, value, size);
+#ifdef DIC_ENABLE
+        dic::control::AttributeHandler(attributePath.mEndpointId, attributeId);
+#endif // DIC_ENABLE
     }
 }

@@ -1,0 +1,23 @@
+/ {
+	leds {
+		/delete-node/ led_0;
+
+		led_blue: led_0 {
+			gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>;
+			label = "LED Blue";
+		};
+	};
+
+	keys {
+		/delete-node/ button_dfu;
+
+		key_dfu: button_dfu {
+			label = "USB DFU";
+			gpios = <&gpiob 2 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+	};
+};
+
+&uart0 {
+	pinctrl-0 = <&uart0_tx_pa3_default &uart0_rx_pa4_default>;
+};

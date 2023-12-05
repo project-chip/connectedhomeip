@@ -18,6 +18,8 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
 
+#import <Matter/MTRDefines.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
@@ -30,26 +32,26 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The vendor ID from the Device Attestation Certificate. May be nil only if attestation was unsuccessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, readonly, nullable) NSNumber * vendorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The product ID from the Device Attestation Certificate. May be nil only if attestation was unsuccessful.
  */
-@property (nonatomic, readonly, nullable) NSNumber * productID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, readonly, nullable) NSNumber * productID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The vendor ID value from the device's Basic Information cluster that was used
  * for device attestation.  If attestation succeeds, this must match the vendor
  * ID from the certification declaration.
  */
-@property (nonatomic, readonly) NSNumber * basicInformationVendorID API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+@property (nonatomic, readonly) NSNumber * basicInformationVendorID MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * The product ID value from the device's Basic Information cluster that was
  * used for device attestation.  If attestation succeeds, this must match one of
  * the product IDs from the certification declaration.
  */
-@property (nonatomic, readonly) NSNumber * basicInformationProductID API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6))
+@property (nonatomic, readonly) NSNumber * basicInformationProductID MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6))
     ;
 
 @property (nonatomic, readonly) MTRCertificateDERBytes dacCertificate;
@@ -90,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
                              opaqueDeviceHandle:(void *)opaqueDeviceHandle
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                                           error:(NSError * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Notify the delegate when device attestation fails.  If this callback is implemented,
@@ -104,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deviceAttestationFailedForController:(MTRDeviceController *)controller
                           opaqueDeviceHandle:(void *)opaqueDeviceHandle
                                        error:(NSError * _Nonnull)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)deviceAttestation:(MTRDeviceController *)controller
        completedForDevice:(void *)device

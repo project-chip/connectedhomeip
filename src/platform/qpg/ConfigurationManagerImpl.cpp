@@ -70,11 +70,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         err = StoreRebootCount(1);
         SuccessOrExit(err);
     }
-    if (!QPGConfig::ConfigValueExists(QPGConfig::kCounterKey_TotalOperationalHours))
-    {
-        err = StoreTotalOperationalHours(0);
-        SuccessOrExit(err);
-    }
 
     qvRebootReason = qvCHIP_GetResetReason();
 

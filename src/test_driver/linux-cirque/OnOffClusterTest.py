@@ -42,14 +42,14 @@ CIRQUE_URL = "http://localhost:5000"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-Server',
-        'base_image': 'project-chip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'Mount'],
         'rcp_mode': True,
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     },
     'device1': {
         'type': 'CHIP-Tool',
-        'base_image': 'project-chip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'Mount'],
         'rcp_mode': True,
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],

@@ -147,13 +147,15 @@ class Esp32Builder(Builder):
                  board: Esp32Board = Esp32Board.M5Stack,
                  app: Esp32App = Esp32App.ALL_CLUSTERS,
                  enable_rpcs: bool = False,
-                 enable_ipv4: bool = True
+                 enable_ipv4: bool = True,
+                 enable_insights_trace: bool = False
                  ):
         super(Esp32Builder, self).__init__(root, runner)
         self.board = board
         self.app = app
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
+        self.enable_insights_trace = enable_insights_trace
 
         if not app.IsCompatible(board):
             raise Exception(
@@ -190,6 +192,15 @@ class Esp32Builder(Builder):
         if not self.enable_ipv4:
             self._Execute(
                 ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+
+        if self.enable_insights_trace:
+            insights_flag = 'y'
+        else:
+            insights_flag = 'n'
+
+        # pre-requisite
+        self._Execute(
+            ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_ENABLE_ESP_INSIGHTS_TRACE=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
 
         cmake_flags = []
 

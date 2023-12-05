@@ -25,7 +25,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <zap-generated/CHIPClusters.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
@@ -39,6 +38,11 @@ AndroidCommissioningWindowOpener::AndroidCommissioningWindowOpener(DeviceControl
 {
     JNIEnv * env  = JniReferences::GetInstance().GetEnvForCurrentThread();
     mJavaCallback = env->NewGlobalRef(jCallbackObject);
+    if (mJavaCallback == nullptr)
+    {
+        ChipLogError(Controller, "Failed to create global reference for mJavaCallback");
+        return;
+    }
 
     jclass callbackClass = env->GetObjectClass(jCallbackObject);
 
@@ -61,7 +65,10 @@ AndroidCommissioningWindowOpener::~AndroidCommissioningWindowOpener()
 {
     ChipLogError(Controller, "Delete AndroidCommissioningWindowOpener");
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    env->DeleteGlobalRef(mJavaCallback);
+    if (mJavaCallback != nullptr)
+    {
+        env->DeleteGlobalRef(mJavaCallback);
+    }
 }
 
 CHIP_ERROR AndroidCommissioningWindowOpener::OpenBasicCommissioningWindow(DeviceController * controller, NodeId deviceId,
@@ -113,6 +120,8 @@ void AndroidCommissioningWindowOpener::OnOpenCommissioningWindowResponse(void * 
 {
     auto * self  = static_cast<AndroidCommissioningWindowOpener *>(context);
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     VerifyOrExit(self->mJavaCallback != nullptr, ChipLogError(Controller, "mJavaCallback is not allocated."));
 
@@ -147,10 +156,11 @@ exit:
 void AndroidCommissioningWindowOpener::OnOpenBasicCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status)
 {
     auto * self = static_cast<AndroidCommissioningWindowOpener *>(context);
-
     if (self->mJavaCallback != nullptr)
     {
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+        JniLocalReferenceManager manager(env);
         if (status == CHIP_NO_ERROR)
         {
             if (self->mOnSuccessMethod != nullptr)

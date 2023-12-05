@@ -16,6 +16,7 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
+from asyncio import CancelledError
 from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
@@ -69,11 +70,15 @@ class TestRunnerConfig:
     hooks: A configurable set of hooks to be called at various steps while
            running. It may may allow the callers to gain insights about the
            current running state.
+
+    auto_start_stop: Indicates whether the run method should start and stop
+            the runner of if that will be handled outside of that method.
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
     options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
+    auto_start_stop: bool = True
 
 
 class TestRunnerBase(ABC):
@@ -108,7 +113,7 @@ class TestRunnerBase(ABC):
         pass
 
     @abstractmethod
-    def run(self, config: TestRunnerConfig) -> bool:
+    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig) -> bool:
         """
         This method runs a test suite.
 
@@ -121,9 +126,6 @@ class TestRunnerBase(ABC):
 
 
 class TestRunner(TestRunnerBase):
-    """
-    TestRunner is a default runner implementation.
-    """
     async def start(self):
         return
 
@@ -144,7 +146,7 @@ class TestRunner(TestRunnerBase):
                 continue
 
             result = await self._run_with_timeout(parser, runner_config)
-            if isinstance(result, Exception):
+            if isinstance(result, Exception) or isinstance(result, CancelledError):
                 raise (result)
             elif not result:
                 return False
@@ -158,12 +160,14 @@ class TestRunner(TestRunnerBase):
     async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
+            if config.auto_start_stop:
+                await self.start()
             status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
-        except Exception as exception:
+        except (Exception, CancelledError) as exception:
             status = exception
         finally:
-            await self.stop()
+            if config.auto_start_stop:
+                await self.stop()
             return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
@@ -180,6 +184,10 @@ class TestRunner(TestRunnerBase):
                 elif not config.adapter:
                     hooks.step_start(request)
                     hooks.step_unknown()
+                    continue
+                elif config.pseudo_clusters.is_manual_step(request):
+                    hooks.step_start(request)
+                    await hooks.step_manual()
                     continue
                 else:
                     hooks.step_start(request)

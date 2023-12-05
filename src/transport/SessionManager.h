@@ -528,7 +528,7 @@ namespace MessagePacketBuffer {
 /**
  * Maximum size of a message footer, in bytes.
  */
-constexpr uint16_t kMaxFooterSize = kMaxTagLen;
+inline constexpr uint16_t kMaxFooterSize = kMaxTagLen;
 
 /**
  * Allocates a packet buffer with space for message headers and footers.

@@ -39,16 +39,6 @@ tests:
       PICS: CC.C.C07.Tx && CC.C.F03
       wait: "MoveToColor"
 
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C07.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C07.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
-
     - label: "Wait for ConfigTransitionTime"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -56,31 +46,11 @@ tests:
           values:
               - name: "ms"
                 value: ConfigTransitionTime
-
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C07.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C07.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
 
     - label: "DUT sends MoveColor command to TH"
       PICS: CC.C.C08.Tx && CC.C.F03
       wait: "MoveColor"
 
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C08.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C08.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
-
     - label: "Wait for ConfigTransitionTime"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -88,31 +58,11 @@ tests:
           values:
               - name: "ms"
                 value: ConfigTransitionTime
-
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C08.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C08.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
 
     - label: "DUT sends StepColor command to TH"
       PICS: CC.C.C09.Tx
       wait: "StepColor"
 
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C09.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C09.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
-
     - label: "Wait for ConfigTransitionTime"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -120,31 +70,11 @@ tests:
           values:
               - name: "ms"
                 value: ConfigTransitionTime
-
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C09.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C09.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
 
     - label: "DUT sends StopMoveStep command to TH"
       PICS: CC.C.C47.Tx
       wait: "StopMoveStep"
 
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C47.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label: "DUT reads CurrentY attribute from TH(potentially multiple times)"
-      PICS: CC.C.C47.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"
-
     - label: "Wait for ConfigTransitionTime"
       cluster: "DelayCommands"
       command: "WaitForMs"
@@ -152,15 +82,3 @@ tests:
           values:
               - name: "ms"
                 value: ConfigTransitionTime
-
-    - label: "DUT reads CurrentX attribute from TH(potentially multiple times)"
-      PICS: CC.C.C47.Tx && CC.C.A0003 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentX"
-
-    - label:
-          "DUT reads CurrentY attribute from ConfiguredTime: type: int16u
-          defaultValue: 30000TH(potentially multiple times)"
-      PICS: CC.C.C47.Tx && CC.C.A0004 && CC.C.F03
-      wait: "readAttribute"
-      attribute: "CurrentY"

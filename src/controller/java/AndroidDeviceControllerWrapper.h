@@ -43,6 +43,9 @@
 #include "AndroidOperationalCredentialsIssuer.h"
 #include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+#include "OTAProviderDelegateBridge.h"
+#endif
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -173,6 +176,8 @@ public:
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
                 bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
+    void Shutdown();
+
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
 #else
@@ -188,6 +193,10 @@ public:
                                                      bool shouldWaitAfterDeviceAttestation);
 
     CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+
+    CHIP_ERROR StartOTAProvider(jobject otaProviderDelegate);
+
+    CHIP_ERROR FinishOTAProvider();
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -230,6 +239,9 @@ private:
     DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
     AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
     chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
+#endif
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

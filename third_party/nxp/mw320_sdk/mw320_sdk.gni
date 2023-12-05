@@ -85,6 +85,7 @@ template("mw320_sdk") {
       "${mw320_sdk_root}/middleware/lwip/src/include",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip",
       "${mw320_sdk_root}/middleware/lwip/src/include/lwip/apps",
+      "${mw320_sdk_root}/boards/rdmw320_r0/mbedtls_common",
     ]
 
     defines = [

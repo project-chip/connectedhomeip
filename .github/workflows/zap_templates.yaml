@@ -32,7 +32,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
         defaults:
             run:
                 shell: sh
@@ -40,7 +40,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -53,6 +53,8 @@ jobs:
                 DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
+            - name: Generate script-maintained items (ERROR_CODES.md)
+              run: ./scripts/run_in_build_env.sh "scripts/error_table.py > docs/ERROR_CODES.md"
             - name: Ensure git works in current working directory
               run: git config --global --add safe.directory `pwd`
             - name: Check for uncommited changes

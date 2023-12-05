@@ -49,13 +49,6 @@ CHIP_ERROR AppTask::Init(void)
 
     ContactSensorMgr().SetCallback(OnStateChanged);
 
-    CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkSensor");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 

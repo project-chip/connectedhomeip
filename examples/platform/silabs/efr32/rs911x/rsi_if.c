@@ -54,6 +54,11 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+// TODO convert this file to cpp and use CodeUtils.h
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
 /* Rsi driver Task will use as its stack */
 StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
 
@@ -629,14 +634,6 @@ void wfx_rsi_task(void * arg)
                 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
                 /*
-                 * Checks if the IPv6 event has been notified, if not invoke the nd6_tmr,
-                 * which starts the duplicate address detectation.
-                 */
-                if (!hasNotifiedIPV6)
-                {
-                    nd6_tmr();
-                }
-                /*
                  * Checks if the assigned IPv6 address is preferred by evaluating
                  * the first block of IPv6 address ( block 0)
                  */
@@ -699,50 +696,40 @@ void wfx_rsi_task(void * arg)
         {
             if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
             {
-                SILABS_LOG("%s: start SSID scan", __func__);
-                int x;
-                wfx_wifi_scan_result_t ap;
-                rsi_scan_info_t * scan;
-                int32_t status;
-                uint8_t bgscan_results[BG_SCAN_RES_SIZE] = { 0 };
-                status = rsi_wlan_bgscan_profile(1, (rsi_rsp_scan_t *) bgscan_results, BG_SCAN_RES_SIZE);
+                rsi_rsp_scan_t scan_rsp = { 0 };
+                int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
 
-                SILABS_LOG("%s: status: %02x size = %d", __func__, status, BG_SCAN_RES_SIZE);
-                rsi_rsp_scan_t * rsp = (rsi_rsp_scan_t *) bgscan_results;
                 if (status)
                 {
-                    /*
-                     * Scan is done - failed
-                     */
+                    SILABS_LOG("SSID scan failed: %02x ", status);
                 }
                 else
-                    for (x = 0; x < rsp->scan_count[0]; x++)
+                {
+                    rsi_scan_info_t * scan;
+                    wfx_wifi_scan_result_t ap;
+                    for (int x = 0; x < scan_rsp.scan_count[0]; x++)
                     {
-                        scan = &rsp->scan_info[x];
-                        strcpy(&ap.ssid[0], (char *) &scan->ssid[0]);
-                        if (wfx_rsi.scan_ssid)
+                        scan = &scan_rsp.scan_info[x];
+                        // is it a scan all or target scan
+                        if (!wfx_rsi.scan_ssid ||
+                            (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
                         {
-                            SILABS_LOG("Inside scan_ssid");
-                            SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
-                            if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
-                            {
-                                SILABS_LOG("Inside ap details");
-                                ap.security = scan->security_mode;
-                                ap.rssi     = (-1) * scan->rssi_val;
-                                memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
-                                (*wfx_rsi.scan_cb)(&ap);
-                            }
-                        }
-                        else
-                        {
-                            SILABS_LOG("Inside else");
+                            strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
                             ap.security = scan->security_mode;
                             ap.rssi     = (-1) * scan->rssi_val;
-                            ap.chan     = scan->rf_channel;
-                            memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
+                            configASSERT(sizeof(ap.bssid) >= BSSID_MAX_STR_LEN);
+                            configASSERT(sizeof(scan->bssid) >= BSSID_MAX_STR_LEN);
+                            memcpy(ap.bssid, scan->bssid, BSSID_MAX_STR_LEN);
                             (*wfx_rsi.scan_cb)(&ap);
+
+                            if (wfx_rsi.scan_ssid)
+                            {
+                                break; // we found the targeted ssid.
+                            }
                         }
                     }
+                }
+
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
                 /* Terminate with end of scan which is no ap sent back */
                 (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);

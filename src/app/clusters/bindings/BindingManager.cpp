@@ -48,9 +48,7 @@ BindingFabricTableDelegate gFabricTableDelegate;
 
 } // namespace
 
-namespace {
-
-} // namespace
+namespace {} // namespace
 
 namespace chip {
 

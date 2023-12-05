@@ -36,7 +36,7 @@ CHIP_REPO = os.path.join(os.path.abspath(
 DEVICE_CONFIG = {
     'device0': {
         'type': 'CHIP-Echo-Requester',
-        'base_image': 'project-chip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -45,7 +45,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIP-Echo-Responder',
-        'base_image': 'project-chip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'Interactive', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',

@@ -10,6 +10,7 @@ and features.
 
 *
 esp32/README
+ti/ti_platform_overview
 ```
 
 ## Build Guides
@@ -39,7 +40,7 @@ esp32/README
 -   [Silicon Labs - Documentation](https://github.com/SiliconLabs/matter#readme)
 -   [Silicon Labs - Building](./silabs_efr32_building.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
--   [TI - Platform Overview](./ti_platform_overview.md)
+-   [TI - Platform Overview](./ti/ti_platform_overview.md)
 
 ## Tool Guides
 
@@ -54,6 +55,7 @@ esp32/README
 
 -   [Access Control](./access-control-guide.md)
 -   [IP Commissioning](./ip_commissioning.md)
+-   [Matter IDL tooling and validation](./matter_idl_tooling.md)
 
 ## Setup Guides
 

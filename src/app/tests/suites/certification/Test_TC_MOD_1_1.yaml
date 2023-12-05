@@ -31,25 +31,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/26445
-    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
-      verification: |
-          ./chip-tool modeselect read cluster-revision 1 1
+    - label: "Step 2: Read the global attribute: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 2
+          constraints:
+              type: int16u
 
-          Verify the "ClusterRevision" value is of unit16 and reflects the highest revision number 2 on the TH(Chip-tool) and below is the sample log provided for the raspi platform:
-
-          [1645775623.658997][3277:3282] CHIP:TOO:   ClusterRevision: 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 3a: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
       PICS: MOD.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -58,7 +48,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3b: TH reads the FeatureMap attribute from the DUT"
+    - label: "Step 3: TH reads the FeatureMap attribute from the DUT"
       PICS: " !MOD.S.F00 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -107,7 +97,7 @@ tests:
               type: list
               contains: [5]
 
-    - label: "Read the global attribute: EventList"
+    - label: "Step 5: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -116,7 +106,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 5: Read the global attribute: AcceptedCommandList"
+    - label: "Step 6: TH reads AcceptedCommandList attribute from DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -124,7 +114,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 6: Read the global attribute: GeneratedCommandList"
+    - label: "Step 7: TH reads GeneratedCommandList attribute from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

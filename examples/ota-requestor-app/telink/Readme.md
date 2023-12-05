@@ -2,34 +2,39 @@
 
 ## Build and flash
 
-1. Pull docker image from repository:
+1. Run the Docker container:
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-telink:1
+    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}')
     ```
 
-1. Run docker container:
+    Compatible docker image version can be found in next file:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
+    $ .github/workflows/examples-telink.yaml
     ```
 
-    here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
-    attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
-
-1. Activate the build environment:
+2. Activate the build environment:
 
     ```bash
-    $ source ./scripts/activate.sh
+    $ source ./scripts/activate.sh -p all,telink
     ```
 
-1. In the example dir run:
+3. In the example dir run (replace _<build_target>_ with your board name, for
+   example, `tlsr9518adk80d` or `tlsr9528a`):
 
     ```bash
-    $ west build
+    $ west build -b <build_target>
     ```
 
-1. Flash binary:
+    Also use key `-DFLASH_SIZE`, if your board has memory size different from 2
+    MB, for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=1m`:
+
+    ```bash
+    $ west build -b tlsr9518adk80d -- -DFLASH_SIZE=4m
+    ```
+
+4. Flash binary:
 
     ```
     $ west flash --erase
@@ -108,14 +113,15 @@ feature for another Telink example:
 
 -   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
     file.
--   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
--   zephyr.bin - ignore this file.
--   zephyr.signed.bin - ignore this file.
+
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
+corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 

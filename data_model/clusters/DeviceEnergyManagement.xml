@@ -1,0 +1,507 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0098" name="Device Energy Management" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+  </revisionHistory>
+  <classification hierarchy="base" role="application" picsCode="DENM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PA" name="PowerAdjustment" summary="Allows an EMS a temporary power
+                                                       adjustment (within the limits offered by the ESA).">
+      <mandatoryConform/>
+    </feature>
+    <feature bit="1" code="PFR" name="PowerForecastReporting" summary="Allows an EMS to request the indicative
+                                                       future power consumption vs time of an ESA.">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="2" code="PFA" name="PowerForecastAdjustment" summary="Allows an EMS to adjust the indicative
+                                                       future power consumption vs time of an ESA.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <number name="Energy" type=""/>
+    <number name="Power" type=""/>
+    <enum name="CostTypeEnum">
+      <item value="0" name="Financial" summary="Financial cost">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="GHGEmissions" summary="Grid CO2e grams cost">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Comfort" summary="Consumer comfort impact cost">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Temperature" summary="Temperature impact cost">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="EsaStateEnum">
+      <item value="0" name="Offline" summary="The ESA is not available to the EMS (e.g. start-up, maintenance mode)">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Online" summary="The ESA is working normally and can be controlled by the EMS">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Fault" summary="The ESA has developed a fault and cannot provide service">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="UserOptOut" summary="The user has disabled the ESA's flexibility capability for a period of time">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="PowerAdjustActive" summary="The ESA is in the middle of a power adjustment event">
+        <optionalConform>
+          <feature name="PA"/>
+        </optionalConform>
+      </item>
+      <item value="5" name="Paused" summary="The ESA is currently paused in its Power Forecast">
+        <optionalConform>
+          <feature name="PFA"/>
+        </optionalConform>
+      </item>
+    </enum>
+    <enum name="EsaTypeEnum">
+      <item value="0" name="EVSE" summary="EV Supply Equipment">
+        <optionalConform/>
+      </item>
+      <item value="1" name="SpaceHeating" summary="Space heating appliance">
+        <optionalConform/>
+      </item>
+      <item value="2" name="WaterHeating" summary="Water heating appliance">
+        <optionalConform/>
+      </item>
+      <item value="3" name="SpaceCooling" summary="Space cooling appliance">
+        <optionalConform/>
+      </item>
+      <item value="4" name="SpaceHeatingCooling" summary="Space heating and cooling appliance">
+        <optionalConform/>
+      </item>
+      <item value="5" name="BatteryStorage" summary="Battery Electric Storage System">
+        <optionalConform/>
+      </item>
+      <item value="6" name="SolarPV" summary="Solar PV inverter">
+        <optionalConform/>
+      </item>
+      <item value="7" name="FridgeFreezer" summary="Fridge / Freezer">
+        <optionalConform/>
+      </item>
+      <item value="8" name="WashingMachine" summary="Washing Machine">
+        <optionalConform/>
+      </item>
+      <item value="9" name="Dishwasher" summary="Dishwasher">
+        <optionalConform/>
+      </item>
+      <item value="10" name="Cooking" summary="Cooking appliance">
+        <optionalConform/>
+      </item>
+      <item value="255" name="Other" summary="Other appliance type">
+        <optionalConform/>
+      </item>
+    </enum>
+    <struct name="CostStruct">
+      <field id="0" name="CostType" type="CostTypeEnum" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Value" type="int32" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="DecimalPoints" type="uint8" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Currency" type="uint16" default="0">
+        <access read="true"/>
+        <optionalConform/>
+        <constraint type="max" value="999"/>
+      </field>
+    </struct>
+    <struct name="PowerAdjustStruct">
+      <field id="0" name="MinPower" type="Power" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxPower" type="Power" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MinDuration" type="elapsed-s" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="MaxDuration" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="PowerForecastStruct">
+      <field id="0" name="ForecastId" type="uint16" default="0">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ActiveSlotNumber" type="uint16" default="0">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="StartTime" type="epoch-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="EndTime" type="epoch-s">
+        <access read="true"/>
+        <optionalConform/>
+      </field>
+      <field id="4" name="EarliestStartTime" type="epoch-s">
+        <access read="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+      <field id="5" name="LatestEndTime" type="epoch-s">
+        <access read="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="IsPausable" type="bool">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="Slots" type="list">
+        <entry type="SlotStruct"/>
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="maxCount" value="16"/>
+      </field>
+    </struct>
+    <struct name="PowerLimitsStruct structure">
+      <field id="0" name="StartTime" type="epoch-s">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="1" name="Duration" type="elapsed-s">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="NominalPower" type="Power">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="3" name="MaximumEnergy" type="Energy">
+        <access read="true" write="true"/>
+        <optionalConform/>
+      </field>
+    </struct>
+    <struct name="SlotAdjustmentStruct">
+      <field id="0" name="SlotIndex" type="uint16">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="1" name="NominalPower" type="Power">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="2" name="Duration" type="elapsed-s">
+        <access read="true" write="true"/>
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </struct>
+    <struct name="SlotStruct">
+      <field id="0" name="MinDuration" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="MaxDuration" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="DefaultDuration" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="ElapsedSlotTime" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="RemainingSlotTime" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="SlotIsPauseable" type="bool">
+        <access read="true"/>
+        <optionalConform/>
+      </field>
+      <field id="6" name="NominalPower" type="Power">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="7" name="MinPower" type="Power">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="MaxPower" type="Power">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="9" name="NominalEnergy" type="Energy">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="10" name="Costs" type="list[CostStruct Type]">
+        <access read="true"/>
+        <optionalConform/>
+        <constraint type="max" value="5"/>
+      </field>
+      <field id="11" name="MinPowerAdjustment" type="Power">
+        <access read="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+      <field id="12" name="MaxPowerAdjustment" type="Power">
+        <access read="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+      <field id="13" name="MinDurationAdjustment" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+      <field id="14" name="MaxDurationAdjustment" type="elapsed-s">
+        <access read="true"/>
+        <mandatoryConform>
+          <feature name="PFA"/>
+        </mandatoryConform>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="EsaType" type="EsaTypeEnum" default="Other">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="EsaIsGenerator" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="EsaState" type="EsaStateEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0003" name="AbsMinPower" type="Power" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="AbsMaxPower" type="Power" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="PowerAdjustmentCapability" type="list[PowerAdjustStruct Type]" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="PA"/>
+      </mandatoryConform>
+      <constraint type="max" value="16"/>
+    </attribute>
+    <attribute id="0x0006" name="PowerForecast" type="PowerForecastStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="PFR"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="PowerAdjustRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="Power" type="Power">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="1" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </command>
+    <command id="0x01" name="CancelPowerAdjustRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="StartTimeAdjustRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="PFA"/>
+      </mandatoryConform>
+      <field id="0" name="RequestedStartTime" type="epoch-s">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </command>
+    <command id="0x03" name="PauseRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="PFA"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x04" name="ResumeRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="PFA"/>
+      </mandatoryConform>
+    </command>
+    <command id="0x05" name="ModifyPowerForecastRequest" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <feature name="PFA"/>
+      </optionalConform>
+      <field id="0" name="ForecastId" type="uint32">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SlotAdjustments" type="list[SlotAdjustmentStruct Type]">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="RequestLimitBasedPowerForecast" response="Y">
+      <access invokePrivilege="operate"/>
+      <optionalConform>
+        <feature name="PFA"/>
+      </optionalConform>
+      <field id="1" name="PowerLimits" type="list[PowerLimitsStruct structure]">
+        <mandatoryConform/>
+        <constraint type="max" value="10"/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="PowerAdjustStart" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="PA"/>
+      </optionalConform>
+    </event>
+    <event id="0x01" name="PowerAdjustEnd" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="PA"/>
+      </optionalConform>
+      <field id="0" name="Cause" type="enum8" default="NormalCompletion">
+        <enum>
+          <item value="0" name="NormalCompletion" summary="The ESA completed the session as requested">
+            <optionalConform/>
+          </item>
+          <item value="1" name="Offline" summary="The ESA was set to offline">
+            <optionalConform/>
+          </item>
+          <item value="2" name="Fault" summary="The ESA has developed a fault could not complete the service">
+            <optionalConform/>
+          </item>
+          <item value="3" name="UserOptOut" summary="The user has disabled the ESA's flexibility capability">
+            <optionalConform/>
+          </item>
+        </enum>
+        <mandatoryConform>
+          <feature name="PA"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="Duration" type="elapsed-s">
+        <mandatoryConform>
+          <feature name="PA"/>
+        </mandatoryConform>
+      </field>
+      <field id="1" name="EnergyUse" type="Energy">
+        <mandatoryConform>
+          <feature name="PA"/>
+        </mandatoryConform>
+      </field>
+    </event>
+    <event id="0x02" name="Paused" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="PFA"/>
+      </optionalConform>
+    </event>
+    <event id="0x03" name="Resumed" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="PFA"/>
+      </optionalConform>
+    </event>
+  </events>
+</cluster>

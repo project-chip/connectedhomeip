@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="HVAC"/>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0202" />
     <field name="MultiSpeed" mask="0x01" />
     <field name="Auto" mask="0x02" />
@@ -27,7 +27,7 @@ limitations under the License.
     <field name="Airflow Direction" mask="0x20" />
   </bitmap>
 
-  <enum name="FanModeEnum" type="ENUM8">
+  <enum name="FanModeEnum" type="enum8">
     <cluster code="0x0202"/>
     <item name="Off" value="0x00"/>
     <item name="Low" value="0x01"/>
@@ -38,42 +38,42 @@ limitations under the License.
     <item name="Smart" value="0x06"/>
   </enum>
 
-  <enum name="FanModeSequenceEnum" type="ENUM8">
+  <enum name="FanModeSequenceEnum" type="enum8">
     <cluster code="0x0202"/>
     <item name="Off/Low/Med/High" value="0x00"/>
     <item name="Off/Low/High" value="0x01"/>
     <item name="Off/Low/Med/High/Auto" value="0x02"/>
     <item name="Off/Low/High/Auto" value="0x03"/>
-    <item name="Off/On/Auto" value="0x04"/>
-    <item name="Off/On" value="0x05"/>
+    <item name="Off/High/Auto" value="0x04"/>
+    <item name="Off/High" value="0x05"/>
   </enum>
 
-  <bitmap name="RockBitmap" type="BITMAP8">
+  <bitmap name="RockBitmap" type="bitmap8">
     <cluster code="0x0202" />
     <field name="RockLeftRight" mask="0x01" />
     <field name="RockUpDown" mask="0x02" />
     <field name="RockRound" mask="0x04" />
   </bitmap>
 
-  <bitmap name="WindBitmap" type="BITMAP8">
+  <bitmap name="WindBitmap" type="bitmap8">
     <cluster code="0x0202" />
     <field name="Sleep Wind" mask="0x01" />
     <field name="Natural Wind" mask="0x02" />
   </bitmap>
 
-  <enum name="StepDirectionEnum" type="ENUM8">
+  <enum name="StepDirectionEnum" type="enum8">
     <cluster code="0x0202"/>
     <item name="Increase" value="0x00"/>
     <item name="Decrease" value="0x01"/>
   </enum>
 
-  <enum name="AirflowDirectionEnum" type="ENUM8">
+  <enum name="AirflowDirectionEnum" type="enum8">
     <cluster code="0x0202"/>
     <item name="Forward" value="0x00"/>
     <item name="Reverse" value="0x01"/>
   </enum>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Fan Control</name>
     <domain>HVAC</domain>
     <description>An interface for controlling a fan in a heating/cooling system.</description>
@@ -83,13 +83,15 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
+    <globalAttribute side="either" code="0xFFFD" value="4"/>
+
     <attribute side="server" code="0x0000" define="FAN_MODE" type="FanModeEnum" min="0" max="6" writable="true" default="0" optional="false">FanMode</attribute>
-    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="true" default="2" optional="false">FanModeSequence</attribute>
-    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="Percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
-    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="Percent" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
-    <attribute side="server" code="0x0004" define="SPEED_MAX" type="INT8U" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
-    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="INT8U" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
-    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="INT8U" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
+    <attribute side="server" code="0x0001" define="FAN_MODE_SEQUENCE" type="FanModeSequenceEnum" min="0" max="5" writable="false" default="2" optional="false">FanModeSequence</attribute>
+    <attribute side="server" code="0x0002" define="PERCENT_SETTING" type="percent" min="0" max="100" writable="true" default="0" isNullable="true" optional="false">PercentSetting</attribute>
+    <attribute side="server" code="0x0003" define="PERCENT_CURRENT" type="percent" min="0" max="100" writable="false" default="0" optional="false">PercentCurrent</attribute>
+    <attribute side="server" code="0x0004" define="SPEED_MAX" type="int8u" min="1" max="100" writable="false" default="1" optional="true">SpeedMax</attribute>
+    <attribute side="server" code="0x0005" define="SPEED_SETTING" type="int8u" min="0" max="100" writable="true" default="0" isNullable="true" optional="true">SpeedSetting</attribute>
+    <attribute side="server" code="0x0006" define="SPEED_CURRENT" type="int8u" min="0" max="100" writable="false" default="0" optional="true">SpeedCurrent</attribute>
     <attribute side="server" code="0x0007" define="ROCK_SUPPORT" type="RockBitmap" writable="false" default="0x00" optional="true">RockSupport</attribute>
     <attribute side="server" code="0x0008" define="ROCK_SETTING" type="RockBitmap" writable="true" default="0x00" optional="true">RockSetting</attribute>
     <attribute side="server" code="0x0009" define="WIND_SUPPORT" type="WindBitmap" writable="false" default="0x00" optional="true">WindSupport</attribute>
@@ -102,6 +104,5 @@ limitations under the License.
       <arg name="Wrap" type="boolean" optional="true"/>
       <arg name="LowestOff" type="boolean" optional="true"/>
     </command>
-
   </cluster>
 </configurator>

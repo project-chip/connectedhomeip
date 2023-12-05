@@ -65,10 +65,10 @@ public:
     PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type) {}
     PeerAddress(Type type) : mTransportType(type) {}
 
-    PeerAddress(PeerAddress &&)      = default;
-    PeerAddress(const PeerAddress &) = default;
+    PeerAddress(PeerAddress &&)                  = default;
+    PeerAddress(const PeerAddress &)             = default;
     PeerAddress & operator=(const PeerAddress &) = default;
-    PeerAddress & operator=(PeerAddress &&) = default;
+    PeerAddress & operator=(PeerAddress &&)      = default;
 
     const Inet::IPAddress & GetIPAddress() const { return mIPAddress; }
     PeerAddress & SetIPAddress(const Inet::IPAddress & addr)

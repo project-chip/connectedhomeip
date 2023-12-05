@@ -25,7 +25,7 @@ config:
 
 tests:
     - label: "Note"
-      verifications: |
+      verification: |
           This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
       disabled: true
 
@@ -40,7 +40,7 @@ tests:
           "Step 2: Manually put the DUT into a state wherein it can receive a
           Start Command"
       verification: |
-
+          Manually put the DUT into a state wherein it can receive a Start Command
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the OperationalStateList attribute"
@@ -191,7 +191,7 @@ tests:
           of time less than the expected duration of the operation that has been
           started"
       verification: |
-
+          TH waits for a vendor defined wait time, this being a period of time less than the expected duration of the operation that has been started
       disabled: true
 
     - label: "Step 11: TH reads from the DUT the CountdownTime attribute"
@@ -304,12 +304,15 @@ tests:
     - label:
           "Step 16: Manually put the DUT into a state wherein it cannot receive
           a Start Command"
+      PICS: OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
       verification: |
-
+          Manually put the DUT into a state wherein it cannot receive a Start Command
       disabled: true
 
     - label: "Step 17: TH sends Start command to the DUT"
-      PICS: OPSTATE.S.C02.Rsp && OPSTATE.S.C04.Tx
+      PICS:
+          OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OPSTATE.S.C02.Rsp &&
+          OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
 
@@ -322,7 +325,7 @@ tests:
           [1689674700.385233][17340:17342] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Command 0x0000_0004
           [1689674700.385266][17340:17342] CHIP:TOO:   OperationalCommandResponse: {
           [1689674700.385274][17340:17342] CHIP:TOO:     commandResponseState: {
-          [1689674700.385281][17340:17342] CHIP:TOO:       ErrorStateID: 0
+          [1689674700.385281][17340:17342] CHIP:TOO:       ErrorStateID: 1
           [1689674700.385289][17340:17342] CHIP:TOO:      }
           [1689674700.385295][17340:17342] CHIP:TOO:    }
           [1689674700.385311][17340:17342] CHIP:DMG: ICR moving to [AwaitingDe]

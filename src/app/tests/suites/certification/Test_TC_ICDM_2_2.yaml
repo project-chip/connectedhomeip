@@ -26,6 +26,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Precondition"
+      verification: |
+          Commission DUT to TH (can be skipped if done in a preceding test).
+          TH reads from the DUT the RegisteredClients attribute.
+          If list of registered clients is not empty, unregister existing clients
+          TH reads from the DUT the RegisteredClients attribute. Verify that the DUT response contains empty list of registered clients.
+      disabled: true
+
     - label:
           "Step 1: TH sends RegisterClient command. - CheckInNodeID: registering
           clients node ID - MonitoredSubject: monitored subject ID - Key: shared

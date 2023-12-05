@@ -21,22 +21,17 @@
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <string.h>
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
-namespace chip {
-namespace TestCerts {
-extern const ByteSpan sTestCert_PAA_FFF1_Cert;
-extern const ByteSpan sTestCert_PAA_NoVID_Cert;
-} // namespace TestCerts
-} // namespace chip
-
 using namespace chip::Crypto;
+using chip::TestCerts::GetTestPaaRootStore;
 
 namespace chip {
 namespace Credentials {
@@ -45,11 +40,6 @@ namespace {
 
 // As per specifications section 11.22.5.1. Constant RESP_MAX
 constexpr size_t kMaxResponseLength = 900;
-
-static const ByteSpan kTestPaaRoots[] = {
-    TestCerts::sTestCert_PAA_FFF1_Cert,
-    TestCerts::sTestCert_PAA_NoVID_Cert,
-};
 
 // Test CD Signing Key from `credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem`
 // used to verify any in-SDK development CDs. The associated keypair to do actual signing is in
@@ -268,7 +258,7 @@ struct MatterCDSigningKey
     const P256PublicKeySpan mPubkey;
 };
 
-std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
+constexpr std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
     { FixedByteSpan<20>{ gTestCdPubkeyKid }, FixedByteSpan<65>{ gTestCdPubkeyBytes } },
     { FixedByteSpan<20>{ gCdSigningKey001Kid }, FixedByteSpan<65>{ gCdSigningKey001PubkeyBytes } },
     { FixedByteSpan<20>{ gCdSigningKey002Kid }, FixedByteSpan<65>{ gCdSigningKey002PubkeyBytes } },
@@ -277,7 +267,11 @@ std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
     { FixedByteSpan<20>{ gCdSigningKey005Kid }, FixedByteSpan<65>{ gCdSigningKey005PubkeyBytes } },
 } };
 
-const ArrayAttestationTrustStore kTestAttestationTrustStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
+struct TestAttestationTrustStore final : public ArrayAttestationTrustStore
+{
+    TestAttestationTrustStore() : ArrayAttestationTrustStore(GetTestPaaRootStore().data(), GetTestPaaRootStore().size()) {}
+};
+Global<TestAttestationTrustStore> gTestAttestationTrustStore;
 
 AttestationVerificationResult MapError(CertificateChainValidationResult certificateChainValidationResult)
 {
@@ -397,7 +391,7 @@ void DefaultDACVerifier::VerifyAttestationInformation(const DeviceAttestationVer
 
         if (err == CHIP_ERROR_NOT_IMPLEMENTED)
         {
-            VerifyOrExit(kTestAttestationTrustStore.GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
+            VerifyOrExit(gTestAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
                          attestationError = AttestationVerificationResult::kPaaNotFound);
         }
 
@@ -503,6 +497,14 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
     if (!firmwareInfo.empty())
     {
         // TODO: validate contents based on DCL
+    }
+
+    // Verify the cd elements are as required by the spec
+    // security_level, security_information are meant to be ignored. version_number is not meant to be interpreted by the
+    // commissioners.
+    if (cdContent.formatVersion != 1 || cdContent.certificationType >= chip::to_underlying(CertificationType::kReserved))
+    {
+        return AttestationVerificationResult::kAttestationElementsMalformed;
     }
 
     // The vendor_id field in the Certification Declaration SHALL match the VendorID attribute found in the Basic Information
@@ -678,7 +680,7 @@ CHIP_ERROR CsaCdKeysTrustStore::LookupVerifyingKey(const ByteSpan & kid, Crypto:
 
 const AttestationTrustStore * GetTestAttestationTrustStore()
 {
-    return &kTestAttestationTrustStore;
+    return &gTestAttestationTrustStore.get();
 }
 
 DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)

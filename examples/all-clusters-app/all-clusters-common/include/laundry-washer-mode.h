@@ -45,7 +45,7 @@ private:
                                               { .value = to_underlying(ModeBase::ModeTag::kNight) },
                                               { .value = to_underlying(ModeBase::ModeTag::kQuiet) } };
     ModeTagStructType modeTagsHeavy[2]    = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                           { .value = to_underlying(ModeTag::kHeavy) } };
+                                              { .value = to_underlying(ModeTag::kHeavy) } };
     ModeTagStructType modeTagsWhites[1]   = { { .value = to_underlying(ModeTag::kWhites) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
@@ -73,6 +73,8 @@ private:
 public:
     ~LaundryWasherModeDelegate() override = default;
 };
+
+ModeBase::Instance * Instance();
 
 void Shutdown();
 

@@ -27,7 +27,7 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -270,13 +270,17 @@ public:
     static void TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     static void TestReadHandler_SubscriptionReportingIntervalsTest1(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest2(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest3(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadHandler_SubscriptionReportingIntervalsTest4(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     static void TestReadHandler_SubscriptionReportingIntervalsTest5(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest6(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest7(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadHandler_SubscriptionReportingIntervalsTest8(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest9(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
@@ -1719,12 +1723,18 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
 
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
         //
         // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
         //
         //
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                         [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
@@ -1801,12 +1811,18 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
 
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
         //
         // Drive IO until we get an error on the subscription, which should be caused
         // by the liveness timer firing once we hit our max-interval plus
         // retransmit timeouts.
         //
-        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
                                         [&]() { return callback.mOnError >= 1; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
@@ -1953,6 +1969,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     gTestReadInteraction.mEmitSubscriptionError = false;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval equal to client-requested min-interval.
@@ -2181,6 +2199,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
 
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but lower than 60m:
 // server adjustment to a value greater than client-requested, but greater than 60 (not allowed).
@@ -2246,6 +2266,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but greater than 60m:
@@ -2473,6 +2495,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but greater than 60m:
@@ -4680,13 +4704,22 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_TwoSubscribesMultipleReads", TestReadInteraction::TestReadHandler_TwoSubscribesMultipleReads),
     NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
-    NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest1", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1),
+/*
+    Disabling SubscriptionReportingIntervals tests for ICD run.
+    These tests test the non-ICD behavior and cannot take into account that an ICD will always
+    change the max interval of a subscription.
+*/
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+    NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest1", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1), // no good
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest2", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest3", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3),
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest4", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4),
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest5", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest5),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest6", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest6),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest7", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7),
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest8", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest9", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9),
         NL_TEST_DEF("TestReadSubscribeAttributeResponseWithVersionOnlyCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache),

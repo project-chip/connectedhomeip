@@ -25,10 +25,10 @@ namespace DeviceLayer {
 namespace Internal {
 
 typedef uint16_t EFR32OpaqueKeyId;
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdUnknown       = 0xFFFFU; // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdVolatile      = 0xFFFEU; // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMin = 0x0U;    // Do not modify, will impact existing deployments
-constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMax = 0x1FFU;  // Do not decrease, will impact existing deployments
+inline constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdUnknown       = 0xFFFFU; // Do not modify, will impact existing deployments
+inline constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdVolatile      = 0xFFFEU; // Do not modify, will impact existing deployments
+inline constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMin = 0x0U;    // Do not modify, will impact existing deployments
+inline constexpr EFR32OpaqueKeyId kEFR32OpaqueKeyIdPersistentMax = 0x1FFU;  // Do not decrease, will impact existing deployments
 
 enum class EFR32OpaqueKeyUsages : uint8_t
 {
@@ -132,7 +132,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Delete();
+    CHIP_ERROR DestroyKey();
 
 protected:
     void * mContext      = nullptr;

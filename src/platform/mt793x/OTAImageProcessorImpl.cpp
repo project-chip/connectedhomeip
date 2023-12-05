@@ -158,7 +158,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    if (IsSpanUsable(block))
+    if (!block.empty())
     {
         filogic_ota_state_t filogic_err;
         filogic_ota_io_write_sync(imageProcessor->mFilogicCtx, block.data(), block.size(), &filogic_err);
@@ -179,7 +179,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 // // Store block data for HandleProcessBlock to access
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;

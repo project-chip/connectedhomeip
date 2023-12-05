@@ -37,12 +37,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-ti:1
+            image: ghcr.io/project-chip/chip-build-ti:26
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -57,7 +57,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py  \
-                      --target cc32xx-lock build \
+                      --target cc32xx-lock --target cc32xx-air-purifier build \
                       --copy-artifacts-to out/artifacts \
                   "
             - name: Get lock app size stats
@@ -65,6 +65,13 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     cc32xx CC3235SF_LAUNCHXL lock \
                     out/artifacts/cc32xx-lock/chip-CC3235SF_LAUNCHXL-lock-example.out \
+                    /tmp/bloat_reports/
+
+            - name: Get air purifier app size stats
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    cc32xx CC3235SF_LAUNCHXL air-purifier \
+                    out/artifacts/cc32xx-air-purifier/chip-CC3235SF_LAUNCHXL-air-purifier-example.out \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports

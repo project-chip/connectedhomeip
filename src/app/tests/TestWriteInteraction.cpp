@@ -23,10 +23,10 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestContext.h>
@@ -379,8 +379,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
-    const char charSpanData[]    = "a simple test string";
+    const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
+    static const char charSpanData[] = "a simple test string";
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;

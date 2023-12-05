@@ -109,6 +109,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
   readonly attribute CaseSigma3 case_sigma3 = 0x32;
   readonly attribute CaseSigma2Resume case_sigma2_resume = 0x33;
   readonly attribute protocol_binary_data status_report = 0x40;
+  readonly attribute protocol_binary_data icd_checkin = 0x50;
 }
 
 /// Fake cluster for defining structures for IM data encoding.
@@ -174,12 +175,12 @@ client cluster IMProtocol = 0xFFFF0001 {
     boolean keep_subscriptions = 0;
     int16u min_minterval_floor = 1;
     int16u max_minterval_ceiling = 2;
-    optional AttributePathIB attribute_requests = 3;
-    optional EventPathIB event_requests = 4;
-    optional EventFilterIB event_filters = 5;
+    optional AttributePathIB attribute_requests[] = 3;
+    optional EventPathIB event_requests[] = 4;
+    optional EventFilterIB event_filters[] = 5;
     // NOTE: 6 is missing here ...
     boolean fabric_filtered = 7;
-    optional DataVersionFilterIB data_version_filters = 8;
+    optional DataVersionFilterIB data_version_filters[] = 8;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;

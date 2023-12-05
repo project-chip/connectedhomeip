@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
-  val current: List<Int>,
-  val previous: List<Int>
+  val current: List<UInt>,
+  val previous: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {\n")
@@ -34,19 +34,19 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
-      startList(ContextSpecificTag(TAG_CURRENT))
+      startStructure(tlvTag)
+      startArray(ContextSpecificTag(TAG_CURRENT))
       for (item in current.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
-      startList(ContextSpecificTag(TAG_PREVIOUS))
+      endArray()
+      startArray(ContextSpecificTag(TAG_PREVIOUS))
       for (item in previous.iterator()) {
         put(AnonymousTag, item)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -56,23 +56,23 @@ class ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent(
     private const val TAG_PREVIOUS = 1
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val current =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_CURRENT))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getInt(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<Int> {
-          tlvReader.enterList(ContextSpecificTag(TAG_PREVIOUS))
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getInt(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

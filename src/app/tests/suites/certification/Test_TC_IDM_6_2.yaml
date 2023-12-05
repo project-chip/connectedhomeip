@@ -28,8 +28,14 @@ config:
 tests:
     - label: "Note"
       verification: |
-          Please use Interactive mode to Verify subscription test cases
-          Here the command to enter interactive mode:--   ./chip-tool interactive start
+          1. The Cluster and Commands should be based on the cluster implementation on the DUT.
+          2. The cluster used in the below test steps is an example, User can use any supported chip cluster/attribute/command.
+      disabled: true
+
+    - label: "Precondition"
+      verification: |
+          1. Please use Interactive mode to Verify subscription test cases
+          2. Here the command to enter interactive mode:--   ./chip-tool interactive start
       disabled: true
 
     - label:
@@ -832,14 +838,24 @@ tests:
       disabled: true
 
     - label:
-          "Step 12: TH sends Subscribe Request Message to DUT with EventRequests
-          set to path which indicates a cluster event that is not supported."
+          "Step 12: TH sends Subscribe Request Message to DUT. DUT sends Report
+          Data message to DUT + TH sends Status Response Message with an error
+          Status."
       verification: |
           Mark this as not testable /NA. Out of Scope
+          SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
       disabled: true
 
     - label:
           "Step 13: TH sends Subscribe Request Message to DUT with EventRequests
+          set to path which indicates a cluster event that is not supported."
+      verification: |
+          Mark this as not testable /NA. Out of Scope
+          SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
+      disabled: true
+
+    - label:
+          "Step 14: TH sends Subscribe Request Message to DUT with EventRequests
           set to path which requires a privilege that is not granted for the
           cluster in the path."
       verification: |
@@ -893,7 +909,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14: TH sends Subscribe Request Message to DUT with EventRequests
+          "Step 16: TH sends Subscribe Request Message to DUT with EventRequests
           set to Wildcard path where reading an event in the path requires a
           privilege that is not granted for the cluster in the path."
       verification: |

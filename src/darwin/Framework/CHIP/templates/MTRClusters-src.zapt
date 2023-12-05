@@ -1,22 +1,19 @@
 {{> header excludeZapComment=true}}
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRBaseClusters.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
-#import "MTRBaseClusterUtils.h"
-#import "MTRBaseDevice_Internal.h"
 #import "MTRClusterConstants.h"
-#import "MTRClusters_Internal.h"
 #import "MTRDevice_Internal.h"
-#import "MTRCallbackBridge.h"
 #import "MTRCluster_Internal.h"
+#import "MTRClusters_Internal.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
 
-#include <lib/support/CHIPListUtils.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -28,37 +25,10 @@ using chip::Optional;
 using chip::System::Clock::Timeout;
 using chip::System::Clock::Seconds16;
 
-static void MTRClustersLogEnqueue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, workQueue);
-}
-
-static void MTRClustersLogDequeue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
-    MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, workQueue);
-}
-
-static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *error) {
-    // Log the data at the INFO level (not usually persisted permanently),
-    // but make sure we log the work completion at the DEFAULT level.
-    MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, value, error);
-    MTR_LOG_DEFAULT("%@ endWork", logPrefix);
-}
-
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
-
-- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 {{#zcl_commands}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
@@ -74,87 +44,49 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 {{/inline}}
-{{#*inline "clusterId"}}
-{{#unless (isSupported cluster command=command)}}
-{{asMEI ../manufacturerCode ../code}}
-{{else}}
-MTRClusterIDType{{cluster}}ID
-{{/unless}}
-{{/inline}}
-{{#*inline "commandId"}}
-{{#unless (isSupported cluster command=command)}}
-{{asMEI manufacturerCode code}}
-{{else}}
-MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
-{{/unless}}
-{{/inline}}
-{{#*inline "baseCluster"}}
-{{#if (isSupported cluster command=command)}}
-MTRBaseCluster{{cluster}}
-{{else}}
-MTRBaseCluster{{compatClusterNameRemapping parent.name}}
-{{/if}}
-{{/inline}}
-{{#*inline "completionName"}}
-{{#if (isSupported cluster command=command)}}
-completion
-{{else}}
-completionHandler
-{{/if}}
-{{/inline}}
 {{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int){{> clusterId}}, (unsigned int){{> commandId}}];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[{{> baseCluster}} alloc] initWithDevice:baseDevice endpointID:@(self.endpoint) queue:self.device.queue];
-        [cluster {{asLowerCamelCase name}}WithParams:params {{> completionName}}:
-        {{#if hasSpecificResponse}}
-        ^(MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params * _Nullable value, NSError * _Nullable error) {
-            MTRClustersLogCompletion(logPrefix, value, error);
-            dispatch_async(self.callbackQueue, ^{
-              {{! This treats completion as taking an id for the data.  This is
-                  not great from a type-safety perspective, of course. }}
-              completion(value, error);
-            });
-            [workItem endWork];
-        }
-        {{else}}
-        ^(NSError * _Nullable error) {
-            MTRClustersLogCompletion(logPrefix, nil, error);
-            dispatch_async(self.callbackQueue, ^{
-              {{! For now, don't change the bridge API; instead just use an adapter
-                  to invoke our completion handler. This is not great from a
-                  type-safety perspective, of course. }}
-              completion(error);
-            });
-            [workItem endWork];
-        }
-        {{/if}}
-        ];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-      expectedValues = nil;
-    } else {
-      expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
-    if (expectedValues) {
-      [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 {{/if}}
 {{/inline}}
@@ -174,11 +106,12 @@ completionHandler
                  (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))))}}
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
-- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
+- (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
@@ -187,9 +120,9 @@ completionHandler
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber *timedWriteTimeout = params.timedWriteTimeout;
-    {{#if mustUseTimedInvoke}}
+    {{#if mustUseTimedWrite}}
     if (!timedWriteTimeout) {
-        timedWriteTimeout = @(10000);
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
     {{/if}}
 
@@ -242,7 +175,7 @@ completionHandler
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
-- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase command}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
@@ -262,7 +195,8 @@ completionHandler
 {
   return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs];

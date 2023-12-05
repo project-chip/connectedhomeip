@@ -152,7 +152,8 @@ class TC_ACE_1_2(MatterBaseTest):
         subscription_acl.SetAttributeUpdateCallback(acl_cb)
 
         self.print_step(5, "TH2 subscribes to the AccessControlEntryChanged event")
-        subscription_ace = await self.TH2.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
+        urgent = 1
+        subscription_ace = await self.TH2.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged, urgent)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         ace_queue = queue.Queue()
         ace_cb = EventChangeCallback(Clusters.AccessControl.Events.AccessControlEntryChanged, ace_queue)
         subscription_ace.SetEventUpdateCallback(ace_cb)

@@ -17,10 +17,10 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
   val activeTimestampPresent: Boolean,
@@ -53,9 +53,9 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT), activeTimestampPresent)
       put(ContextSpecificTag(TAG_PENDING_TIMESTAMP_PRESENT), pendingTimestampPresent)
       put(ContextSpecificTag(TAG_MASTER_KEY_PRESENT), masterKeyPresent)
@@ -87,10 +87,10 @@ class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents(
     private const val TAG_CHANNEL_MASK_PRESENT = 11
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterOperationalDatasetComponents {
-      tlvReader.enterStructure(tag)
+      tlvReader.enterStructure(tlvTag)
       val activeTimestampPresent =
         tlvReader.getBoolean(ContextSpecificTag(TAG_ACTIVE_TIMESTAMP_PRESENT))
       val pendingTimestampPresent =

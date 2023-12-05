@@ -25,6 +25,7 @@
 #pragma once
 
 #include <functional>
+#include <platform/CHIPDeviceError.h>
 
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
@@ -62,11 +63,11 @@ namespace Internal {
 // '08' = Matter nvm3 region
 // '72' = the sub region group base offset (Factory, Config, Counter or KVS)
 // '01' = the id offset inside the group.
-constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
-constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
-constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
-constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
-constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
+inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
+inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
+inline constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
 constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
     return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
@@ -176,6 +177,7 @@ public:
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
@@ -183,6 +185,7 @@ public:
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);

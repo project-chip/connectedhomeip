@@ -91,20 +91,17 @@ tests:
       disabled: true
 
     - label:
-          "Step 3: DUT shouldnt be discoverable via both commissionable and
-          operational advertisements"
-      PICS: "!MCORE.DD.EXTENDED_DISCOVERY"
+          "Step 3: Verify that the DUT is not advertising as an operational node
+          on DNS-SD with service type _matter._tcp"
       verification: |
-          Verify DUT is not discoverable over DNS-SD in both TCP and UDP
-
-          avahi-browse -rt _matterc._tcp
-          avahi-browse -rt _matterc._udp
+          Verify that the DUT is not advertising as an operational node on DNS-SD with service type _matter._tcp
+          avahi-browse -rt _matter._tcp
       disabled: true
 
     - label:
-          "Step 4: DUT should be discoverable via commissionable service
-          advertisements but shall not be in the commissioning mode"
-      PICS: MCORE.DD.EXTENDED_DISCOVERY
+          "Step 4: If the DUT is advertising as a commissionable node with CM=2
+          over DNS-SD or advertising the Matter service over BLE, TH commissions
+          the device"
       verification: |
           Verify that the DUT is discoverable over DNS-SD with service type _matterc._udp with no subtype _CM and text key for CM with value 0
 

@@ -156,7 +156,6 @@ tests:
                       0xFFFD,
                   ]
 
-    # Optional
     - label: "TS4: Check for mandatory attributes in AttributeList"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
@@ -264,7 +263,7 @@ tests:
           constraints:
               contains: [0x03]
 
-    # Feature TZ
+    #Feature TZ
     - label: "TS5: Check for TZ feature-based events in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F00
       command: "readAttribute"
@@ -281,7 +280,7 @@ tests:
           constraints:
               excludes: [0x00, 0x01, 0x02]
 
-    # Feature TSC
+    #Feature TSC
     - label: "TS5: Check for TSC feature-based events in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F03
       command: "readAttribute"
@@ -289,6 +288,7 @@ tests:
       response:
           constraints:
               contains: [0x04]
+
     - label: "TS5: Check for TSC feature-based events not in EventList"
       PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F03"
       command: "readAttribute"
@@ -370,7 +370,7 @@ tests:
     # TS 7: GeneratedCommandList
     ##########################
     # Feature TZ
-    - label: "TS6: Check for TZ feature-based commands in AcceptedCommandList"
+    - label: "TS7: Check for TZ feature-based commands in GeneratedCommandList"
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -379,7 +379,7 @@ tests:
               contains: [0x03]
 
     - label:
-          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+          "TS7: Check for TZ feature-based commands in not GeneratedCommandList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "GeneratedCommandList"

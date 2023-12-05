@@ -20,6 +20,7 @@
 #include <platform/PlatformManager.h>
 
 #include "app/clusters/network-commissioning/network-commissioning.h"
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
@@ -41,6 +42,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/RuntimeOptionsProvider.h>
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -136,6 +138,18 @@ DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
 DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
+#ifndef CHIP_APP_MAIN_HAS_THREAD_DRIVER
+#define CHIP_APP_MAIN_HAS_THREAD_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_WIFI_DRIVER
+#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kRootEndpointId, &sThreadDriver);
 #endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
@@ -225,15 +239,15 @@ void InitNetworkCommissioning()
 using chip::Shell::Engine;
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
  * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
  * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
 #endif
 
 namespace {
@@ -250,6 +264,11 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     if (event->Type == DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
+    }
+    else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
+    {
+        // Restart the server on connectivity change
+        app::DnssdServer::Instance().StartServer();
     }
 }
 
@@ -285,7 +304,7 @@ void StopSignalHandler(int signal)
 
 } // namespace
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 static bool EnsureWiFiIsStarted()
 {
     for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
@@ -412,7 +431,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     }
 
 #if defined(PW_RPC_ENABLED)
-    rpc::Init();
+    rpc::Init(LinuxDeviceOptions::GetInstance().rpcServerPort);
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
@@ -449,9 +468,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
     DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
+        // Start WiFi management in Concurrent mode
         DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
         if (!EnsureWiFiIsStarted())
         {
@@ -541,6 +561,9 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
+    chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
+        LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);

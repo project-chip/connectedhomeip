@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -56,7 +56,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -85,17 +85,21 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Setup Build Without Detail Logging
+            - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Progress Logging
+            - name: Set up Build Without Progress Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Error Logging
+            - name: Set up Build Without Error Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
+              run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Set up Build Without Logging
+              run: scripts/build/gn_gen.sh --args="chip_logging=false"
+            - name: Run Build Without Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
               uses: actions/upload-artifact@v3
@@ -131,7 +135,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -147,7 +151,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -200,7 +204,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/sanitizers/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|-ReadImpl|-InvokeSubscribeImpl' \
                        check \
                     "
             - name: Clean output
@@ -279,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -295,7 +299,7 @@ jobs:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -303,21 +307,67 @@ jobs:
 
             - name: Setup Build, Run Build and Run Tests
               run: |
-                  scripts/build/gn_gen.sh --args="enable_rtti=true enable_pylib=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false"
+                  scripts/build/gn_gen.sh --args="enable_rtti=true enable_pylib=true chip_config_memory_debug_checks=false chip_config_memory_debug_dmalloc=false chip_generate_link_map_file=false"
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
-            - name: Run Python library specific unit tests
+            - name: Setup test python environment
+              shell: bash
               run: |
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl'
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl'
-                  scripts/run_in_build_env.sh 'pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl'
-                  scripts/run_in_build_env.sh '(cd src/controller/python/test/unit_tests/ && python3 -m unittest -v)'
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  pip3 install ./out/controller/python/chip_core-0.0-cp37-abi3-linux_x86_64.whl
+                  pip3 install ./out/controller/python/chip_clusters-0.0-py3-none-any.whl
+                  pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
 
+            - name: Run Python tests
+              shell: bash
+              run: |
+                  source pyenv/bin/activate
+                  cd src/controller/python/test/unit_tests/
+                  python3 -m unittest -v
+            - name: Clean previous outputs
+              run: rm -rf out pyenv
             - name: Run Python Setup Payload Generator Test
+              shell: bash
               run: |
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
-                  scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
-                  scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
+                  scripts/run_in_build_env.sh 'virtualenv pyenv'
+                  source pyenv/bin/activate
+                  pip3 install -r src/setup_payload/python/requirements.txt
+                  python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool
+
+    build_linux_python_lighting_device:
+        name: Build on Linux (python lighting-app)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:26
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
+            - name: Setup Build
+              run: |
+                  scripts/build_python_device.sh --chip_detail_logging true
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
@@ -326,7 +376,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -401,7 +451,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -409,7 +459,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

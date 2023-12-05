@@ -6,7 +6,7 @@ steps:
           - "--init"
           - "--recursive"
       id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:2"
+    - name: "ghcr.io/project-chip/chip-build-vscode:26"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -21,7 +21,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "ghcr.io/project-chip/chip-build-vscode:2"
+    - name: "ghcr.io/project-chip/chip-build-vscode:26"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -35,7 +35,7 @@ steps:
               --target android-arm64-tv-server
               --target android-x64-chip-tool
               --target bouffalolab-bl602-iot-matter-v1-light
-              --target bouffalolab-bl704l-dvk-light
+              --target bouffalolab-bl704ldk-light
               --target bouffalolab-xt-zb6-devkit-light-rpc
               --target cc13x2x7_26x2x7-lighting
               --target cc13x2x7_26x2x7-lock-mtd
@@ -85,7 +85,7 @@ steps:
               --target k32w-shell
               build
               --create-archives /workspace/artifacts/
-    - name: "ghcr.io/project-chip/chip-build-vscode:2"
+    - name: "ghcr.io/project-chip/chip-build-vscode:26"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -163,6 +163,8 @@ steps:
               --target qpg-qpg6105-light
               --target qpg-qpg6105-shell
               --target telink-tlsr9518adk80d-light
+              --target telink-tlsr9528a-light
+              --target telink-tlsr9528a_retention-light-switch
               --target tizen-arm-light
               build
               --create-archives /workspace/artifacts/

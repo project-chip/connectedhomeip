@@ -27,10 +27,11 @@
 #endif
 
 #include <algorithm>
+#include <initializer_list>
 #include <inttypes.h>
 #include <stddef.h>
 
-#include <credentials/CHIPCert.h>
+#include <credentials/CHIPCert_Internal.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPCore.h>
@@ -81,9 +82,7 @@ CHIP_ERROR EncodeAuthorityKeyIdentifierExtension(const Crypto::P256PublicKey & p
 
     ASN1_START_SEQUENCE
     {
-        OID extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(kTag_AuthorityKeyIdentifier));
-
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
+        ASN1_ENCODE_OBJECT_ID(kOID_Extension_AuthorityKeyIdentifier);
 
         ASN1_START_OCTET_STRING_ENCAPSULATED
         {
@@ -111,9 +110,7 @@ CHIP_ERROR EncodeSubjectKeyIdentifierExtension(const Crypto::P256PublicKey & pub
 
     ASN1_START_SEQUENCE
     {
-        OID extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(kTag_SubjectKeyIdentifier));
-
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
+        ASN1_ENCODE_OBJECT_ID(kOID_Extension_SubjectKeyIdentifier);
 
         ASN1_START_OCTET_STRING_ENCAPSULATED
         {
@@ -130,19 +127,47 @@ exit:
     return err;
 }
 
-CHIP_ERROR EncodeKeyUsageExtension(uint16_t keyUsageBits, ASN1Writer & writer)
+CHIP_ERROR EncodeExtKeyUsageExtension(std::initializer_list<OID> keyPurposeOIDs, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     ASN1_START_SEQUENCE
     {
-        OID extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(kTag_KeyUsage));
+        ASN1_ENCODE_OBJECT_ID(kOID_Extension_ExtendedKeyUsage);
 
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
+        // ExtKeyUsage extension MUST be marked as critical.
+        ASN1_ENCODE_BOOLEAN(true);
+        ASN1_START_OCTET_STRING_ENCAPSULATED
+        {
+            ASN1_START_SEQUENCE
+            {
+                for (auto && oid : keyPurposeOIDs)
+                {
+                    ASN1_ENCODE_OBJECT_ID(oid);
+                }
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_ENCAPSULATED;
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR EncodeKeyUsageExtension(BitFlags<KeyUsageFlags> keyUsageFlags, ASN1Writer & writer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ASN1_START_SEQUENCE
+    {
+        ASN1_ENCODE_OBJECT_ID(kOID_Extension_KeyUsage);
 
         // KeyUsage extension MUST be marked as critical.
         ASN1_ENCODE_BOOLEAN(true);
-        ASN1_START_OCTET_STRING_ENCAPSULATED { ASN1_ENCODE_BIT_STRING(keyUsageBits); }
+        ASN1_START_OCTET_STRING_ENCAPSULATED
+        {
+            ASN1_ENCODE_BIT_STRING(keyUsageFlags.Raw());
+        }
         ASN1_END_ENCAPSULATED;
     }
     ASN1_END_SEQUENCE;
@@ -154,12 +179,9 @@ exit:
 CHIP_ERROR EncodeIsCAExtension(IsCACert isCA, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     ASN1_START_SEQUENCE
     {
-        OID extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(kTag_BasicConstraints));
-
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
+        ASN1_ENCODE_OBJECT_ID(kOID_Extension_BasicConstraints);
 
         // BasicConstraints extension MUST be marked as critical.
         ASN1_ENCODE_BOOLEAN(true);
@@ -188,46 +210,17 @@ exit:
 CHIP_ERROR EncodeCASpecificExtensions(ASN1Writer & writer)
 {
     ReturnErrorOnFailure(EncodeIsCAExtension(kCACert, writer));
-
-    uint16_t keyUsageBits = static_cast<uint16_t>(KeyUsageFlags::kKeyCertSign) | static_cast<uint16_t>(KeyUsageFlags::kCRLSign);
-
-    ReturnErrorOnFailure(EncodeKeyUsageExtension(keyUsageBits, writer));
-
+    ReturnErrorOnFailure(
+        EncodeKeyUsageExtension(BitFlags<KeyUsageFlags>(KeyUsageFlags::kKeyCertSign, KeyUsageFlags::kCRLSign), writer));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    uint16_t keyUsageBits = static_cast<uint16_t>(KeyUsageFlags::kDigitalSignature);
-
     ReturnErrorOnFailure(EncodeIsCAExtension(kNotCACert, writer));
-    ReturnErrorOnFailure(EncodeKeyUsageExtension(keyUsageBits, writer));
-
-    ASN1_START_SEQUENCE
-    {
-        OID extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(kTag_ExtendedKeyUsage));
-
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
-
-        // ExtKeyUsage extension MUST be marked as critical.
-        ASN1_ENCODE_BOOLEAN(true);
-        ASN1_START_OCTET_STRING_ENCAPSULATED
-        {
-            ASN1_START_SEQUENCE
-            {
-                ASN1_ENCODE_OBJECT_ID(kOID_KeyPurpose_ClientAuth);
-                ASN1_ENCODE_OBJECT_ID(kOID_KeyPurpose_ServerAuth);
-            }
-            ASN1_END_SEQUENCE;
-        }
-        ASN1_END_ENCAPSULATED;
-    }
-    ASN1_END_SEQUENCE;
-
-exit:
-    return err;
+    ReturnErrorOnFailure(EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer));
+    ReturnErrorOnFailure(EncodeExtKeyUsageExtension({ kOID_KeyPurpose_ClientAuth, kOID_KeyPurpose_ServerAuth }, writer));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EncodeFutureExtension(const Optional<FutureExtension> & futureExt, ASN1Writer & writer)
@@ -320,13 +313,11 @@ exit:
     return err;
 }
 
-} // namespace
-
 CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
                          const Crypto::P256PublicKey & issuerPubkey, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t certType;
+    CertType certType;
     bool isCA;
 
     VerifyOrReturnError(requestParams.SerialNumber >= 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -334,7 +325,7 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
                         CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
-    isCA = (certType == kCertType_ICA || certType == kCertType_Root);
+    isCA = (certType == CertType::kICA || certType == CertType::kRoot);
 
     ASN1_START_SEQUENCE
     {
@@ -348,7 +339,10 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
 
         ReturnErrorOnFailure(writer.PutInteger(requestParams.SerialNumber));
 
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
         ASN1_END_SEQUENCE;
 
         // issuer Name
@@ -371,8 +365,63 @@ exit:
     return err;
 }
 
+} // namespace
+
+CHIP_ERROR EncodeNetworkIdentityTBSCert(const P256PublicKey & pubkey, ASN1Writer & writer)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipDN issuerAndSubject;
+    InitNetworkIdentitySubject(issuerAndSubject);
+
+    ASN1_START_SEQUENCE
+    {
+        // version [0] EXPLICIT Version DEFAULT v1
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
+        {
+            ASN1_ENCODE_INTEGER(2); // Version ::= INTEGER { v1(0), v2(1), v3(2) }
+        }
+        ASN1_END_CONSTRUCTED;
+
+        ReturnErrorOnFailure(writer.PutInteger(kNetworkIdentitySerialNumber));
+
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
+        ASN1_END_SEQUENCE;
+
+        // issuer Name
+        ReturnErrorOnFailure(issuerAndSubject.EncodeToASN1(writer));
+
+        // validity Validity,
+        ReturnErrorOnFailure(EncodeValidity(kNetworkIdentityNotBeforeTime, kNetworkIdentityNotAfterTime, writer));
+
+        // subject Name
+        ReturnErrorOnFailure(issuerAndSubject.EncodeToASN1(writer));
+
+        ReturnErrorOnFailure(EncodeSubjectPublicKeyInfo(pubkey, writer));
+
+        // certificate extensions
+        ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 3)
+        {
+            ASN1_START_SEQUENCE
+            {
+                EncodeIsCAExtension(kNotCACert, writer);
+                EncodeKeyUsageExtension(KeyUsageFlags::kDigitalSignature, writer);
+                EncodeExtKeyUsageExtension({ kOID_KeyPurpose_ClientAuth, kOID_KeyPurpose_ServerAuth }, writer);
+            }
+            ASN1_END_SEQUENCE;
+        }
+        ASN1_END_CONSTRUCTED;
+    }
+    ASN1_END_SEQUENCE;
+
+exit:
+    return err;
+}
+
 CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                           Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
+                           const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
@@ -389,7 +438,10 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, const Cr
     {
         ReturnErrorOnFailure(EncodeTBSCert(requestParams, subjectPubkey, issuerKeypair.Pubkey(), writer));
 
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
         ASN1_END_SEQUENCE;
 
         ReturnErrorOnFailure(EncodeChipECDSASignature(signature, writer));
@@ -402,43 +454,43 @@ exit:
     return err;
 }
 
-DLL_EXPORT CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair,
+DLL_EXPORT CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256Keypair & issuerKeypair,
                                       MutableByteSpan & x509Cert)
 {
-    uint8_t certType;
+    CertType certType;
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Root, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kRoot, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(requestParams.SubjectDN.IsEqual(requestParams.IssuerDN), CHIP_ERROR_INVALID_ARGUMENT);
 
     return NewChipX509Cert(requestParams, issuerKeypair.Pubkey(), issuerKeypair, x509Cert);
 }
 
 DLL_EXPORT CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, const Crypto::P256PublicKey & subjectPubkey,
-                                     Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
+                                     const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
-    uint8_t certType;
+    CertType certType;
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_ICA, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kICA, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(requestParams.IssuerDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Root, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kRoot, CHIP_ERROR_INVALID_ARGUMENT);
 
     return NewChipX509Cert(requestParams, subjectPubkey, issuerKeypair, x509Cert);
 }
 
 DLL_EXPORT CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams,
-                                                 const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                                 MutableByteSpan & x509Cert)
+                                                 const Crypto::P256PublicKey & subjectPubkey,
+                                                 const Crypto::P256Keypair & issuerKeypair, MutableByteSpan & x509Cert)
 {
-    uint8_t certType;
+    CertType certType;
 
     ReturnErrorOnFailure(requestParams.SubjectDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_Node, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kNode, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(requestParams.IssuerDN.GetCertType(certType));
-    VerifyOrReturnError(certType == kCertType_ICA || certType == kCertType_Root, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(certType == CertType::kICA || certType == CertType::kRoot, CHIP_ERROR_INVALID_ARGUMENT);
 
     return NewChipX509Cert(requestParams, subjectPubkey, issuerKeypair, x509Cert);
 }

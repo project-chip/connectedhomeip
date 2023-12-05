@@ -18,11 +18,16 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#include "OTAImageProcessorImpl.h"
+#if CHIP_DEVICE_LAYER_TARGET_BL602 || CHIP_DEVICE_LAYER_TARGET_BL702 || CHIP_DEVICE_LAYER_TARGET_BL702L
 extern "C" {
 #include <hal_sys.h>
 #include <hosal_ota.h>
+#endif
+
+extern void hal_reboot(void);
 }
+
+#include "OTAImageProcessorImpl.h"
 
 using namespace chip::System;
 
@@ -198,7 +203,6 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     ByteSpan block = imageProcessor->mBlock;
     if (imageProcessor->mHeaderParser.IsInitialized())
     {
-
         error = imageProcessor->mHeaderParser.AccumulateAndDecode(block, header);
         if (CHIP_ERROR_BUFFER_TOO_SMALL == error)
         {

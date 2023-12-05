@@ -47,7 +47,7 @@ class ScopedMemoryBufferBase
 {
 public:
     ScopedMemoryBufferBase() {}
-    ScopedMemoryBufferBase(const ScopedMemoryBufferBase &) = delete;
+    ScopedMemoryBufferBase(const ScopedMemoryBufferBase &)                   = delete;
     ScopedMemoryBufferBase & operator=(const ScopedMemoryBufferBase & other) = delete;
 
     ScopedMemoryBufferBase(ScopedMemoryBufferBase && other) { *this = std::move(other); }

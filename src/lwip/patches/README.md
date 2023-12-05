@@ -19,6 +19,16 @@ Troubleshooting: The patch uses the `ip6_addr_net_eq` function, which is a
 recent API change on upstream LwIP. The previous version of this function is
 `ip6_addr_netcmp`, so this function call may need to be replaced on older forks.
 
+### ND6 LLADDR fix
+
+In earlier version of lwIP, there is a bug where the RA processing fails if the
+RA includes an LLADDR option with a hw address that is not the max length. This
+happens for thread devices. Relevant patches from lwIP main that should be
+applied back to any Matter device using an older version of lwIP:
+
+https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=7807f706f357d2eea85d9927d970991dc4b1ef90
+https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=6f700a157d1049a06ab9c467057d71e98e7798de
+
 ## Important upstream patches
 
 ### Malformed neighbor solicitation packet fix

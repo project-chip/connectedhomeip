@@ -46,11 +46,11 @@ CHIP_ERROR ASRFactoryDataProvider::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
-    uint8_t ret = asr_factory_check();
-    if (ret != 0)
+    factory_error_t ret = asr_factory_check();
+    if (ret != FACTORY_NO_ERROR)
     {
         err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "The hash of factory bin is not correct.");
+        ChipLogError(DeviceLayer, "ASR factory data check failed. err = %d", ret);
     }
 #endif
     return err;
@@ -314,8 +314,8 @@ CHIP_ERROR ASRFactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan &
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
 #if !CONFIG_ENABLE_ASR_FACTORY_DATA_PROVIDER
@@ -355,9 +355,8 @@ CHIP_ERROR ASRFactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
 #else
-#define BUFFER_MAX_SIZE 32
-    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
-    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    size_t buffer_len                                              = ConfigurationManager::kMaxVendorNameLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxVendorNameLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_VENDOR_NAME_PARTITION, buffer, buffer_len, buffer_len));
     ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
@@ -373,7 +372,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetVendorId(uint16_t & vendorId)
 #else
     uint32_t vendorId32;
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_VENDOR_ID_PARTITION, vendorId32));
-    vendorId                            = static_cast<uint16_t>(vendorId32);
+    vendorId                                                        = static_cast<uint16_t>(vendorId32);
 #endif
     return CHIP_NO_ERROR;
 }
@@ -384,9 +383,8 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductName(char * buf, size_t bufSize)
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
 #else
-#define BUFFER_MAX_SIZE 32
-    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
-    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    size_t buffer_len                                               = ConfigurationManager::kMaxProductNameLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxProductNameLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_NAME_PARTITION, buffer, buffer_len, buffer_len));
     ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
@@ -402,24 +400,54 @@ CHIP_ERROR ASRFactoryDataProvider::GetProductId(uint16_t & productId)
 #else
     uint32_t productId32;
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_ID_PARTITION, productId32));
-    productId                           = static_cast<uint16_t>(productId32);
+    productId                                                      = static_cast<uint16_t>(productId32);
 #endif
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
+    size_t buffer_len                                              = ConfigurationManager::kMaxPartNumberLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxPartNumberLength + 1] = { 0 };
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PART_NUMBER_PARTITION, buffer, buffer_len, buffer_len));
+    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, buffer, buffer_len);
+    buf[buffer_len]                                                = 0;
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 {
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
+    size_t buffer_len                                              = ConfigurationManager::kMaxProductURLLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxProductURLLength + 1] = { 0 };
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_URL_PARTITION, buffer, buffer_len, buffer_len));
+    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, buffer, buffer_len);
+    buf[buffer_len]                                                  = 0;
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 {
+#if !CONFIG_ENABLE_ASR_FACTORY_DEVICE_INFO_PROVIDER
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#else
+    size_t buffer_len                                                = ConfigurationManager::kMaxProductLabelLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxProductLabelLength + 1] = { 0 };
+    ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_PRODUCT_LABEL_PARTITION, buffer, buffer_len, buffer_len));
+    ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(buf, buffer, buffer_len);
+    buf[buffer_len]                                                  = 0;
+#endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRFactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
@@ -428,9 +456,8 @@ CHIP_ERROR ASRFactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
 #else
-#define BUFFER_MAX_SIZE 32
-    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
-    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    size_t buffer_len                                                = ConfigurationManager::kMaxSerialNumberLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxSerialNumberLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_SERIAL_NUMBER_PARTITION, buffer, buffer_len, buffer_len));
     ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);
@@ -487,7 +514,7 @@ CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion
 #else
     uint32_t hardwareVersion32;
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_HARDWARE_VERSION_PARTITION, hardwareVersion32));
-    hardwareVersion                     = static_cast<uint16_t>(hardwareVersion32);
+    hardwareVersion   = static_cast<uint16_t>(hardwareVersion32);
 #endif
     return CHIP_NO_ERROR;
 }
@@ -498,9 +525,8 @@ CHIP_ERROR ASRFactoryDataProvider::GetHardwareVersionString(char * buf, size_t b
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
 #else
-#define BUFFER_MAX_SIZE 32
-    uint8_t buffer[BUFFER_MAX_SIZE + 1] = { 0 };
-    size_t buffer_len                   = BUFFER_MAX_SIZE + 1;
+    size_t buffer_len = ConfigurationManager::kMaxHardwareVersionStringLength + 1;
+    uint8_t buffer[ConfigurationManager::kMaxHardwareVersionStringLength + 1] = { 0 };
     ReturnErrorOnFailure(ASRConfig::ReadFactoryConfigValue(ASR_HARDWARE_VERSION_STR_PARTITION, buffer, buffer_len, buffer_len));
     ReturnErrorCodeIf(bufSize < buffer_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf, buffer, buffer_len);

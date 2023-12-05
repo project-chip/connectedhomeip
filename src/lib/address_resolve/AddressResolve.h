@@ -33,7 +33,8 @@ struct ResolveResult
 {
     Transport::PeerAddress address;
     ReliableMessageProtocolConfig mrpRemoteConfig;
-    bool supportsTcp = false;
+    bool supportsTcp         = false;
+    bool isICDOperatingAsLIT = false;
 
     ResolveResult() : address(Transport::Type::kUdp), mrpRemoteConfig(GetDefaultMRPConfig()) {}
 };
@@ -75,7 +76,7 @@ public:
     // While active, resolve handles are maintained in an internal list
     // to be processed, so copying their values (i.e. pointers) is not
     // allowed.
-    NodeLookupHandleBase(const NodeLookupHandleBase &) = delete;
+    NodeLookupHandleBase(const NodeLookupHandleBase &)             = delete;
     NodeLookupHandleBase & operator=(const NodeLookupHandleBase &) = delete;
 
     void SetListener(NodeListener * listener) { mListener = listener; }
@@ -97,7 +98,7 @@ public:
     NodeLookupRequest() {}
     NodeLookupRequest(const PeerId & peerId) : mPeerId(peerId) {}
 
-    NodeLookupRequest(const NodeLookupRequest &) = default;
+    NodeLookupRequest(const NodeLookupRequest &)             = default;
     NodeLookupRequest & operator=(const NodeLookupRequest &) = default;
 
     const PeerId & GetPeerId() const { return mPeerId; }
@@ -224,7 +225,7 @@ public:
     /// This method will return CHIP_ERROR_INCORRECT_STATE if the handle is
     /// still active.
     ///
-    /// This method will return CHIP_ERROR_WELL_EMPTY if there are no more
+    /// This method will return CHIP_ERROR_NOT_FOUND if there are no more
     /// results.
     ///
     /// This method may return other errors in some cases.

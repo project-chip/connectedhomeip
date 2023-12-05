@@ -41,36 +41,28 @@
 #undef ENABLE_REAL_OTA_UPDATE_TESTS
 #endif
 
+#if ENABLE_OTA_TESTS
+
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint16_t kTimeoutWithUpdateInSeconds = 60;
 static const uint64_t kDeviceId1 = 0x12341234;
 static const uint64_t kDeviceId2 = 0x12341235;
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
 static const uint64_t kDeviceId3 = 0x12341236;
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 // NOTE: These onboarding payloads are for the chip-ota-requestor-app, not chip-all-clusters-app
 static NSString * kOnboardingPayload1 = @"MT:-24J0SO527K10648G00"; // Discriminator: 1111
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00"; // Discriminator: 1112
+#ifdef ENABLE_REAL_OTA_UPDATE_TESTS
 static NSString * kOnboardingPayload3 = @"MT:-24J0IRV01L10648G00"; // Discriminator: 1113
+#endif // ENABLE_REAL_OTA_UPDATE_TESTS
 
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kOTAProviderEndpointId = 0;
 
-static MTRDevice * sConnectedDevice1;
-static MTRDevice * sConnectedDevice2;
-static MTRDevice * sConnectedDevice3;
-
-// Singleton controller we use.
 static MTRDeviceController * sController = nil;
-
-// Keys we can use to restart the controller.
-static MTRTestKeys * sTestKeys = nil;
-
-static NSString * kOtaDownloadedFilePath1 = @"/tmp/chip-ota-requestor-downloaded-image1";
-
-static NSString * kOtaDownloadedFilePath2 = @"/tmp/chip-ota-requestor-downloaded-image2";
-
-static NSString * kOtaDownloadedFilePath3 = @"/tmp/chip-ota-requestor-downloaded-image3";
 
 static NSNumber * kUpdatedSoftwareVersion_5 = @5;
 
@@ -79,6 +71,107 @@ static NSString * kUpdatedSoftwareVersionString_5 = @"5.0";
 static NSNumber * kUpdatedSoftwareVersion_10 = @10;
 
 static NSString * kUpdatedSoftwareVersionString_10 = @"10.0";
+
+// kOtaRequestorBasePort gets the discriminator added to it to figure out the
+// port the ota-requestor app should be using.  This ensures that apps with
+// distinct discriminators use distinct ports.
+static const uint16_t kOtaRequestorBasePort = 5542 - 1111;
+
+@class MTROTARequestorAppRunner;
+
+@interface MTROTAProviderTests : XCTestCase
+- (NSTask *)createTaskForPath:(NSString *)path;
+- (NSString *)createImageFromRawImage:(NSString *)rawImage withVersion:(NSNumber *)version;
+- (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID;
+- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor;
+@end
+
+static unsigned sAppRunnerIndex = 1;
+
+@interface MTROTARequestorAppRunner : NSObject
+@property (nonatomic, copy) NSString * downloadFilePath;
+
+- (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase;
+- (MTRDevice *)commissionWithNodeID:(NSNumber *)nodeID;
+@end
+
+@implementation MTROTARequestorAppRunner {
+    unsigned _uniqueIndex;
+    NSTask * _appTask;
+    MTROTAProviderTests * _testcase;
+    NSString * _payload;
+    MTRDevice * commissionedDevice;
+}
+
+- (MTRDevice *)commissionWithNodeID:(NSNumber *)nodeID
+{
+    return [_testcase commissionDeviceWithPayload:_payload nodeID:nodeID];
+}
+
+- (instancetype)initWithPayload:(NSString *)payload testcase:(MTROTAProviderTests *)testcase
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _uniqueIndex = sAppRunnerIndex++;
+    _testcase = testcase;
+    _payload = payload;
+    _downloadFilePath = [NSString stringWithFormat:@"/tmp/chip-ota-requestor-downloaded-image%u", _uniqueIndex];
+
+    NSError * error;
+    __auto_type * parsedPayload = [MTRSetupPayload setupPayloadWithOnboardingPayload:payload error:&error];
+    XCTAssertNotNil(parsedPayload);
+    XCTAssertNil(error);
+
+    XCTAssertFalse(parsedPayload.hasShortDiscriminator);
+
+    __auto_type * discriminator = parsedPayload.discriminator;
+
+    _appTask = [testcase createTaskForPath:@"out/debug/ota-requestor-app/chip-ota-requestor-app"];
+
+    __auto_type * arguments = @[
+        @"--interface-id",
+        @"-1",
+        @"--secured-device-port",
+        [NSString stringWithFormat:@"%u", kOtaRequestorBasePort + discriminator.unsignedShortValue],
+        @"--discriminator",
+        [NSString stringWithFormat:@"%u", discriminator.unsignedShortValue],
+        @"--KVS",
+        [NSString stringWithFormat:@"/tmp/chip-ota-requestor-kvs%u", _uniqueIndex],
+        @"--otaDownloadPath",
+        _downloadFilePath,
+        @"--autoApplyImage",
+    ];
+
+    [_appTask setArguments:arguments];
+
+    NSString * outFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-%u.log", _uniqueIndex];
+    NSString * errorFile = [NSString stringWithFormat:@"/tmp/darwin/framework-tests/ota-requestor-app-err-%u.log", _uniqueIndex];
+
+    // Make sure the files exist.
+    [[NSFileManager defaultManager] createFileAtPath:outFile contents:nil attributes:nil];
+    [[NSFileManager defaultManager] createFileAtPath:errorFile contents:nil attributes:nil];
+
+    _appTask.standardOutput = [NSFileHandle fileHandleForWritingAtPath:outFile];
+    _appTask.standardError = [NSFileHandle fileHandleForWritingAtPath:errorFile];
+
+    [_appTask launchAndReturnError:&error];
+    XCTAssertNil(error);
+
+    NSLog(@"Started requestor with arguments %@ stdout=%@ and stderr=%@", arguments, outFile, errorFile);
+
+    [_testcase registerRunningRequestor:self];
+
+    return self;
+}
+
+- (void)terminate
+{
+    [_appTask terminate];
+}
+
+@end
 
 @interface MTROTAProviderTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, readonly) XCTestExpectation * expectation;
@@ -238,14 +331,14 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
 - (void)respondNotAvailableWithCompletion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusNotAvailable);
     completion(responseParams, nil);
 }
 
 - (void)respondBusyWithDelay:(NSNumber *)delay completion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusBusy);
     responseParams.delayedActionTime = delay;
     completion(responseParams, nil);
 }
@@ -258,7 +351,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                        completion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusUpdateAvailable);
     responseParams.delayedActionTime = delay;
     responseParams.imageURI = uri;
     // TODO: Figure out whether we need better
@@ -276,7 +369,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     }];
 }
 
-- (void)respondToApplyUpdateRequestWithAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)action
+- (void)respondToApplyUpdateRequestWithAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)action
                                    completion:(ApplyUpdateRequestCompletion)completion
 {
     __auto_type * params = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
@@ -333,7 +426,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                               nodeID:(NSNumber *)nodeID
                      softwareVersion:(NSNumber *)softwareVersion
                softwareVersionString:(NSString *)softwareVersionString
-                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
                             testcase:(XCTestCase *)testcase;
 
 @property (nonatomic, readonly) XCTestExpectation * queryExpectation;
@@ -351,8 +444,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                               nodeID:(NSNumber *)nodeID
                      softwareVersion:(NSNumber *)softwareVersion
                softwareVersionString:(NSString *)softwareVersionString
-                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
-                            testcase:(XCTestCase *)testcase
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
+                            testcase:(MTROTAProviderTests *)testcase
 {
     if (!(self = [super init])) {
         return nil;
@@ -365,28 +458,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     _applyUpdateRequestExpectation = [testcase expectationWithDescription:@"handleApplyUpdateRequestForNodeID called"];
     _notifyUpdateAppliedExpectation = [testcase expectationWithDescription:@"handleNotifyUpdateAppliedForNodeID called"];
 
-    NSString * imagePath = [rawImagePath stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
-
-    // Find the right absolute path to our ota_image_tool.py script.  PWD should
-    // point to our src/darwin/Framework, while the script is in
-    // src/app/ota_image_tool.py.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSString * imageToolPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
-
-#if ENABLE_OTA_TESTS
-    NSTask * task = [[NSTask alloc] init];
-    [task setLaunchPath:imageToolPath];
-    [task setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [softwareVersion stringValue], @"-vs", softwareVersionString, @"-da",
-        @"sha256", rawImagePath, imagePath
-    ]];
-    NSError * launchError = nil;
-    [task launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task waitUntilExit];
-    XCTAssertEqual([task terminationStatus], 0);
-#endif
+    NSString * imagePath = [testcase createImageFromRawImage:rawImagePath withVersion:softwareVersion];
 
     NSData * updateToken = [sOTAProviderDelegate generateUpdateToken];
 
@@ -483,7 +555,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         [self.applyUpdateRequestExpectation fulfill];
     };
 
-    if (applyUpdateAction == MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed) {
+    if (applyUpdateAction == MTROTASoftwareUpdateProviderApplyUpdateActionProceed) {
         sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
             XCTAssertEqualObjects(nodeID, nodeID);
@@ -501,13 +573,13 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 }
 @end
 
-@interface MTROTAProviderTests : XCTestCase
-@end
-
 static BOOL sStackInitRan = NO;
 static BOOL sNeedsStackShutdown = YES;
 
-@implementation MTROTAProviderTests
+@implementation MTROTAProviderTests {
+    NSMutableSet<NSNumber *> * _commissionedNodeIDs;
+    NSMutableSet<MTROTARequestorAppRunner *> * _runningRequestors;
+}
 
 + (void)tearDown
 {
@@ -531,16 +603,51 @@ static BOOL sNeedsStackShutdown = YES;
         [self initStack];
     }
 
+    _commissionedNodeIDs = [[NSMutableSet alloc] init];
+    _runningRequestors = [[NSMutableSet alloc] init];
+
     XCTAssertNil(sOTAProviderDelegate.queryImageHandler);
     XCTAssertNil(sOTAProviderDelegate.applyUpdateRequestHandler);
     XCTAssertNil(sOTAProviderDelegate.notifyUpdateAppliedHandler);
     XCTAssertNil(sOTAProviderDelegate.transferBeginHandler);
     XCTAssertNil(sOTAProviderDelegate.blockQueryHandler);
     XCTAssertNil(sOTAProviderDelegate.transferEndHandler);
+
+    // Start a new controller for each test, with a new fabric.  Otherwise
+    // reusing the same node id for our commissionee devices will cause us to
+    // try to reuse sessions in ways that fail.
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    params.vendorID = @(kTestVendorId);
+
+    MTRDeviceController * controller = [[MTRDeviceControllerFactory sharedInstance] createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    sController = controller;
 }
 
 - (void)tearDown
 {
+    for (NSNumber * nodeID in _commissionedNodeIDs) {
+        __auto_type * device = [MTRBaseDevice deviceWithNodeID:nodeID controller:sController];
+        ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
+    }
+
+    for (MTROTARequestorAppRunner * runner in _runningRequestors) {
+        [runner terminate];
+    }
+    // Break cycle.
+    _runningRequestors = nil;
+
+    if (sController != nil) {
+        [sController shutdown];
+        XCTAssertFalse([sController isRunning]);
+        sController = nil;
+    }
+
     // Per-test teardown, runs after each test.
     [super tearDown];
 
@@ -573,7 +680,14 @@ static BOOL sNeedsStackShutdown = YES;
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
 
+    [_commissionedNodeIDs addObject:nodeID];
+
     return [MTRDevice deviceWithNodeID:nodeID controller:sController];
+}
+
+- (void)registerRunningRequestor:(MTROTARequestorAppRunner *)requestor
+{
+    [_runningRequestors addObject:requestor];
 }
 
 - (void)initStack
@@ -593,41 +707,103 @@ static BOOL sNeedsStackShutdown = YES;
 
     BOOL ok = [factory startControllerFactory:factoryParams error:nil];
     XCTAssertTrue(ok);
-
-    __auto_type * testKeys = [[MTRTestKeys alloc] init];
-    XCTAssertNotNil(testKeys);
-
-    sTestKeys = testKeys;
-
-    // Needs to match what startControllerOnExistingFabric calls elsewhere in
-    // this file do.
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
-    params.vendorID = @(kTestVendorId);
-
-    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
-    XCTAssertNotNil(controller);
-
-    sController = controller;
-
-    sConnectedDevice1 = [self commissionDeviceWithPayload:kOnboardingPayload1 nodeID:@(kDeviceId1)];
-    sConnectedDevice2 = [self commissionDeviceWithPayload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
-    sConnectedDevice3 = [self commissionDeviceWithPayload:kOnboardingPayload3 nodeID:@(kDeviceId3)];
 }
 
 + (void)shutdownStack
 {
     sNeedsStackShutdown = NO;
 
-    MTRDeviceController * controller = sController;
-    XCTAssertNotNil(controller);
-
-    [controller shutdown];
-    XCTAssertFalse([controller isRunning]);
-
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
-#if ENABLE_OTA_TESTS
+/**
+ * Given a path relative to the Matter root, create an absolute path to the file.
+ */
+- (NSString *)absolutePathFor:(NSString *)matterRootRelativePath
+{
+    // Find the right absolute path to our file.  PWD should
+    // point to our src/darwin/Framework.
+    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
+    NSMutableArray * pathComponents = [[NSMutableArray alloc] init];
+    [pathComponents addObject:[pwd substringToIndex:(pwd.length - @"src/darwin/Framework".length)]];
+    [pathComponents addObjectsFromArray:[matterRootRelativePath pathComponents]];
+    return [NSString pathWithComponents:pathComponents];
+}
+
+/**
+ * Create a task given a path relative to the Matter root.
+ */
+- (NSTask *)createTaskForPath:(NSString *)path
+{
+    NSTask * task = [[NSTask alloc] init];
+    [task setLaunchPath:[self absolutePathFor:path]];
+    return task;
+}
+
+/**
+ * Runs a task to completion and makes sure it succeeds.
+ */
+- (void)runTask:(NSTask *)task
+{
+    NSError * launchError;
+    [task launchAndReturnError:&launchError];
+    XCTAssertNil(launchError);
+
+    [task waitUntilExit];
+    XCTAssertEqual([task terminationStatus], 0);
+}
+
+/**
+ * Returns path to the raw image.
+ */
+- (NSString *)createRawImageWithVersion:(NSNumber *)version
+{
+    NSTask * buildTask = [self createTaskForPath:@"scripts/examples/gn_build_example.sh"];
+    NSString * objdir =
+        [self absolutePathFor:[NSString stringWithFormat:@"out/debug/ota-requestor-app-v%u", version.unsignedIntValue]];
+    [buildTask setArguments:@[
+        [self absolutePathFor:@"examples/ota-requestor-app/linux"],
+        objdir,
+        @"chip_config_network_layer_ble=false",
+        @"non_spec_compliant_ota_action_delay_floor=0",
+        [NSString stringWithFormat:@"chip_device_config_device_software_version=%u", version.unsignedIntValue],
+        [NSString stringWithFormat:@"chip_device_config_device_software_version_string=\"%u.0\"", version.unsignedIntValue],
+    ]];
+
+    [self runTask:buildTask];
+
+    NSString * sourcePath = [NSString pathWithComponents:@[ objdir, @"chip-ota-requestor-app" ]];
+    NSString * destPath = [NSString stringWithFormat:@"/tmp/ota-raw-image-v%u", version.unsignedIntValue];
+
+    // We don't care about error on remove; the file might not be there.  But if
+    // it _is_ there, we have to remove, or the copy will fail.
+    [[NSFileManager defaultManager] removeItemAtPath:destPath error:nil];
+
+    NSError * copyError;
+    BOOL ok = [[NSFileManager defaultManager] copyItemAtPath:sourcePath toPath:destPath error:&copyError];
+    XCTAssertNil(copyError);
+    XCTAssertTrue(ok);
+
+    return destPath;
+}
+
+/**
+ * Returns path to the created image.
+ */
+- (NSString *)createImageFromRawImage:(NSString *)rawImage withVersion:(NSNumber *)version
+{
+    NSString * image = [rawImage stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
+
+    NSTask * task = [self createTaskForPath:@"src/app/ota_image_tool.py"];
+    [task setArguments:@[
+        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", version.stringValue, @"-vs",
+        [NSString stringWithFormat:@"%.1f", version.floatValue], @"-da", @"sha256", rawImage, image
+    ]];
+
+    [self runTask:task];
+
+    return image;
+}
 
 - (void)test000_SetUp
 {
@@ -646,7 +822,7 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * params = [[MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams alloc] init];
     params.providerNodeID = [sController controllerNodeID];
     params.vendorID = @(kTestVendorId);
-    params.announcementReason = @(MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement);
+    params.announcementReason = @(MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement);
     params.endpoint = @(kOTAProviderEndpointId);
 
     __auto_type * cluster = [[MTRClusterOTASoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
@@ -665,7 +841,8 @@ static BOOL sNeedsStackShutdown = YES;
 {
     // Test that if we advertise ourselves as a provider we end up getting a
     // QueryImage callbacks that we can respond to.
-    __auto_type * device = sConnectedDevice1;
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
 
     XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
     sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
@@ -689,7 +866,8 @@ static BOOL sNeedsStackShutdown = YES;
     // Test that if we advertise ourselves as a provider and respond BUSY to
     // QueryImage callback, then we get a second QueryImage callback later on
     // that we can then respond to however we wish.
-    __auto_type * device = sConnectedDevice1;
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
 
     XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
     XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called second time"];
@@ -734,8 +912,11 @@ static BOOL sNeedsStackShutdown = YES;
     //    in the middle of doing BDX with device1, this actually responds with Busy.
     // 5) Error out of the device1 transfer.
     // 6) Wait for device2 to query us again.
-    __auto_type * device1 = sConnectedDevice1;
-    __auto_type * device2 = sConnectedDevice2;
+    __auto_type * runner1 = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device1 = [runner1 commissionWithNodeID:@(kDeviceId1)];
+
+    __auto_type * runner2 = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload2 testcase:self];
+    __auto_type * device2 = [runner2 commissionWithNodeID:@(kDeviceId2)];
 
     __block XCTestExpectation * announceResponseExpectation2;
     XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
@@ -823,7 +1004,8 @@ static BOOL sNeedsStackShutdown = YES;
     // 5) Send the data as the BDX transfer proceeds.
     // 6) When device invokes ApplyUpdateRequest, respond with Discontinue so
     //    that the update does not actually proceed.
-    __auto_type * device = sConnectedDevice1;
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
 
     // First, create an image.  Make it at least 4096 bytes long, so we get
     // multiple BDX blocks going.
@@ -840,11 +1022,11 @@ static BOOL sNeedsStackShutdown = YES;
 
     __auto_type * checker =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:rawImagePath
-                                           otaImageDownloadFilePath:kOtaDownloadedFilePath1
+                                           otaImageDownloadFilePath:runner.downloadFilePath
                                                              nodeID:@(kDeviceId1)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
                                                            testcase:self];
     // We do not expect the update to actually be applied here.
     checker.notifyUpdateAppliedExpectation.inverted = YES;
@@ -888,21 +1070,21 @@ static BOOL sNeedsStackShutdown = YES;
     // 7) When device invokes ApplyUpdateRequest, respond with Proceed so that the update proceeds
     // 8) Wait for the app to restart and wait for the NotifyUpdateApplied message to confirm the app has updated to the new version
 
-    // This test expects a pre-generated raw image at otaRawImagePath.
-    NSString * otaRawImagePath = @"/tmp/ota-raw-image-v5";
+    NSString * otaRawImagePath = [self createRawImageWithVersion:kUpdatedSoftwareVersion_5];
 
     // Check whether the ota raw image exists at otaRawImagePath
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
 
-    __auto_type * device = sConnectedDevice1;
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
 
     __auto_type * checker =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath
-                                           otaImageDownloadFilePath:kOtaDownloadedFilePath1
+                                           otaImageDownloadFilePath:runner.downloadFilePath
                                                              nodeID:@(kDeviceId1)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.
@@ -928,10 +1110,6 @@ static BOOL sNeedsStackShutdown = YES;
 
 - (void)test006_DoBDXTransferWithTwoOTARequesters
 {
-    // Note: This test has a dependency on test005_DoBDXTransferAllowUpdateRequest since we update device1 to version
-    // number 5 in the above test. We reuse device1 for this test and we need to use an OTA image with a higher version number (10)
-    // for device1 to update itself again. We need to fix this when we want to run tests out of order.
-
     // In this test, we test BDX transfers between one provider and two OTA requestors device1 and device2.
     //
     // 1) We announce ourselves to device1 first.
@@ -946,9 +1124,8 @@ static BOOL sNeedsStackShutdown = YES;
     // 10) At this point, we set the apply update handlers for device2.
     // 11) Device2 applies the update and reboots with its new image.
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 for device1 and at otaRawImagePath2 for device2.
-    NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v10";
-    NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v5";
+    NSString * otaRawImagePath1 = [self createRawImageWithVersion:kUpdatedSoftwareVersion_10];
+    NSString * otaRawImagePath2 = [self createRawImageWithVersion:kUpdatedSoftwareVersion_5];
 
     // Check whether the ota raw image exists at otaRawImagePath1 and otaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
@@ -985,40 +1162,8 @@ static BOOL sNeedsStackShutdown = YES;
 
     __block XCTestExpectation * announceResponseExpectation2;
 
-    NSString * imagePath1 = [otaRawImagePath1 stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
-
-    NSString * imagePath2 = [otaRawImagePath2 stringByReplacingOccurrencesOfString:@"raw-image" withString:@"image"];
-
-    // Find the right absolute path to our ota_image_tool.py script.  PWD should
-    // point to our src/darwin/Framework, while the script is in
-    // src/app/ota_image_tool.py.
-    NSString * pwd = [[NSProcessInfo processInfo] environment][@"PWD"];
-    NSString * imageToolPath = [NSString
-        pathWithComponents:@[ [pwd substringToIndex:(pwd.length - @"darwin/Framework".length)], @"app", @"ota_image_tool.py" ]];
-
-    NSTask * task1 = [[NSTask alloc] init];
-    [task1 setLaunchPath:imageToolPath];
-    [task1 setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [kUpdatedSoftwareVersion_10 stringValue], @"-vs",
-        kUpdatedSoftwareVersionString_10, @"-da", @"sha256", otaRawImagePath1, imagePath1
-    ]];
-    NSError * launchError = nil;
-    [task1 launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task1 waitUntilExit];
-    XCTAssertEqual([task1 terminationStatus], 0);
-
-    NSTask * task2 = [[NSTask alloc] init];
-    [task2 setLaunchPath:imageToolPath];
-    [task2 setArguments:@[
-        @"create", @"-v", @"0xFFF1", @"-p", @"0x8001", @"-vn", [kUpdatedSoftwareVersion_5 stringValue], @"-vs",
-        kUpdatedSoftwareVersionString_5, @"-da", @"sha256", otaRawImagePath2, imagePath2
-    ]];
-    launchError = nil;
-    [task2 launchAndReturnError:&launchError];
-    XCTAssertNil(launchError);
-    [task2 waitUntilExit];
-    XCTAssertEqual([task2 terminationStatus], 0);
+    NSString * imagePath1 = [self createImageFromRawImage:otaRawImagePath1 withVersion:kUpdatedSoftwareVersion_10];
+    NSString * imagePath2 = [self createImageFromRawImage:otaRawImagePath2 withVersion:kUpdatedSoftwareVersion_5];
 
     NSData * updateToken1 = [sOTAProviderDelegate generateUpdateToken];
     NSData * updateToken2 = [sOTAProviderDelegate generateUpdateToken];
@@ -1027,8 +1172,12 @@ static BOOL sNeedsStackShutdown = YES;
     __block uint64_t imageSize;
     __block uint32_t lastBlockIndex = UINT32_MAX;
     const uint16_t busyDelay = 30; // 30 second
-    __auto_type * device1 = sConnectedDevice1;
-    __auto_type * device2 = sConnectedDevice2;
+
+    __auto_type * runner1 = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device1 = [runner1 commissionWithNodeID:@(kDeviceId1)];
+
+    __auto_type * runner2 = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload2 testcase:self];
+    __auto_type * device2 = [runner2 commissionWithNodeID:@(kDeviceId2)];
 
     // This to keep track of whether queryImageHandler for device 2 was called or not. The first time it's called we will
     // fulfill queryExpectation2 and proceed with BDX for device 1.
@@ -1238,7 +1387,7 @@ static BOOL sNeedsStackShutdown = YES;
         // Device1 is updated to version 10 and device2 to version 5.
         NSNumber * kSoftwareVersion = (isDeviceID1) ? kUpdatedSoftwareVersion_10 : kUpdatedSoftwareVersion_5;
         NSString * otaImageFilePath = (isDeviceID1) ? otaRawImagePath1 : otaRawImagePath2;
-        NSString * otaDownloadedFilePath = (isDeviceID1) ? kOtaDownloadedFilePath1 : kOtaDownloadedFilePath2;
+        NSString * otaDownloadedFilePath = (isDeviceID1) ? runner1.downloadFilePath : runner2.downloadFilePath;
 
         XCTAssertEqual(controller, sController);
         XCTAssertEqualObjects(params.updateToken, updateToken);
@@ -1246,7 +1395,7 @@ static BOOL sNeedsStackShutdown = YES;
 
         XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaImageFilePath andPath:otaDownloadedFilePath]);
 
-        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                          completion:completion];
 
         if (isDeviceID1) {
@@ -1343,23 +1492,23 @@ static BOOL sNeedsStackShutdown = YES;
     // 4) Device3 completes the BDX transfer
     // 5) Device3 applies the update and reboots with the new image with version number 10
 
-    // This test expects a pre-generated raw image at otaRawImagePath1 and a raw image at otaRawImagePath2
-    NSString * otaRawImagePath1 = @"/tmp/ota-raw-image-v5";
-    NSString * otaRawImagePath2 = @"/tmp/ota-raw-image-v10";
+    NSString * otaRawImagePath1 = [self createRawImageWithVersion:kUpdatedSoftwareVersion_5];
+    NSString * otaRawImagePath2 = [self createRawImageWithVersion:kUpdatedSoftwareVersion_10];
 
     // Check whether the ota raw image exists at otaRawImagePath1 and otaRawImagePath2
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath1]);
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath2]);
 
-    __auto_type * device = sConnectedDevice3;
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload3 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId3)];
 
     __auto_type * checker =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath1
-                                           otaImageDownloadFilePath:kOtaDownloadedFilePath3
+                                           otaImageDownloadFilePath:runner.downloadFilePath
                                                              nodeID:@(kDeviceId3)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.
@@ -1386,11 +1535,11 @@ static BOOL sNeedsStackShutdown = YES;
 
     __auto_type * checker1 =
         [[MTROTAProviderTransferChecker alloc] initWithRawImagePath:otaRawImagePath2
-                                           otaImageDownloadFilePath:kOtaDownloadedFilePath3
+                                           otaImageDownloadFilePath:runner.downloadFilePath
                                                              nodeID:@(kDeviceId3)
                                                     softwareVersion:kUpdatedSoftwareVersion_10
                                               softwareVersionString:kUpdatedSoftwareVersionString_10
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.
@@ -1417,18 +1566,17 @@ static BOOL sNeedsStackShutdown = YES;
 
 - (void)test999_TearDown
 {
-    __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
-    ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
-
-    device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId2) controller:sController];
-    ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
-
-    device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId3) controller:sController];
-    ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
-
     [[self class] shutdownStack];
 }
 
-#endif
-
 @end
+
+#else // ENABLE_OTA_TESTS
+
+@interface MTROTAProviderTests : XCTestCase
+@end
+
+@implementation MTROTAProviderTests
+@end
+
+#endif // ENABLE_OTA_TESTS

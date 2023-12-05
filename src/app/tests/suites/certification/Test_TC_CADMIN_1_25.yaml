@@ -17,6 +17,9 @@ name:
     36.1.25. [TC-CADMIN-1.25] Subscription to the attributes - verify
     subscription response [ECM] [DUT - Commissionee]
 
+PICS:
+    - CADMIN.S
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"

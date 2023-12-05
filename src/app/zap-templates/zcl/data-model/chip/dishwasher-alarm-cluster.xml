@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="AlarmMap" type="BITMAP32">
+  <bitmap name="AlarmMap" type="bitmap32">
      <cluster code="0x005D" />
      <field name="InflowError"           mask="0x01"/>
      <field name="DrainError"            mask="0x02"/>
@@ -60,4 +60,9 @@ limitations under the License.
         <field id="3" name="Mask" type="AlarmMap" />
     </event>
   </cluster>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x005D" />
+    <field name="Reset" mask="0x01" />
+  </bitmap>
 </configurator>

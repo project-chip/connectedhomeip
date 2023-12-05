@@ -87,6 +87,15 @@ darwin-framework-tool/README
 java-matter-controller/README
 ```
 
+## Kotlin matter controller example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+kotlin-matter-controller/README
+```
+
 ## Virtual Device App example
 
 ```{toctree}
@@ -201,6 +210,15 @@ pump-controller-app/**/README
 pump-controller-app/cc13x2x7_26x2x7/doc/programming*
 ```
 
+## Refrigerator example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+refrigerator-app/**/README
+```
+
 ## Shell example
 
 ```{toctree}
@@ -264,6 +282,7 @@ tv-app/**/README
 :maxdepth: 1
 
 tv-casting-app/**/README
+tv-casting-app/APIs.md
 ```
 
 ## Window example
@@ -275,11 +294,29 @@ tv-casting-app/**/README
 window-app/**/README
 ```
 
-## Resource monitoring example
+## RVC example
 
 ```{toctree}
 :glob:
 :maxdepth: 1
 
-resource-monitoring-app/**/README
+rvc-app/README
+```
+
+## Air Purifier Example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+air-purifier-app/**/README
+```
+
+## Network Infrastructure Manager example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+network-manager-app/README
 ```

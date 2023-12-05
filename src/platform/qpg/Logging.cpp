@@ -19,10 +19,6 @@
 #include <openthread/platform/memory.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#ifdef PW_RPC_ENABLED
-#include "PigweedLogger.h"
-#endif
-
 constexpr uint8_t kPrintfModuleLwip       = 0x01;
 constexpr uint8_t kPrintfModuleOpenThread = 0x02;
 constexpr uint8_t kPrintfModuleLogging    = 0x03;

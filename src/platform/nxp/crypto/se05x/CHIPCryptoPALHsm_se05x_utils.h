@@ -95,7 +95,7 @@ SE05x_CryptoObjectID_t se05x_getCryptoObjID(void);
 /* Set object id status */
 void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 
-#endif //#if ENABLE_REENTRANCY
+#endif // #if ENABLE_REENTRANCY
 
 #ifdef __cplusplus
 }

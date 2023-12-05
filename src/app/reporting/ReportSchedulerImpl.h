@@ -34,6 +34,9 @@ public:
 
     // ICDStateObserver
     void OnEnterActiveMode() override;
+    void OnTransitionToIdle() override;
+    // No action is needed by the ReportScheduler on ICD operation Mode changes
+    void OnICDModeChange() override{};
 
     // ReadHandlerObserver
     void OnSubscriptionEstablished(ReadHandler * aReadHandler) final;

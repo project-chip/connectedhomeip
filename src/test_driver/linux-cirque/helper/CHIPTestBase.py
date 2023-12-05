@@ -23,7 +23,7 @@ import sys
 import time
 import traceback
 from enum import IntEnum
-from typing import List, Union
+from typing import List, Mapping, Union
 from urllib.parse import urljoin
 
 import requests
@@ -45,7 +45,7 @@ child classes should implement:
 
 
 class CHIPVirtualHome:
-    def __init__(self, cirque_url, device_config):
+    def __init__(self, cirque_url, device_config: Mapping[str, dict]):
         self.home_id = None
         self.logger = None
         self.cirque_url = cirque_url
@@ -55,6 +55,10 @@ class CHIPVirtualHome:
         self.non_ap_devices = []
         self.thread_devices = []
         self.ap_devices = []
+
+        for device in device_config.values():
+            if device.get("base_image", "@default") == "@default":
+                device["base_image"] = self.default_base_image
 
     # The entrance of the whole test
     def run_test(self, save_logs=True):
@@ -417,3 +421,7 @@ class CHIPVirtualHome:
 
     def get_device_pretty_id(self, device_id):
         return "{}({}...)".format(self.get_device_pretty_name(device_id), device_id[:8])
+
+    @property
+    def default_base_image(cls):
+        return os.environ.get("CHIP_CIRQUE_BASE_IMAGE", "project-chip/chip-cirque-device-base")

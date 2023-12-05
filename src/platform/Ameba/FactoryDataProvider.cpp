@@ -31,6 +31,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 using namespace ::chip::DeviceLayer::Internal;
+using namespace chip::app::Clusters::BasicInformation;
 
 namespace chip {
 namespace DeviceLayer {
@@ -247,8 +248,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (kReadFromFlash)
@@ -661,6 +662,20 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 #endif
     }
 
+    return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductFinish(ProductFinishEnum * finish)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    *finish        = ProductFinishEnum::kOther;
+    return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(ColorEnum * primaryColor)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    *primaryColor  = ColorEnum::kBlack;
     return err;
 }
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     12.4.14. [TC-CNET-4.16] [Thread] NetworkIDNotFound value as
@@ -22,36 +21,97 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_THREAD
     endpoint: 0
 
+    PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET:
+        type: octet_string
+        defaultValue: "hex:1111111122222222"
+
 tests:
-    - label: "Preconditions"
+    - label: "Precondition : Factory reset the DUT"
       verification: |
-          1. Factory Reset the DUT
-          2. Commission TH and DUT to setup the Thread
-          3. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
-          4. The FeatureMap attribute value is 2
-          5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
-      disabled: true
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Precondition: Commission TH and DUT on Thread network "
+      verification: |
+          ./chip-tool pairing ble-thread 0x12344321 <operationalDataset> <setup-pin-code> <discriminator>
+
+          [1698660637.937566][6429:6431] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698660637.937644][6429:6431] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698660637.937705][6429:6431] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698660637.937750][6429:6431] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698660637.937812][6429:6431] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698660637.937863][6429:6431] CHIP:DIS: Closing all BLE connections
+          [1698660637.937911][6429:6431] CHIP:IN: Clearing BLE pending packets.
+          [1698660637.938582][6429:6431] CHIP:BLE: Auto-closing end point's BLE connection.
+          [1698660637.938645][6429:6431] CHIP:DL: Closing BLE GATT connection (con 0xffff9c034bb0)
+          [1698660637.938805][6429:6430] CHIP:DL: BluezDisconnect peer=F7:D4:24:D2:4A:1F
+          [1698660638.365208][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: MarkForEviction Type:1 LSID:62220
+          [1698660638.365311][6429:6431] CHIP:SC: SecureSession[0xffff9400f900, LSID:62220]: State change 'kActive' --> 'kPendingEviction'
+          [1698660638.365440][6429:6431] CHIP:IN: SecureSession[0xffff9400f900]: Released - Type:1 LSID:62220
+          [1698660638.365529][6429:6431] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698660638.365598][6429:6431] CHIP:TOO: Device commissioning completed with success
+          [1698660638.365873][6429:6431] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after successfull Commission"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 2
+          constraints:
+              type: bitmap32
 
     - label:
-          "Step 1: TH sends ArmFailSafe command to the DUT with the
-          ExpiryLengthSeconds field set to 900"
-      verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 900 0 54 0
+          "Precondition: DUT MaxNetworks attribute value is at least 1 and is
+          saved as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
 
-          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH.
-
-          [1650392597.976230][10152:10157] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1650392597.976363][10152:10157] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1650392597.976539][10152:10157] CHIP:TOO:   ArmFailSafeResponse: {
-          [1650392597.976665][10152:10157] CHIP:TOO:     errorCode: 0
-          [1650392597.976729][10152:10157] CHIP:TOO:     debugText:
-          [1650392597.976785][10152:10157] CHIP:TOO:    }
-          [1650392597.976874][10152:10157] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650392597.976987][10152:10157] CHIP:EM: Sending Standalone Ack for MessageCounter:10494017 on exchange 14665i
-      disabled: true
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 900
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
 
     - label:
           "Step 2: TH sends RemoveNetwork Command to the DUT with NetworkID
@@ -59,27 +119,17 @@ tests:
           PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
           commissioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
-      verification: |
-          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0
-
-          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 3 (NetworkIDNotFound).
-
-          [1683268296.896031][12131:12134] CHIP:DMG:         InteractionModelRevision = 1
-          [1683268296.896239][12131:12134] CHIP:DMG: },
-          [1683268296.896474][12131:12134] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1683268296.897219][12131:12134] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1683268296.897526][12131:12134] CHIP:TOO:   NetworkConfigResponse: {
-          [1683268296.897745][12131:12134] CHIP:TOO:     networkingStatus: 3
-          [1683268296.898546][12131:12134] CHIP:TOO:    }
-          [1683268296.898769][12131:12134] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1683268296.901995][12131:12134] CHIP:EM: <<< [E:60271i S:53927 M:99281930 (Ack:250739545)] (S) Msg TX to 1:0000000000000036 [345E] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1683268296.903001][12131:12134] CHIP:IN: (S) Sending msg 99281930 on secure session with LSID: 53927
-          [1683268296.905843][12131:12134] CHIP:EM: Flushed pending ack for MessageCounter:250739545 on exchange 60271i
-      disabled: true
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3
 
     - label:
           "Step 3: TH sends ConnectNetwork Command to the DUT with NetworkID
@@ -87,20 +137,14 @@ tests:
           PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the
           commissioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
-      verification: |
-          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0
-
-          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 3 (NetworkIDNotFound).
-
-          [1650392982.606392][10188:10193] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1650392982.606501][10188:10193] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
-          [1650392982.606653][10188:10193] CHIP:TOO:   ConnectNetworkResponse: {
-          [1650392982.606753][10188:10193] CHIP:TOO:     networkingStatus: 3
-          [1650392982.606815][10188:10193] CHIP:TOO:     errorValue: 0
-          [1650392982.606872][10188:10193] CHIP:TOO:    }
-          [1650392982.606960][10188:10193] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3

@@ -37,49 +37,49 @@
  *
  *  @note Integral truncate would take the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetLower32From64(v) ((uint32_t)(((uint64_t)(v) >> 0) & 0xFFFFFFFFUL))
+#define CHIP_TLV_GetLower32From64(v) ((uint32_t) (((uint64_t) (v) >> 0) & 0xFFFFFFFFUL))
 
 /*
  *  @brief Integral truncate argument X to the next least significant 32-bit
  *
  *  @note Right bit shift gets rid of the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetUpper32From64(v) ((uint32_t)(((uint64_t)(v) >> 32) & 0xFFFFFFFFUL))
+#define CHIP_TLV_GetUpper32From64(v) ((uint32_t) (((uint64_t) (v) >> 32) & 0xFFFFFFFFUL))
 
 /*
  *  @brief Integral truncate L to the least significant 16-bit
  *
  *  @note Integral truncate would take the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetLower16From32(v) ((uint16_t)(((uint32_t)(v) >> 0) & 0xFFFFU))
+#define CHIP_TLV_GetLower16From32(v) ((uint16_t) (((uint32_t) (v) >> 0) & 0xFFFFU))
 
 /*
  *  @brief Integral truncate argument X to the next least significant 16-bit
  *
  *  @note Right bit shift gets rid of the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetUpper16From32(v) ((uint16_t)(((uint32_t)(v) >> 16) & 0xFFFFU))
+#define CHIP_TLV_GetUpper16From32(v) ((uint16_t) (((uint32_t) (v) >> 16) & 0xFFFFU))
 
 /*
  *  @brief Integral truncate L to the least significant 8-bit
  *
  *  @note Integral truncate would take the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetLower8From16(v) ((uint8_t)(((uint16_t)(v) >> 0) & 0xFFU))
+#define CHIP_TLV_GetLower8From16(v) ((uint8_t) (((uint16_t) (v) >> 0) & 0xFFU))
 
 /*
  *  @brief Integral truncate argument X to the next least significant 8-bit
  *
  *  @note Right bit shift gets rid of the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_GetUpper8From16(v) ((uint8_t)(((uint16_t)(v) >> 8) & 0xFFU))
+#define CHIP_TLV_GetUpper8From16(v) ((uint8_t) (((uint16_t) (v) >> 8) & 0xFFU))
 
 /*
  *  @brief Integral truncate argument v to 8-bit
  *
  *  @note Integral truncate would take the least significant bits, regardless of hardware endianness.
  */
-#define CHIP_TLV_Serialize8(v) ((uint8_t)(v))
+#define CHIP_TLV_Serialize8(v) ((uint8_t) (v))
 
 /*
  *  @brief Integral truncate argument v to 16-bit, and then serialize it using CHIP standard Little Endian order
@@ -265,28 +265,28 @@
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint8_t), and then serialized
  */
-#define CHIP_TLV_UINT8(TagSpec, Value) chip::TLV::TLVElementType::UInt8 | TagSpec, CHIP_TLV_Serialize8((uint8_t)(Value))
+#define CHIP_TLV_UINT8(TagSpec, Value) chip::TLV::TLVElementType::UInt8 | TagSpec, CHIP_TLV_Serialize8((uint8_t) (Value))
 
 /*
  *  @brief Specifies a 16-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint16_t), and then serialized
  */
-#define CHIP_TLV_UINT16(TagSpec, Value) chip::TLV::TLVElementType::UInt16 | TagSpec, CHIP_TLV_Serialize16((uint16_t)(Value))
+#define CHIP_TLV_UINT16(TagSpec, Value) chip::TLV::TLVElementType::UInt16 | TagSpec, CHIP_TLV_Serialize16((uint16_t) (Value))
 
 /*
  *  @brief Specifies a 32-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint32_t), and then serialized
  */
-#define CHIP_TLV_UINT32(TagSpec, Value) chip::TLV::TLVElementType::UInt32 | TagSpec, CHIP_TLV_Serialize32((uint32_t)(Value))
+#define CHIP_TLV_UINT32(TagSpec, Value) chip::TLV::TLVElementType::UInt32 | TagSpec, CHIP_TLV_Serialize32((uint32_t) (Value))
 
 /*
  *  @brief Specifies a 64-bit Unsigned Integer TLV element
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  *  @param Value        Would be first converted to (uint64_t), and then serialized
  */
-#define CHIP_TLV_UINT64(TagSpec, Value) chip::TLV::TLVElementType::UInt64 | TagSpec, CHIP_TLV_Serialize64((uint64_t)(Value))
+#define CHIP_TLV_UINT64(TagSpec, Value) chip::TLV::TLVElementType::UInt64 | TagSpec, CHIP_TLV_Serialize64((uint64_t) (Value))
 
 /**
  *  @brief
@@ -299,7 +299,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_1ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::UTF8String_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -312,7 +312,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_2ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::UTF8String_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -325,7 +325,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_4ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::UTF8String_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -338,7 +338,7 @@
  *  @param ...                  Bytes representing the string characters to serialize
  */
 #define CHIP_TLV_UTF8_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::UTF8String_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::UTF8String_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -351,7 +351,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_1ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::ByteString_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_1ByteLength | TagSpec, CHIP_TLV_Serialize8((uint8_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -364,7 +364,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_2ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::ByteString_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_2ByteLength | TagSpec, CHIP_TLV_Serialize16((uint16_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -377,7 +377,7 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_4ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::ByteString_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_4ByteLength | TagSpec, CHIP_TLV_Serialize32((uint32_t) (StringLength)), ##__VA_ARGS__
 
 /**
  *  @brief
@@ -390,4 +390,4 @@
  *  @param ...                  Bytes to serialize
  */
 #define CHIP_TLV_BYTE_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
-    chip::TLV::TLVElementType::ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
+    chip::TLV::TLVElementType::ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t) (StringLength)), ##__VA_ARGS__

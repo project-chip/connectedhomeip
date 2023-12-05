@@ -17,18 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class BindingClusterTargetStruct(
-  val node: Optional<Long>,
-  val group: Optional<Int>,
-  val endpoint: Optional<Int>,
-  val cluster: Optional<Long>,
-  val fabricIndex: Int
+  val node: Optional<ULong>,
+  val group: Optional<UInt>,
+  val endpoint: Optional<UInt>,
+  val cluster: Optional<ULong>,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("BindingClusterTargetStruct {\n")
@@ -40,9 +40,9 @@ class BindingClusterTargetStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (node.isPresent) {
         val optnode = node.get()
         put(ContextSpecificTag(TAG_NODE), optnode)
@@ -71,33 +71,33 @@ class BindingClusterTargetStruct(
     private const val TAG_CLUSTER = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): BindingClusterTargetStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BindingClusterTargetStruct {
+      tlvReader.enterStructure(tlvTag)
       val node =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NODE)))
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
         } else {
           Optional.empty()
         }
       val group =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_GROUP)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_GROUP)))
         } else {
           Optional.empty()
         }
       val endpoint =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
         } else {
           Optional.empty()
         }
       val cluster =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_CLUSTER)))
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER)))
         } else {
           Optional.empty()
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

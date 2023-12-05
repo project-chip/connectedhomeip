@@ -27,19 +27,16 @@ static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 static const uint16_t kTestProductId1 = 0x8000u;
 static const uint16_t kTestProductId2 = 0x8001u;
-static const uint16_t kTestDiscriminator1 = 1111u;
-static const uint16_t kTestDiscriminator2 = 1112u;
-static const uint16_t kTestDiscriminator3 = 1113u;
-static const uint16_t kTestDiscriminator4 = 3840u;
-static const uint16_t kTestDiscriminator5 = 3839u;
+static const uint16_t kTestDiscriminator1 = 3840u;
+static const uint16_t kTestDiscriminator2 = 3839u;
 static const uint16_t kDiscoverDeviceTimeoutInSeconds = 10;
-static const uint16_t kExpectedDiscoveredDevicesCount = 5;
+static const uint16_t kExpectedDiscoveredDevicesCount = 2;
 
 // Singleton controller we use.
 static MTRDeviceController * sController = nil;
 
 @interface DeviceScannerDelegate : NSObject <MTRCommissionableBrowserDelegate>
-@property (nonatomic) XCTestExpectation * expectation;
+@property (nonatomic, nullable) XCTestExpectation * expectation;
 @property (nonatomic) NSNumber * resultsCount;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
@@ -59,8 +56,26 @@ static MTRDeviceController * sController = nil;
     return self;
 }
 
+- (instancetype)init
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _resultsCount = 0;
+    _expectation = nil;
+    return self;
+}
+
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
+    if (self.expectation == nil) {
+        // We are not actually supposed to be looking at results; don't do it,
+        // because we may be starting/stopping browse multiple times and seeing
+        // odd numbers of results.
+        return;
+    }
+
     _resultsCount = @(_resultsCount.unsignedLongValue + 1);
     if ([_resultsCount isEqual:@(kExpectedDiscoveredDevicesCount)]) {
         [self.expectation fulfill];
@@ -77,9 +92,7 @@ static MTRDeviceController * sController = nil;
     XCTAssertEqual(instanceName.length, 16); // The  instance name is random, so just ensure the len is right.
     XCTAssertEqualObjects(vendorId, @(kTestVendorId));
     XCTAssertTrue([productId isEqual:@(kTestProductId1)] || [productId isEqual:@(kTestProductId2)]);
-    XCTAssertTrue([discriminator isEqual:@(kTestDiscriminator1)] || [discriminator isEqual:@(kTestDiscriminator2)] ||
-        [discriminator isEqual:@(kTestDiscriminator3)] || [discriminator isEqual:@(kTestDiscriminator4)] ||
-        [discriminator isEqual:@(kTestDiscriminator5)]);
+    XCTAssertTrue([discriminator isEqual:@(kTestDiscriminator1)] || [discriminator isEqual:@(kTestDiscriminator2)]);
     XCTAssertEqual(commissioningMode, YES);
 
     NSLog(@"Found Device (%@) with discriminator: %@ (vendor: %@, product: %@)", instanceName, discriminator, vendorId, productId);

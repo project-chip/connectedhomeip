@@ -51,8 +51,8 @@ CHIP_ERROR SystemInfo::GetPlatformVersion(PlatformVersion & version)
         return CHIP_ERROR_INTERNAL;
     }
 
-    sInstance.mMajor = version.mMajor = (uint8_t)(platformVersion[0] - '0');
-    sInstance.mMinor = version.mMinor = (uint8_t)(platformVersion[2] - '0');
+    sInstance.mMajor = version.mMajor = (uint8_t) (platformVersion[0] - '0');
+    sInstance.mMinor = version.mMinor = (uint8_t) (platformVersion[2] - '0');
     free(platformVersion);
     return CHIP_NO_ERROR;
 }

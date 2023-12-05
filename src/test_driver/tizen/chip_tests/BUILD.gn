@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/tizen.gni")
+
+import("${tizen_sdk_build_root}/tizen_sdk.gni")
+
+tizen_qemu_mkisofs("chip-tests-runner") {
+  runner = "runner.sh"
+
+  # Build CHIP unit tests.
+  deps = [ "${chip_root}/src:tests" ]
+
+  # Bundle all created unit tests.
+  # TODO (arkq): Collect all unit tests in a way that we could add all targets
+  #              to the assets list. Right now QEMU runner dependencies are not
+  #              tracked properly. Changes to the unit tests will not trigger
+  #              rebuild of the ISO image, so the test will be run with old
+  #              binaries.
+  assets_non_tracked = [ rebase_path("${root_build_dir}/tests") ]
+  assets_non_tracked_exclude_globs = [ "*.map" ]
+}
+
+tizen_qemu_run("chip-tests") {
+  # Enable network support, so Tizen can obtain current date/time from the
+  # network. Correct date/time is required for the commissioning process -
+  # attestation will fail otherwise.
+  virtio_net = true
+
+  deps = [ ":chip-tests-runner" ]
+  mkisofs_outputs = get_target_outputs(":chip-tests-runner")
+  iso_image = rebase_path(mkisofs_outputs[0])
+}
+
+group("check") {
+  deps = [ ":chip-tests" ]
+  testonly = true
+}

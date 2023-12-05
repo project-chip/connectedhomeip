@@ -29,6 +29,7 @@ class ASRApp(Enum):
     THERMOSTAT = auto()
     OTA_REQUESTOR = auto()
     DISHWASHER = auto()
+    REFRIGERATOR = auto()
 
     def ExampleName(self):
         if self == ASRApp.ALL_CLUSTERS:
@@ -51,6 +52,8 @@ class ASRApp(Enum):
             return 'ota-requestor-app'
         elif self == ASRApp.DISHWASHER:
             return 'dishwasher-app'
+        elif self == ASRApp.REFRIGERATOR:
+            return 'refrigerator-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -75,6 +78,8 @@ class ASRApp(Enum):
             return 'chip-asr-ota-requestor-example'
         elif self == ASRApp.DISHWASHER:
             return 'chip-asr-dishwasher-example'
+        elif self == ASRApp.REFRIGERATOR:
+            return 'chip-asr-refrigerator-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

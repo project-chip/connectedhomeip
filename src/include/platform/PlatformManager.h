@@ -24,7 +24,7 @@
 #pragma once
 
 #include <platform/AttributeList.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
@@ -285,8 +285,8 @@ protected:
     ~PlatformManager() = default;
 
     // No copy, move or assignment.
-    PlatformManager(const PlatformManager &)  = delete;
-    PlatformManager(const PlatformManager &&) = delete;
+    PlatformManager(const PlatformManager &)             = delete;
+    PlatformManager(const PlatformManager &&)            = delete;
     PlatformManager & operator=(const PlatformManager &) = delete;
 };
 

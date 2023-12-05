@@ -324,9 +324,13 @@ public:
 #ifdef __clang__
 #if __has_feature(address_sanitizer)
 #define __SANITIZE_ADDRESS__ 1
-#endif
-#endif
-#endif
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __has_feature(address_sanitizer)
+#else
+#define __SANITIZE_ADDRESS__ 0
+#endif // __clang__
+#endif // __SANITIZE_ADDRESS__
 #if __SANITIZE_ADDRESS__
         // Free all remaining objects so that ASAN can catch specific use-after-free cases.
         ReleaseAll();

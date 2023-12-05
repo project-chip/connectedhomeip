@@ -19,6 +19,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
@@ -139,10 +140,10 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
                  "}\n";
     EncodeAndValidate(static_cast<double>(1.0), jsonString);
 
-    CharSpan charSpan = CharSpan::fromCharString("hello");
+    CharSpan charSpan = "hello"_span;
     jsonString        = "{\n"
-                 "   \"1:STRING\" : \"hello\"\n"
-                 "}\n";
+                        "   \"1:STRING\" : \"hello\"\n"
+                        "}\n";
     EncodeAndValidate(charSpan, jsonString);
 
     // Validated using https://base64.guru/converter/encode/hex

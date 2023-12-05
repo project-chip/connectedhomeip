@@ -66,6 +66,8 @@ public:
     ~RvcRunModeDelegate() override = default;
 };
 
+ModeBase::Instance * Instance();
+
 void Shutdown();
 
 } // namespace RvcRunMode
@@ -108,6 +110,8 @@ private:
 public:
     ~RvcCleanModeDelegate() override = default;
 };
+
+ModeBase::Instance * Instance();
 
 void Shutdown();
 

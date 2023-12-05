@@ -32,7 +32,7 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-constexpr const char kShellPrompt[] = "matterCli> ";
+constexpr char kShellPrompt[] = "matterCli> ";
 
 // To track carriage returns of Windows return cases of '\r\n'
 bool haveCR = false;
@@ -118,8 +118,8 @@ void ReadLine(char * buffer, size_t max)
                 if (isprint(static_cast<int>(buffer[line_sz])) || buffer[line_sz] == '\t')
                 {
                     streamer_printf(streamer_get(), "%c", buffer[line_sz]);
-                    line_sz++;
                 }
+                line_sz++;
                 break;
             }
         }

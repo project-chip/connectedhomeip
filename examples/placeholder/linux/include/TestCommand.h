@@ -35,9 +35,9 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
-constexpr const char kIdentityAlpha[] = "";
-constexpr const char kIdentityBeta[]  = "";
-constexpr const char kIdentityGamma[] = "";
+inline constexpr char kIdentityAlpha[] = "";
+inline constexpr char kIdentityBeta[]  = "";
+inline constexpr char kIdentityGamma[] = "";
 
 class TestCommand : public TestRunner,
                     public PICSChecker,

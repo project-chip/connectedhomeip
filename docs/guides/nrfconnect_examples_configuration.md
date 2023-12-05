@@ -186,13 +186,13 @@ You can enable the support for Thread Sleepy End Device in Matter by setting the
 following Kconfig options:
 
 -   `CONFIG_OPENTHREAD_MTD`
--   `CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT`
+-   `CONFIG_CHIP_ENABLE_ICD_SUPPORT`
 
 The following Kconfig options can be used to tune Thread Sleepy End Device wake
 intervals:
 
--   `CONFIG_CHIP_SED_IDLE_INTERVAL`
--   `CONFIG_CHIP_SED_ACTIVE_INTERVAL`
+-   `CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL`
+-   `CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL`
 
 #### Commissioning with NFC support
 

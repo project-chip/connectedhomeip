@@ -28,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     test_suites_chip_tool_darwin:
         name: Test Suites - Darwin
@@ -38,6 +38,14 @@ jobs:
                 build_variant: [no-ble-asan-clang]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
+
+            # We can't use the pigweed clang to build the Darwin framework once we start using
+            # Swift, because it does not handle CLANG_ENABLE_MODULES correctly.
+            #
+            # But the Xcode clang does not handle LSan correctly.  Since we can't easily apply
+            # LSAN_OPTIONS to just everything except darwin-framework-tool, instead disable asan for
+            # it.
+            BUILD_VARIANT_FRAMEWORK_TOOL: no-ble
             LSAN_OPTIONS: detect_leaks=1 malloc_context_size=40 suppressions=scripts/tests/chiptest/lsan-mac-suppressions.txt
 
         if: github.actor != 'restyled-io[bot]'
@@ -45,7 +53,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -70,10 +78,9 @@ jobs:
               # Enable -Wconversion by hand as well, because it seems to not be
               # enabled by default in the Xcode config.
               #
-              # Disable -Wunguarded-availability-new because we internally use
-              # APIs we added after our deployment target version.  Maybe we
-              # should change the deployment target version instead?
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx OTHER_CFLAGS='${inherited} -Wconversion -Wno-unguarded-availability-new'
+              # Disable availability annotations, since we are not building against a system
+              # Matter.framework.
+              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
@@ -84,13 +91,14 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
+                        --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
                         --target darwin-x64-lock-${BUILD_VARIANT} \
                         --target darwin-x64-ota-provider-${BUILD_VARIANT} \
                         --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
                         --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         --target darwin-x64-bridge-${BUILD_VARIANT} \
+                        --target darwin-x64-lit-icd-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -98,7 +106,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
+                     --chip-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
                      --target-skip-glob '{TestAccessControlConstraints}' \
                      run \
                      --iterations 1 \
@@ -115,7 +123,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_darwin_framework_ota_test.py \
                      run \
-                     --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
+                     --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin-framework-tool \
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --ota-data-file /tmp/rawImage \
                      --ota-image-file /tmp/otaImage \
@@ -140,8 +148,8 @@ jobs:
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
-                  name: framework-build-log-darwin-${{ matrix.build_variant }}
-                  path: out/darwin-x64-darwin-framework-tool-${{ matrix.build_variant }}/darwin_framework_build.log
+                  name: framework-build-log-darwin-${BUILD_VARIANT_FRAMEWORK_TOOL}
+                  path: out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT_FRAMEWORK_TOOL}/darwin_framework_build.log
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}

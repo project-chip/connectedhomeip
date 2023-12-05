@@ -180,6 +180,13 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 
 void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // Make sure to clear out our reason for trying the next result first thing,
+    // so it does not stick around in various error cases.
+    bool tryingNextResultDueToSessionEstablishmentError = mTryingNextResultDueToSessionEstablishmentError;
+    mTryingNextResultDueToSessionEstablishmentError     = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     if (mState == State::Uninitialized)
     {
         return;
@@ -228,18 +235,39 @@ void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & ad
     {
         // We expect to get a callback via OnSessionEstablished or OnSessionEstablishmentError to continue
         // the state machine forward.
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        if (tryingNextResultDueToSessionEstablishmentError)
+        {
+            // Our retry has already been kicked off, so claim 0 delay until it
+            // starts.  We only reach this from OnSessionEstablishmentError when
+            // the error is CHIP_ERROR_TIMEOUT.
+            NotifyRetryHandlers(CHIP_ERROR_TIMEOUT, config, System::Clock::kZero);
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         return;
     }
 
     // Move to the ResolvingAddress state, in case we have more results,
-    // since we expect to receive results in that state.
+    // since we expect to receive results in that state.  Pretend like we moved
+    // on directly to this address from whatever triggered us to try this result
+    // (so restore mTryingNextResultDueToSessionEstablishmentError to the value
+    // it had at the start of this function).
     MoveToState(State::ResolvingAddress);
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    mTryingNextResultDueToSessionEstablishmentError = tryingNextResultDueToSessionEstablishmentError;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
     {
-        // No need to NotifyRetryHandlers, since we never actually
-        // spent any time trying the previous result.
+        // No need to NotifyRetryHandlers, since we never actually spent any
+        // time trying the previous result.  Whatever work we need to do has
+        // been handled by our recursive OnNodeAddressResolved callback.  Make
+        // sure not to touch `this` under here, because it might have been
+        // deleted by OnNodeAddressResolved.
         return;
     }
+
+    // No need to reset mTryingNextResultDueToSessionEstablishmentError here,
+    // because we're about to delete ourselves.
 
     DequeueConnectionCallbacks(err);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
@@ -360,25 +388,35 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablishmentError was called while we were not connecting"));
 
+    // If this condition ever changes, we may need to store the error in a
+    // member instead of having a boolean
+    // mTryingNextResultDueToSessionEstablishmentError, so we can recover the
+    // error in UpdateDeviceData.
     if (CHIP_ERROR_TIMEOUT == error)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         // Make a copy of the ReliableMessageProtocolConfig, since our
         // mCaseClient is about to go away once we change state.
         ReliableMessageProtocolConfig remoteMprConfig = mCASEClient->GetRemoteMRPIntervals();
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
         // Move to the ResolvingAddress state, in case we have more results,
         // since we expect to receive results in that state.
         MoveToState(State::ResolvingAddress);
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        mTryingNextResultDueToSessionEstablishmentError = true;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
-#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-            // Our retry has already been kicked off.
-            NotifyRetryHandlers(error, remoteMprConfig, System::Clock::kZero);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+            // Whatever work we needed to do has been handled by our
+            // OnNodeAddressResolved callback.  Make sure not to touch `this`
+            // under here, because it might have been deleted by
+            // OnNodeAddressResolved.
             return;
         }
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        mTryingNextResultDueToSessionEstablishmentError = false;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
         // Moving back to the Connecting state would be a bit of a lie, since we
         // don't have an mCASEClient.  Just go back to NeedsAddress, since
@@ -541,7 +579,7 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     // If we're in a mode where we would generally retry CASE, retry operational
-    // discovery once.  That allows us to more-gracefully handle broken networks
+    // discovery if we're allowed to.  That allows us to more-gracefully handle broken networks
     // where multicast DNS does not actually work and hence only the initial
     // unicast DNS-SD queries get a response.
     //
@@ -702,10 +740,43 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, const Reliab
 
 void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate)
 {
-    for (auto * item = mConnectionRetry.First(); item && item != &mConnectionRetry; item = item->mNext)
+    // We have to be very careful here: Calling into these handlers might in
+    // theory destroy the Callback objects involved, but unlike the
+    // succcess/failure cases we don't want to just clear the handlers from our
+    // list when we are calling them, because we might need to call a given
+    // handler more than once.
+    //
+    // To handle this we:
+    //
+    // 1) Snapshot the list of handlers up front, so if any of the handlers
+    //    triggers an AddRetryHandler with some other handler that does not
+    //    affect the list we plan to notify here.
+    //
+    // 2) When planning to notify a handler move it to a new list that contains
+    //    just that handler.  This way if it gets canceled as part of the
+    //    notification we can tell it has been canceled.
+    //
+    // 3) If notifying the handler does not cancel it, add it back to our list
+    //    of handlers so we will notify it on future retries.
+
+    Cancelable retryHandlerListSnapshot;
+    mConnectionRetry.DequeueAll(retryHandlerListSnapshot);
+
+    while (retryHandlerListSnapshot.mNext != &retryHandlerListSnapshot)
     {
-        auto cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(item);
+        auto * cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(retryHandlerListSnapshot.mNext);
+
+        Callback::CallbackDeque currentCallbackHolder;
+        currentCallbackHolder.Enqueue(cb->Cancel());
+
         cb->mCall(cb->mContext, mPeerId, error, timeoutEstimate);
+
+        if (currentCallbackHolder.mNext != &currentCallbackHolder)
+        {
+            // Callback has not been canceled as part of the call, so is still
+            // supposed to be registered with us.
+            AddRetryHandler(cb);
+        }
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

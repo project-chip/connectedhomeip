@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 52.3.1. [TC-DGWIFI-3.1] Attributes observed with client as DUT
+name: 52.3.1. [TC-DGWIFI-3.2] Command Generated [DUT as Client]
 
 PICS:
     - DGWIFI.C
@@ -28,5 +28,5 @@ tests:
     #  command: "WaitForCommissioning"
 
     - label: "DUT sends ResetCounts command to TH"
-      PICS: DGTHREAD.C.C00.Tx
+      PICS: DGWIFI.C.C00.Tx
       wait: "ResetCounts"

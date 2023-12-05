@@ -14,6 +14,8 @@
 #include <commands/clusters/ReportCommandBridge.h>
 #include <commands/clusters/WriteAttributeCommandBridge.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
 
 {{> clusters_header}}
 
@@ -39,6 +41,9 @@ public:
     {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#zcl_command_arguments}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #if MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
@@ -46,20 +51,32 @@ public:
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #endif // MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %u", endpointId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId, commandId, endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         __auto_type * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name preserveAcronyms=true}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
         __auto_type * params = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#zcl_command_arguments}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #if MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.parent.name type=type depth=0}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #endif // MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{/zcl_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
@@ -69,6 +86,10 @@ public:
             {{#if hasSpecificResponse}}
                 ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
+                    if (error == nil) {
+                        constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
+                        RemoteDataModelLogger::LogCommandAsJSON(@(endpointId), @(clusterId), @(responseId), values);
+                    }
             {{else}}
                 ^(NSError * _Nullable error) {
             {{/if}}
@@ -76,6 +97,12 @@ public:
                     if (error != nil) {
                         mError = error;
                         LogNSError("Error", error);
+                        {{#if hasSpecificResponse}}
+                          constexpr chip::CommandId responseId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase responseName}}::Id;
+                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(responseId), error);
+                        {{else}}
+                          RemoteDataModelLogger::LogCommandErrorAsJSON(@(endpointId), @(clusterId), @(commandId), error);
+                        {{/if}}
                     }
                     if (responsesNeeded == 0) {
                         SetCommandExitStatus(mError);
@@ -127,7 +154,10 @@ public:
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReadAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReadAttribute (0x%08" PRIX32 ") on endpoint %u", endpointId, clusterId, attributeId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
@@ -145,8 +175,11 @@ public:
         {{~/if_is_fabric_scoped_struct~}}
         ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
-        if (error != nil) {
+        if (error == nil) {
+          RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+        } else {
           LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} read Error", error);
+          RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
         }
         SetCommandExitStatus(error);
          }];
@@ -180,7 +213,10 @@ public:
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) WriteAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::AttributeId attributeId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") WriteAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
         __auto_type * params = [[MTRWriteParams alloc] init];
@@ -189,17 +225,33 @@ public:
         {{#if_chip_complex}}
         {{asObjectiveCType type parent.name}} value;
         {{>decodable_value target="value" source="mValue" cluster=parent.name errorCode="return err;" depth=0}}
-        {{else if (isOctetString type)}}
-        {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
-        {{else if (isString type)}}
-        {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
         {{else}}
-        {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue];
+          {{#if isNullable}}
+            {{asObjectiveCType type parent.name}} value = nil;
+            if (!mValue.IsNull()) {
+              {{#if (isOctetString type)}}
+                value = [[NSData alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size()];
+              {{else if (isString type)}}
+                value = [[NSString alloc] initWithBytes:mValue.Value().data() length:mValue.Value().size() encoding:NSUTF8StringEncoding];
+              {{else}}
+                value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue.Value()];
+              {{/if}}
+            }
+          {{else}}
+            {{#if (isOctetString type)}}
+              {{asObjectiveCType type parent.name}} value = [[NSData alloc] initWithBytes:mValue.data() length:mValue.size()];
+            {{else if (isString type)}}
+              {{asObjectiveCType type parent.name}} value = [[NSString alloc] initWithBytes:mValue.data() length:mValue.size() encoding:NSUTF8StringEncoding];
+            {{else}}
+              {{asObjectiveCType type parent.name}} value = [NSNumber numberWith{{asObjectiveCNumberType "" type false}}:mValue{{#if isNullable}}.Value(){{/if}}];
+            {{/if}}
+          {{/if}}
         {{/if_chip_complex}}
 
         [cluster write{{>attribute}}WithValue:value params:params completion:^(NSError * _Nullable error) {
             if (error != nil) {
               LogNSError("{{asUpperCamelCase parent.name preserveAcronyms=true}} {{asUpperCamelCase name preserveAcronyms=true}} write Error", error);
+              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
             }
             SetCommandExitStatus(error);
             }];
@@ -211,11 +263,11 @@ private:
     {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}} mValue;
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}}> mComplex;
     {{else if (isOctetString type)}}
-    chip::ByteSpan mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} mValue;
     {{else if (isCharString type)}}
-    chip::ByteSpan mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<chip::ByteSpan>{{else}}chip::ByteSpan{{/if}} mValue;
     {{else}}
-    {{as_underlying_zcl_type type}} mValue;
+    {{#if isNullable}}chip::app::DataModel::Nullable<{{as_underlying_zcl_type type}}>{{else}}{{as_underlying_zcl_type type}}{{/if}} mValue;
     {{/if_chip_complex}}
 };
 
@@ -234,7 +286,10 @@ public:
 
     CHIP_ERROR SendCommand(MTRBaseDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) ReportAttribute ({{asHex code 8}}) on endpoint %u", endpointId);
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Id;
+        constexpr chip::CommandId attributeId = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") ReportAttribute (0x%08" PRIX32 ") on endpoint %u", clusterId, attributeId, endpointId);
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
         __auto_type * cluster = [[MTRBase{{>cluster}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
         __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(mMinInterval) maxInterval:@(mMaxInterval)];
@@ -251,6 +306,11 @@ public:
                                 subscriptionEstablished:^(){ mSubscriptionEstablished=YES; }
                                 reportHandler:^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         NSLog(@"{{asUpperCamelCase parent.name preserveAcronyms=true}}.{{asUpperCamelCase name preserveAcronyms=true}} response %@", [value description]);
+            if (error == nil) {
+              RemoteDataModelLogger::LogAttributeAsJSON(@(endpointId), @(clusterId), @(attributeId), value);
+            } else {
+              RemoteDataModelLogger::LogAttributeErrorAsJSON(@(endpointId), @(clusterId), @(attributeId), error);
+            }
         SetCommandExitStatus(error);
          }];
 
@@ -264,9 +324,9 @@ public:
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/if}}
 {{#if (isProvisional (asUpperCamelCase name preserveAcronyms=true))}}
 #endif // MTR_ENABLE_PROVISIONAL
+{{/if}}
 {{/if}}
 {{/zcl_clusters}}
 

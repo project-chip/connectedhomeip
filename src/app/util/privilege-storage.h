@@ -18,11 +18,11 @@
 
 #include <lib/core/DataModelTypes.h>
 
-constexpr int kMatterAccessPrivilegeView       = 0;
-constexpr int kMatterAccessPrivilegeOperate    = 1;
-constexpr int kMatterAccessPrivilegeManage     = 2;
-constexpr int kMatterAccessPrivilegeAdminister = 3;
-constexpr int kMatterAccessPrivilegeMaxValue   = kMatterAccessPrivilegeAdminister;
+inline constexpr int kMatterAccessPrivilegeView       = 0;
+inline constexpr int kMatterAccessPrivilegeOperate    = 1;
+inline constexpr int kMatterAccessPrivilegeManage     = 2;
+inline constexpr int kMatterAccessPrivilegeAdminister = 3;
+inline constexpr int kMatterAccessPrivilegeMaxValue   = kMatterAccessPrivilegeAdminister;
 
 int MatterGetAccessPrivilegeForReadAttribute(chip::ClusterId cluster, chip::AttributeId attribute);
 int MatterGetAccessPrivilegeForWriteAttribute(chip::ClusterId cluster, chip::AttributeId attribute);

@@ -28,7 +28,7 @@
 #include <app/TimerDelegates.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 #if CONFIG_DEVICE_LAYER

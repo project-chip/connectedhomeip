@@ -35,6 +35,10 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 // This test suite pushes multiple PASESession objects onto the stack for the
 // purposes of testing device-to-device communication.  However, in the real
 // world, these won't live in a single device's memory.  Hence, disable stack
@@ -59,7 +63,7 @@ constexpr uint32_t sTestPaseMessageCount = 5;
 constexpr uint32_t sTestSpake2p01_PinCode        = 20202021;
 constexpr uint32_t sTestSpake2p01_IterationCount = 1000;
 constexpr uint8_t sTestSpake2p01_Salt[]          = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20,
-                                            0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
+                                                     0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
 constexpr Spake2pVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xB9, 0x61, 0x70, 0xAA, 0xE8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4F, 0xE9, 0xA3, 0xB2, 0x87, 0xC3,
     0x03, 0x30, 0xC2, 0xA6, 0x60, 0x37, 0x5D, 0x17, 0xBB, 0x20, 0x5A, 0x8C, 0xF1, 0xAE, 0xCB, 0x35,
@@ -161,8 +165,8 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     loopback.Reset();
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
-                                          ByteSpan(nullptr, 0), Optional<ReliableMessageProtocolConfig>::Missing(),
+                   pairing.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount, ByteSpan(),
+                                          Optional<ReliableMessageProtocolConfig>::Missing(),
                                           &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     ctx.DrainAndServiceIO();
 
@@ -256,10 +260,21 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
-            64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-            64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-        });
+        // Adding an if-else to avoid affecting non-ICD tests
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // Increase local MRP retry intervals to take into account the increase response delay from an ICD
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
     NL_TEST_ASSERT(inSuite,
@@ -279,8 +294,15 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
+        auto waitTimeout = 100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // If running as an ICD, increase waitTimeout to account for the polling interval
+        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+#endif
+
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
-        chip::test_utils::SleepMillis((100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST).count());
+        chip::test_utils::SleepMillis(waitTimeout.count());
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();
@@ -439,10 +461,10 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
+    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(

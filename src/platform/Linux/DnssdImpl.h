@@ -20,7 +20,9 @@
 #include <sys/select.h>
 #include <unistd.h>
 
+#include <atomic>
 #include <chrono>
+#include <list>
 #include <map>
 #include <memory>
 #include <string>
@@ -100,7 +102,7 @@ private:
 class MdnsAvahi
 {
 public:
-    MdnsAvahi(const MdnsAvahi &) = delete;
+    MdnsAvahi(const MdnsAvahi &)             = delete;
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);
@@ -109,10 +111,12 @@ public:
     CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                      chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
+                      chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier);
+    CHIP_ERROR StopBrowse(intptr_t browseIdentifier);
     CHIP_ERROR Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                        chip::Inet::IPAddressType transportType, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                        void * context);
+    void StopResolve(const char * name);
 
     Poller & GetPoller() { return mPoller; }
 
@@ -126,10 +130,16 @@ private:
         void * mContext;
         Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
+        size_t mBrowseRetries;
+        AvahiIfIndex mInterface;
+        std::string mProtocol;
+        chip::System::Clock::Timeout mNextRetryDelay = chip::System::Clock::Seconds16(1);
+        std::atomic_bool mStopped{ false };
     };
 
     struct ResolveContext
     {
+        size_t mNumber; // unique number for this context
         MdnsAvahi * mInstance;
         DnssdResolveCallback mCallback;
         void * mContext;
@@ -138,11 +148,28 @@ private:
         AvahiProtocol mTransport;
         AvahiProtocol mAddressType;
         std::string mFullType;
-        uint8_t mAttempts = 0;
+        uint8_t mAttempts                = 0;
+        AvahiServiceResolver * mResolver = nullptr;
+
+        ~ResolveContext()
+        {
+            if (mResolver != nullptr)
+            {
+                avahi_service_resolver_free(mResolver);
+                mResolver = nullptr;
+            }
+        }
     };
 
     MdnsAvahi() : mClient(nullptr) {}
     static MdnsAvahi sInstance;
+
+    /// Allocates a new resolve context with a unique `mNumber`
+    ResolveContext * AllocateResolveContext();
+
+    ResolveContext * ResolveContextForHandle(size_t handle);
+    void FreeResolveContext(size_t handle);
+    void FreeResolveContext(const char * name);
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);
@@ -153,6 +180,7 @@ private:
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
                              void * userdata);
+    static void BrowseRetryCallback(chip::System::Layer * aLayer, void * appState);
     static void HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
                               AvahiResolverEvent event, const char * name, const char * type, const char * domain,
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
@@ -165,6 +193,11 @@ private:
     AvahiClient * mClient;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
+    static constexpr size_t kMaxBrowseRetries = 4;
+
+    // Handling of allocated resolves
+    size_t mResolveCount = 0;
+    std::list<ResolveContext *> mAllocatedResolves;
 };
 
 } // namespace Dnssd

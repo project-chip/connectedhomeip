@@ -29,9 +29,9 @@
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 

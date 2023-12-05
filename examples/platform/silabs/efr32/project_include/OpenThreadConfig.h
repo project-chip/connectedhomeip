@@ -86,7 +86,7 @@
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 0
 #define OPENTHREAD_CONFIG_COMMISSIONER_ENABLE 0
 #define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
-#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
+#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
 #define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_TCP_ENABLE 0
@@ -97,6 +97,10 @@
 // Define as 1 to stay awake between fragments while transmitting a large packet,
 // and to stay awake after receiving a packet with frame pending set to true.
 #define OPENTHREAD_CONFIG_MAC_STAY_AWAKE_BETWEEN_FRAGMENTS 1
+
+#define OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS 0
+
+#define OPENTHREAD_CONFIG_DETERMINISTIC_ECDSA_ENABLE 0
 
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.

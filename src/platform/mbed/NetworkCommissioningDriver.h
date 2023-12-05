@@ -29,9 +29,9 @@ namespace NetworkCommissioning {
 #include <netsocket/WiFiInterface.h>
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
 class MbedScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -49,7 +49,7 @@ public:
         item.security.SetRaw(mScanResults[mIternum].get_security());
         static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "Our length won't fit in ssidLen");
         item.ssidLen  = static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(mScanResults[mIternum].get_ssid()),
-                                                    chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+                                                     chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mScanResults[mIternum].get_channel();
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mScanResults[mIternum].get_rssi();

@@ -122,7 +122,51 @@ tests:
               type: list
               contains: [11]
 
-    - label: "Step 5a: TH reads AcceptedCommandList from DUT"
+    - label: "Step 5a: TH reads EventList from DUT"
+      PICS:
+          " !DGWIFI.S.E00 && !DGWIFI.S.E01 && !DGWIFI.S.E02 &&
+          PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 5b: TH reads optional attribute (Disconnection) in EventList
+          from DUT"
+      PICS: DGWIFI.S.E00 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label:
+          "Step 5c: TH reads optional attribute (AssociationFailure) in
+          EventList from DUT"
+      PICS: DGWIFI.S.E01 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label:
+          "Step 5d: TH reads optional attribute (ConnectionStatus) in EventList
+          from DUT"
+      PICS: DGWIFI.S.E02 && PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
+
+    - label: "Step 6a: TH reads AcceptedCommandList from DUT"
       PICS: " !DGWIFI.S.F01 "
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -132,7 +176,7 @@ tests:
               type: list
 
     - label:
-          "Step 5b: TH reads Feature dependent(DGWIFI.S.F01) command in
+          "Step 6b: TH reads Feature dependent(DGWIFI.S.F01) command in
           AcceptedCommandList from DUT"
       PICS: DGWIFI.S.F01
       command: "readAttribute"
@@ -142,54 +186,10 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 6: TH reads GeneratedCommandList from DUT"
+    - label: "Step 7: TH reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:
               type: list
-
-    - label: "Step 7a: TH reads EventList from DUT"
-      PICS:
-          "PICS_EVENT_LIST_ENABLED &&  !DGWIFI.S.E00 && !DGWIFI.S.E01 &&
-          !DGWIFI.S.E02 "
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label:
-          "Step 7b: TH reads optional attribute (Disconnection) in EventList
-          from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E00
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [0]
-
-    - label:
-          "Step 7c: TH reads optional attribute (AssociationFailure) in
-          EventList from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E01
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [1]
-
-    - label:
-          "Step 7d: TH reads optional attribute (ConnectionStatus) in EventList
-          from DUT"
-      PICS: PICS_EVENT_LIST_ENABLED && DGWIFI.S.E02
-      command: "readAttribute"
-      attribute: "EventList"
-      response:
-          constraints:
-              type: list
-              contains: [2]

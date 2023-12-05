@@ -18,7 +18,9 @@ name:
     as Server
 
 PICS:
-    - RVCCLEANM.S
+    - RVCCLEANM.S.A0002
+    - RVCCLEANM.S.A0003
+    - RVCCLEANM.S.F00
 
 config:
     nodeId: 0x12344321
@@ -120,12 +122,19 @@ tests:
           [1690183885.227148][15298:15300] CHIP:DMG:                         {
           [1690183885.227152][15298:15300] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690183885.227156][15298:15300] CHIP:DMG:                         },
+
+          ./chip-tool  rvcrunmode read start-up-mode 1 1
+
+          On TH(chip-tool),  Verify that StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform
+
+          [1692178796.077748][3730:3732] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0054 Attribute 0x0000_0002 DataVersion: 1431406600
+          [1692178796.077821][3730:3732] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the OnMode attribute."
-      PICS: RVCCLEANM.S.A0000 && RVCCLEANM.S.A0002
+      PICS: RVCCLEANM.S.A0003 && RVCCLEANM.S.A0002
       verification: |
-          Set onmode to any integer value because as default it value has null.
+          As default value of OnMode attribute is NULL. Set the OnMode to any mode value listed in the SupportedModes entries.
 
           ./chip-tool  rvccleanmode write on-mode 0 1 1
 

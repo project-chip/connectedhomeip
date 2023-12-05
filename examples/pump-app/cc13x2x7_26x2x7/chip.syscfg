@@ -84,8 +84,7 @@ for(var setting in ccfgSettings)
     CCFG[setting] = ccfgSettings[setting];
 }
 
-// Disable CCFG generation, this is added by the BIM project
-CCFG.enableCodeGeneration = false;
+CCFG.enableCodeGeneration = true;
 
 /* NVS */
 NVS1.$name                      = "CONFIG_NVSINTERNAL";

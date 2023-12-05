@@ -19,26 +19,26 @@ package chip.devicecontroller.cluster
 import chip.devicecontroller.cluster.eventstructs.UnitTestingClusterTestEventEvent
 import chip.devicecontroller.cluster.eventstructs.UnitTestingClusterTestFabricScopedEventEvent
 import chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 import org.junit.Test
 
 class ChipClusterEventStructTest {
   @Test
   fun testEventEventTlvTest() {
     val simpleStruct =
-      UnitTestingClusterSimpleStruct(1, true, 2, byteArrayOf(0x00, 0x01), "test", 3, 4.5f, 6.7)
+      UnitTestingClusterSimpleStruct(1U, true, 2U, byteArrayOf(0x00, 0x01), "test", 3U, 4.5f, 6.7)
     val simpleStruct2 =
-      UnitTestingClusterSimpleStruct(8, false, 9, byteArrayOf(0x02, 0x03), "test2", 4, 5.6f, 7.8)
+      UnitTestingClusterSimpleStruct(8U, false, 9U, byteArrayOf(0x02, 0x03), "test2", 4U, 5.6f, 7.8)
     val struct =
       UnitTestingClusterTestEventEvent(
-        1,
-        2,
+        1U,
+        2U,
         true,
         simpleStruct,
         listOf(simpleStruct, simpleStruct2),
-        listOf(3, 4, 5)
+        listOf(3U, 4U, 5U)
       )
 
     val tlvWriter = TlvWriter()
@@ -60,7 +60,7 @@ class ChipClusterEventStructTest {
 
   @Test
   fun testFabricScopedEventEventTest() {
-    val struct = UnitTestingClusterTestFabricScopedEventEvent(1)
+    val struct = UnitTestingClusterTestFabricScopedEventEvent(1U)
 
     val tlvWriter = TlvWriter()
     struct.toTlv(AnonymousTag, tlvWriter)

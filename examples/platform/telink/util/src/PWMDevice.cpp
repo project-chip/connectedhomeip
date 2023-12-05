@@ -25,7 +25,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_DECLARE(app);
+LOG_MODULE_REGISTER(PWMDevice);
 
 constexpr uint32_t kBreatheStepTimeMS = 10;
 
@@ -44,8 +44,7 @@ CHIP_ERROR PWMDevice::Init(const pwm_dt_spec * pwmDevice, uint8_t aMinLevel, uin
 
     if (!device_is_ready(mPwmDevice->dev))
     {
-        LOG_ERR("PWM device %s is not ready", mPwmDevice->dev->name);
-        return CHIP_ERROR_INCORRECT_STATE;
+        LOG_ERR("PWM device %s is not ready", mPwmDevice->dev ? mPwmDevice->dev->name : "N/A");
     }
 
     k_timer_init(&mPwmLedTimer, &PWMDevice::PwmLedTimerHandler, nullptr);
@@ -134,6 +133,10 @@ void PWMDevice::Set(bool aOn)
 
 void PWMDevice::UpdateLight(void)
 {
+    if (!device_is_ready(mPwmDevice->dev))
+    {
+        return;
+    }
     constexpr uint32_t kPwmWidthUs  = 20000u;
     const uint8_t maxEffectiveLevel = mMaxLevel - mMinLevel;
     const uint8_t effectiveLevel    = mState == kState_On ? chip::min<uint8_t>(mLevel - mMinLevel, maxEffectiveLevel) : 0;

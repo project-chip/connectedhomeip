@@ -17,7 +17,8 @@ from typing import Tuple, Union
 
 from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
                      TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
-                     TestStepValueAndValuesError, TestStepVerificationStandaloneError, TestStepWaitResponseError)
+                     TestStepSaveAsNameError, TestStepValueAndValuesError, TestStepVerificationStandaloneError,
+                     TestStepWaitResponseError)
 from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
 try:
@@ -88,9 +89,9 @@ class YamlLoader:
         schema = {
             'label': str,
             'identity': str,
-            'nodeId': int,
+            'nodeId': (int, str),  # Can be a variable.
             'runIf': str,  # Should be a variable.
-            'groupId': int,
+            'groupId': (int, str),  # Can be a variable.
             'endpoint': (int, str),  # Can be a variable
             'cluster': str,
             'attribute': str,
@@ -106,6 +107,7 @@ class YamlLoader:
             'saveResponseAs': str,
             'minInterval': int,
             'maxInterval': int,
+            'keepSubscriptions': bool,
             'timeout': int,
             'timedInteractionTimeoutMs': int,
             'dataVersion': (list, int, str),  # Can be a variable
@@ -122,6 +124,7 @@ class YamlLoader:
         self.__rule_wait_should_not_expect_a_response(content)
         self.__rule_response_variable_should_exist_in_config(config, content)
         self.__rule_argument_value_is_only_when_writing_attributes(content)
+        self.__rule_saveas_name_and_attribute_name_should_be_different(content)
 
         if 'arguments' in content:
             arguments = content.get('arguments')
@@ -265,7 +268,17 @@ class YamlLoader:
 
     def __rule_argument_value_is_only_when_writing_attributes(self, content):
         if 'arguments' in content:
-            command = content.get('command')
+            operation = content.get('command')
+            if not operation:
+                operation = content.get('wait')
             arguments = content.get('arguments')
-            if 'value' in arguments and command != 'writeAttribute':
+            if 'value' in arguments and operation != 'writeAttribute':
                 raise TestStepArgumentsValueError(content)
+
+    def __rule_saveas_name_and_attribute_name_should_be_different(self, content):
+        if content.get('command') == 'readAttribute' and 'response' in content:
+            attribute_name = content.get('attribute')
+            response = content.get('response')
+            if 'saveAs' in response:
+                if response.get('saveAs') == attribute_name:
+                    raise TestStepSaveAsNameError(content)

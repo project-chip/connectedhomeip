@@ -23,6 +23,10 @@
 
 @class MTRBaseDevice;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+@class MTRDeviceControllerAbstractParameters;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 NS_ASSUME_NONNULL_BEGIN
 
 MTR_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -37,22 +41,45 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @interface MTRDeviceController : NSObject
 
 /**
- * Controllers are created via the MTRDeviceControllerFactory object.
+ * Controllers are created via the MTRDeviceControllerFactory object or
+ * initialized via initWithParameters:error:.
  */
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * Initialize a device controller with the provided parameters.  This will:
+ *
+ * 1) Auto-start the MTRDeviceControllerFactory in storage-per-controller mode
+ *    if it has not already been started.
+ * 2) Return nil or a running controller.
+ *
+ * Once this returns non-nil, it's the caller's resposibility to call shutdown
+ * on the controller to avoid leaking it.
+ */
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
+                                      error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 /**
  * If true, the controller has not been shut down yet.
  */
 @property (readonly, nonatomic, getter=isRunning) BOOL running;
 
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * The ID assigned to this controller at creation time.
+ */
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+
 /**
  * Return the Node ID assigned to the controller.  Will return nil if the
  * controller is not running (and hence does not know its node id).
  */
 @property (readonly, nonatomic, nullable)
-    NSNumber * controllerNodeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    NSNumber * controllerNodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Set up a commissioning session for a device, using the provided setup payload
@@ -85,7 +112,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 - (BOOL)setupCommissioningSessionWithPayload:(MTRSetupPayload *)payload
                                    newNodeID:(NSNumber *)newNodeID
                                        error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Set up a commissioning session for a device, using the provided discovered
@@ -119,7 +146,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                                               payload:(MTRSetupPayload *)payload
                                             newNodeID:(NSNumber *)newNodeID
                                                 error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Commission the node with the given node ID.  The node ID must match the node
@@ -127,7 +154,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  */
 - (BOOL)commissionNodeWithID:(NSNumber *)nodeID
          commissioningParams:(MTRCommissioningParameters *)commissioningParams
-                       error:(NSError * __autoreleasing *)error API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                       error:(NSError * __autoreleasing *)error MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Call this method after MTRDeviceAttestationDelegate
@@ -145,7 +172,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  */
 - (BOOL)cancelCommissioningForNodeID:(NSNumber *)nodeID
                                error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Get an MTRBaseDevice for a commissioning session that was set up for the
@@ -153,7 +180,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  */
 - (nullable MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID
                                                         error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Optionally pre-warm the controller for setting up a commissioning session.
@@ -164,7 +191,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * For example this may do a BLE scan in advance so results are ready earlier
  * once the discriminator is known.
  */
-- (void)preWarmCommissioningSession API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)preWarmCommissioningSession MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Set the Delegate for the device controller  as well as the Queue on which the Delegate callbacks will be triggered
@@ -174,7 +201,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setDeviceControllerDelegate:(id<MTRDeviceControllerDelegate>)delegate
-                              queue:(dispatch_queue_t)queue API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                              queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Start scanning for commissionable devices.
@@ -182,14 +209,14 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * This method will fail if the controller factory is not running or the browse has already been started.
  */
 - (BOOL)startBrowseForCommissionables:(id<MTRCommissionableBrowserDelegate>)delegate
-                                queue:(dispatch_queue_t)queue API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+                                queue:(dispatch_queue_t)queue MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Stop scanning for commissionable devices.
  *
  * This method will fail if the controller factory is not running or the browse has not been started.
  */
-- (BOOL)stopBrowseForCommissionables API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+- (BOOL)stopBrowseForCommissionables MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Return the attestation challenge for the secure session of the device being commissioned.
@@ -198,7 +225,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Returns nil if given Device ID does not match an active commissionee, or if a Secure Session is not availale.
  */
 - (NSData * _Nullable)attestationChallengeForDeviceID:(NSNumber *)deviceID
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Compute a PASE verifier for the desired setup passcode.
@@ -214,7 +241,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
                                               iterations:(NSNumber *)iterations
                                                     salt:(NSData *)salt
                                                    error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Shut down the controller. Calls to shutdown after the first one are NO-OPs.

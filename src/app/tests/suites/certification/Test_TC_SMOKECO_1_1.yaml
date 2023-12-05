@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the ClusterRevision attribute from the DUT"
+    - label: "Step 2: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "TH reads from the DUT the FeatureMap attribute"
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute"
       PICS: "!SMOKECO.S.F00 && !SMOKECO.S.F01"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -48,7 +48,8 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
+    - label:
+          "Step 3b: TH reads from the DUT the FeatureMap attribute(Smoke Alarm)"
       PICS: SMOKECO.S.F00 && !SMOKECO.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +58,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads from the DUT the FeatureMap attribute(CO Alarm)"
+    - label: "Step 3c: TH reads from the DUT the FeatureMap attribute(CO Alarm)"
       PICS: SMOKECO.S.F01 && !SMOKECO.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -67,8 +68,8 @@ tests:
               type: bitmap32
 
     - label:
-          "TH reads from the DUT the FeatureMap attribute(Smoke Alarm & CO
-          Alarm)"
+          "Step 3d: TH reads from the DUT the FeatureMap attribute(Smoke Alarm &
+          CO Alarm)"
       PICS: SMOKECO.S.F00 && SMOKECO.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -77,16 +78,18 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "TH reads from the DUT the AttributeList attribute"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains: [0, 3, 5, 6, 7]
+              contains: [0, 3, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "TH reads from the DUT the AttributeList attribute(SmokeState)"
-      PICS: SMOKECO.S.A0001
+    - label:
+          "Step 4b: TH reads from the DUT the AttributeList
+          attribute(SmokeState)"
+      PICS: SMOKECO.S.A0001 && SMOKECO.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -94,8 +97,9 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads from the DUT the AttributeList attribute(COState)"
-      PICS: SMOKECO.S.A0002
+    - label:
+          "Step 4c: TH reads from the DUT the AttributeList attribute(COState)"
+      PICS: SMOKECO.S.A0002 && SMOKECO.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -103,7 +107,9 @@ tests:
               type: list
               contains: [2]
 
-    - label: "TH reads from the DUT the AttributeList attribute(DeviceMuted)"
+    - label:
+          "Step 4d: TH reads from the DUT the AttributeList
+          attribute(DeviceMuted)"
       PICS: SMOKECO.S.A0004
       command: "readAttribute"
       attribute: "AttributeList"
@@ -113,7 +119,7 @@ tests:
               contains: [4]
 
     - label:
-          "TH reads from the DUT the AttributeList
+          "Step 4e: TH reads from the DUT the AttributeList
           attribute(InterconnectSmokeAlarm)"
       PICS: SMOKECO.S.A0008
       command: "readAttribute"
@@ -124,7 +130,7 @@ tests:
               contains: [8]
 
     - label:
-          "TH reads from the DUT the AttributeList
+          "Step 4f: TH reads from the DUT the AttributeList
           attribute(InterconnectCOAlarm)"
       PICS: SMOKECO.S.A0009
       command: "readAttribute"
@@ -135,7 +141,8 @@ tests:
               contains: [9]
 
     - label:
-          "TH reads from the DUT the AttributeList attribute(ContaminationState)"
+          "Step 4g: TH reads from the DUT the AttributeList
+          attribute(ContaminationState)"
       PICS: SMOKECO.S.A000a
       command: "readAttribute"
       attribute: "AttributeList"
@@ -145,7 +152,7 @@ tests:
               contains: [10]
 
     - label:
-          "TH reads from the DUT the AttributeList
+          "Step 4h: TH reads from the DUT the AttributeList
           attribute(SmokeSensitivityLevel)"
       PICS: SMOKECO.S.A000b
       command: "readAttribute"
@@ -155,7 +162,9 @@ tests:
               type: list
               contains: [11]
 
-    - label: "TH reads from the DUT the AttributeList attribute(ExpiryDate)"
+    - label:
+          "Step 4i: TH reads from the DUT the AttributeList
+          attribute(ExpiryDate)"
       PICS: SMOKECO.S.A000c
       command: "readAttribute"
       attribute: "AttributeList"
@@ -164,7 +173,7 @@ tests:
               type: list
               contains: [12]
 
-    - label: "TH reads from the DUT the EventList attribute"
+    - label: "Step 5a: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -173,7 +182,8 @@ tests:
               type: list
               contains: [2, 3, 4, 5, 10]
 
-    - label: "TH reads from the DUT the EventList attribute(SmokeAlarm)"
+    - label:
+          "Step 5b: TH reads from the DUT the EventList attribute(SmokeAlarm)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E00
       command: "readAttribute"
       attribute: "EventList"
@@ -182,7 +192,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "TH reads from the DUT the EventList attribute(COAlarm)"
+    - label: "Step 5c: TH reads from the DUT the EventList attribute(COAlarm)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E01
       command: "readAttribute"
       attribute: "EventList"
@@ -191,7 +201,8 @@ tests:
               type: list
               contains: [1]
 
-    - label: "TH reads from the DUT the EventList attribute(AlarmMuted)"
+    - label:
+          "Step 5d: TH reads from the DUT the EventList attribute(AlarmMuted)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E06
       command: "readAttribute"
       attribute: "EventList"
@@ -200,7 +211,7 @@ tests:
               type: list
               contains: [6]
 
-    - label: "TH reads from the DUT the EventList attribute(MuteEnded)"
+    - label: "Step 5e: TH reads from the DUT the EventList attribute(MuteEnded)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E07
       command: "readAttribute"
       attribute: "EventList"
@@ -210,7 +221,8 @@ tests:
               contains: [7]
 
     - label:
-          "TH reads from the DUT the EventList attribute(InterconnectSmokeAlarm)"
+          "Step 5f: TH reads from the DUT the EventList
+          attribute(InterconnectSmokeAlarm)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E08
       command: "readAttribute"
       attribute: "EventList"
@@ -220,7 +232,8 @@ tests:
               contains: [8]
 
     - label:
-          "TH reads from the DUT the EventList attribute(InterconnectCOAlarm)"
+          "Step 5g: TH reads from the DUT the EventList
+          attribute(InterconnectCOAlarm)"
       PICS: PICS_EVENT_LIST_ENABLED && SMOKECO.S.E09
       command: "readAttribute"
       attribute: "EventList"
@@ -229,7 +242,7 @@ tests:
               type: list
               contains: [9]
 
-    - label: "TH reads from the DUT the AcceptedCommandList attribute"
+    - label: "Step 6a: TH reads from the DUT the AcceptedCommandList attribute"
       PICS: "!SMOKECO.S.C00.Rsp"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -238,7 +251,7 @@ tests:
           constraints:
               type: list
 
-    - label: "TH reads from the DUT the AcceptedCommandList attribute"
+    - label: "Step 6b: TH reads from the DUT the AcceptedCommandList attribute"
       PICS: SMOKECO.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -247,7 +260,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "TH reads from the DUT the GeneratedCommandList attribute"
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

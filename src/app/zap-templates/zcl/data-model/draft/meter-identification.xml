@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="MeterTypeId" type="ENUM16">
+  <enum name="MeterTypeId" type="enum16">
     <item name="UtilityPrimaryMeter" value="0x0000"/>
     <item name="UtilityProductionMeter" value="0x0001"/>
     <item name="UtilitySecondaryMeter" value="0x0002"/>
@@ -24,7 +24,7 @@ limitations under the License.
     <item name="GenericMeter" value="0x0110"/>
   </enum>
 
-  <enum name="DataQualityId" type="ENUM16">
+  <enum name="DataQualityId" type="enum16">
     <item name="AllDataCertified" value="0x0000"/>
     <item name="OnlyInstantaneousPowerNotCertified" value="0x0001"/>
     <item name="OnlyCumulatedConsumptionNotCertified" value="0x0002"/>

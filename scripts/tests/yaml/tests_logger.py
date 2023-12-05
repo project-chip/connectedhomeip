@@ -67,19 +67,19 @@ class TestParserLogger(TestParserHooks):
         self.__errors = 0
         self.__strings = ParserStrings()
 
-    def start(self, count: int):
+    def parsing_start(self, count: int):
         print(self.__strings.start.format(count=count))
 
-    def stop(self, duration: int):
+    def parsing_stop(self, duration: int):
         state = _FAILURE if self.__errors else _SUCCESS
         success = click.style(self.__success, bold=True)
         errors = click.style(self.__errors, bold=True)
         print(self.__strings.stop.format(state=state, successes=success, errors=errors, duration=duration))
 
-    def test_start(self, name: str):
+    def test_parsing_start(self, name: str):
         print(self.__strings.test_start.format(name=name), end='')
 
-    def test_failure(self, exception: Exception, duration: int):
+    def test_parsing_failure(self, exception: Exception, duration: int):
         print(self.__strings.test_result.format(state=_FAILURE, duration=duration))
 
         try:
@@ -91,7 +91,7 @@ class TestParserLogger(TestParserHooks):
 
         self.__errors += 1
 
-    def test_success(self, duration: int):
+    def test_parsing_success(self, duration: int):
         print(self.__strings.test_result.format(state=_SUCCESS, duration=duration))
         self.__success += 1
 

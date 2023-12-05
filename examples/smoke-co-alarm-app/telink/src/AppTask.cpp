@@ -38,19 +38,18 @@ CHIP_ERROR AppTask::Init(void)
         return err;
     }
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkCOSensor");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 
 void AppTask::SelfTestHandler(AppEvent * aEvent)
 {
-    AlarmMgr().StartSelfTesting();
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    bool success = SmokeCoAlarmServer::Instance().RequestSelfTest(1);
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    if (!success)
+    {
+        LOG_ERR("Manual self-test failed");
+    }
 }
 
 void AppTask::SelfTestEventHandler(AppEvent * aEvent)

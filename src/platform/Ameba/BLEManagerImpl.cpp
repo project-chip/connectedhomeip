@@ -54,7 +54,7 @@
 #include "rtk_coex.h"
 #include "trace_app.h"
 #include "wifi_conf.h"
-//#include "complete_ble_service.h"
+// #include "complete_ble_service.h"
 #include "app_msg.h"
 #endif
 /*******************************************************************************
@@ -153,11 +153,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(!mFlags.Has(Flags::kAMEBABLEStackInitialized), err = CHIP_ERROR_INCORRECT_STATE);
 
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
-    matter_blemgr_set_callback_func((matter_blemgr_callback)(matter_blemgr_callback_dispatcher), this);
+    matter_blemgr_set_callback_func((matter_blemgr_callback) (matter_blemgr_callback_dispatcher), this);
     err = MapBLEError(matter_blemgr_init());
 #else
     err = MapBLEError(bt_matter_adapter_init());
-    chip_blemgr_set_callback_func((chip_blemgr_callback)(ble_callback_dispatcher), this);
+    chip_blemgr_set_callback_func((chip_blemgr_callback) (ble_callback_dispatcher), this);
 #endif
     SuccessOrExit(err);
 
@@ -214,8 +214,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled, 
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type                    = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
+                                                                                     : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = conn_id;
         PlatformMgr().PostEventOrDie(&event);
     }

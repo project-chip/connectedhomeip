@@ -17,20 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class GroupKeyManagementClusterGroupKeySetStruct(
-  val groupKeySetID: Int,
-  val groupKeySecurityPolicy: Int,
+  val groupKeySetID: UInt,
+  val groupKeySecurityPolicy: UInt,
   val epochKey0: ByteArray?,
-  val epochStartTime0: Long?,
+  val epochStartTime0: ULong?,
   val epochKey1: ByteArray?,
-  val epochStartTime1: Long?,
+  val epochStartTime1: ULong?,
   val epochKey2: ByteArray?,
-  val epochStartTime2: Long?
+  val epochStartTime2: ULong?
 ) {
   override fun toString(): String = buildString {
     append("GroupKeyManagementClusterGroupKeySetStruct {\n")
@@ -45,9 +45,9 @@ class GroupKeyManagementClusterGroupKeySetStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D), groupKeySetID)
       put(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY), groupKeySecurityPolicy)
       if (epochKey0 != null) {
@@ -94,11 +94,11 @@ class GroupKeyManagementClusterGroupKeySetStruct(
     private const val TAG_EPOCH_KEY2 = 6
     private const val TAG_EPOCH_START_TIME2 = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeySetStruct {
-      tlvReader.enterStructure(tag)
-      val groupKeySetID = tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GroupKeyManagementClusterGroupKeySetStruct {
+      tlvReader.enterStructure(tlvTag)
+      val groupKeySetID = tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
       val groupKeySecurityPolicy =
-        tlvReader.getInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
+        tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
       val epochKey0 =
         if (!tlvReader.isNull()) {
           tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))
@@ -108,7 +108,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
         }
       val epochStartTime0 =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
+          tlvReader.getULong(ContextSpecificTag(TAG_EPOCH_START_TIME0))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME0))
           null
@@ -122,7 +122,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
         }
       val epochStartTime1 =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
+          tlvReader.getULong(ContextSpecificTag(TAG_EPOCH_START_TIME1))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME1))
           null
@@ -136,7 +136,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
         }
       val epochStartTime2 =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
+          tlvReader.getULong(ContextSpecificTag(TAG_EPOCH_START_TIME2))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_EPOCH_START_TIME2))
           null

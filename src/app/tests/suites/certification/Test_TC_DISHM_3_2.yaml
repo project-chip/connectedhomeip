@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          !DISHM.S.F00(DEPONOFF) | OnOff cluster’s StartUpOnOff attribute is NULL | StartUpOnOff is 0 | OnMode is NULL
+      disabled: true
+
     - label: "Note"
       verification: |
           To Execute the TC-DISHM-3.2 test case using reboot in raspi device we followed the below suggested way:
@@ -118,6 +123,13 @@ tests:
           [1690188912.259790][16011:16013] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1690188912.259800][16011:16013] CHIP:DMG:                         },
           [1690188912.259813][16011:16013] CHIP:DMG:
+
+          ./chip-tool dishwashermode read start-up-mode 1 1
+
+          On TH(chip-tool), Verify that StartUpMode attribute value is 0 and below is the sample log provided for the raspi platform .
+
+          [1692171314.157274][3112:3114] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 2502960195
+          [1692171314.157331][3112:3114] CHIP:TOO:   StartUpMode: 0
       disabled: true
 
     - label: "Step 5: TH reads from the DUT the CurrentMode attribute."

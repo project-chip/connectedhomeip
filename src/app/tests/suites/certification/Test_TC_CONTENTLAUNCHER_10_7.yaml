@@ -46,6 +46,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 0, Value: "Gaby sHoffman" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -75,6 +94,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 1, Value: "PBS" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -104,6 +142,25 @@ tests:
                 value: false
               - name: "Search"
                 value: { ParameterList: [{ Type: 2, Value: "Snow White" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -133,6 +190,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 3, Value: "Spike Lee" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -162,6 +238,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 4, Value: "Football games" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -191,6 +286,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 5, Value: "Star Wars" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -220,6 +334,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 6, Value: "Horror" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -249,6 +382,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 7, Value: "NCAA" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -278,6 +430,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 8, Value: PopularityName }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -307,6 +478,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 9, Value: "Netflix" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -336,6 +526,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 10, Value: "football" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -365,6 +574,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 11, Value: "Arsenel" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"
@@ -394,6 +622,25 @@ tests:
                 value: true
               - name: "Search"
                 value: { ParameterList: [{ Type: 12, Value: "TVSeries" }] }
+              - name: "PlaybackPreferences"
+                value:
+                    {
+                        PlaybackPosition: 0,
+                        TextTrack:
+                            {
+                                LanguageCode: "exampleLanguageCode",
+                                Characteristics: [0],
+                                AudioOutputIndex: 0,
+                            },
+                        AudioTracks:
+                            [
+                                {
+                                    LanguageCode: "exampleLanguageCode",
+                                    Characteristics: [0],
+                                    AudioOutputIndex: 0,
+                                },
+                            ],
+                    }
       response:
           values:
               - name: "Status"

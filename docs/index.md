@@ -9,6 +9,7 @@ QUICK_START
 PROJECT_FLOW
 VSCODE_DEVELOPMENT
 api/index
+ci-cd/index
 discussion/index
 guides/index
 style/index
@@ -16,6 +17,7 @@ examples/index
 tools/index
 BUG_REPORT
 code_generation
+clusters
 ERROR_CODES
 ```
 

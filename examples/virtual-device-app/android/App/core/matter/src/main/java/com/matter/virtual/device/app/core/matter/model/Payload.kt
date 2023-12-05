@@ -1,10 +1,10 @@
 package com.matter.virtual.device.app.core.matter.model
 
-import chip.onboardingpayload.DiscoveryCapability
-import chip.onboardingpayload.OnboardingPayload
 import com.matter.virtual.device.app.core.common.MatterConstants
 import com.matter.virtual.device.app.core.model.OnboardingType
 import com.matter.virtual.device.app.core.model.Payload
+import matter.onboardingpayload.DiscoveryCapability
+import matter.onboardingpayload.OnboardingPayload
 import timber.log.Timber
 
 fun Payload.asSetupPayload(): OnboardingPayload {

@@ -22,17 +22,28 @@
 #include <cassert>
 #include <zephyr/kernel.h>
 
-#ifdef CONFIG_USB
+#ifdef CONFIG_USB_DEVICE_STACK
 #include <zephyr/usb/usb_device.h>
+
+static bool output_enable = false;
+
+static void usb_dc_status_change(enum usb_dc_status_code cb_status, const uint8_t * param)
+{
+    (void) param;
+    if (cb_status == USB_DC_CONFIGURED)
+    {
+        output_enable = true;
+    }
+}
 #endif
 
 extern "C" void pw_sys_io_Init()
 {
     int err;
 
-#ifdef CONFIG_USB
-    err = usb_enable(nullptr);
-    assert(err == 0);
+#ifdef CONFIG_USB_DEVICE_STACK
+    output_enable = false;
+    (void) usb_enable(usb_dc_status_change);
 #endif
 
     err = console_init();
@@ -54,6 +65,10 @@ Status ReadByte(std::byte * dest)
 
 Status WriteByte(std::byte b)
 {
+#ifdef CONFIG_USB_DEVICE_STACK
+    if (!output_enable)
+        return Status::FailedPrecondition();
+#endif
     return console_putchar(static_cast<char>(b)) < 0 ? Status::FailedPrecondition() : OkStatus();
 }
 

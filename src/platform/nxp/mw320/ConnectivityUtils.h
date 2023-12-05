@@ -26,8 +26,8 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-//#include <linux/types.h> /* for "caddr_t" et al      */
-//#include <linux/wireless.h>
+// #include <linux/types.h> /* for "caddr_t" et al      */
+// #include <linux/wireless.h>
 
 namespace chip {
 namespace DeviceLayer {

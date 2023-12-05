@@ -18,11 +18,13 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 #include <type_traits>
 
+#include <lib/core/Unchecked.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -42,13 +44,50 @@ public:
     using reference = T &;
 
     constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
-    constexpr Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+
+    // Note: VerifyOrDie cannot be used inside a constexpr function, because it uses
+    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
+    // and that's not allowed in constexpr functions.
+
+    Span(pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen)
+    {
+        VerifyOrDie(databuf != nullptr || datalen == 0); // not constexpr on some platforms
+    }
+
+    // A Span can only point to null if it is empty (size == 0). The default constructor
+    // should be used to construct empty Spans. All other cases involving null are invalid.
+    Span(std::nullptr_t null, size_t size) = delete;
+
+    // Creates a Span view of a plain array.
+    //
+    // Note that this constructor template explicitly excludes `const char[]`, see below.
+    template <
+        class U, size_t N,
+        std::enable_if_t<!std::is_same_v<U, const char> && sizeof(U) == sizeof(T) && std::is_convertible_v<U *, T *>, bool> = true>
+    constexpr explicit Span(U (&databuf)[N]) : mDataBuf(databuf), mDataLen(N)
+    {}
+
+    // Explicitly disallow the creation of a CharSpan from a `const char[]` to prevent the
+    // creation of spans from string literals that incorrectly include the trailing '\0' byte.
+    // If CharSpan("Hi!") were allowed, it would be a span of length 4, not 3 as intended.
+    //
+    // To create a CharSpan literal, use the `_span` operator instead, e.g. "Hi!"_span.
+    template <
+        class U, size_t N,
+        std::enable_if_t<std::is_same_v<U, const char> && 1 == sizeof(T) && std::is_convertible_v<const char *, T *>, bool> = true>
+    constexpr explicit Span(U (&databuf)[N]) = delete;
+
+    // Creates a (potentially mutable) Span view of an std::array
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
-    constexpr explicit Span(U (&databuf)[N]) : Span(databuf, N)
+    constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
-    constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
+    constexpr Span(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a Span view of an std::array
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr Span(const std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <size_t N>
@@ -83,24 +122,18 @@ public:
     constexpr pointer end() const { return data() + size(); }
 
     // Element accessors, matching the std::span API.
-    // VerifyOrDie cannot be used inside a constexpr function, because it uses
-    // "static" on some platforms (e.g. when CHIP_PW_TOKENIZER_LOGGING is true)
-    // and that's not allowed in constexpr functions.
     reference operator[](size_t index) const
     {
-        VerifyOrDie(index < size());
+        VerifyOrDie(index < size()); // not constexpr on some platforms
         return data()[index];
     }
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
-    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    inline bool data_equal(const FixedSpan<U, N> & other) const;
 
     Span SubSpan(size_t offset, size_t length) const
     {
@@ -139,7 +172,10 @@ public:
         return Span(reinterpret_cast<T *>(&bytes[1]), length);
     }
 
-    // Allow creating CharSpans from a character string.
+    // Creates a CharSpan from a null-terminated C character string.
+    //
+    // Note that for string literals, the user-defined `_span` string
+    // literal operator should be used instead, e.g. `"Hello"_span`.
     template <class U, typename = std::enable_if_t<std::is_same<T, const U>::value && std::is_same<const char, T>::value>>
     static Span fromCharString(U * chars)
     {
@@ -152,11 +188,67 @@ public:
     template <typename U>
     bool operator==(const Span<U> & other) const = delete;
 
+    // Creates a Span without checking whether databuf is a null pointer.
+    //
+    // Note: The normal (checked) constructor should be used for general use;
+    // this overload exists for special use cases where databuf is guaranteed
+    // to be valid (not null) and a constexpr constructor is required.
+    //
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61648 prevents making
+    // operator""_span a friend (and this constructor private).
+
+    constexpr Span(UncheckedType tag, pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
+
 private:
     pointer mDataBuf;
     size_t mDataLen;
 };
 
+inline namespace literals {
+
+inline constexpr Span<const char> operator"" _span(const char * literal, size_t size)
+{
+    return Span<const char>(Unchecked, literal, size);
+}
+
+} // namespace literals
+
+namespace detail {
+
+// To make FixedSpan (specifically various FixedByteSpan types) default constructible
+// without creating a weird "empty() == true but size() != 0" state, we need an
+// appropriate sized array of zeroes. With a naive definition like
+//      template <class T, size_t N> constexpr T kZero[N] {};
+// we would end up with separate zero arrays for each size, and might also accidentally
+// increase the read-only data size of the binary by a large amount. Instead, we define
+// a per-type limit for the zero array, FixedSpan won't be default constructible for
+// T / N combinations that exceed the limit. The default limit is 0.
+template <class T>
+struct zero_limit : std::integral_constant<size_t, 0>
+{
+};
+
+// FixedByteSpan types up to N=65 currently need to be default-constructible.
+template <>
+struct zero_limit<uint8_t> : std::integral_constant<size_t, 65>
+{
+};
+
+template <class T>
+inline constexpr T kZeroes[zero_limit<T>::value]{};
+
+template <class T, size_t N>
+constexpr T const * shared_zeroes()
+{
+    static_assert(N <= zero_limit<typename std::remove_const<T>::type>::value, "N exceeds zero_limit<T>");
+    return kZeroes<typename std::remove_const<T>::type>;
+}
+
+} // namespace detail
+
+/**
+ * Similar to a Span but with a fixed size.
+ */
 template <class T, size_t N>
 class FixedSpan
 {
@@ -164,7 +256,8 @@ public:
     using pointer   = T *;
     using reference = T &;
 
-    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    // Creates a FixedSpan pointing to a sequence of zeroes.
+    constexpr FixedSpan() : mDataBuf(detail::shared_zeroes<T, N>()) {}
 
     // We want to allow construction from things that look like T*, but we want
     // to make construction from an array use the constructor that asserts the
@@ -179,16 +272,31 @@ public:
     template <class U,
               typename = std::enable_if_t<std::is_pointer<U>::value && sizeof(std::remove_pointer_t<U>) == sizeof(T) &&
                                           std::is_convertible<U, T *>::value>>
-    constexpr explicit FixedSpan(U databuf) : mDataBuf(databuf)
-    {}
+    explicit FixedSpan(U databuf) : mDataBuf(databuf)
+    {
+        VerifyOrDie(databuf != nullptr || N == 0); // not constexpr on some platforms
+    }
+
+    // FixedSpan does not support an empty / null state.
+    FixedSpan(std::nullptr_t null) = delete;
+
     template <class U, size_t M, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr explicit FixedSpan(U (&databuf)[M]) : mDataBuf(databuf)
     {
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
 
+    // Creates a (potentially mutable) FixedSpan view of an std::array
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
+    {}
+
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr FixedSpan(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a FixedSpan view of an std::array
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr FixedSpan(const std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
     // Allow implicit construction from a FixedSpan of sufficient size over a
@@ -200,10 +308,11 @@ public:
     }
 
     constexpr pointer data() const { return mDataBuf; }
-    constexpr size_t size() const { return N; }
-    constexpr bool empty() const { return data() == nullptr; }
     constexpr pointer begin() const { return mDataBuf; }
     constexpr pointer end() const { return mDataBuf + N; }
+
+    // The size of a FixedSpan is always N. There is intentially no empty() method.
+    static constexpr size_t size() { return N; }
 
     // Element accessors, matching the std::span API.
     // VerifyOrDie cannot be used inside a constexpr function, because it uses
@@ -211,24 +320,15 @@ public:
     // and that's not allowed in constexpr functions.
     reference operator[](size_t index) const
     {
-        VerifyOrDie(index < size());
+        VerifyOrDie(index < N);
         return data()[index];
     }
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const FixedSpan<U, N> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
-        return (empty() && other.empty()) ||
-            (!empty() && !other.empty() && (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
-    }
-
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
-    {
-        return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
+        return (N == other.size() && memcmp(data(), other.data(), N * sizeof(T)) == 0);
     }
 
     // operator== explicitly not implemented on FixedSpan, because its meaning
@@ -245,36 +345,19 @@ private:
 
 template <class T>
 template <class U, size_t N, typename>
-constexpr Span<T>::Span(const FixedSpan<U, N> & other) : Span(other.data(), other.size())
+constexpr Span<T>::Span(const FixedSpan<U, N> & other) : mDataBuf(other.data()), mDataLen(other.size())
 {}
 
-template <class T>
-template <class U, size_t N, typename>
-inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
-{
-    return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
-}
-
-/**
- * @brief Returns true if the `span` could be used to access some data,
- *        false otherwise.
- * @param[in] span The Span to validate.
- */
 template <typename T>
-inline bool IsSpanUsable(const Span<T> & span)
+[[deprecated("Use !empty()")]] inline bool IsSpanUsable(const Span<T> & span)
 {
-    return (span.data() != nullptr) && (span.size() > 0);
+    return !span.empty();
 }
 
-/**
- * @brief Returns true if the `span` could be used to access some data,
- *        false otherwise.
- * @param[in] span The FixedSpan to validate.
- */
 template <typename T, size_t N>
-inline bool IsSpanUsable(const FixedSpan<T, N> & span)
+[[deprecated("FixedSpan is always usable / non-empty if N > 0")]] inline bool IsSpanUsable(const FixedSpan<T, N> & span)
 {
-    return (span.data() != nullptr);
+    return N > 0;
 }
 
 using ByteSpan        = Span<const uint8_t>;
@@ -287,7 +370,6 @@ using MutableCharSpan = Span<char>;
 
 inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan & out_buf)
 {
-    VerifyOrReturnError(IsSpanUsable(span_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buf.size() >= span_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), span_to_copy.data(), span_to_copy.size());
@@ -298,7 +380,6 @@ inline CHIP_ERROR CopySpanToMutableSpan(ByteSpan span_to_copy, MutableByteSpan &
 
 inline CHIP_ERROR CopyCharSpanToMutableCharSpan(CharSpan cspan_to_copy, MutableCharSpan & out_buf)
 {
-    VerifyOrReturnError(IsSpanUsable(cspan_to_copy), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buf.size() >= cspan_to_copy.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memcpy(out_buf.data(), cspan_to_copy.data(), cspan_to_copy.size());

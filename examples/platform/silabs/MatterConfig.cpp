@@ -41,6 +41,10 @@
 #include "MemMonitoring.h"
 #endif
 
+#ifdef SIWX_917
+#include "wfx_rsi.h"
+#endif /* SIWX_917 */
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -65,6 +69,10 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #endif
 
 #include <lib/support/BytesToHex.h>
+
+#ifdef PERFORMANCE_TEST_ENABLED
+#include <performance_test_commands.h>
+#endif
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -172,7 +180,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 // WiFi needs to be initialized after Memory Init for some reason
 #ifdef SL_WIFI
-    InitWiFi();
+    ReturnErrorOnFailure(InitWiFi());
 #endif
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
@@ -222,6 +230,12 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     initParams.operationalKeystore = &gOperationalKeystore;
 #endif
 
+#ifdef PERFORMANCE_TEST_ENABLED
+    // Set up Test Event Trigger command of the General Diagnostics cluster. Used only in performance testing
+    static SilabsTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(kTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif
+
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
@@ -263,14 +277,16 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#elif defined(SIWX_917)
-    SILABS_LOG("Init RSI 917 Platform");
-    if (wfx_rsi_platform() != SL_STATUS_OK)
+#endif                           /* WF200_WIFI */
+
+#ifdef SIWX_917
+    sl_status_t status;
+    if ((status = wfx_wifi_rsi_init()) != SL_STATUS_OK)
     {
-        SILABS_LOG("RSI init failed");
-        return CHIP_ERROR_INTERNAL;
+        ReturnErrorOnFailure((CHIP_ERROR) status);
     }
-#endif /* WF200_WIFI */
+#endif // SIWX_917
+
     return CHIP_NO_ERROR;
 }
 #endif // SL_WIFI

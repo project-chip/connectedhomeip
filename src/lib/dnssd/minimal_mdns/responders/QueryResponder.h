@@ -102,7 +102,7 @@ class QueryResponderRecordFilter
 public:
     /// Default contstructor accepts everything that is not null
     QueryResponderRecordFilter() {}
-    QueryResponderRecordFilter(const QueryResponderRecordFilter & other) = default;
+    QueryResponderRecordFilter(const QueryResponderRecordFilter & other)             = default;
     QueryResponderRecordFilter & operator=(const QueryResponderRecordFilter & other) = default;
 
     /// Set if to include only items marked as 'additional reply' or everything.
@@ -175,7 +175,7 @@ public:
     {
         SkipInvalid();
     }
-    QueryResponderIterator(const QueryResponderIterator & other) = default;
+    QueryResponderIterator(const QueryResponderIterator & other)             = default;
     QueryResponderIterator & operator=(const QueryResponderIterator & other) = default;
 
     QueryResponderIterator & operator++()

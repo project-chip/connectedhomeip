@@ -17,13 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<Int>, val value: Int) {
+class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<UInt>, val value: UInt) {
   override fun toString(): String = buildString {
     append("DishwasherModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -31,9 +31,9 @@ class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<Int>, val value: 
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (mfgCode.isPresent) {
         val optmfgCode = mfgCode.get()
         put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
@@ -47,15 +47,15 @@ class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<Int>, val value: 
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DishwasherModeClusterModeTagStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DishwasherModeClusterModeTagStruct {
+      tlvReader.enterStructure(tlvTag)
       val mfgCode =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_MFG_CODE)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

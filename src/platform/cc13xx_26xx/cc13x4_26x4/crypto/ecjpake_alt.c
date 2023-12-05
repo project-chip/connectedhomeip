@@ -143,7 +143,7 @@ static const char * const ecjpake_id[] = { "client", "server" };
  */
 static int tls_write_binary(uint8_t ** p, const uint8_t * end, const uint8_t * bin, size_t len)
 {
-    if ((end < *p) || ((size_t)(end - *p) < 1 + len))
+    if ((end < *p) || ((size_t) (end - *p) < 1 + len))
     {
         return (MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL);
     }
@@ -179,7 +179,7 @@ static int tls_read_binary(const uint8_t ** p, const uint8_t * end, uint8_t * bi
     uint8_t data_len;
 
     /* length byte plus the length of the crypto key */
-    if ((end < *p) || ((size_t)(end - *p) < 1 + len))
+    if ((end < *p) || ((size_t) (end - *p) < 1 + len))
     {
         return (MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
     }
@@ -321,7 +321,7 @@ static int tls_verify_curve_info(const uint8_t ** p, const uint8_t * end, mbedtl
     {
         return (MBEDTLS_ERR_ECP_BAD_INPUT_DATA);
     }
-    curve_name_id = (((uint16_t)(*p)[1] << 8)) | (((uint16_t)(*p)[2]));
+    curve_name_id = (((uint16_t) (*p)[1] << 8)) | (((uint16_t) (*p)[2]));
     *p += 3;
 
     curve_info = mbedtls_ecp_curve_info_from_grp_id(group_id);
@@ -474,7 +474,7 @@ static void big_num_reverse(uint8_t * arr, size_t len)
  */
 static int ecjpake_write_len_binary(uint8_t ** p, const uint8_t * end, const uint8_t * bin, size_t len)
 {
-    if ((end < *p) || ((size_t)(end - *p) < 4 + len))
+    if ((end < *p) || ((size_t) (end - *p) < 4 + len))
     {
         return (MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL);
     }

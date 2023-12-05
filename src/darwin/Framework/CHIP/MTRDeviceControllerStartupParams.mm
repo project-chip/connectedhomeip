@@ -18,9 +18,16 @@
 #import "MTRCertificates.h"
 #import "MTRConversion.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
+#import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
+
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#else
+#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
@@ -28,6 +35,41 @@
 #include <lib/core/PeerId.h>
 
 using namespace chip;
+
+static CHIP_ERROR ExtractNodeIDFabricIDFromNOC(
+    MTRCertificateDERBytes noc, NSNumber * __autoreleasing * nodeID, NSNumber * __autoreleasing * fabricID)
+{
+    // ExtractNodeIdFabricIdFromOpCert needs a TLV-encoded opcert, not a DER-encoded one.
+    auto * tlvNOC = [MTRCertificates convertX509Certificate:noc];
+    if (tlvNOC == nil) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    ByteSpan nocSpan = AsByteSpan(tlvNOC);
+
+    FabricId certFabricID = kUndefinedFabricId;
+    NodeId certNodeID = kUndefinedNodeId;
+    CHIP_ERROR err = Credentials::ExtractNodeIdFabricIdFromOpCert(nocSpan, &certNodeID, &certFabricID);
+    if (err != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Unable to extract node ID and fabric ID from operational certificate: %s", err.AsString());
+        return err;
+    }
+    *nodeID = @(certNodeID);
+    *fabricID = @(certFabricID);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR ExtractFabricIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __autoreleasing * fabricID)
+{
+    NSNumber * ignored;
+    return ExtractNodeIDFabricIDFromNOC(noc, &ignored, fabricID);
+}
+
+static CHIP_ERROR ExtractNodeIDFromNOC(MTRCertificateDERBytes noc, NSNumber * __autoreleasing * nodeID)
+{
+    NSNumber * ignored;
+    return ExtractNodeIDFabricIDFromNOC(noc, nodeID, &ignored);
+}
 
 @implementation MTRDeviceControllerStartupParams
 
@@ -45,6 +87,7 @@ using namespace chip;
     _nocSigner = nocSigner;
     _fabricID = [fabricID copy];
     _ipk = [ipk copy];
+    _uniqueIdentifier = [NSUUID UUID];
 
     return self;
 }
@@ -59,24 +102,13 @@ using namespace chip;
         return nil;
     }
 
-    { // Scope for temporaries
-        // ExtractNodeIdFabricIdFromOpCert needs a TLV-encoded opcert, not a DER-encoded one.
-        uint8_t tlvOpCertBuf[Credentials::kMaxCHIPCertLength];
-        MutableByteSpan tlvOpCert(tlvOpCertBuf);
-        CHIP_ERROR err = Credentials::ConvertX509CertToChipCert(AsByteSpan(operationalCertificate), tlvOpCert);
+    { // Scope for temporary
+        NSNumber * fabricID;
+        CHIP_ERROR err = ExtractFabricIDFromNOC(operationalCertificate, &fabricID);
         if (err != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Unable to convert operational certificate to TLV: %s", ErrorStr(err));
             return nil;
         }
-
-        FabricId fabricId = kUndefinedFabricId;
-        NodeId unused = kUndefinedNodeId;
-        err = Credentials::ExtractNodeIdFabricIdFromOpCert(tlvOpCert, &unused, &fabricId);
-        if (err != CHIP_NO_ERROR) {
-            MTR_LOG_ERROR("Unable to extract fabric id from operational certificate: %s", ErrorStr(err));
-            return nil;
-        }
-        _fabricID = @(fabricId);
+        _fabricID = fabricID;
     }
 
     _operationalKeypair = operationalKeypair;
@@ -84,6 +116,7 @@ using namespace chip;
     _intermediateCertificate = [intermediateCertificate copy];
     _rootCertificate = [rootCertificate copy];
     _ipk = [ipk copy];
+    _uniqueIdentifier = [NSUUID UUID];
 
     return self;
 }
@@ -106,6 +139,50 @@ using namespace chip;
     _operationalKeypair = params.operationalKeypair;
     _operationalCertificateIssuer = params.operationalCertificateIssuer;
     _operationalCertificateIssuerQueue = params.operationalCertificateIssuerQueue;
+    _uniqueIdentifier = params.uniqueIdentifier;
+
+    return self;
+}
+
+- (instancetype)initWithParameters:(MTRDeviceControllerParameters *)params error:(CHIP_ERROR &)error
+{
+    if (!(self = [super init])) {
+        error = CHIP_ERROR_INCORRECT_STATE;
+        return nil;
+    }
+
+    if (![params isKindOfClass:[MTRDeviceControllerExternalCertificateParameters class]]) {
+        MTR_LOG_ERROR("Unexpected subclass of MTRDeviceControllerParameters");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return nil;
+    }
+
+    _nocSigner = nil;
+
+    NSNumber * fabricID;
+    error = ExtractFabricIDFromNOC(params.operationalCertificate, &fabricID);
+    if (error != CHIP_NO_ERROR) {
+        return nil;
+    }
+    _fabricID = fabricID;
+
+    _ipk = params.ipk;
+    _vendorID = params.vendorID;
+    // Note: Since we have an operationalCertificate, we do not need a nodeID as
+    // part of our params; it will not be used.  Don't even initialize it, to
+    // avoid confusion about that.
+    //
+    // We don't really use the fabricID for anything either, but we promise to
+    // have a non-nil one, which is why we set it above.
+    _nodeID = nil;
+    _caseAuthenticatedTags = nil;
+    _rootCertificate = params.rootCertificate;
+    _intermediateCertificate = params.intermediateCertificate;
+    _operationalCertificate = params.operationalCertificate;
+    _operationalKeypair = params.operationalKeypair;
+    _operationalCertificateIssuer = params.operationalCertificateIssuer;
+    _operationalCertificateIssuerQueue = params.operationalCertificateIssuerQueue;
+    _uniqueIdentifier = params.uniqueIdentifier;
 
     return self;
 }
@@ -120,7 +197,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     MutableByteSpan derCert(buf);
     CHIP_ERROR err = Credentials::ConvertChipCertToX509Cert(cert, derCert);
     if (err != CHIP_NO_ERROR) {
-        MTR_LOG_ERROR("Failed do convert Matter certificate to X.509 DER: %s", ErrorStr(err));
+        MTR_LOG_ERROR("Failed to convert Matter certificate to X.509 DER: %s", ErrorStr(err));
         return nil;
     }
 
@@ -174,6 +251,86 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @end
 
+@implementation MTRDeviceControllerAbstractParameters
+- (instancetype)_initInternal
+{
+    return [super init];
+}
+@end
+
+@implementation MTRDeviceControllerParameters
+- (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
+                                    ipk:(NSData *)ipk
+                               vendorID:(NSNumber *)vendorID
+                     operationalKeypair:(id<MTRKeypair>)operationalKeypair
+                 operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                        rootCertificate:(MTRCertificateDERBytes)rootCertificate
+{
+    if (!(self = [super _initInternal])) {
+        return nil;
+    }
+
+    _productAttestationAuthorityCertificates = nil;
+    _certificationDeclarationCertificates = nil;
+    _shouldAdvertiseOperational = NO;
+
+    _ipk = ipk;
+    _vendorID = vendorID;
+    _rootCertificate = rootCertificate;
+    _intermediateCertificate = intermediateCertificate;
+    _operationalCertificate = operationalCertificate;
+    _operationalKeypair = operationalKeypair;
+
+    _operationalCertificateIssuer = nil;
+    _operationalCertificateIssuerQueue = nil;
+    _storageDelegate = storageDelegate;
+    _storageDelegateQueue = storageDelegateQueue;
+    _uniqueIdentifier = uniqueIdentifier;
+
+    return self;
+}
+
+- (void)setOperationalCertificateIssuer:(id<MTROperationalCertificateIssuer>)operationalCertificateIssuer
+                                  queue:(dispatch_queue_t)queue
+{
+    _operationalCertificateIssuer = operationalCertificateIssuer;
+    _operationalCertificateIssuerQueue = queue;
+}
+
+- (void)setOTAProviderDelegate:(id<MTROTAProviderDelegate>)otaProviderDelegate queue:(dispatch_queue_t)queue
+{
+    _otaProviderDelegate = otaProviderDelegate;
+    _otaProviderDelegateQueue = queue;
+}
+
+@end
+
+@implementation MTRDeviceControllerExternalCertificateParameters
+- (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
+                   storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
+                       uniqueIdentifier:(NSUUID *)uniqueIdentifier
+                                    ipk:(NSData *)ipk
+                               vendorID:(NSNumber *)vendorID
+                     operationalKeypair:(id<MTRKeypair>)operationalKeypair
+                 operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                        rootCertificate:(MTRCertificateDERBytes)rootCertificate
+{
+    return [super initWithStorageDelegate:storageDelegate
+                     storageDelegateQueue:storageDelegateQueue
+                         uniqueIdentifier:uniqueIdentifier
+                                      ipk:ipk
+                                 vendorID:vendorID
+                       operationalKeypair:operationalKeypair
+                   operationalCertificate:operationalCertificate
+                  intermediateCertificate:intermediateCertificate
+                          rootCertificate:rootCertificate];
+}
+@end
+
 @implementation MTRDeviceControllerStartupParamsInternal
 
 - (instancetype)initWithParams:(MTRDeviceControllerStartupParams *)params
@@ -181,6 +338,9 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (!(self = [super initWithParams:params])) {
         return nil;
     }
+
+    _storageDelegate = nil;
+    _storageDelegateQueue = nil;
 
     if (self.nocSigner == nil && self.rootCertificate == nil) {
         MTR_LOG_ERROR("nocSigner and rootCertificate are both nil; no public key available to identify the fabric");
@@ -249,6 +409,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricTable = fabricTable;
     _keystore = keystore;
     _advertiseOperational = advertiseOperational;
+    _allowMultipleControllersPerFabric = NO;
 
     return self;
 }
@@ -349,7 +510,9 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (usingExistingNOC == YES
         && ((oldIntermediateCert == nil) != (self.intermediateCertificate == nil)
             || ((oldIntermediateCert != nil) &&
-                [MTRCertificates isCertificate:oldIntermediateCert equalTo:self.intermediateCertificate] == NO))) {
+                [MTRCertificates isCertificate:oldIntermediateCert
+                                       equalTo:self.intermediateCertificate]
+                    == NO))) {
         self.operationalCertificate = nil;
     }
 
@@ -379,6 +542,91 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricIndex.Emplace(fabricIndex);
     _keystore = keystore;
     _advertiseOperational = advertiseOperational;
+    _allowMultipleControllersPerFabric = NO;
+
+    return self;
+}
+
+- (instancetype)initForNewController:(MTRDeviceController *)controller
+                         fabricTable:(chip::FabricTable *)fabricTable
+                            keystore:(chip::Crypto::OperationalKeystore *)keystore
+                advertiseOperational:(BOOL)advertiseOperational
+                              params:(MTRDeviceControllerParameters *)params
+                               error:(CHIP_ERROR &)error
+{
+    if (!(self = [super initWithParameters:params error:error])) {
+        return nil;
+    }
+
+    Crypto::P256PublicKey pubKey;
+    error = ExtractPubkeyFromX509Cert(AsByteSpan(self.rootCertificate), pubKey);
+    if (error != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("Can't extract public key from root certificate: %s", error.AsString());
+        return nil;
+    }
+
+    NSNumber * nodeID;
+    error = ExtractNodeIDFromNOC(self.operationalCertificate, &nodeID);
+    if (error != CHIP_NO_ERROR) {
+        // Already logged.
+        return nil;
+    }
+
+    if (fabricTable->FindIdentity(pubKey, self.fabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue)) {
+        MTR_LOG_ERROR("Trying to start a controller identity that is already running");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+        return nil;
+    }
+
+    auto * oldNOCTLV = [controller.controllerDataStore fetchLastLocallyUsedNOC];
+    if (oldNOCTLV != nil) {
+        ByteSpan oldNOCSpan = AsByteSpan(oldNOCTLV);
+
+        FabricId ignored = kUndefinedFabricId;
+        NodeId oldNodeID = kUndefinedNodeId;
+        CHIP_ERROR err = Credentials::ExtractNodeIdFabricIdFromOpCert(oldNOCSpan, &oldNodeID, &ignored);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Unable to extract node ID and fabric ID from old operational certificate: %s", err.AsString());
+            return nil;
+        }
+
+        CATValues oldCATs;
+        err = Credentials::ExtractCATsFromOpCert(oldNOCSpan, oldCATs);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Failed to extract CATs from old operational certificate: %s", err.AsString());
+            return nil;
+        }
+
+        auto * tlvNOC = [MTRCertificates convertX509Certificate:self.operationalCertificate];
+        if (tlvNOC == nil) {
+            return nil;
+        }
+
+        ByteSpan nocSpan = AsByteSpan(tlvNOC);
+        CATValues newCATs;
+        err = Credentials::ExtractCATsFromOpCert(nocSpan, newCATs);
+        if (err != CHIP_NO_ERROR) {
+            MTR_LOG_ERROR("Failed to extract CATs from new operational certificate: %s", err.AsString());
+            return nil;
+        }
+
+        if (nodeID.unsignedLongLongValue != oldNodeID || oldCATs != newCATs) {
+            // Our NOC has changed in a way that would affect ACL checks.  Clear
+            // out our session resumption storage, because resuming those CASE
+            // sessions will end up doing ACL checks against our old NOC.
+            MTR_LOG_DEFAULT("Node ID or CATs changed.  Clearing CASE resumption storage.");
+            [controller.controllerDataStore clearAllResumptionInfo];
+        }
+    }
+
+    _fabricTable = fabricTable;
+    _keystore = keystore;
+    _advertiseOperational = advertiseOperational;
+    _allowMultipleControllersPerFabric = YES;
+    _storageDelegate = params.storageDelegate;
+    _storageDelegateQueue = params.storageDelegateQueue;
+    _productAttestationAuthorityCertificates = params.productAttestationAuthorityCertificates;
+    _certificationDeclarationCertificates = params.certificationDeclarationCertificates;
 
     return self;
 }

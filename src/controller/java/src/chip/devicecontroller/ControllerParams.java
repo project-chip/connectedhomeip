@@ -23,8 +23,6 @@ public final class ControllerParams {
   @Nullable private final byte[] ipk;
   private final long adminSubject;
 
-  private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
-
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
     this.fabricId = builder.fabricId;
@@ -132,7 +130,7 @@ public final class ControllerParams {
   /** Builder for {@link ControllerParams}. */
   public static class Builder {
     private long fabricId = 1;
-    private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
+    private int udpListenPort = 0;
     private int controllerVendorId = 0xFFFF;
     private int failsafeTimerSeconds = 30;
     private int caseFailsafeTimerSeconds = 0;
@@ -151,9 +149,6 @@ public final class ControllerParams {
     private Builder() {}
 
     public Builder setFabricId(long fabricId) {
-      if (fabricId < 1) {
-        throw new IllegalArgumentException("fabricId must be > 0");
-      }
       this.fabricId = fabricId;
       return this;
     }

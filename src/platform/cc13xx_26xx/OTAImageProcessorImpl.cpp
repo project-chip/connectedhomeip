@@ -454,7 +454,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;

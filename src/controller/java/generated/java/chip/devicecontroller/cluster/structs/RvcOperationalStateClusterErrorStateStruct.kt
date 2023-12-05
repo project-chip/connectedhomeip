@@ -17,14 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class RvcOperationalStateClusterErrorStateStruct(
-  val errorStateID: Int,
+  val errorStateID: UInt,
   val errorStateLabel: Optional<String>,
   val errorStateDetails: Optional<String>
 ) {
@@ -36,9 +36,9 @@ class RvcOperationalStateClusterErrorStateStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ERROR_STATE_I_D), errorStateID)
       if (errorStateLabel.isPresent) {
         val opterrorStateLabel = errorStateLabel.get()
@@ -57,9 +57,9 @@ class RvcOperationalStateClusterErrorStateStruct(
     private const val TAG_ERROR_STATE_LABEL = 1
     private const val TAG_ERROR_STATE_DETAILS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
-      tlvReader.enterStructure(tag)
-      val errorStateID = tlvReader.getInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterErrorStateStruct {
+      tlvReader.enterStructure(tlvTag)
+      val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))

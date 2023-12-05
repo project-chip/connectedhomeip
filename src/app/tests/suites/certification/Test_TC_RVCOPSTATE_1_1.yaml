@@ -135,6 +135,17 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
+          " !RVCOPSTATE.S.C00.Rsp && !RVCOPSTATE.S.C01.Rsp &&
+          !RVCOPSTATE.S.C02.Rsp && !RVCOPSTATE.S.C03.Rsp "
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      PICS:
           " RVCOPSTATE.S.C00.Rsp || RVCOPSTATE.S.C01.Rsp || RVCOPSTATE.S.C02.Rsp
           || RVCOPSTATE.S.C03.Rsp "
       command: "readAttribute"

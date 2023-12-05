@@ -43,11 +43,6 @@ public:
     const Span<EndpointId> * GetEndpointList(EndpointId powerSourceClusterEndpoint) const;
     void Shutdown();
     size_t GetNumSupportedEndpointLists() const;
-
-private:
-    // Both return std::numeric_limits<size_t>::max() for not found
-    size_t PowerSourceClusterEndpointIndex(EndpointId endpointId) const;
-    size_t NextEmptyIndex() const;
 };
 
 class PowerSourceAttrAccess : public AttributeAccessInterface

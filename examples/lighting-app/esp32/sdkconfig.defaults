@@ -61,3 +61,6 @@ CONFIG_MBEDTLS_HKDF_C=y
 
 # Disable Read Client
 CONFIG_DISABLE_READ_CLIENT=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6

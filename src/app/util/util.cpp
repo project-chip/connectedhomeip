@@ -23,6 +23,7 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
+#include <lib/core/CHIPConfig.h>
 
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
@@ -79,7 +80,7 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
     for (i = 0; i < dataSize; i++)
     {
         value2 = value2 << 8;
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
         value2 += pData[i];
 #else  // BIGENDIAN
         value2 += pData[dataSize - i - 1];
@@ -157,6 +158,9 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallba
 void MatterOperationalStatePluginServerInitCallback() {}
 void MatterRvcOperationalStatePluginServerInitCallback() {}
 void MatterDishwasherAlarmPluginServerInitCallback() {}
+void MatterBooleanSensorConfigurationPluginServerInitCallback() {}
+void MatterValveConfigurationAndControlPluginServerInitCallback() {}
+void MatterMicrowaveOvenModePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
@@ -224,7 +228,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
     }
 }
 
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
 #define EM_BIG_ENDIAN true
 #else
 #define EM_BIG_ENDIAN false

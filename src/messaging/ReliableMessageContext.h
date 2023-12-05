@@ -114,17 +114,14 @@ public:
      */
     bool IsAckPending() const;
 
-    /// Determine whether there is message hasn't been acknowledged.
-    bool IsMessageNotAcked() const;
+    /// Determine whether the reliable message context is waiting for an ack.
+    bool IsWaitingForAck() const;
 
-    /// Set whether there is a message hasn't been acknowledged.
-    void SetMessageNotAcked(bool messageNotAcked);
+    /// Set whether the reliable message context is waiting for an ack.
+    void SetWaitingForAck(bool waitingForAck);
 
     /// Set if this exchange is requesting Sleepy End Device active mode
     void SetRequestingActiveMode(bool activeMode);
-
-    /// Determine whether this exchange is requesting Sleepy End Device active mode
-    bool IsRequestingActiveMode() const;
 
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
@@ -136,6 +133,9 @@ public:
     ReliableMessageMgr * GetReliableMessageMgr();
 
 protected:
+    bool WaitingForResponseOrAck() const;
+    void SetWaitingForResponseOrAck(bool waitingForResponseOrAck);
+
     enum class Flags : uint16_t
     {
         /// When set, signifies that this context is the initiator of the exchange.
@@ -147,8 +147,10 @@ protected:
         /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
         kFlagAutoRequestAck = (1u << 2),
 
-        /// When set, signifies there is a message which hasn't been acknowledged.
-        kFlagMessageNotAcked = (1u << 3),
+        /// When set, signifies the reliable message context is waiting for an
+        /// ack: a message that needs an ack has been sent, no ack has been
+        /// received, and we have not yet run out of MRP retries.
+        kFlagWaitingForAck = (1u << 3),
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = (1u << 4),
@@ -164,14 +166,24 @@ protected:
         /// When set, we have had Close() or Abort() called on us already.
         kFlagClosed = (1u << 7),
 
-        /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
-        kFlagActiveMode = (1u << 8),
-
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
-        kFlagEphemeralExchange = (1u << 9),
+        kFlagEphemeralExchange = (1u << 8),
 
         /// When set, ignore session being released, because we are releasing it ourselves.
-        kFlagIgnoreSessionRelease = (1u << 10),
+        kFlagIgnoreSessionRelease = (1u << 9),
+
+        // This flag is used to determine if the peer (receiver) should be considered active or not.
+        // When set, sender knows it has received at least one application-level message
+        // from the peer and can assume the peer (receiver) is active.
+        // If the flag is not set, we don't know if the peer (receiver) is active or not.
+        kFlagReceivedAtLeastOneMessage = (1u << 10),
+
+        /// When set:
+        ///
+        /// (1) We sent a message that expected a response (hence
+        ///     IsResponseExpected() is true).
+        /// (2) We have received neither a response nor an ack for that message.
+        kFlagWaitingForResponseOrAck = (1u << 11),
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
@@ -216,19 +228,14 @@ inline bool ReliableMessageContext::IsAckPending() const
     return mFlags.Has(Flags::kFlagAckPending);
 }
 
-inline bool ReliableMessageContext::IsMessageNotAcked() const
+inline bool ReliableMessageContext::IsWaitingForAck() const
 {
-    return mFlags.Has(Flags::kFlagMessageNotAcked);
+    return mFlags.Has(Flags::kFlagWaitingForAck);
 }
 
 inline bool ReliableMessageContext::HasPiggybackAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
-}
-
-inline bool ReliableMessageContext::IsRequestingActiveMode() const
-{
-    return mFlags.Has(Flags::kFlagActiveMode);
 }
 
 inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
@@ -241,14 +248,19 @@ inline void ReliableMessageContext::SetAckPending(bool inAckPending)
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
 }
 
-inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
-{
-    mFlags.Set(Flags::kFlagActiveMode, activeMode);
-}
-
 inline bool ReliableMessageContext::IsEphemeralExchange() const
 {
     return mFlags.Has(Flags::kFlagEphemeralExchange);
+}
+
+inline bool ReliableMessageContext::WaitingForResponseOrAck() const
+{
+    return mFlags.Has(Flags::kFlagWaitingForResponseOrAck);
+}
+
+inline void ReliableMessageContext::SetWaitingForResponseOrAck(bool waitingForResponseOrAck)
+{
+    mFlags.Set(Flags::kFlagWaitingForResponseOrAck, waitingForResponseOrAck);
 }
 
 } // namespace Messaging

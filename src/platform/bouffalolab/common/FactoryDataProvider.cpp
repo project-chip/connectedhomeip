@@ -14,25 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "FactoryDataProvider.h"
-#include "CHIPDevicePlatformConfig.h"
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
+
+#include <platform/CHIPDeviceConfig.h>
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 #include <matter_factory_data.h>
 #else
-#include <platform/CHIPDeviceConfig.h>
 extern "C" {
 #include <utils_base64.h>
 }
 #endif
-#include <platform/CHIPDeviceConfig.h>
-extern "C" {
-#include <utils_base64.h>
-}
-#include <platform/bouffalolab/common/FactoryDataProvider.h>
+
+#include "FactoryDataProvider.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -411,6 +406,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
     len = mfd_getVendorName(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -457,6 +453,7 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
     len = mfd_getProductName(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -503,6 +500,7 @@ CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
     len = mfd_getPartNumber(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -524,6 +522,7 @@ CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
     len = mfd_getProductUrl(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -545,6 +544,7 @@ CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
     len = mfd_getProductLabel(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -566,6 +566,7 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     len = mfd_getSerialNumber(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -588,14 +589,16 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
      (int) (__DATE__[10] - '0'))
 
 #define OS_MONTH                                                                                                                   \
-    (__DATE__[2] == 'n' ? (__DATE__[1] == 'a' ? 1 : 6)                                                                             \
-                        : __DATE__[2] == 'b' ? 2                                                                                   \
-                                             : __DATE__[2] == 'r' ? (__DATE__[0] == 'M' ? 3 : 4)                                   \
-                                                                  : __DATE__[2] == 'y' ? 5                                         \
-                                                                                       : __DATE__[2] == 'l'                        \
-                         ? 7                                                                                                       \
-                         : __DATE__[2] == 'g' ? 8                                                                                  \
-                                              : __DATE__[2] == 'p' ? 9 : __DATE__[2] == 't' ? 10 : __DATE__[2] == 'v' ? 11 : 12)
+    (__DATE__[2] == 'n'       ? (__DATE__[1] == 'a' ? 1 : 6)                                                                       \
+         : __DATE__[2] == 'b' ? 2                                                                                                  \
+         : __DATE__[2] == 'r' ? (__DATE__[0] == 'M' ? 3 : 4)                                                                       \
+         : __DATE__[2] == 'y' ? 5                                                                                                  \
+         : __DATE__[2] == 'l' ? 7                                                                                                  \
+         : __DATE__[2] == 'g' ? 8                                                                                                  \
+         : __DATE__[2] == 'p' ? 9                                                                                                  \
+         : __DATE__[2] == 't' ? 10                                                                                                 \
+         : __DATE__[2] == 'v' ? 11                                                                                                 \
+                              : 12)
 
 #define OS_DAY ((__DATE__[4] == ' ' ? 0 : __DATE__[4] - '0') * 10 + (__DATE__[5] - '0'))
 
@@ -640,10 +643,10 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 {
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
     int len = 0;
-
-    len = mfd_getHardwareVersionString(buf, bufSize);
+    len     = mfd_getHardwareVersionString(buf, bufSize);
     if (len > 0)
     {
+        buf[len] = 0;
         return CHIP_NO_ERROR;
     }
     else if (0 == len)
@@ -685,29 +688,6 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
 
     return CHIP_NO_ERROR;
 #endif
-}
-
-extern "C" bool spake2pUtils_test(uint32_t aIt, uint8_t * aSalt, uint32_t aSaltLen, uint8_t * aSaltVerifier,
-                                  uint32_t * pSaltVerifierLen, uint32_t pincode)
-{
-    chip::Crypto::Spake2pVerifier verifier;
-    ByteSpan salt(aSalt, aSaltLen);
-    chip::MutableByteSpan serializedVerifierSpan(aSaltVerifier, *pSaltVerifierLen);
-
-    VerifyOrReturnValue(aIt >= chip::Crypto::kSpake2p_Min_PBKDF_Iterations && aIt <= chip::Crypto::kSpake2p_Max_PBKDF_Iterations,
-                        false);
-    VerifyOrReturnValue(aSalt && aSaltLen >= chip::Crypto::kSpake2p_Min_PBKDF_Salt_Length &&
-                            aSaltLen <= chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length,
-                        false);
-    VerifyOrReturnValue(aSaltVerifier && *pSaltVerifierLen >= chip::Crypto::kSpake2p_VerifierSerialized_Length, false);
-
-    VerifyOrReturnValue(CHIP_NO_ERROR == verifier.Generate(aIt, salt, pincode), false);
-
-    VerifyOrReturnValue(CHIP_NO_ERROR == verifier.Serialize(serializedVerifierSpan), false);
-
-    *pSaltVerifierLen = serializedVerifierSpan.size();
-
-    return true;
 }
 
 } // namespace DeviceLayer

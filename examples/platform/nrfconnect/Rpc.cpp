@@ -95,9 +95,20 @@ K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
 class NrfDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
-        k_timer_start(&reboot_timer, K_SECONDS(1), K_FOREVER);
+        k_timeout_t delay;
+        if (request.delay_ms != 0)
+        {
+            delay = K_MSEC(request.delay_ms);
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to 1s");
+            delay = K_SECONDS(1);
+        }
+
+        k_timer_start(&reboot_timer, delay, K_FOREVER);
         return pw::OkStatus();
     }
 };

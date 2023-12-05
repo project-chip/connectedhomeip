@@ -274,7 +274,7 @@ CHIP_ERROR AmebaOTAImageProcessor::ProcessHeader(ByteSpan & block)
 
 CHIP_ERROR AmebaOTAImageProcessor::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;

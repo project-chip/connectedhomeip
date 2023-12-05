@@ -202,6 +202,18 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
 }
 
+void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, LockOperationTypeEnum opType,
+                                                   OperationSourceEnum opSource, Nullable<uint16_t> userId)
+{
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kInvalidCredential, userId,
+                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), Nullable<List<const LockOpCredentials>>(),
+                           false);
+
+    HandleWrongCodeEntry(endpointId);
+
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d]", endpointId);
+}
+
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
 {
     auto endpointContext = getContext(endpointId);
@@ -1046,7 +1058,7 @@ void DoorLockServer::getWeekDayScheduleCommandHandler(chip::app::CommandHandler 
     {
         ChipLogProgress(Zcl, "[GetWeekDaySchedule] User does not exist [endpointId=%d,weekDayIndex=%d,userIndex=%d]", endpointId,
                         weekDayIndex, userIndex);
-        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kFailure);
+        sendGetWeekDayScheduleResponse(commandObj, commandPath, weekDayIndex, userIndex, DlStatus::kNotFound);
         return;
     }
 
@@ -1246,7 +1258,7 @@ void DoorLockServer::getYearDayScheduleCommandHandler(chip::app::CommandHandler 
     {
         ChipLogProgress(Zcl, "[GetYearDaySchedule] User does not exist [endpointId=%d,yearDayIndex=%d,userIndex=%d]", endpointId,
                         yearDayIndex, userIndex);
-        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kFailure);
+        sendGetYearDayScheduleResponse(commandObj, commandPath, yearDayIndex, userIndex, DlStatus::kNotFound);
         return;
     }
 
@@ -1815,7 +1827,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         return static_cast<EmberAfStatus>(DlStatus::kOccupied);
     }
 
-    const auto & newUserName                = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
+    const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
     auto newUserUniqueId                    = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus                      = userStatus.IsNull() ? UserStatusEnum::kOccupiedEnabled : userStatus.Value();
     auto newUserType                        = userType.IsNull() ? UserTypeEnum::kUnrestrictedUser : userType.Value();
@@ -1973,7 +1985,7 @@ Status DoorLockServer::clearUser(chip::EndpointId endpointId, chip::FabricIndex 
     }
 
     // Remove the user entry
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, chip::CharSpan(""), 0,
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, ""_span, 0,
                                       UserStatusEnum::kAvailable, UserTypeEnum::kUnrestrictedUser, CredentialRuleEnum::kSingle,
                                       nullptr, 0))
     {
@@ -3132,8 +3144,10 @@ bool DoorLockServer::sendRemoteLockUserChange(chip::EndpointId endpointId, LockD
     }
     ChipLogProgress(Zcl,
                     "[RemoteLockUserChange] Sent lock user change event "
-                    "[endpointId=%d,eventNumber=%" PRIu64 ",dataType=%u,operation=%u,nodeId=%" PRIu64 ",fabricIndex=%d]",
-                    endpointId, eventNumber, to_underlying(dataType), to_underlying(operation), nodeId, fabricIndex);
+                    "[endpointId=%d,eventNumber=0x" ChipLogFormatX64 ",dataType=%u,operation=%u,nodeId=0x" ChipLogFormatX64
+                    ",fabricIndex=%d]",
+                    endpointId, ChipLogValueX64(eventNumber), to_underlying(dataType), to_underlying(operation),
+                    ChipLogValueX64(nodeId), fabricIndex);
     return true;
 }
 
@@ -3314,23 +3328,20 @@ bool DoorLockServer::RemoteOperationEnabled(chip::EndpointId endpointId) const
         mode != OperatingModeEnum::kPrivacy && mode != OperatingModeEnum::kNoRemoteLockUnlock;
 }
 
-CHIP_ERROR DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj,
-                                               const chip::app::ConcreteCommandPath & commandPath, EmberAfStatus status)
+void DoorLockServer::sendClusterResponse(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                         EmberAfStatus status)
 {
     VerifyOrDie(nullptr != commandObj);
 
-    auto err             = CHIP_NO_ERROR;
     auto statusAsInteger = to_underlying(status);
     if (statusAsInteger == to_underlying(DlStatus::kOccupied) || statusAsInteger == to_underlying(DlStatus::kDuplicate))
     {
-        err = commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status));
+        VerifyOrDie(commandObj->AddClusterSpecificFailure(commandPath, static_cast<chip::ClusterStatus>(status)) == CHIP_NO_ERROR);
     }
     else
     {
-        err = commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
+        commandObj->AddStatus(commandPath, ToInteractionModelStatus(status));
     }
-
-    return err;
 }
 
 EmberAfDoorLockEndpointContext * DoorLockServer::getContext(chip::EndpointId endpointId)

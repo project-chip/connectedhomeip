@@ -66,13 +66,6 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_init(&sToggleMoveTypeTimer, &AppTask::OpenTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sToggleMoveTypeTimer, this);
 
-    CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkWindow");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 

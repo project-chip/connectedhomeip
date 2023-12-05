@@ -37,11 +37,11 @@ tests:
           ./chip-tool dishwashermode read supported-modes 1 1
 
           Verify that the DUT response contains list of ModeOptionsStruct entries.
-          - Verify that list should contain at least one entry
-          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value
-          -  ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the semantic tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster alias tag value (RapidCool, RapidFreeze) or in the MfgTags (0x8000 to 0xBFFF) range
+          - Verify that the list has at least 2 and at most 255 entries
+          - Verify that each ModeOptionsStruct entry has a unique Mode field value and Label field value.
+          - If ModeOptionsStruct entry’s ModeTags field is not empty,  then Verify the values of the Value fields that are not larger than 16 bits, for each Value field: Is the mode tag value a defined common tag value (Auto(0x0000), Quick(0x0001), Quiet(0x0002), LowNoise(0x0003), LowEnergy(0x0004), Vacation(0x0005), Min(0x0006), Max(0x0007), Night(0x0008), Day(0x0009)) or a defined cluster-derived tag value (Normal, Heavy, Light) or in the MfgTags (0x8000 to 0xBFFF) range.
           - If the Value field is in the MfgTags (0x8000 to 0xBFFF) range, the TagName field is a string with a length between 1 and 64
-          - Verify that at least one ModeOptionsStruct entry includes either the RapidCool semantic tag or the RapidFreeze semantic tag in the SemanticTags field
+          - Verify that at least one ModeOptionsStruct entry includes the Normal mode tag
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
 
           [1689997453.610123][360094:360096] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0000 DataVersion: 1427220838
@@ -86,7 +86,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode  read current-mode 1 1
 
-          Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer and the value is  from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
+          Verify on TH(chip-tool) logs, CurrentMode attribute is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
 
           [1689997642.999367][360160:360162] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0001 DataVersion: 1994417976
           [1689997642.999395][360160:360162] CHIP:TOO:   CurrentMode: 0
@@ -97,7 +97,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer and the value is from supported_modes_dut (As per spec default value is null) , below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
+          Verify on TH(chip-tool) logs, OnMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here OnMode attribute value is Null
 
           [1649676072.465968][10754:10759] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0003 DataVersion: 4277065072
           [1649676072.466094][10754:10759] CHIP:TOO: OnMode: null
@@ -108,7 +108,7 @@ tests:
       verification: |
           ./chip-tool dishwashermode read start-up-mode 1 1
 
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer(As per spec default value is null) and value is from supported_modes_dut, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer from supported_modes_dut or null, below is the sample log provided for the raspi platform, Here StartUpMode attribute value is Null
 
           [1689997956.636092][360258:360260] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0059 Attribute 0x0000_0002 DataVersion: 1994417976
           [1689997956.636125][360258:360260] CHIP:TOO:   StartUpMode: null

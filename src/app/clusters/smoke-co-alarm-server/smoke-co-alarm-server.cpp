@@ -29,6 +29,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::SmokeCoAlarm;
+using namespace chip::app::Clusters::SmokeCoAlarm::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 SmokeCoAlarmServer SmokeCoAlarmServer::sInstance;
@@ -42,439 +43,366 @@ SmokeCoAlarmServer & SmokeCoAlarmServer::Instance()
     return sInstance;
 }
 
-bool SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedStateEnum newExpressedState)
-{
-    ExpressedStateEnum expressedState;
-    bool success = GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
-
-    if (success && (expressedState != newExpressedState))
-    {
-        success = SetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Set, newExpressedState);
-
-        if (success && (newExpressedState == ExpressedStateEnum::kNormal))
-        {
-            Events::AllClear::Type event{};
-            SendEvent(endpointId, event);
-        }
-    }
-
-    return success;
-}
-
 void SmokeCoAlarmServer::SetExpressedStateByPriority(EndpointId endpointId,
                                                      const std::array<ExpressedStateEnum, kPriorityOrderLength> & priorityOrder)
 {
-    AlarmStateEnum alarmState          = AlarmStateEnum::kNormal;
-    EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
-    bool active                        = false;
-
     for (ExpressedStateEnum priority : priorityOrder)
     {
+        AlarmStateEnum alarmState          = AlarmStateEnum::kNormal;
+        EndOfServiceEnum endOfServiceState = EndOfServiceEnum::kNormal;
+        bool active                        = false;
+        bool success                       = false;
+
         switch (priority)
         {
         case ExpressedStateEnum::kSmokeAlarm:
-            VerifyOrReturn(GetSmokeState(endpointId, alarmState));
+            success = GetSmokeState(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kCOAlarm:
-            VerifyOrReturn(GetCOState(endpointId, alarmState));
+            success = GetCOState(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kBatteryAlert:
-            VerifyOrReturn(GetBatteryAlert(endpointId, alarmState));
+            success = GetBatteryAlert(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kTesting:
-            VerifyOrReturn(GetTestInProgress(endpointId, active));
+            success = GetTestInProgress(endpointId, active);
             break;
         case ExpressedStateEnum::kHardwareFault:
-            VerifyOrReturn(GetHardwareFaultAlert(endpointId, active));
+            success = GetHardwareFaultAlert(endpointId, active);
             break;
         case ExpressedStateEnum::kEndOfService:
-            VerifyOrReturn(GetEndOfServiceAlert(endpointId, endOfServiceState));
+            success = GetEndOfServiceAlert(endpointId, endOfServiceState);
             break;
         case ExpressedStateEnum::kInterconnectSmoke:
-            VerifyOrReturn(GetInterconnectSmokeAlarm(endpointId, alarmState));
+            success = GetInterconnectSmokeAlarm(endpointId, alarmState);
             break;
         case ExpressedStateEnum::kInterconnectCO:
-            VerifyOrReturn(GetInterconnectCOAlarm(endpointId, alarmState));
+            success = GetInterconnectCOAlarm(endpointId, alarmState);
             break;
         default:
             break;
         }
 
-        if ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active)
+        if (success && ((alarmState != AlarmStateEnum::kNormal) || (endOfServiceState != EndOfServiceEnum::kNormal) || active))
         {
-            VerifyOrDo(SetExpressedState(endpointId, priority), ChipLogError(NotSpecified, "Set ExpressedState failed"));
+            SetExpressedState(endpointId, priority);
             return;
         }
     }
 
-    VerifyOrDo(SetExpressedState(endpointId, ExpressedStateEnum::kNormal), ChipLogError(NotSpecified, "Set ExpressedState failed"));
+    SetExpressedState(endpointId, ExpressedStateEnum::kNormal);
+}
+
+bool SmokeCoAlarmServer::RequestSelfTest(EndpointId endpointId)
+{
+    ExpressedStateEnum expressedState;
+    VerifyOrReturnValue(GetExpressedState(endpointId, expressedState), false);
+
+    // If the value is busy then return busy
+    if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
+        expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
+        expressedState == ExpressedStateEnum::kInterconnectCO)
+    {
+        return false;
+    }
+
+    VerifyOrReturnValue(SetTestInProgress(endpointId, true), false);
+    SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
+
+    emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetSmokeState(EndpointId endpointId, AlarmStateEnum newSmokeState)
 {
-    AlarmStateEnum smokeState;
-    bool success = GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, smokeState);
+    AlarmStateEnum alarmState;
+    VerifyOrReturnValue(GetAttribute(endpointId, SmokeState::Id, SmokeState::Get, alarmState), false);
+    VerifyOrReturnValue(alarmState != newSmokeState, true);
 
-    if (success && (smokeState != newSmokeState))
+    VerifyOrReturnValue(SetAttribute(endpointId, SmokeState::Id, SmokeState::Set, newSmokeState), false);
+    if (newSmokeState == AlarmStateEnum::kWarning || newSmokeState == AlarmStateEnum::kCritical)
     {
-        success = SetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Set, newSmokeState);
-
-        if (success && (newSmokeState == AlarmStateEnum::kWarning || newSmokeState == AlarmStateEnum::kCritical))
-        {
-            Events::SmokeAlarm::Type event{ newSmokeState };
-            SendEvent(endpointId, event);
-        }
-
-        if (success && (newSmokeState == AlarmStateEnum::kCritical))
-        {
-            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
-        }
+        Events::SmokeAlarm::Type event{ newSmokeState };
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    if (newSmokeState == AlarmStateEnum::kCritical)
+    {
+        SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetCOState(EndpointId endpointId, AlarmStateEnum newCOState)
 {
-    AlarmStateEnum coState;
-    bool success = GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, coState);
+    AlarmStateEnum alarmState;
+    VerifyOrReturnValue(GetAttribute(endpointId, COState::Id, COState::Get, alarmState), false);
+    VerifyOrReturnValue(alarmState != newCOState, true);
 
-    if (success && (coState != newCOState))
+    VerifyOrReturnValue(SetAttribute(endpointId, COState::Id, COState::Set, newCOState), false);
+    if (newCOState == AlarmStateEnum::kWarning || newCOState == AlarmStateEnum::kCritical)
     {
-        success = SetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Set, newCOState);
-
-        if (success && (newCOState == AlarmStateEnum::kWarning || newCOState == AlarmStateEnum::kCritical))
-        {
-            Events::COAlarm::Type event{ newCOState };
-            SendEvent(endpointId, event);
-        }
-
-        if (success && (newCOState == AlarmStateEnum::kCritical))
-        {
-            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
-        }
+        Events::COAlarm::Type event{ newCOState };
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    if (newCOState == AlarmStateEnum::kCritical)
+    {
+        SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetBatteryAlert(EndpointId endpointId, AlarmStateEnum newBatteryAlert)
 {
-    AlarmStateEnum batteryAlert;
-    bool success = GetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Get, batteryAlert);
+    AlarmStateEnum alarmState;
+    VerifyOrReturnValue(GetAttribute(endpointId, BatteryAlert::Id, BatteryAlert::Get, alarmState), false);
+    VerifyOrReturnValue(alarmState != newBatteryAlert, true);
 
-    if (success && (batteryAlert != newBatteryAlert))
+    VerifyOrReturnValue(SetAttribute(endpointId, BatteryAlert::Id, BatteryAlert::Set, newBatteryAlert), false);
+    if (newBatteryAlert == AlarmStateEnum::kWarning || newBatteryAlert == AlarmStateEnum::kCritical)
     {
-        success = SetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Set, newBatteryAlert);
-
-        if (success && (newBatteryAlert == AlarmStateEnum::kWarning || newBatteryAlert == AlarmStateEnum::kCritical))
-        {
-            Events::LowBattery::Type event{ newBatteryAlert };
-            SendEvent(endpointId, event);
-        }
-
-        if (success && (newBatteryAlert == AlarmStateEnum::kCritical))
-        {
-            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
-        }
+        Events::LowBattery::Type event{ newBatteryAlert };
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    if (newBatteryAlert == AlarmStateEnum::kCritical)
+    {
+        SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetDeviceMuted(EndpointId endpointId, MuteStateEnum newDeviceMuted)
 {
     MuteStateEnum deviceMuted;
-    bool success = GetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Get, deviceMuted);
+    VerifyOrReturnValue(GetAttribute(endpointId, DeviceMuted::Id, DeviceMuted::Get, deviceMuted), false);
+    VerifyOrReturnValue(deviceMuted != newDeviceMuted, true);
 
-    if (success && (deviceMuted != newDeviceMuted))
+    if (newDeviceMuted == MuteStateEnum::kMuted)
     {
-        if (newDeviceMuted == MuteStateEnum::kMuted)
-        {
-            AlarmStateEnum alarmState;
-            success = GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, alarmState);
-            if (success && (alarmState == AlarmStateEnum::kCritical))
-            {
-                success = false;
-            }
+        AlarmStateEnum alarmState;
 
-            if (success)
-            {
-                success = GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, alarmState);
-                if (success && (alarmState == AlarmStateEnum::kCritical))
-                {
-                    success = false;
-                }
-            }
+        // If the attribute has been read and the attribute is Critical, return false
 
-            if (success)
-            {
-                success = GetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Get, alarmState);
-                if (success && (alarmState == AlarmStateEnum::kCritical))
-                {
-                    success = false;
-                }
-            }
+        bool success = GetSmokeState(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-            if (success)
-            {
-                success = GetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Get,
-                                       alarmState);
-                if (success && (alarmState == AlarmStateEnum::kCritical))
-                {
-                    success = false;
-                }
-            }
+        success = GetCOState(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-            if (success)
-            {
-                success =
-                    GetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Get, alarmState);
-                if (success && (alarmState == AlarmStateEnum::kCritical))
-                {
-                    success = false;
-                }
-            }
-        }
+        success = GetBatteryAlert(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-        if (success)
-        {
-            success = SetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Set, newDeviceMuted);
-        }
+        success = GetInterconnectSmokeAlarm(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
 
-        if (success)
-        {
-            if (newDeviceMuted == MuteStateEnum::kMuted)
-            {
-                Events::AlarmMuted::Type event{};
-                SendEvent(endpointId, event);
-            }
-            else if (newDeviceMuted == MuteStateEnum::kNotMuted)
-            {
-                Events::MuteEnded::Type event{};
-                SendEvent(endpointId, event);
-            }
-        }
+        success = GetInterconnectCOAlarm(endpointId, alarmState);
+        VerifyOrReturnValue(!success || alarmState != AlarmStateEnum::kCritical, false);
     }
 
-    return success;
+    VerifyOrReturnValue(SetAttribute(endpointId, DeviceMuted::Id, DeviceMuted::Set, newDeviceMuted), false);
+    if (newDeviceMuted == MuteStateEnum::kMuted)
+    {
+        Events::AlarmMuted::Type event{};
+        SendEvent(endpointId, event);
+    }
+    else if (newDeviceMuted == MuteStateEnum::kNotMuted)
+    {
+        Events::MuteEnded::Type event{};
+        SendEvent(endpointId, event);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetTestInProgress(EndpointId endpointId, bool newTestInProgress)
 {
-    bool testInProgress;
-    bool success = GetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Get, testInProgress);
+    bool active;
+    VerifyOrReturnValue(GetAttribute(endpointId, TestInProgress::Id, TestInProgress::Get, active), false);
+    VerifyOrReturnValue(active != newTestInProgress, true);
 
-    if (success && (testInProgress != newTestInProgress))
+    VerifyOrReturnValue(SetAttribute(endpointId, TestInProgress::Id, TestInProgress::Set, newTestInProgress), false);
+    if (!newTestInProgress)
     {
-        success = SetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Set, newTestInProgress);
-
-        if (success && !newTestInProgress)
-        {
-            Events::SelfTestComplete::Type event{};
-            SendEvent(endpointId, event);
-        }
+        Events::SelfTestComplete::Type event{};
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetHardwareFaultAlert(EndpointId endpointId, bool newHardwareFaultAlert)
 {
-    bool hardwareFaultAlert;
-    bool success =
-        GetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Get, hardwareFaultAlert);
+    bool active;
+    VerifyOrReturnValue(GetAttribute(endpointId, HardwareFaultAlert::Id, HardwareFaultAlert::Get, active), false);
+    VerifyOrReturnValue(active != newHardwareFaultAlert, true);
 
-    if (success && (hardwareFaultAlert != newHardwareFaultAlert))
+    VerifyOrReturnValue(SetAttribute(endpointId, HardwareFaultAlert::Id, HardwareFaultAlert::Set, newHardwareFaultAlert), false);
+    if (newHardwareFaultAlert)
     {
-        success = SetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Set,
-                               newHardwareFaultAlert);
-
-        if (success && newHardwareFaultAlert)
-        {
-            Events::HardwareFault::Type event{};
-            SendEvent(endpointId, event);
-        }
+        Events::HardwareFault::Type event{};
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetEndOfServiceAlert(EndpointId endpointId, EndOfServiceEnum newEndOfServiceAlert)
 {
-    EndOfServiceEnum endOfServiceAlert;
-    bool success =
-        GetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Get, endOfServiceAlert);
+    EndOfServiceEnum endOfServiceState;
+    VerifyOrReturnValue(GetAttribute(endpointId, EndOfServiceAlert::Id, EndOfServiceAlert::Get, endOfServiceState), false);
+    VerifyOrReturnValue(endOfServiceState != newEndOfServiceAlert, true);
 
-    if (success && (endOfServiceAlert != newEndOfServiceAlert))
+    VerifyOrReturnValue(SetAttribute(endpointId, EndOfServiceAlert::Id, EndOfServiceAlert::Set, newEndOfServiceAlert), false);
+    if (newEndOfServiceAlert == EndOfServiceEnum::kExpired)
     {
-        success =
-            SetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Set, newEndOfServiceAlert);
-
-        if (success && (newEndOfServiceAlert == EndOfServiceEnum::kExpired))
-        {
-            Events::EndOfService::Type event{};
-            SendEvent(endpointId, event);
-        }
+        Events::EndOfService::Type event{};
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetInterconnectSmokeAlarm(EndpointId endpointId, AlarmStateEnum newInterconnectSmokeAlarm)
 {
-    AlarmStateEnum interconnectSmokeAlarm;
-    bool success = GetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Get,
-                                interconnectSmokeAlarm);
+    AlarmStateEnum alarmState;
+    VerifyOrReturnValue(GetAttribute(endpointId, InterconnectSmokeAlarm::Id, InterconnectSmokeAlarm::Get, alarmState), false);
+    VerifyOrReturnValue(alarmState != newInterconnectSmokeAlarm, true);
 
-    if (success && (interconnectSmokeAlarm != newInterconnectSmokeAlarm))
+    VerifyOrReturnValue(
+        SetAttribute(endpointId, InterconnectSmokeAlarm::Id, InterconnectSmokeAlarm::Set, newInterconnectSmokeAlarm), false);
+    if (newInterconnectSmokeAlarm == AlarmStateEnum::kWarning || newInterconnectSmokeAlarm == AlarmStateEnum::kCritical)
     {
-        success = SetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Set,
-                               newInterconnectSmokeAlarm);
-
-        if (success &&
-            (newInterconnectSmokeAlarm == AlarmStateEnum::kWarning || newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
-        {
-            Events::InterconnectSmokeAlarm::Type event{ newInterconnectSmokeAlarm };
-            SendEvent(endpointId, event);
-        }
-
-        if (success && (newInterconnectSmokeAlarm == AlarmStateEnum::kCritical))
-        {
-            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
-        }
+        Events::InterconnectSmokeAlarm::Type event{ newInterconnectSmokeAlarm };
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    if (newInterconnectSmokeAlarm == AlarmStateEnum::kCritical)
+    {
+        SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetInterconnectCOAlarm(EndpointId endpointId, AlarmStateEnum newInterconnectCOAlarm)
 {
-    AlarmStateEnum interconnectCOAlarm;
-    bool success =
-        GetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Get, interconnectCOAlarm);
+    AlarmStateEnum alarmState;
+    VerifyOrReturnValue(GetAttribute(endpointId, InterconnectCOAlarm::Id, InterconnectCOAlarm::Get, alarmState), false);
+    VerifyOrReturnValue(alarmState != newInterconnectCOAlarm, true);
 
-    if (success && (interconnectCOAlarm != newInterconnectCOAlarm))
+    VerifyOrReturnValue(SetAttribute(endpointId, InterconnectCOAlarm::Id, InterconnectCOAlarm::Set, newInterconnectCOAlarm), false);
+    if (newInterconnectCOAlarm == AlarmStateEnum::kWarning || newInterconnectCOAlarm == AlarmStateEnum::kCritical)
     {
-        success = SetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Set,
-                               newInterconnectCOAlarm);
-
-        if (success && (newInterconnectCOAlarm == AlarmStateEnum::kWarning || newInterconnectCOAlarm == AlarmStateEnum::kCritical))
-        {
-            Events::InterconnectCOAlarm::Type event{ newInterconnectCOAlarm };
-            SendEvent(endpointId, event);
-        }
-
-        if (success && (newInterconnectCOAlarm == AlarmStateEnum::kCritical))
-        {
-            SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
-        }
+        Events::InterconnectCOAlarm::Type event{ newInterconnectCOAlarm };
+        SendEvent(endpointId, event);
     }
 
-    return success;
+    if (newInterconnectCOAlarm == AlarmStateEnum::kCritical)
+    {
+        SetDeviceMuted(endpointId, MuteStateEnum::kNotMuted);
+    }
+
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetContaminationState(EndpointId endpointId, ContaminationStateEnum newContaminationState)
 {
     ContaminationStateEnum contaminationState;
-    bool success =
-        GetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Get, contaminationState);
+    VerifyOrReturnValue(GetAttribute(endpointId, ContaminationState::Id, ContaminationState::Get, contaminationState), false);
+    VerifyOrReturnValue(contaminationState != newContaminationState, true);
 
-    if (success && (contaminationState != newContaminationState))
-    {
-        success = SetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Set,
-                               newContaminationState);
-    }
+    VerifyOrReturnValue(SetAttribute(endpointId, ContaminationState::Id, ContaminationState::Set, newContaminationState), false);
 
-    return success;
+    return true;
 }
 
 bool SmokeCoAlarmServer::SetSmokeSensitivityLevel(EndpointId endpointId, SensitivityEnum newSmokeSensitivityLevel)
 {
-    SensitivityEnum smokeSensitivityLevel;
-    bool success = GetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Get,
-                                smokeSensitivityLevel);
+    SensitivityEnum sensitivity;
+    VerifyOrReturnValue(GetAttribute(endpointId, SmokeSensitivityLevel::Id, SmokeSensitivityLevel::Get, sensitivity), false);
+    VerifyOrReturnValue(sensitivity != newSmokeSensitivityLevel, true);
 
-    if (success && (smokeSensitivityLevel != newSmokeSensitivityLevel))
-    {
-        success = SetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Set,
-                               newSmokeSensitivityLevel);
-    }
+    VerifyOrReturnValue(SetAttribute(endpointId, SmokeSensitivityLevel::Id, SmokeSensitivityLevel::Set, newSmokeSensitivityLevel),
+                        false);
 
-    return success;
+    return true;
 }
 
 bool SmokeCoAlarmServer::GetExpressedState(chip ::EndpointId endpointId, ExpressedStateEnum & expressedState)
 {
-    return GetAttribute(endpointId, Attributes::ExpressedState::Id, Attributes::ExpressedState::Get, expressedState);
+    return GetAttribute(endpointId, ExpressedState::Id, ExpressedState::Get, expressedState);
 }
 
 bool SmokeCoAlarmServer::GetSmokeState(EndpointId endpointId, AlarmStateEnum & smokeState)
 {
-    return GetAttribute(endpointId, Attributes::SmokeState::Id, Attributes::SmokeState::Get, smokeState);
+    return GetAttribute(endpointId, SmokeState::Id, SmokeState::Get, smokeState);
 }
 
 bool SmokeCoAlarmServer::GetCOState(EndpointId endpointId, AlarmStateEnum & coState)
 {
-    return GetAttribute(endpointId, Attributes::COState::Id, Attributes::COState::Get, coState);
+    return GetAttribute(endpointId, COState::Id, COState::Get, coState);
 }
 
 bool SmokeCoAlarmServer::GetBatteryAlert(EndpointId endpointId, AlarmStateEnum & batteryAlert)
 {
-    return GetAttribute(endpointId, Attributes::BatteryAlert::Id, Attributes::BatteryAlert::Get, batteryAlert);
+    return GetAttribute(endpointId, BatteryAlert::Id, BatteryAlert::Get, batteryAlert);
 }
 
 bool SmokeCoAlarmServer::GetDeviceMuted(EndpointId endpointId, MuteStateEnum & deviceMuted)
 {
-    return GetAttribute(endpointId, Attributes::DeviceMuted::Id, Attributes::DeviceMuted::Get, deviceMuted);
+    return GetAttribute(endpointId, DeviceMuted::Id, DeviceMuted::Get, deviceMuted);
 }
 
 bool SmokeCoAlarmServer::GetTestInProgress(EndpointId endpointId, bool & testInProgress)
 {
-    return GetAttribute(endpointId, Attributes::TestInProgress::Id, Attributes::TestInProgress::Get, testInProgress);
+    return GetAttribute(endpointId, TestInProgress::Id, TestInProgress::Get, testInProgress);
 }
 
 bool SmokeCoAlarmServer::GetHardwareFaultAlert(EndpointId endpointId, bool & hardwareFaultAlert)
 {
-    return GetAttribute(endpointId, Attributes::HardwareFaultAlert::Id, Attributes::HardwareFaultAlert::Get, hardwareFaultAlert);
+    return GetAttribute(endpointId, HardwareFaultAlert::Id, HardwareFaultAlert::Get, hardwareFaultAlert);
 }
 
 bool SmokeCoAlarmServer::GetEndOfServiceAlert(EndpointId endpointId, EndOfServiceEnum & endOfServiceAlert)
 {
-    return GetAttribute(endpointId, Attributes::EndOfServiceAlert::Id, Attributes::EndOfServiceAlert::Get, endOfServiceAlert);
+    return GetAttribute(endpointId, EndOfServiceAlert::Id, EndOfServiceAlert::Get, endOfServiceAlert);
 }
 
 bool SmokeCoAlarmServer::GetInterconnectSmokeAlarm(EndpointId endpointId, AlarmStateEnum & interconnectSmokeAlarm)
 {
-    return GetAttribute(endpointId, Attributes::InterconnectSmokeAlarm::Id, Attributes::InterconnectSmokeAlarm::Get,
-                        interconnectSmokeAlarm);
+    return GetAttribute(endpointId, InterconnectSmokeAlarm::Id, InterconnectSmokeAlarm::Get, interconnectSmokeAlarm);
 }
 
 bool SmokeCoAlarmServer::GetInterconnectCOAlarm(EndpointId endpointId, AlarmStateEnum & interconnectCOAlarm)
 {
-    return GetAttribute(endpointId, Attributes::InterconnectCOAlarm::Id, Attributes::InterconnectCOAlarm::Get, interconnectCOAlarm);
+    return GetAttribute(endpointId, InterconnectCOAlarm::Id, InterconnectCOAlarm::Get, interconnectCOAlarm);
 }
 
 bool SmokeCoAlarmServer::GetContaminationState(EndpointId endpointId, ContaminationStateEnum & contaminationState)
 {
-    return GetAttribute(endpointId, Attributes::ContaminationState::Id, Attributes::ContaminationState::Get, contaminationState);
+    return GetAttribute(endpointId, ContaminationState::Id, ContaminationState::Get, contaminationState);
 }
 
 bool SmokeCoAlarmServer::GetSmokeSensitivityLevel(EndpointId endpointId, SensitivityEnum & smokeSensitivityLevel)
 {
-    return GetAttribute(endpointId, Attributes::SmokeSensitivityLevel::Id, Attributes::SmokeSensitivityLevel::Get,
-                        smokeSensitivityLevel);
+    return GetAttribute(endpointId, SmokeSensitivityLevel::Id, SmokeSensitivityLevel::Get, smokeSensitivityLevel);
 }
 
 bool SmokeCoAlarmServer::GetExpiryDate(EndpointId endpointId, uint32_t & expiryDate)
 {
-    return GetAttribute(endpointId, Attributes::ExpiryDate::Id, Attributes::ExpiryDate::Get, expiryDate);
+    return GetAttribute(endpointId, ExpiryDate::Id, ExpiryDate::Get, expiryDate);
 }
 
 chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpointId)
 {
     chip::BitFlags<Feature> featureMap;
-    if (!GetAttribute(endpointId, Attributes::FeatureMap::Id, Attributes::FeatureMap::Get, *featureMap.RawStorage()))
+    if (!GetAttribute(endpointId, FeatureMap::Id, FeatureMap::Get, *featureMap.RawStorage()))
     {
         ChipLogError(Zcl, "Unable to get the Smoke CO Alarm feature map: attribute read error");
         featureMap.ClearAll();
@@ -486,41 +414,42 @@ chip::BitFlags<Feature> SmokeCoAlarmServer::GetFeatures(EndpointId endpointId)
  * SmokeCoAlarmServer private methods
  *********************************************************/
 
-bool SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
+void SmokeCoAlarmServer::SetExpressedState(EndpointId endpointId, ExpressedStateEnum newExpressedState)
+{
+    ExpressedStateEnum expressedState;
+    VerifyOrReturn(GetAttribute(endpointId, ExpressedState::Id, ExpressedState::Get, expressedState));
+    VerifyOrReturn(expressedState != newExpressedState);
+
+    VerifyOrReturn(SetAttribute(endpointId, ExpressedState::Id, ExpressedState::Set, newExpressedState));
+    if (newExpressedState == ExpressedStateEnum::kNormal)
+    {
+        Events::AllClear::Type event{};
+        SendEvent(endpointId, event);
+    }
+}
+
+void SmokeCoAlarmServer::HandleRemoteSelfTestRequest(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
 {
     EndpointId endpointId = commandPath.mEndpointId;
-    Status status         = Status::Success;
 
     ExpressedStateEnum expressedState;
-    bool success = GetExpressedState(endpointId, expressedState);
+    VerifyOrReturn(GetExpressedState(endpointId, expressedState), commandObj->AddStatus(commandPath, Status::Failure));
 
-    if (success)
+    // If the value is busy then return busy
+    if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
+        expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
+        expressedState == ExpressedStateEnum::kInterconnectCO)
     {
-        // If the value is busy then return busy
-        if (expressedState == ExpressedStateEnum::kSmokeAlarm || expressedState == ExpressedStateEnum::kCOAlarm ||
-            expressedState == ExpressedStateEnum::kTesting || expressedState == ExpressedStateEnum::kInterconnectSmoke ||
-            expressedState == ExpressedStateEnum::kInterconnectCO)
-        {
-            status = Status::Busy;
-        }
-        else
-        {
-            success = SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
-
-            if (success)
-            {
-                success = emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
-            }
-        }
+        commandObj->AddStatus(commandPath, Status::Busy);
+        return;
     }
 
-    if (!success)
-    {
-        status = Status::Failure;
-    }
+    VerifyOrReturn(SetTestInProgress(endpointId, true), commandObj->AddStatus(commandPath, Status::Failure));
+    SetExpressedState(endpointId, ExpressedStateEnum::kTesting);
 
-    commandObj->AddStatus(commandPath, status);
-    return true;
+    emberAfPluginSmokeCoAlarmSelfTestRequestCommand(endpointId);
+
+    commandObj->AddStatus(commandPath, Status::Success);
 }
 
 template <typename T>
@@ -540,10 +469,15 @@ template <typename T>
 bool SmokeCoAlarmServer::GetAttribute(EndpointId endpointId, AttributeId attributeId,
                                       EmberAfStatus (*getFn)(EndpointId endpointId, T * value), T & value) const
 {
-    EmberAfStatus status = getFn(endpointId, &value);
-    bool success         = (EMBER_ZCL_STATUS_SUCCESS == status);
+    EmberAfStatus status   = getFn(endpointId, &value);
+    bool success           = (EMBER_ZCL_STATUS_SUCCESS == status);
+    bool unsupportedStatus = (EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE == status);
 
-    if (!success)
+    if (unsupportedStatus)
+    {
+        ChipLogProgress(Zcl, "Read unsupported SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI, ChipLogValueMEI(attributeId));
+    }
+    else if (!success)
     {
         ChipLogError(Zcl, "Failed to read SmokeCOAlarm attribute: attribute=" ChipLogFormatMEI ", status=0x%x",
                      ChipLogValueMEI(attributeId), to_underlying(status));
@@ -573,7 +507,8 @@ bool SmokeCoAlarmServer::SetAttribute(EndpointId endpointId, AttributeId attribu
 bool emberAfSmokeCoAlarmClusterSelfTestRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                        const Commands::SelfTestRequest::DecodableType & commandData)
 {
-    return SmokeCoAlarmServer::Instance().HandleRemoteSelfTestRequest(commandObj, commandPath);
+    SmokeCoAlarmServer::Instance().HandleRemoteSelfTestRequest(commandObj, commandPath);
+    return true;
 }
 
 void MatterSmokeCoAlarmPluginServerInitCallback() {}

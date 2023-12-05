@@ -39,9 +39,15 @@
 
 #include <zephyr/bluetooth/addr.h>
 #include <zephyr/bluetooth/gatt.h>
+#include <zephyr/drivers/flash.h>
 #include <zephyr/random/rand32.h>
+#include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
+
+extern "C" {
+#include <b9x_bt_flash.h>
+}
 
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
 #include <zephyr/pm/policy.h>
@@ -110,30 +116,26 @@ bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 // This value should be adjusted accordingly if the service declaration changes.
 constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
-CHIP_ERROR InitRandomStaticAddress()
+CHIP_ERROR InitBLEMACAddress()
 {
-    // Generate a random static address for the default identity.
-    // This must be done before bt_enable() as after that updating the default identity is not possible.
+    // By default the BLE public address will be applied. In case if previously generated random address doesn't exist
+    // or public address doesn't exist, the new random static address will be generated and written to flash
     int error = 0;
     bt_addr_le_t addr;
 
-    // generating the address
-    addr.type = BT_ADDR_LE_RANDOM;
-    error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
-    BT_ADDR_SET_STATIC(&addr.a);
+    b9x_bt_blc_mac_init(addr.a.val);
 
-    if (error)
+    if (BT_ADDR_IS_STATIC(&addr.a)) // in case of Random static address, create a new id
     {
-        ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
-        return System::MapErrorZephyr(error);
-    }
+        addr.type = BT_ADDR_LE_RANDOM;
 
-    error = bt_id_create(&addr, nullptr);
+        error = bt_id_create(&addr, nullptr);
 
-    if (error < 0)
-    {
-        ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
-        return System::MapErrorZephyr(error);
+        if (error < 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
+            return System::MapErrorZephyr(error);
+        }
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
@@ -158,7 +160,7 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-    ReturnErrorOnFailure(InitRandomStaticAddress());
+    ReturnErrorOnFailure(InitBLEMACAddress());
     // int err = bt_enable(NULL); // Can't init BLE stack here due to abscense of non-cuncurrent mode
     // VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
@@ -178,8 +180,11 @@ CHIP_ERROR BLEManagerImpl::_Init(void)
 
 void BLEManagerImpl::_Shutdown()
 {
-    bt_disable();
-    mBLERadioInitialized = false;
+    if (mBLERadioInitialized)
+    {
+        bt_disable();
+        mBLERadioInitialized = false;
+    }
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
@@ -269,14 +274,14 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest(void)
     advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
     scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 
-    mAdvertisingRequest.priority    = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
-    mAdvertisingRequest.options     = kAdvertisingOptions;
-    mAdvertisingRequest.minInterval = mFlags.Has(Flags::kFastAdvertisingEnabled)
-        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-    mAdvertisingRequest.maxInterval = mFlags.Has(Flags::kFastAdvertisingEnabled)
-        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+    mAdvertisingRequest.priority         = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
+    mAdvertisingRequest.options          = kAdvertisingOptions;
+    mAdvertisingRequest.minInterval      = mFlags.Has(Flags::kFastAdvertisingEnabled)
+             ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
+             : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+    mAdvertisingRequest.maxInterval      = mFlags.Has(Flags::kFastAdvertisingEnabled)
+             ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
+             : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     mAdvertisingRequest.advertisingData  = Span<bt_data>(advertisingData);
     mAdvertisingRequest.scanResponseData = nameSize ? Span<bt_data>(scanResponseData) : Span<bt_data>{};
 
@@ -309,9 +314,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
 
     if (!mBLERadioInitialized)
     {
-        char bt_dev_name[CONFIG_BT_DEVICE_NAME_MAX];
-        strncpy(bt_dev_name, bt_get_name(), sizeof(bt_dev_name));
-
         /* Switch off Thread */
         ThreadStackMgrImpl().SetThreadEnabled(false);
         ThreadStackMgrImpl().SetRadioBlocked(true);
@@ -319,7 +321,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertisingProcess(void)
         /* Init BLE stack */
         err = bt_enable(NULL);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-        (void) bt_set_name(bt_dev_name);
+
         mBLERadioInitialized = true;
 #if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
         pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);

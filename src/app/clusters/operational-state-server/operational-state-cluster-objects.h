@@ -27,10 +27,10 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
-constexpr size_t kOperationalStateLabelMaxSize   = 64u;
-constexpr size_t kOperationalErrorLabelMaxSize   = 64u;
-constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
-constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
+inline constexpr size_t kOperationalStateLabelMaxSize   = 64u;
+inline constexpr size_t kOperationalErrorLabelMaxSize   = 64u;
+inline constexpr size_t kOperationalErrorDetailsMaxSize = 64u;
+inline constexpr size_t kOperationalPhaseNameMaxSize    = 64u;
 
 /**
  * A class which represents the operational state of an Operational State cluster derivation instance.
@@ -136,6 +136,35 @@ struct GenericOperationalError : public app::Clusters::detail::Structs::ErrorSta
         {
             errorStateDetails = NullOptional;
         }
+    }
+
+    bool IsEqual(const Structs::ErrorStateStruct::Type & rhs) const
+    {
+        if (errorStateID != rhs.errorStateID)
+        {
+            return false;
+        }
+        if (errorStateLabel.HasValue() != rhs.errorStateLabel.HasValue() ||
+            errorStateDetails.HasValue() != rhs.errorStateDetails.HasValue())
+        {
+            return false;
+        }
+        if (errorStateLabel.HasValue())
+        {
+            if (!errorStateLabel.Value().data_equal(rhs.errorStateLabel.Value()))
+            {
+                return false;
+            }
+        }
+        if (errorStateDetails.HasValue())
+        {
+            if (!errorStateDetails.Value().data_equal(rhs.errorStateDetails.Value()))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
 private:

@@ -325,6 +325,18 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
     return CHIP_NO_ERROR;
 }
 
+void TCPBase::ReleaseActiveConnection(Inet::TCPEndPoint * endPoint)
+{
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i].mEndPoint == endPoint)
+        {
+            mActiveConnections[i].Free();
+            mUsedEndPointCount--;
+        }
+    }
+}
+
 CHIP_ERROR TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle && buffer)
 {
     Inet::IPAddress ipAddress;
@@ -425,15 +437,8 @@ void TCPBase::OnConnectionClosed(Inet::TCPEndPoint * endPoint, CHIP_ERROR err)
 
     ChipLogProgress(Inet, "Connection closed.");
 
-    for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
-    {
-        if (tcp->mActiveConnections[i].mEndPoint == endPoint)
-        {
-            ChipLogProgress(Inet, "Freeing closed connection.");
-            tcp->mActiveConnections[i].Free();
-            tcp->mUsedEndPointCount--;
-        }
-    }
+    ChipLogProgress(Inet, "Freeing closed connection.");
+    tcp->ReleaseActiveConnection(endPoint);
 }
 
 void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCPEndPoint * endPoint,
@@ -449,6 +454,7 @@ void TCPBase::OnConnectionReceived(Inet::TCPEndPoint * listenEndPoint, Inet::TCP
             if (!tcp->mActiveConnections[i].InUse())
             {
                 tcp->mActiveConnections[i].Init(endPoint);
+                tcp->mUsedEndPointCount++;
                 break;
             }
         }
@@ -502,15 +508,9 @@ void TCPBase::OnPeerClosed(Inet::TCPEndPoint * endPoint)
 {
     TCPBase * tcp = reinterpret_cast<TCPBase *>(endPoint->mAppState);
 
-    for (size_t i = 0; i < tcp->mActiveConnectionsSize; i++)
-    {
-        if (tcp->mActiveConnections[i].mEndPoint == endPoint)
-        {
-            ChipLogProgress(Inet, "Freeing connection: connection closed by peer");
-            tcp->mActiveConnections[i].Free();
-            tcp->mUsedEndPointCount--;
-        }
-    }
+    ChipLogProgress(Inet, "Freeing connection: connection closed by peer");
+
+    tcp->ReleaseActiveConnection(endPoint);
 }
 
 bool TCPBase::HasActiveConnections() const

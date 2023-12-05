@@ -34,12 +34,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-asr:1
+            image: ghcr.io/project-chip/chip-build-asr:26
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -57,5 +57,7 @@ jobs:
                         --target asr-asr582x-bridge-factory \
                         --target asr-asr582x-temperature-measurement-rotating_id \
                         --target asr-asr582x-thermostat-rio \
+                        --target asr-asr582x-dishwasher \
+                        --target asr-asr582x-refrigerator \
                         build \
                      "

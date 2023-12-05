@@ -24,8 +24,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
 
@@ -223,7 +223,7 @@ const char * ESP32Utils::WiFiModeToStr(wifi_mode_t wifiMode)
 
 struct netif * ESP32Utils::GetStationNetif(void)
 {
-    return GetNetif("WIFI_STA_DEF");
+    return GetNetif(kDefaultWiFiStationNetifKey);
 }
 
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
@@ -321,16 +321,25 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    if (!esp_netif_create_default_wifi_ap())
+    // Lets not create a default AP interface if already present
+    if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiAPNetifKey))
     {
-        ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
-        return CHIP_ERROR_INTERNAL;
+        if (!esp_netif_create_default_wifi_ap())
+        {
+            ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    if (!esp_netif_create_default_wifi_sta())
+
+    // Lets not create a default station interface if already present
+    if (!esp_netif_get_handle_from_ifkey(kDefaultWiFiStationNetifKey))
     {
-        ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
-        return CHIP_ERROR_INTERNAL;
+        if (!esp_netif_create_default_wifi_sta())
+        {
+            ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
+            return CHIP_ERROR_INTERNAL;
+        }
     }
 
     // Initialize the ESP WiFi layer.

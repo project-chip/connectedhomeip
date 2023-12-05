@@ -38,13 +38,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:2
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -76,13 +76,13 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:1
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:26
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

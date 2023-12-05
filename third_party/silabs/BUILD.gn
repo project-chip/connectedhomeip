@@ -15,10 +15,11 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
+import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
-if (silabs_board == "BRD4325B") {  # CCP board
+if (wifi_soc == true) {  # CCP board
   import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -28,7 +29,6 @@ declare_args() {
   # Build target to use for efr32 SDK. Use this to set global SDK defines.
   silabs_sdk_target = ""
 
-  use_thread_coap_lib = false
   sl_matter_version_str = ""
   sl_matter_version = 1
   sl_hardware_version = 1
@@ -53,18 +53,18 @@ group("efr32_sdk") {
   public_configs = [ ":silabs_config" ]
 }
 
-if (silabs_board != "BRD4325B") {  # CCP board
+if (wifi_soc != true) {  # CCP board
   # Openthread GSDK libraries configurations
+
   if (use_silabs_thread_lib) {
     config("libopenthread-platform_config") {
-      include_dirs = [ "${sl_openthread_root}/examples/platforms" ]
+      include_dirs = [ "${openthread_root}/examples/platforms" ]
 
       defines = [ "SL_CONFIG_OPENTHREAD_LIB=1" ]
     }
 
     copy("copy_openthread_system") {
-      sources =
-          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
 
       outputs =
           [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
@@ -77,8 +77,7 @@ if (silabs_board != "BRD4325B") {  # CCP board
     }
 
     source_set("libopenthread-platform") {
-      sources =
-          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources = [ "${openthread_root}/examples/platforms/openthread-system.h" ]
 
       public_deps = [ ":openthread_system" ]
 
@@ -98,7 +97,7 @@ if (silabs_board != "BRD4325B") {  # CCP board
         "${chip_root}/examples/platform/silabs",
         "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
         "${sl_ot_efr32_root}",
-        "${sl_openthread_root}/src/",
+        "${openthread_root}/src/",
       ]
 
       # temporarily disable check until gsdk pulls in a more recent version
@@ -122,35 +121,43 @@ if (silabs_board != "BRD4325B") {  # CCP board
     source_set("ot-efr32-cert") {
       if (enable_openthread_cli) {
         sources = [
-          "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
-          "${sl_openthread_root}/src/cli/cli.cpp",
-          "${sl_openthread_root}/src/cli/cli.hpp",
-          "${sl_openthread_root}/src/cli/cli_coap.cpp",
-          "${sl_openthread_root}/src/cli/cli_coap.hpp",
-          "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
-          "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
-          "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
-          "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
-          "${sl_openthread_root}/src/cli/cli_config.h",
-          "${sl_openthread_root}/src/cli/cli_dataset.cpp",
-          "${sl_openthread_root}/src/cli/cli_dataset.hpp",
-          "${sl_openthread_root}/src/cli/cli_history.cpp",
-          "${sl_openthread_root}/src/cli/cli_history.hpp",
-          "${sl_openthread_root}/src/cli/cli_joiner.cpp",
-          "${sl_openthread_root}/src/cli/cli_joiner.hpp",
-          "${sl_openthread_root}/src/cli/cli_network_data.cpp",
-          "${sl_openthread_root}/src/cli/cli_network_data.hpp",
-          "${sl_openthread_root}/src/cli/cli_output.cpp",
-          "${sl_openthread_root}/src/cli/cli_output.hpp",
-          "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
-          "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
-          "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
-          "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
-          "${sl_openthread_root}/src/cli/cli_tcp.cpp",
-          "${sl_openthread_root}/src/cli/cli_tcp.hpp",
-          "${sl_openthread_root}/src/cli/cli_udp.cpp",
-          "${sl_openthread_root}/src/cli/cli_udp.hpp",
-          "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
+          "${openthread_root}/examples/apps/cli/cli_uart.cpp",
+          "${openthread_root}/src/cli/cli.cpp",
+          "${openthread_root}/src/cli/cli.hpp",
+          "${openthread_root}/src/cli/cli_bbr.cpp",
+          "${openthread_root}/src/cli/cli_bbr.hpp",
+          "${openthread_root}/src/cli/cli_br.cpp",
+          "${openthread_root}/src/cli/cli_br.hpp",
+          "${openthread_root}/src/cli/cli_coap.cpp",
+          "${openthread_root}/src/cli/cli_coap.hpp",
+          "${openthread_root}/src/cli/cli_coap_secure.cpp",
+          "${openthread_root}/src/cli/cli_coap_secure.hpp",
+          "${openthread_root}/src/cli/cli_commissioner.cpp",
+          "${openthread_root}/src/cli/cli_commissioner.hpp",
+          "${openthread_root}/src/cli/cli_config.h",
+          "${openthread_root}/src/cli/cli_dataset.cpp",
+          "${openthread_root}/src/cli/cli_dataset.hpp",
+          "${openthread_root}/src/cli/cli_dns.cpp",
+          "${openthread_root}/src/cli/cli_dns.hpp",
+          "${openthread_root}/src/cli/cli_history.cpp",
+          "${openthread_root}/src/cli/cli_history.hpp",
+          "${openthread_root}/src/cli/cli_joiner.cpp",
+          "${openthread_root}/src/cli/cli_joiner.hpp",
+          "${openthread_root}/src/cli/cli_mac_filter.cpp",
+          "${openthread_root}/src/cli/cli_mac_filter.hpp",
+          "${openthread_root}/src/cli/cli_network_data.cpp",
+          "${openthread_root}/src/cli/cli_network_data.hpp",
+          "${openthread_root}/src/cli/cli_output.cpp",
+          "${openthread_root}/src/cli/cli_output.hpp",
+          "${openthread_root}/src/cli/cli_srp_client.cpp",
+          "${openthread_root}/src/cli/cli_srp_client.hpp",
+          "${openthread_root}/src/cli/cli_srp_server.cpp",
+          "${openthread_root}/src/cli/cli_srp_server.hpp",
+          "${openthread_root}/src/cli/cli_tcp.cpp",
+          "${openthread_root}/src/cli/cli_tcp.hpp",
+          "${openthread_root}/src/cli/cli_udp.cpp",
+          "${openthread_root}/src/cli/cli_udp.hpp",
+          "${openthread_root}/src/cli/x509_cert_key.hpp",
         ]
       }
 
@@ -162,9 +169,9 @@ if (silabs_board != "BRD4325B") {  # CCP board
       public_deps = [
         ":libopenthread-platform",
         ":openthread_core_config_efr32",
+        "${openthread_root}/include/openthread:openthread",
+        "${openthread_root}/src/core/:libopenthread_core_headers",
         "${segger_rtt_root}:segger_rtt",
-        "${sl_openthread_root}/include/openthread:openthread",
-        "${sl_openthread_root}/src/core/:libopenthread_core_headers",
       ]
 
       deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -181,7 +188,7 @@ if (silabs_board != "BRD4325B") {  # CCP board
         COAP_API = "coap_"
       }
 
-      public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
+      public_configs += [ "${openthread_root}:openthread_${XTD}_config" ]
 
       libs = [
         "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",

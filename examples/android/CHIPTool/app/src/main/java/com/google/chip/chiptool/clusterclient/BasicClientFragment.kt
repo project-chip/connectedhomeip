@@ -21,10 +21,13 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.BasicClientFragmentBinding
-import com.google.chip.chiptool.util.TlvParseUtil
+import com.google.chip.chiptool.util.toAny
 import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class BasicClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -55,7 +58,7 @@ class BasicClientFragment : Fragment() {
         // TODO : Need to be implement poj-to-tlv
         sendWriteAttribute(
           BasicInformation.Attribute.NodeLabel,
-          TlvParseUtil.encode(binding.nodeLabelEd.text.toString())
+          TlvWriter().put(AnonymousTag, binding.nodeLabelEd.text.toString()).getEncoded()
         )
         binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
       }
@@ -65,7 +68,7 @@ class BasicClientFragment : Fragment() {
         // TODO : Need to be implement poj-to-tlv
         sendWriteAttribute(
           BasicInformation.Attribute.Location,
-          TlvParseUtil.encode(binding.locationEd.text.toString())
+          TlvWriter().put(AnonymousTag, binding.locationEd.text.toString()).getEncoded()
         )
         binding.locationEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
       }
@@ -75,7 +78,7 @@ class BasicClientFragment : Fragment() {
         // TODO : Need to be implement poj-to-tlv
         sendWriteAttribute(
           BasicInformation.Attribute.LocalConfigDisabled,
-          TlvParseUtil.encode(isChecked)
+          TlvWriter().put(AnonymousTag, isChecked).getEncoded()
         )
       }
     }
@@ -150,13 +153,13 @@ class BasicClientFragment : Fragment() {
           }
 
           override fun onReport(nodeState: NodeState?) {
-            val value =
+            val tlv =
               nodeState
                 ?.getEndpointState(endpointId)
                 ?.getClusterState(clusterId)
                 ?.getAttributeState(attributeId)
-                ?.value
-                ?: "null"
+                ?.tlv
+            val value = tlv?.let { TlvReader(it).toAny() }
             Log.i(TAG, "[Read Success] $attributeName: $value")
             showMessage("[Read Success] $attributeName: $value")
           }

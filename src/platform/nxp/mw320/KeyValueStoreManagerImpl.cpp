@@ -64,7 +64,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    size_t copy_size = std::min(value_size, (size_t)(read_size - offset_bytes));
+    size_t copy_size = std::min(value_size, (size_t) (read_size - offset_bytes));
     ::memcpy(value, &buf[offset_bytes], copy_size);
 
     *read_bytes_size = copy_size;

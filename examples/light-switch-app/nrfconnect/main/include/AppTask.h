@@ -33,10 +33,6 @@
 #include "DFUOverSMP.h"
 #endif
 
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDUtil.h"
-#endif
-
 #include <cstdint>
 
 struct k_timer;

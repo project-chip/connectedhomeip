@@ -35,7 +35,7 @@ public:
 
     virtual void DoAction(Action aAction)
     {
-#if CONFIG_PM_DEVICE && CONFIG_NORDIC_QSPI_NOR
+#if defined(CONFIG_PM_DEVICE) && defined(CONFIG_NORDIC_QSPI_NOR)
         // utilize the QSPI driver sleep power mode
         const auto * qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
         if (device_is_ready(qspi_dev))

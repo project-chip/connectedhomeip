@@ -52,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
  *                                          Only present when MTREventTimeTypeKey is MTREventTimeTypeSystemUpTime.
  *                MTREventTimestampDateKey : NSDate object.
  *                                           Only present when MTREventTimeTypeKey is MTREventTimeTypeTimestampDate.
+ *                MTREventIsHistoricalKey : NSNumber-wrapped BOOL value.
+ *                                          Value is YES if the event is in the far past or not realtime.
+ *                                          Only present when MTREventPathKey is present.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
  *                MTREventTimeTypeKey.
@@ -79,7 +82,12 @@ NS_ASSUME_NONNULL_BEGIN
  *                A structure-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
  *                contain the following key values.
  *
- *                MTRContextTagKey : NSNumber object as context tag.
+ *                MTRContextTagKey : NSNumber object as context tag.  This can
+ *                                   actually be a fully-qualified profile tag,
+ *                                   but for compatibility it's using the same
+ *                                   key name.  The two types of tags can be
+ *                                   told apart by checking whether the value is
+ *                                   in the context tag range (0 <= tag <= 0xFF).
  *                MTRDataKey : Data-value NSDictionary object.
  *
  *                An array-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
@@ -110,7 +118,7 @@ typedef void (^MTRDeviceResubscriptionScheduledHandler)(NSError * error, NSNumbe
 /**
  * Handler for openCommissioningWindowWithSetupPasscode.
  */
-API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
+MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2))
 typedef void (^MTRDeviceOpenCommissioningWindowHandler)(MTRSetupPayload * _Nullable payload, NSError * _Nullable error);
 
 extern NSString * const MTRAttributePathKey;
@@ -131,11 +139,12 @@ extern NSString * const MTRDoubleValueType;
 extern NSString * const MTRNullValueType;
 extern NSString * const MTRStructureValueType;
 extern NSString * const MTRArrayValueType;
-extern NSString * const MTREventNumberKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventPriorityKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimeTypeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventSystemUpTimeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-extern NSString * const MTREventTimestampDateKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventNumberKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventPriorityKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
@@ -147,25 +156,25 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
     MTRTransportTypeUDP,
     MTRTransportTypeBLE,
     MTRTransportTypeTCP,
-} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * A path indicating an attribute being requested (for read or subscribe).
  *
  * nil is used to represent wildcards.
  */
-API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
     ;
-@property (nonatomic, readonly, copy, nullable) NSNumber * cluster API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @property (nonatomic, readonly, copy, nullable)
-    NSNumber * attribute API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    NSNumber * attribute MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                              clusterID:(NSNumber * _Nullable)clusterID
                                            attributeID:(NSNumber * _Nullable)attributeID
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 /**
@@ -173,17 +182,17 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  *
  * nil is used to represent wildcards.
  */
-API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTREventRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
     ;
-@property (nonatomic, readonly, copy, nullable) NSNumber * cluster API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
-@property (nonatomic, readonly, copy, nullable) NSNumber * event API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, readonly, copy, nullable) NSNumber * event MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                          clusterID:(NSNumber * _Nullable)clusterID
                                            eventID:(NSNumber * _Nullable)eventID
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 @end
 
 @interface MTRBaseDevice : NSObject
@@ -199,13 +208,13 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  */
 + (MTRBaseDevice *)deviceWithNodeID:(NSNumber *)nodeID
                          controller:(MTRDeviceController *)controller
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The transport used by the current session with this device, or
  * `MTRTransportTypeUndefined` if no session is currently active.
  */
-@property (readonly) MTRTransportType sessionTransportType API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (readonly) MTRTransportType sessionTransportType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Subscribe to receive attribute reports for everything (all endpoints, all
@@ -254,7 +263,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                   errorHandler:(MTRDeviceErrorHandler)errorHandler
        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
        resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Reads attributes from the device.
@@ -283,7 +292,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                               params:(MTRReadParams * _Nullable)params
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Reads multiple attribute or event paths from the device.
@@ -304,7 +313,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                 eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                     params:(MTRReadParams * _Nullable)params
                      queue:(dispatch_queue_t)queue
-                completion:(MTRDeviceResponseHandler)completion API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+                completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Write to attribute in a designated attribute path
@@ -331,7 +340,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Invoke a command with a designated command path
@@ -355,7 +364,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Subscribes to the specified attributes on the device.
@@ -391,7 +400,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                                       queue:(dispatch_queue_t)queue
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Subscribes to multiple attribute or event paths.
@@ -424,7 +433,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                     reportHandler:(MTRDeviceResponseHandler)reportHandler
           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
           resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Deregister all local report handlers for a remote device
@@ -435,7 +444,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  */
 - (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue
                                completion:(dispatch_block_t)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Open a commissioning window on the device.
@@ -456,7 +465,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Open a commissioning window on the device, using a random setup passcode.
@@ -473,7 +482,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Reads events from the device.
@@ -500,7 +509,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                           params:(MTRReadParams * _Nullable)params
                            queue:(dispatch_queue_t)queue
                       completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Subscribes to the specified events on the device.
@@ -533,14 +542,14 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
                                   queue:(dispatch_queue_t)queue
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
  * A path indicating a specific cluster on a device (i.e. without any
  * wildcards).
  */
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRClusterPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
@@ -561,7 +570,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 + (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
                                         clusterID:(NSNumber *)clusterID
                                       attributeID:(NSNumber *)attributeID
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -574,7 +583,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 + (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
                                 clusterID:(NSNumber *)clusterID
-                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                                  eventID:(NSNumber *)eventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -586,7 +595,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 + (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
                                     clusterID:(NSNumber *)clusterID
-                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                                    commandID:(NSNumber *)commandID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 @interface MTRAttributeReport : NSObject
@@ -641,20 +650,20 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
                                          error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 
 typedef NS_ENUM(NSUInteger, MTREventTimeType) {
     MTREventTimeTypeSystemUpTime = 0,
     MTREventTimeTypeTimestampDate
-} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+} MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(NSUInteger, MTREventPriority) {
     MTREventPriorityDebug = 0,
     MTREventPriorityInfo = 1,
     MTREventPriorityCritical = 2
-} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+} MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 @interface MTREventReport : NSObject
 @property (nonatomic, readonly, copy) MTREventPath * path;
@@ -675,10 +684,10 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
  * eventTimeType, systemUpTime, timestampDate should be expected to have useful
  * values.
  */
-@property (nonatomic, readonly) MTREventTimeType eventTimeType API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
-@property (nonatomic, readonly) NSTimeInterval systemUpTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, readonly) MTREventTimeType eventTimeType MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, readonly) NSTimeInterval systemUpTime MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @property (nonatomic, readonly, copy, nullable)
-    NSDate * timestampDate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+    NSDate * timestampDate MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
  * An instance of the event payload interface that corresponds to the report's
@@ -715,7 +724,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
  */
 - (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
                                          error:(NSError * __autoreleasing *)error
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 

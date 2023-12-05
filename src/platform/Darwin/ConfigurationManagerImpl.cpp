@@ -23,13 +23,14 @@
  *          for Darwin platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/Darwin/ConfigurationManagerImpl.h>
 
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/Darwin/PosixConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <lib/support/CHIPMemString.h>

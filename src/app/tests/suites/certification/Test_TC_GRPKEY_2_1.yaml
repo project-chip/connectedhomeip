@@ -1,0 +1,186 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 26.3.1. [TC-GRPKEY-2.1] Attributes [DUT-Server]
+
+PICS:
+    - GRPKEY.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Group Key Management"
+    endpoint: 0
+
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH reads GroupKeyMap attribute from DUT using a
+          fabric-filtered read."
+      PICS: GRPKEY.S.A0000
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: true
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 2: TH binds GroupId 0x0103 with GroupKeySetID 0x01a3 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with one entry as follows: List item
+          1:,GroupId: 0x0103,GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.A0000
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+
+    - label:
+          "Step 3: TH reads GroupKeyMap Attribute from the GroupKeyManagement
+          cluster from DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0000
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+
+    - label:
+          "Step 4: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT."
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+
+    # Step 5 does not exist in the test plan.
+
+    - label:
+          "Step 6: TH reads GroupTable attribute from GroupKeyManagement cluster
+          on DUT."
+      PICS: GRPKEY.S.A0001
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []
+
+    - label:
+          "Step 7a: TH attempts to write to the GroupTable attribute from
+          GroupKeyManagement cluster on DUT"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      command: "writeAttribute"
+      attribute: "GroupTable"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [Groups.Endpoint],
+                      GroupName: "Test Group2",
+                  },
+              ]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 7b: TH attempts to write to the GroupTable attribute from
+          GroupKeyManagement cluster on DUT"
+      PICS: GRPKEY.S.A0001 && !G.S.F00
+      command: "writeAttribute"
+      attribute: "GroupTable"
+      arguments:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [Groups.Endpoint],
+                      GroupName: "",
+                  },
+              ]
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 8: TH reads MaxGroupsPerFabric attribute from GroupKeyManagement
+          cluster on DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0002
+      command: "readAttribute"
+      attribute: "MaxGroupsPerFabric"
+      fabricFiltered: true
+      response:
+          saveAs: MaxGroupsPerFabricValue
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    - label:
+          "Step 9: TH attempts to write MaxGroupsPerFabric attribute of
+          GroupKeyManagement cluster to the same value as read in step 8."
+      PICS: GRPKEY.S.A0002
+      command: "writeAttribute"
+      attribute: "MaxGroupsPerFabric"
+      arguments:
+          value: MaxGroupsPerFabricValue
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Step 10: TH reads MaxGroupKeysPerFabric attribute from
+          GroupKeyManagement cluster on DUT using a fabric-filtered read."
+      PICS: GRPKEY.S.A0003
+      command: "readAttribute"
+      attribute: "MaxGroupKeysPerFabric"
+      fabricFiltered: true
+      response:
+          saveAs: MaxGroupKeysPerFabricValue
+          constraints:
+              type: int16u
+              minValue: 1
+              maxValue: 65535
+
+    - label:
+          "Step 11: TH attempts to write MaxGroupKeysPerFabric attribute of
+          GroupKeyManagement cluster on DUT to the same value as read in step
+          10."
+      PICS: GRPKEY.S.A0003
+      command: "writeAttribute"
+      attribute: "MaxGroupKeysPerFabric"
+      arguments:
+          value: MaxGroupKeysPerFabricValue
+      response:
+          error: UNSUPPORTED_WRITE

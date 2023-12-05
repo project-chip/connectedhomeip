@@ -16,9 +16,6 @@
  */
 #pragma once
 
-// The "sl_token_manager.h" include belongs to the .cpp file, but the formatter change the order
-// of the headers, causing a compilation error, so the include had to be added here instead
-#include "sl_token_manager.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 
 namespace chip {

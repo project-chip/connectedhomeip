@@ -253,6 +253,18 @@ config("strict_warnings") {
     cflags += [ "-Wconversion" ]
   }
 
+  # For now we can't enable -Wundef across the board.  Enable it where
+  # we can.  Ideally this would be checking chip_device_platform or so
+  # to be more fine-grained than current_os, but it's not clear that
+  # we can access that here.
+  if (current_os != "freertos" && current_os != "mbed" &&
+      # cmsis-rtos is OpenIOT
+      current_os != "cmsis-rtos" &&
+      # cyw30739 is one of the Infineon builds
+      current_os != "cyw30739") {
+    cflags += [ "-Wundef" ]
+  }
+
   if (matter_enable_java_compilation) {
     cflags -= [ "-Wshadow" ]
   }
@@ -485,8 +497,12 @@ config("coverage_default") {
 }
 
 declare_args() {
-  # Enable Runtime Type Information (RTTI)
+  # Enable or disable Runtime Type Information (RTTI).
+  # Defaults true on darwin because Darwin.framework uses it.
   enable_rtti = current_os == "mac" || current_os == "ios"
+
+  # Enable or disable support for C++ exceptions.
+  enable_exceptions = false
 }
 
 config("no_rtti") {
@@ -514,7 +530,11 @@ config("exceptions") {
 }
 
 config("exceptions_default") {
-  configs = [ ":no_exceptions" ]
+  if (enable_exceptions) {
+    configs = [ ":exceptions" ]
+  } else {
+    configs = [ ":no_exceptions" ]
+  }
 }
 
 config("unwind_tables") {

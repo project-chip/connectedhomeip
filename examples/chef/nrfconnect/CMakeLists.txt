@@ -20,25 +20,16 @@ get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconne
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
-include(${CHEF}/project_include.cmake)
 
 get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 set(CONF_FILE prj.conf)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_DEVICE_VENDOR_ID}")
-set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_DEVICE_PRODUCT_ID}")
-if(NOT ${CONFIG_DEVICE_PRODUCT_NAME} STREQUAL "")
-    set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\"${CONFIG_DEVICE_PRODUCT_NAME}\"")
-endif()
-if(NOT ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING} STREQUAL "")
-  set(CHIP_CFLAGS "${CHIP_CFLAGS} -DCHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING}\"")
-endif()
-message(STATUS "Vendor ID " ${CONFIG_DEVICE_VENDOR_ID})
-message(STATUS "Product ID " ${CONFIG_DEVICE_PRODUCT_ID})
-message(STATUS "Product Name " ${CONFIG_DEVICE_PRODUCT_NAME})
-message(STATUS "SW Version String" ${CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING})
+message(STATUS "Vendor ID " ${CONFIG_CHIP_DEVICE_VENDOR_ID})
+message(STATUS "Product ID " ${CONFIG_CHIP_DEVICE_PRODUCT_ID})
+message(STATUS "Product Name " ${CONFIG_CHIP_DEVICE_PRODUCT_NAME})
+message(STATUS "SW Version String" ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING})
 
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
 set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
@@ -92,6 +83,10 @@ target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/common/chef-channel-manager.cpp
+    ${CHEF}/common/chef-air-quality.cpp
+    ${CHEF}/common/chef-concentration-measurement.cpp
+    ${CHEF}/common/chef-rvc-mode-delegate.cpp
+    ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
@@ -103,11 +98,7 @@ chip_configure_data_model(app
 include(${CHIP_ROOT}/config/nrfconnect/app/flashing.cmake)
 
 
-if (CONFIG_ENABLE_PW_RPC)
-
-target_compile_options(app PRIVATE
-                       "-DCONFIG_ENABLE_PW_RPC=1"
-)
+if (CONFIG_CHIP_PW_RPC)
 
 # Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags
 link_libraries($<BUILD_INTERFACE:zephyr_interface>)
@@ -227,4 +218,4 @@ target_link_libraries(app PRIVATE
   pw_sys_io
 )
 
-endif(CONFIG_ENABLE_PW_RPC)
+endif(CONFIG_CHIP_PW_RPC)

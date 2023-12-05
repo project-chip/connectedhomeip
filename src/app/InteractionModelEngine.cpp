@@ -29,9 +29,11 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
+#include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
+#include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
@@ -41,13 +43,13 @@ namespace app {
 
 using Protocols::InteractionModel::Status;
 
-InteractionModelEngine sInteractionModelEngine;
+Global<InteractionModelEngine> sInteractionModelEngine;
 
 InteractionModelEngine::InteractionModelEngine() {}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
-    return &sInteractionModelEngine;
+    return &sInteractionModelEngine.get();
 }
 
 CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, FabricTable * apFabricTable,
@@ -316,6 +318,43 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+{
+    bool isActive = false;
+    mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            return Loop::Continue;
+        }
+
+        Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
+        if (subject.fabricIndex != aFabricIndex)
+        {
+            return Loop::Continue;
+        }
+
+        if (subject.authMode == Access::AuthMode::kCase)
+        {
+            if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
+            {
+                isActive = handler->IsActiveSubscription();
+
+                // Exit loop only if isActive is set to true
+                // Otherwise keep looking for another subscription that could
+                // match the subject
+                if (isActive)
+                {
+                    return Loop::Break;
+                }
+            }
+        }
+
+        return Loop::Continue;
+    });
+
+    return isActive;
+}
+
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
     mCommandHandlerObjs.ReleaseObject(&apCommandObj);
@@ -335,10 +374,10 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
-        mSubscriptionResumptionScheduled    = true;
-        auto timeTillNextResubscriptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
-        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds32(timeTillNextResubscriptionSecs),
-                                                                      ResumeSubscriptionsTimerCallback, this);
+        mSubscriptionResumptionScheduled            = true;
+        auto timeTillNextSubscriptionResumptionSecs = ComputeTimeSecondsTillNextSubscriptionResumption();
+        mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
     }
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -452,7 +491,7 @@ static bool HasValidEventPathForEndpointAndCluster(EndpointId aEndpoint, const E
     if (aEventPath.HasWildcardEventId())
     {
 #if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
-        for (decltype(aCluster->eventCount) idx = 0; idx > aCluster->eventCount; ++idx)
+        for (decltype(aCluster->eventCount) idx = 0; idx < aCluster->eventCount; ++idx)
         {
             ConcreteEventPath path(aEndpoint, aCluster->clusterId, aCluster->eventList[idx]);
             // If we get here, the path exists.  We just have to do an ACL check for it.
@@ -641,7 +680,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
                 err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasValidAttributePath,
-                                          requestedAttributePathCount);
+                                                             requestedAttributePathCount);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;

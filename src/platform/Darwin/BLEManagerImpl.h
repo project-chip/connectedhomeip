@@ -23,6 +23,9 @@
 
 #pragma once
 
+#include <lib/core/Global.h>
+#include <lib/support/CodeUtils.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 namespace chip {
@@ -68,7 +71,7 @@ private:
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
 
-    static BLEManagerImpl sInstance;
+    static Global<BLEManagerImpl> sInstance;
 
     BleConnectionDelegate * mConnectionDelegate   = nullptr;
     BlePlatformDelegate * mPlatformDelegate       = nullptr;
@@ -83,7 +86,7 @@ private:
  */
 inline BLEManager & BLEMgr(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 /**
@@ -94,7 +97,7 @@ inline BLEManager & BLEMgr(void)
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {
-    return BLEManagerImpl::sInstance;
+    return BLEManagerImpl::sInstance.get();
 }
 
 } // namespace Internal

@@ -33,7 +33,7 @@ config:
         defaultValue: "hex:17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
 
 tests:
-    - label: "Step 1: TH commissions DUT using admin node ID N1"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -50,17 +50,17 @@ tests:
                 saveAs: CommissionerNodeId
 
     - label:
-          "Step 2: TH reads DUT Endpoint 0 OperationalCredentials cluster
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     #Issue: https://github.com/project-chip/connectedhomeip/issues/24081
     - label:
-          "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       verification: |
           ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
@@ -87,21 +87,22 @@ tests:
                 value: "y"
 
     - label:
-          "Step 4: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_OK_EMPTY"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "Step 5: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"
       event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
       response:
           value:
               {
@@ -109,113 +110,93 @@ tests:
                   AdminPasscodeID: null,
                   ChangeType: 1,
                   LatestValue:
-                      { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex },
-                  FabricIndex: CurrentFabricIndex,
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
               }
 
     - label:
-          "Step 6: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue }]
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 7: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      verification: |
-          ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH1(Chiptool) , Verify  AccessControlExtensionChanged containing at least 2 new elements.
-
-          [1661427357.681328][23441:23446] CHIP:TOO:    }
-          [1661427357.681520][23441:23446] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
-          [1661427357.681555][23441:23446] CHIP:TOO:   Event number: 5
-          [1661427357.681580][23441:23446] CHIP:TOO:   Priority: Info
-          [1661427357.681602][23441:23446] CHIP:TOO:   Timestamp: 95095658
-          [1661427357.681660][23441:23446] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1661427357.681697][23441:23446] CHIP:TOO:     AdminNodeID: 112233
-          [1661427357.681730][23441:23446] CHIP:TOO:     AdminPasscodeID: null
-          [1661427357.681764][23441:23446] CHIP:TOO:     ChangeType: 2
-          [1661427357.681793][23441:23446] CHIP:TOO:     LatestValue: {
-          [1661427357.681826][23441:23446] CHIP:TOO:       Data: 1718
-          [1661427357.681854][23441:23446] CHIP:TOO:       FabricIndex: 1
-          [1661427357.681882][23441:23446] CHIP:TOO:      }
-          [1661427357.681924][23441:23446] CHIP:TOO:     FabricIndex: 1
-          [1661427357.681951][23441:23446] CHIP:TOO:    }
-          [1661427357.682163][23441:23446] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001F Event 0x0000_0001
-          [1661427357.682207][23441:23446] CHIP:TOO:   Event number: 6
-          [1661427357.682230][23441:23446] CHIP:TOO:   Priority: Info
-          [1661427357.682260][23441:23446] CHIP:TOO:   Timestamp: 95095659
-          [1661427357.682327][23441:23446] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1661427357.682375][23441:23446] CHIP:TOO:     AdminNodeID: 112233
-          [1661427357.682405][23441:23446] CHIP:TOO:     AdminPasscodeID: null
-          [1661427357.682434][23441:23446] CHIP:TOO:     ChangeType: 1
-          [1661427357.682459][23441:23446] CHIP:TOO:     LatestValue: {
-          [1661427357.682495][23441:23446] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
-          [1661427357.682524][23441:23446] CHIP:TOO:       FabricIndex: 1
-          [1661427357.682550][23441:23446] CHIP:TOO:      }
-          [1661427357.682579][23441:23446] CHIP:TOO:     FabricIndex: 1
-          [1661427357.682603][23441:23446] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 2,
+                          LatestValue:
+                              {
+                                  Data: D_OK_EMPTY,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
+          - values:
+                - value:
+                      {
+                          AdminNodeID: CommissionerNodeId,
+                          AdminPasscodeID: null,
+                          ChangeType: 1,
+                          LatestValue:
+                              {
+                                  Data: D_OK_SINGLE,
+                                  FabricIndex: CurrentFabricIndexValue,
+                              },
+                          FabricIndex: CurrentFabricIndexValue,
+                      }
 
     - label:
-          "Step 8: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 8: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 1
           element struct Data field: D_BAD_LENGTH"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_LENGTH, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_LENGTH, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 9: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      verification: |
-          ./chip-tool accesscontrol read-event  access-control-extension-changed 1 0
-
-          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged containing at least 1 new element, and MUST NOT contain an added event for the extension with data that is too large
-
-          [1661427763.925039][23523:23528] CHIP:TOO:   Event number: 7
-          [1661427763.925054][23523:23528] CHIP:TOO:   Priority: Info
-          [1661427763.925067][23523:23528] CHIP:TOO:   Timestamp: 95411825
-          [1661427763.925095][23523:23528] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1661427763.925112][23523:23528] CHIP:TOO:     AdminNodeID: 112233
-          [1661427763.925127][23523:23528] CHIP:TOO:     AdminPasscodeID: null
-          [1661427763.925142][23523:23528] CHIP:TOO:     ChangeType: 2
-          [1661427763.925156][23523:23528] CHIP:TOO:     LatestValue: {
-          [1661427763.925174][23523:23528] CHIP:TOO:       Data: 17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018
-          [1661427763.925191][23523:23528] CHIP:TOO:       FabricIndex: 1
-          [1661427763.925205][23523:23528] CHIP:TOO:      }
-          [1661427763.925220][23523:23528] CHIP:TOO:     FabricIndex: 1
-          [1661427763.925234][23523:23528] CHIP:TOO:    }
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 2,
+                  LatestValue:
+                      {
+                          Data: D_OK_SINGLE,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
 
     - label:
-          "Step 10: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is list of AccessControlExtensionStruct containing 2
           elements struct Data field: D_OK_EMPTY struct Data field: D_OK_SINGLE"
       PICS: ACL.S.A0001
@@ -224,47 +205,35 @@ tests:
       arguments:
           value:
               [
-                  { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex },
-                  { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex },
+                  { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue },
+                  { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue },
               ]
       response:
           error: CONSTRAINT_ERROR
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 11: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 11: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      verification: |
-          ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-          On TH1(Chiptool) , Verify AccessControl cluster AccessControlExtensionChanged event
-          containing at least 1 new element, and MUST NOT contain an added event for the second extension
-          [[1661428163.049647][23604:23609] CHIP:TOO:   Event number: 8
-          [1661428163.049660][23604:23609] CHIP:TOO:   Priority: Info
-          [1661428163.049673][23604:23609] CHIP:TOO:   Timestamp: 95827304
-          [1661428163.049698][23604:23609] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1661428163.049714][23604:23609] CHIP:TOO:     AdminNodeID: 112233
-          [1661428163.049729][23604:23609] CHIP:TOO:     AdminPasscodeID: null
-          [1661428163.049744][23604:23609] CHIP:TOO:     ChangeType: 1
-          [1661428163.049758][23604:23609] CHIP:TOO:     LatestValue: {
-          [1661428163.049774][23604:23609] CHIP:TOO:       Data: 1718
-          [1661428163.049789][23604:23609] CHIP:TOO:       FabricIndex: 1
-          [1661428163.049803][23604:23609] CHIP:TOO:      }
-          [1661428163.049817][23604:23609] CHIP:TOO:     FabricIndex: 1
-          [1661428163.049831][23604:23609] CHIP:TOO:    }
-          [1661428163.050010][23604:23609] CHIP:EM: Sending Standalone Ack for MessageCounter:70117030 on exchange 55174i
-          [1661428163.050065][23604:23609] CHIP:IN: Prepared secure message 0x7f2e7d092ff0 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 55174i
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }
 
     - label:
-          "Step 12: TH writes DUT Endpoint 0 AccessControl cluster Extension
+          "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
           attribute, value is an empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
@@ -272,36 +241,23 @@ tests:
       arguments:
           value: []
 
-    #Issue: https://github.com/project-chip/connectedhomeip/issues/24149
     - label:
-          "Step 13: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 13: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
-      verification: |
-          ./chip-tool   accesscontrol  read-event  access-control-extension-changed 1 0
-
-          On TH1(Chiptool) , Verify  AccessControl cluster AccessControlExtensionChanged event containing at least 1 new element
-
-          [1661428343.982081][23629:23634] CHIP:TOO:   Event number: 9
-          [1661428343.982087][23629:23634] CHIP:TOO:   Priority: Info
-          [1661428343.982092][23629:23634] CHIP:TOO:   Timestamp: 96078599
-          [1661428343.982103][23629:23634] CHIP:TOO:   AccessControlExtensionChanged: {
-          [1661428343.982109][23629:23634] CHIP:TOO:     AdminNodeID: 112233
-          [1661428343.982115][23629:23634] CHIP:TOO:     AdminPasscodeID: null
-          [1661428343.982121][23629:23634] CHIP:TOO:     ChangeType: 2
-          [1661428343.982127][23629:23634] CHIP:TOO:     LatestValue: {
-          [1661428343.982133][23629:23634] CHIP:TOO:       Data: 1718
-          [1661428343.982139][23629:23634] CHIP:TOO:       FabricIndex: 1
-          [1661428343.982145][23629:23634] CHIP:TOO:      }
-          [1661428343.982151][23629:23634] CHIP:TOO:     FabricIndex: 1
-          [1661428343.982157][23629:23634] CHIP:TOO:    }
-          [1661428343.982246][23629:23634] CHIP:EM: Sending Standalone Ack for MessageCounter:13864065 on exchange 38943i
-          [1661428343.982272][23629:23634] CHIP:IN: Prepared secure message 0x7ff9a8e43ff0 to 0x0000000000000001 (1)  of type 0x10 and
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && ACL.S.E01
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: ACL.S.E01
+      command: "readEvent"
+      event: "AccessControlExtensionChanged"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value:
+              {
+                  AdminNodeID: CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 2,
+                  LatestValue:
+                      {
+                          Data: D_OK_EMPTY,
+                          FabricIndex: CurrentFabricIndexValue,
+                      },
+                  FabricIndex: CurrentFabricIndexValue,
+              }

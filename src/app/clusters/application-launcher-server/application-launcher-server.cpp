@@ -31,13 +31,14 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-#include <app/data-model/Encode.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -257,7 +258,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not found");
                 LauncherResponseType response;
-                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -292,7 +293,7 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
         {
             ChipLogError(Zcl, "ApplicationLauncher target app not found");
             LauncherResponseType response;
-            response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
+            response.status = StatusEnum::kAppNotAvailable;
             responder.Success(response);
             return true;
         }
@@ -351,7 +352,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }
@@ -440,7 +441,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
             {
                 ChipLogError(Zcl, "ApplicationLauncher target app not loaded");
                 LauncherResponseType response;
-                response.status = ApplicationLauncherStatusEnum::kAppNotAvailable;
+                response.status = StatusEnum::kAppNotAvailable;
                 responder.Success(response);
                 return true;
             }

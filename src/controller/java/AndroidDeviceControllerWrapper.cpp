@@ -206,6 +206,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         *errInfoOnFailure = err;
         return nullptr;
     }
+    chip::Credentials::SetGroupDataProvider(&wrapper->mGroupDataProvider);
     initParams.groupDataProvider = &wrapper->mGroupDataProvider;
 
     err = wrapper->mOpCertStore.Init(wrapperStorage);
@@ -367,6 +368,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     return wrapper.release();
 }
 
+void AndroidDeviceControllerWrapper::Shutdown()
+{
+    mController->Shutdown();
+    DeviceControllerFactory::GetInstance().Shutdown();
+}
+
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
                                                                    jobject networkCredentials)
 {
@@ -403,8 +410,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
         passwordStr = static_cast<jstring>(env->NewGlobalRef(env->CallObjectMethod(wifiCredentialsJava, getPassword)));
         VerifyOrReturnError(ssidStr != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
-        ssid                 = env->GetStringUTFChars(ssidStr, 0);
-        password             = env->GetStringUTFChars(passwordStr, 0);
+        ssid                 = env->GetStringUTFChars(ssidStr, nullptr);
+        password             = env->GetStringUTFChars(passwordStr, nullptr);
         jsize ssidLength     = env->GetStringUTFLength(ssidStr);
         jsize passwordLength = env->GetStringUTFLength(passwordStr);
 
@@ -502,6 +509,53 @@ exit:
     return err;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::StartOTAProvider(jobject otaProviderDelegate)
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    OTAProviderDelegateBridge * otaProviderBridge = new OTAProviderDelegateBridge();
+    auto systemState                              = DeviceControllerFactory::GetInstance().GetSystemState();
+
+    VerifyOrExit(otaProviderBridge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = otaProviderBridge->Init(systemState->SystemLayer(), systemState->ExchangeMgr(), otaProviderDelegate);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(Controller, "OTA Provider Initialize Error : %" CHIP_ERROR_FORMAT, err.Format()));
+
+    mOtaProviderBridge = otaProviderBridge;
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        if (otaProviderBridge != nullptr)
+        {
+            delete otaProviderBridge;
+            otaProviderBridge = nullptr;
+        }
+    }
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::FinishOTAProvider()
+{
+#if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
+    if (mOtaProviderBridge != nullptr)
+    {
+        mOtaProviderBridge->Shutdown();
+        delete mOtaProviderBridge;
+
+        mOtaProviderBridge = nullptr;
+    }
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -535,11 +589,13 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
     {
         env->ReleaseStringUTFChars(ssidStr, ssid);
         env->DeleteGlobalRef(ssidStr);
+        ssidStr = nullptr;
     }
     if (passwordStr != nullptr)
     {
         env->ReleaseStringUTFChars(passwordStr, password);
         env->DeleteGlobalRef(passwordStr);
+        passwordStr = nullptr;
     }
     if (operationalDatasetBytes != nullptr)
     {
@@ -554,6 +610,8 @@ void AndroidDeviceControllerWrapper::OnCommissioningStatusUpdate(PeerId peerId, 
 {
     chip::DeviceLayer::StackUnlock unlock;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
     jmethodID onCommissioningStatusUpdateMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningStatusUpdate",
                                                              "(JLjava/lang/String;I)V", &onCommissioningStatusUpdateMethod);
@@ -598,8 +656,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
     jint jniNetworkingStatus                  = static_cast<jint>(dataResponse.networkingStatus);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), jniNetworkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(NetworkingStatusClassName, NetworkingStatusCtorSignature,
+                                                               jniNetworkingStatus, NetworkingStatus);
     jobject DebugText;
     if (!dataResponse.debugText.HasValue())
     {
@@ -631,9 +689,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
             jint jniNewElementSecurity                   = static_cast<jint>(entry.security.Raw());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_securityClassName.c_str(),
-                                                                       newElement_securityCtorSignature.c_str(),
-                                                                       jniNewElementSecurity, newElement_security);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                newElement_securityClassName, newElement_securityCtorSignature, jniNewElementSecurity, newElement_security);
             jobject newElement_ssid;
             jbyteArray newElement_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry.ssid.size()));
             env->SetByteArrayRegion(newElement_ssidByteArray, 0, static_cast<jsize>(entry.ssid.size()),

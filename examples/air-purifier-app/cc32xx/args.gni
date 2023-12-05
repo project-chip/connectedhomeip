@@ -1,0 +1,44 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
+import("${chip_root}/examples/platform/cc32xx/args.gni")
+
+ti_simplelink_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+ti_simplelink_sysconfig_target =
+    get_label_info(":sysconfig", "label_no_toolchain")
+
+ti_simplelink_board = "CC3235SF_LAUNCHXL"
+
+# use -Os instead of -Og
+#is_debug = false
+
+# disable BLE for now
+chip_config_network_layer_ble = false
+chip_bypass_rendezvous = false
+
+#enable logging
+chip_progress_logging = true
+chip_detail_logging = true
+chip_automation_logging = true
+
+## Disable lock tracking, since our FreeRTOS configuration does not set
+# INCLUDE_xSemaphoreGetMutexHolder
+chip_stack_lock_tracking = "none"
+
+matter_device_vid = "0xFFF1"
+matter_device_pid = "0x8006"
+matter_software_ver = "0x0001"
+matter_software_ver_str = "1.0d1"

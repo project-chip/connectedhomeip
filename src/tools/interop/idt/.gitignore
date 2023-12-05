@@ -1,0 +1,10 @@
+*~
+.DS_Store
+.idea/
+IDT_ARTIFACTS/
+OUT/
+__pycache__/
+pycache/
+venv/
+.zip
+BUILD

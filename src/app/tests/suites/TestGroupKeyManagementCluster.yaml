@@ -1114,3 +1114,14 @@ tests:
       attribute: "GroupKeyMap"
       response:
           value: []
+
+    - label: "TH tries to remove a non-existent key"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x0111
+      response:
+          error: NOT_FOUND

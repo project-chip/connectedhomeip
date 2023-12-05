@@ -123,7 +123,7 @@ DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(Determine
 
 bool DiagnosticDataProviderImpl::SupportsWatermarks()
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     return true;
 #else
     return false;
@@ -165,7 +165,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     Malloc::Stats stats;
     ReturnErrorOnFailure(Malloc::GetStats(stats));
 
@@ -178,7 +178,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     Malloc::ResetMaxStats();
     return CHIP_NO_ERROR;
 #else
@@ -258,19 +258,19 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kCellular;
                 break;
             }
         }

@@ -204,6 +204,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
+    // Note: Attribute ID 0x0009 was removed (#30002).
     default: {
         break;
     }
@@ -378,6 +379,15 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 
     // When HandleEventTrigger fails, we simply convert any error to INVALID_COMMAND
     commandObj->AddStatus(commandPath, (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success);
+    return true;
+}
+
+bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+                                                          Commands::TimeSnapshot::DecodableType const & commandData)
+{
+    // TODO(#30096): Command needs to be implemented.
+    ChipLogError(Zcl, "TimeSnapshot not yet supported!");
+    commandObj->AddStatus(commandPath, Status::InvalidCommand);
     return true;
 }
 

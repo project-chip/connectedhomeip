@@ -31,9 +31,9 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <transport/SessionManager.h>
 
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
+inline constexpr size_t kMaxTcpActiveConnectionCount = 4;
+inline constexpr size_t kMaxTcpPendingPackets        = 4;
+inline constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
 
 extern chip::FabricTable gFabricTable;
 extern chip::SessionManager gSessionManager;

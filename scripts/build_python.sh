@@ -68,7 +68,6 @@ Input Options:
                                                             src/python_testing scripts.
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
-  --include_yamltests                                       Whether to install the matter_yamltests wheel.
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
 }
@@ -129,9 +128,6 @@ while (($#)); do
             extra_packages=$2
             shift
             ;;
-        --include_yamltests)
-            include_yamltests="yes"
-            ;;
         --pregen_dir | -z)
             pregen_dir=$2
             shift
@@ -151,12 +147,29 @@ echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
+# This is to prevent python compiled for previous versions reporting 10.16 as a version
+# which breaks the ability to install python wheels.
+#
+# See https://eclecticlight.co/2020/08/13/macos-version-numbering-isnt-so-simple/ for
+# some explanation
+#
+# TLDR:
+#
+#   > import platform
+#   > print(platform.mac_ver()[0])
+#     11.7.3   // (example) if SYSTEM_VERSION_COMPAT is 0
+#     10.16    // SYSTEM_VERSION_COMPAT is unset or 1
+export SYSTEM_VERSION_COMPAT=0
+
 # Generates ninja files
 [[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
 [[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
 [[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
+# Make all possible human redable tracing available.
+tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
+
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
 
 function ninja_target() {
     # Print the ninja target required to build a gn label.
@@ -184,15 +197,6 @@ else
     WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 fi
 
-if [ -n "$include_yamltests" ]; then
-    YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
-
-    # Add wheels from pw_python_package or pw_python_distribution templates.
-    WHEEL+=(
-        "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
-    )
-fi
-
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
 fi
@@ -214,7 +218,14 @@ if [ -n "$install_virtual_env" ]; then
     "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
+        YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
+        # Add wheels from pw_python_package or pw_python_distribution templates.
+        YAMLTEST_WHEEL=(
+            "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
+        )
+
         echo_blue "Installing python test dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${YAMLTEST_WHEEL[@]}"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi

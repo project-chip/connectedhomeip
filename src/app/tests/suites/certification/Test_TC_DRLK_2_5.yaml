@@ -89,7 +89,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
       response:
-          saveAs: NumberOfWeekDaySchedulesSupportedPerUser
+          saveAs: NumberOfWeekDaySchedulesSupportedPerUserValue
           constraints:
               minValue: 0
               maxValue: 255
@@ -99,7 +99,7 @@ tests:
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
       response:
-          saveAs: NumberOfTotalUsersSupported
+          saveAs: NumberOfTotalUsersSupportedValue
           constraints:
               minValue: 0
               maxValue: 65534
@@ -212,7 +212,42 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Step 7: TH sends Clear Week Day Schedule Command to DUT"
+    - label:
+          "Step 7: TH sends Get Week Day Schedule Command to DUT for
+          non-existent User"
+      PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
+      command: "GetWeekDaySchedule"
+      arguments:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+      response:
+          values:
+              - name: "WeekDayIndex"
+                value: 1
+              - name: "UserIndex"
+                value: 2
+              - name: "Status"
+                value: 0x8B
+              - name: "DaysMask"
+                constraints:
+                    hasValue: false
+              - name: "StartHour"
+                constraints:
+                    hasValue: false
+              - name: "StartMinute"
+                constraints:
+                    hasValue: false
+              - name: "EndHour"
+                constraints:
+                    hasValue: false
+              - name: "EndMinute"
+                constraints:
+                    hasValue: false
+
+    - label: "Step 8: TH sends Clear Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
@@ -222,7 +257,7 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "Step 8: TH sends Get Week Day Schedule Command to DUT"
+    - label: "Step 9: TH sends Get Week Day Schedule Command to DUT"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:

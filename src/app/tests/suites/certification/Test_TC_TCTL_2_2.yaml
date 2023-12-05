@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     178.2.2. [TC-TCTL-2.2] Optional Temperature number attributes with DUT as
@@ -23,54 +22,43 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Temperature Control"
+    endpoint: 1
 
 tests:
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
-
-    - label: "Step 2: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000
-      verification: |
-          ./chip-tool temperaturecontrol read temperature-setpoint 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperature with value between MinTemperature and TCTL.S.A0002(MaxTemperature) inclusive.
-
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   TemperatureSetpoint : 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
-
-    - label: "Step 3: TH reads from the DUT the MinTemperature attribute"
+    - label: "Step 2: TH reads from the DUT the MinTemperature attribute"
       PICS: TCTL.S.A0001
-      verification: |
-          ./chip-tool temperaturecontrol read min-temperature 1 1
-          on TH(chip-tool), Verify that the DUT response contains a temperature with value less than TCTL.S.A0002(MaxTemperature).
+      command: "readAttribute"
+      attribute: "MinTemperature"
+      response:
+          saveAs: MinTemperatureValue
+          constraints:
+              type: temperature
 
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0001 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   MinTemperature: 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
-
-    - label: "Step 4: TH reads from the DUT the MaxTemperature attribute"
+    - label: "Step 3: TH reads from the DUT the MaxTemperature attribute"
       PICS: TCTL.S.A0002
-      verification: |
-          ./chip-tool temperaturecontrol read max-temperature 1 1
+      command: "readAttribute"
+      attribute: "MaxTemperature"
+      response:
+          saveAs: MaxTemperatureValue
+          constraints:
+              type: temperature
+              minValue: MinTemperatureValue
 
-          On TH(chip-tool), Verify that the DUT response contains a temperature with value greater than TCTL.S.A0001(MinTemperature).
-
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0002 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   MaxTemperature: 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+    - label: "Step 4: TH reads from the DUT the TemperatureSetpoint attribute"
+      PICS: TCTL.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          saveAs: temperatureValue
+          constraints:
+              minValue: MinTemperatureValue
+              maxValue: MaxTemperatureValue

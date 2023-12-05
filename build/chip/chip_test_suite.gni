@@ -85,7 +85,7 @@ template("chip_test_suite") {
   } else {
     _target_type = "source_set"
   }
-  target(_target_type, "${_suite_name}_lib") {
+  target(_target_type, "${_suite_name}.lib") {
     forward_variables_from(invoker, "*", [ "tests" ])
 
     output_dir = "${root_out_dir}/lib"
@@ -99,7 +99,104 @@ template("chip_test_suite") {
       public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
     }
   }
+  if (chip_link_tests) {
+    tests = []
 
+    if (defined(invoker.test_sources)) {
+      foreach(_test, invoker.test_sources) {
+        _test_name = string_replace(_test, ".cpp", "")
+
+        pw_test(_test_name) {
+          forward_variables_from(invoker,
+                                 [
+                                   "deps",
+                                   "public_deps",
+                                   "cflags",
+                                   "configs",
+                                 ])
+          public_deps += [ ":${_suite_name}.lib" ]
+          sources = [ _test ]
+        }
+        tests += [ _test_name ]
+      }
+    }
+
+    if (defined(invoker.tests)) {
+      foreach(_test, invoker.tests) {
+        pw_test(_test) {
+          forward_variables_from(invoker,
+                                 [
+                                   "deps",
+                                   "public_deps",
+                                   "cflags",
+                                   "configs",
+                                 ])
+          public_deps += [ ":${_suite_name}.lib" ]
+          test_main = ""
+          sources = [
+            "${_test}.cpp",
+            "${_test}Driver.cpp",
+          ]
+        }
+        tests += [ _test ]
+      }
+    }
+
+    group(_suite_name) {
+      deps = []
+      foreach(_test, tests) {
+        deps += [ ":${_test}" ]
+      }
+    }
+
+    if (chip_pw_run_tests) {
+      group("${_suite_name}_run") {
+        deps = []
+        foreach(_test, tests) {
+          deps += [ ":${_test}.run" ]
+        }
+      }
+    }
+  } else {
+    group(_suite_name) {
+      deps = [ ":${_suite_name}.lib" ]
+    }
+  }
+}
+
+# TODO: remove this once transition away from nlunit-test is completed
+template("chip_test_suite_using_nltest") {
+  _suite_name = target_name
+
+  # Ensures that the common library has sources containing both common
+  # and individual unit tests.
+  if (!defined(invoker.sources)) {
+    invoker.sources = []
+  }
+
+  if (defined(invoker.test_sources)) {
+    invoker.sources += invoker.test_sources
+  }
+
+  if (chip_build_test_static_libraries) {
+    _target_type = "static_library"
+  } else {
+    _target_type = "source_set"
+  }
+  target(_target_type, "${_suite_name}.lib") {
+    forward_variables_from(invoker, "*", [ "tests" ])
+
+    output_dir = "${root_out_dir}/lib"
+
+    if (!defined(invoker.public_deps)) {
+      public_deps = []
+    }
+
+    if (current_os != "zephyr" && current_os != "mbed") {
+      # Depend on stdio logging, and have it take precedence over the default platform backend
+      public_deps += [ "${chip_root}/src/platform/logging:force_stdio" ]
+    }
+  }
   if (chip_link_tests) {
     tests = []
 
@@ -123,11 +220,10 @@ template("chip_test_suite") {
         chip_test(_test_name) {
           sources = [ _driver_name ]
           public_deps = [
-            ":${_suite_name}_lib",
+            ":${_suite_name}.lib",
             ":${_test_name}_generate_driver",
           ]
         }
-
         tests += [ _test_name ]
       }
     }
@@ -137,9 +233,8 @@ template("chip_test_suite") {
         chip_test(_test) {
           sources = [ "${_test}Driver.cpp" ]
 
-          public_deps = [ ":${_suite_name}_lib" ]
+          public_deps = [ ":${_suite_name}.lib" ]
         }
-
         tests += [ _test ]
       }
     }
@@ -151,15 +246,17 @@ template("chip_test_suite") {
       }
     }
 
-    group("${_suite_name}_run") {
-      deps = []
-      foreach(_test, tests) {
-        deps += [ ":${_test}_run" ]
+    if (chip_pw_run_tests) {
+      group("${_suite_name}_run") {
+        deps = []
+        foreach(_test, tests) {
+          deps += [ ":${_test}.run" ]
+        }
       }
     }
   } else {
     group(_suite_name) {
-      deps = [ ":${_suite_name}_lib" ]
+      deps = [ ":${_suite_name}.lib" ]
     }
   }
 }

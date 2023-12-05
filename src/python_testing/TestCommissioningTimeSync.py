@@ -26,6 +26,7 @@ from mobly import asserts
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
+kCheckForMatchingFabric = 3
 kConfigureUTCTime = 6
 kConfigureTimeZone = 7
 kConfigureDSTOffset = 8
@@ -88,7 +89,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
 
     async def create_commissioner(self):
         if self.commissioner:
-            self.destroy_current_commissioner()
+            await self.destroy_current_commissioner()
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
         self.commissioner = new_fabric_admin.NewController(nodeId=112233, useTestCommissioner=True)
@@ -207,6 +208,78 @@ class TestCommissioningTimeSync(MatterBaseTest):
         asserts.assert_false(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP), 'kConfigureDefaultNTP incorrectly set')
         asserts.assert_false(self.commissioner.CheckStageSuccessful(
             kConfigureTrustedTimeSource), 'kConfigureTrustedTimeSource incorrectly set')
+
+    @async_test_body
+    async def test_FabricCheckStage(self):
+        await self.create_commissioner()
+
+        # This was moved into a different stage when the time sync stuff was added
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result is already set")
+        self.commissioner.SetCheckMatchingFabric(True)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(
+            kCheckForMatchingFabric), "Did not run check for matching fabric stage")
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), 0, "Fabric check result did not get set by pairing delegate")
+
+        # Let's try it again with no check
+        await self.create_commissioner()
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result is already set")
+        self.commissioner.SetCheckMatchingFabric(False)
+        await self.commission_and_base_checks()
+        asserts.assert_false(self.commissioner.CheckStageSuccessful(
+            kCheckForMatchingFabric), "Incorrectly ran check for matching fabric stage")
+        asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result incorrectly set")
+
+    @async_test_body
+    async def test_TimeZoneName(self):
+        await self.create_commissioner()
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name="test")
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name="test")]
+        asserts.assert_equal(received, expected, "Time zone was not correctly set by commissioner")
+
+        await self.create_commissioner()
+        # name is max 64 per the spec
+        sixty_five_byte_string = "x" * 65
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name=sixty_five_byte_string)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name=None)]
+        asserts.assert_equal(received, expected, "Commissioner did not ignore too-long name")
+
+        await self.create_commissioner()
+        # name is max 64 per the spec
+        sixty_four_byte_string = "x" * 64
+        self.commissioner.SetTimeZone(offset=3600, validAt=0, name=sixty_four_byte_string)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureTimeZone), 'Time zone was not successfully set')
+
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.TimeZone)
+        expected = [Clusters.TimeSynchronization.Structs.TimeZoneStruct(offset=3600, validAt=0, name=sixty_four_byte_string)]
+        asserts.assert_equal(received, expected, "Time zone 64 byte name was not correctly set")
+
+    @async_test_body
+    async def test_DefaultNtpSize(self):
+        await self.create_commissioner()
+        too_long_name = "x." + "x" * 127
+        self.commissioner.SetDefaultNTP(too_long_name)
+        await self.commission_and_base_checks()
+        asserts.assert_false(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP),
+                             'Commissioner attempted to set default NTP to a too long value')
+
+        await self.create_commissioner()
+        just_fits_name = "x." + "x" * 126
+        self.commissioner.SetDefaultNTP(just_fits_name)
+        await self.commission_and_base_checks()
+        asserts.assert_true(self.commissioner.CheckStageSuccessful(kConfigureDefaultNTP),
+                            'Commissioner did not correctly set default NTP')
+        received = await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.DefaultNTP)
+        asserts.assert_equal(received, just_fits_name, 'Commissioner incorrectly set default NTP name')
 
 
 # TODO(cecille): Test - Add hooks to change the time zone response to indicate no DST is needed

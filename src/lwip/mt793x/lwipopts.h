@@ -176,7 +176,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define PBUF_POOL_SIZE 10
 
 /* PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. */
-//#define PBUF_POOL_BUFSIZE       1536
+// #define PBUF_POOL_BUFSIZE       1536
 /* packet of MT7687 IOT has extra TXD header and packet offset */
 #define PBUF_POOL_BUFSIZE 1664
 

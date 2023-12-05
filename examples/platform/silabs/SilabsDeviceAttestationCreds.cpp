@@ -15,10 +15,12 @@
  *    limitations under the License.
  */
 #include "SilabsDeviceAttestationCreds.h"
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <psa/crypto.h>
 
@@ -27,9 +29,6 @@
 using namespace chip::DeviceLayer::Internal;
 
 using chip::DeviceLayer::Internal::SilabsConfig;
-
-extern uint8_t linker_nvm_end[];
-static uint8_t * _credentials_address = (uint8_t *) linker_nvm_end;
 
 namespace chip {
 namespace Credentials {
@@ -46,8 +45,17 @@ class DeviceAttestationCredsSilabs : public DeviceAttestationCredentialsProvider
 public:
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & out_span) override
     {
-        return GetFile("GetCertificationDeclaration", SilabsConfig::kConfigKey_Creds_CD_Offset, SILABS_CREDENTIALS_CD_OFFSET,
-                       SilabsConfig::kConfigKey_Creds_CD_Size, SILABS_CREDENTIALS_CD_SIZE, out_span);
+        if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_Base_Addr))
+        {
+            // Provisioned CD
+            return GetFile("GetCertificationDeclaration", SilabsConfig::kConfigKey_Creds_CD_Offset, SILABS_CREDENTIALS_CD_OFFSET,
+                           SilabsConfig::kConfigKey_Creds_CD_Size, SILABS_CREDENTIALS_CD_SIZE, out_span);
+        }
+        else
+        {
+            // Example CD
+            return Examples::GetExampleDACProvider()->GetCertificationDeclaration(out_span);
+        }
     }
 
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override
@@ -59,68 +67,87 @@ public:
 
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & out_span) override
     {
-        return GetFile("GetDeviceAttestationCert", SilabsConfig::kConfigKey_Creds_DAC_Offset, SILABS_CREDENTIALS_DAC_OFFSET,
-                       SilabsConfig::kConfigKey_Creds_DAC_Size, SILABS_CREDENTIALS_DAC_SIZE, out_span);
+        if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_Base_Addr))
+        {
+            // Provisioned DAC
+            return GetFile("GetDeviceAttestationCert", SilabsConfig::kConfigKey_Creds_DAC_Offset, SILABS_CREDENTIALS_DAC_OFFSET,
+                           SilabsConfig::kConfigKey_Creds_DAC_Size, SILABS_CREDENTIALS_DAC_SIZE, out_span);
+        }
+        else
+        {
+            // Example DAC
+            return Examples::GetExampleDACProvider()->GetDeviceAttestationCert(out_span);
+        }
     }
 
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & out_span) override
     {
-        return GetFile("GetProductAttestationIntermediateCert", SilabsConfig::kConfigKey_Creds_PAI_Offset,
-                       SILABS_CREDENTIALS_PAI_OFFSET, SilabsConfig::kConfigKey_Creds_PAI_Size, SILABS_CREDENTIALS_PAI_SIZE,
-                       out_span);
+        if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_Base_Addr))
+        {
+            // Provisioned PAI
+            return GetFile("GetProductAttestationIntermediateCert", SilabsConfig::kConfigKey_Creds_PAI_Offset,
+                           SILABS_CREDENTIALS_PAI_OFFSET, SilabsConfig::kConfigKey_Creds_PAI_Size, SILABS_CREDENTIALS_PAI_SIZE,
+                           out_span);
+        }
+        else
+        {
+            // Example PAI
+            return Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCert(out_span);
+        }
     }
 
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & message_to_sign, MutableByteSpan & out_span) override
     {
-        uint32_t key_id       = SILABS_CREDENTIALS_DAC_KEY_ID;
-        uint8_t signature[64] = { 0 };
-        size_t signature_size = sizeof(signature);
-
         if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_KeyId))
         {
+            // Provisioned DAC key
+#ifdef SIWX_917
+            return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
+            uint32_t key_id       = SILABS_CREDENTIALS_DAC_KEY_ID;
+            uint8_t signature[64] = { 0 };
+            size_t signature_size = sizeof(signature);
+
             ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_KeyId, key_id));
+
+            ChipLogProgress(DeviceLayer, "SignWithDeviceAttestationKey, key:%lu", key_id);
+
+            psa_status_t err =
+                psa_sign_message(static_cast<psa_key_id_t>(key_id), PSA_ALG_ECDSA(PSA_ALG_SHA_256), message_to_sign.data(),
+                                 message_to_sign.size(), signature, signature_size, &signature_size);
+            VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
+
+            return CopySpanToMutableSpan(ByteSpan(signature, signature_size), out_span);
+#endif
         }
-
-        ChipLogProgress(DeviceLayer, "SignWithDeviceAttestationKey, key:%lu", key_id);
-
-        psa_status_t err =
-            psa_sign_message(static_cast<psa_key_id_t>(key_id), PSA_ALG_ECDSA(PSA_ALG_SHA_256), message_to_sign.data(),
-                             message_to_sign.size(), signature, signature_size, &signature_size);
-        VerifyOrReturnError(!err, CHIP_ERROR_INTERNAL);
-
-        return CopySpanToMutableSpan(ByteSpan(signature, signature_size), out_span);
+        else
+        {
+            // Example DAC key
+            return Examples::GetExampleDACProvider()->SignWithDeviceAttestationKey(message_to_sign, out_span);
+        }
     }
 
 private:
     CHIP_ERROR GetFile(const char * description, uint32_t offset_key, uint32_t offset_default, uint32_t size_key,
                        uint32_t size_default, MutableByteSpan & out_span)
     {
-        uint8_t * address = nullptr;
-        uint32_t offset   = offset_default;
+        uint32_t base_addr = 0;
+        uint8_t * address  = nullptr;
+        uint32_t offset    = offset_default;
+        uint32_t size      = size_default;
+
+        ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr));
+        address = (uint8_t *) (base_addr + offset);
+
+        // Offset
         if (SilabsConfig::ConfigValueExists(offset_key))
         {
-            // NVM-provided offset
             ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(offset_key, offset));
         }
 
-        if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_Creds_Base_Addr))
-        {
-            // NVM-provided location
-            uint32_t base_addr = 0;
-            ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Creds_Base_Addr, base_addr));
-            address = (uint8_t *) (base_addr + offset);
-        }
-        else
-        {
-            // Default location
-            address = _credentials_address + offset;
-        }
-
         // Size
-        uint32_t size = size_default;
         if (SilabsConfig::ConfigValueExists(size_key))
         {
-            // NVM-provided size
             ReturnErrorOnFailure(SilabsConfig::ReadConfigValue(size_key, size));
         }
 

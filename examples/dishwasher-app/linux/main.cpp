@@ -15,24 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "operational-state-delegates.h"
+#include "operational-state-delegate-impl.h"
 #include <AppMain.h>
-
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit()
-{
-    MatterOperationalStateServerInit();
-}
+void ApplicationInit() {}
 
-void ApplicationShutdown() {}
+void ApplicationShutdown()
+{
+    OperationalState::Shutdown();
+}
 
 int main(int argc, char * argv[])
 {

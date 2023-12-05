@@ -581,7 +581,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_ENCRYPTION_TYPE                       CHIP_CORE_ERROR(0x11)
 
-// AVAILABLE: 0x12
+/**
+ *  @def CHIP_ERROR_INVALID_UTF8
+ *
+ *  @brief
+ *    Invalid UTF8 string (contains some characters that are invalid)
+ *
+ */
+#define CHIP_ERROR_INVALID_UTF8                                CHIP_CORE_ERROR(0x12)
 
 /**
  *  @def CHIP_ERROR_INTEGRITY_CHECK_FAILED
@@ -602,7 +609,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_SIGNATURE                           CHIP_CORE_ERROR(0x14)
 
-// AVAILABLE: 0x15
+/**
+ *  @def CHIP_ERROR_INVALID_TLV_CHAR_STRING
+ *
+ *  @brief
+ *    Invalid TLV character string (e.g. null terminator)
+ *
+ */
+#define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
+
 // AVAILABLE: 0x16
 
 /**
@@ -651,22 +666,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_WRONG_KEY_TYPE                              CHIP_CORE_ERROR(0x1b)
 
 /**
- *  @def CHIP_ERROR_WELL_UNINITIALIZED
+ *  @def CHIP_ERROR_UNINITIALIZED
  *
  *  @brief
  *    A requested object is uninitialized.
  *
  */
-#define CHIP_ERROR_WELL_UNINITIALIZED                          CHIP_CORE_ERROR(0x1c)
+#define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
-/**
- *  @def CHIP_ERROR_WELL_EMPTY
- *
- *  @brief
- *    A requested object is empty.
- *
- */
-#define CHIP_ERROR_WELL_EMPTY                                  CHIP_CORE_ERROR(0x1d)
+// AVAILABLE: 0x1d
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH
@@ -1449,7 +1457,15 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // AVAILABLE: 0xb1
 // AVAILABLE: 0xb2
-// AVAILABLE: 0xb3
+
+/**
+ *  @def CHIP_ERROR_DNS_SD_UNAUTHORIZED
+ *
+ *  @brief
+ *    The application is not authorized to do DNS_SD lookups.
+ *
+ */
+#define CHIP_ERROR_DNS_SD_UNAUTHORIZED                        CHIP_CORE_ERROR(0xb3)
 
 /**
  *  @def CHIP_ERROR_MDNS_COLLISION

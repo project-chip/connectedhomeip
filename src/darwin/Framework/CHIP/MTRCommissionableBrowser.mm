@@ -33,7 +33,7 @@ using namespace chip::DeviceLayer;
 using namespace chip::Ble;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-constexpr const char * kBleKey = "BLE";
+constexpr char kBleKey[] = "BLE";
 
 @implementation MTRCommissionableBrowserResultInterfaces
 @end

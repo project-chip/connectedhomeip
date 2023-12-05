@@ -30,7 +30,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 // #include <support/CHIPMem.h>
-// #include <support/ErrorStr.h>
+// #include <core/ErrorStr.h>
 
 // #include <examples/platform/linux/AppMain.h>
 

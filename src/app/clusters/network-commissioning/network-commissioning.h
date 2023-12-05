@@ -112,34 +112,18 @@ private:
     // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
     void HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
+    void HandleAddOrUpdateWiFiNetworkWithPDC(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
     void HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req);
     void HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req);
     void HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req);
     void HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req);
+    void HandleNonConcurrentConnectNetwork(void);
+    void HandleQueryIdentity(HandlerContext & ctx, const Commands::QueryIdentity::DecodableType & req);
 
 public:
-    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kWiFiNetworkInterface),
-        mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
-    {
-        mpDriver.Set<DeviceLayer::NetworkCommissioning::WiFiDriver *>(apDelegate);
-    }
-
-    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kThreadNetworkInterface),
-        mpWirelessDriver(apDelegate), mpBaseDriver(apDelegate)
-    {
-        mpDriver.Set<DeviceLayer::NetworkCommissioning::ThreadDriver *>(apDelegate);
-    }
-
-    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate) :
-        CommandHandlerInterface(Optional<EndpointId>(aEndpointId), Id),
-        AttributeAccessInterface(Optional<EndpointId>(aEndpointId), Id), mFeatureFlags(Feature::kEthernetNetworkInterface),
-        mpWirelessDriver(nullptr), mpBaseDriver(apDelegate)
-    {}
-
+    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
+    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate);
+    Instance(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate);
     virtual ~Instance() = default;
 };
 

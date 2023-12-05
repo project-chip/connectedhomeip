@@ -28,6 +28,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Validate the feature map"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x7]
+
     - label: "Read Replacement Product List"
       command: "readAttribute"
       attribute: "ReplacementProductList"

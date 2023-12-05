@@ -84,6 +84,20 @@ declare_args() {
 
   # When using minmdns, set the number of parallel resolves
   chip_config_minmdns_max_parallel_resolves = 2
+
+  # If set to true, adds a string "info" field to Cancelable.
+  # Only here for backwards compat.  Generally, THIS SHOULD NOT BE SET TO TRUE.
+  chip_config_cancelable_has_info_string_field = false
+
+  # Whether the target architecture is big-endian (true) or little-endian (false).
+  chip_target_is_big_endian = false
+
+  # Validation on TLV encode/decode for string validity of character
+  # strings:
+  #   - SHALL NOT end with binary 0 (spec still allows embedded 0)
+  #   - SHALL be valid UTF8
+  chip_tlv_validate_char_string_on_write = true
+  chip_tlv_validate_char_string_on_read = false
 }
 
 if (chip_target_style == "") {

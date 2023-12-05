@@ -22,19 +22,20 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OnOffClientFragmentBinding
-import com.google.chip.chiptool.util.TlvParseUtil
+import com.google.chip.chiptool.util.toAny
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -116,13 +117,13 @@ class OnOffClientFragment : Fragment() {
           }
 
           override fun onReport(nodeState: NodeState?) {
-            val value =
+            val tlv =
               nodeState
                 ?.getEndpointState(endpointId)
                 ?.getClusterState(clusterId)
                 ?.getAttributeState(attributeId)
-                ?.value
-                ?: "null"
+                ?.tlv
+            val value = tlv?.let { TlvReader(it).toAny() }
             Log.v(TAG, "On/Off attribute value: $value")
             showMessage("On/Off attribute value: $value")
           }
@@ -201,7 +202,7 @@ class OnOffClientFragment : Fragment() {
               ?.tlv
               ?: return
           // TODO : Need to be implement poj-to-tlv
-          val value = TlvParseUtil.decodeBoolean(tlv)
+          val value = TlvReader(tlv).getBool(AnonymousTag)
           val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
           val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
           val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"

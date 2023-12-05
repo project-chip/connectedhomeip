@@ -214,7 +214,7 @@ const uint8_t gDacPrivKey[] = {};
 const uint8_t gDacPubKey[]  = {};
 const uint8_t gDacCert[]    = {};
 #endif
-const uint8_t gPaiCert[] = {
+const uint8_t gPaiCert[]    = {
     0x30, 0x82, 0x01, 0xd4, 0x30, 0x82, 0x01, 0x7a, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x66, 0xd2, 0xa2, 0xc8, 0xa1, 0x41,
     0x29, 0xd3, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x30, 0x31, 0x18, 0x30, 0x16, 0x06,
     0x03, 0x55, 0x04, 0x03, 0x0c, 0x0f, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x54, 0x65, 0x73, 0x74, 0x20, 0x50, 0x41, 0x41,
@@ -370,8 +370,8 @@ CHIP_ERROR DeviceAttestationCredsCC32XX::SignWithDeviceAttestationKey(const Byte
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(out_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because

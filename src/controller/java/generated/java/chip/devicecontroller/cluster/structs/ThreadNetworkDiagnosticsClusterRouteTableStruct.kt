@@ -17,20 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ThreadNetworkDiagnosticsClusterRouteTableStruct(
-  val extAddress: Long,
-  val rloc16: Int,
-  val routerId: Int,
-  val nextHop: Int,
-  val pathCost: Int,
-  val LQIIn: Int,
-  val LQIOut: Int,
-  val age: Int,
+  val extAddress: ULong,
+  val rloc16: UInt,
+  val routerId: UInt,
+  val nextHop: UInt,
+  val pathCost: UInt,
+  val LQIIn: UInt,
+  val LQIOut: UInt,
+  val age: UInt,
   val allocated: Boolean,
   val linkEstablished: Boolean
 ) {
@@ -49,9 +49,9 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_EXT_ADDRESS), extAddress)
       put(ContextSpecificTag(TAG_RLOC16), rloc16)
       put(ContextSpecificTag(TAG_ROUTER_ID), routerId)
@@ -78,16 +78,19 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterRouteTableStruct {
-      tlvReader.enterStructure(tag)
-      val extAddress = tlvReader.getLong(ContextSpecificTag(TAG_EXT_ADDRESS))
-      val rloc16 = tlvReader.getInt(ContextSpecificTag(TAG_RLOC16))
-      val routerId = tlvReader.getInt(ContextSpecificTag(TAG_ROUTER_ID))
-      val nextHop = tlvReader.getInt(ContextSpecificTag(TAG_NEXT_HOP))
-      val pathCost = tlvReader.getInt(ContextSpecificTag(TAG_PATH_COST))
-      val LQIIn = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_IN))
-      val LQIOut = tlvReader.getInt(ContextSpecificTag(TAG_L_Q_I_OUT))
-      val age = tlvReader.getInt(ContextSpecificTag(TAG_AGE))
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ThreadNetworkDiagnosticsClusterRouteTableStruct {
+      tlvReader.enterStructure(tlvTag)
+      val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
+      val rloc16 = tlvReader.getUInt(ContextSpecificTag(TAG_RLOC16))
+      val routerId = tlvReader.getUInt(ContextSpecificTag(TAG_ROUTER_ID))
+      val nextHop = tlvReader.getUInt(ContextSpecificTag(TAG_NEXT_HOP))
+      val pathCost = tlvReader.getUInt(ContextSpecificTag(TAG_PATH_COST))
+      val LQIIn = tlvReader.getUInt(ContextSpecificTag(TAG_L_Q_I_IN))
+      val LQIOut = tlvReader.getUInt(ContextSpecificTag(TAG_L_Q_I_OUT))
+      val age = tlvReader.getUInt(ContextSpecificTag(TAG_AGE))
       val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
       val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
 

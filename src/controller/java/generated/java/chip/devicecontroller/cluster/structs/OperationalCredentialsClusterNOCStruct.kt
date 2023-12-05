@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OperationalCredentialsClusterNOCStruct(
   val noc: ByteArray,
   val icac: ByteArray?,
-  val fabricIndex: Int
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
     append("OperationalCredentialsClusterNOCStruct {\n")
@@ -35,9 +35,9 @@ class OperationalCredentialsClusterNOCStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NOC), noc)
       if (icac != null) {
         put(ContextSpecificTag(TAG_ICAC), icac)
@@ -54,8 +54,8 @@ class OperationalCredentialsClusterNOCStruct(
     private const val TAG_ICAC = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterNOCStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalCredentialsClusterNOCStruct {
+      tlvReader.enterStructure(tlvTag)
       val noc = tlvReader.getByteArray(ContextSpecificTag(TAG_NOC))
       val icac =
         if (!tlvReader.isNull()) {
@@ -64,7 +64,7 @@ class OperationalCredentialsClusterNOCStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_ICAC))
           null
         }
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 

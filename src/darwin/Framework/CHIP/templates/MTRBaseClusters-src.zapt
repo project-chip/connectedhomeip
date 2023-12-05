@@ -3,15 +3,19 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRBaseClusters_Internal.h"
-#import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
-#import "MTRCallbackBridge.h"
+#import "MTRCallbackBridgeBase.h"
 #import "MTRCluster_Internal.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
+#import "MTRDefines_Internal.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/util/im-client-callbacks.h>
 #include <controller/CHIPCluster.h>
 #include <lib/support/CHIPListUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -27,22 +31,23 @@ using chip::Optional;
 using chip::System::Clock::Timeout;
 using chip::System::Clock::Seconds16;
 
+typedef void (*DefaultSuccessCallbackType)(void *);
+
+class MTRDefaultSuccessCallbackBridge : public MTRCallbackBridge<DefaultSuccessCallback>
+{
+public:
+    MTRDefaultSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
+        MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context) {
+        DispatchSuccess(context, nil);
+    }
+};
+
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#zcl_clusters}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
-
-- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
@@ -51,7 +56,6 @@ using chip::System::Clock::Seconds16;
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
 {{#if (or (isSupported cluster command=command)
           (isSupported (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
-{{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}{{else}}CommandSuccess{{/if}}{{/inline}}
 {{#*inline "paramsType"}}
 {{#unless (isSupported cluster command=command)}}
 MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping parent.name name}}Params
@@ -67,61 +71,39 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 - (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
 {
-    // Make a copy of params before we go async.
-    params = [params copy];
-    auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
-      {{#if hasSpecificResponse}}
-        {{! This treats completion as taking an id for the data.  This is
-            not great from a type-safety perspective, of course. }}
-        completion,
-      {{else}}
-        {{! For now, don't change the bridge API; instead just use an adapter
-            to invoke our completion handler. This is not great from a
-            type-safety perspective, of course. }}
-        ^(id _Nullable value, NSError * _Nullable error) {
-          completion(error);
-        },
-      {{/if}}
-      ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
-        Optional<uint16_t> timedInvokeTimeoutMs;
-        Optional<Timeout> invokeTimeout;
-        ListFreer listFreer;
-        {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
-        if (params != nil) {
-          if (params.timedInvokeTimeoutMs != nil) {
-            params.timedInvokeTimeoutMs = MTRClampedNumber(params.timedInvokeTimeoutMs, @(1), @(UINT16_MAX));
-            timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
-          }
-          if (params.serverSideProcessingTimeout != nil) {
-            // Clamp to a number of seconds that will not overflow 32-bit
-            // int when converted to ms.
-            auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
-            invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
-          }
-        }
-        {{#if mustUseTimedInvoke}}
-        if (!timedInvokeTimeoutMs.HasValue()) {
-          timedInvokeTimeoutMs.SetValue(10000);
-        }
-        {{/if}}
-        {{#zcl_command_arguments}}
-          {{#first}}
-            {{#unless parent.commandHasRequiredField}}
-            if (params != nil) {
-            {{/unless}}
-          {{/first}}
-          {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
-          {{#last}}
-            {{#unless parent.commandHasRequiredField}}
-            }
-           {{/unless}}
-          {{/last}}
-        {{/zcl_command_arguments}}
+    if (params == nil) {
+        params = [[{{> paramsType}} alloc] init];
+    }
 
-        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self.endpoint, timedInvokeTimeoutMs, invokeTimeout);
-    });
-    std::move(*bridge).DispatchAction(self.device);
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        {{#if hasSpecificResponse}}
+        completion(response, error);
+        {{else}}
+        completion(error);
+        {{/if}}
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    {{#if mustUseTimedInvoke}}
+    if (timedInvokeTimeoutMs == nil) {
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+    {{/if}}
+
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+{{#if hasSpecificResponse}}
+                                     responseClass:MTR{{cluster}}Cluster{{asUpperCamelCase responseName preserveAcronyms=true}}Params.class
+{{else}}
+                                     responseClass:nil
+{{/if}}
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 {{/if}}
 {{/inline}}
@@ -144,20 +126,21 @@ MTR{{cluster}}Cluster{{command}}Params
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
-    {{~#if_is_fabric_scoped_struct type}}
-    // Make a copy of params before we go async.
-    params = [params copy];
-    {{else}}
-    MTRReadParams * params = [[MTRReadParams alloc] init];
-    {{/if_is_fabric_scoped_struct~}}
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    return MTRReadAttribute<MTR{{>attribute_data_callback_name}}CallbackBridge,
-                         {{asObjectiveCClass type parent.name}},
-                         TypeInfo::DecodableType>(params, completion, self.callbackQueue, self.device, self.endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
+    [self.device _readKnownAttributeWithEndpointID:@(self.endpoint)
+                                         clusterID:@(TypeInfo::GetClusterId())
+                                       attributeID:@(TypeInfo::GetAttributeId())
+    {{#if_is_fabric_scoped_struct type}}
+                                            params:params
+    {{else}}
+                                            params:nil
+    {{/if_is_fabric_scoped_struct}}
+                                             queue:self.callbackQueue
+                                        completion:completion];
 }
 
-{{#if isWritableAttribute}}
-{{#*inline "callbackName"}}DefaultSuccess{{/inline}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
 {
   [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
@@ -168,23 +151,23 @@ MTR{{cluster}}Cluster{{command}}Params
     params = [params copy];
     value = [value copy];
 
-    auto * bridge = new MTR{{>callbackName}}CallbackBridge(self.callbackQueue,
+    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue,
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
           type-safety perspective, of course. }}
       ^(id _Nullable ignored, NSError * _Nullable error) {
         completion(error);
       },
-      ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+      ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
         chip::Optional<uint16_t> timedWriteTimeout;
         if (params != nil) {
           if (params.timedWriteTimeout != nil){
             timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
           }
         }
-        {{#if mustUseTimedInvoke}}
+        {{#if mustUseTimedWrite}}
         if (!timedWriteTimeout.HasValue()) {
-          timedWriteTimeout.SetValue(10000);
+          timedWriteTimeout.SetValue(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
         }
         {{/if}}
 
@@ -206,29 +189,24 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))reportHandler
 {
     using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-    MTRSubscribeAttribute<MTR{{>attribute_data_callback_name}}CallbackSubscriptionBridge, {{asObjectiveCClass type parent.name}}, TypeInfo::DecodableType>(params, subscriptionEstablished, reportHandler, self.callbackQueue, self.device, self.endpoint, TypeInfo::GetClusterId(), TypeInfo::GetAttributeId());
+    [self.device _subscribeToKnownAttributeWithEndpointID:@(self.endpoint)
+                                                clusterID:@(TypeInfo::GetClusterId())
+                                              attributeID:@(TypeInfo::GetAttributeId())
+                                                   params:params
+                                                    queue:self.callbackQueue
+                                            reportHandler:reportHandler
+                                  subscriptionEstablished:subscriptionEstablished];
 }
 
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint  queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion
 {
-    auto * bridge = new MTR{{>attribute_data_callback_name}}CallbackBridge(queue, completion);
-    std::move(*bridge).DispatchLocalAction(clusterStateCacheContainer.baseDevice, ^({{>attribute_data_callback_name}}Callback successCb, MTRErrorCallback failureCb) {
-          if (clusterStateCacheContainer.cppClusterStateCache) {
-              chip::app::ConcreteAttributePath path;
-              using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
-              path.mEndpointId = static_cast<chip::EndpointId>([endpoint unsignedShortValue]);
-              path.mClusterId = TypeInfo::GetClusterId();
-              path.mAttributeId = TypeInfo::GetAttributeId();
-              TypeInfo::DecodableType value;
-              CHIP_ERROR err = clusterStateCacheContainer.cppClusterStateCache->Get<TypeInfo>(path, value);
-              if (err == CHIP_NO_ERROR)
-              {
-                successCb(bridge, value);
-              }
-              return err;
-          }
-          return CHIP_ERROR_NOT_FOUND;
-      });
+    using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    [clusterStateCacheContainer
+        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
+                                      clusterID:TypeInfo::GetClusterId()
+                                    attributeID:TypeInfo::GetAttributeId()
+                                          queue:queue
+                                     completion:completion];
 }
 
 {{/if}}
@@ -303,7 +281,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
       }];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];

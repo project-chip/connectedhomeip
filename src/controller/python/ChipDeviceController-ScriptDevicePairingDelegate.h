@@ -46,6 +46,7 @@ typedef void (*DevicePairingDelegate_OnCommissioningFailureFunct)(
 typedef void (*DevicePairingDelegate_OnCommissioningStatusUpdateFunct)(PeerId peerId,
                                                                        chip::Controller::CommissioningStage stageCompleted,
                                                                        CHIP_ERROR err);
+typedef void (*DevicePairingDelegate_OnFabricCheckFunct)(NodeId nodeId);
 }
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
@@ -59,6 +60,7 @@ public:
     void SetCommissioningSuccessCallback(DevicePairingDelegate_OnCommissioningSuccessFunct callback);
     void SetCommissioningFailureCallback(DevicePairingDelegate_OnCommissioningFailureFunct callback);
     void SetCommissioningWindowOpenCallback(DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
+    void SetFabricCheckCallback(DevicePairingDelegate_OnFabricCheckFunct callback);
     void OnStatusUpdate(Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
@@ -66,6 +68,7 @@ public:
     void OnCommissioningFailure(PeerId peerId, CHIP_ERROR error, CommissioningStage stageFailed,
                                 Optional<Credentials::AttestationVerificationResult> additionalErrorInfo) override;
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
+    void OnFabricCheck(NodeId matchingNodeId) override;
     Callback::Callback<Controller::OnOpenCommissioningWindow> *
     GetOpenWindowCallback(Controller::CommissioningWindowOpener * context);
     void OnOpenCommissioningWindow(NodeId deviceId, CHIP_ERROR status, SetupPayload payload);
@@ -78,6 +81,7 @@ private:
     DevicePairingDelegate_OnCommissioningSuccessFunct mOnCommissioningSuccessCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningFailureFunct mOnCommissioningFailureCallback           = nullptr;
     DevicePairingDelegate_OnCommissioningStatusUpdateFunct mOnCommissioningStatusUpdateCallback = nullptr;
+    DevicePairingDelegate_OnFabricCheckFunct mOnFabricCheckCallback                             = nullptr;
     Callback::Callback<Controller::OnOpenCommissioningWindow> mOpenWindowCallback;
     Controller::CommissioningWindowOpener * mWindowOpener = nullptr;
     bool expectingPairingComplete                         = false;

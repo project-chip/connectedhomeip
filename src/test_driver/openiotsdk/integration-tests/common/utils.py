@@ -72,6 +72,7 @@ def discover_device(devCtrl, setupPayload):
     if not res:
         log.info("Device not found")
         return None
+    log.info("Device found at %r" % res[0])
     return res[0]
 
 
@@ -87,6 +88,8 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
     if nodeId is None:
         nodeId = random.randint(1, 1000000)
 
+    log.info("Connecting to device %d" % nodeId)
+
     pincode = int(setupPayload.attributes['SetUpPINCode'])
     try:
         res = devCtrl.CommissionOnNetwork(
@@ -95,7 +98,7 @@ def connect_device(devCtrl, setupPayload, commissionableDevice, nodeId=None):
         log.error("Commission discovered device failed {}".format(str(ex)))
         return None
     if not res:
-        log.info("Commission discovered device failed")
+        log.info("Commission discovered device failed: %r" % res)
         return None
     return nodeId
 

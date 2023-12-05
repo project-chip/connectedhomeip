@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     131.2.4. [TC-G-2.4] Commands - AddGroup Command with same GroupID on
@@ -23,413 +22,271 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Groups"
     endpoint: 0
 
-tests:
-    - label: "Pre-Conditions"
-      verification: |
-          1 Note: This test case is applicable only when DUT supports Group Cluster at least on two end points: PIXIT.G.ENDPOINT,PIXIT.G.ENDPOINT2
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT1
+    Groups.Endpoint1: 1
 
-          2 TH is commissioned with DUT
-      disabled: true
+    # Users should set endpoint value on the command line to PIXIT.G.ENDPOINT2
+    Groups.Endpoint2: 2
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Step 1: Verify that PIXIT.G.ENDPOINT and PIXIT.G.ENDPOINT2 are
           different."
-      verification: |
-          Verify that PIXIT.G.ENDPOINT and PIXIT.G.ENDPOINT2 are different.
-      disabled: true
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: Groups.Endpoint1
+              - name: "Value2"
+                value: Groups.Endpoint2
+      response:
+          - values:
+                - name: "Equals"
+                  value: false
 
     - label:
           "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT on EP0 using a key that is pre-installed on the TH.
-          GroupKeySet fields are as follows: GroupKeySetID: 1
-          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
-          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
-          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
-          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
-      verification: |
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1, "groupKeySecurityPolicy": 0, "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1": "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
-
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689928280.676270][5573:5576] CHIP:DMG: InvokeResponseMessage =
-          [1689928280.676273][5573:5576] CHIP:DMG: {
-          [1689928280.676275][5573:5576] CHIP:DMG:         suppressResponse = false,
-          [1689928280.676277][5573:5576] CHIP:DMG:         InvokeResponseIBs =
-          [1689928280.676280][5573:5576] CHIP:DMG:         [
-          [1689928280.676281][5573:5576] CHIP:DMG:                 InvokeResponseIB =
-          [1689928280.676285][5573:5576] CHIP:DMG:                 {
-          [1689928280.676287][5573:5576] CHIP:DMG:                         CommandStatusIB =
-          [1689928280.676289][5573:5576] CHIP:DMG:                         {
-          [1689928280.676291][5573:5576] CHIP:DMG:                                 CommandPathIB =
-          [1689928280.676293][5573:5576] CHIP:DMG:                                 {
-          [1689928280.676295][5573:5576] CHIP:DMG:                                         EndpointId = 0x0,
-          [1689928280.676297][5573:5576] CHIP:DMG:                                         ClusterId = 0x3f,
-          [1689928280.676300][5573:5576] CHIP:DMG:                                         CommandId = 0x0,
-          [1689928280.676302][5573:5576] CHIP:DMG:                                 },
-          [1689928280.676304][5573:5576] CHIP:DMG:
-          [1689928280.676306][5573:5576] CHIP:DMG:                                 StatusIB =
-          [1689928280.676309][5573:5576] CHIP:DMG:                                 {
-          [1689928280.676311][5573:5576] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1689928280.676313][5573:5576] CHIP:DMG:                                 },
-          [1689928280.676315][5573:5576] CHIP:DMG:
-          [1689928280.676317][5573:5576] CHIP:DMG:                         },
-          [1689928280.676320][5573:5576] CHIP:DMG:
-          [1689928280.676321][5573:5576] CHIP:DMG:                 },
-          [1689928280.676324][5573:5576] CHIP:DMG:
-          [1689928280.676326][5573:5576] CHIP:DMG:         ],
-          [1689928280.676328][5573:5576] CHIP:DMG:
-      disabled: true
+          cluster to DUT."
+      PICS: GRPKEY.S.C00.Rsp
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
+                    }
 
     - label:
           "Step 3: TH writes the GroupKeyMap attribute in the GroupKeyManagement
           cluster on EP0 with one entry binding GroupId(0x0001) with
           GroupKeySetID 1"
-      verification: |
-          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 1, "fabricIndex": 1} ]' 1 0
-
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          1689928416.859884][5757:5760] CHIP:DMG: WriteResponseMessage =
-          [1689928416.859894][5757:5760] CHIP:DMG: {
-          [1689928416.859903][5757:5760] CHIP:DMG:         AttributeStatusIBs =
-          [1689928416.859921][5757:5760] CHIP:DMG:         [
-          [1689928416.859931][5757:5760] CHIP:DMG:                 AttributeStatusIB =
-          [1689928416.859943][5757:5760] CHIP:DMG:                 {
-          [1689928416.859953][5757:5760] CHIP:DMG:                         AttributePathIB =
-          [1689928416.859964][5757:5760] CHIP:DMG:                         {
-          [1689928416.859975][5757:5760] CHIP:DMG:                                 Endpoint = 0x0,
-          [1689928416.859988][5757:5760] CHIP:DMG:                                 Cluster = 0x3f,
-          [1689928416.859999][5757:5760] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1689928416.860009][5757:5760] CHIP:DMG:                         }
-          [1689928416.860025][5757:5760] CHIP:DMG:
-          [1689928416.860036][5757:5760] CHIP:DMG:                         StatusIB =
-          [1689928416.860050][5757:5760] CHIP:DMG:                         {
-          [1689928416.860062][5757:5760] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1689928416.860071][5757:5760] CHIP:DMG:                         },
-          [1689928416.860081][5757:5760] CHIP:DMG:
-          [1689928416.860088][5757:5760] CHIP:DMG:                 },
-          [1689928416.860104][5757:5760] CHIP:DMG:
-          [1689928416.860113][5757:5760] CHIP:DMG:                 AttributeStatusIB =
-          [1689928416.860126][5757:5760] CHIP:DMG:                 {
-          [1689928416.860135][5757:5760] CHIP:DMG:                         AttributePathIB =
-          [1689928416.860145][5757:5760] CHIP:DMG:                         {
-          [1689928416.860156][5757:5760] CHIP:DMG:                                 Endpoint = 0x0,
-          [1689928416.860167][5757:5760] CHIP:DMG:                                 Cluster = 0x3f,
-          [1689928416.860177][5757:5760] CHIP:DMG:                                 Attribute = 0x0000_0000,
-          [1689928416.860185][5757:5760] CHIP:DMG:                                 ListIndex = Null,
-          [1689928416.860197][5757:5760] CHIP:DMG:                         }
-          [1689928416.860209][5757:5760] CHIP:DMG:
-          [1689928416.860216][5757:5760] CHIP:DMG:                         StatusIB =
-          [1689928416.860224][5757:5760] CHIP:DMG:                         {
-          [1689928416.860231][5757:5760] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1689928416.860239][5757:5760] CHIP:DMG:                         },
-          [1689928416.860251][5757:5760] CHIP:DMG:
-          [1689928416.860261][5757:5760] CHIP:DMG:                 },
-          [1689928416.860277][5757:5760] CHIP:DMG:
-          [1689928416.860286][5757:5760] CHIP:DMG:         ],
-          [1689928416.860307][5757:5760] CHIP:DMG:
-          [1689928416.860319][5757:5760] CHIP:DMG:         InteractionModelRevision = 1
-          [1689928416.860328][5757:5760] CHIP:DMG: }
-      disabled: true
+      PICS: GRPKEY.S.A0000
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 1 }]
 
     - label:
-          "Step 4: TH cleans up the groups by sending the RemoveAllGroups
-          command to the DUT on PIXIT.G.ENDPOINT,PIXIT.G.ENDPOINT2"
-      verification: |
-          ./chip-tool groups remove-all-groups 1 1
+          "Step 4a: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT1"
+      endpoint: Groups.Endpoint1
+      command: "RemoveAllGroups"
 
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689928700.354515][5800:5803] CHIP:DMG: {
-          [1689928700.354516][5800:5803] CHIP:DMG:         suppressResponse = false,
-          [1689928700.354518][5800:5803] CHIP:DMG:         InvokeResponseIBs =
-          [1689928700.354522][5800:5803] CHIP:DMG:         [
-          [1689928700.354524][5800:5803] CHIP:DMG:                 InvokeResponseIB =
-          [1689928700.354527][5800:5803] CHIP:DMG:                 {
-          [1689928700.354528][5800:5803] CHIP:DMG:                         CommandStatusIB =
-          [1689928700.354531][5800:5803] CHIP:DMG:                         {
-          [1689928700.354533][5800:5803] CHIP:DMG:                                 CommandPathIB =
-          [1689928700.354537][5800:5803] CHIP:DMG:                                 {
-          [1689928700.354539][5800:5803] CHIP:DMG:                                         EndpointId = 0x1,
-          [1689928700.354541][5800:5803] CHIP:DMG:                                         ClusterId = 0x4,
-          [1689928700.354544][5800:5803] CHIP:DMG:                                         CommandId = 0x4,
-          [1689928700.354546][5800:5803] CHIP:DMG:                                 },
-          [1689928700.354549][5800:5803] CHIP:DMG:
-          [1689928700.354551][5800:5803] CHIP:DMG:                                 StatusIB =
-          [1689928700.354554][5800:5803] CHIP:DMG:                                 {
-          [1689928700.354556][5800:5803] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1689928700.354558][5800:5803] CHIP:DMG:                                 },
-          [1689928700.354560][5800:5803] CHIP:DMG:
-          [1689928700.354562][5800:5803] CHIP:DMG:                         },
-          [1689928700.354565][5800:5803] CHIP:DMG:
-          [1689928700.354567][5800:5803] CHIP:DMG:                 },
-          [1689928700.354569][5800:5803] CHIP:DMG:
-          [1689928700.354571][5800:5803] CHIP:DMG:         ],
-          [1689928700.354574][5800:5803] CHIP:DMG:
-
-
-          ./chip-tool groups remove-all-groups 1 2
-
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689928742.133296][5810:5813] CHIP:DMG: InvokeResponseMessage =
-          [1689928742.133303][5810:5813] CHIP:DMG: {
-          [1689928742.133311][5810:5813] CHIP:DMG:         suppressResponse = false,
-          [1689928742.133317][5810:5813] CHIP:DMG:         InvokeResponseIBs =
-          [1689928742.133329][5810:5813] CHIP:DMG:         [
-          [1689928742.133336][5810:5813] CHIP:DMG:                 InvokeResponseIB =
-          [1689928742.133348][5810:5813] CHIP:DMG:                 {
-          [1689928742.133355][5810:5813] CHIP:DMG:                         CommandStatusIB =
-          [1689928742.133364][5810:5813] CHIP:DMG:                         {
-          [1689928742.133371][5810:5813] CHIP:DMG:                                 CommandPathIB =
-          [1689928742.133380][5810:5813] CHIP:DMG:                                 {
-          [1689928742.133388][5810:5813] CHIP:DMG:                                         EndpointId = 0x2,
-          [1689928742.133397][5810:5813] CHIP:DMG:                                         ClusterId = 0x4,
-          [1689928742.133405][5810:5813] CHIP:DMG:                                         CommandId = 0x4,
-          [1689928742.133413][5810:5813] CHIP:DMG:                                 },
-          [1689928742.133424][5810:5813] CHIP:DMG:
-          [1689928742.133435][5810:5813] CHIP:DMG:                                 StatusIB =
-          [1689928742.133447][5810:5813] CHIP:DMG:                                 {
-          [1689928742.133455][5810:5813] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1689928742.133463][5810:5813] CHIP:DMG:                                 },
-          [1689928742.133472][5810:5813] CHIP:DMG:
-          [1689928742.133478][5810:5813] CHIP:DMG:                         },
-          [1689928742.133490][5810:5813] CHIP:DMG:
-          [1689928742.133500][5810:5813] CHIP:DMG:                 },
-          [1689928742.133508][5810:5813] CHIP:DMG:
-          [1689928742.133514][5810:5813] CHIP:DMG:         ],
-          [1689928742.133526][5810:5813] CHIP:DMG:
-      disabled: true
+    - label:
+          "Step 4b: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT2"
+      endpoint: Groups.Endpoint2
+      command: "RemoveAllGroups"
 
     - label:
           "Step 5a: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT with
-          the following fields: GroupID as 0x0001 GroupName as 'Gp1'"
+          the following fields: GroupID as 0x0001,GroupName as 'Gp1'"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
-      verification: |
-          ./chip-tool groups add-group 0x0001 Gp1 1 1
-
-          Verify the AddGroupResponse with  following field:
-          Status is SUCCESS
-          GroupID is 0x0001 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
-
-          [1689928877.256544][5836:5839] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
-          [1689928877.256740][5836:5839] CHIP:TOO:   AddGroupResponse: {
-          [1689928877.256774][5836:5839] CHIP:TOO:     status: 0
-          [1689928877.256777][5836:5839] CHIP:TOO:     groupID: 1
-          [1689928877.256780][5836:5839] CHIP:TOO:    }
-      disabled: true
+      endpoint: Groups.Endpoint1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp1"
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
 
     - label:
           "Step 5b: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT2 with
-          the following fields: GroupID as 0x0001 GroupName as 'Gp2'"
+          the following fields: GroupID as 0x0001,GroupName as 'Gp2'"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
-      verification: |
-          ./chip-tool groups add-group 0x0001 Gp2 1 2
-
-          Verify the AddGroupResponse with  following field:
-          Status is SUCCESS
-          GroupID is 0x0001 on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
-
-          [1689928983.569742][5852:5855] CHIP:DMG: Received Command Response Data, Endpoint=2 Cluster=0x0000_0004 Command=0x0000_0000
-          [1689928983.569765][5852:5855] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0004 Command 0x0000_0000
-          [1689928983.569795][5852:5855] CHIP:TOO:   AddGroupResponse: {
-          [1689928983.569805][5852:5855] CHIP:TOO:     status: 0
-          [1689928983.569813][5852:5855] CHIP:TOO:     groupID: 1
-          [1689928983.569821][5852:5855] CHIP:TOO:    }
-      disabled: true
+      endpoint: Groups.Endpoint2
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp2"
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
 
     - label:
           "Step 6: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
       PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify the GroupTable with the following entries
-          GroupID is 0x0001
-          If G.S.F00(GN) is true then GroupName is Gp2 , Otherwise empty
-          Endpoints list contains a endpoints 1, 2
-          on TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
-
-          [1689929132.327353][5868:5871] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 229830719
-          [1689929132.327657][5868:5871] CHIP:TOO:   GroupTable: 1 entries
-          [1689929132.327692][5868:5871] CHIP:TOO:     [1]: {
-          [1689929132.327708][5868:5871] CHIP:TOO:       GroupId: 1
-          [1689929132.327724][5868:5871] CHIP:TOO:       Endpoints: 2 entries
-          [1689929132.327736][5868:5871] CHIP:TOO:         [1]: 1
-          [1689929132.327744][5868:5871] CHIP:TOO:         [2]: 2
-          [1689929132.327754][5868:5871] CHIP:TOO:       GroupName: Gp2
-          [1689929132.327762][5868:5871] CHIP:TOO:       FabricIndex: 1
-          [1689929132.327769][5868:5871] CHIP:TOO:      }
-      disabled: true
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint1, Groups.Endpoint2],
+                  },
+              ]
 
     - label:
-          "Step 7: Verify that the GroupTable contains an entry with the
-          GroupName as 'Gp2'"
-      PICS: G.S.F00
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify the GroupTable with the following entries
-          GroupID is 0x0001
-          If G.S.F00(GN) is true then GroupName is Gp2 , Otherwise empty
-          Endpoints list contains a endpoints 1, 2
-          on TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
-
-          [1689929132.327353][5868:5871] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 229830719
-          [1689929132.327657][5868:5871] CHIP:TOO:   GroupTable: 1 entries
-          [1689929132.327692][5868:5871] CHIP:TOO:     [1]: {
-          [1689929132.327708][5868:5871] CHIP:TOO:       GroupId: 1
-          [1689929132.327724][5868:5871] CHIP:TOO:       Endpoints: 2 entries
-          [1689929132.327736][5868:5871] CHIP:TOO:         [1]: 1
-          [1689929132.327744][5868:5871] CHIP:TOO:         [2]: 2
-          [1689929132.327754][5868:5871] CHIP:TOO:       GroupName: Gp2
-          [1689929132.327762][5868:5871] CHIP:TOO:       FabricIndex: 1
-          [1689929132.327769][5868:5871] CHIP:TOO:      }
-      disabled: true
+          "Step 7: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0, Verify that the GroupTable contains an entry
+          with the GroupName as 'Gp2'"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint1, Groups.Endpoint2],
+                      GroupName: "Gp2",
+                  },
+              ]
 
     - label:
           "Step 8: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
           the following fields: GroupID as 0x0001"
       PICS: G.S.C01.Rsp && G.S.C01.Tx
-      verification: |
-          ./chip-tool groups view-group 0x0001 1 1
-
-          Verify the ViewGroupResponse with following fields :
-          Status is SUCCESS
-          GroupID is 0x0001
-          If G.S.F00(GN) is true then GroupName is Gp1, Otherwise empty
-          on  TH(Chip-tool)  Log , below is the sample log provided for the raspi platform:
-
-          Note: GroupName for GroupID 0x0001 is same on  ENDPOINT 1 and ENDPOINT 2
-
-          [1689929265.503341][5898:5901] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1689929265.503352][5898:5901] CHIP:TOO:   ViewGroupResponse: {
-          [1689929265.503357][5898:5901] CHIP:TOO:     status: 0
-          [1689929265.503359][5898:5901] CHIP:TOO:     groupID: 1
-          [1689929265.503361][5898:5901] CHIP:TOO:     groupName: Gp2
-          [1689929265.503363][5898:5901] CHIP:TOO:    }
-      disabled: true
+      endpoint: Groups.Endpoint1
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+      response:
+          values:
+              - name: Status
+                value: 0x00
+              - name: GroupID
+                value: 0x0001
 
     - label:
-          "Step 9: Verify that the ViewGroupResponse contains GroupName as
-          'GP2'. Note: GroupName for GroupID 0x0001 is same on PIXIT.G.ENDPOINT
-          and PIXIT.G.ENDPOINT2"
-      PICS: G.S.F00
-      verification: |
-          ./chip-tool groups view-group 0x0001 1 1
-
-          Verify the ViewGroupResponse with following fields :
-          Status is SUCCESS
-          GroupID is 0x0001
-          If G.S.F00(GN) is true then GroupName is Gp1, Otherwise empty
-          on  TH(Chip-tool)  Log , below is the sample log provided for the raspi platform:
-
-          Note: GroupName for GroupID 0x0001 is same on  ENDPOINT 1 and ENDPOINT 2
-
-          [1689929265.503341][5898:5901] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1689929265.503352][5898:5901] CHIP:TOO:   ViewGroupResponse: {
-          [1689929265.503357][5898:5901] CHIP:TOO:     status: 0
-          [1689929265.503359][5898:5901] CHIP:TOO:     groupID: 1
-          [1689929265.503361][5898:5901] CHIP:TOO:     groupName: Gp2
-          [1689929265.503363][5898:5901] CHIP:TOO:    }
-      disabled: true
+          "Step 9: TH sends ViewGroup command to DUT on PIXIT.G.ENDPOINT with
+          the following fields: GroupID as 0x0001. Verify that the
+          ViewGroupResponse contains GroupName as 'GP2'"
+      PICS: G.S.C01.Rsp && G.S.C01.Tx && G.S.F00
+      endpoint: Groups.Endpoint1
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0001
+      response:
+          values:
+              - name: Status
+                value: 0x00
+              - name: GroupID
+                value: 0x0001
+              - name: GroupName
+                value: "Gp2"
 
     - label:
           "Step 10: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT as
           unicast with the following field: GroupID as 0x0001"
       PICS: G.S.C03.Rsp && G.S.C03.Tx
-      verification: |
-          ./chip-tool groups remove-group 0x0001 1 1
-
-          Verify the RemoveGroupResponse with  Status as SUCCESS and GroupID is 0x0001 on the TH(Chip-tool)  Log, below is the sample log provided for the raspi platform:
-
-          [1689929333.591022][5912:5915] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0003
-          [1689929333.591032][5912:5915] CHIP:TOO:   RemoveGroupResponse: {
-          [1689929333.591035][5912:5915] CHIP:TOO:     status: 0
-          [1689929333.591037][5912:5915] CHIP:TOO:     groupID: 1
-          [1689929333.591039][5912:5915] CHIP:TOO:    }
-      disabled: true
+      endpoint: Groups.Endpoint1
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
 
     - label:
           "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
-      PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
+      PICS: GRPKEY.S.A0001 && !G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint2],
+                      GroupName: "",
+                  },
+              ]
 
-          Verify that Grouptable  entry with GroupID 0x0001 is  associated with the Endpoint 2  and no entry with GroupID 0x0001 associated with the Endpoint 1 on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689929376.037105][5924:5927] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 229830719
-          [1689929376.037147][5924:5927] CHIP:TOO:   GroupTable: 1 entries
-          [1689929376.037191][5924:5927] CHIP:TOO:     [1]: {
-          [1689929376.037204][5924:5927] CHIP:TOO:       GroupId: 1
-          [1689929376.037213][5924:5927] CHIP:TOO:       Endpoints: 1 entries
-          [1689929376.037224][5924:5927] CHIP:TOO:         [1]: 2
-          [1689929376.037233][5924:5927] CHIP:TOO:       GroupName: Gp2
-          [1689929376.037241][5924:5927] CHIP:TOO:       FabricIndex: 1
-          [1689929376.037246][5924:5927] CHIP:TOO:      }
-      disabled: true
+    - label:
+          "Step 11: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0001,
+                      Endpoints: [Groups.Endpoint2],
+                      GroupName: "Gp2",
+                  },
+              ]
 
     - label:
           "Step 12: TH sends RemoveGroup command to DUT on PIXIT.G.ENDPOINT2 as
           unicast with the following field: GroupID as 0x0001"
       PICS: G.S.C03.Rsp && G.S.C03.Tx
-      verification: |
-          ./chip-tool groups remove-group 0x0001 1 2
-
-          Verify DUT responds with SUCCESS status response on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689929465.586716][5960:5963] CHIP:DMG: },
-          [1689929465.586745][5960:5963] CHIP:DMG: Received Command Response Data, Endpoint=2 Cluster=0x0000_0004 Command=0x0000_0003
-          [1689929465.586771][5960:5963] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_0004 Command 0x0000_0003
-          [1689929465.586795][5960:5963] CHIP:TOO:   RemoveGroupResponse: {
-          [1689929465.586813][5960:5963] CHIP:TOO:     status: 0
-          [1689929465.586818][5960:5963] CHIP:TOO:     groupID: 1
-          [1689929465.586826][5960:5963] CHIP:TOO:    }
-      disabled: true
+      endpoint: Groups.Endpoint2
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0001
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: 0x0001
 
     - label:
           "Step 13: TH reads GroupTable attribute from the GroupKeyManagement
           cluster from DUT on EP0"
       PICS: GRPKEY.S.A0001
-      verification: |
-          ./chip-tool groupkeymanagement read group-table 1 0
-
-          Verify that there is no entry that has GroupID 0x0001 associated with the Endpoint 2 on the TH(Chip-tool)  Log  and below is the sample log provided for the raspi platform:
-
-          [1689934348.530688][6829:6831] CHIP:DMG: ReportDataMessage =
-          [1689934348.530718][6829:6831] CHIP:DMG: {
-          [1689934348.530740][6829:6831] CHIP:DMG:         AttributeReportIBs =
-          [1689934348.530775][6829:6831] CHIP:DMG:         [
-          [1689934348.530801][6829:6831] CHIP:DMG:                 AttributeReportIB =
-          [1689934348.530837][6829:6831] CHIP:DMG:                 {
-          [1689934348.530864][6829:6831] CHIP:DMG:                         AttributeDataIB =
-          [1689934348.530900][6829:6831] CHIP:DMG:                         {
-          [1689934348.530935][6829:6831] CHIP:DMG:                                 DataVersion = 0xdc445868,
-          [1689934348.530968][6829:6831] CHIP:DMG:                                 AttributePathIB =
-          [1689934348.531003][6829:6831] CHIP:DMG:                                 {
-          [1689934348.531056][6829:6831] CHIP:DMG:                                         Endpoint = 0x0,
-          [1689934348.531095][6829:6831] CHIP:DMG:                                         Cluster = 0x3f,
-          [1689934348.531143][6829:6831] CHIP:DMG:                                         Attribute = 0x0000_0001,
-          [1689934348.531178][6829:6831] CHIP:DMG:                                 }
-          [1689934348.531225][6829:6831] CHIP:DMG:
-          [1689934348.531259][6829:6831] CHIP:DMG:                                 Data = [
-          [1689934348.531303][6829:6831] CHIP:DMG:
-          [1689934348.531340][6829:6831] CHIP:DMG:                                 ],
-          [1689934348.531384][6829:6831] CHIP:DMG:                         },
-          [1689934348.531421][6829:6831] CHIP:DMG:
-          [1689934348.531450][6829:6831] CHIP:DMG:                 },
-          [1689934348.531496][6829:6831] CHIP:DMG:
-          [1689934348.531521][6829:6831] CHIP:DMG:         ],
-          [1689934348.531566][6829:6831] CHIP:DMG:
-          [1689934348.531592][6829:6831] CHIP:DMG:         SuppressResponse = true,
-          [1689934348.531619][6829:6831] CHIP:DMG:         InteractionModelRevision = 1
-          [1689934348.531655][6829:6831] CHIP:DMG: }
-          [1689934348.531858][6829:6831] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3695466600
-          [1689934348.531940][6829:6831] CHIP:TOO:   GroupTable: 0 entries
-      disabled: true
+      cluster: "Group Key Management"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value: []

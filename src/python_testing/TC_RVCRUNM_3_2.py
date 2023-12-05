@@ -45,6 +45,30 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.RvcRunMode.Attributes.StartUpMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to StartUpMode failed")
 
+    async def check_preconditions(self, endpoint):
+        # check whether the StartUpMode will be overridden by the OnMode attribute
+
+        if not self.check_pics("RVCRUNM.S.F00"):
+            return True
+
+        logging.info("RVCRUNM.S.F00: 1")
+
+        cluster = Clusters.Objects.OnOff
+        attr = Clusters.OnOff.Attributes.StartUpOnOff
+        startUpOnOff = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("StartUpOnOff: %s" % (startUpOnOff))
+        if startUpOnOff == NullValue or startUpOnOff == 0:
+            return True
+
+        cluster = Clusters.Objects.RvcRunMode
+        attr = Clusters.RvcRunMode.Attributes.OnMode
+        onMode = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr)
+        logging.info("OnMode: %s" % (onMode))
+        if onMode == NullValue:
+            return True
+
+        return False
+
     @async_test_body
     async def test_TC_RVCRUNM_3_2(self):
 
@@ -59,6 +83,12 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0002"), "RVCRUNM.S.A0002 must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.C00.Rsp"), "RVCRUNM.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.C01.Tx"), "RVCRUNM.S.C01.Tx must be supported")
+
+        depOnOffKey = "RVCRUNM.S.F00"
+        asserts.assert_true(depOnOffKey in self.matter_test_config.pics, "%s must be provided" % (depOnOffKey))
+
+        ret = await self.check_preconditions(self.endpoint)
+        asserts.assert_true(ret, "invalid preconditions - StartUpMode overridden by OnMode")
 
         attributes = Clusters.RvcRunMode.Attributes
 

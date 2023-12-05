@@ -55,7 +55,7 @@ public:
 
     // Non-copyable
     Efr32PsaOperationalKeystore(Efr32PsaOperationalKeystore const &) = delete;
-    void operator=(Efr32PsaOperationalKeystore const &) = delete;
+    void operator=(Efr32PsaOperationalKeystore const &)              = delete;
 
     /**
      * @brief Initialize the Operational Keystore
@@ -94,13 +94,17 @@ protected:
     bool mIsInitialized                      = false;
 
 private:
-    void ResetPendingKey()
+    void ResetPendingKey(bool keepKeyPairInStorage = false)
     {
-        if (mPendingKeypair != nullptr)
+        if (mPendingKeypair != nullptr && !keepKeyPairInStorage)
         {
-            mPendingKeypair->Delete();
-            Platform::Delete(mPendingKeypair);
+            // This removes the PSA Keypair from storage and unloads it
+            // using the EFR32OpaqueKeypair context.
+            // We destroy it when the OperationKeyStore process failed.
+            mPendingKeypair->DestroyKey();
         }
+
+        Platform::Delete(mPendingKeypair);
         mPendingKeypair         = nullptr;
         mIsPendingKeypairActive = false;
         mPendingFabricIndex     = kUndefinedFabricIndex;

@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
-import chip.devicecontroller.ChipStructs
-import chip.devicecontroller.ChipTLVValueDecoder
 import chip.devicecontroller.ClusterIDMapping.OperationalCredentials
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
@@ -17,15 +15,17 @@ import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OpCredClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -115,13 +115,6 @@ class OpCredClientFragment : Fragment() {
           }
 
           override fun onReport(nodeState: NodeState?) {
-            val value =
-              nodeState
-                ?.getEndpointState(endpointId)
-                ?.getClusterState(clusterId)
-                ?.getAttributeState(attributeId)
-                ?.value
-                ?: "null"
             val tlv =
               nodeState
                 ?.getEndpointState(endpointId)
@@ -129,30 +122,9 @@ class OpCredClientFragment : Fragment() {
                 ?.getAttributeState(attributeId)
                 ?.tlv
 
-            if (tlv == null) {
-              Log.i(TAG, "OpCred $attributeName value: $value")
-              showMessage("OpCred $attributeName value: $value")
-              return
-            }
-
-            val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
-            when (attribute) {
-              OperationalCredentials.Attribute.Fabrics -> {
-                val ret =
-                  ChipTLVValueDecoder.decodeAttributeValue<
-                    List<ChipStructs.OperationalCredentialsClusterFabricDescriptorStruct>
-                  >(
-                    attributePath,
-                    tlv
-                  )
-                Log.i(TAG, "OpCred $attributeName value: $value")
-                showMessage(ret.toString())
-              }
-              else -> {
-                Log.i(TAG, "OpCred $attributeName value: $value")
-                showMessage("OpCred $attributeName value: $value")
-              }
-            }
+            val value = tlv?.let { TlvReader(it).toAny() }
+            Log.i(TAG, "OpCred $attributeName value: $value")
+            showMessage("OpCred $attributeName value: $value")
           }
         },
         devicePtr,

@@ -108,7 +108,7 @@ tests:
       PICS: WNCV.S.A000b
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -121,7 +121,7 @@ tests:
       PICS: WNCV.S.A000c
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -134,7 +134,7 @@ tests:
       PICS: WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -147,7 +147,7 @@ tests:
       PICS: WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -159,7 +159,7 @@ tests:
       attribute: "InstalledOpenLimitLift"
       PICS: WNCV.S.A0010
       response:
-          saveAs: InstalledOpenLimitLift
+          saveAs: InstalledOpenLimitLiftValue
           constraints:
               type: int16u
               minValue: 0
@@ -173,7 +173,7 @@ tests:
       attribute: "InstalledClosedLimitLift"
       PICS: WNCV.S.A0011
       response:
-          saveAs: InstalledClosedLimitLift
+          saveAs: InstalledClosedLimitLiftValue
           constraints:
               type: int16u
               minValue: 0
@@ -187,7 +187,7 @@ tests:
       attribute: "InstalledOpenLimitTilt"
       PICS: WNCV.S.A0012
       response:
-          saveAs: InstalledOpenLimitTilt
+          saveAs: InstalledOpenLimitTiltValue
           constraints:
               type: int16u
               minValue: 0
@@ -201,7 +201,7 @@ tests:
       attribute: "InstalledClosedLimitTilt"
       PICS: WNCV.S.A0013
       response:
-          saveAs: InstalledClosedLimitTilt
+          saveAs: InstalledClosedLimitTiltValue
           constraints:
               type: int16u
               minValue: 0
@@ -266,8 +266,8 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: InstalledOpenLimitLift
-              maxValue: InstalledClosedLimitLift
+              minValue: InstalledOpenLimitLiftValue
+              maxValue: InstalledClosedLimitLiftValue
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
     - label:
@@ -290,8 +290,8 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: InstalledOpenLimitTilt
-              maxValue: InstalledClosedLimitTilt
+              minValue: InstalledOpenLimitTiltValue
+              maxValue: InstalledClosedLimitTiltValue
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label:
@@ -328,7 +328,7 @@ tests:
       PICS: WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
 
@@ -341,7 +341,7 @@ tests:
       PICS: WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
     ###################################################

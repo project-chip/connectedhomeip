@@ -282,6 +282,12 @@ config CHIP_PERSISTENT_SUBSCRIPTIONS
 	  subscriptions instead of waiting for the subscriber node to realize that
 	  the publisher is alive again.
 
+config CHIP_STATISTICS
+	bool "Resource usage statistics"
+	help
+	  Enables tracking the current and the top usage of critical resources used
+	  by the Matter stack, such as packet buffers, timers or exchange contexts.
+
 config CHIP_LIB_SHELL
 	bool "Matter shell commands"
 	default n
@@ -317,37 +323,66 @@ config CHIP_ENABLE_DNS_CLIENT
 	help
 	  Enables using the OpenThread DNS client for the Matter service discovery.
 
-config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
-	bool "Thread Sleepy End Device support"
+config CHIP_ENABLE_ICD_SUPPORT
+	bool "Matter Intermittently Connected Devices support"
 	default n
-	depends on OPENTHREAD_MTD
-	imply OPENTHREAD_MTD_SED
+	imply OPENTHREAD_MTD_SED if NET_L2_OPENTHREAD
 	help
-	  Enables the Thread Sleepy End Device (SED) support in Matter.
+	  Enables the Intermittently Connected Device (ICD) support in Matter.
 
-if CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+if CHIP_ENABLE_ICD_SUPPORT
 
-config CHIP_SED_IDLE_INTERVAL
-	int "Sleepy End Device idle interval (ms)"
+config CHIP_ICD_SLOW_POLL_INTERVAL
+	int "Intermittently Connected Device slow polling interval (ms)"
 	default 1000
 	help
-	  Provides the Sleepy End Device wake interval in milliseconds while the
-	  device is idle (which means that there is no active exchange to or from
-	  the device, and its commissioning window is closed).
+	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
+	  device is in the idle mode. It determines the fastest frequency at which the device will be able
+	  to receive the messages in the idle mode.
 
-config CHIP_SED_ACTIVE_INTERVAL
-	int "Sleepy End Device active interval (ms)"
+config CHIP_ICD_FAST_POLLING_INTERVAL
+	int "Intermittently Connected Device fast polling interval (ms)"
 	default 200
 	help
-	  Provides the Sleepy End Device wake interval in milliseconds while the
-	  device is active (which means that there is an active exchange to or from
-	  the device, or its commissioning window is open).
+	  Provides the Intermittently Connected Device fast polling interval in milliseconds while the
+	  device is in the active mode. It determines the fastest frequency at which the device will be able
+	  to receive the messages in the active mode. The CHIP_ICD_FAST_POLLING_INTERVAL shall be smaller than
+	  CHIP_ICD_ACTIVE_MODE_INTERVAL.
 
-endif # CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+config CHIP_ICD_IDLE_MODE_INTERVAL
+	int "Intermittently Connected Device idle mode interval (s)"
+	default 120
+	help
+	  Provides the Intermittently Connected Device idle mode interval in seconds.
+	  It determines the maximum amount of time the device can stay in the idle mode, which means the
+	  device may be unreachable and not able to receive messages.
+
+config CHIP_ICD_ACTIVE_MODE_INTERVAL
+	int "Intermittently Connected Device active mode interval (ms)"
+	default 300
+	help
+	  Provides the Intermittently Connected Device active mode interval in milliseconds.
+	  It determines the minimum amount of time the device shall stay in the active mode.
+
+config CHIP_ICD_ACTIVE_MODE_THRESHOLD
+	int "Intermittently Connected Device active mode threshold (ms)"
+	default 300
+	help
+	  Provides the Intermittently Connected Device active mode threshold in milliseconds.
+	  It determines the minimum amount of time the device shall stay in the active mode after the network activity.
+
+config CHIP_ICD_CLIENTS_PER_FABRIC
+	int "Intermittently Connected Device number of clients per fabric"
+	default 2
+	help
+	  Provides the Intermittently Connected Device number of clients per fabric. It determines the maximum number
+	  of clients per fabric that can be registered to receive notification from a device if their subscription is lost.
+
+endif # CHIP_ENABLE_ICD_SUPPORT
 
 config CHIP_THREAD_SSED
 	bool "Enable Thread Synchronized Sleepy End Device support"
-	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+	depends on OPENTHREAD_CSL_RECEIVER && CHIP_ENABLE_ICD_SUPPORT
 	help
 	  Enables the Thread Synchronized Sleepy End Device support in Matter.
 
@@ -417,6 +452,12 @@ config CHIP_MALLOC_SYS_HEAP_SIZE
 	  Provides a value that controls how much of the device RAM is reserved for
 	  the heap used by the memory allocation functions based on sys_heap from
 	  Zephyr RTOS.
+
+config CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT
+	bool "Enable support for heap watermarks based on Zephyr sys_heap"
+	help
+	  Enables support for getting current heap high watermark and resetting 
+	  watermarks. 
 
 endif
 

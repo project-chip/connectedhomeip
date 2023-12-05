@@ -28,9 +28,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
+#include <core/ErrorStr.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>

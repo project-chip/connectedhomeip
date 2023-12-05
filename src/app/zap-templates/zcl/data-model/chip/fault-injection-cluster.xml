@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="FaultType" type="ENUM8">
+  <enum name="FaultType" type="enum8">
     <cluster code="0xFFF1FC06"/>
     <item name="Unspecified" value="0x00"/>
     <item name="SystemFault" value="0x01"/>
@@ -24,7 +24,7 @@ limitations under the License.
     <item name="ChipFault" value="0x03"/>
     <item name="CertFault" value="0x04"/>    
   </enum>  
-  <cluster>
+  <cluster apiMaturity="internal">
     <domain>CHIP</domain>
     <name>Fault Injection</name>
     <code>0xFFF1FC06</code>
@@ -33,17 +33,17 @@ limitations under the License.
     <command source="client" code="0x00" name="FailAtFault" optional="false">
       <description>Configure a fault to be triggered deterministically</description>
       <arg name="Type" type="FaultType"/>      
-      <arg name="Id" type="INT32U"/>
-      <arg name="NumCallsToSkip" type="INT32U"/>
-      <arg name="NumCallsToFail" type="INT32U"/>
-      <arg name="TakeMutex" type="BOOLEAN"/>      
+      <arg name="Id" type="int32u"/>
+      <arg name="NumCallsToSkip" type="int32u"/>
+      <arg name="NumCallsToFail" type="int32u"/>
+      <arg name="TakeMutex" type="boolean"/>      
       <access op="invoke" role="manage"/>
     </command>
     <command source="client" code="0x01" name="FailRandomlyAtFault" optional="false">
       <description>Configure a fault to be triggered randomly, with a given probability defined as a percentage</description>
       <arg name="Type" type="FaultType"/>      
-      <arg name="Id" type="INT32U"/>
-      <arg name="Percentage" type="INT8U"/>   
+      <arg name="Id" type="int32u"/>
+      <arg name="Percentage" type="int8u"/>   
       <access op="invoke" role="manage"/>
     </command>    
   </cluster>

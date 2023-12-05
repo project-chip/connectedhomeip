@@ -211,14 +211,6 @@ private:
     uint32_t mECMSaltLength              = 0;
     uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    bool mSEDActiveModeEnabled = false;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    bool mRecoverRouterDeviceRole = false;
-#endif
-
     // For tests only, so that we can test the commissioning window timeout
     // without having to wait 3 minutes.
     Optional<System::Clock::Seconds16> mMinCommissioningTimeoutOverride;

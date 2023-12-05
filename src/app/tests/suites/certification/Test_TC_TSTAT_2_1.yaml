@@ -335,7 +335,7 @@ tests:
               maxValue: 3000
 
     - label: "Step 17a: Reads attribute from DUT: MinHeatSetpointLimit"
-      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017 && TSTAT.S.A0003
+      PICS: TSTAT.S.A0015 && TSTAT.S.F05 && TSTAT.S.A0017 && TSTAT.S.A0019
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
       response:
@@ -362,7 +362,7 @@ tests:
           verifies that the value is within range"
       command: "readAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.A0003 && !TSTAT.S.A0015 && !TSTAT.S.A0016 && !TSTAT.S.F05
+      PICS: TSTAT.S.A0015 && !TSTAT.S.A0003 && !TSTAT.S.F05
       response:
           constraints:
               type: int16s

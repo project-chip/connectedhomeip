@@ -144,7 +144,7 @@ pass_parser_group = click.make_pass_decorator(ParserGroup)
 class YamlTestParserGroup(click.Group):
     def format_options(self, ctx, formatter):
         """Writes all the options into the formatter if they exist."""
-        if ctx.custom_options:
+        if getattr(ctx, 'custom_options', None):
             params_copy = self.params
             non_custom_params = list(filter(lambda x: x.name not in ctx.custom_options, self.params))
             custom_params = list(filter(lambda x: x.name in ctx.custom_options, self.params))
@@ -224,6 +224,11 @@ CONTEXT_SETTINGS = dict(
             'server_name': 'chip-tool',
             'server_arguments': 'interactive server',
         },
+        'darwinframeworktool': {
+            'adapter': 'matter_chip_tool_adapter.adapter',
+            'server_name': 'darwin-framework-tool',
+            'server_arguments': 'interactive server',
+        },
         'app1': {
             'configuration_directory': 'examples/placeholder/linux/apps/app1',
             'adapter': 'matter_placeholder_adapter.adapter',
@@ -255,8 +260,12 @@ def runner_base(ctx, configuration_directory: str, test_name: str, configuration
     specifications = SpecDefinitionsFromPaths(specifications_paths.split(','), pseudo_clusters)
     tests_finder = TestsFinder(configuration_directory, configuration_name)
 
+    test_list = tests_finder.get(test_name)
+    if len(test_list) == 0:
+        raise Exception(f"No tests found for test name '{test_name}'")
+
     parser_config = TestParserConfig(pics, specifications, kwargs)
-    parser_builder_config = TestParserBuilderConfig(tests_finder.get(test_name), parser_config, hooks=TestParserLogger())
+    parser_builder_config = TestParserBuilderConfig(test_list, parser_config, hooks=TestParserLogger())
     parser_builder_config.options.stop_on_error = stop_on_error
     while ctx:
         ctx.obj = ParserGroup(parser_builder_config, pseudo_clusters)
@@ -335,7 +344,10 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
-    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, commission_on_network_dut)
+    node_id_to_commission = None
+    if commission_on_network_dut:
+        node_id_to_commission = parser_group.builder_config.parser_config.config_override['nodeId']
+    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, node_id_to_commission=node_id_to_commission)
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 
@@ -346,6 +358,15 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
 @click.pass_context
 def chiptool(ctx, *args, **kwargs):
     """Run the test suite using chip-tool."""
+    return ctx.forward(websocket)
+
+
+@runner_base.command()
+@test_runner_options
+@websocket_runner_options
+@click.pass_context
+def darwinframeworktool(ctx, *args, **kwargs):
+    """Run the test suite using darwin-framework-tool."""
     return ctx.forward(websocket)
 
 

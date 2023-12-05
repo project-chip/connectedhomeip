@@ -123,6 +123,7 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
+    ~CommandSender();
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     TLV::TLVWriter * GetCommandDataIBTLVWriter();

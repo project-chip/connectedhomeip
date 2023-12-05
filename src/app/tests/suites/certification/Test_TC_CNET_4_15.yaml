@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     12.4.13. [TC-CNET-4.15] [WiFi] NetworkIDNotFound value as
@@ -22,80 +21,126 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_WIFI
     endpoint: 0
 
+    PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:7A6967626565686F6D65"
+
 tests:
-    - label: "Preconditions"
+    - label: "Precondition: DUT is factory reset"
       verification: |
-          1. Factory Reset the DUT
-          2. Commission TH and DUT to setup the Thread
-          3. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
-          4. The FeatureMap attribute value is 1
-          5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
-      disabled: true
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Precondition: Commission TH and DUT on WiFi network"
+      verification: |
+          ./chip-tool pairing ble-wifi 0x12344321 <ssid> <password> <setup-pin-code> <discriminator>
+
+          [1698912271.738597][32363:32366] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698912271.738606][32363:32366] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698912271.738613][32363:32366] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698912271.738617][32363:32366] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698912271.738622][32363:32366] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698912271.738639][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: MarkForEviction Type:1 LSID:50170
+          [1698912271.738642][32363:32366] CHIP:SC: SecureSession[0x7fbb04014a50, LSID:50170]: State change 'kActive' --> 'kPendingEviction'
+          [1698912271.738666][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: Released - Type:1 LSID:50170
+          [1698912271.738672][32363:32366] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698912271.738677][32363:32366] CHIP:TOO: Device commissioning completed with success
+          [1698912271.738691][32363:32366] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
 
     - label:
-          "Step 1: TH sends ArmFailSafe command to the DUT with the
-          ExpiryLengthSeconds field set to 900"
-      verification: |
-          ./chip-tool generalcommissioning arm-fail-safe 900 0 1 0
+          "Precondition: DUT MaxNetworks attribute value is at least 1 and is
+          saved as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
 
-          Via the TH (chip-tool),  Verify the DUT sends ArmFailSafe with timeout as 900 secs to the TH with error code 0.
-
-          [1650383264.543046][44233:44238] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0001
-          [1650383264.543109][44233:44238] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0030 Command 0x0000_0001
-          [1650383264.543212][44233:44238] CHIP:TOO:   ArmFailSafeResponse: {
-          [1650383264.543275][44233:44238] CHIP:TOO:     errorCode: 0
-          [1650383264.543313][44233:44238] CHIP:TOO:     debugText:
-          [1650383264.543348][44233:44238] CHIP:TOO:    }
-          [1650383264.543402][44233:44238] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650383264.543470][44233:44238] CHIP:EM: Sending Standalone Ack for MessageCounter:6293749 on exchange 65264i
-      disabled: true
+    - label:
+          "Step 1: TH sends ArmFailSafe command to the DUT with
+          ExpiryLengthSeconds set to 900"
+      cluster: "General Commissioning"
+      command: "ArmFailSafe"
+      arguments:
+          values:
+              - name: "ExpiryLengthSeconds"
+                value: 900
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
 
     - label:
           "Step 2: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not
           match the provisioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
-      verification: |
-          ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-           ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
-
-          Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 3 (NetworkIDNotFound).
-
-          [1650383270.888700][44239:44244] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0005
-          [1650383270.888774][44239:44244] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0005
-          [1650383270.888876][44239:44244] CHIP:TOO:   NetworkConfigResponse: {
-          [1650383270.888952][44239:44244] CHIP:TOO:     networkingStatus: 3
-          [1650383270.888992][44239:44244] CHIP:TOO:    }
-          [1650383270.889044][44239:44244] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650383270.889125][44239:44244] CHIP:EM: Sending Standalone Ack for MessageCounter:4715093 on exchange 59014i
-      disabled: true
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3
 
     - label:
           "Step 3: TH sends ConnectNetwork Command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not
           match the provisioned network, and Breadcrumb field set to 1"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
-      verification: |
-          ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
-
-          Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 3 (NetworkIDNotFound).
-
-          [1650383278.349428][44245:44250] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0007
-          [1650383278.349490][44245:44250] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Command 0x0000_0007
-          [1650383278.349592][44245:44250] CHIP:TOO:   ConnectNetworkResponse: {
-          [1650383278.349656][44245:44250] CHIP:TOO:     networkingStatus: 3
-          [1650383278.349693][44245:44250] CHIP:TOO:     errorValue: 0
-          [1650383278.349727][44245:44250] CHIP:TOO:    }
-          [1650383278.349782][44245:44250] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1650383278.349847][44245:44250] CHIP:EM: Sending Standalone Ack for MessageCounter:11070796 on exchange 31080i
-      disabled: true
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          values:
+              - name: "NetworkingStatus"
+                value: 3
+              - name: "ErrorValue"
+                constraints:
+                    type: int32s

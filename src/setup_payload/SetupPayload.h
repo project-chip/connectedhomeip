@@ -68,14 +68,14 @@ const int kManualSetupVendorIdCharLength   = 5;
 const int kManualSetupProductIdCharLength  = 5;
 
 // Spec 5.1.4.2 CHIP-Common Reserved Tags
-constexpr uint8_t kSerialNumberTag         = 0x00;
-constexpr uint8_t kPBKDFIterationsTag      = 0x01;
-constexpr uint8_t kBPKFSaltTag             = 0x02;
-constexpr uint8_t kNumberOFDevicesTag      = 0x03;
-constexpr uint8_t kCommissioningTimeoutTag = 0x04;
+inline constexpr uint8_t kSerialNumberTag         = 0x00;
+inline constexpr uint8_t kPBKDFIterationsTag      = 0x01;
+inline constexpr uint8_t kBPKFSaltTag             = 0x02;
+inline constexpr uint8_t kNumberOFDevicesTag      = 0x03;
+inline constexpr uint8_t kCommissioningTimeoutTag = 0x04;
 
-constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
-constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
+inline constexpr uint32_t kSetupPINCodeMaximumValue   = 99999998;
+inline constexpr uint32_t kSetupPINCodeUndefinedValue = 0;
 
 // clang-format off
 const int kTotalPayloadDataSizeInBits =

@@ -50,7 +50,7 @@ void shell_handle_uartirq(char ch)
 int streamer_asr_init(streamer_t * streamer)
 {
     (void) streamer;
-    duet_uart_set_callback(UART1_INDEX, (duet_uart_callback_func)(shell_handle_uartirq));
+    duet_uart_set_callback(UART1_INDEX, (duet_uart_callback_func) (shell_handle_uartirq));
     lega_rtos_init_queue(&hal_uart_buf_queue, "shell_buffer_queue", sizeof(char), HAL_UART_BUF_QUEUE_BYTES);
     return 0;
 }

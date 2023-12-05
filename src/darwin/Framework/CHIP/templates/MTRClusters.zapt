@@ -17,11 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    {{description}}
  */
 {{availability (asUpperCamelCase name preserveAcronyms=true)}}
-@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRCluster
-
-- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
-                              endpointID:(NSNumber *)endpointID
-                                   queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} : MTRGenericCluster
 
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
@@ -30,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isSupported cluster command=command)}}
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{#unless hasArguments}}
-- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#if (and (isStrEqual command "KeySetReadAllIndices")
            (isStrEqual cluster "GroupKeyManagement"))}}
@@ -54,8 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "availability"}}
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/inline}}
-- (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
-{{#if isWritableAttribute}}
+- (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
@@ -64,6 +61,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} (Availability)
+
+/**
+{{#zcl_commands}}
+{{#first}}
+ * For all instance methods that take a completion (i.e. command invocations),
+ * the completion will be called on the provided queue.
+{{/first}}
+{{else}}
+ * The queue is currently unused, but may be used in the future for calling completions
+ * for command invocations if commands are added to this cluster.
+{{/zcl_commands}}
+ */
+- (instancetype _Nullable)initWithDevice:(MTRDevice *)device
+                              endpointID:(NSNumber *)endpointID
+                                   queue:(dispatch_queue_t)queue {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
 @end
 
@@ -101,7 +117,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
-- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
+- (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
 {{/unless}}
 {{/unless}}
 {{/if}}
@@ -114,7 +130,8 @@ NS_ASSUME_NONNULL_BEGIN
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 - (void)writeAttribute{{attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{availability cluster attribute=attribute deprecationMessage=(concat "Please use writeAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithValue on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
 {{/if}}

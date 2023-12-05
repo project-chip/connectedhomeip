@@ -50,8 +50,6 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             time_source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
             asserts.assert_less(time_source, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kUnknownEnumValue,
                                 "TimeSource is not in valid range")
-        else:
-            asserts.assert_true(False, "TimeSource is a mandatory attribute and must be present in the PICS file")
 
         self.print_step(4, "Read TrustedTimeSource")
         if self.check_pics("TIMESYNC.S.A0003"):

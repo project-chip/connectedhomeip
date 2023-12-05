@@ -11,17 +11,14 @@
         "darwin/Framework/CHIP/templates/helper.js"
     ],
     "resources": {
-        "availability-data": "availability.yaml"
+        "availability-data": "availability.yaml",
+        "config-data": "../../../../app/common/templates/config-data.yaml"
     },
     "override": "../../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {
             "name": "header",
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
-        },
-        {
-            "name": "MTRCallbackBridge",
-            "path": "partials/MTRCallbackBridge.zapt"
         },
         {
             "name": "encode_value",
@@ -53,16 +50,6 @@
         }
     ],
     "templates": [
-        {
-            "path": "MTRCallbackBridge.zapt",
-            "name": "Objc MTRCallbackBridge header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.h"
-        },
-        {
-            "path": "MTRCallbackBridge-src.zapt",
-            "name": "Objc MTRCallbackBridge",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.mm"
-        },
         {
             "path": "MTRBaseClusters_Internal.zapt",
             "name": "Objc ZCL asynchronous API Internal Header",
@@ -137,6 +124,16 @@
             "path": "MTRAttributeSpecifiedCheck-src.zapt",
             "name": "Function to check if attribute is specified",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
+        },
+        {
+            "path": "MTRCommandTimedCheck-src.zapt",
+            "name": "Function to check if command needs timed invoke",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRDeviceTypeMetadata-src.zapt",
+            "name": "Functions to ask for information about device types",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRDeviceTypeMetadata.mm"
         }
     ]
 }

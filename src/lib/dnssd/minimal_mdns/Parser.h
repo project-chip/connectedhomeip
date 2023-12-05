@@ -29,7 +29,7 @@ class QueryData
 {
 public:
     QueryData() {}
-    QueryData(const QueryData &) = default;
+    QueryData(const QueryData &)             = default;
     QueryData & operator=(const QueryData &) = default;
 
     QueryData(QType type, QClass klass, bool unicast) : mType(type), mClass(klass), mAnswerViaUnicast(unicast) {}
@@ -77,7 +77,7 @@ class ResourceData
 public:
     ResourceData() {}
 
-    ResourceData(const ResourceData &) = default;
+    ResourceData(const ResourceData &)             = default;
     ResourceData & operator=(const ResourceData &) = default;
 
     QType GetType() const { return mType; }

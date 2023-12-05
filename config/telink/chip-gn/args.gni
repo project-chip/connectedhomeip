@@ -20,8 +20,8 @@ chip_device_platform = "telink"
 
 chip_build_tests = false
 
-chip_project_config_include = ""
-chip_system_project_config_include = ""
+chip_project_config_include = "<CHIPProjectConfig.h>"
+chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = ""
 
 chip_crypto = "mbedtls"
