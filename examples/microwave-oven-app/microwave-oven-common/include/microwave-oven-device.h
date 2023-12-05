@@ -46,44 +46,6 @@ class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
                                    public ModeBase::Delegate,
                                    public OperationalState::Delegate
 {
-private:
-    // define delegates and instances for Microwave Oven device
-    MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
-    OperationalState::Instance mOperationalStateInstance;
-    ModeBase::Instance mMicrowaveOvenModeInstance;
-
-    // MicrowaveOvenMode types
-    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
-    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
-
-    const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
-                                                 .mode     = ModeDefrost,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
-    };
-
-    // Operational States
-    const OperationalState::GenericOperationalState opStateList[4] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-    };
-
-    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
-        Span<const OperationalState::GenericOperationalState>(opStateList);
-
-    const OperationalState::GenericOperationalPhase opPhaseList[1] = {
-        // Phase List is null
-        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    };
-
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
-        Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
 
 public:
     /**
@@ -227,6 +189,46 @@ public:
      * CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the modeIndex in beyond the list of available mode tags.
      */
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
+
+private:
+    // define delegates and instances for Microwave Oven device
+    MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
+    OperationalState::Instance mOperationalStateInstance;
+    ModeBase::Instance mMicrowaveOvenModeInstance;
+
+    // MicrowaveOvenMode types
+    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
+    ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
+
+    const detail::Structs::ModeOptionStruct::Type kModeOptions[2] = {
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
+                                                 .mode     = ModeNormal,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Defrost"),
+                                                 .mode     = ModeDefrost,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsDefrost) }
+    };
+
+    // Operational States
+    const OperationalState::GenericOperationalState opStateList[4] = {
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
+    };
+
+    app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(opStateList);
+
+    const OperationalState::GenericOperationalPhase opPhaseList[1] = {
+        // Phase List is null
+        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
+    };
+
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
+        Span<const OperationalState::GenericOperationalPhase>(opPhaseList);
+
 };
 
 } // namespace Clusters
