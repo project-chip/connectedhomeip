@@ -143,9 +143,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_UNINITIALIZED.AsInteger():
         desc = "Uninitialized";
         break;
-    case CHIP_ERROR_EMPTY.AsInteger():
-        desc = "Empty";
-        break;
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
         break;

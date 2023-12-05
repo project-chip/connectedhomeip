@@ -103,7 +103,7 @@ protected:
         // All the fields added together
         return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
                                            sizeof(uint64_t), sizeof(uint32_t), kUserActiveModeTriggerInstructionSize,
-                                           sizeof(Crypto::Aes128KeyByteArray));
+                                           sizeof(Crypto::Symmetric128BitsKeyByteArray));
     }
 
     static constexpr size_t MaxICDCounterSize()

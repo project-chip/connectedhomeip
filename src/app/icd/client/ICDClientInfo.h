@@ -58,8 +58,8 @@ struct ICDClientInfo
                    kUserActiveModeTriggerInstructionSize);
         }
         has_instruction = other.has_instruction;
-        ByteSpan buf(other.shared_key.As<Crypto::Aes128KeyByteArray>());
-        memcpy(shared_key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        ByteSpan buf(other.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
+        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
         return *this;
     }
 };
