@@ -382,7 +382,7 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
 
     if (oldValue != mMaximumChargeCurrent)
     {
-        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %" PRId64, mMaximumChargeCurrent);
+        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %ld", static_cast<long>(mMaximumChargeCurrent));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
 
         /* Call the EV Charger hardware current limit callback */
@@ -514,7 +514,7 @@ CHIP_ERROR EnergyEvseDelegate::SetCircuitCapacity(int64_t newValue)
     mCircuitCapacity = newValue;
     if (oldValue != mCircuitCapacity)
     {
-        ChipLogDetail(AppServer, "CircuitCapacity updated to %" PRId64, mCircuitCapacity);
+        ChipLogDetail(AppServer, "CircuitCapacity updated to %ld", static_cast<long>(mCircuitCapacity));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, CircuitCapacity::Id);
     }
     return CHIP_NO_ERROR;
@@ -536,7 +536,7 @@ CHIP_ERROR EnergyEvseDelegate::SetMinimumChargeCurrent(int64_t newValue)
     mMinimumChargeCurrent = newValue;
     if (oldValue != mMinimumChargeCurrent)
     {
-        ChipLogDetail(AppServer, "MinimumChargeCurrent updated to %" PRId64, mMinimumChargeCurrent);
+        ChipLogDetail(AppServer, "MinimumChargeCurrent updated to %ld", static_cast<long>(mMinimumChargeCurrent));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id);
     }
     return CHIP_NO_ERROR;
@@ -559,7 +559,7 @@ CHIP_ERROR EnergyEvseDelegate::SetMaximumChargeCurrent(int64_t newValue)
     mMaximumChargeCurrent = newValue;
     if (oldValue != mMaximumChargeCurrent)
     {
-        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %" PRId64, mMaximumChargeCurrent);
+        ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %ld", static_cast<long>(mMaximumChargeCurrent));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
     }
     return CHIP_NO_ERROR;
@@ -581,7 +581,7 @@ CHIP_ERROR EnergyEvseDelegate::SetMaximumDischargeCurrent(int64_t newValue)
     mMaximumDischargeCurrent = newValue;
     if (oldValue != mMaximumDischargeCurrent)
     {
-        ChipLogDetail(AppServer, "MaximumDischargeCurrent updated to %" PRId64, mMaximumDischargeCurrent);
+        ChipLogDetail(AppServer, "MaximumDischargeCurrent updated to %ld", static_cast<long>(mMaximumDischargeCurrent));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id);
     }
     return CHIP_NO_ERROR;
@@ -602,7 +602,7 @@ CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
     mUserMaximumChargeCurrent = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %" PRId64, mUserMaximumChargeCurrent);
+        ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(mUserMaximumChargeCurrent));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
     }
 
