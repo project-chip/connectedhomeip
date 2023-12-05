@@ -56,7 +56,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
         return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
 #endif
     default:
-    break;
+        break;
     }
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -103,7 +103,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
         return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
 #endif
     default:
-    break;
+        break;
     }
     return EMBER_ZCL_STATUS_SUCCESS;
 }
