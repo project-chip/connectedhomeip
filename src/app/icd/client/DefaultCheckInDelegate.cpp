@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
@@ -16,20 +15,17 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <app/icd/client/ICDClientInfo.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
 
-/// Callbacks for check in protocol
-class DLL_EXPORT CheckInDelegate
+void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRegisterICD)
 {
-public:
-    virtual ~CheckInDelegate() {}
-    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRefreshKey) = 0;
-};
+    ChipLogProgress(ICDClient, "Check In Message preocessing complete");
+}
 
 } // namespace app
 } // namespace chip

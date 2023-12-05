@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DefaultICDClientStorage.h"
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <iterator>
 #include <lib/core/Global.h>
 #include <lib/support/Base64.h>
@@ -442,33 +442,28 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, bool & refreshKey)
 {
     uint32_t counter;
     MutableByteSpan appData;
-    VerifyOrReturnError(chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
-                            clientInfo.shared_key, payload, counter, appData) == CHIP_NO_ERROR,
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-
-    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_ARGUMENT);
-    clientInfo.offset = counter - clientInfo.start_icd_counter;
-    if (checkInCounter > kCheckInRolloverConstant)
+    auto * iterator = IterateICDClientInfo();
+    while (iterator->Next(clientInfo))
     {
-        RefreshKeyAndRegisterClient(clientInfo);
+        if (CHIP_NO_ERROR ==
+            chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload, counter,
+                                                                                       appData))
+        {
+            auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
+            refreshKey          = false;
+            VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_ARGUMENT);
+            clientInfo.offset = counter - clientInfo.start_icd_counter;
+            if (checkInCounter > kCheckInRolloverConstant)
+            {
+                refreshKey = true;
+            }
+            return CHIP_NO_ERROR;
+        }
     }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultICDClientStorage::RefreshKeyAndRegisterClient(ICDClientInfo & clientInfo)
-{
-    uint8_t randomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
-    chip::Optional<chip::ByteSpan> icdSymmetricKey;
-    chip::Crypto::DRBG_get_bytes(randomGeneratedICDSymmetricKey, sizeof(randomGeneratedICDSymmetricKey));
-    icdSymmetricKey.SetValue(ByteSpan(randomGeneratedICDSymmetricKey));
-    // TODO - Register client with new key and node ID
-    ReturnErrorOnFailure(SetKey(clientInfo, icdSymmetricKey.Value()));
-    ReturnErrorOnFailure(StoreEntry(clientInfo));
     return CHIP_NO_ERROR;
 }
 } // namespace app
