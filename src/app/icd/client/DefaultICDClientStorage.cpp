@@ -287,6 +287,11 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
 }
 
+void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
+{
+    mpKeyStore->DestroyKey(clientInfo.shared_key);
+}
+
 CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
 {
     TLV::TLVType arrayType;
@@ -385,6 +390,23 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
+CHIP_ERROR DefaultICDClientStorage::GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo)
+{
+    size_t clientInfoSize = 0;
+    std::vector<ICDClientInfo> clientInfoVector;
+    ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
+    IgnoreUnusedVariable(clientInfoSize);
+    for (auto & info : clientInfoVector)
+    {
+        if (peerNode.GetNodeId() == info.peer_node.GetNodeId())
+        {
+            clientInfo = info;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
     size_t clientInfoSize = 0;
@@ -395,7 +417,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     {
         if (peerNode.GetNodeId() == it->peer_node.GetNodeId())
         {
-            mpKeyStore->DestroyKey(it->shared_key);
+            RemoveKey(*it);
             it = clientInfoVector.erase(it);
             break;
         }
@@ -430,7 +452,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     IgnoreUnusedVariable(clientInfoSize);
     for (auto & clientInfo : clientInfoVector)
     {
-        mpKeyStore->DestroyKey(clientInfo.shared_key);
+        RemoveKey(clientInfo);
     }
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));
