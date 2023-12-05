@@ -60,6 +60,8 @@ public:
 
     ~HmacKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
 
+    const psa_key_attributes_t & Get() { return mAttrs; }
+
 private:
     psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
 };
