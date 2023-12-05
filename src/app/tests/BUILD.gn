@@ -128,6 +128,7 @@ chip_test_suite_using_nltest("tests") {
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
@@ -161,6 +162,7 @@ chip_test_suite_using_nltest("tests") {
   }
 
   test_sources += [ "TestAclAttribute.cpp" ]
+  test_sources += [ "TestDefaultICDClientStorage.cpp" ]
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -200,6 +202,7 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd:manager",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",

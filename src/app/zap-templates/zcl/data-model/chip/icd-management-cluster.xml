@@ -68,7 +68,7 @@ limitations under the License.
         <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
         <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
-        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
+        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
             <access op="read" privilege="administer"/>
         </attribute>

@@ -34,6 +34,8 @@
         "color-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
+        "content-app-observer-cluster.xml",
+        "content-control-cluster.xml",
         "descriptor-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
@@ -43,6 +45,7 @@
         "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",
+        "energy-evse-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
         "fault-injection-cluster.xml",
@@ -74,6 +77,7 @@
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
+        "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
         "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
@@ -310,7 +314,11 @@
             "OverrunCount"
         ],
         "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
+        "Media Playback": [
+            "SampledPosition",
+            "ActiveAudioTrack",
+            "ActiveTextTrack"
+        ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
         "Time Synchronization": [
@@ -366,6 +374,12 @@
             "CountdownTime"
         ],
         "RVC Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",

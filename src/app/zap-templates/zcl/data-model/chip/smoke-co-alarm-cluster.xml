@@ -34,7 +34,7 @@ limitations under the License.
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="1" />
     <!-- Cluster feature map -->
-    <globalAttribute side="server" code="0xFFFC" type="Feature" value="1" />
+    <globalAttribute side="server" code="0xFFFC" type="Feature" value="3" />
 
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>

@@ -42,10 +42,10 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="ARRAY" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
+    <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="array" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
     <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
     <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="NumberOfRinsesEnum"                                           writable="true"  isNullable="false"  optional="true">NumberOfRinses</attribute>
-    <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="ARRAY" entryType="NumberOfRinsesEnum"                      writable="false"  isNullable="false"  optional="true">SupportedRinses</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="array" entryType="NumberOfRinsesEnum"                      writable="false"  isNullable="false"  optional="true">SupportedRinses</attribute>
   </cluster>
 </configurator>
  

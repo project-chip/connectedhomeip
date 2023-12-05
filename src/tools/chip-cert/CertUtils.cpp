@@ -231,14 +231,14 @@ bool HasStringPrefix(const uint8_t * buffer, size_t len, const char * prefix)
 CertFormat DetectCertFormat(const uint8_t * cert, uint32_t certLen)
 {
     static const uint8_t chipRawPrefix[]           = { 0x15, 0x30, 0x01 };
-    static const char * chipHexPrefix              = "153001";
-    static const char * chipB64Prefix              = "FTAB";
+    static const char chipHexPrefix[]              = "153001";
+    static const char chipB64Prefix[]              = "FTAB";
     static const uint8_t chipCompactPdcRawPrefix[] = { 0x15, 0x30, 0x09 };
-    static const char * chipCompactPdcHexPrefix    = "153009";
-    static const char * chipCompactPdcB64Prefix    = "FTAJ";
+    static const char chipCompactPdcHexPrefix[]    = "153009";
+    static const char chipCompactPdcB64Prefix[]    = "FTAJ";
     static const uint8_t derRawPrefix[]            = { 0x30, 0x82 };
-    static const char * derHexPrefix               = "30820";
-    static const char * pemMarker                  = "-----BEGIN CERTIFICATE-----";
+    static const char derHexPrefix[]               = "30820";
+    static const char pemMarker[]                  = "-----BEGIN CERTIFICATE-----";
 
     VerifyOrReturnError(cert != nullptr, kCertFormat_Unknown);
 

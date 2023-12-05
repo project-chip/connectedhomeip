@@ -509,6 +509,22 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback
+    : public Callback::Callback<CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallbackType>
+{
+public:
+    CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback(jobject javaCallback);
+
+    ~CHIPOvenCavityOperationalStateClusterOperationalCommandResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOvenModeClusterChangeToModeResponseCallback
     : public Callback::Callback<CHIPOvenModeClusterChangeToModeResponseCallbackType>
 {
@@ -632,6 +648,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPEnergyEvseClusterGetTargetsResponseCallback
+    : public Callback::Callback<CHIPEnergyEvseClusterGetTargetsResponseCallbackType>
+{
+public:
+    CHIPEnergyEvseClusterGetTargetsResponseCallback(jobject javaCallback);
+
+    ~CHIPEnergyEvseClusterGetTargetsResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
@@ -750,6 +781,20 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPChannelClusterProgramGuideResponseCallback : public Callback::Callback<CHIPChannelClusterProgramGuideResponseCallbackType>
+{
+public:
+    CHIPChannelClusterProgramGuideResponseCallback(jobject javaCallback);
+
+    ~CHIPChannelClusterProgramGuideResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTargetNavigatorClusterNavigateTargetResponseCallback
     : public Callback::Callback<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>
 {
@@ -833,6 +878,37 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPContentControlClusterResetPINResponseCallback
+    : public Callback::Callback<CHIPContentControlClusterResetPINResponseCallbackType>
+{
+public:
+    CHIPContentControlClusterResetPINResponseCallback(jobject javaCallback);
+
+    ~CHIPContentControlClusterResetPINResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPContentAppObserverClusterContentAppMessageResponseCallback
+    : public Callback::Callback<CHIPContentAppObserverClusterContentAppMessageResponseCallbackType>
+{
+public:
+    CHIPContentAppObserverClusterContentAppMessageResponseCallback(jobject javaCallback);
+
+    ~CHIPContentAppObserverClusterContentAppMessageResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

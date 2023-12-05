@@ -219,7 +219,7 @@ namespace DeviceLayer {
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(offset != 0, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
 
             KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil, true);
             if (!item) {
@@ -257,7 +257,7 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
 
             KeyValueItem * item = FindItemForKey([[NSString alloc] initWithUTF8String:key], nil);
             if (!item) {
@@ -282,7 +282,7 @@ namespace DeviceLayer {
         CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
         {
             ReturnErrorCodeIf(key == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_WELL_UNINITIALIZED);
+            ReturnErrorCodeIf(gContext == nullptr, CHIP_ERROR_UNINITIALIZED);
 
             NSData * data = [[NSData alloc] initWithBytes:value length:value_size];
 

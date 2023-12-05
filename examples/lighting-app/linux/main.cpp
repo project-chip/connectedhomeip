@@ -40,7 +40,7 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_lighting_fifo_";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_lighting_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 LightingAppCommandDelegate sLightingAppCommandDelegate;
 } // namespace

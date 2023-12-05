@@ -73,12 +73,12 @@ Protocols::InteractionModel::Status ServerClusterCommandExists(const ConcreteCom
     return Status::Success;
 }
 
-void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip::TLV::TLVReader & aReader,
+void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPath, chip::TLV::TLVReader & aReader,
                                   CommandHandler * apCommandObj)
 {
     static bool statusCodeFlipper = false;
 
-    if (ServerClusterCommandExists(aCommandPath) != Protocols::InteractionModel::Status::Success)
+    if (ServerClusterCommandExists(aRequestCommandPath) != Protocols::InteractionModel::Status::Success)
     {
         return;
     }
@@ -106,7 +106,8 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(path));
+        const CommandHandler::InvokeResponseParameters prepareParams(aRequestCommandPath);
+        ReturnOnFailure(apCommandObj->PrepareInvokeResponseCommand(path, prepareParams));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
