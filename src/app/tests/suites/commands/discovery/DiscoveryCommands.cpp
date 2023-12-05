@@ -155,7 +155,7 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
         chip::CharSpan(nodeData.commissionData.pairingInstruction, strlen(nodeData.commissionData.pairingInstruction));
     data.supportsTcpClient = nodeData.resolutionData.supportsTcpClient;
     data.supportsTcpServer = nodeData.resolutionData.supportsTcpServer;
-    data.port        = nodeData.resolutionData.port;
+    data.port              = nodeData.resolutionData.port;
 
     if (!chip::CanCastTo<uint8_t>(nodeData.resolutionData.numIPs))
     {
