@@ -70,16 +70,16 @@ public:
 
         /**
          *
-         * Newer OnResponse that allows for additional will be called when a successful response from server has been received and
-         * processed. Specifically: OnResponse will be called when a successful response from server has been received and
-         * processed. Specifically:
+         * OnResponseWithAdditionalData will be called when a successful response from server has been received and processed.
+         * Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
-         * This OnResponse is similar to OnResponse mentioned below, except it contains an additional parameter
-         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is more future extendable
-         * to provide additional response data that can be consumed by the client without changing the API declaration.
+         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
+         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
+         * future to provide additional response data and only making changes to `AdditionalResponseData`, and not all the potential
+         * call sites.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
@@ -93,8 +93,9 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                TLV::TLVReader * apData, const AdditionalResponseData & aAdditionalResponseData)
+        virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                                  const AdditionalResponseData & aAdditionalResponseData)
         {
             OnResponse(apCommandSender, aPath, aStatusIB, apData);
         }
@@ -188,7 +189,11 @@ public:
             return *this;
         }
 
+        // From the perspective of `PrepareCommand`, this is an out parameter. This value will be
+        // set by `PrepareCommand` and is expected to be unchanged by caller until it is provided
+        // to the `FinishCommand`.
         Optional<uint16_t> mCommandRef;
+        // For both `PrepareCommand` and `FinishCommand` this is an in parameter.
         bool mStartOrEndDataStruct = false;
     };
 
@@ -223,12 +228,12 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, const AdditionalCommandParameters & aOptionalArgs);
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs);
 
     [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR
     PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
     {
-        AdditionalCommandParameters optionalArgs = AdditionalCommandParameters();
+        AdditionalCommandParameters optionalArgs;
         optionalArgs.SetStartOrEndDataStruct(aStartDataStruct);
         return PrepareCommand(aCommandPathParams, optionalArgs);
     }
@@ -238,7 +243,7 @@ public:
     [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandParameters")]] CHIP_ERROR
     FinishCommand(bool aEndDataStruct = true)
     {
-        AdditionalCommandParameters optionalArgs = AdditionalCommandParameters();
+        AdditionalCommandParameters optionalArgs;
         optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
         return FinishCommand(optionalArgs);
     }
@@ -256,9 +261,15 @@ public:
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
+                              AdditionalCommandParameters & aOptionalArgs)
     {
         return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
+    }
+    template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestData(aCommandPath, aData, optionalArgs);
     }
 
     /**
@@ -268,14 +279,20 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                              const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
         // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
         VerifyOrReturnError(aOptionalArgs.mStartOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
 
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+    }
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestData(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
     }
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandParameters & aOptionalArgs);
@@ -295,9 +312,17 @@ public:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                           const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                          const AdditionalCommandParameters & aOptionalArgs = AdditionalCommandParameters())
+                                          AdditionalCommandParameters & aOptionalArgs)
     {
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+    }
+
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestDataNoTimedCheck(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
     }
 
     /**
@@ -312,8 +337,7 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs,
-                                      const AdditionalCommandParameters & aOptionalArgs)
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
     {
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();

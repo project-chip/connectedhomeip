@@ -386,8 +386,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         {
             if (statusIB.IsSuccess())
             {
-                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
-                                       hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
+                mpCallback->OnResponseWithAdditionalData(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
+                                                         hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
             }
             else
             {
@@ -413,8 +413,7 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 #endif
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams,
-                                         const AdditionalCommandParameters & aOptionalArgs)
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
@@ -425,9 +424,10 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
+    VerifyOrReturnError(!aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     if (mBatchCommandsEnabled)
     {
-        VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        aOptionalArgs.mCommandRef.SetValue(mFinishedCommandCount);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -462,8 +462,7 @@ CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOpt
 
     if (mBatchCommandsEnabled)
     {
-        // If error below occurs, whatever provided aOptionalArgs to PerpareCommand has changed it's
-        // value for mCommandRef since calling PrepareCommand.
+        // If error below occurs, aOptionalArgs.mCommandRef was modified since PerpareCommand was called.
         VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
