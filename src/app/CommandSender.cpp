@@ -326,7 +326,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         bool commandRefExpected = (mFinishedCommandCount > 1);
         bool hasDataResponse    = false;
         TLV::TLVReader commandDataReader;
-        mAdditionalResponseElements = AdditionalInvokeResponseElements();
+        AdditionalResponseData additionalResponseData;
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -341,7 +341,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
-            ReturnErrorOnFailure(GetRef(commandStatus, mAdditionalResponseElements.mCommandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandStatus, additionalResponseData.mCommandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -353,7 +353,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
-            ReturnErrorOnFailure(GetRef(commandData, mAdditionalResponseElements.mCommandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandData, additionalResponseData.mCommandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -387,7 +387,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             if (statusIB.IsSuccess())
             {
                 mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
-                                       hasDataResponse ? &commandDataReader : nullptr);
+                                       hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
             }
             else
             {

@@ -421,7 +421,6 @@ private:
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    AdditionalInvokeResponseElements mAdditionalResponseElements;
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
