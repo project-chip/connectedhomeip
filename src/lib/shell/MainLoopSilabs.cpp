@@ -32,7 +32,7 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-constexpr const char kShellPrompt[] = "matterCli> ";
+constexpr char kShellPrompt[] = "matterCli> ";
 
 // To track carriage returns of Windows return cases of '\r\n'
 bool haveCR = false;

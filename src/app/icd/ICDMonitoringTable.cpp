@@ -42,7 +42,7 @@ CHIP_ERROR ICDMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kCheckInNodeID), checkInNodeID));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kMonitoredSubject), monitoredSubject));
 
-    ByteSpan buf(key.As<Crypto::Aes128KeyByteArray>());
+    ByteSpan buf(key.As<Crypto::Symmetric128BitsKeyByteArray>());
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kKey), buf));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -70,13 +70,14 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 ReturnErrorOnFailure(reader.Get(monitoredSubject));
                 break;
             case to_underlying(Fields::kKey): {
-                ByteSpan buf(key.AsMutable<Crypto::Aes128KeyByteArray>());
+                ByteSpan buf(key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>());
                 ReturnErrorOnFailure(reader.Get(buf));
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another key in storage and will cause
                 // key leakage in some implementation.
-                memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+                memcpy(key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+                       sizeof(Crypto::Symmetric128BitsKeyByteArray));
                 keyHandleValid = true;
             }
             break;
@@ -100,12 +101,12 @@ void ICDMonitoringEntry::Clear()
 
 CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
 {
-    VerifyOrReturnError(keyData.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(keyData.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(symmetricKeystore != nullptr, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(!keyHandleValid, CHIP_ERROR_INTERNAL);
 
-    Crypto::Aes128KeyByteArray keyMaterial;
-    memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Aes128KeyByteArray));
+    Crypto::Symmetric128BitsKeyByteArray keyMaterial;
+    memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     ReturnErrorOnFailure(symmetricKeystore->CreateKey(keyMaterial, key));
     keyHandleValid = true;
@@ -174,8 +175,8 @@ ICDMonitoringEntry & ICDMonitoringEntry::operator=(const ICDMonitoringEntry & ic
     index             = icdMonitoringEntry.index;
     keyHandleValid    = icdMonitoringEntry.keyHandleValid;
     symmetricKeystore = icdMonitoringEntry.symmetricKeystore;
-    memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), icdMonitoringEntry.key.As<Crypto::Aes128KeyByteArray>(),
-           sizeof(Crypto::Aes128KeyByteArray));
+    memcpy(key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), icdMonitoringEntry.key.As<Crypto::Symmetric128BitsKeyByteArray>(),
+           sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     return *this;
 }
@@ -214,8 +215,8 @@ CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & en
     e.checkInNodeID    = entry.checkInNodeID;
     e.monitoredSubject = entry.monitoredSubject;
     e.index            = index;
-    memcpy(e.key.AsMutable<Crypto::Aes128KeyByteArray>(), entry.key.As<Crypto::Aes128KeyByteArray>(),
-           sizeof(Crypto::Aes128KeyByteArray));
+    memcpy(e.key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), entry.key.As<Crypto::Symmetric128BitsKeyByteArray>(),
+           sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     return e.Save(this->mStorage);
 }

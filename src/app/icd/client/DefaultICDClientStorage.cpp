@@ -188,7 +188,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     TLV::TLVType structType;
     ReturnErrorOnFailure(reader.EnterContainer(structType));
@@ -203,7 +203,7 @@ CHIP_ERROR DefaultICDClientStorage::LoadCounter(FabricIndex fabricIndex, size_t 
     clientInfoSize = static_cast<size_t>(tempClientInfoSize);
 
     ReturnErrorOnFailure(reader.ExitContainer(structType));
-    return CHIP_NO_ERROR;
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<ICDClientInfo> & clientInfoVector,
@@ -224,7 +224,7 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
     }
     ReturnErrorOnFailure(err);
 
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), len);
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
@@ -262,8 +262,9 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
         ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
-        VerifyOrReturnError(buf.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.shared_key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
@@ -273,15 +274,16 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         return err;
     }
 
-    return reader.ExitContainer(arrayType);
+    ReturnErrorOnFailure(reader.ExitContainer(arrayType));
+    return reader.VerifyEndOfContainer();
 }
 
 CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
 {
-    VerifyOrReturnError(keyData.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(keyData.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
 
-    Crypto::Aes128KeyByteArray keyMaterial;
-    memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Aes128KeyByteArray));
+    Crypto::Symmetric128BitsKeyByteArray keyMaterial;
+    memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
 }
@@ -299,7 +301,7 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ByteSpan buf(clientInfo.shared_key.As<Crypto::Aes128KeyByteArray>());
+        ByteSpan buf(clientInfo.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
