@@ -429,7 +429,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::OnActiveModeNotificaiton()
+CHIP_ERROR ReadClient::OnActiveModeNotification()
 {
     VerifyOrReturnError(IsSubscriptionType() && IsIdle(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPeerActivePeriod != System::Clock::kZero, CHIP_ERROR_INCORRECT_STATE);
