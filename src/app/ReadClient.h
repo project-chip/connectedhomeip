@@ -326,7 +326,7 @@ public:
     /**
      *  Activate the idle subscription.
      *
-     *  When subscribing to ICD, the subscriber is expected to set the `mActivePeriod`
+     *  When subscribing to an ICD, the subscriber is expected to set the `mActivePeriod`
      * in `ReadPrepareParams`.
      *
      *  @retval #others fail to send read request
