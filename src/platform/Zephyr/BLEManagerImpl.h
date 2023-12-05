@@ -97,7 +97,7 @@ private:
     struct ServiceData;
 
     BitFlags<Flags> mFlags;
-    uint16_t mGAPConns;
+    uint16_t mMatterConnNum;
     CHIPoBLEServiceMode mServiceMode;
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
     bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
@@ -106,6 +106,8 @@ private:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
+    // The summarized number of Bluetooth LE connections related to the device (including these not related to Matter service).
+    uint16_t mTotalConnNum;
 
     void DriveBLEState(void);
     CHIP_ERROR PrepareAdvertisingRequest();

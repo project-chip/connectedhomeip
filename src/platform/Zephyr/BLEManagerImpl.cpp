@@ -167,7 +167,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    mGAPConns = 0;
+    mMatterConnNum = 0;
+    mTotalConnNum  = 0;
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
@@ -493,14 +494,12 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
     if (connEvent->HciResult == BT_HCI_ERR_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "BLE connection established (ConnId: 0x%02x)", bt_conn_index(connEvent->BtConn));
-        mGAPConns++;
+        mMatterConnNum++;
     }
     else
     {
         ChipLogError(DeviceLayer, "BLE connection failed (reason: 0x%02x)", connEvent->HciResult);
     }
-
-    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), CONFIG_BT_MAX_CONN);
 
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -516,7 +515,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 
     ChipLogProgress(DeviceLayer, "BLE GAP connection terminated (reason 0x%02x)", connEvent->HciResult);
 
-    mGAPConns--;
+    mMatterConnNum--;
 
     // If indications were enabled for this connection, record that they are now disabled and
     // notify the BLE Layer of a disconnect.
@@ -543,8 +542,6 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
-
-    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", NumConnections(), CONFIG_BT_MAX_CONN);
 
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
@@ -705,7 +702,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 uint16_t BLEManagerImpl::_NumConnections(void)
 {
-    return mGAPConns;
+    return mMatterConnNum;
 }
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
@@ -880,9 +877,16 @@ void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_
 void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
 {
     ChipDeviceEvent event;
+    bt_conn_info bt_info;
 
     PlatformMgr().LockChipStack();
 
+    sInstance.mTotalConnNum++;
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
+
+    VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+    // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
+    VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
     VerifyOrExit(sInstance.mFlags.Has(Flags::kChipoBleGattServiceRegister), );
 
@@ -899,9 +903,16 @@ exit:
 void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
     ChipDeviceEvent event;
+    bt_conn_info bt_info;
 
     PlatformMgr().LockChipStack();
 
+    sInstance.mTotalConnNum--;
+    ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
+
+    VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
+    // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
+    VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
     VerifyOrExit(sInstance.mFlags.Has(Flags::kChipoBleGattServiceRegister), );
 
