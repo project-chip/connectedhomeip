@@ -36,26 +36,26 @@ public:
     virtual ~SessionKeystore() {}
 
     /**
-     * @brief Import raw key material and return an AES 128 Bits key handle.
+     * @brief Import raw key material and return a key handle for a key that be used to do AES 128 encryption.
      *
      * @note This method should only be used when using the raw key material in the Matter stack
      * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
      * cryptographic operations in a secure environment.
      *
      * If the method returns no error, the application is responsible for destroying the handle
-     * using DestroyKey() method when the key is no longer needed.
+     * using the DestroyKey() method when the key is no longer needed.
      */
     virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128BitsKeyHandle & key) = 0;
 
     /**
-     * @brief Import raw key material and return an HMAC 128 Bits key handle.
+     * @brief Import raw key material and return a key handle for a key that can be used to do 128-bit HMAC.
      *
      * @note This method should only be used when using the raw key material in the Matter stack
      * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
      * cryptographic operations in a secure environment.
      *
      * If the method returns no error, the application is responsible for destroying the handle
-     * using DestroyKey() method when the key is no longer needed.
+     * using the DestroyKey() method when the key is no longer needed.
      */
     virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128BitsKeyHandle & key) = 0;
 

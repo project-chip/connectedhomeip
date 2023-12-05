@@ -567,7 +567,7 @@ using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BY
 /**
  * @brief Platform-specific Symmetric key handle
  *
- * The class represents key used by Matter stack either in the form of raw key material or key
+ * The class represents a key used by the Matter stack either in the form of raw key material or key
  * reference, depending on the platform. To achieve that, it contains an opaque context that can be
  * cast to a concrete representation used by the given platform. Note that currently Matter uses
  * 128-bit symmetric keys only.
