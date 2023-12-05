@@ -87,24 +87,24 @@ static const struct flash_area primary_2 = { .fa_id        = FLASH_AREA_IMAGE_PR
                                              .fa_size      = BOOT_PRIMARY_2_SIZE };
 #endif
 
-static const struct flash_area secondary_1 = { .fa_id = FLASH_AREA_IMAGE_SECONDARY(0),
+static const struct flash_area secondary_1         = { .fa_id        = FLASH_AREA_IMAGE_SECONDARY(0),
 #ifndef TI_BOOT_USE_EXTERNAL_FLASH
-                                               .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+                                                       .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
 #else
                                                .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
 #endif
-                                               .fa_off  = BOOT_SECONDARY_1_BASE_ADDRESS,
-                                               .fa_size = BOOT_SECONDARY_1_SIZE };
+                                                       .fa_off       = BOOT_SECONDARY_1_BASE_ADDRESS,
+                                                       .fa_size      = BOOT_SECONDARY_1_SIZE };
 
 #if (MCUBOOT_IMAGE_NUMBER == 2)
-static const struct flash_area secondary_2 = { .fa_id = FLASH_AREA_IMAGE_SECONDARY(1),
+static const struct flash_area secondary_2         = { .fa_id        = FLASH_AREA_IMAGE_SECONDARY(1),
 #ifndef TI_BOOT_USE_EXTERNAL_FLASH
-                                               .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
+                                                       .fa_device_id = FLASH_DEVICE_INTERNAL_FLASH,
 #else
                                                .fa_device_id = FLASH_DEVICE_EXTERNAL_FLASH(0),
 #endif
-                                               .fa_off  = BOOT_SECONDARY_2_BASE_ADDRESS,
-                                               .fa_size = BOOT_SECONDARY_2_SIZE };
+                                                       .fa_off       = BOOT_SECONDARY_2_BASE_ADDRESS,
+                                                       .fa_size      = BOOT_SECONDARY_2_SIZE };
 #endif
 #endif
 
