@@ -42,6 +42,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Protocols;
 
+using namespace chip::System::Clock::Literals;
+
 namespace {
 
 constexpr EndpointId kTestEndpointId        = 1;
@@ -296,6 +298,7 @@ public:
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -2626,6 +2629,98 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
 
+/**
+ * When the peer of the subscription is an ICD, the client should set the active duration before sending the
+ * request. When the active timeout reached, the subscription will enter "IdleSubscription" state, the client
+ * can call "WakeUp" to re-activate it again when the check-in message is received from the ICD.
+ */
+void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
+    auto sessionHandle = ctx.GetSessionBobToAlice();
+
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        app::ReadClient readClient(app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), callback,
+                                   app::ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        app::AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = ArraySize(attributePathParams);
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+        readPrepareParams.mActivePeriod              = 999_ms;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
+
+        chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till timeout.
+        // We won't actually request resubscription, since the device is not active, the resubscription will be deferred until
+        // WakeUp() is called.
+        //
+        //
+        ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
+
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_NO_ERROR);
+
+        ctx.GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        err = readClient.WakeUp();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                        [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
+        NL_TEST_ASSERT(apSuite, callback.mOnDone == 0);
+    }
+
+    ctx.SetMRPMode(chip::Test::MessagingContext::MRPMode::kDefault);
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestReadHandler_MultipleReads(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -4736,6 +4831,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_KeepSubscriptionTest", TestReadInteraction::TestReadHandler_KeepSubscriptionTest),
+    NL_TEST_DEF("TestSubscribeIdleWakeUp", TestReadInteraction::TestSubscribeIdleWakeUp),
     NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -431,8 +431,8 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
 CHIP_ERROR ReadClient::WakeUp()
 {
-    VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE, "Not a valid subscription.");
-    VerifyOrReturnError(mPeerActivePeriod != System::Clock::kZero, CHIP_ERROR_INCORRECT_STATE, "The device should not sleep.");
+    VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPeerActivePeriod != System::Clock::kZero, CHIP_ERROR_INCORRECT_STATE);
     MoveToState(ClientState::Idle);
     Close(CHIP_ERROR_TIMEOUT);
     return CHIP_NO_ERROR;
@@ -447,7 +447,7 @@ CHIP_ERROR ReadClient::TouchPeerActiveTime(System::Clock::Timeout aActivePeriod)
 {
     System::Clock::Timestamp time;
 
-    ReturnLogErrorOnFailure(System::SystemClock().GetClock_RealTime(time));
+    ReturnLogErrorOnFailure(System::SystemClock().GetClock_RealTimeMS(time));
 
     mPeerActiveUntilTimestamp = time + aActivePeriod;
 
@@ -921,20 +921,20 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (mPeerActivePeriod != System::Clock::kZero)
+    if (_this->mPeerActivePeriod != System::Clock::kZero)
     {
         // If device is sleeping, we mark the subscription as "IdleSubscription", and trigger resubscription on `WakeUp`.
         System::Clock::Timestamp time;
-        CHIP_ERROR error = System::SystemClock().GetClock_RealTime(time);
+        CHIP_ERROR error = System::SystemClock().GetClock_RealTimeMS(time);
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "Failed to get current time: %s", ErrorStr(error));
             _this->Close(error, false);
         }
-        if (time > mPeerActiveUntilTimestamp)
+        if (time > _this->mPeerActiveUntilTimestamp)
         {
             ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as IdleSubscription.");
-            MoveToState(ClientState::IdleSubscription);
+            _this->MoveToState(ClientState::IdleSubscription);
             return;
         }
     }
@@ -1047,7 +1047,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     if (mPeerActivePeriod != System::Clock::kZero)
     {
         System::Clock::Timestamp time;
-        ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(time));
+        ReturnErrorOnFailure(System::SystemClock().GetClock_RealTimeMS(time));
         mPeerActiveUntilTimestamp = mPeerActivePeriod;
     }
     else
