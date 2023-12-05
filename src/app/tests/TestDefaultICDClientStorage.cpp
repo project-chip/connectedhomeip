@@ -57,7 +57,7 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     FabricIndex fabricId = 1;
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
-
+    NodeId unknownNodeId = 6668;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
 
@@ -94,12 +94,15 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
         err = manager.StoreEntry(clientInfo3);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        ICDClientInfo clientInfo;
+        manager.GetEntry(clientInfo3.peer_node, clientInfo);
+        NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
+        NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == manager.GetEntry(ScopedNodeId(unknownNodeId, fabricId), clientInfo));
         // Make sure iterator counts correctly
         auto * iterator = manager.IterateICDClientInfo();
         // same nodeId for clientInfo2 and clientInfo3, so the new one replace old one
         NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
 
-        ICDClientInfo clientInfo;
         NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
         NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
         NL_TEST_ASSERT(apSuite, clientInfo.has_instruction);

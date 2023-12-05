@@ -56,9 +56,13 @@ public:
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
+    void RemoveKey(ICDClientInfo & clientInfo) override;
+
     CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) override;
 
-    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
+    CHIP_ERROR GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo) override;
+
+    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) override;
 
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
 
