@@ -46,7 +46,7 @@ OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOpti
 #endif // CHIP_ENABLE_OPENTHREAD
                                   {} };
 
-const char * sDeviceOptionHelp = "  --ble-device <number>\n"
+const char sDeviceOptionHelp[] = "  --ble-device <number>\n"
                                  "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
                                  "\n"

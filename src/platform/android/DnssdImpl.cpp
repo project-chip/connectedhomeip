@@ -53,8 +53,8 @@ jmethodID sRemoveServicesMethod   = nullptr;
 
 // Implementation of functions declared in lib/dnssd/platform/Dnssd.h
 
-constexpr const char * kProtocolTcp = "._tcp";
-constexpr const char * kProtocolUdp = "._udp";
+constexpr char kProtocolTcp[] = "._tcp";
+constexpr char kProtocolUdp[] = "._udp";
 
 CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {

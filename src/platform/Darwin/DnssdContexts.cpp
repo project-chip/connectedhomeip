@@ -28,7 +28,7 @@ namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
-constexpr const char * kLocalDot            = "local.";
+constexpr char kLocalDot[]                  = "local.";
 
 bool IsLocalDomain(const char * domain)
 {
