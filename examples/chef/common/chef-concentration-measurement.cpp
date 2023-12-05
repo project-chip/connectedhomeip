@@ -69,7 +69,7 @@ EmberAfStatus chefConcentrationMeasurementWriteCallback(std::map<int, Instance<N
     AttributeId attributeId = attributeMetadata->attributeId;
 
     if (attributeId == measuredValueId) {
-        float newValue = 0; 
+        float newValue = 0;
 	uint16_t tlvLen = *(uint16_t *)buffer;
 	chip::TLV::TLVReader reader;
 	reader.Init(buffer + sizeof(uint16_t), tlvLen);
