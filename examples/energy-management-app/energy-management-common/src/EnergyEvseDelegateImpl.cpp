@@ -84,7 +84,7 @@ Status EnergyEvseDelegate::Disable()
  * @param maximumChargeCurrent (in mA)
  */
 Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
-                                          const uint64_t & minimumChargeCurrent, const uint64_t & maximumChargeCurrent)
+                                          const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
@@ -164,7 +164,7 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
  * @param maximumChargeCurrent (in mA)
  */
 Status EnergyEvseDelegate::EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
-                                             const uint64_t & maximumDischargeCurrent)
+                                             const int64_t & maximumDischargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
 

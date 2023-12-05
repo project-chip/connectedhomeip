@@ -62,7 +62,7 @@ public:
      * return other Status codes if it fails
      */
     virtual Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & enableChargeTime,
-                                  const uint64_t & minimumChargeCurrent, const uint64_t & maximumChargeCurrent) = 0;
+                                  const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Discharging.
@@ -70,7 +70,7 @@ public:
      * return other Status codes if it fails
      */
     virtual Status EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & enableDischargeTime,
-                                     const uint64_t & maximumDischargeCurrent) = 0;
+                                     const int64_t & maximumDischargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Diagnostics.
