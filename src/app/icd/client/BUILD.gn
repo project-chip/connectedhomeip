@@ -38,6 +38,7 @@ source_set("handler") {
   sources = [
     "CheckInHandler.cpp",
     "CheckInHandler.h",
+    "CheckInDelegate.h",
   ]
   public_deps = [
     ":manager",
