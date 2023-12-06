@@ -68,12 +68,12 @@ public:
 
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
-    // TODO Status hwRegisterEvseHardwareCallback(Callback);
-    Status hwSetMaxHardwareCurrentLimit(int64_t currentmA);
-    Status hwSetCircuitCapacity(int64_t currentmA);
-    Status hwSetCableAssemblyLimit(int64_t currentmA);
-    Status hwSetState(StateEnum state);
-    Status hwSetFault(FaultStateEnum fault);
+    // TODO Status HwRegisterEvseHardwareCallback(Callback);
+    Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
+    Status HwSetCircuitCapacity(int64_t currentmA);
+    Status HwSetCableAssemblyLimit(int64_t currentmA);
+    Status HwSetState(StateEnum state);
+    Status HwSetFault(FaultStateEnum fault);
 
     // ------------------------------------------------------------------
     // Get attribute methods
