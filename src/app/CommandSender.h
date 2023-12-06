@@ -70,13 +70,13 @@ public:
 
         /**
          *
-         * OnResponseWithAdditionalData will be called when a successful response from server has been received and processed.
+         * OnDetailedResponse will be called when a successful response from server has been received and processed.
          * Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
-         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
+         * This OnDetailedResponse is similar to OnResponse mentioned below, except it contains an additional parameter
          * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
          * future to provide additional response data and only making changes to `AdditionalResponseData`, and not all the potential
          * call sites.
@@ -93,9 +93,9 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                                                  const AdditionalResponseData & aAdditionalResponseData)
+        virtual void OnDetailedResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                        const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                        const AdditionalResponseData & aAdditionalResponseData)
         {
             OnResponse(apCommandSender, aPath, aStatusIB, apData);
         }

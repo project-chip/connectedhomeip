@@ -247,7 +247,7 @@ public:
     static void TestCommandInvalidMessage3(nlTestSuite * apSuite, void * apContext);
     static void TestCommandInvalidMessage4(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerInvalidMessageSync(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerInvalidMessageWithAsyncHandlerInScope(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
@@ -1094,7 +1094,7 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
 
 // Command Sender sends malformed invoke request, this command is aysnc command, handler fails to process it and sends status
 // report with invalid action
-void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerInvalidMessageWithAsyncHandlerInScope(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1723,7 +1723,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandSenderCommandFailureResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandFailureResponseFlow),
     NL_TEST_DEF("TestCommandSenderAbruptDestruction", chip::app::TestCommandInteraction::TestCommandSenderAbruptDestruction),
     NL_TEST_DEF("TestCommandHandlerInvalidMessageSync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageSync),
-    NL_TEST_DEF("TestCommandHandlerInvalidMessageAsync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageAsync),
+    NL_TEST_DEF("TestCommandHandlerInvalidMessageWithAsyncHandlerInScope", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageWithAsyncHandlerInScope),
     NL_TEST_SENTINEL()
 };
 // clang-format on
