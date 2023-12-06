@@ -109,7 +109,7 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
     if (chargingEnabledUntil.IsNull())
     {
         /* Charging enabled indefinitely */
-        ChipLogError(NotSpecified, "Charging enabled indefinitely")
+        ChipLogError(NotSpecified, "Charging enabled indefinitely");
     }
     else
     {
