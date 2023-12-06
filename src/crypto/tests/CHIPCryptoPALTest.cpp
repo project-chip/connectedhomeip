@@ -193,7 +193,25 @@ public:
     ~TestAesKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Aes128KeyHandle key;
+    Aes128BitsKeyHandle key;
+};
+
+struct TestHmacKey
+{
+public:
+    TestHmacKey(nlTestSuite * inSuite, const uint8_t * keyBytes, size_t keyLength)
+    {
+        Crypto::Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(&keyMaterial, keyBytes, keyLength);
+
+        CHIP_ERROR err = keystore.CreateKey(keyMaterial, key);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    ~TestHmacKey() { keystore.DestroyKey(key); }
+
+    DefaultSessionKeystore keystore;
+    Hmac128BitsKeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
