@@ -161,7 +161,7 @@ CHIP_ERROR ECDSA_sign_msg_H(P256KeypairContext * mKeypair, const uint8_t * msg, 
                             P256ECDSASignature & out_signature)
 {
     // To be checked by the caller
-    // VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    // VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t digest[kSHA256_Hash_Length];
@@ -233,7 +233,7 @@ CHIP_ERROR ECDH_derive_secret_H(P256KeypairContext * mKeypair, const P256PublicK
     const mbedtls_ecp_keypair * keypair = to_const_keypair(mKeypair);
 
     // To be checked by the caller
-    // VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    // VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
     result = mbedtls_ecp_group_load(&ecp_grp, MapECPGroupId(remote_public_key.Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -352,7 +352,7 @@ CHIP_ERROR NewCertificateSigningRequest_H(P256KeypairContext * mKeypair, uint8_t
     VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
 
     // To be checked by the caller
-    // VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    // VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
     mbedtls_x509write_csr_set_key(&csr, &pk);
 

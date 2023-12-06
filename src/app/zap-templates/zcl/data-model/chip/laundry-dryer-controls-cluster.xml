@@ -38,7 +38,7 @@ limitations under the License.
 
         <globalAttribute side="server" code="0xFFFD" value="1" />
 
-        <attribute side="server" code="0x0000" define="SUPPORTED_DRYNESS_LEVELS" type="ARRAY" entryType="DrynessLevelEnum" writable="false" isNullable="false" optional="false" min="0x01" max="0x04">SupportedDrynessLevels</attribute>
+        <attribute side="server" code="0x0000" define="SUPPORTED_DRYNESS_LEVELS" type="array" entryType="DrynessLevelEnum" writable="false" isNullable="false" optional="false" min="0x01" max="0x04">SupportedDrynessLevels</attribute>
         <attribute side="server" code="0x0001" define="SELECTED_DRYNESS_LEVEL" type="DrynessLevelEnum"      writable="true"  isNullable="true"   optional="false">SelectedDrynessLevel</attribute>
     </cluster>
 </configurator> 

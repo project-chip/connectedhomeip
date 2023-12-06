@@ -24,7 +24,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
-    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST"           type="ARRAY" entryType="TargetInfoStruct"    length="254" writable="false" optional="false">TargetList</attribute>
+    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST"           type="array" entryType="TargetInfoStruct"    length="254" writable="false" optional="false">TargetList</attribute>
     <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="int8u" default="0"            min="0x00" max="0xFF" writable="false" optional="true">CurrentTarget</attribute>
 
     <command source="client" code="0x00" name="NavigateTarget" response="NavigateTargetResponse" optional="false">
@@ -38,6 +38,13 @@ limitations under the License.
       <arg name="Status" type="StatusEnum"/>
       <arg name="Data"   type="char_string" optional="true"/>
     </command>
+
+    <event side="server" code="0x00" priority="info" name="TargetUpdated" optional="false">
+      <description>This field SHALL indicate the updated target list as defined by the TargetList attribute if there is a change in the list of targets. Otherwise this field can be omitted from the event.</description>
+      <field id="0" name="TargetList" array="true" type="TargetInfoStruct"  />
+      <field id="1" name="CurrentTarget" type="int8u" />
+      <field id="2" name="Data" length="900" type="octet_string" />
+    </event>
   </cluster>
 
   <enum name="StatusEnum" type="enum8">
@@ -49,7 +56,7 @@ limitations under the License.
 
   <struct name="TargetInfoStruct">
     <cluster code="0x0505"/>
-    <item name="Identifier" type="int8u"/>
+    <item name="Identifier" type="int8u" length="254"/>
     <item name="Name"       type="char_string"/>
   </struct>
 </configurator>

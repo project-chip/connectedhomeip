@@ -26,18 +26,18 @@
 using namespace chip::DeviceLayer;
 
 namespace {
-constexpr const char * kClusterIdKey                = "clusterId";
-constexpr const char * kEndpointIdKey               = "endpointId";
-constexpr const char * kAttributeIdKey              = "attributeId";
-constexpr const char * kWaitTypeKey                 = "waitType";
-constexpr const char * kAttributeWriteKey           = "writeAttribute";
-constexpr const char * kAttributeReadKey            = "readAttribute";
-constexpr const char * kCommandIdKey                = "commandId";
-constexpr const char * kWaitForCommissioningCommand = "WaitForCommissioning";
-constexpr const char * kCategoryError               = "Error";
-constexpr const char * kCategoryProgress            = "Info";
-constexpr const char * kCategoryDetail              = "Debug";
-constexpr const char * kCategoryAutomation          = "Automation";
+constexpr char kClusterIdKey[]                = "clusterId";
+constexpr char kEndpointIdKey[]               = "endpointId";
+constexpr char kAttributeIdKey[]              = "attributeId";
+constexpr char kWaitTypeKey[]                 = "waitType";
+constexpr char kAttributeWriteKey[]           = "writeAttribute";
+constexpr char kAttributeReadKey[]            = "readAttribute";
+constexpr char kCommandIdKey[]                = "commandId";
+constexpr char kWaitForCommissioningCommand[] = "WaitForCommissioning";
+constexpr char kCategoryError[]               = "Error";
+constexpr char kCategoryProgress[]            = "Info";
+constexpr char kCategoryDetail[]              = "Debug";
+constexpr char kCategoryAutomation[]          = "Automation";
 
 struct InteractiveServerResultLog
 {

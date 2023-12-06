@@ -120,6 +120,10 @@ protected:
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
+    // ICD Counter
+    CHIP_ERROR IncrementCounter();
+    CHIP_ERROR InitCounter();
+
     uint8_t mOpenExchangeContextCount = 0;
     uint8_t mCheckInRequestCount      = 0;
 

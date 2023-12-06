@@ -32,6 +32,33 @@
 
 namespace chip {
 namespace app {
+namespace {
+
+// Gets the CommandRef if available. Error returned if we expected CommandRef and it wasn't
+// provided in the response.
+template <typename ParserT>
+CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefExpected)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t ref;
+    err = aParser.GetRef(&ref);
+
+    VerifyOrReturnError(err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV, err);
+    if (err == CHIP_END_OF_TLV)
+    {
+        if (commandRefExpected)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        aRef = NullOptional;
+        return CHIP_NO_ERROR;
+    }
+
+    aRef = MakeOptional(ref);
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
 
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
                              bool aSuppressResponse) :
@@ -296,8 +323,10 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     StatusIB statusIB;
 
     {
-        bool hasDataResponse = false;
+        bool commandRefExpected = (mFinishedCommandCount > 1);
+        bool hasDataResponse    = false;
         TLV::TLVReader commandDataReader;
+        AdditionalResponseData additionalResponseData;
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -312,6 +341,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
+            ReturnErrorOnFailure(GetRef(commandStatus, additionalResponseData.mCommandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -323,6 +353,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
+            ReturnErrorOnFailure(GetRef(commandData, additionalResponseData.mCommandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -355,8 +386,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         {
             if (statusIB.IsSuccess())
             {
-                mpCallback->OnResponse(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
-                                       hasDataResponse ? &commandDataReader : nullptr);
+                mpCallback->OnResponseWithAdditionalData(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
+                                                         hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
             }
             else
             {
@@ -367,14 +398,38 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
+CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters & aConfigParams)
+{
+#if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mRemoteMaxPathsPerInvoke = aConfigParams.mRemoteMaxPathsPerInvoke;
+    mBatchCommandsEnabled    = (aConfigParams.mRemoteMaxPathsPerInvoke > 1);
+    return CHIP_NO_ERROR;
+#else
+    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    return CHIP_NO_ERROR;
+#endif
+}
+
+CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
     //
-    // We must not be in the middle of preparing a command, or having prepared or sent one.
+    // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
-    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
+    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled);
+    VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
+
+    VerifyOrReturnError(!aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mBatchCommandsEnabled)
+    {
+        aOptionalArgs.mCommandRef.SetValue(mFinishedCommandCount);
+    }
+
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
     CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
     ReturnErrorOnFailure(invokeRequests.GetError());
@@ -382,7 +437,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     ReturnErrorOnFailure(invokeRequest.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
-    if (aStartDataStruct)
+    if (aOptionalArgs.mStartOrEndDataStruct)
     {
         ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
@@ -392,7 +447,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
+CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOptionalArgs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -400,17 +455,27 @@ CHIP_ERROR CommandSender::FinishCommand(bool aEndDataStruct)
 
     CommandDataIB::Builder & commandData = mInvokeRequestBuilder.GetInvokeRequests().GetCommandData();
 
-    if (aEndDataStruct)
+    if (aOptionalArgs.mStartOrEndDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
+    if (mBatchCommandsEnabled)
+    {
+        // If error below occurs, aOptionalArgs.mCommandRef was modified since PerpareCommand was called.
+        VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (aOptionalArgs.mCommandRef.HasValue())
+    {
+        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.mCommandRef.Value()));
+    }
+
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
     MoveToState(State::AddedCommand);
 
+    mFinishedCommandCount++;
     return CHIP_NO_ERROR;
 }
 
@@ -424,9 +489,10 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
 }
 
-CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                        const AdditionalCommandParameters & aOptionalArgs)
 {
-    ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false));
+    ReturnErrorOnFailure(FinishCommand(aOptionalArgs));
     if (!mTimedInvokeTimeoutMs.HasValue())
     {
         mTimedInvokeTimeoutMs = aTimedInvokeTimeoutMs;
@@ -442,6 +508,8 @@ CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeT
 CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
+    ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 

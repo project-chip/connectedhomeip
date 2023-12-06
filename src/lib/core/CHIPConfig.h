@@ -293,12 +293,23 @@
  *  @def CHIP_UDC_PORT
  *
  *  @brief
- *    chip TCP/UDP port for unsecured user-directed-commissioning traffic.
+ *    chip TCP/UDP port on commissioner for unsecured user-directed-commissioning traffic.
  *
  */
 #ifndef CHIP_UDC_PORT
 #define CHIP_UDC_PORT CHIP_PORT + 10
 #endif // CHIP_UDC_PORT
+
+/**
+ *  @def CHIP_UDC_COMMISSIONEE_PORT
+ *
+ *  @brief
+ *    chip TCP/UDP port on commisionee for unsecured user-directed-commissioning traffic.
+ *
+ */
+#ifndef CHIP_UDC_COMMISSIONEE_PORT
+#define CHIP_UDC_COMMISSIONEE_PORT CHIP_UDC_PORT + 10
+#endif // CHIP_UDC_COMMISSIONEE_PORT
 
 /**
  *  @def CHIP_CONFIG_SECURITY_TEST_MODE
@@ -1665,6 +1676,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous ICD Clients info iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ *
+ * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ */
+#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
 #endif
 
 /**

@@ -31,7 +31,7 @@ std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
 OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
-constexpr const char * kTrustStorePathVariable = "PAA_TRUST_STORE_PATH";
+constexpr char kTrustStorePathVariable[] = "PAA_TRUST_STORE_PATH";
 
 CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
 

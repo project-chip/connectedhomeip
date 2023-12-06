@@ -85,13 +85,13 @@ struct BLEConnection
 };
 
 /* CHIPoBLE UUID strings */
-const char * chip_ble_service_uuid    = "0000FFF6-0000-1000-8000-00805F9B34FB";
-const char * chip_ble_char_c1_tx_uuid = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
-const char * chip_ble_char_c2_rx_uuid = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
+const char chip_ble_service_uuid[]    = "0000FFF6-0000-1000-8000-00805F9B34FB";
+const char chip_ble_char_c1_tx_uuid[] = "18EE2EF5-263D-4559-959F-4F9C429F9D11";
+const char chip_ble_char_c2_rx_uuid[] = "18EE2EF5-263D-4559-959F-4F9C429F9D12";
 /* CCCD */
-const char * desc_uuid_short = "2902";
+const char desc_uuid_short[] = "2902";
 
-const char * chip_ble_service_uuid_short = "FFF6";
+const char chip_ble_service_uuid_short[] = "FFF6";
 
 /* Tizen Default Scan Timeout */
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);

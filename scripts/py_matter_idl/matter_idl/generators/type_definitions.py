@@ -169,6 +169,7 @@ __CHIP_SIZED_TYPES__ = {
     "bitmap64": BasicInteger(idl_name="bitmap64", byte_count=8, is_signed=False),
     "bitmap8": BasicInteger(idl_name="bitmap8", byte_count=1, is_signed=False),
     "enum16": BasicInteger(idl_name="enum16", byte_count=2, is_signed=False),
+    "enum24": BasicInteger(idl_name="enum24", byte_count=3, is_signed=False),
     "enum32": BasicInteger(idl_name="enum32", byte_count=4, is_signed=False),
     "enum8": BasicInteger(idl_name="enum8", byte_count=1, is_signed=False),
     "int16s": BasicInteger(idl_name="int16s", byte_count=2, is_signed=True),
@@ -188,7 +189,7 @@ __CHIP_SIZED_TYPES__ = {
     "int8s": BasicInteger(idl_name="int8s", byte_count=1, is_signed=True),
     "int8u": BasicInteger(idl_name="int8u", byte_count=1, is_signed=False),
     # Derived types
-    # Specification describes them in section '7.18.2. Derived Data Types'
+    # Specification describes them in section '7.19.2. Derived Data Types'
     "action_id": BasicInteger(idl_name="action_id", byte_count=1, is_signed=False),
     "amperage_ma": BasicInteger(idl_name="amperage_ma", byte_count=8, is_signed=True),
     "attrib_id": BasicInteger(idl_name="attrib_id", byte_count=4, is_signed=False),
@@ -216,7 +217,8 @@ __CHIP_SIZED_TYPES__ = {
     "posix_ms": BasicInteger(idl_name="posix_ms", byte_count=8, is_signed=False),
     "power_mw": BasicInteger(idl_name="power_mw", byte_count=8, is_signed=True),
     "priority": BasicInteger(idl_name="priority", byte_count=1, is_signed=False),
-    "status": BasicInteger(idl_name="status", byte_count=2, is_signed=False),
+    "semtag": BasicInteger(idl_name="semtag", byte_count=4, is_signed=False),
+    "status": BasicInteger(idl_name="status", byte_count=1, is_signed=False),
     "systime_ms": BasicInteger(idl_name="systime_ms", byte_count=8, is_signed=False),
     "systime_us": BasicInteger(idl_name="systime_us", byte_count=8, is_signed=False),
     "tag": BasicInteger(idl_name="tag", byte_count=1, is_signed=False),
@@ -338,7 +340,7 @@ class TypeLookupContext:
         Handles both standard names (like enum8) as well as enumerations defined
         within the current lookup context.
         """
-        if name.lower() in ["enum8", "enum16", "enum32"]:
+        if name.lower() in ["enum8", "enum16", "enum24", "enum32"]:
             return True
         return any(map(lambda e: e.name == name, self.all_enums))
 
@@ -388,9 +390,9 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
     elif lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
-    elif lowercase_name in ['enum8', 'enum16', 'enum32']:
+    elif lowercase_name in ['enum8', 'enum16', 'enum24', 'enum32']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
-    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32']:
+    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)

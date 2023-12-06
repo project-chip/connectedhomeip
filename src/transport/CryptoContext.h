@@ -160,8 +160,8 @@ private:
     SessionRole mSessionRole;
 
     bool mKeyAvailable;
-    Crypto::Aes128KeyHandle mEncryptionKey;
-    Crypto::Aes128KeyHandle mDecryptionKey;
+    Crypto::Aes128BitsKeyHandle mEncryptionKey;
+    Crypto::Aes128BitsKeyHandle mDecryptionKey;
     Crypto::AttestationChallenge mAttestationChallenge;
     Crypto::SessionKeystore * mKeystore       = nullptr;
     Crypto::SymmetricKeyContext * mKeyContext = nullptr;
