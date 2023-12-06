@@ -132,6 +132,12 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     bool IsListOperation() const { return mListOp != ListOperation::NotList; }
     bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
 
+    void LogPath() const
+    {
+        ChipLogProgress(DataManagement, "Concrete Attribute Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mEndpointId,
+                        ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
+    }
+
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
     // ReplaceItem, DeleteItem or AppendItem. Otherwise, it is to be ignored.

@@ -40,6 +40,7 @@ void BufferedReadCallback::OnReportEnd()
     if (err != CHIP_NO_ERROR)
     {
         mCallback.OnError(err);
+        return;
     }
 
     mCallback.OnReportEnd();

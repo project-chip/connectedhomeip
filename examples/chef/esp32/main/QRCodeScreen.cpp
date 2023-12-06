@@ -43,7 +43,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 // TODO need sensible library tag when put in library
-extern const char * TAG;
+extern const char TAG[];
 
 namespace {
 

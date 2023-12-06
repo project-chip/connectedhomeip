@@ -47,7 +47,9 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                 const chip::CharSpan & data)
+                                                 const chip::CharSpan & data,
+                                                 const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                 bool useCurrentContext)
 {
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;

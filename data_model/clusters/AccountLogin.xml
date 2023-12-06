@@ -86,12 +86,27 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="SetupPIN" type="string">
         <mandatoryConform/>
-        <constraint type="minLength" value="11"/>
+        <constraint type="minLength" value="8"/>
+      </field>
+      <field id="2" name="Node" type="node-id">
+        <optionalConform/>
       </field>
     </command>
     <command id="0x03" name="Logout" response="Y">
       <access invokePrivilege="operate" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
+      <field id="0" name="Node" type="node-id">
+        <optionalConform/>
+      </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="LoggedOut" priority="critical">
+      <access fabricSensitive="true" invokePrivilege="admin"/>
+      <mandatoryConform/>
+      <field id="0" name="Node" type="node-id">
+        <optionalConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

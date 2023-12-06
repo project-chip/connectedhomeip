@@ -43,13 +43,18 @@ class AccountLoginCluster(
     // Implementation needs to be added here
   }
 
-  suspend fun login(tempAccountIdentifier: String, setupPIN: String, timedInvokeTimeoutMs: Int) {
+  suspend fun login(
+    tempAccountIdentifier: String,
+    setupPIN: String,
+    node: ULong?,
+    timedInvokeTimeoutMs: Int
+  ) {
     val commandId = 2L
 
     // Implementation needs to be added here
   }
 
-  suspend fun logout(timedInvokeTimeoutMs: Int) {
+  suspend fun logout(node: ULong?, timedInvokeTimeoutMs: Int) {
     val commandId = 3L
 
     // Implementation needs to be added here

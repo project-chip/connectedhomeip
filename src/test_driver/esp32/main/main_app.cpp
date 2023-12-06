@@ -36,7 +36,7 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-const char * TAG = "CHIP-tests";
+const char TAG[] = "CHIP-tests";
 
 static void tester_task(void * pvParameters)
 {

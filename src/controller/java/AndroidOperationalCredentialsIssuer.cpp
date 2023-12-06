@@ -35,8 +35,8 @@
 
 namespace chip {
 namespace Controller {
-constexpr const char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
-constexpr const char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
+constexpr char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
+constexpr char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
 
 using namespace Credentials;
 using namespace Crypto;
