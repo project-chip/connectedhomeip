@@ -69,6 +69,11 @@ public:
         (void) csrNonce;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    RevocationReason IsCertificateRevoked(bool isPaa, ByteSpan issuer, ByteSpan authorityKeyId, ByteSpan serialNumber) override
+    {
+        return RevocationReason::kRevocationCheckNotSupported;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

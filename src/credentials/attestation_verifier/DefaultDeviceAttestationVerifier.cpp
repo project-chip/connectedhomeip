@@ -607,6 +607,12 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     return CHIP_NO_ERROR;
 }
 
+RevocationReason DefaultDACVerifier::IsCertificateRevoked(bool isPaa, ByteSpan issuer, ByteSpan authorityKeyId,
+                                                          ByteSpan serialNumber)
+{
+    return RevocationReason::kRevocationCheckNotSupported;
+}
+
 bool CsaCdKeysTrustStore::IsCdTestKey(const ByteSpan & kid) const
 {
     return kid.data_equal(ByteSpan{ gTestCdPubkeyKid });

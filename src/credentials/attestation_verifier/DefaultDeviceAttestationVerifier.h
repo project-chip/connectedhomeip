@@ -74,6 +74,8 @@ public:
                                                    const ByteSpan & attestationSignatureBuffer,
                                                    const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override;
 
+    RevocationReason IsCertificateRevoked(bool isPaa, ByteSpan issuer, ByteSpan authorityKeyId, ByteSpan serialNumber) override;
+
     CsaCdKeysTrustStore * GetCertificationDeclarationTrustStore() override { return &mCdKeysTrustStore; }
 
 protected:
