@@ -45,7 +45,7 @@ tests:
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool)
       disabled: true
 
-      
+
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001
@@ -55,7 +55,7 @@ tests:
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut
 
       disabled: true
-    
+
     - label: "Step 4: TH reads from the DUT the OnMode attribute."
       PICS: OM.S.A0003
       verification: |
@@ -63,7 +63,7 @@ tests:
 
           Verify on TH(chip-tool) logs, OnMode attribute value is an integer value from supported_modes_dut or null
       disabled: true
-        
+
     - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
       PICS: OM.S.A0002
       verification: |
@@ -71,5 +71,3 @@ tests:
 
           Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer value from supported_modes_dut or null
       disabled: true
-
-    

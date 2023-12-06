@@ -68,7 +68,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-    
+
     - label:
           "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
           to old_current_mode_dut"
@@ -82,7 +82,7 @@ tests:
           values:
               - name: "Status"
                 value: 0x00
-    
+
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.OM.MODE_CHANGE_FAIL"
@@ -108,9 +108,9 @@ tests:
               type: int8u
               minValue: 0
               maxValue: 254
-    
+
     #Skipping test-7 because SDK is not enabled with this failure response
-    
+
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001
       command: "readAttribute"
@@ -147,7 +147,7 @@ tests:
               type: int8u
               minValue: 0
               maxValue: 254
-    
+
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.OM.MODE_CHANGE_OK"
@@ -161,7 +161,7 @@ tests:
           values:
               - name: "Status"
                 value: 0x00
-      
+
     - label:
           "Step 12: TH reads from the DUT the CurrentMode attribute.   Verify
           that the DUT response contains an integer value equal to
@@ -171,7 +171,7 @@ tests:
       attribute: "CurrentMode"
       response:
           value: NewMode_CHANGE_OK
-    
+
     - label:
           "Step 13: TH sends a ChangeToMode command to the DUT with NewMode set
           to invalid_mode_th"
@@ -185,7 +185,7 @@ tests:
           values:
               - name: "Status"
                 value: 0x01
-    
+
     - label:
           "Step 14: TH reads from the DUT the CurrentMode attribute. Verify
           that the DUT response contains an integer value equal to
@@ -195,4 +195,3 @@ tests:
       attribute: "CurrentMode"
       response:
           value: NewMode_CHANGE_OK
-      

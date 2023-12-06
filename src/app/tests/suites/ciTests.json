@@ -117,7 +117,7 @@
         "Test_TC_DRYERCTRL_1_1",
         "Test_TC_DRYERCTRL_2_1"
     ],
-    "OvenMode":[ 
+    "OvenMode":[
         "Test_TC_OM_1_1",
         "Test_TC_OM_2_1",
         "Test_TC_OM_3_1",

@@ -32,7 +32,7 @@ config:
     new_mode_th:
         type: int8u
         defaultValue: 2
-  
+
 tests:
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
@@ -64,7 +64,7 @@ tests:
               type: int8u
               minValue: 0
               maxValue: 254
-    
+
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001 && OM.S.F00
       command: "readAttribute"
@@ -102,7 +102,7 @@ tests:
           constraints:
               type: list
               minLength: 2
-            
+
     - label:
           "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
@@ -117,7 +117,7 @@ tests:
           values:
               - name: "Status"
                 value: 0x00
-      
+
     - label: "Step 6:TH sends a Off command to the DUT"
       PICS: OO.S.C00.Rsp && OM.S.F00
       cluster: "On/Off"
@@ -136,4 +136,3 @@ tests:
       attribute: "CurrentMode"
       response:
       value: on_mode_dut
-         
