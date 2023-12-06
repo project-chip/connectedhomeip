@@ -594,6 +594,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     commandHandler.Close();
+    ctx.GetLoopback().Reset();
 }
 
 void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext)
@@ -1390,7 +1391,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(n
 
         commandSender.AllocateBuffer();
 
-        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        // CommandSender does not support sending multiple commands with public API, so we craft a message manually.
         for (int i = 0; i < 2; i++)
         {
             InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
@@ -1685,7 +1686,7 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
     // Verify that async command handle has been allocated
     NL_TEST_ASSERT(apSuite, asyncCommandHandle.Get() != nullptr);
 
-    // Mimick closure of the exchange that would happen on a session release and verify that releasing the handle there-after
+    // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
     asyncCommandHandle.Get()->mExchangeCtx->GetSessionHolder().Release();
     asyncCommandHandle.Get()->mExchangeCtx->OnSessionReleased();
@@ -1743,8 +1744,10 @@ nlTestSuite sSuite =
 {
     "TestCommandInteraction",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 
