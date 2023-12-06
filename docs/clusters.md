@@ -79,6 +79,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        150 |       0x96 | DemandResponseLoadControl                               |
+|        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
