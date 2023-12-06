@@ -113,7 +113,6 @@
         "Test_TC_WASHERCTRL_2_1",
         "Test_TC_WASHERCTRL_2_2"
     ],
-    "LaundryDryerControl": ["Test_TC_DRYERCTRL_1_1", "Test_TC_DRYERCTRL_2_1"],
     "OvenMode": [
         "Test_TC_OM_1_1",
         "Test_TC_OM_2_1",
@@ -398,6 +397,7 @@
         "TimeFormatLocalization",
         "LaundryWasherMode",
         "LaundryWasherControl",
+        "OvenMode",
         "MediaControl",
         "ModeSelect",
         "MultipleFabrics",
