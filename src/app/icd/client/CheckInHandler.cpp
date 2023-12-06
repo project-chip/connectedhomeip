@@ -80,7 +80,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
     bool needRefreshKey = false;
-    VerifyOrReturnError(mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey),
+    VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey),
                         CHIP_ERROR_INCORRECT_STATE);
     mpCheckInDelegate->OnCheckInComplete(clientInfo, needRefreshKey);
     return CHIP_NO_ERROR;
