@@ -47,7 +47,7 @@ tests:
 
       
 
-   - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
+    - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001
       verification: |
           ./chip-tool Ovenmode read current-mode 1 1
@@ -56,7 +56,7 @@ tests:
 
       disabled: true
     
-   - label: "Step 4: TH reads from the DUT the OnMode attribute."
+    - label: "Step 4: TH reads from the DUT the OnMode attribute."
       PICS: OM.S.A0003
       verification: |
           ./chip-tool Ovenmode read on-mode 1 1
@@ -69,7 +69,7 @@ tests:
       verification: |
           ./chip-tool Ovenmode read start-up-mode 1 1
 
-         Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer value from supported_modes_dut or null
+          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer value from supported_modes_dut or null
       disabled: true
 
     

@@ -43,10 +43,10 @@ tests:
 
     - label:
         "Step 2: TH reads from the DUT the StartUpMode attribute."
-     PICS: OM.S.A0002
-     command: "readAttribute"
-     attribute: "StartUpMode"
-     response:
+      PICS: OM.S.A0002
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
         saveAs: startup_mode_dut
 
     - label:

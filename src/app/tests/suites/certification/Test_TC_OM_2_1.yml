@@ -52,7 +52,7 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response: "supported_modes_dut"
-          saveAs:
+      saveAs:
           constraints:
               type: list
               minLength: 2
@@ -122,7 +122,7 @@ tests:
               minValue: 0
               maxValue: 254
 
-     - label:
+    - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.LWM.MODE_CHANGE_OK"
       PICS: OM.S.M.CAN_MANUALLY_CONTROLLED

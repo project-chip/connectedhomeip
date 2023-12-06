@@ -186,5 +186,3 @@ tests:
       attribute: "CurrentMode"
       response:
           value: new_on_mode_dut
-
-  
