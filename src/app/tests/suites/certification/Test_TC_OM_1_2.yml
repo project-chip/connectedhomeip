@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 3.2 [TC-OM-1.2] Cluster attributes with DUT as Server
 
 PICS:
@@ -44,8 +43,6 @@ tests:
           - Verify that at least one ModeOptionsStruct entry includes the Normal mode tag
           - Save the Mode field values as supported_modes_dut on the TH (Chip-tool)
       disabled: true
-
-
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001

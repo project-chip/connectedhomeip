@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 3.4 [TC-OM-3.1] On Mode functionality with DUT as Server
 
 PICS:
@@ -76,7 +75,8 @@ tests:
               minValue: 0
               maxValue: 254
 
-    - label:  "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
+    - label:
+          "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
           Else proceed to step 6."
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
@@ -87,9 +87,9 @@ tests:
               - name: "Value2"
                 value: old_current_mode_dut
           response:
-            - values:
-                - name: "Equals"
-                  saveAs: IsExpectedValue
+              - values:
+                    - name: "Equals"
+                      saveAs: IsExpectedValue
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       runIf: IsExpectedValue
@@ -97,7 +97,7 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-      #need to review this step
+          #need to review this step
           saveAs: supported_modes_dut
           constraints:
               type: list
@@ -123,12 +123,10 @@ tests:
       cluster: "On/Off"
       command: "Off"
 
-
     - label: "Step 7:TH sends a On command to the DUT"
       PICS: OO.S.C01.Rsp && OM.S.F00
       cluster: "On/Off"
       command: "On"
-
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001 && OM.S.F00

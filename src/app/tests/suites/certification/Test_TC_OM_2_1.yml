@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 3.3 [TC-OM-2.1] Change to Mode functionality with DUT as Server
-
 
 PICS:
     - OM.S
@@ -24,11 +22,11 @@ config:
     cluster: "Oven Mode"
     endpoint: 1
 
-  #PIXIT.OVEN.MODE_CHANGE_OK
+    #PIXIT.OVEN.MODE_CHANGE_OK
     NewMode_CHANGE_OK:
         type: int8u
         defaultValue: 2
-  #PIXIT.OVEN.MODE_CHANGE_FAIL
+    #PIXIT.OVEN.MODE_CHANGE_FAIL
     NewMode_CHANGE_FAIL:
         type: int8u
         defaultValue: 10
@@ -67,7 +65,6 @@ tests:
               type: int8u
               minValue: 0
               maxValue: 254
-
 
     - label:
           "Step 4: TH sends a ChangeToMode command to the DUT with NewMode set
@@ -187,8 +184,8 @@ tests:
                 value: 0x01
 
     - label:
-          "Step 14: TH reads from the DUT the CurrentMode attribute. Verify
-          that the DUT response contains an integer value equal to
+          "Step 14: TH reads from the DUT the CurrentMode attribute. Verify that
+          the DUT response contains an integer value equal to
           PIXIT.OM.MODE_CHANGE_OK"
       PICS: OM.S.A0001
       command: "readAttribute"

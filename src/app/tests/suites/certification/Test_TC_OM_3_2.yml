@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 3.5 [TC-OM-3.2] Startup Mode functionality with DUT as Server
 
 PICS:
@@ -41,13 +40,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-        "Step 2: TH reads from the DUT the StartUpMode attribute."
+    - label: "Step 2: TH reads from the DUT the StartUpMode attribute."
       PICS: OM.S.A0002
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-        saveAs: startup_mode_dut
+          saveAs: startup_mode_dut
 
     - label:
           "Step 2: If startup_mode_dut is null proceed to step 3. Else save

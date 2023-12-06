@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 name: 3.6 [TC-OM-3.3] On Mode and Startup Mode functionality with DUT as Server
 
 PICS:
