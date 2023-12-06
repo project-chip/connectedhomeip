@@ -9045,12 +9045,11 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Measured(0L),
-            Accuracy(1L),
-            CumulativeEnergyImported(2L),
-            CumulativeEnergyExported(3L),
-            PeriodicEnergyImported(4L),
-            PeriodicEnergyExported(5L),
+            Accuracy(0L),
+            CumulativeEnergyImported(1L),
+            CumulativeEnergyExported(2L),
+            PeriodicEnergyImported(3L),
+            PeriodicEnergyExported(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

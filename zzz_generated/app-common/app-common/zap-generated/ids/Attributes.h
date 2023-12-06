@@ -3632,28 +3632,24 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
 
-namespace Measured {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Measured
-
 namespace Accuracy {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace Accuracy
 
 namespace CumulativeEnergyImported {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace CumulativeEnergyImported
 
 namespace CumulativeEnergyExported {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace CumulativeEnergyExported
 
 namespace PeriodicEnergyImported {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace PeriodicEnergyImported
 
 namespace PeriodicEnergyExported {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace PeriodicEnergyExported
 
 namespace GeneratedCommandList {

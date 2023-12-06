@@ -1964,11 +1964,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
 
-namespace Measured {
-EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
-EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace Measured
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);

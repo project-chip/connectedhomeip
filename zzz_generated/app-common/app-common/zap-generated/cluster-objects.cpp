@@ -14193,8 +14193,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Measured::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured);
     case Attributes::Accuracy::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, accuracy);
     case Attributes::CumulativeEnergyImported::TypeInfo::GetAttributeId():

@@ -6579,12 +6579,11 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * Measured                                                          | 0x0000 |
-| * Accuracy                                                          | 0x0001 |
-| * CumulativeEnergyImported                                          | 0x0002 |
-| * CumulativeEnergyExported                                          | 0x0003 |
-| * PeriodicEnergyImported                                            | 0x0004 |
-| * PeriodicEnergyExported                                            | 0x0005 |
+| * Accuracy                                                          | 0x0000 |
+| * CumulativeEnergyImported                                          | 0x0001 |
+| * CumulativeEnergyExported                                          | 0x0002 |
+| * PeriodicEnergyImported                                            | 0x0003 |
+| * PeriodicEnergyExported                                            | 0x0004 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -19055,7 +19054,6 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                       //
-        make_unique<ReadAttribute>(Id, "measured", Attributes::Measured::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accuracy", Attributes::Accuracy::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "cumulative-energy-imported", Attributes::CumulativeEnergyImported::Id,
                                    credsIssuerConfig), //
@@ -19070,8 +19068,6 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
-        make_unique<WriteAttribute<bool>>(Id, "measured", 0, 1, Attributes::Measured::Id, WriteCommandType::kForceWrite,
-                                          credsIssuerConfig), //
         make_unique<
             WriteAttributeAsComplex<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type>>(
             Id, "accuracy", Attributes::Accuracy::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19105,7 +19101,6 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                       //
-        make_unique<SubscribeAttribute>(Id, "measured", Attributes::Measured::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accuracy", Attributes::Accuracy::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "cumulative-energy-imported", Attributes::CumulativeEnergyImported::Id,
                                         credsIssuerConfig), //

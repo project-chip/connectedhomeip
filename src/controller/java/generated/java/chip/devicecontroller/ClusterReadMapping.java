@@ -8932,18 +8932,7 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readElectricalEnergyMeasurementInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalEnergyMeasurementMeasuredCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readElectricalEnergyMeasurementMeasuredAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readMeasuredAttribute(
-              (ChipClusters.BooleanAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readElectricalEnergyMeasurementMeasuredCommandParams
-        );
-        result.put("readMeasuredAttribute", readElectricalEnergyMeasurementMeasuredAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalEnergyMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readElectricalEnergyMeasurementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readGeneratedCommandListAttribute(

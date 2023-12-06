@@ -2919,9 +2919,6 @@ static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
     switch (aAttributeId) {
-    case Attributes::Measured::Id: {
-        return YES;
-    }
     case Attributes::Accuracy::Id: {
         return YES;
     }

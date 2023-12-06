@@ -20221,18 +20221,6 @@ using DecodableType = Type;
 
 namespace Attributes {
 
-namespace Measured {
-struct TypeInfo
-{
-    using Type             = bool;
-    using DecodableType    = bool;
-    using DecodableArgType = bool;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured
 namespace Accuracy {
 struct TypeInfo
 {
@@ -20351,7 +20339,6 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Measured::TypeInfo::DecodableType measured = static_cast<bool>(0);
         Attributes::Accuracy::TypeInfo::DecodableType accuracy;
         Attributes::CumulativeEnergyImported::TypeInfo::DecodableType cumulativeEnergyImported;
         Attributes::CumulativeEnergyExported::TypeInfo::DecodableType cumulativeEnergyExported;

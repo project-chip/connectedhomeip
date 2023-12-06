@@ -50,14 +50,6 @@ class ElectricalEnergyMeasurementCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun readMeasuredAttribute(): Boolean {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeMeasuredAttribute(minInterval: Int, maxInterval: Int): Boolean {
-    // Implementation needs to be added here
-  }
-
   suspend fun readAccuracyAttribute(): AccuracyAttribute {
     // Implementation needs to be added here
   }

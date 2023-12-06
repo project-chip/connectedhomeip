@@ -11221,11 +11221,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case ElectricalEnergyMeasurement::Id: {
         switch (path.mAttributeId)
         {
-        case ElectricalEnergyMeasurement::Attributes::Measured::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Measured", 1, value);
-        }
         case ElectricalEnergyMeasurement::Attributes::Accuracy::Id: {
             chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

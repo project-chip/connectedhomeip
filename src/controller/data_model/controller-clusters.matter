@@ -4171,12 +4171,11 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
     optional EnergyMeasurementStruct energyExported = 1;
   }
 
-  readonly attribute boolean measured = 0;
-  readonly attribute MeasurementAccuracyStruct accuracy = 1;
-  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 2;
-  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 3;
-  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 4;
-  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 5;
+  readonly attribute MeasurementAccuracyStruct accuracy = 0;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 1;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

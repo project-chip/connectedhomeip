@@ -7595,17 +7595,6 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
 {
     using namespace Clusters::ElectricalEnergyMeasurement;
     switch (aAttributeId) {
-    case Attributes::Measured::Id: {
-        using TypeInfo = Attributes::Measured::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithBool:cppValue];
-        return value;
-    }
     case Attributes::Accuracy::Id: {
         using TypeInfo = Attributes::Accuracy::TypeInfo;
         TypeInfo::DecodableType cppValue;

@@ -19349,22 +19349,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::ElectricalEnergyMeasurement;
         switch (aPath.mAttributeId)
         {
-        case Attributes::Measured::Id: {
-            using TypeInfo = Attributes::Measured::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            std::string valueClassName     = "java/lang/Boolean";
-            std::string valueCtorSignature = "(Z)V";
-            jboolean jnivalue              = static_cast<jboolean>(cppValue);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(valueClassName.c_str(), valueCtorSignature.c_str(),
-                                                                           jnivalue, value);
-            return value;
-        }
         case Attributes::Accuracy::Id: {
             using TypeInfo = Attributes::Accuracy::TypeInfo;
             TypeInfo::DecodableType cppValue;
