@@ -574,15 +574,11 @@ using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BY
  *
  * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
  *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
- *       Child classes only need to implement a constructor, implement a destructor and delete all the copy operators.
+ *       Child classes only need to implement a constructor and delete all the copy operators.
  */
 class Symmetric128BitsKeyHandle
 {
 public:
-    Symmetric128BitsKeyHandle() = default;
-    // Destructor is implemented in the .cpp. It is pure virtual only to force the class to be abstract.
-    virtual ~Symmetric128BitsKeyHandle() = 0;
-
     Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
     Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
     void operator=(const Symmetric128BitsKeyHandle &)            = delete;
@@ -606,6 +602,10 @@ public:
         return *SafePointerCast<T *>(&mContext);
     }
 
+protected:
+    Symmetric128BitsKeyHandle() = default;
+    ~Symmetric128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+
 private:
     static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
@@ -618,11 +618,10 @@ private:
 /**
  * @brief Platform-specific AES key handle
  */
-class Aes128KeyHandle : public Symmetric128BitsKeyHandle
+class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
 {
 public:
     Aes128KeyHandle() = default;
-    virtual ~Aes128KeyHandle() {}
 
     Aes128KeyHandle(const Aes128KeyHandle &) = delete;
     Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
@@ -633,11 +632,10 @@ public:
 /**
  * @brief Platform-specific HMAC key handle
  */
-class Hmac128KeyHandle : public Symmetric128BitsKeyHandle
+class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 {
 public:
     Hmac128KeyHandle() = default;
-    virtual ~Hmac128KeyHandle() {}
 
     Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
     Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
