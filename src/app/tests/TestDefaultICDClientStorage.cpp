@@ -15,13 +15,17 @@
  *    limitations under the License.
  */
 
+#include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SessionManager.h>
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 
 using namespace chip;
 using namespace app;
@@ -200,6 +204,43 @@ void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, count == 0);
 }
 
+void TestProcessCheckInPayload(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    FabricIndex fabricId = 1;
+    NodeId nodeId        = 6666;
+    TestPersistentStorageDelegate clientInfoStorage;
+    TestSessionKeystoreImpl keystore;
+
+    DefaultICDClientStorage manager;
+    err = manager.Init(&clientInfoStorage, &keystore);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.UpdateFabricList(fabricId);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Populate clientInfo
+    ICDClientInfo clientInfo1;
+    clientInfo1.peer_node = ScopedNodeId(nodeId, fabricId);
+
+    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = manager.StoreEntry(clientInfo1);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t counter                  = 1;
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(chip::Protocols::SecureChannel::CheckinMessage::sMinPayloadSize);
+    MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
+    err = chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(clientInfo1.shared_key, counter, ByteSpan(),
+                                                                                        output);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ICDClientInfo clientInfo;
+    ByteSpan payload{ buffer->Start(), buffer->DataLength() };
+    bool refreshKey;
+    err = manager.ProcessCheckInPayload(payload, clientInfo, refreshKey);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+}
+
 /**
  *  Set up the test suite.
  */
@@ -229,6 +270,8 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestClientInfoCount", TestClientInfoCount),
     NL_TEST_DEF("TestClientInfoCountMultipleFabric", TestClientInfoCountMultipleFabric),
+    NL_TEST_DEF("TestProcessCheckInPayload", TestProcessCheckInPayload),
+
     NL_TEST_SENTINEL()
 };
 // clang-format on
