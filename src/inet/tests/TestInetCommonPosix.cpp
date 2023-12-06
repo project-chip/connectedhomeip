@@ -481,7 +481,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         else
             sRemainingSystemLayerEventDelay--;
 
-        static_cast<System::LayerImplFreeRTOS&>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
+        static_cast<System::LayerImplFreeRTOS &>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
     }
 #if CHIP_TARGET_STYLE_UNIX
     // TapAddrAutoconf and TapInterface are only needed for LwIP on
