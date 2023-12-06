@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,13 +34,6 @@ namespace chip {
 namespace app {
 class CheckInMessageHandler : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
-    class Callback
-    {
-    public:
-        virtual ~Callback() = default;
-
-        // TODO : Include the callback message from ICDClientManagement
-    };
 
 public:
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate);
@@ -58,10 +51,10 @@ protected:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
 private:
-    Messaging::ExchangeManager * mExchangeManager = nullptr;
-    CheckInDelegate * mCheckInDelegate            = nullptr;
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mExchangeManager; }
-    DefaultICDClientStorage * mICDClientStorage = nullptr;
+    Messaging::ExchangeManager * mpExchangeManager = nullptr;
+    CheckInDelegate * mpCheckInDelegate            = nullptr;
+    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeManager; }
+    ICDClientStorage * mpICDClientStorage = nullptr;
 };
 
 } // namespace app

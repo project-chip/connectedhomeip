@@ -477,8 +477,7 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
                                                                                        appData))
         {
             auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-            refreshKey          = false;
-            VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_SIGNATURE);
             clientInfo.offset = counter - clientInfo.start_icd_counter;
             if (checkInCounter > kCheckInRolloverConstant)
             {

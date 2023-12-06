@@ -28,7 +28,14 @@ class DLL_EXPORT CheckInDelegate
 {
 public:
     virtual ~CheckInDelegate() {}
-    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRefreshKey) = 0;
+
+    /**
+     * @brief Callback used to let the application know that a checkin message was received and validated.
+     *
+     * @param[out] clientInfo - ClientInfo object of the peer node
+     * @param[out] needRefreshKey - Indicates if the application should refresh the exisiting key
+     */
+    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) = 0;
 };
 
 } // namespace app
