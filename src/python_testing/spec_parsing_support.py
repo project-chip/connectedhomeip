@@ -108,29 +108,6 @@ class CommandType(Enum):
     GENERATED = auto()
 
 
-def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
-    ret = deepcopy(base)
-    extras = {k: v for k, v in derived.items() if k not in base.keys()}
-    overrides = {k: v for k, v in derived.items() if k in base.keys()}
-    ret.update(extras)
-    for id, override in overrides.items():
-        if override.conformance:
-            ret[id].conformance = override.conformance
-        if override.read_access:
-            ret[id].read_access = override.read_access
-        if override.write_access:
-            ret[id].write_access = override.write_access
-        if ret[id].read_access == None and ret[id].write_access == None:
-            location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=id)
-            self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                                severity=ProblemSeverity.WARNING, problem='Unable to find access element'))
-        if ret[id].read_access == None:
-            ret[id].read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
-        if ret[id].write_access == None:
-            ret[id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
-    return ret
-
-
 class ClusterParser:
     def __init__(self, cluster, cluster_id, name, is_alias):
         self._problems: list[ProblemNotice] = []
@@ -401,6 +378,28 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             if id in alias:
                 return True
         return False
+
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint) -> dict[uint, XmlAttribute]:
+        ret = deepcopy(base)
+        extras = {k: v for k, v in derived.items() if k not in base.keys()}
+        overrides = {k: v for k, v in derived.items() if k in base.keys()}
+        ret.update(extras)
+        for id, override in overrides.items():
+            if override.conformance:
+                ret[id].conformance = override.conformance
+            if override.read_access:
+                ret[id].read_access = override.read_access
+            if override.write_access:
+                ret[id].write_access = override.write_access
+            if ret[id].read_access is None and ret[id].write_access is None:
+                location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=id)
+                problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                              severity=ProblemSeverity.WARNING, problem='Unable to find access element'))
+            if ret[id].read_access is None:
+                ret[id].read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
+            if ret[id].write_access is None:
+                ret[id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
+        return ret
 
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'clusters')
     clusters: dict[int, XmlCluster] = {}
