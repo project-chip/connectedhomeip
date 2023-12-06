@@ -144,7 +144,6 @@ private:
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
     int64_t mCableAssemblyCurrentLimit              = 0; /* Cable limit detected when cable is plugged in, in mA */
     int64_t mMaximumChargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when charging enabled */
-    int64_t mMinimumChargingCurrentLimitFromCommand = 0; /* Value of current minimum limit when charging enabled */
     int64_t mActualChargingCurrentLimit             = 0;
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
 
