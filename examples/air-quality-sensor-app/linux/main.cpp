@@ -35,7 +35,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_air_quality_fifo_";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_air_quality_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 AirQualitySensorAppAttrUpdateDelegate sAirQualitySensorAppCommandDelegate;
 } // namespace

@@ -52,7 +52,7 @@ public:
      * Called during ICD device registration in commissioning, commissioner/controller
      * provides raw key data, the shared key handle in clientInfo is updated based upon raw key data
      *
-     * @param[inout] aICDClientInfo the ICD Client information to be updated with keyData and be saved
+     * @param[inout] clientInfo the ICD Client information to be updated with keyData and be saved
      * @param[in] aKeyData raw key data provided by application
      */
     virtual CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) = 0;
@@ -61,16 +61,31 @@ public:
      * Store updated ICD ClientInfo to storage when ICD registration completes or check-in message
      * comes.
      *
-     * @param[in] aICDClientInfo the updated ICD Client Info.
+     * @param[in] clientInfo the updated ICD Client Info.
      */
     virtual CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) = 0;
 
     /**
+     * Remove ICD key from clientInfo when ICD registration fails
+     *
+     * @param[inout] clientInfo the updated ICD Client Info.
+     */
+    virtual void RemoveKey(ICDClientInfo & clientInfo) = 0;
+
+    /**
+     * Get ICD ClientInfo from storage
+     * One user case is to retrieve UserActiveModeTriggerHint and inform how user how to wake up sleepy device.
+     * @param[in] peerNode scoped node with peer node id and fabric index
+     * @param[out] clientInfo the ICD Client Info.
+     */
+    virtual CHIP_ERROR GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo) = 0;
+
+    /**
      * Delete ICD Client persistent information associated with the specified scoped node Id.
      * when ICD device is unpaired/removed, the corresponding entry in ICD storage is removed.
-     * @param aPeerNodeId scoped node with peer node id and fabric index
+     * @param peerNode scoped node with peer node id and fabric index
      */
-    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) = 0;
+    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) = 0;
 
     /**
      * Remove all ICDClient persistent information associated with the specified

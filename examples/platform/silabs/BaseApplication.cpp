@@ -744,10 +744,6 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     {
         BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
-
-#ifdef DISPLAY_ENABLED
-    UpdateLCDStatusScreen();
-#endif
 }
 
 void BaseApplication::OutputQrCode(bool refreshLCD)
