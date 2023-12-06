@@ -31,10 +31,11 @@ public:
 
     /**
      * @brief Callback used to let the application know that a checkin message was received and validated.
-     * When needRefreshKey is true, it indicates the client to refresh the key and re-register the client with the new key
+     * When needRefreshKey is true,  it indicates that the ICD registration needs to be updated with a new key to avoid counter
+     * roll-over problems.
      *
      * @param[in] clientInfo - ClientInfo object of the peer node
-     * @param[in] needRefreshKey - Indicates if the application should refresh the exisiting key
+     * @param[in] needRefreshKey - Indicates whether the application should refresh the existing key
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) = 0;
 };
