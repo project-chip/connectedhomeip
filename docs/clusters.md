@@ -78,6 +78,7 @@ Generally regenerate using one of:
 |        128 |       0x80 | BooleanSensorConfiguration                              |
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        150 |       0x96 | DemandResponseLoadControl                               |
+|        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |

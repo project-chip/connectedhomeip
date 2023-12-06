@@ -114,6 +114,29 @@ public:
      * in order to resume the commissioning process.
      */
     virtual void OnScanNetworksFailure(CHIP_ERROR error) {}
+
+    /**
+     * @brief
+     *  Called when the ICD registration information (ICD symmetric key, check-in node ID and monitored subject) is required.
+     *
+     * The DeviceCommissioner will be waiting in the kICDGetRegistrationInfo step and not advancing the commissioning process.
+     *
+     * The implementation should set the ICD registration info on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistrationInfoReady()
+     * in order to resume the commissioning process.
+     *
+     * The implementation may set the credentials before start commissioning, and call ICDRegistrationInfoReady() directly.
+     */
+    virtual void OnICDRegistrationInfoRequired() {}
+
+    /**
+     * @bried
+     *   Called when the registration flow for the ICD completes.
+     *
+     * @param[in] icdNodeId    The node id of the ICD.
+     * @param[in] icdCounter   The ICD Counter received from the device.
+     */
+    virtual void OnICDRegistrationComplete(NodeId icdNodeId, uint32_t icdCounter) {}
 };
 
 } // namespace Controller

@@ -29,7 +29,7 @@ namespace reporting {
 
 static chip::app::DefaultTimerDelegate sTimerDelegate;
 static ReportSchedulerImpl sTestDefaultReportScheduler(&sTimerDelegate);
-static SynchronizedReportSchedulerImpl sTestReportScheduler(&sTimerDelegate);
+static SynchronizedReportSchedulerImpl sTestSyncReportScheduler(&sTimerDelegate);
 
 ReportSchedulerImpl * GetDefaultReportScheduler()
 {
@@ -38,7 +38,7 @@ ReportSchedulerImpl * GetDefaultReportScheduler()
 
 SynchronizedReportSchedulerImpl * GetSynchronizedReportScheduler()
 {
-    return &sTestReportScheduler;
+    return &sTestSyncReportScheduler;
 }
 
 } // namespace reporting
