@@ -827,7 +827,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
+        case CommissioningStage::kICDGetRegistrationInfo:
+            // Noting to od. The ICD registation info is handled elsewhere.
+            break;
         case CommissioningStage::kICDRegistration:
+            // Noting to od. DevicePairingDelegate will handle this.
+            break;
+        case CommissioningStage::kICDSendStayActive:
+            // Nothing to do.
             break;
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;

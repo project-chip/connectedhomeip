@@ -1179,12 +1179,17 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    if (commissioner->GetPairingDelegate() != nullptr)
+    auto pairingDelegate         = commissioner->GetPairingDelegate();
+    auto deviceBeingCommissioned = commissioner->mDeviceBeingCommissioned;
+    if (pairingDelegate != nullptr && deviceBeingCommissioned != nullptr)
     {
-        commissioner->GetPairingDelegate()->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
-                                                                      data.ICDCounter);
+        pairingDelegate->OnICDRegistrationComplete(deviceBeingCommissioned->GetDeviceId(), data.ICDCounter);
+        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
-    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+    else
+    {
+        commissioner->CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, report);
+    }
 }
 
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
