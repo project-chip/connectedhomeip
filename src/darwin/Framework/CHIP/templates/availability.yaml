@@ -8127,6 +8127,7 @@
           - OvenCavityOperationalState
           - ContentControl
           - ContentAppObserver
+          - DeviceEnergyManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
