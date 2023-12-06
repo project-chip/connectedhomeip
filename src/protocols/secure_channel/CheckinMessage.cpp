@@ -62,7 +62,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128BitsKeyHa
     return err;
 }
 
-CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, const ByteSpan & payload,
+CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, const ByteSpan & payload,
                                                       CounterType & counter, MutableByteSpan & appData)
 {
     VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_ARGUMENT);

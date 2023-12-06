@@ -66,7 +66,7 @@ public:
      * @return CHIP_ERROR
      */
 
-    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, const ByteSpan & payload, CounterType & counter,
+    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, const ByteSpan & payload, CounterType & counter,
                                                  MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
