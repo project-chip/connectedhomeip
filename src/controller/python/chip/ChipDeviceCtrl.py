@@ -880,10 +880,9 @@ class ChipDeviceControllerBase():
         suppressResponse: Do not send a response to this action
 
         Returns:
-            #TODO what is the return value going to be?
-            - command respone. The type of the response is defined by the command.
+            - Array of command respones in the same order as what was given in `commands`. The type of the response is defined by the command.
         Raises:
-            - InteractionModelError on error
+            - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
         '''
         self.CheckIsActive()
 

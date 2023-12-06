@@ -82,7 +82,7 @@ public:
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
-         *
+         * 
          * It is advised that subclass should only override this or `OnResponse`. But, it shouldn't actually matter if both are
          * overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
@@ -96,8 +96,8 @@ public:
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
         virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                                                  const AdditionalResponseData & aAdditionalResponseData)
+                                        const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                        const AdditionalResponseData & aAdditionalResponseData)
         {
             OnResponse(apCommandSender, aPath, aStatusIB, apData);
         }
@@ -111,8 +111,8 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * It is advised that subclass should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
-         * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
+         * It is advised that subclass should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually matter
+         * if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -199,7 +199,7 @@ public:
         // to `FinishCommand`.
         Optional<uint16_t> mCommandRef;
         // For both `PrepareCommand` and `FinishCommand` this is an in parameter. It must have
-        // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.
+        // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.        
         bool mStartOrEndDataStruct = false;
     };
 

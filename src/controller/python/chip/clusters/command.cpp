@@ -248,8 +248,6 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     CommandSender::ConfigParameters config;
     config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
 
-    // TODO I can also verify that exchanges is not for Group message
-
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
     std::unique_ptr<CommandSender> sender =
@@ -286,7 +284,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
                 reader.Next();
                 SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
             }
-            // TODO look at this specific call to Finish Command and confirm that it makes sense to call all the time.
+
             SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
                                                                                  : Optional<uint16_t>::Missing(),
                                                       additionalParams));
