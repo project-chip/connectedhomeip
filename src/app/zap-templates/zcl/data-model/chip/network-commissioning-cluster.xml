@@ -105,6 +105,9 @@ limitations under the License.
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
 
+        <!-- cluster revision -->
+        <globalAttribute side="either" code="0xFFFD" value="2"/>
+
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="int8u" writable="false" optional="false">
             <description>MaxNetworks</description>
             <access op="read" privilege="administer"/>
