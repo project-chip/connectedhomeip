@@ -103,7 +103,8 @@ public:
      * and populate the clientInfo with the stored information corresponding to the key.
      * @param[in] payload received checkIn Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
-     * @param[out] refreshKey set to true if the counter value reaches 2 ^ 31 indicating the key needs to be refreshed
+     * @param[out] refreshKey set to true if the offset of the received counter value from the stored initial value reaches 2 ^ 31
+     * indicating the key needs to be refreshed to avoid counter roll-over problems.
      */
     virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, bool & refreshKey) = 0;
 };
