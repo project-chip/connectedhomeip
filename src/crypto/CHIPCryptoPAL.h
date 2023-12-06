@@ -982,6 +982,31 @@ public:
 
     virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
                                    uint8_t * out_buffer, size_t out_length);
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * This implements the CHIP_Crypto_HMAC() cryptographic primitive
+     * in the the specification.
+     *
+     * The `out_length` must be at least kSHA256_Hash_Length, and only
+     * kSHA256_Hash_Length bytes are written to out_buffer.
+     *
+     * Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
+     * @param key The HMAC Key handle to use for the HMAC operation
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer into which to write the output.
+     * @param out_length Underlying size of the `out_buffer`.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR HMAC_SHA256(const Hmac128BitsKeyHandle & key, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
 };
 
 /**
