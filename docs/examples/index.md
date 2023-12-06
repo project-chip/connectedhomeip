@@ -78,15 +78,6 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
-## Energy Management example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-energy-management-app/**/README
-```
-
 ## Java matter controller example
 
 ```{toctree}
