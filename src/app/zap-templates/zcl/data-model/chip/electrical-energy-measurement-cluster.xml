@@ -92,7 +92,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
 
     <event side="server" code="0x00" name="CumulativeEnergyMeasured" priority="info" optional="true">
-      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server.</description>
+      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server, exported from the server of both.</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
