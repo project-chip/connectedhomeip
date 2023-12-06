@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
