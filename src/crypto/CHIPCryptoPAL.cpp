@@ -233,11 +233,6 @@ CHIP_ERROR Find16BitUpperCaseHexAfterPrefix(const ByteSpan & buffer, const char 
 
 } // namespace
 
-Symmetric128BitsKeyHandle::~Symmetric128BitsKeyHandle()
-{
-    ClearSecretData(mContext.mOpaque);
-}
-
 using HKDF_sha_crypto = HKDF_sha;
 
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
@@ -784,7 +779,7 @@ CHIP_ERROR EcdsaAsn1SignatureToRaw(size_t fe_length_bytes, const ByteSpan & asn1
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                          size_t nonce_length, uint8_t * output)
 {
     // Discard tag portion of CCM to apply only CTR mode encryption/decryption.
