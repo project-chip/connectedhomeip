@@ -68,7 +68,7 @@ private:
 
 } // namespace
 
-CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128BitsKeyHandle & key)
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
@@ -96,7 +96,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
-                                         Aes128BitsKeyHandle & key)
+                                         Aes128KeyHandle & key)
 {
     PsaKdf kdf;
     ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret.Span(), salt, info));
@@ -107,7 +107,7 @@ CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, c
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
-                                                 Aes128BitsKeyHandle & i2rKey, Aes128BitsKeyHandle & r2iKey,
+                                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                  AttestationChallenge & attestationChallenge)
 {
     PsaKdf kdf;

@@ -59,7 +59,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
-        Aes128BitsKeyHandle keyHandle;
+        Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
         // Validate that counter change, indeed changes the output buffer content
@@ -90,14 +90,14 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
-        Aes128BitsKeyHandle keyHandle;
+        Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
         // As of now passing an empty key handle while using PSA crypto will result in a failure.
         // However when using OpenSSL this same test result in a success.
         // Issue #28986
 
-        // Aes128BitsKeyHandle emptyKeyHandle;
+        // Aes128KeyHandle emptyKeyHandle;
         // err = CheckinMessage::GenerateCheckinMessagePayload(emptyKeyHandle, counter, userData, outputBuffer);
         // ChipLogError(Inet, "%s", err.AsString());
         // NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
@@ -140,7 +140,7 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
     Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, test.key, test.key_len);
 
-    Aes128BitsKeyHandle keyHandle;
+    Aes128KeyHandle keyHandle;
     NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
     //=================Encrypt=======================
@@ -183,7 +183,7 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
         Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
-        Aes128BitsKeyHandle keyHandle;
+        Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
         //=================Encrypt=======================

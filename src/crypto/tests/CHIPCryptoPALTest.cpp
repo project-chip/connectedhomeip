@@ -193,7 +193,7 @@ public:
     ~TestAesKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Aes128BitsKeyHandle key;
+    Aes128KeyHandle key;
 };
 
 struct TestHmacKey

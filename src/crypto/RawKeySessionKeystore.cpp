@@ -24,7 +24,7 @@ namespace Crypto {
 
 using HKDF_sha_crypto = HKDF_sha;
 
-CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128BitsKeyHandle & key)
+CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
     return CHIP_NO_ERROR;
@@ -37,7 +37,7 @@ CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray &
 }
 
 CHIP_ERROR RawKeySessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
-                                            Aes128BitsKeyHandle & key)
+                                            Aes128KeyHandle & key)
 {
     HKDF_sha_crypto hkdf;
 
@@ -46,7 +46,7 @@ CHIP_ERROR RawKeySessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret
 }
 
 CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
-                                                    Aes128BitsKeyHandle & i2rKey, Aes128BitsKeyHandle & r2iKey,
+                                                    Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                     AttestationChallenge & attestationChallenge)
 {
     HKDF_sha_crypto hkdf;
