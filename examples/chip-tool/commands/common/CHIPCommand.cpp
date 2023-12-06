@@ -131,7 +131,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
-    ReturnLogErrorOnFailure(mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState().ExchangeMgr(),
+    ReturnLogErrorOnFailure(mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
                                                  &mICDClientStorage, &mCheckInDelegate));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
