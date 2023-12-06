@@ -79,8 +79,8 @@
 using namespace chip;
 using namespace chip::Inet;
 
-Inet::UDPEndPointManagerImpl gUDP;
-Inet::TCPEndPointManagerImpl gTCP;
+chip::Inet::UDPEndPointManagerImpl gUDP;
+chip::Inet::TCPEndPointManagerImpl gTCP;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -481,7 +481,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
         else
             sRemainingSystemLayerEventDelay--;
 
-        DeviceLayer::SystemLayer().HandlePlatformTimer();
+        static_cast<System::LayerImplFreeRTOS&>(DeviceLayer::SystemLayer()).HandlePlatformTimer();
     }
 #if CHIP_TARGET_STYLE_UNIX
     // TapAddrAutoconf and TapInterface are only needed for LwIP on
