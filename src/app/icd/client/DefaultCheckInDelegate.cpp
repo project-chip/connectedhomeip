@@ -24,7 +24,11 @@ namespace app {
 
 void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
 {
-    ChipLogProgress(ICDClient, "Check In Message preocessing complete");
+    ChipLogProgress(ICD, "Check In Message preocessing complete");
+    if (needRefreshKey)
+    {
+        // TODO : Refresh key and re-register client
+    }
 }
 
 } // namespace app
