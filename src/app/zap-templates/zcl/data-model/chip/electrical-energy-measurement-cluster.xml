@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2023 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="Energy"/>
+  <domain name="Measurement &amp; Sensing"/>
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0091"/>
@@ -85,21 +85,20 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="MEASURED" type="boolean" writable="false" default="false" optional="false">Measured</attribute>
-    <attribute side="server" code="0x0001" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" default="false" optional="false">Accuracy</attribute>
-    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
-    <attribute side="server" code="0x0003" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
-    <attribute side="server" code="0x0004" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
-    <attribute side="server" code="0x0005" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" default="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
+    <attribute side="server" code="0x0000" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" optional="false">Accuracy</attribute>
+    <attribute side="server" code="0x0001" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
+    <attribute side="server" code="0x0003" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
+    <attribute side="server" code="0x0004" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
 
     <event side="server" code="0x00" name="CumulativeEnergyMeasured" priority="info" optional="true">
-      <description>This event SHALL be generated when the server takes a snapshot of th cumulative energy imported by the server.</description>
+      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server.</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
 
     <event side="server" code="0x01" name="PeriodicEnergyMeasured" priority="info" optional="true">
-      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server.</description>
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy, exported energy, or both.</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
