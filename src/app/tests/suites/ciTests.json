@@ -115,7 +115,7 @@
     ],
 
     "LaundryDryerControl": [
-        "Test_TC_DRYERCTRL_1_1", 
+        "Test_TC_DRYERCTRL_1_1",
         "Test_TC_DRYERCTRL_2_1"
     ],
 
