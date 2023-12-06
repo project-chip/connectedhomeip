@@ -99,6 +99,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
+    ReturnLogErrorOnFailure(mICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
@@ -129,6 +130,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
+
+    ReturnLogErrorOnFailure(mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState().ExchangeMgr(),
+                                                 &mICDClientStorage, &mCheckInDelegate));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));
