@@ -54,7 +54,8 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner() = delete;
+    ChipDeviceScanner(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
@@ -62,7 +63,7 @@ public:
     ~ChipDeviceScanner() { Shutdown(); }
 
     /// Initialize the scanner.
-    CHIP_ERROR Init(const BluezEndpoint * aEndpoint, ChipDeviceScannerDelegate * delegate);
+    CHIP_ERROR Init(ChipDeviceScannerDelegate * delegate);
 
     /// Release any resources associated with the scanner.
     void Shutdown();
@@ -92,7 +93,7 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    const BluezEndpoint * mEndpoint       = nullptr;
+    const BluezEndpoint & mEndpoint;
     GCancellable * mCancellable           = nullptr;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;

@@ -188,12 +188,12 @@ private:
     bool mIsCentral = false;
     BluezEndpoint mEndpoint;
 
-    BluezAdvertisement mBLEAdvertisement;
-    ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
-    uint16_t mBLEAdvDurationMs = 20;
-    const char * mpBLEAdvUUID  = nullptr;
+    BluezAdvertisement mBLEAdvertisement = BluezAdvertisement(mEndpoint);
+    ChipAdvType mBLEAdvType              = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    uint16_t mBLEAdvDurationMs           = 20;
+    const char * mpBLEAdvUUID            = nullptr;
 
-    ChipDeviceScanner mDeviceScanner;
+    ChipDeviceScanner mDeviceScanner = ChipDeviceScanner(mEndpoint);
     BLEScanConfig mBLEScanConfig;
 };
 

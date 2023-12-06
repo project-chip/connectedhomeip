@@ -38,10 +38,11 @@ class BluezEndpoint;
 class BluezAdvertisement
 {
 public:
-    BluezAdvertisement() = default;
+    BluezAdvertisement() = delete;
+    BluezAdvertisement(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint * aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -69,8 +70,8 @@ private:
     CHIP_ERROR StopImpl();
 
     // Objects (interfaces) used by LE advertisement
-    const BluezEndpoint * mEndpoint = nullptr;
-    BluezLEAdvertisement1 * mpAdv   = nullptr;
+    const BluezEndpoint & mEndpoint;
+    BluezLEAdvertisement1 * mpAdv = nullptr;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
