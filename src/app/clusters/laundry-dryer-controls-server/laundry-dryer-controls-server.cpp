@@ -161,7 +161,7 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
     VerifyOrDie((delegate != nullptr) && "Dryer Controls implementation requires a registered delegate for validation.");
     switch (attributePath.mAttributeId)
     {
-    case Attributes::SupportedDrynessLevels::Id: {
+    case Attributes::SelectedDrynessLevel::Id: {
         uint8_t drynessLevelIdx = 0;
         while (true)
         {
