@@ -53,7 +53,7 @@ public:
     HmacKeyAttributes()
     {
         psa_set_key_type(&mAttrs, PSA_KEY_TYPE_HMAC);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_ANY_HASH));
+        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_SHA_256));
         psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_SIGN_MESSAGE);
         psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
     }
