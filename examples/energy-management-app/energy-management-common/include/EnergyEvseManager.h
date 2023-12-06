@@ -31,8 +31,7 @@ using namespace chip::app::Clusters::EnergyEvse;
 class EnergyEvseManager : public Instance
 {
 public:
-    EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate & aDelegate) :
-        EnergyEvse::Instance(aEndpointId, aDelegate), mEndpointId(aEndpointId)
+    EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate & aDelegate) : EnergyEvse::Instance(aEndpointId, aDelegate)
     {
         mInstance = this;
         mDelegate = &aDelegate;
@@ -51,7 +50,6 @@ public:
 
 private:
     EnergyEvse::Instance * mInstance;
-    EndpointId mEndpointId;
     EnergyEvseDelegate * mDelegate;
 };
 
