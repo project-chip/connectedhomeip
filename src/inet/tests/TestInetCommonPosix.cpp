@@ -79,8 +79,8 @@
 using namespace chip;
 using namespace chip::Inet;
 
-chip::Inet::UDPEndPointManagerImpl gUDP;
-chip::Inet::TCPEndPointManagerImpl gTCP;
+UDPEndPointManagerImpl gUDP;
+TCPEndPointManagerImpl gTCP;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -366,7 +366,7 @@ void InitNetwork()
             {
                 static ip6_addr_t br_ip6_addr = gNetworkOptions.IPv6GatewayAddr[j].ToIPv6();
                 struct ip6_prefix ip6_prefix;
-                ip6_prefix.addr       = Inet::IPAddress::Any.ToIPv6();
+                ip6_prefix.addr       = IPAddress::Any.ToIPv6();
                 ip6_prefix.prefix_len = 0;
                 ip6_add_route_entry(&ip6_prefix, &sNetIFs[j], &br_ip6_addr, NULL);
             }
