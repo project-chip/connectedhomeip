@@ -25,8 +25,8 @@ SubscriptionResumptionSessionEstablisher::SubscriptionResumptionSessionEstablish
 {}
 
 CHIP_ERROR
-SubscriptionResumptionSessionEstablisher::ResumeSubscription(CASESessionManager & caseSessionManager,
-                                                 const SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
+SubscriptionResumptionSessionEstablisher::ResumeSubscription(
+    CASESessionManager & caseSessionManager, const SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
 {
     mSubscriptionInfo.mNodeId         = subscriptionInfo.mNodeId;
     mSubscriptionInfo.mFabricIndex    = subscriptionInfo.mFabricIndex;
@@ -66,7 +66,7 @@ SubscriptionResumptionSessionEstablisher::ResumeSubscription(CASESessionManager 
 }
 
 void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                         const SessionHandle & sessionHandle)
+                                                                     const SessionHandle & sessionHandle)
 {
     SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;
@@ -89,7 +89,8 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     delete _this;
 }
 
-void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId,
+                                                                             CHIP_ERROR error)
 {
     SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;

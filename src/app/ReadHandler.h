@@ -261,8 +261,7 @@ public:
      *
      *  Used after the SubscriptionResumptionSessionEstablisher establishs the CASE session
      */
-    void OnSubscriptionResumed(const SessionHandle & sessionHandle,
-                               SubscriptionResumptionSessionEstablisher & sessionEstablisher);
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & sessionEstablisher);
 #endif
 
 private:

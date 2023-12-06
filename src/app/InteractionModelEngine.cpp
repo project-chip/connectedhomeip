@@ -1861,7 +1861,8 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             return;
         }
 
-        if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) != CHIP_NO_ERROR)
+        if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) !=
+            CHIP_NO_ERROR)
         {
             ChipLogProgress(InteractionModel, "Failed to ResumeSubscription 0x%" PRIx32, subscriptionInfo.mSubscriptionId);
             iterator->Release();
