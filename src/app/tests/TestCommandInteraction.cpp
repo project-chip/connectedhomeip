@@ -1107,15 +1107,18 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite *
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    // Warning! This test is not testing what the testname is suggesting. Because the invoke request is malformed,
-    // DispatchSingleClusterCommand is never called and asyncCommandHandle is never set. Possible fix to this test
-    // might be incoming when CommandSender is capable of sending multiple invoke command requests.
+    ctx.DrainAndServiceIO();
 
-    // Decrease CommandHandler refcount and send response
+    // Error status response has been sent already; it's not waiting for the handle.
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
+    NL_TEST_ASSERT(apSuite, asyncCommand == false);
+
+    // Decrease CommandHandler refcount. No additional message should be sent since error response already sent.
     asyncCommandHandle = nullptr;
 
-    // Prevent breaking other tests.
-    asyncCommand = false;
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
@@ -1391,7 +1394,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(n
 
         commandSender.AllocateBuffer();
 
-        // CommandSender does not support sending multiple commands with public API, so we craft a message manually.
+        // TODO(#30453): CommandSender does support sending multiple commands, update this test to use that.
         for (int i = 0; i < 2; i++)
         {
             InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
@@ -1410,9 +1413,6 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(n
                            CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
@@ -1453,7 +1453,7 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
 
         commandSender.AllocateBuffer();
 
-        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        // TODO(#30453): CommandSender does support sending multiple commands, update this test to use that.
         for (size_t i = 0; i < numberOfCommandsToSend; i++)
         {
             InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
@@ -1473,9 +1473,6 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(1));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
@@ -1529,7 +1526,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
 
         commandSender.AllocateBuffer();
 
-        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        // TODO(#30453): CommandSender does support sending multiple commands, update this test to use that.
         for (size_t i = 0; i < numberOfCommandsToSend; i++)
         {
             InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
@@ -1549,9 +1546,6 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
@@ -1606,7 +1600,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
 
         commandSender.AllocateBuffer();
 
-        // CommandSender does not support sending multiple commands with public API, so we craft a message manaully.
+        // TODO(#30453): CommandSender does support sending multiple commands, update this test to use that.
         for (size_t i = 0; i < numberOfCommandsToSend; i++)
         {
             InvokeRequests::Builder & invokeRequests = commandSender.mInvokeRequestBuilder.GetInvokeRequests();
@@ -1626,9 +1620,6 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.Ref(static_cast<uint16_t>(i)));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.EndOfCommandDataIB());
         }
-
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.mInvokeRequestBuilder.EndOfInvokeRequestMessage());
 
         commandSender.MoveToState(app::CommandSender::State::AddedCommand);
     }
