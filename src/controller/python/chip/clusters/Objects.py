@@ -22796,9 +22796,9 @@ class EnergyEvse(Cluster):
                 ClusterObjectFieldDescriptor(Label="batteryCapacity", Tag=0x00000031, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="vehicleID", Tag=0x00000032, Type=typing.Union[None, Nullable, str]),
                 ClusterObjectFieldDescriptor(Label="sessionID", Tag=0x00000040, Type=typing.Union[Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="sessionDuration", Tag=0x00000041, Type=uint),
-                ClusterObjectFieldDescriptor(Label="sessionEnergyCharged", Tag=0x00000042, Type=int),
-                ClusterObjectFieldDescriptor(Label="sessionEnergyDischarged", Tag=0x00000043, Type=typing.Optional[int]),
+                ClusterObjectFieldDescriptor(Label="sessionDuration", Tag=0x00000041, Type=typing.Union[Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="sessionEnergyCharged", Tag=0x00000042, Type=typing.Union[Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="sessionEnergyDischarged", Tag=0x00000043, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -22829,9 +22829,9 @@ class EnergyEvse(Cluster):
     batteryCapacity: 'typing.Union[None, Nullable, int]' = None
     vehicleID: 'typing.Union[None, Nullable, str]' = None
     sessionID: 'typing.Union[Nullable, uint]' = None
-    sessionDuration: 'uint' = None
-    sessionEnergyCharged: 'int' = None
-    sessionEnergyDischarged: 'typing.Optional[int]' = None
+    sessionDuration: 'typing.Union[Nullable, uint]' = None
+    sessionEnergyCharged: 'typing.Union[Nullable, int]' = None
+    sessionEnergyDischarged: 'typing.Union[None, Nullable, int]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -22924,12 +22924,12 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="targetTime", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="targetTimeMinutesPastMidnight", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="targetSoC", Tag=1, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="addedEnergy", Tag=2, Type=typing.Optional[int]),
                     ])
 
-            targetTime: 'uint' = 0
+            targetTimeMinutesPastMidnight: 'uint' = 0
             targetSoC: 'typing.Optional[uint]' = None
             addedEnergy: 'typing.Optional[int]' = None
 
@@ -23456,9 +23456,9 @@ class EnergyEvse(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'uint' = 0
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class SessionEnergyCharged(ClusterAttributeDescriptor):
@@ -23472,9 +23472,9 @@ class EnergyEvse(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=int)
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'int' = 0
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class SessionEnergyDischarged(ClusterAttributeDescriptor):
@@ -23488,9 +23488,9 @@ class EnergyEvse(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, int])
 
-            value: 'typing.Optional[int]' = None
+            value: 'typing.Union[None, Nullable, int]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

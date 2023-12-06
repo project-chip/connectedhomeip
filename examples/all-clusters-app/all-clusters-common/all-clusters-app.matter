@@ -3703,7 +3703,7 @@ provisional cluster EnergyEvse = 153 {
   }
 
   struct ChargingTargetStruct {
-    int16u targetTime = 0;
+    int16u targetTimeMinutesPastMidnight = 0;
     optional percent targetSoC = 1;
     optional energy_mwh addedEnergy = 2;
   }
@@ -3766,9 +3766,9 @@ provisional cluster EnergyEvse = 153 {
   readonly attribute optional nullable energy_mwh batteryCapacity = 49;
   readonly attribute optional nullable char_string<32> vehicleID = 50;
   readonly attribute nullable int32u sessionID = 64;
-  readonly attribute elapsed_s sessionDuration = 65;
-  readonly attribute energy_mwh sessionEnergyCharged = 66;
-  readonly attribute optional energy_mwh sessionEnergyDischarged = 67;
+  readonly attribute nullable elapsed_s sessionDuration = 65;
+  readonly attribute nullable energy_mwh sessionEnergyCharged = 66;
+  readonly attribute optional nullable energy_mwh sessionEnergyDischarged = 67;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

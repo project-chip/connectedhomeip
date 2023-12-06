@@ -9336,10 +9336,10 @@ public class ClusterReadMapping {
         InteractionInfo readEnergyEvseSessionDurationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.EnergyEvseCluster) cluster).readSessionDurationAttribute(
-              (ChipClusters.LongAttributeCallback) callback
+              (ChipClusters.EnergyEvseCluster.SessionDurationAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedEnergyEvseClusterSessionDurationAttributeCallback(),
           readEnergyEvseSessionDurationCommandParams
         );
         result.put("readSessionDurationAttribute", readEnergyEvseSessionDurationAttributeInteractionInfo);
@@ -9347,10 +9347,10 @@ public class ClusterReadMapping {
         InteractionInfo readEnergyEvseSessionEnergyChargedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.EnergyEvseCluster) cluster).readSessionEnergyChargedAttribute(
-              (ChipClusters.LongAttributeCallback) callback
+              (ChipClusters.EnergyEvseCluster.SessionEnergyChargedAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedEnergyEvseClusterSessionEnergyChargedAttributeCallback(),
           readEnergyEvseSessionEnergyChargedCommandParams
         );
         result.put("readSessionEnergyChargedAttribute", readEnergyEvseSessionEnergyChargedAttributeInteractionInfo);
@@ -9358,10 +9358,10 @@ public class ClusterReadMapping {
         InteractionInfo readEnergyEvseSessionEnergyDischargedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.EnergyEvseCluster) cluster).readSessionEnergyDischargedAttribute(
-              (ChipClusters.LongAttributeCallback) callback
+              (ChipClusters.EnergyEvseCluster.SessionEnergyDischargedAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedEnergyEvseClusterSessionEnergyDischargedAttributeCallback(),
           readEnergyEvseSessionEnergyDischargedCommandParams
         );
         result.put("readSessionEnergyDischargedAttribute", readEnergyEvseSessionEnergyDischargedAttributeInteractionInfo);

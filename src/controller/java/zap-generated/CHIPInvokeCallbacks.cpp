@@ -3959,13 +3959,14 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
     {
         auto & entry_0 = iter_ChargingTargets_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_targetTime;
-        std::string newElement_0_targetTimeClassName     = "java/lang/Integer";
-        std::string newElement_0_targetTimeCtorSignature = "(I)V";
-        jint jninewElement_0_targetTime                  = static_cast<jint>(entry_0.targetTime);
-        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_targetTimeClassName.c_str(),
-                                                                   newElement_0_targetTimeCtorSignature.c_str(),
-                                                                   jninewElement_0_targetTime, newElement_0_targetTime);
+        jobject newElement_0_targetTimeMinutesPastMidnight;
+        std::string newElement_0_targetTimeMinutesPastMidnightClassName     = "java/lang/Integer";
+        std::string newElement_0_targetTimeMinutesPastMidnightCtorSignature = "(I)V";
+        jint jninewElement_0_targetTimeMinutesPastMidnight = static_cast<jint>(entry_0.targetTimeMinutesPastMidnight);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_targetTimeMinutesPastMidnightClassName.c_str(),
+                                                                   newElement_0_targetTimeMinutesPastMidnightCtorSignature.c_str(),
+                                                                   jninewElement_0_targetTimeMinutesPastMidnight,
+                                                                   newElement_0_targetTimeMinutesPastMidnight);
         jobject newElement_0_targetSoC;
         if (!entry_0.targetSoC.HasValue())
         {
@@ -4016,8 +4017,8 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
             return;
         }
 
-        newElement_0 = env->NewObject(chargingTargetStructStructClass_1, chargingTargetStructStructCtor_1, newElement_0_targetTime,
-                                      newElement_0_targetSoC, newElement_0_addedEnergy);
+        newElement_0 = env->NewObject(chargingTargetStructStructClass_1, chargingTargetStructStructCtor_1,
+                                      newElement_0_targetTimeMinutesPastMidnight, newElement_0_targetSoC, newElement_0_addedEnergy);
         chip::JniReferences::GetInstance().AddToList(ChargingTargets, newElement_0);
     }
 

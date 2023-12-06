@@ -50,6 +50,12 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   class SessionIDAttribute(val value: UInt?)
 
+  class SessionDurationAttribute(val value: UInt?)
+
+  class SessionEnergyChargedAttribute(val value: Long?)
+
+  class SessionEnergyDischargedAttribute(val value: Long?)
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -349,27 +355,36 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     // Implementation needs to be added here
   }
 
-  suspend fun readSessionDurationAttribute(): UInt {
+  suspend fun readSessionDurationAttribute(): SessionDurationAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSessionDurationAttribute(minInterval: Int, maxInterval: Int): UInt {
+  suspend fun subscribeSessionDurationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SessionDurationAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun readSessionEnergyChargedAttribute(): Long {
+  suspend fun readSessionEnergyChargedAttribute(): SessionEnergyChargedAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSessionEnergyChargedAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeSessionEnergyChargedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SessionEnergyChargedAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun readSessionEnergyDischargedAttribute(): Long {
+  suspend fun readSessionEnergyDischargedAttribute(): SessionEnergyDischargedAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSessionEnergyDischargedAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeSessionEnergyDischargedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SessionEnergyDischargedAttribute {
     // Implementation needs to be added here
   }
 

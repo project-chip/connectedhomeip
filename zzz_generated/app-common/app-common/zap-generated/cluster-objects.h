@@ -20766,15 +20766,15 @@ namespace Structs {
 namespace ChargingTargetStruct {
 enum class Fields : uint8_t
 {
-    kTargetTime  = 0,
-    kTargetSoC   = 1,
-    kAddedEnergy = 2,
+    kTargetTimeMinutesPastMidnight = 0,
+    kTargetSoC                     = 1,
+    kAddedEnergy                   = 2,
 };
 
 struct Type
 {
 public:
-    uint16_t targetTime = static_cast<uint16_t>(0);
+    uint16_t targetTimeMinutesPastMidnight = static_cast<uint16_t>(0);
     Optional<chip::Percent> targetSoC;
     Optional<int64_t> addedEnergy;
 
@@ -21367,9 +21367,9 @@ struct TypeInfo
 namespace SessionDuration {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionDuration::Id; }
@@ -21379,9 +21379,9 @@ struct TypeInfo
 namespace SessionEnergyCharged {
 struct TypeInfo
 {
-    using Type             = int64_t;
-    using DecodableType    = int64_t;
-    using DecodableArgType = int64_t;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionEnergyCharged::Id; }
@@ -21391,9 +21391,9 @@ struct TypeInfo
 namespace SessionEnergyDischarged {
 struct TypeInfo
 {
-    using Type             = int64_t;
-    using DecodableType    = int64_t;
-    using DecodableArgType = int64_t;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionEnergyDischarged::Id; }
@@ -21469,9 +21469,9 @@ struct TypeInfo
         Attributes::BatteryCapacity::TypeInfo::DecodableType batteryCapacity;
         Attributes::VehicleID::TypeInfo::DecodableType vehicleID;
         Attributes::SessionID::TypeInfo::DecodableType sessionID;
-        Attributes::SessionDuration::TypeInfo::DecodableType sessionDuration                 = static_cast<uint32_t>(0);
-        Attributes::SessionEnergyCharged::TypeInfo::DecodableType sessionEnergyCharged       = static_cast<int64_t>(0);
-        Attributes::SessionEnergyDischarged::TypeInfo::DecodableType sessionEnergyDischarged = static_cast<int64_t>(0);
+        Attributes::SessionDuration::TypeInfo::DecodableType sessionDuration;
+        Attributes::SessionEnergyCharged::TypeInfo::DecodableType sessionEnergyCharged;
+        Attributes::SessionEnergyDischarged::TypeInfo::DecodableType sessionEnergyDischarged;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
