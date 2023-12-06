@@ -4438,7 +4438,7 @@ static void AssertCannotReadString(nlTestSuite * inSuite, ContiguousBufferTLVRea
 static void CheckGetStringView(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[256];
-    const char testString[] = "This is a test";
+    static const char testString[] = "This is a test";
     {
         TLVWriter writer;
         writer.Init(buf);

@@ -1,6 +1,7 @@
 package com.google.chip.chiptool.clusterclient
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,22 +10,42 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipClusters.DefaultClusterCallback
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ClusterIDMapping
 import chip.devicecontroller.OTAProviderDelegate
+import chip.devicecontroller.OTAProviderDelegate.QueryImageResponseStatusEnum
+import chip.devicecontroller.ReportCallback
+import chip.devicecontroller.WriteAttributesCallback
+import chip.devicecontroller.cluster.structs.AccessControlClusterAccessControlEntryStruct
+import chip.devicecontroller.cluster.structs.OtaSoftwareUpdateRequestorClusterProviderLocation
+import chip.devicecontroller.model.AttributeWriteRequest
+import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.NodeState
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.OtaProviderClientFragmentBinding
+import com.google.chip.chiptool.util.toAny
 import java.io.BufferedInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OtaProviderClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -45,6 +66,8 @@ class OtaProviderClientFragment : Fragment() {
   private val binding
     get() = _binding!!
 
+  private val attributeList = ClusterIDMapping.OtaSoftwareUpdateRequestor.Attribute.values()
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -59,14 +82,310 @@ class OtaProviderClientFragment : Fragment() {
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
     binding.selectFirmwareFileBtn.setOnClickListener { selectFirmwareFileBtnClick() }
+    binding.updateOTAStatusBtn.setOnClickListener { updateOTAStatusBtnClick() }
     binding.announceOTAProviderBtn.setOnClickListener {
       scope.launch { sendAnnounceOTAProviderBtnClick() }
     }
 
+    binding.writeAclBtn.setOnClickListener { scope.launch { sendAclBtnClick() } }
+
+    binding.readAttributeBtn.setOnClickListener { scope.launch { readAttributeBtnClick() } }
+
+    binding.writeAttributeBtn.setOnClickListener { scope.launch { writeAttributeBtnClick() } }
+
+    setQueryImageSpinnerListener()
+
+    val attributeNames = attributeList.map { it.name }
+
+    binding.attributeSp.adapter =
+      ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, attributeNames)
+
     binding.vendorIdEd.setText(ChipClient.VENDOR_ID.toString())
+    binding.delayActionTimeEd.setText("0")
 
     deviceController.startOTAProvider(otaProviderCallback)
     return binding.root
+  }
+
+  private suspend fun sendAclBtnClick() {
+    val endpointId = 0
+    val clusterId = ClusterIDMapping.AccessControl.ID
+    val attributeId = ClusterIDMapping.AccessControl.Attribute.Acl.id
+
+    val attributePath = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+    deviceController.readAttributePath(
+      object : ReportCallback {
+        override fun onError(
+          attributePath: ChipAttributePath?,
+          eventPath: ChipEventPath?,
+          e: Exception
+        ) {
+          Log.d(TAG, "onError : ", e)
+          showMessage("Error : $e")
+        }
+
+        override fun onReport(nodeState: NodeState?) {
+          Log.d(TAG, "onResponse")
+          val tlv =
+            nodeState
+              ?.getEndpointState(endpointId)
+              ?.getClusterState(clusterId)
+              ?.getAttributeState(attributeId)
+              ?.tlv
+          requireActivity().runOnUiThread { showAddAccessControlDialog(tlv) }
+        }
+      },
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      listOf(attributePath),
+      0
+    )
+  }
+
+  private fun showAddAccessControlDialog(tlv: ByteArray?) {
+    if (tlv == null) {
+      Log.d(TAG, "Access Control read fail")
+      showMessage("Access Control read fail")
+      return
+    }
+
+    val dialogView =
+      requireActivity().layoutInflater.inflate(R.layout.add_access_control_dialog, null)
+    val groupIdEd = dialogView.findViewById<EditText>(R.id.groupIdEd)
+    groupIdEd.visibility = View.GONE
+    val nodeIdEd = dialogView.findViewById<EditText>(R.id.nodeIdEd)
+    nodeIdEd.visibility = View.VISIBLE
+    val accessControlEntrySp = dialogView.findViewById<Spinner>(R.id.accessControlEntrySp)
+    accessControlEntrySp.adapter =
+      ArrayAdapter(
+        requireContext(),
+        android.R.layout.simple_spinner_dropdown_item,
+        GroupSettingFragment.Companion.AccessControlEntry.values()
+      )
+
+    val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
+    dialogView.findViewById<Button>(R.id.addAccessControlBtn).setOnClickListener {
+      scope.launch {
+        sendAccessControl(
+          tlv,
+          nodeIdEd.text.toString().toULong(),
+          GroupSettingFragment.Companion.AccessControlEntry.valueOf(
+              accessControlEntrySp.selectedItem.toString()
+            )
+            .id
+        )
+        requireActivity().runOnUiThread { dialog.dismiss() }
+      }
+    }
+    dialog.show()
+  }
+
+  private suspend fun sendAccessControl(tlv: ByteArray, nodeId: ULong, privilege: UInt) {
+    val tlvWriter = TlvWriter().startArray(AnonymousTag)
+    var entryStructList: List<AccessControlClusterAccessControlEntryStruct>
+    TlvReader(tlv).also {
+      entryStructList = buildList {
+        it.enterArray(AnonymousTag)
+        while (!it.isEndOfContainer()) {
+          add(AccessControlClusterAccessControlEntryStruct.fromTlv(AnonymousTag, it))
+        }
+        it.exitContainer()
+      }
+    }
+
+    // If GroupID is already added to AccessControl, do not add it.
+    for (entry in entryStructList) {
+      if (
+        entry.authMode == 2U /* CASE */ &&
+          entry.subjects != null &&
+          entry.subjects!!.contains(nodeId)
+      ) {
+        continue
+      }
+
+      entry.toTlv(AnonymousTag, tlvWriter)
+    }
+
+    val newEntry =
+      AccessControlClusterAccessControlEntryStruct(
+        privilege,
+        2U /* CASE */,
+        listOf(nodeId),
+        null,
+        deviceController.fabricIndex.toUInt()
+      )
+    newEntry.toTlv(AnonymousTag, tlvWriter)
+    tlvWriter.endArray()
+
+    deviceController.write(
+      object : WriteAttributesCallback {
+        override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
+          Log.d(TAG, "onError : ", e)
+          showMessage("Error : ${e.toString()}")
+        }
+
+        override fun onResponse(attributePath: ChipAttributePath?) {
+          Log.d(TAG, "onResponse")
+          showMessage("write Success")
+        }
+      },
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      listOf(
+        AttributeWriteRequest.newInstance(
+          0,
+          ClusterIDMapping.AccessControl.ID,
+          ClusterIDMapping.AccessControl.Attribute.Acl.id,
+          tlvWriter.getEncoded()
+        )
+      ),
+      0,
+      0
+    )
+  }
+
+  private suspend fun readAttributeBtnClick() {
+    val attribute = attributeList[binding.attributeSp.selectedItemPosition]
+    val endpointId = OTA_REQUESTER_ENDPOINT_ID
+    val clusterId = ClusterIDMapping.OtaSoftwareUpdateRequestor.ID
+    val attributeId = attribute.id
+    val path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId)
+    deviceController.readAttributePath(
+      object : ReportCallback {
+        override fun onError(
+          attributePath: ChipAttributePath?,
+          eventPath: ChipEventPath?,
+          e: Exception
+        ) {
+          requireActivity().runOnUiThread {
+            Toast.makeText(
+                requireActivity(),
+                R.string.ota_provider_invalid_attribute,
+                Toast.LENGTH_SHORT
+              )
+              .show()
+          }
+        }
+
+        override fun onReport(nodeState: NodeState?) {
+          val tlv =
+            nodeState
+              ?.getEndpointState(endpointId)
+              ?.getClusterState(clusterId)
+              ?.getAttributeState(attributeId)
+              ?.tlv
+
+          val value = tlv?.let { TlvReader(it).toAny() }
+          Log.i(TAG, "OtaSoftwareUpdateRequestor ${attribute.name} value: $value")
+          showMessage("OtaSoftwareUpdateRequestor ${attribute.name} value: $value")
+        }
+      },
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      listOf<ChipAttributePath>(path),
+      0
+    )
+  }
+
+  private fun writeAttributeBtnClick() {
+    val attribute = attributeList[binding.attributeSp.selectedItemPosition]
+    if (attribute != ClusterIDMapping.OtaSoftwareUpdateRequestor.Attribute.DefaultOTAProviders) {
+      requireActivity().runOnUiThread {
+        Toast.makeText(
+            requireActivity(),
+            R.string.ota_provider_invalid_attribute,
+            Toast.LENGTH_SHORT
+          )
+          .show()
+      }
+      return
+    }
+    val dialogView =
+      requireActivity().layoutInflater.inflate(R.layout.write_default_otaproviders_dialog, null)
+    val fabricIndexEd = dialogView.findViewById<EditText>(R.id.fabricIndexEd)
+    val providerNodeIdEd = dialogView.findViewById<EditText>(R.id.providerNodeIdEd)
+    val endpointIdEd = dialogView.findViewById<EditText>(R.id.endpointIdEd)
+
+    fabricIndexEd.setText(deviceController.fabricIndex.toUInt().toString())
+    providerNodeIdEd.setText(deviceController.controllerNodeId.toULong().toString())
+    endpointIdEd.setText(OTA_PROVIDER_ENDPOINT_ID.toUInt().toString())
+
+    val dialog = AlertDialog.Builder(requireContext()).apply { setView(dialogView) }.create()
+
+    dialogView.findViewById<Button>(R.id.writeDefaultOtaProvidersBtn).setOnClickListener {
+      scope.launch {
+        sendWriteDefaultOTAProviders(
+          providerNodeIdEd.text.toString().toULong(),
+          endpointIdEd.text.toString().toUInt(),
+          fabricIndexEd.text.toString().toUInt()
+        )
+        requireActivity().runOnUiThread { dialog.dismiss() }
+      }
+    }
+    dialog.show()
+  }
+
+  private suspend fun sendWriteDefaultOTAProviders(
+    providerNodeId: ULong,
+    endpointId: UInt,
+    fabricIndex: UInt
+  ) {
+    val endpoint = OTA_REQUESTER_ENDPOINT_ID
+    val clusterId = ClusterIDMapping.OtaSoftwareUpdateRequestor.ID
+    val attributeId = ClusterIDMapping.OtaSoftwareUpdateRequestor.Attribute.DefaultOTAProviders.id
+
+    val tlv =
+      TlvWriter()
+        .apply {
+          startArray(AnonymousTag)
+          OtaSoftwareUpdateRequestorClusterProviderLocation(providerNodeId, endpointId, fabricIndex)
+            .toTlv(AnonymousTag, this)
+          endArray()
+        }
+        .getEncoded()
+
+    val writeRequest = AttributeWriteRequest.newInstance(endpoint, clusterId, attributeId, tlv)
+
+    deviceController.write(
+      object : WriteAttributesCallback {
+        override fun onError(attributePath: ChipAttributePath?, e: Exception?) {
+          Log.d(TAG, "onError")
+          showMessage("error : ${e.toString()}")
+        }
+
+        override fun onResponse(attributePath: ChipAttributePath?) {
+          Log.d(TAG, "onResponse")
+          showMessage("write success")
+        }
+      },
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      listOf<AttributeWriteRequest>(writeRequest),
+      0,
+      0
+    )
+  }
+
+  private fun setQueryImageSpinnerListener() {
+    val statusList = QueryImageResponseStatusEnum.values()
+    binding.titleStatusSp.adapter =
+      ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, statusList)
+    binding.titleStatusSp.onItemSelectedListener =
+      object : AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+          val isBusy = statusList[position] == QueryImageResponseStatusEnum.Busy
+
+          requireActivity().runOnUiThread {
+            binding.delayActionTimeTv.visibility =
+              if (isBusy) {
+                View.VISIBLE
+              } else {
+                View.GONE
+              }
+            binding.delayActionTimeEd.visibility = binding.delayActionTimeTv.visibility
+          }
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+          Log.d(TAG, "onNothingSelected")
+        }
+      }
   }
 
   private fun selectFirmwareFileBtnClick() {
@@ -116,15 +435,30 @@ class OtaProviderClientFragment : Fragment() {
     requireActivity().runOnUiThread { binding.firmwareFileTv.text = filename }
   }
 
-  private suspend fun sendAnnounceOTAProviderBtnClick() {
-    requireActivity().runOnUiThread {
-      val version = 2L
-      val versionString = "2.0"
+  private fun updateOTAStatusBtnClick() {
+    val version = 2L
+    val versionString = "2.0"
 
-      val filename = binding.firmwareFileTv.text.toString()
-      Log.d(TAG, "sendAnnounceOTAProviderBtnClick : $filename")
-      otaProviderCallback.setOTAFile(version, versionString, filename, fileUri)
+    val filename = binding.firmwareFileTv.text.toString()
+    Log.d(TAG, "updateOTAStatusBtnClick : $filename")
+
+    when (binding.titleStatusSp.selectedItem.toString()) {
+      QueryImageResponseStatusEnum.UpdateAvailable.name ->
+        otaProviderCallback.setOTAFile(version, versionString, filename, fileUri)
+      QueryImageResponseStatusEnum.Busy.name ->
+        otaProviderCallback.setOTABusyError(
+          binding.delayActionTimeEd.text.toString().toUInt(),
+          binding.titleUserConsentNeededSp.selectedItem.toString().toBoolean()
+        )
+      QueryImageResponseStatusEnum.NotAvailable.name ->
+        otaProviderCallback.setOTANotAvailableError(
+          binding.titleUserConsentNeededSp.selectedItem.toString().toBoolean()
+        )
     }
+  }
+
+  private suspend fun sendAnnounceOTAProviderBtnClick() {
+    requireActivity().runOnUiThread { updateOTAStatusBtnClick() }
 
     val otaRequestCluster =
       ChipClusters.OtaSoftwareUpdateRequestorCluster(
@@ -166,11 +500,36 @@ class OtaProviderClientFragment : Fragment() {
     private var inputStream: InputStream? = null
     private var bufferedInputStream: BufferedInputStream? = null
 
-    fun setOTAFile(version: Long, versionString: String, fileName: String, uri: Uri?) {
+    private var status: QueryImageResponseStatusEnum? = null
+    private var delayedTime: UInt? = null
+    private var userConsentNeeded: Boolean? = null
+
+    fun setOTAFile(
+      version: Long,
+      versionString: String,
+      fileName: String,
+      uri: Uri?,
+      userConsentNeeded: Boolean? = null
+    ) {
+      this.status = QueryImageResponseStatusEnum.UpdateAvailable
       this.version = version
       this.versionString = versionString
       this.fileName = fileName
       this.uri = uri
+      this.delayedTime = null
+      this.userConsentNeeded = userConsentNeeded
+    }
+
+    fun setOTABusyError(delayedTime: UInt, userConsentNeeded: Boolean? = null) {
+      this.status = QueryImageResponseStatusEnum.Busy
+      this.delayedTime = delayedTime
+      this.userConsentNeeded = userConsentNeeded
+    }
+
+    fun setOTANotAvailableError(userConsentNeeded: Boolean? = null) {
+      this.status = QueryImageResponseStatusEnum.NotAvailable
+      this.delayedTime = null
+      this.userConsentNeeded = userConsentNeeded
     }
 
     override fun handleQueryImage(
@@ -181,18 +540,30 @@ class OtaProviderClientFragment : Fragment() {
       location: String?,
       requestorCanConsent: Boolean?,
       metadataForProvider: ByteArray?
-    ): OTAProviderDelegate.QueryImageResponse {
+    ): OTAProviderDelegate.QueryImageResponse? {
       Log.d(
         TAG,
         "handleQueryImage, $vendorId, $productId, $softwareVersion, $hardwareVersion, $location"
       )
-      return OTAProviderDelegate.QueryImageResponse(version, versionString, fileName)
+
+      return when (status) {
+        QueryImageResponseStatusEnum.UpdateAvailable ->
+          OTAProviderDelegate.QueryImageResponse(version, versionString, fileName, null)
+        QueryImageResponseStatusEnum.Busy ->
+          OTAProviderDelegate.QueryImageResponse(
+            status,
+            delayedTime?.toLong() ?: 0,
+            userConsentNeeded ?: false
+          )
+        QueryImageResponseStatusEnum.NotAvailable ->
+          OTAProviderDelegate.QueryImageResponse(status, userConsentNeeded ?: false)
+        else -> null
+      }
     }
 
     override fun handleOTAQueryFailure(error: Int) {
       Log.d(TAG, "handleOTAQueryFailure, $error")
       showMessage("handleOTAQueryFailure : $error")
-      deviceController.finishOTAProvider()
     }
 
     override fun handleApplyUpdateRequest(

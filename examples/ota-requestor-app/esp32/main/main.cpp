@@ -58,7 +58,7 @@ using namespace chip::Shell;
 using namespace ::chip::Credentials;
 
 namespace {
-const char * TAG = "ota-requester-app";
+extern const char TAG[] = "ota-requester-app";
 static AppDeviceCallbacks EchoCallbacks;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;

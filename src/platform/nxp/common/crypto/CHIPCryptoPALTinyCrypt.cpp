@@ -124,7 +124,7 @@ static bool _isValidTagLength(size_t tag_length)
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -145,7 +145,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     }
 
     // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray) * 8);
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                sizeof(Symmetric128BitsKeyByteArray) * 8);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Encrypt
@@ -161,7 +162,7 @@ exit:
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, const uint8_t * aad, size_t aad_len,
-                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -182,7 +183,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     }
 
     // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray) * 8);
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                sizeof(Symmetric128BitsKeyByteArray) * 8);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Decrypt

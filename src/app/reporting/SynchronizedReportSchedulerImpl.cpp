@@ -79,7 +79,7 @@ void SynchronizedReportSchedulerImpl::CancelReport()
 }
 
 /// @brief Checks if the timer is active for the ReportScheduler
-bool SynchronizedReportSchedulerImpl::IsReportScheduled()
+bool SynchronizedReportSchedulerImpl::IsReportScheduled(ReadHandler * ReadHandler)
 {
     return mTimerDelegate->IsTimerActive(this);
 }
@@ -133,14 +133,13 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::FindNextMinInterval(const Timestamp 
 CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode,
                                                                        const Timestamp & now)
 {
-    VerifyOrReturnError(nullptr != FindReadHandlerNode(aNode->GetReadHandler()), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(FindNextMaxInterval(now));
     ReturnErrorOnFailure(FindNextMinInterval(now));
     bool reportableNow   = false;
     bool reportableAtMin = false;
 
     mNodesPool.ForEachActiveObject([&reportableNow, &reportableAtMin, this, now](ReadHandlerNode * node) {
-        if (!node->IsEngineRunScheduled())
+        if (!node->IsEngineRunScheduled() || node->IsChunkedReport())
         {
             if (node->IsReportableNow(now))
             {
@@ -180,11 +179,10 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::CalculateNextReportTimeout(Timeout &
 /// the engine already verifies that read handlers are reportable before sending a report
 void SynchronizedReportSchedulerImpl::TimerFired()
 {
-    Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
+    bool firedEarly = true;
 
-    InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-
-    mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
+    mNodesPool.ForEachActiveObject([now, &firedEarly](ReadHandlerNode * node) {
         if (node->GetMinTimestamp() <= now)
         {
             node->SetCanBeSynced(true);
@@ -192,6 +190,9 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 
         if (node->IsReportableNow(now))
         {
+            // We set firedEarly false here because we assume we fired the timer early if no handler is reportable at the moment,
+            // which becomes false if we find a handler that is reportable
+            firedEarly = false;
             node->SetEngineRunScheduled(true);
             ChipLogProgress(DataManagement, "Handler: %p with min: 0x" ChipLogFormatX64 " and max: 0x" ChipLogFormatX64 "", (node),
                             ChipLogValueX64(node->GetMinTimestamp().count()), ChipLogValueX64(node->GetMaxTimestamp().count()));
@@ -199,6 +200,18 @@ void SynchronizedReportSchedulerImpl::TimerFired()
 
         return Loop::Continue;
     });
+
+    // If there are no handlers registers, no need to schedule the next report
+    if (mNodesPool.Allocated() && firedEarly)
+    {
+        Timeout timeout = Milliseconds32(0);
+        ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
+        ScheduleReport(timeout, nullptr, now);
+    }
+    else
+    {
+        InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+    }
 }
 
 } // namespace reporting
