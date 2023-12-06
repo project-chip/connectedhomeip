@@ -30,7 +30,7 @@ CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128BitsKeyHandle & key)
+CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key)
 {
     memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
     return CHIP_NO_ERROR;

@@ -211,7 +211,7 @@ public:
     ~TestHmacKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Hmac128BitsKeyHandle key;
+    Hmac128KeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
@@ -939,7 +939,7 @@ static void TestHMAC_SHA256_KeyHandle(nlTestSuite * inSuite, void * inContext)
         Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, v.key, v.key_length);
 
-        Hmac128BitsKeyHandle keyHandle;
+        Hmac128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
         mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);

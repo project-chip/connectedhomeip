@@ -633,16 +633,16 @@ public:
 /**
  * @brief Platform-specific HMAC key handle
  */
-class Hmac128BitsKeyHandle : public Symmetric128BitsKeyHandle
+class Hmac128KeyHandle : public Symmetric128BitsKeyHandle
 {
 public:
-    Hmac128BitsKeyHandle() = default;
-    virtual ~Hmac128BitsKeyHandle() {}
+    Hmac128KeyHandle() = default;
+    virtual ~Hmac128KeyHandle() {}
 
-    Hmac128BitsKeyHandle(const Hmac128BitsKeyHandle &) = delete;
-    Hmac128BitsKeyHandle(Hmac128BitsKeyHandle &&)      = delete;
-    void operator=(const Hmac128BitsKeyHandle &)       = delete;
-    void operator=(Hmac128BitsKeyHandle &&)            = delete;
+    Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
+    Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
+    void operator=(const Hmac128KeyHandle &)   = delete;
+    void operator=(Hmac128KeyHandle &&)        = delete;
 };
 
 /**
@@ -1005,7 +1005,7 @@ public:
      * @param out_length Underlying size of the `out_buffer`.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR HMAC_SHA256(const Hmac128BitsKeyHandle & key, const uint8_t * message, size_t message_length,
+    virtual CHIP_ERROR HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
                                    uint8_t * out_buffer, size_t out_length);
 };
 

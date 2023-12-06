@@ -57,7 +57,7 @@ public:
      * If the method returns no error, the application is responsible for destroying the handle
      * using the DestroyKey() method when the key is no longer needed.
      */
-    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128BitsKeyHandle & key) = 0;
+    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) = 0;
 
     /**
      * @brief Derive key from a shared secret.

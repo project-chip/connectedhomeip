@@ -364,8 +364,8 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128BitsKeyHandle & key, const uint8_t * message, size_t message_length,
-                                 uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HMAC_sha::HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length, uint8_t * out_buffer,
+                                 size_t out_length)
 {
     VerifyOrReturnError(isBufferNonEmpty(message, message_length), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr && out_length == PSA_HASH_LENGTH(PSA_ALG_SHA_256), CHIP_ERROR_INVALID_ARGUMENT);
