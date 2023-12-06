@@ -31,9 +31,10 @@ public:
 
     /**
      * @brief Callback used to let the application know that a checkin message was received and validated.
+     * When needRefreshKey is true, it indicates the client to refresh the key and re-register the client with the new key
      *
-     * @param[out] clientInfo - ClientInfo object of the peer node
-     * @param[out] needRefreshKey - Indicates if the application should refresh the exisiting key
+     * @param[in] clientInfo - ClientInfo object of the peer node
+     * @param[in] needRefreshKey - Indicates if the application should refresh the exisiting key
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) = 0;
 };
