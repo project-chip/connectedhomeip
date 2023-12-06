@@ -12,9 +12,16 @@ exports.model = {
       },
       {{/zcl_commands}}
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes: {
       {{#zcl_attributes_server}}
-      {{code}} : "{{asUpperCamelCase label}}",
+        {{#if isOptional}}
+          {{#if (matterSupportedClusterFeatureAttributes parent.label code)}}
+            {{code}} : "{{asUpperCamelCase label}}", 
+          {{/if}}
+        {{else}}
+          {{code}} : "{{asUpperCamelCase label}}", 
+        {{/if}}
       {{/zcl_attributes_server}}
     },
     {{#if (supportedClusterEvents code)}}

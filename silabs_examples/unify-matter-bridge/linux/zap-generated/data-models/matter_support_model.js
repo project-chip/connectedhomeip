@@ -16,6 +16,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "IdentifyTime",
       1 : "IdentifyType",
@@ -98,8 +99,186 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "NameSupport",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  5 : {
+    name : "Scenes",
+    commands : {
+      0 : {
+        name : "AddScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      0 : {
+        name : "AddSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      1 : {
+        name : "ViewScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      1 : {
+        name : "ViewSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      2 : {
+        name : "RemoveScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      2 : {
+        name : "RemoveSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      3 : {
+        name : "RemoveAllScenes",
+        arguments : [
+          "GroupID",
+        ],
+      },
+      3 : {
+        name : "RemoveAllScenesResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+        ],
+      },
+      4 : {
+        name : "StoreScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      4 : {
+        name : "StoreSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      5 : {
+        name : "RecallScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+        ],
+      },
+      6 : {
+        name : "GetSceneMembership",
+        arguments : [
+          "GroupID",
+        ],
+      },
+      6 : {
+        name : "GetSceneMembershipResponse",
+        arguments : [
+          "Status",
+          "Capacity",
+          "GroupID",
+          "SceneList",
+        ],
+      },
+      64 : {
+        name : "EnhancedAddScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      64 : {
+        name : "EnhancedAddSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      65 : {
+        name : "EnhancedViewScene",
+        arguments : [
+          "GroupID",
+          "SceneID",
+        ],
+      },
+      65 : {
+        name : "EnhancedViewSceneResponse",
+        arguments : [
+          "Status",
+          "GroupID",
+          "SceneID",
+          "TransitionTime",
+          "SceneName",
+          "ExtensionFieldSets",
+        ],
+      },
+      66 : {
+        name : "CopyScene",
+        arguments : [
+          "Mode",
+          "GroupIdentifierFrom",
+          "SceneIdentifierFrom",
+          "GroupIdentifierTo",
+          "SceneIdentifierTo",
+        ],
+      },
+      66 : {
+        name : "CopySceneResponse",
+        arguments : [
+          "Status",
+          "GroupIdentifierFrom",
+          "SceneIdentifierFrom",
+        ],
+      },
+    },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
+    attributes : {
+      0 : "SceneCount",
+      1 : "CurrentScene",
+      2 : "CurrentGroup",
+      3 : "SceneValid",
+      4 : "NameSupport",
+      6 : "SceneTableSize",
+      7 : "RemainingCapacity",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -151,6 +330,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "OnOff",
       16384 : "GlobalSceneControl",
@@ -168,6 +348,7 @@ exports.model = {
   7 : {
     name : "OnOffSwitchConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SwitchType",
       16 : "SwitchActions",
@@ -259,6 +440,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "CurrentLevel",
       1 : "RemainingTime",
@@ -285,16 +467,11 @@ exports.model = {
   15 : {
     name : "BinaryInputBasic",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      4 : "ActiveText",
-      28 : "Description",
-      46 : "InactiveText",
       81 : "OutOfService",
-      84 : "Polarity",
       85 : "PresentValue",
-      103 : "Reliability",
       111 : "StatusFlags",
-      256 : "ApplicationType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -306,6 +483,7 @@ exports.model = {
   28 : {
     name : "PulseWidthModulation",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -318,12 +496,12 @@ exports.model = {
   29 : {
     name : "Descriptor",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "DeviceTypeList",
       1 : "ServerList",
       2 : "ClientList",
       3 : "PartsList",
-      4 : "TagList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -335,6 +513,7 @@ exports.model = {
   30 : {
     name : "Binding",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Binding",
       65528 : "GeneratedCommandList",
@@ -348,9 +527,9 @@ exports.model = {
   31 : {
     name : "AccessControl",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Acl",
-      1 : "Extension",
       2 : "SubjectsPerAccessControlEntry",
       3 : "TargetsPerAccessControlEntry",
       4 : "AccessControlEntriesPerFabric",
@@ -455,10 +634,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "ActionList",
       1 : "EndpointLists",
-      2 : "SetupURL",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -477,6 +656,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "DataModelRevision",
       1 : "VendorName",
@@ -489,18 +669,7 @@ exports.model = {
       8 : "HardwareVersionString",
       9 : "SoftwareVersion",
       10 : "SoftwareVersionString",
-      11 : "ManufacturingDate",
-      12 : "PartNumber",
-      13 : "ProductURL",
-      14 : "ProductLabel",
-      15 : "SerialNumber",
-      16 : "LocalConfigDisabled",
-      17 : "Reachable",
-      18 : "UniqueID",
       19 : "CapabilityMinima",
-      20 : "ProductAppearance",
-      21 : "SpecificationVersion",
-      22 : "MaxPathsPerInvoke",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -560,6 +729,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -583,6 +753,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "DefaultOTAProviders",
       1 : "UpdatePossible",
@@ -599,6 +770,7 @@ exports.model = {
   43 : {
     name : "LocalizationConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "ActiveLocale",
       1 : "SupportedLocales",
@@ -613,10 +785,9 @@ exports.model = {
   44 : {
     name : "TimeFormatLocalization",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "HourFormat",
-      1 : "ActiveCalendarType",
-      2 : "SupportedCalendarTypes",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -628,8 +799,8 @@ exports.model = {
   45 : {
     name : "UnitLocalization",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "TemperatureUnit",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -641,6 +812,7 @@ exports.model = {
   46 : {
     name : "PowerSourceConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Sources",
       65528 : "GeneratedCommandList",
@@ -654,38 +826,11 @@ exports.model = {
   47 : {
     name : "PowerSource",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Status",
       1 : "Order",
       2 : "Description",
-      3 : "WiredAssessedInputVoltage",
-      4 : "WiredAssessedInputFrequency",
-      5 : "WiredCurrentType",
-      6 : "WiredAssessedCurrent",
-      7 : "WiredNominalVoltage",
-      8 : "WiredMaximumCurrent",
-      9 : "WiredPresent",
-      10 : "ActiveWiredFaults",
-      11 : "BatVoltage",
-      12 : "BatPercentRemaining",
-      13 : "BatTimeRemaining",
-      14 : "BatChargeLevel",
-      15 : "BatReplacementNeeded",
-      16 : "BatReplaceability",
-      17 : "BatPresent",
-      18 : "ActiveBatFaults",
-      19 : "BatReplacementDescription",
-      20 : "BatCommonDesignation",
-      21 : "BatANSIDesignation",
-      22 : "BatIECDesignation",
-      23 : "BatApprovedChemistry",
-      24 : "BatCapacity",
-      25 : "BatQuantity",
-      26 : "BatChargeState",
-      27 : "BatTimeToFullCharge",
-      28 : "BatFunctionalWhileCharging",
-      29 : "BatChargingCurrent",
-      30 : "ActiveBatChargeFaults",
       31 : "EndpointList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -741,6 +886,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Breadcrumb",
       1 : "BasicCommissioningInfo",
@@ -832,26 +978,11 @@ exports.model = {
           "Breadcrumb",
         ],
       },
-      9 : {
-        name : "QueryIdentity",
-        arguments : [
-          "KeyIdentifier",
-          "PossessionNonce",
-        ],
-      },
-      10 : {
-        name : "QueryIdentityResponse",
-        arguments : [
-          "Identity",
-          "PossessionSignature",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MaxNetworks",
       1 : "Networks",
-      2 : "ScanMaxTimeSeconds",
-      3 : "ConnectMaxTimeSeconds",
       4 : "InterfaceEnabled",
       5 : "LastNetworkingStatus",
       6 : "LastNetworkID",
@@ -888,6 +1019,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -907,29 +1039,11 @@ exports.model = {
           "EventTrigger",
         ],
       },
-      1 : {
-        name : "TimeSnapshot",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "TimeSnapshotResponse",
-        arguments : [
-          "SystemTimeMs",
-          "PosixTimeMs",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "NetworkInterfaces",
       1 : "RebootCount",
-      2 : "UpTime",
-      3 : "TotalOperationalHours",
-      4 : "BootReason",
-      5 : "ActiveHardwareFaults",
-      6 : "ActiveRadioFaults",
-      7 : "ActiveNetworkFaults",
       8 : "TestEventTriggersEnabled",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -949,11 +1063,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "ThreadMetrics",
-      1 : "CurrentHeapFree",
-      2 : "CurrentHeapUsed",
-      3 : "CurrentHeapHighWatermark",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -972,6 +1083,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Channel",
       1 : "RoutingRole",
@@ -979,7 +1091,6 @@ exports.model = {
       3 : "PanId",
       4 : "ExtendedPanId",
       5 : "MeshLocalPrefix",
-      6 : "OverrunCount",
       7 : "NeighborTable",
       8 : "RouteTable",
       9 : "PartitionId",
@@ -987,51 +1098,6 @@ exports.model = {
       11 : "DataVersion",
       12 : "StableDataVersion",
       13 : "LeaderRouterId",
-      14 : "DetachedRoleCount",
-      15 : "ChildRoleCount",
-      16 : "RouterRoleCount",
-      17 : "LeaderRoleCount",
-      18 : "AttachAttemptCount",
-      19 : "PartitionIdChangeCount",
-      20 : "BetterPartitionAttachAttemptCount",
-      21 : "ParentChangeCount",
-      22 : "TxTotalCount",
-      23 : "TxUnicastCount",
-      24 : "TxBroadcastCount",
-      25 : "TxAckRequestedCount",
-      26 : "TxAckedCount",
-      27 : "TxNoAckRequestedCount",
-      28 : "TxDataCount",
-      29 : "TxDataPollCount",
-      30 : "TxBeaconCount",
-      31 : "TxBeaconRequestCount",
-      32 : "TxOtherCount",
-      33 : "TxRetryCount",
-      34 : "TxDirectMaxRetryExpiryCount",
-      35 : "TxIndirectMaxRetryExpiryCount",
-      36 : "TxErrCcaCount",
-      37 : "TxErrAbortCount",
-      38 : "TxErrBusyChannelCount",
-      39 : "RxTotalCount",
-      40 : "RxUnicastCount",
-      41 : "RxBroadcastCount",
-      42 : "RxDataCount",
-      43 : "RxDataPollCount",
-      44 : "RxBeaconCount",
-      45 : "RxBeaconRequestCount",
-      46 : "RxOtherCount",
-      47 : "RxAddressFilteredCount",
-      48 : "RxDestAddrFilteredCount",
-      49 : "RxDuplicatedCount",
-      50 : "RxErrNoFrameCount",
-      51 : "RxErrUnknownNeighborCount",
-      52 : "RxErrInvalidSrcAddrCount",
-      53 : "RxErrSecCount",
-      54 : "RxErrFcsCount",
-      55 : "RxErrOtherCount",
-      56 : "ActiveTimestamp",
-      57 : "PendingTimestamp",
-      58 : "Delay",
       59 : "SecurityPolicy",
       60 : "ChannelPage0Mask",
       61 : "OperationalDatasetComponents",
@@ -1054,20 +1120,13 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Bssid",
       1 : "SecurityType",
       2 : "WiFiVersion",
       3 : "ChannelNumber",
       4 : "Rssi",
-      5 : "BeaconLostCount",
-      6 : "BeaconRxCount",
-      7 : "PacketMulticastRxCount",
-      8 : "PacketMulticastTxCount",
-      9 : "PacketUnicastRxCount",
-      10 : "PacketUnicastTxCount",
-      11 : "CurrentMaxRate",
-      12 : "OverrunCount",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1086,16 +1145,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "PHYRate",
-      1 : "FullDuplex",
-      2 : "PacketRxCount",
-      3 : "PacketTxCount",
-      4 : "TxErrCount",
-      5 : "CollisionCount",
-      6 : "OverrunCount",
-      7 : "CarrierDetect",
-      8 : "TimeSinceReset",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1146,20 +1197,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "UTCTime",
       1 : "Granularity",
-      2 : "TimeSource",
-      3 : "TrustedTimeSource",
-      4 : "DefaultNTP",
-      5 : "TimeZone",
-      6 : "DSTOffset",
-      7 : "LocalTime",
-      8 : "TimeZoneDatabase",
-      9 : "NTPServerAvailable",
-      10 : "TimeZoneListMaxSize",
-      11 : "DSTOffsetListMaxSize",
-      12 : "SupportsDNSResolve",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1171,23 +1212,9 @@ exports.model = {
   57 : {
     name : "BridgedDeviceBasicInformation",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      1 : "VendorName",
-      2 : "VendorID",
-      3 : "ProductName",
-      5 : "NodeLabel",
-      7 : "HardwareVersion",
-      8 : "HardwareVersionString",
-      9 : "SoftwareVersion",
-      10 : "SoftwareVersionString",
-      11 : "ManufacturingDate",
-      12 : "PartNumber",
-      13 : "ProductURL",
-      14 : "ProductLabel",
-      15 : "SerialNumber",
       17 : "Reachable",
-      18 : "UniqueID",
-      20 : "ProductAppearance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1199,10 +1226,10 @@ exports.model = {
   59 : {
     name : "Switch",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "NumberOfPositions",
       1 : "CurrentPosition",
-      2 : "MultiPressMax",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1237,6 +1264,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "WindowStatus",
       1 : "AdminFabricIndex",
@@ -1335,6 +1363,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "NOCs",
       1 : "Fabrics",
@@ -1390,6 +1419,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "GroupKeyMap",
       1 : "GroupTable",
@@ -1406,6 +1436,7 @@ exports.model = {
   64 : {
     name : "FixedLabel",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "LabelList",
       65528 : "GeneratedCommandList",
@@ -1419,6 +1450,7 @@ exports.model = {
   65 : {
     name : "UserLabel",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "LabelList",
       65528 : "GeneratedCommandList",
@@ -1432,6 +1464,7 @@ exports.model = {
   66 : {
     name : "ProxyConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -1444,6 +1477,7 @@ exports.model = {
   67 : {
     name : "ProxyDiscovery",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -1456,6 +1490,7 @@ exports.model = {
   68 : {
     name : "ProxyValid",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -1468,6 +1503,7 @@ exports.model = {
   69 : {
     name : "BooleanState",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "StateValue",
       65528 : "GeneratedCommandList",
@@ -1509,156 +1545,12 @@ exports.model = {
 
         ],
       },
-      4 : {
-        name : "StayActiveResponse",
-        arguments : [
-          "PromisedActiveDuration",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "IdleModeDuration",
       1 : "ActiveModeDuration",
       2 : "ActiveModeThreshold",
-      3 : "RegisteredClients",
-      4 : "ICDCounter",
-      5 : "ClientsSupportedPerFabric",
-      6 : "UserActiveModeTriggerHint",
-      7 : "UserActiveModeTriggerInstruction",
-      8 : "OperatingMode",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  71 : {
-    name : "Timer",
-    commands : {
-      0 : {
-        name : "SetTimer",
-        arguments : [
-          "NewTime",
-        ],
-      },
-      1 : {
-        name : "ResetTimer",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "AddTime",
-        arguments : [
-          "AdditionalTime",
-        ],
-      },
-      3 : {
-        name : "ReduceTime",
-        arguments : [
-          "TimeReduction",
-        ],
-      },
-    },
-    attributes : {
-      0 : "SetTime",
-      1 : "TimeRemaining",
-      2 : "TimerState",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  72 : {
-    name : "OvenCavityOperationalState",
-    commands : {
-      0 : {
-        name : "Pause",
-        arguments : [
-
-        ],
-      },
-      1 : {
-        name : "Stop",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "Start",
-        arguments : [
-
-        ],
-      },
-      3 : {
-        name : "Resume",
-        arguments : [
-
-        ],
-      },
-      4 : {
-        name : "OperationalCommandResponse",
-        arguments : [
-          "CommandResponseState",
-        ],
-      },
-    },
-    attributes : {
-      0 : "PhaseList",
-      1 : "CurrentPhase",
-      2 : "CountdownTime",
-      3 : "OperationalStateList",
-      4 : "OperationalState",
-      5 : "OperationalError",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  73 : {
-    name : "OvenMode",
-    commands : {
-      0 : {
-        name : "ChangeToMode",
-        arguments : [
-          "NewMode",
-        ],
-      },
-      1 : {
-        name : "ChangeToModeResponse",
-        arguments : [
-          "Status",
-          "StatusText",
-        ],
-      },
-    },
-    attributes : {
-      0 : "SupportedModes",
-      1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  74 : {
-    name : "LaundryDryerControls",
-    commands : {},
-    attributes : {
-      0 : "SupportedDrynessLevels",
-      1 : "SelectedDrynessLevel",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1677,13 +1569,12 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Description",
       1 : "StandardNamespace",
       2 : "SupportedModes",
       3 : "CurrentMode",
-      4 : "StartUpMode",
-      5 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1709,11 +1600,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1739,11 +1629,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1755,11 +1644,8 @@ exports.model = {
   83 : {
     name : "LaundryWasherControls",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "SpinSpeeds",
-      1 : "SpinSpeedCurrent",
-      2 : "NumberOfRinses",
-      3 : "SupportedRinses",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1785,10 +1671,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1814,10 +1700,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1837,13 +1723,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "TemperatureSetpoint",
-      1 : "MinTemperature",
-      2 : "MaxTemperature",
-      3 : "Step",
-      4 : "SelectedTemperatureLevel",
-      5 : "SupportedTemperatureLevels",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1855,6 +1736,7 @@ exports.model = {
   87 : {
     name : "RefrigeratorAlarm",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Mask",
       2 : "State",
@@ -1884,11 +1766,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1900,6 +1781,7 @@ exports.model = {
   91 : {
     name : "AirQuality",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "AirQuality",
       65528 : "GeneratedCommandList",
@@ -1920,20 +1802,13 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "ExpressedState",
-      1 : "SmokeState",
-      2 : "COState",
       3 : "BatteryAlert",
-      4 : "DeviceMuted",
       5 : "TestInProgress",
       6 : "HardwareFaultAlert",
       7 : "EndOfServiceAlert",
-      8 : "InterconnectSmokeAlarm",
-      9 : "InterconnectCOAlarm",
-      10 : "ContaminationState",
-      11 : "SmokeSensitivityLevel",
-      12 : "ExpiryDate",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1958,9 +1833,9 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Mask",
-      1 : "Latch",
       2 : "State",
       3 : "Supported",
       65528 : "GeneratedCommandList",
@@ -2057,10 +1932,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "PhaseList",
       1 : "CurrentPhase",
-      2 : "CountdownTime",
       3 : "OperationalStateList",
       4 : "OperationalState",
       5 : "OperationalError",
@@ -2105,17 +1980,11 @@ exports.model = {
           "CommandResponseState",
         ],
       },
-      128 : {
-        name : "GoHome",
-        arguments : [
-
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "PhaseList",
       1 : "CurrentPhase",
-      2 : "CountdownTime",
       3 : "OperationalStateList",
       4 : "OperationalState",
       5 : "OperationalError",
@@ -2273,13 +2142,9 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "Condition",
-      1 : "DegradationDirection",
       2 : "ChangeIndication",
-      3 : "InPlaceIndicator",
-      4 : "LastChangedTime",
-      5 : "ReplacementProductList",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2298,392 +2163,9 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "Condition",
-      1 : "DegradationDirection",
       2 : "ChangeIndication",
-      3 : "InPlaceIndicator",
-      4 : "LastChangedTime",
-      5 : "ReplacementProductList",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  128 : {
-    name : "BooleanStateConfiguration",
-    commands : {
-      0 : {
-        name : "SuppressAlarm",
-        arguments : [
-          "AlarmsToSuppress",
-        ],
-      },
-      1 : {
-        name : "EnableDisableAlarm",
-        arguments : [
-          "AlarmsToEnableDisable",
-        ],
-      },
-    },
-    attributes : {
-      0 : "CurrentSensitivityLevel",
-      1 : "SupportedSensitivityLevels",
-      2 : "DefaultSensitivityLevel",
-      3 : "AlarmsActive",
-      4 : "AlarmsSuppressed",
-      5 : "AlarmsEnabled",
-      6 : "AlarmsSupported",
-      7 : "SensorFault",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  129 : {
-    name : "ValveConfigurationAndControl",
-    commands : {
-      0 : {
-        name : "Open",
-        arguments : [
-          "OpenDuration",
-          "TargetLevel",
-        ],
-      },
-      1 : {
-        name : "Close",
-        arguments : [
-
-        ],
-      },
-    },
-    attributes : {
-      0 : "OpenDuration",
-      1 : "DefaultOpenDuration",
-      2 : "AutoCloseTime",
-      3 : "RemainingDuration",
-      4 : "CurrentState",
-      5 : "TargetState",
-      6 : "CurrentLevel",
-      7 : "TargetLevel",
-      8 : "DefaultOpenLevel",
-      9 : "ValveFault",
-      10 : "LevelStep",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  145 : {
-    name : "ElectricalEnergyMeasurement",
-    commands : {},
-    attributes : {
-      0 : "Accuracy",
-      1 : "CumulativeEnergyImported",
-      2 : "CumulativeEnergyExported",
-      3 : "PeriodicEnergyImported",
-      4 : "PeriodicEnergyExported",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  150 : {
-    name : "DemandResponseLoadControl",
-    commands : {
-      0 : {
-        name : "RegisterLoadControlProgramRequest",
-        arguments : [
-          "LoadControlProgram",
-        ],
-      },
-      1 : {
-        name : "UnregisterLoadControlProgramRequest",
-        arguments : [
-          "LoadControlProgramID",
-        ],
-      },
-      2 : {
-        name : "AddLoadControlEventRequest",
-        arguments : [
-          "Event",
-        ],
-      },
-      3 : {
-        name : "RemoveLoadControlEventRequest",
-        arguments : [
-          "EventID",
-          "CancelControl",
-        ],
-      },
-      4 : {
-        name : "ClearLoadControlEventsRequest",
-        arguments : [
-
-        ],
-      },
-    },
-    attributes : {
-      0 : "LoadControlPrograms",
-      1 : "NumberOfLoadControlPrograms",
-      2 : "Events",
-      3 : "ActiveEvents",
-      4 : "NumberOfEventsPerProgram",
-      5 : "NumberOfTransitions",
-      6 : "DefaultRandomStart",
-      7 : "DefaultRandomDuration",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  152 : {
-    name : "DeviceEnergyManagement",
-    commands : {
-      0 : {
-        name : "PowerAdjustRequest",
-        arguments : [
-          "Power",
-          "Duration",
-          "Cause",
-        ],
-      },
-      1 : {
-        name : "CancelPowerAdjustRequest",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "StartTimeAdjustRequest",
-        arguments : [
-          "RequestedStartTime",
-          "Cause",
-        ],
-      },
-      3 : {
-        name : "PauseRequest",
-        arguments : [
-          "Duration",
-          "Cause",
-        ],
-      },
-      4 : {
-        name : "ResumeRequest",
-        arguments : [
-
-        ],
-      },
-      5 : {
-        name : "ModifyForecastRequest",
-        arguments : [
-          "ForecastId",
-          "SlotAdjustments",
-          "Cause",
-        ],
-      },
-      6 : {
-        name : "RequestConstraintBasedForecast",
-        arguments : [
-          "Constraints",
-          "Cause",
-        ],
-      },
-      7 : {
-        name : "CancelRequest",
-        arguments : [
-
-        ],
-      },
-    },
-    attributes : {
-      0 : "ESAType",
-      1 : "ESACanGenerate",
-      2 : "ESAState",
-      3 : "AbsMinPower",
-      4 : "AbsMaxPower",
-      5 : "PowerAdjustmentCapability",
-      6 : "Forecast",
-      7 : "OptOutState",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  153 : {
-    name : "EnergyEvse",
-    commands : {
-      0 : {
-        name : "GetTargetsResponse",
-        arguments : [
-          "ChargingTargetSchedules",
-        ],
-      },
-      1 : {
-        name : "Disable",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "EnableCharging",
-        arguments : [
-          "ChargingEnabledUntil",
-          "MinimumChargeCurrent",
-          "MaximumChargeCurrent",
-        ],
-      },
-      3 : {
-        name : "EnableDischarging",
-        arguments : [
-          "DischargingEnabledUntil",
-          "MaximumDischargeCurrent",
-        ],
-      },
-      4 : {
-        name : "StartDiagnostics",
-        arguments : [
-
-        ],
-      },
-      5 : {
-        name : "SetTargets",
-        arguments : [
-          "ChargingTargetSchedules",
-        ],
-      },
-      6 : {
-        name : "GetTargets",
-        arguments : [
-
-        ],
-      },
-      7 : {
-        name : "ClearTargets",
-        arguments : [
-
-        ],
-      },
-    },
-    attributes : {
-      0 : "State",
-      1 : "SupplyState",
-      2 : "FaultState",
-      3 : "ChargingEnabledUntil",
-      4 : "DischargingEnabledUntil",
-      5 : "CircuitCapacity",
-      6 : "MinimumChargeCurrent",
-      7 : "MaximumChargeCurrent",
-      8 : "MaximumDischargeCurrent",
-      9 : "UserMaximumChargeCurrent",
-      10 : "RandomizationDelayWindow",
-      35 : "NextChargeStartTime",
-      36 : "NextChargeTargetTime",
-      37 : "NextChargeRequiredEnergy",
-      38 : "NextChargeTargetSoC",
-      39 : "ApproximateEVEfficiency",
-      48 : "StateOfCharge",
-      49 : "BatteryCapacity",
-      50 : "VehicleID",
-      64 : "SessionID",
-      65 : "SessionDuration",
-      66 : "SessionEnergyCharged",
-      67 : "SessionEnergyDischarged",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  155 : {
-    name : "EnergyPreference",
-    commands : {},
-    attributes : {
-      0 : "EnergyBalances",
-      1 : "CurrentEnergyBalance",
-      2 : "EnergyPriorities",
-      3 : "LowPowerModeSensitivities",
-      4 : "CurrentLowPowerModeSensitivity",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  157 : {
-    name : "EnergyEvseMode",
-    commands : {
-      0 : {
-        name : "ChangeToMode",
-        arguments : [
-          "NewMode",
-        ],
-      },
-      1 : {
-        name : "ChangeToModeResponse",
-        arguments : [
-          "Status",
-          "StatusText",
-        ],
-      },
-    },
-    attributes : {
-      0 : "SupportedModes",
-      1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  159 : {
-    name : "DeviceEnergyManagementMode",
-    commands : {
-      0 : {
-        name : "ChangeToMode",
-        arguments : [
-          "NewMode",
-        ],
-      },
-      1 : {
-        name : "ChangeToModeResponse",
-        arguments : [
-          "Status",
-          "StatusText",
-        ],
-      },
-    },
-    attributes : {
-      0 : "SupportedModes",
-      1 : "CurrentMode",
-      2 : "StartUpMode",
-      3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2903,68 +2385,16 @@ exports.model = {
           "PINCode",
         ],
       },
-      40 : {
-        name : "SetAliroReaderConfig",
-        arguments : [
-          "SigningKey",
-          "VerificationKey",
-          "GroupIdentifier",
-          "GroupResolvingKey",
-        ],
-      },
-      41 : {
-        name : "ClearAliroReaderConfig",
-        arguments : [
-
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "LockState",
       1 : "LockType",
       2 : "ActuatorEnabled",
       3 : "DoorState",
-      4 : "DoorOpenEvents",
-      5 : "DoorClosedEvents",
-      6 : "OpenPeriod",
-      17 : "NumberOfTotalUsersSupported",
-      18 : "NumberOfPINUsersSupported",
-      19 : "NumberOfRFIDUsersSupported",
-      20 : "NumberOfWeekDaySchedulesSupportedPerUser",
-      21 : "NumberOfYearDaySchedulesSupportedPerUser",
-      22 : "NumberOfHolidaySchedulesSupported",
-      23 : "MaxPINCodeLength",
-      24 : "MinPINCodeLength",
-      25 : "MaxRFIDCodeLength",
-      26 : "MinRFIDCodeLength",
-      27 : "CredentialRulesSupport",
-      28 : "NumberOfCredentialsSupportedPerUser",
-      33 : "Language",
-      34 : "LEDSettings",
       35 : "AutoRelockTime",
-      36 : "SoundVolume",
       37 : "OperatingMode",
       38 : "SupportedOperatingModes",
-      39 : "DefaultConfigurationRegister",
-      40 : "EnableLocalProgramming",
-      41 : "EnableOneTouchLocking",
-      42 : "EnableInsideStatusLED",
-      43 : "EnablePrivacyModeButton",
-      44 : "LocalProgrammingFeatures",
-      48 : "WrongCodeEntryLimit",
-      49 : "UserCodeTemporaryDisableTime",
-      50 : "SendPINOverTheAir",
-      51 : "RequirePINforRemoteOperation",
-      53 : "ExpiringUserTimeout",
-      128 : "AliroReaderVerificationKey",
-      129 : "AliroReaderGroupIdentifier",
-      130 : "AliroReaderGroupSubIdentifier",
-      131 : "AliroExpeditedTransactionSupportedProtocolVersions",
-      132 : "AliroGroupResolvingKey",
-      133 : "AliroSupportedBLEUWBProtocolVersions",
-      134 : "AliroBLEAdvertisingVersion",
-      135 : "NumberOfAliroCredentialIssuerKeysSupported",
-      136 : "NumberOfAliroEndpointKeysSupported",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3026,29 +2456,13 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Type",
-      1 : "PhysicalClosedLimitLift",
-      2 : "PhysicalClosedLimitTilt",
-      3 : "CurrentPositionLift",
-      4 : "CurrentPositionTilt",
-      5 : "NumberOfActuationsLift",
-      6 : "NumberOfActuationsTilt",
       7 : "ConfigStatus",
-      8 : "CurrentPositionLiftPercentage",
-      9 : "CurrentPositionTiltPercentage",
       10 : "OperationalStatus",
-      11 : "TargetPositionLiftPercent100ths",
-      12 : "TargetPositionTiltPercent100ths",
       13 : "EndProductType",
-      14 : "CurrentPositionLiftPercent100ths",
-      15 : "CurrentPositionTiltPercent100ths",
-      16 : "InstalledOpenLimitLift",
-      17 : "InstalledClosedLimitLift",
-      18 : "InstalledOpenLimitTilt",
-      19 : "InstalledClosedLimitTilt",
       23 : "Mode",
-      26 : "SafetyStatus",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3073,16 +2487,11 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       1 : "BarrierMovingState",
       2 : "BarrierSafetyStatus",
       3 : "BarrierCapabilities",
-      4 : "BarrierOpenEvents",
-      5 : "BarrierCloseEvents",
-      6 : "BarrierCommandOpenEvents",
-      7 : "BarrierCommandCloseEvents",
-      8 : "BarrierOpenPeriod",
-      9 : "BarrierClosePeriod",
       10 : "BarrierPosition",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -3095,30 +2504,15 @@ exports.model = {
   512 : {
     name : "PumpConfigurationAndControl",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MaxPressure",
       1 : "MaxSpeed",
       2 : "MaxFlow",
-      3 : "MinConstPressure",
-      4 : "MaxConstPressure",
-      5 : "MinCompPressure",
-      6 : "MaxCompPressure",
-      7 : "MinConstSpeed",
-      8 : "MaxConstSpeed",
-      9 : "MinConstFlow",
-      10 : "MaxConstFlow",
-      11 : "MinConstTemp",
-      12 : "MaxConstTemp",
-      16 : "PumpStatus",
       17 : "EffectiveOperationMode",
       18 : "EffectiveControlMode",
       19 : "Capacity",
-      20 : "Speed",
-      21 : "LifetimeRunningHours",
-      22 : "Power",
-      23 : "LifetimeEnergyConsumed",
       32 : "OperationMode",
-      33 : "ControlMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3168,114 +2562,18 @@ exports.model = {
 
         ],
       },
-      5 : {
-        name : "SetActiveScheduleRequest",
-        arguments : [
-          "ScheduleHandle",
-        ],
-      },
-      6 : {
-        name : "SetActivePresetRequest",
-        arguments : [
-          "PresetHandle",
-          "DelayMinutes",
-        ],
-      },
-      7 : {
-        name : "StartPresetsSchedulesEditRequest",
-        arguments : [
-          "TimeoutSeconds",
-        ],
-      },
-      8 : {
-        name : "CancelPresetsSchedulesEditRequest",
-        arguments : [
-
-        ],
-      },
-      9 : {
-        name : "CommitPresetsSchedulesRequest",
-        arguments : [
-
-        ],
-      },
-      10 : {
-        name : "CancelSetActivePresetRequest",
-        arguments : [
-
-        ],
-      },
-      11 : {
-        name : "SetTemperatureSetpointHoldPolicy",
-        arguments : [
-          "TemperatureSetpointHoldPolicy",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "LocalTemperature",
-      1 : "OutdoorTemperature",
-      2 : "Occupancy",
-      3 : "AbsMinHeatSetpointLimit",
-      4 : "AbsMaxHeatSetpointLimit",
-      5 : "AbsMinCoolSetpointLimit",
-      6 : "AbsMaxCoolSetpointLimit",
-      7 : "PICoolingDemand",
-      8 : "PIHeatingDemand",
-      9 : "HVACSystemTypeConfiguration",
-      16 : "LocalTemperatureCalibration",
       17 : "OccupiedCoolingSetpoint",
       18 : "OccupiedHeatingSetpoint",
-      19 : "UnoccupiedCoolingSetpoint",
-      20 : "UnoccupiedHeatingSetpoint",
       21 : "MinHeatSetpointLimit",
       22 : "MaxHeatSetpointLimit",
       23 : "MinCoolSetpointLimit",
       24 : "MaxCoolSetpointLimit",
-      25 : "MinSetpointDeadBand",
-      26 : "RemoteSensing",
       27 : "ControlSequenceOfOperation",
       28 : "SystemMode",
-      30 : "ThermostatRunningMode",
-      32 : "StartOfWeek",
-      33 : "NumberOfWeeklyTransitions",
-      34 : "NumberOfDailyTransitions",
-      35 : "TemperatureSetpointHold",
-      36 : "TemperatureSetpointHoldDuration",
-      37 : "ThermostatProgrammingOperationMode",
-      41 : "ThermostatRunningState",
-      48 : "SetpointChangeSource",
-      49 : "SetpointChangeAmount",
-      50 : "SetpointChangeSourceTimestamp",
-      52 : "OccupiedSetback",
-      53 : "OccupiedSetbackMin",
-      54 : "OccupiedSetbackMax",
-      55 : "UnoccupiedSetback",
-      56 : "UnoccupiedSetbackMin",
-      57 : "UnoccupiedSetbackMax",
-      58 : "EmergencyHeatDelta",
-      64 : "ACType",
-      65 : "ACCapacity",
-      66 : "ACRefrigerantType",
-      67 : "ACCompressorType",
-      68 : "ACErrorCode",
-      69 : "ACLouverPosition",
-      70 : "ACCoilTemperature",
-      71 : "ACCapacityformat",
-      72 : "PresetTypes",
-      73 : "ScheduleTypes",
-      74 : "NumberOfPresets",
-      75 : "NumberOfSchedules",
-      76 : "NumberOfScheduleTransitions",
-      77 : "NumberOfScheduleTransitionPerDay",
-      78 : "ActivePresetHandle",
-      79 : "ActiveScheduleHandle",
-      80 : "Presets",
-      81 : "Schedules",
-      82 : "PresetsSchedulesEditable",
-      83 : "TemperatureSetpointHoldPolicy",
-      84 : "SetpointHoldExpiryTimestamp",
-      85 : "QueuedPreset",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3296,19 +2594,12 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "FanMode",
       1 : "FanModeSequence",
       2 : "PercentSetting",
       3 : "PercentCurrent",
-      4 : "SpeedMax",
-      5 : "SpeedSetting",
-      6 : "SpeedCurrent",
-      7 : "RockSupport",
-      8 : "RockSetting",
-      9 : "WindSupport",
-      10 : "WindSetting",
-      11 : "AirflowDirection",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3320,10 +2611,10 @@ exports.model = {
   516 : {
     name : "ThermostatUserInterfaceConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "TemperatureDisplayMode",
       1 : "KeypadLockout",
-      2 : "ScheduleProgrammingVisibility",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3522,6 +2813,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "CurrentHue",
       1 : "CurrentSaturation",
@@ -3529,7 +2821,6 @@ exports.model = {
       3 : "CurrentX",
       4 : "CurrentY",
       5 : "DriftCompensation",
-      6 : "CompensationText",
       7 : "ColorTemperatureMireds",
       8 : "ColorMode",
       15 : "Options",
@@ -3586,21 +2877,13 @@ exports.model = {
   769 : {
     name : "BallastConfiguration",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "PhysicalMinLevel",
       1 : "PhysicalMaxLevel",
-      2 : "BallastStatus",
       16 : "MinLevel",
       17 : "MaxLevel",
-      20 : "IntrinsicBallastFactor",
-      21 : "BallastFactorAdjustment",
       32 : "LampQuantity",
-      48 : "LampType",
-      49 : "LampManufacturer",
-      50 : "LampRatedHours",
-      51 : "LampBurnHours",
-      52 : "LampAlarmMode",
-      53 : "LampBurnHoursTripPoint",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3612,11 +2895,11 @@ exports.model = {
   1024 : {
     name : "IlluminanceMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
-      3 : "Tolerance",
       4 : "LightSensorType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -3629,11 +2912,11 @@ exports.model = {
   1026 : {
     name : "TemperatureMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
-      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3645,16 +2928,11 @@ exports.model = {
   1027 : {
     name : "PressureMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
-      3 : "Tolerance",
-      16 : "ScaledValue",
-      17 : "MinScaledValue",
-      18 : "MaxScaledValue",
-      19 : "ScaledTolerance",
-      20 : "Scale",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3666,11 +2944,11 @@ exports.model = {
   1028 : {
     name : "FlowMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
-      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3682,11 +2960,11 @@ exports.model = {
   1029 : {
     name : "RelativeHumidityMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
-      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3698,19 +2976,11 @@ exports.model = {
   1030 : {
     name : "OccupancySensing",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Occupancy",
       1 : "OccupancySensorType",
       2 : "OccupancySensorTypeBitmap",
-      16 : "PIROccupiedToUnoccupiedDelay",
-      17 : "PIRUnoccupiedToOccupiedDelay",
-      18 : "PIRUnoccupiedToOccupiedThreshold",
-      32 : "UltrasonicOccupiedToUnoccupiedDelay",
-      33 : "UltrasonicUnoccupiedToOccupiedDelay",
-      34 : "UltrasonicUnoccupiedToOccupiedThreshold",
-      48 : "PhysicalContactOccupiedToUnoccupiedDelay",
-      49 : "PhysicalContactUnoccupiedToOccupiedDelay",
-      50 : "PhysicalContactUnoccupiedToOccupiedThreshold",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3722,18 +2992,8 @@ exports.model = {
   1036 : {
     name : "CarbonMonoxideConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3745,18 +3005,8 @@ exports.model = {
   1037 : {
     name : "CarbonDioxideConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3768,18 +3018,8 @@ exports.model = {
   1043 : {
     name : "NitrogenDioxideConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3791,18 +3031,8 @@ exports.model = {
   1045 : {
     name : "OzoneConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3814,18 +3044,8 @@ exports.model = {
   1066 : {
     name : "Pm25ConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3837,18 +3057,8 @@ exports.model = {
   1067 : {
     name : "FormaldehydeConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3860,18 +3070,8 @@ exports.model = {
   1068 : {
     name : "Pm1ConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3883,18 +3083,8 @@ exports.model = {
   1069 : {
     name : "Pm10ConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3906,18 +3096,8 @@ exports.model = {
   1070 : {
     name : "TotalVolatileOrganicCompoundsConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3929,18 +3109,8 @@ exports.model = {
   1071 : {
     name : "RadonConcentrationMeasurement",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasuredValue",
-      1 : "MinMeasuredValue",
-      2 : "MaxMeasuredValue",
-      3 : "PeakMeasuredValue",
-      4 : "PeakMeasuredValueWindow",
-      5 : "AverageMeasuredValue",
-      6 : "AverageMeasuredValueWindow",
-      7 : "Uncertainty",
-      8 : "MeasurementUnit",
-      9 : "MeasurementMedium",
-      10 : "LevelValue",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3952,9 +3122,8 @@ exports.model = {
   1283 : {
     name : "WakeOnLan",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MACAddress",
-      1 : "LinkLocalAddress",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3992,48 +3161,9 @@ exports.model = {
           "Count",
         ],
       },
-      4 : {
-        name : "GetProgramGuide",
-        arguments : [
-          "StartTime",
-          "EndTime",
-          "ChannelList",
-          "PageToken",
-          "RecordingFlag",
-          "ExternalIDList",
-          "Data",
-        ],
-      },
-      5 : {
-        name : "ProgramGuideResponse",
-        arguments : [
-          "Paging",
-          "ProgramList",
-        ],
-      },
-      6 : {
-        name : "RecordProgram",
-        arguments : [
-          "ProgramIdentifier",
-          "ShouldRecordSeries",
-          "ExternalIDList",
-          "Data",
-        ],
-      },
-      7 : {
-        name : "CancelRecordProgram",
-        arguments : [
-          "ProgramIdentifier",
-          "ShouldRecordSeries",
-          "ExternalIDList",
-          "Data",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "ChannelList",
-      1 : "Lineup",
-      2 : "CurrentChannel",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4060,9 +3190,9 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "TargetList",
-      1 : "CurrentTarget",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4147,38 +3277,10 @@ exports.model = {
           "Position",
         ],
       },
-      12 : {
-        name : "ActivateAudioTrack",
-        arguments : [
-          "TrackID",
-          "AudioOutputIndex",
-        ],
-      },
-      13 : {
-        name : "ActivateTextTrack",
-        arguments : [
-          "TrackID",
-        ],
-      },
-      14 : {
-        name : "DeactivateTextTrack",
-        arguments : [
-
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "CurrentState",
-      1 : "StartTime",
-      2 : "Duration",
-      3 : "SampledPosition",
-      4 : "PlaybackSpeed",
-      5 : "SeekRangeEnd",
-      6 : "SeekRangeStart",
-      7 : "ActiveAudioTrack",
-      8 : "AvailableAudioTracks",
-      9 : "ActiveTextTrack",
-      10 : "AvailableTextTracks",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4216,6 +3318,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "InputList",
       1 : "CurrentInput",
@@ -4237,6 +3340,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -4262,6 +3366,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -4300,9 +3405,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "AcceptHeader",
-      1 : "SupportedStreamingProtocols",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4328,9 +3432,9 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "OutputList",
-      1 : "CurrentOutput",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4369,9 +3473,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "CatalogList",
-      1 : "CurrentApp",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4383,11 +3486,9 @@ exports.model = {
   1293 : {
     name : "ApplicationBasic",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "VendorName",
-      1 : "VendorID",
       2 : "ApplicationName",
-      3 : "ProductID",
       4 : "Application",
       5 : "Status",
       6 : "ApplicationVersion",
@@ -4426,127 +3527,11 @@ exports.model = {
       3 : {
         name : "Logout",
         arguments : [
-          "Node",
-        ],
-      },
-    },
-    attributes : {
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  1295 : {
-    name : "ContentControl",
-    commands : {
-      0 : {
-        name : "UpdatePIN",
-        arguments : [
-          "OldPIN",
-          "NewPIN",
-        ],
-      },
-      1 : {
-        name : "ResetPIN",
-        arguments : [
 
         ],
       },
-      2 : {
-        name : "ResetPINResponse",
-        arguments : [
-          "PINCode",
-        ],
-      },
-      3 : {
-        name : "Enable",
-        arguments : [
-
-        ],
-      },
-      4 : {
-        name : "Disable",
-        arguments : [
-
-        ],
-      },
-      5 : {
-        name : "AddBonusTime",
-        arguments : [
-          "PINCode",
-          "BonusTime",
-        ],
-      },
-      6 : {
-        name : "SetScreenDailyTime",
-        arguments : [
-          "ScreenTime",
-        ],
-      },
-      7 : {
-        name : "BlockUnratedContent",
-        arguments : [
-
-        ],
-      },
-      8 : {
-        name : "UnblockUnratedContent",
-        arguments : [
-
-        ],
-      },
-      9 : {
-        name : "SetOnDemandRatingThreshold",
-        arguments : [
-          "Rating",
-        ],
-      },
-      10 : {
-        name : "SetScheduledContentRatingThreshold",
-        arguments : [
-          "Rating",
-        ],
-      },
     },
-    attributes : {
-      0 : "Enabled",
-      1 : "OnDemandRatings",
-      2 : "OnDemandRatingThreshold",
-      3 : "ScheduledContentRatings",
-      4 : "ScheduledContentRatingThreshold",
-      5 : "ScreenDailyTime",
-      6 : "RemainingScreenTime",
-      7 : "BlockUnrated",
-      65528 : "GeneratedCommandList",
-      65529 : "AcceptedCommandList",
-      65530 : "EventList",
-      65531 : "AttributeList",
-      65532 : "FeatureMap",
-      65533 : "ClusterRevision",
-    },
-  },
-  1296 : {
-    name : "ContentAppObserver",
-    commands : {
-      0 : {
-        name : "ContentAppMessage",
-        arguments : [
-          "Data",
-          "EncodingHint",
-        ],
-      },
-      1 : {
-        name : "ContentAppMessageResponse",
-        arguments : [
-          "Status",
-          "Data",
-          "EncodingHint",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -4594,135 +3579,8 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "MeasurementType",
-      256 : "DcVoltage",
-      257 : "DcVoltageMin",
-      258 : "DcVoltageMax",
-      259 : "DcCurrent",
-      260 : "DcCurrentMin",
-      261 : "DcCurrentMax",
-      262 : "DcPower",
-      263 : "DcPowerMin",
-      264 : "DcPowerMax",
-      512 : "DcVoltageMultiplier",
-      513 : "DcVoltageDivisor",
-      514 : "DcCurrentMultiplier",
-      515 : "DcCurrentDivisor",
-      516 : "DcPowerMultiplier",
-      517 : "DcPowerDivisor",
-      768 : "AcFrequency",
-      769 : "AcFrequencyMin",
-      770 : "AcFrequencyMax",
-      771 : "NeutralCurrent",
-      772 : "TotalActivePower",
-      773 : "TotalReactivePower",
-      774 : "TotalApparentPower",
-      775 : "Measured1stHarmonicCurrent",
-      776 : "Measured3rdHarmonicCurrent",
-      777 : "Measured5thHarmonicCurrent",
-      778 : "Measured7thHarmonicCurrent",
-      779 : "Measured9thHarmonicCurrent",
-      780 : "Measured11thHarmonicCurrent",
-      781 : "MeasuredPhase1stHarmonicCurrent",
-      782 : "MeasuredPhase3rdHarmonicCurrent",
-      783 : "MeasuredPhase5thHarmonicCurrent",
-      784 : "MeasuredPhase7thHarmonicCurrent",
-      785 : "MeasuredPhase9thHarmonicCurrent",
-      786 : "MeasuredPhase11thHarmonicCurrent",
-      1024 : "AcFrequencyMultiplier",
-      1025 : "AcFrequencyDivisor",
-      1026 : "PowerMultiplier",
-      1027 : "PowerDivisor",
-      1028 : "HarmonicCurrentMultiplier",
-      1029 : "PhaseHarmonicCurrentMultiplier",
-      1280 : "InstantaneousVoltage",
-      1281 : "InstantaneousLineCurrent",
-      1282 : "InstantaneousActiveCurrent",
-      1283 : "InstantaneousReactiveCurrent",
-      1284 : "InstantaneousPower",
-      1285 : "RmsVoltage",
-      1286 : "RmsVoltageMin",
-      1287 : "RmsVoltageMax",
-      1288 : "RmsCurrent",
-      1289 : "RmsCurrentMin",
-      1290 : "RmsCurrentMax",
-      1291 : "ActivePower",
-      1292 : "ActivePowerMin",
-      1293 : "ActivePowerMax",
-      1294 : "ReactivePower",
-      1295 : "ApparentPower",
-      1296 : "PowerFactor",
-      1297 : "AverageRmsVoltageMeasurementPeriod",
-      1299 : "AverageRmsUnderVoltageCounter",
-      1300 : "RmsExtremeOverVoltagePeriod",
-      1301 : "RmsExtremeUnderVoltagePeriod",
-      1302 : "RmsVoltageSagPeriod",
-      1303 : "RmsVoltageSwellPeriod",
-      1536 : "AcVoltageMultiplier",
-      1537 : "AcVoltageDivisor",
-      1538 : "AcCurrentMultiplier",
-      1539 : "AcCurrentDivisor",
-      1540 : "AcPowerMultiplier",
-      1541 : "AcPowerDivisor",
-      1792 : "OverloadAlarmsMask",
-      1793 : "VoltageOverload",
-      1794 : "CurrentOverload",
-      2048 : "AcOverloadAlarmsMask",
-      2049 : "AcVoltageOverload",
-      2050 : "AcCurrentOverload",
-      2051 : "AcActivePowerOverload",
-      2052 : "AcReactivePowerOverload",
-      2053 : "AverageRmsOverVoltage",
-      2054 : "AverageRmsUnderVoltage",
-      2055 : "RmsExtremeOverVoltage",
-      2056 : "RmsExtremeUnderVoltage",
-      2057 : "RmsVoltageSag",
-      2058 : "RmsVoltageSwell",
-      2305 : "LineCurrentPhaseB",
-      2306 : "ActiveCurrentPhaseB",
-      2307 : "ReactiveCurrentPhaseB",
-      2309 : "RmsVoltagePhaseB",
-      2310 : "RmsVoltageMinPhaseB",
-      2311 : "RmsVoltageMaxPhaseB",
-      2312 : "RmsCurrentPhaseB",
-      2313 : "RmsCurrentMinPhaseB",
-      2314 : "RmsCurrentMaxPhaseB",
-      2315 : "ActivePowerPhaseB",
-      2316 : "ActivePowerMinPhaseB",
-      2317 : "ActivePowerMaxPhaseB",
-      2318 : "ReactivePowerPhaseB",
-      2319 : "ApparentPowerPhaseB",
-      2320 : "PowerFactorPhaseB",
-      2321 : "AverageRmsVoltageMeasurementPeriodPhaseB",
-      2322 : "AverageRmsOverVoltageCounterPhaseB",
-      2323 : "AverageRmsUnderVoltageCounterPhaseB",
-      2324 : "RmsExtremeOverVoltagePeriodPhaseB",
-      2325 : "RmsExtremeUnderVoltagePeriodPhaseB",
-      2326 : "RmsVoltageSagPeriodPhaseB",
-      2327 : "RmsVoltageSwellPeriodPhaseB",
-      2561 : "LineCurrentPhaseC",
-      2562 : "ActiveCurrentPhaseC",
-      2563 : "ReactiveCurrentPhaseC",
-      2565 : "RmsVoltagePhaseC",
-      2566 : "RmsVoltageMinPhaseC",
-      2567 : "RmsVoltageMaxPhaseC",
-      2568 : "RmsCurrentPhaseC",
-      2569 : "RmsCurrentMinPhaseC",
-      2570 : "RmsCurrentMaxPhaseC",
-      2571 : "ActivePowerPhaseC",
-      2572 : "ActivePowerMinPhaseC",
-      2573 : "ActivePowerMaxPhaseC",
-      2574 : "ReactivePowerPhaseC",
-      2575 : "ApparentPowerPhaseC",
-      2576 : "PowerFactorPhaseC",
-      2577 : "AverageRmsVoltageMeasurementPeriodPhaseC",
-      2578 : "AverageRmsOverVoltageCounterPhaseC",
-      2579 : "AverageRmsUnderVoltageCounterPhaseC",
-      2580 : "RmsExtremeOverVoltagePeriodPhaseC",
-      2581 : "RmsExtremeUnderVoltagePeriodPhaseC",
-      2582 : "RmsVoltageSagPeriodPhaseC",
-      2583 : "RmsVoltageSwellPeriodPhaseC",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -5000,36 +3858,8 @@ exports.model = {
           "Arg1",
         ],
       },
-      22 : {
-        name : "TestBatchHelperRequest",
-        arguments : [
-          "SleepBeforeResponseTimeMs",
-          "SizeOfResponseBuffer",
-          "FillCharacter",
-        ],
-      },
-      23 : {
-        name : "TestSecondBatchHelperRequest",
-        arguments : [
-          "SleepBeforeResponseTimeMs",
-          "SizeOfResponseBuffer",
-          "FillCharacter",
-        ],
-      },
-      4294049962 : {
-        name : "TestDifferentVendorMeiRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      4294049979 : {
-        name : "TestDifferentVendorMeiResponse",
-        arguments : [
-          "Arg1",
-          "EventNumber",
-        ],
-      },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Boolean",
       1 : "Bitmap8",
@@ -5078,7 +3908,6 @@ exports.model = {
       48 : "TimedWriteBoolean",
       49 : "GeneralErrorBoolean",
       50 : "ClusterErrorBoolean",
-      255 : "Unsupported",
       16384 : "NullableBoolean",
       16385 : "NullableBitmap8",
       16386 : "NullableBitmap16",
@@ -5112,7 +3941,6 @@ exports.model = {
       16423 : "NullableRangeRestrictedInt8s",
       16424 : "NullableRangeRestrictedInt16u",
       16425 : "NullableRangeRestrictedInt16s",
-      16426 : "WriteOnlyInt8u",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -5144,6 +3972,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -5176,6 +4005,7 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "FlipFlop",
       65528 : "GeneratedCommandList",
@@ -5285,11 +4115,21 @@ exports.model = {
       "UpdateAvailable",
       "UrgentUpdateAvailable",
     ], //
+    "ApplicationLauncherStatusEnum" : [
+      "Success",
+      "AppNotAvailable",
+      "SystemBusy",
+    ], //
     "ApplicationStatusEnum" : [
       "Stopped",
       "ActiveVisibleFocus",
       "ActiveHidden",
       "ActiveVisibleNotFocus",
+    ], //
+    "ApplyUpdateActionEnum" : [
+      "Proceed",
+      "AwaitNextAction",
+      "Discontinue",
     ], //
     "ApplyUpdateActionEnum" : [
       "Proceed",
@@ -5590,6 +4430,13 @@ exports.model = {
       "TimeOut",
       "DelayByProvider",
     ], //
+    "ChangeReasonEnum" : [
+      "Unknown",
+      "Success",
+      "Failure",
+      "TimeOut",
+      "DelayByProvider",
+    ], //
     "ChangeTypeEnum" : [
       "Changed",
       "Added",
@@ -5790,6 +4637,11 @@ exports.model = {
       "NoFade",
       "DelayedOffSlowFade",
     ], //
+    "DelayedAllOffEffectVariantEnum" : [
+      "DelayedOffFastFade",
+      "NoFade",
+      "DelayedOffSlowFade",
+    ], //
     "DlLockState" : [
       "NotFullyLocked",
       "Locked",
@@ -5879,38 +4731,8 @@ exports.model = {
       "Https",
       "VendorSpecific",
     ], //
-    "DrynessLevelEnum" : [
-      "Low",
-      "Normal",
-      "Extra",
-      "Max",
-    ], //
     "DyingLightEffectVariantEnum" : [
       "DyingLightFadeOff",
-    ], //
-    "ESAStateEnum" : [
-      "Offline",
-      "Online",
-      "Fault",
-      "PowerAdjustActive",
-      "Paused",
-    ], //
-    "ESATypeEnum" : [
-      "Evse",
-      "SpaceHeating",
-      "WaterHeating",
-      "SpaceCooling",
-      "SpaceHeatingCooling",
-      "BatteryStorage",
-      "SolarPV",
-      "FridgeFreezer",
-      "WashingMachine",
-      "Dishwasher",
-      "Cooking",
-      "HomeWaterPump",
-      "IrrigationWaterPump",
-      "PoolPump",
-      "Other",
     ], //
     "EffectIdentifierEnum" : [
       "DelayedAllOff",
@@ -5963,16 +4785,17 @@ exports.model = {
       "Room",
       "Zone",
     ], //
-    "EnergyPriorityEnum" : [
-      "Comfort",
-      "Speed",
-      "Efficiency",
-      "WaterConsumption",
+    "EnhancedColorMode" : [
+      "CurrentHueAndCurrentSaturation",
+      "CurrentXAndCurrentY",
+      "ColorTemperature",
+      "EnhancedCurrentHueAndCurrentSaturation",
     ], //
-    "EnergyTransferStoppedReasonEnum" : [
-      "EVStopped",
-      "EVSEStopped",
-      "Other",
+    "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
     ], //
     "ErrorStateEnum" : [
       "FailedToFindChargingDock",
@@ -5983,12 +4806,6 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
-    ], //
-    "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -6238,17 +5055,6 @@ exports.model = {
       "Light",
     ], //
     "ModeTag" : [
-      "Normal",
-      "Delicate",
-      "Heavy",
-      "Whites",
-    ], //
-    "ModeTag" : [
-      "Normal",
-      "Heavy",
-      "Light",
-    ], //
-    "ModeTag" : [
       "RapidCool",
       "RapidFreeze",
     ], //
@@ -6260,6 +5066,12 @@ exports.model = {
       "DeepClean",
       "Vacuum",
       "Mop",
+    ], //
+    "ModeTag" : [
+      "Normal",
+      "Delicate",
+      "Heavy",
+      "Whites",
     ], //
     "MoveMode" : [
       "Up",
@@ -6321,10 +5133,6 @@ exports.model = {
       "PhysicalContact",
     ], //
     "OperatingModeEnum" : [
-      "Sit",
-      "Lit",
-    ], //
-    "OperatingModeEnum" : [
       "Normal",
       "Vacation",
       "Privacy",
@@ -6358,15 +5166,15 @@ exports.model = {
       "Aliro",
     ], //
     "OperationalStateEnum" : [
-      "SeekingCharger",
-      "Charging",
-      "Docked",
-    ], //
-    "OperationalStateEnum" : [
       "Stopped",
       "Running",
       "Paused",
       "Error",
+    ], //
+    "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -6530,15 +5338,6 @@ exports.model = {
       "On",
       "Toggle",
     ], //
-    "StateEnum" : [
-      "NotPluggedIn",
-      "PluggedInNoDemand",
-      "PluggedInDemand",
-      "PluggedInCharging",
-      "PluggedInDischarging",
-      "SessionEnding",
-      "Fault",
-    ], //
     "StatusCode" : [
       "Stuck",
       "DustBinMissing",
@@ -6588,26 +5387,6 @@ exports.model = {
       "NoLogs",
       "Busy",
       "Denied",
-    ], //
-    "StatusEnum" : [
-      "Success",
-      "URLNotAvailable",
-      "AuthFailed",
-      "TextTrackNotAvailable",
-      "AudioTrackNotAvailable",
-    ], //
-    "StatusEnum" : [
-      "Success",
-      "InvalidStateForCommand",
-      "NotAllowed",
-      "NotActive",
-      "SpeedOutOfRange",
-      "SeekOutOfRange",
-    ], //
-    "StatusEnum" : [
-      "Success",
-      "MultipleMatches",
-      "NoMatches",
     ], //
     "StatusEnum" : [
       "UpdateAvailable",
@@ -6717,6 +5496,17 @@ exports.model = {
       "RollingBack",
       "DelayedOnUserConsent",
     ], //
+    "UpdateStateEnum" : [
+      "Unknown",
+      "Idle",
+      "Querying",
+      "DelayedOnQuery",
+      "Downloading",
+      "Applying",
+      "DelayedOnApply",
+      "RollingBack",
+      "DelayedOnUserConsent",
+    ], //
     "UserStatusEnum" : [
       "Available",
       "OccupiedEnabled",
@@ -6785,10 +5575,6 @@ exports.model = {
     },
     "AlarmBitmap" : {
       1 : "DoorOpen",
-    },
-    "AlarmModeBitmap" : {
-      1 : "Visual",
-      2 : "Audible",
     },
     "BallastStatusBitmap" : {
       1 : "BallastNonOperational",
@@ -7016,11 +5802,25 @@ exports.model = {
       8 : "ExtremelyPoor",
     },
     "Feature" : {
+      1 : "TemperatureUnit",
+    },
+    "Feature" : {
+      1 : "CalendarFormat",
+    },
+    "Feature" : {
       1 : "Spin",
       2 : "Rinse",
     },
     "Feature" : {
       1 : "TagList",
+    },
+    "Feature" : {
+      1 : "OnOff",
+    },
+    "Feature" : {
+      1 : "NavigationKeyCodes",
+      2 : "LocationKeys",
+      4 : "NumberKeys",
     },
     "Feature" : {
       1 : "WaterMarks",
@@ -7031,15 +5831,10 @@ exports.model = {
       4 : "TemperatureStep",
     },
     "Feature" : {
-      1 : "OnOff",
+      1 : "NameUpdates",
     },
     "Feature" : {
-      1 : "TemperatureUnit",
-    },
-    "Feature" : {
-      1 : "NavigationKeyCodes",
-      2 : "LocationKeys",
-      4 : "NumberKeys",
+      1 : "Reset",
     },
     "Feature" : {
       1 : "PacketCounts",
@@ -7052,11 +5847,11 @@ exports.model = {
       1 : "Extended",
     },
     "Feature" : {
-      1 : "TimeSync",
-      2 : "Level",
+      1 : "ApplicationPlatform",
     },
     "Feature" : {
-      1 : "ApplicationPlatform",
+      1 : "ChannelList",
+      2 : "LineupInfo",
     },
     "Feature" : {
       1 : "MultiSpeed",
@@ -7072,18 +5867,6 @@ exports.model = {
       4 : "ReplacementProductList",
     },
     "Feature" : {
-      1 : "Lighting",
-      2 : "DeadFrontBehavior",
-      4 : "OffOnly",
-    },
-    "Feature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
-    },
-    "Feature" : {
-      1 : "NameUpdates",
-    },
-    "Feature" : {
       1 : "PacketCounts",
       2 : "ErrorCounts",
     },
@@ -7095,8 +5878,8 @@ exports.model = {
       5 : "AudioTracks",
     },
     "Feature" : {
-      1 : "EnergyBalance",
-      2 : "LowPowerModeSensitivity",
+      1 : "Lighting",
+      2 : "DeadFrontBehavior",
     },
     "Feature" : {
       1 : "SmokeAlarm",
@@ -7246,6 +6029,10 @@ exports.model = {
     "LampAlarmModeBitmap" : {
       1 : "LampBurnHours",
     },
+    "LevelControlOptions" : {
+      1 : "ExecuteIfOff",
+      2 : "CoupleColorTempToLevel",
+    },
     "Mode" : {
       1 : "MotorDirectionReversed",
       2 : "CalibrationMode",
@@ -7263,6 +6050,7 @@ exports.model = {
       2 : "Ultrasonic",
       4 : "PhysicalContact",
     },
+    "OnOffControlBitmap" : {
     "OnOffControlBitmap" : {
       1 : "AcceptOnlyWhenOn",
     },
