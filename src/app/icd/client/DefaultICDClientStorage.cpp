@@ -514,6 +514,7 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
             return CHIP_NO_ERROR;
         }
     }
+    iterator->Release();
     return CHIP_NO_ERROR;
 }
 } // namespace app
