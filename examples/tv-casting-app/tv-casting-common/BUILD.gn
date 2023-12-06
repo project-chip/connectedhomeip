@@ -117,6 +117,8 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/src/tracing/json",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
   ]
 
   if (chip_enable_transport_trace) {
