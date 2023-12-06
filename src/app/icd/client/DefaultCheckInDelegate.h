@@ -28,7 +28,7 @@ class DefaultCheckInDelegate : public CheckInDelegate
 {
 public:
     virtual ~DefaultCheckInDelegate() {}
-    void OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRegisterICD) override;
+    void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) override;
 };
 
 } // namespace app

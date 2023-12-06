@@ -40,29 +40,32 @@ namespace app {
 CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
                                        CheckInDelegate * delegate)
 {
-    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    mExchangeManager  = exchangeManager;
-    mICDClientStorage = static_cast<DefaultICDClientStorage *>(clientStorage);
-    mCheckInDelegate  = delegate;
+    VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mpExchangeManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpICDClientStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpExchangeManager  = exchangeManager;
+    mpICDClientStorage = clientStorage;
+    mpCheckInDelegate  = delegate;
     ReturnErrorOnFailure(
-        exchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this));
+        mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this));
 
     return CHIP_NO_ERROR;
 }
 
 void CheckInMessageHandler::Shutdown()
 {
-    if (mExchangeManager)
+    if (mpExchangeManager)
     {
-        mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
-        mExchangeManager = nullptr;
+        mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
+        mpExchangeManager = nullptr;
     }
 }
 CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
 {
     // Return error for wrong message type
-    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     newDelegate = this;
     return CHIP_NO_ERROR;
@@ -71,14 +74,14 @@ CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHead
 CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                     System::PacketBufferHandle && payload)
 {
-    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
-    bool needRefreshKey;
-
-    ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
-    VerifyOrReturnError(mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey));
+    bool needRefreshKey = false;
+    VerifyOrReturnError(mICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey),
+                        CHIP_ERROR_INCORRECT_STATE);
     mCheckInDelegate->OnCheckInComplete(clientInfo, needRefreshKey);
     return CHIP_NO_ERROR;
 }

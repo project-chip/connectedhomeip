@@ -22,7 +22,7 @@
 namespace chip {
 namespace app {
 
-void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool & needRegisterICD)
+void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
 {
     ChipLogProgress(ICDClient, "Check In Message preocessing complete");
 }
