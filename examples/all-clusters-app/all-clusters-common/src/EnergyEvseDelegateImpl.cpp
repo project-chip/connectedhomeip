@@ -36,7 +36,7 @@ Status EnergyEvseDelegate::Disable()
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Disable()");
 
-    /* update State */
+    /* Update State */
     switch (mHwState)
     {
     case StateEnum::kNotPluggedIn:
