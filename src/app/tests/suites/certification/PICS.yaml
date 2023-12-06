@@ -891,7 +891,7 @@ PICS:
     - label:
           "Can the StateValue attribute be changed by manual operation at the
           DUT?"
-      id: BOOL.M.ManuallyControlled
+      id: BOOL.S.M.ManuallyControlled
 
     #
     # client / manually
@@ -6066,10 +6066,10 @@ PICS:
     #
     - label:
           "Does the DUT support reading attribute to get switch state (polling)?"
-      id: SWTCH.C.M.RA
+      id: SWTCH.C.M.SwitchStatePolling
 
     - label: "Does the DUT support eventing to get switch state changes?"
-      id: SWTCH.C.M.EV
+      id: SWTCH.C.M.SwitchStateEventing
 
     - label: "Write all supported optional attributes"
       id: SWTCH.C.AO-WRITE

@@ -69,6 +69,44 @@ uint64_t AppMediaPlaybackManager::HandleGetSeekRangeEnd()
     return HandleMediaRequestGetAttribute(MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_END);
 }
 
+CHIP_ERROR AppMediaPlaybackManager::HandleGetActiveAudioTrack(AttributeValueEncoder & aEncoder)
+{
+    TrackType mActiveAudioTrack;
+    return aEncoder.Encode(mActiveAudioTrack);
+}
+
+CHIP_ERROR AppMediaPlaybackManager::HandleGetAvailableAudioTracks(AttributeValueEncoder & aEncoder)
+{
+    std::vector<TrackType> mAvailableAudioTracks;
+    // TODO: Insert code here
+    return aEncoder.EncodeList([mAvailableAudioTracks](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & audioTrack : mAvailableAudioTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(audioTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR AppMediaPlaybackManager::HandleGetActiveTextTrack(AttributeValueEncoder & aEncoder)
+{
+    TrackType mActiveTextTrack;
+    return aEncoder.Encode(mActiveTextTrack);
+}
+
+CHIP_ERROR AppMediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEncoder & aEncoder)
+{
+    std::vector<TrackType> mAvailableTextTracks;
+    // TODO: Insert code here
+    return aEncoder.EncodeList([mAvailableTextTracks](const auto & encoder) -> CHIP_ERROR {
+        for (auto const & textTrack : mAvailableTextTracks)
+        {
+            ReturnErrorOnFailure(encoder.Encode(textTrack));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 void AppMediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
@@ -84,7 +122,8 @@ void AppMediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::Playbac
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
 }
 
-void AppMediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void AppMediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                                const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
 }
@@ -94,7 +133,8 @@ void AppMediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::Pla
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
 }
 
-void AppMediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
+void AppMediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
+                                           const chip::Optional<bool> & audioAdvanceUnmuted)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
 }
@@ -125,6 +165,27 @@ void AppMediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::Playbac
 void AppMediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
     helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
+}
+
+bool AppMediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
+{
+    // Handle Activate Audio Track
+    HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_ACTIVATE_AUDIO_TRACK, 0);
+    return true;
+}
+
+bool AppMediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
+{
+    // Handle Activate Text Track
+    HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_ACTIVATE_TEXT_TRACK, 0);
+    return true;
+}
+
+bool AppMediaPlaybackManager::HandleDeactivateTextTrack()
+{
+    // Handle Deactivate Text Track
+    HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_DEACTIVATE_TEXT_TRACK, 0);
+    return true;
 }
 
 uint64_t AppMediaPlaybackManager::HandleMediaRequestGetAttribute(chip::AttributeId attributeId)

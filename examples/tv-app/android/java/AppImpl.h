@@ -35,6 +35,8 @@
 #include "../include/account-login/AccountLoginManager.h"
 #include "../include/application-basic/ApplicationBasicManager.h"
 #include "../include/application-launcher/ApplicationLauncherManager.h"
+#include "../include/content-app-observer/ContentAppObserver.h"
+#include "../include/content-control/ContentController.h"
 #include "../include/content-launcher/AppContentLauncherManager.h"
 #include "../include/media-playback/AppMediaPlaybackManager.h"
 #include "../include/target-navigator/TargetNavigatorManager.h"
@@ -47,6 +49,8 @@
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
 #include <app/clusters/channel-server/channel-delegate.h>
+#include <app/clusters/content-app-observer/content-app-observer-delegate.h>
+#include <app/clusters/content-control-server/content-control-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
@@ -72,6 +76,8 @@ using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
 using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
 using ChannelDelegate             = app::Clusters::Channel::Delegate;
 using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using ContentAppObserverDelegate  = app::Clusters::ContentAppObserver::Delegate;
+using ContentControlDelegate      = app::Clusters::ContentControl::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
@@ -112,6 +118,16 @@ public:
         mContentLauncherDelegate.SetEndpointId(GetEndpointId());
         return &mContentLauncherDelegate;
     };
+    ContentAppObserverDelegate * GetContentAppObserverDelegate() override
+    {
+        mContentAppObserverDelegate.SetEndpointId(GetEndpointId());
+        return &mContentAppObserverDelegate;
+    };
+    ContentControlDelegate * GetContentControlDelegate() override
+    {
+        mContentControlDelegate.SetEndpointId(GetEndpointId());
+        return &mContentControlDelegate;
+    };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override
     {
@@ -129,6 +145,8 @@ protected:
     AccountLoginManager mAccountLoginDelegate;
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
+    ContentController mContentControlDelegate;
+    ContentAppObserver mContentAppObserverDelegate;
     AppContentLauncherManager mContentLauncherDelegate;
     KeypadInputManager mKeypadInputDelegate;
     AppMediaPlaybackManager mMediaPlaybackDelegate;

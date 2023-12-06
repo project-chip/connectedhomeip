@@ -61,10 +61,7 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
-    // TODO retrieve Check-in counter
-    CounterType counter = 0;
-
-    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mKey, counter, ByteSpan(), output));
+    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mKey, mICDCounter, ByteSpan(), output));
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
 
     VerifyOrReturnError(mExchangeManager->GetSessionManager() != nullptr, CHIP_ERROR_INTERNAL);
@@ -81,17 +78,19 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     return exchangeContext->SendMessage(MsgType::ICD_CheckIn, std::move(buffer), Messaging::SendMessageFlags::kNoAutoRequestAck);
 }
 
-CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable)
+CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter)
 {
     VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INTERNAL);
     const FabricInfo * fabricInfo = fabricTable->FindFabricWithIndex(entry.fabricIndex);
     PeerId peerId(fabricInfo->GetCompressedFabricId(), entry.checkInNodeID);
 
+    mICDCounter = counter;
+
     AddressResolve::NodeLookupRequest request(peerId);
 
-    memcpy(mKey.AsMutable<Crypto::Aes128KeyByteArray>(), entry.key.As<Crypto::Aes128KeyByteArray>(),
-           sizeof(Crypto::Aes128KeyByteArray));
+    memcpy(mKey.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), entry.key.As<Crypto::Symmetric128BitsKeyByteArray>(),
+           sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 

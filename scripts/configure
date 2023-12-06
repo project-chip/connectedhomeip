@@ -55,6 +55,14 @@ function usage() { # status
     info "  environment variables (CC, CXX, AR, CFLAGS, CXXFLAGS, ...), falling back to"
     info "  default tool names (CC=cc, ...). When using this script within an external"
     info "  build system, toolchain environment variables should be populated."
+    info ""
+    info "Code generation:"
+    info "  By default, some code generation will happen at build time using zap-cli."
+    info "  If zap-cli is not available on PATH, configure will attempt to download it."
+    info "  Alternatively, if a directory called 'zzz_pregenerated' exists at the root"
+    info "  of the project or the root of the SDK, pre-generated code from this directory"
+    info "  will be used. In this case, build time code generation will be disabled and"
+    info "  zap-cli is not required."
     exit "$1"
 }
 
@@ -63,6 +71,8 @@ function main() { # ...
     BUILD_ENV_DEPS=(
         "${CHIP_ROOT}/scripts/setup/requirements.build.txt"
         "${CHIP_ROOT}/scripts/setup/constraints.txt"
+    )
+    BUILD_ENV_DEPS_CODEGEN=(
         "${CHIP_ROOT}/scripts/setup/zap.version"
     )
 
@@ -97,8 +107,18 @@ function main() { # ...
         info "WARNING: A Pigweed environment appears to be active, this is usually a misconfiguration."
     fi
 
-    check_binary gn GN
-    check_binary ninja NINJA
+    # Check for pre-generated code. CHIP_PREGEN_DIR will be picked up by process_project_args.
+    local pregen_dir="zzz_pregenerated"
+    if [[ -n "$PROJECT_PATH" && -d "${PROJECT_PATH}/${pregen_dir}" ]]; then
+        info "Will use pre-generated code from ${PROJECT}/${pregen_dir}, no zap-cli required."
+        export CHIP_PREGEN_DIR="//${pregen_dir}"
+    elif [[ -d "${CHIP_ROOT}/${pregen_dir}" ]]; then
+        info "Will use pre-generated code from ${pregen_dir}, no zap-cli required."
+        export CHIP_PREGEN_DIR="\${chip_root}/${pregen_dir}"
+    else
+        BUILD_ENV_DEPS+=("${BUILD_ENV_DEPS_CODEGEN[@]}")
+        unset CHIP_PREGEN_DIR
+    fi
 
     # Work out build and environment directories
     if [[ "$PWD" == "$CHIP_ROOT" ]]; then
@@ -119,11 +139,15 @@ function main() { # ...
         BUILD_ENV_PATH="${BUILD_DIR}/${BUILD_ENV_DIR}"
     fi
 
+    # Check required tools are present
+    check_binary gn GN
+    check_binary ninja NINJA
+
     # Create the build environment if necessary
     if ! check_build_env; then
         check_python
         configure_python_env
-        if ! check_binary zap-cli; then
+        if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
             download_zap
         fi
         finalize_build_env
@@ -188,6 +212,7 @@ function gn_generate() { # [project options]
     {
         echo "# ${CONFIGURE_MARKER}"
         echo "# project root: ${PROJECT_PATH}"
+        echo "import(\"//build_overrides/chip.gni\")"
     } >"${BUILD_DIR}/args.gn"
     "${gn[@]}" -q gen "$BUILD_DIR"
 

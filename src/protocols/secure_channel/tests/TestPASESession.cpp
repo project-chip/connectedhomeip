@@ -35,6 +35,10 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 // This test suite pushes multiple PASESession objects onto the stack for the
 // purposes of testing device-to-device communication.  However, in the real
 // world, these won't live in a single device's memory.  Hence, disable stack
@@ -294,7 +298,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         // If running as an ICD, increase waitTimeout to account for the polling interval
-        waitTimeout += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 #endif
 
         // Wait some time so the dropped message will be retransmitted when we drain the IO.

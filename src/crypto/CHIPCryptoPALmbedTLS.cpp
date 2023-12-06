@@ -75,7 +75,7 @@ static bool _isValidTagLength(size_t tag_length)
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -96,7 +96,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     }
 
     // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray) * 8);
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                sizeof(Symmetric128BitsKeyByteArray) * 8);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Encrypt
@@ -112,7 +113,7 @@ exit:
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, const uint8_t * aad, size_t aad_len,
-                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -133,7 +134,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_len, co
     }
 
     // Size of key is expressed in bits, hence the multiplication by 8.
-    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray) * 8);
+    result = mbedtls_ccm_setkey(&context, MBEDTLS_CIPHER_ID_AES, key.As<Symmetric128BitsKeyByteArray>(),
+                                sizeof(Symmetric128BitsKeyByteArray) * 8);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     // Decrypt
@@ -450,7 +452,7 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t digest[kSHA256_Hash_Length];
@@ -593,7 +595,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
 
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
     result = mbedtls_ecp_group_load(&ecp_grp, MapECPGroupId(remote_public_key.Type()));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
@@ -787,7 +789,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     pk.CHIP_CRYPTO_PAL_PRIVATE(pk_ctx)  = to_keypair(&mKeypair);
     VerifyOrExit(pk.CHIP_CRYPTO_PAL_PRIVATE(pk_info) != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
     mbedtls_x509write_csr_set_key(&csr, &pk);
 

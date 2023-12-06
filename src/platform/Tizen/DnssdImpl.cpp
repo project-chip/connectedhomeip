@@ -47,8 +47,8 @@
 
 namespace {
 
-constexpr uint8_t kDnssdKeyMaxSize       = 32;
-constexpr const char * kEmptyAddressIpv6 = "0000:0000:0000:0000:0000:0000:0000:0000";
+constexpr uint8_t kDnssdKeyMaxSize = 32;
+constexpr char kEmptyAddressIpv6[] = "0000:0000:0000:0000:0000:0000:0000:0000";
 
 // The number of miliseconds which must elapse without a new "found" event before
 // mDNS browsing is considered finished. We need this timeout because Tizen Native

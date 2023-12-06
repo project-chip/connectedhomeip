@@ -913,8 +913,8 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
     _this->mpSuite = apSuite;
     _this->SetupBuf();
 
-    const char structStr[]      = "something";
-    const uint8_t structBytes[] = { 1, 8, 17 };
+    static const char structStr[] = "something";
+    const uint8_t structBytes[]   = { 1, 8, 17 };
     Clusters::UnitTesting::Structs::SimpleStruct::Type myStruct;
     myStruct.a = 17;
     myStruct.b = true;
@@ -930,8 +930,8 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
     // Encode
     {
         // str needs to live until we call DataModel::Encode.
-        const char str[] = "abc";
-        CharSpan strSpan = CharSpan::fromCharString(str);
+        static const char str[] = "abc";
+        CharSpan strSpan        = CharSpan::fromCharString(str);
         Encodable encodable;
         if (encodeNulls)
         {
@@ -1012,8 +1012,8 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
         }
         else if (encodeValues)
         {
-            const char str[] = "abc";
-            CharSpan strSpan = CharSpan::fromCharString(str);
+            static const char str[] = "abc";
+            CharSpan strSpan        = CharSpan::fromCharString(str);
 
             NL_TEST_ASSERT(apSuite, !decodable.nullableInt.IsNull());
             NL_TEST_ASSERT(apSuite, decodable.nullableInt.Value() == 5);

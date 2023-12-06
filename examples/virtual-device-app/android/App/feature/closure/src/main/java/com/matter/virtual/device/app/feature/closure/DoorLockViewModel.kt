@@ -61,18 +61,9 @@ constructor(
     super.onCleared()
   }
 
-  fun onClickButton() {
-    Timber.d("onClickButton()")
-    viewModelScope.launch {
-      Timber.d("current lockState value = ${_lockState.value}")
-      if (_lockState.value == LockState.LOCKED) {
-        Timber.d("set value = unlocked")
-        setLockStateUseCase(LockState.UNLOCKED)
-      } else {
-        Timber.d("set value = locked")
-        setLockStateUseCase(LockState.LOCKED)
-      }
-    }
+  fun setLockState(lockState: LockState) {
+    Timber.d("setLockState():new:$lockState")
+    viewModelScope.launch { setLockStateUseCase(lockState) }
   }
 
   fun onClickSendLockAlarmEventButton() {

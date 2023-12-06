@@ -140,17 +140,14 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_WRONG_KEY_TYPE.AsInteger():
         desc = "Wrong key type";
         break;
-    case CHIP_ERROR_WELL_UNINITIALIZED.AsInteger():
-        desc = "Well uninitialized";
-        break;
-    case CHIP_ERROR_WELL_EMPTY.AsInteger():
-        desc = "Well empty";
+    case CHIP_ERROR_UNINITIALIZED.AsInteger():
+        desc = "Uninitialized";
         break;
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
         break;
     case CHIP_ERROR_INVALID_LIST_LENGTH.AsInteger():
-        desc = "invalid list length";
+        desc = "Invalid list length";
         break;
     case CHIP_END_OF_TLV.AsInteger():
         desc = "End of TLV";

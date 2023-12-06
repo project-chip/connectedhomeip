@@ -63,7 +63,7 @@ tests:
           [1697604266.130640][7393:7395] CHIP:DMG: }
       disabled: true
 
-    - label: "Step 2b: Operator sets switch to first position"
+    - label: "Step 2b: Operator sets switch to first position (zero) on the DUT"
       PICS: SWTCH.S.F00
       verification: |
           On Raspi platform to trigger the event,  give the below command by opening an another terminal in DUT
@@ -80,7 +80,7 @@ tests:
           [1697604377.955474][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000006 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B411B1D63
       disabled: true
 
-    - label: "Step 2c: Read CurrentPosition attribute"
+    - label: "Step 2c: TH reads the CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F00
       verification: |
           switch read current-position 1 1
@@ -91,7 +91,7 @@ tests:
           [1646209289.746228][2617:2622] CHIP:TOO:   CurrentPosition: 0
       disabled: true
 
-    - label: "Step 2d: Operator sets switch to second position"
+    - label: "Step 2d: Operator sets switch to second position (one) on the DUT"
       PICS: SWTCH.S.F00
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
@@ -119,7 +119,7 @@ tests:
           [1687257297.110349][17168:17170] CHIP:TOO: }
       disabled: true
 
-    - label: "Step 2e: Read CurrentPosition attribute"
+    - label: "Step 2e: TH reads CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F00
       verification: |
           switch read current-position 1 1
@@ -132,7 +132,8 @@ tests:
 
     - label:
           "Step 2f: If NumberOfPositions>2 (see 2a of TC-SWTCH-2.1) : - Operator
-          sets switch to next position - Read CurrentPosition attribute"
+          sets switch to next position on the DUT - TH reads the CurrentPosition
+          attribute from the DUT"
       PICS: SWTCH.S.F00
       verification: |
           If NumberOfPositions>2, then Set switch to next position Otherwise skip this step.
@@ -179,7 +180,8 @@ tests:
     - label:
           "Step 2g: If NumberOfPositions>3 : - Repeat step 2f for
           NumberOfPositions-3 times - After each time Operator has set switch to
-          next position, - Read CurrentPosition attribute"
+          next position on the DUT, - TH reads CurrentPosition attribute from
+          the DUT"
       PICS: SWTCH.S.F00
       verification: |
           If NumberOfPositions>3, then Set the switch to next position Otherwise skip this step.
@@ -219,7 +221,7 @@ tests:
           [1687258513.235239][17561:17563] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 2h: Operator returns switch to first position"
+    - label: "Step 2h: Operator returns switch to first position on the DUT"
       PICS: SWTCH.S.F00
       verification: |
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
@@ -248,7 +250,7 @@ tests:
           [1697606183.274373][7536:7538] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 2i: Read CurrentPosition attribute"
+    - label: "Step 2i: TH reads the CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F00
       verification: |
           switch read current-position 1 1
@@ -280,13 +282,13 @@ tests:
           [1697606330.207014][7536:7538] CHIP:DMG: }
       disabled: true
 
-    - label: "Step 3b: Operator does not operate switch"
+    - label: "Step 3b: Operator does not operate switch on the DUT"
       PICS: SWTCH.S.F01
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Step 3c: Read CurrentPosition attribute"
+    - label: "Step 3c: TH reads the CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F01
       verification: |
           switch read current-position 1 1
@@ -329,7 +331,7 @@ tests:
           [1697606630.390851][7536:7538] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 3e: Read CurrentPosition attribute"
+    - label: "Step 3e: TH reads the CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F01
       verification: |
           switch read current-position 1 1
@@ -340,7 +342,7 @@ tests:
           [1687847982.359195][19398:19400] CHIP:TOO:   CurrentPosition: 1
       disabled: true
 
-    - label: "Step 3f: Operator releases switch"
+    - label: "Step 3f: Operator releases switch on the DUT"
       PICS: SWTCH.S.F01
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -360,7 +362,7 @@ tests:
           [1697606778.141592][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000000D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B413FBD1D
       disabled: true
 
-    - label: "Step 3g: Read CurrentPosition attribute"
+    - label: "Step 3g: TH reads the CurrentPosition attribute from the DUT"
       PICS: SWTCH.S.F01
       verification: |
           switch read current-position 1 1
@@ -404,13 +406,13 @@ tests:
           [1697607082.641233][7736:7738] CHIP:DMG: }
       disabled: true
 
-    - label: "Step 4b: Operator does not operate switch"
+    - label: "Step 4b: Operator does not operate switch on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Step 4c: Operator operates switch (press briefly)"
+    - label: "Step 4c: Operator operates switch (press briefly) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -442,7 +444,7 @@ tests:
           [1697607828.913054][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 4d: Operator releases switch"
+    - label: "Step 4d: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -475,7 +477,7 @@ tests:
 
     - label:
           "Step 4e: Operator operates switch (keep pressed for long time, e.g. 5
-          seconds)"
+          seconds) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -506,7 +508,7 @@ tests:
           [1697608164.378219][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 4f: Operator releases switch"
+    - label: "Step 4f: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -594,13 +596,13 @@ tests:
           [1697608657.944751][7767:7769] CHIP:DMG: }
       disabled: true
 
-    - label: "Step 5b: Operator does not operate switch"
+    - label: "Step 5b: Operator does not operate switch on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           no Matter messages
       disabled: true
 
-    - label: "Step 5c: Operator operates switch (press briefly)"
+    - label: "Step 5c: Operator operates switch (press briefly) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -631,7 +633,7 @@ tests:
           [1697608808.722385][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 5d: Operator releases switch"
+    - label: "Step 5d: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -664,7 +666,7 @@ tests:
 
     - label:
           "Step 5e: Operator operates switch (keep pressed for long time, e.g. 5
-          seconds)"
+          seconds) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -724,7 +726,7 @@ tests:
           [1697609316.967402][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 5f: Operator releases switch"
+    - label: "Step 5f: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -813,13 +815,13 @@ tests:
           [1697609646.344688][7767:7769] CHIP:DMG: }
       disabled: true
 
-    - label: "Step 6b: Operator does not operate switch"
+    - label: "Step 6b: Operator does not operate switch on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           no Matter messages for this step
       disabled: true
 
-    - label: "Step 6c: Operator operates switch (press briefly)"
+    - label: "Step 6c: Operator operates switch (press briefly) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -850,7 +852,7 @@ tests:
           [1697609943.498325][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6d: Operator releases switch"
+    - label: "Step 6d: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -910,7 +912,7 @@ tests:
           [1697610193.287285][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6e: Operator operates switch (press briefly)"
+    - label: "Step 6e: Operator operates switch (press briefly) on the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -941,7 +943,7 @@ tests:
           [1697609943.498325][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6f: Operator releases switch"
+    - label: "Step 6f: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -974,8 +976,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 6g: Briefly after 6f, operator operates switch again (press
-          briefly)"
+          "Step 6g: Briefly after 6f, Operator operates switch again on the
+          DUT(press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1034,7 +1036,7 @@ tests:
           [1697610464.005872][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6h: Operator releases switch"
+    - label: "Step 6h: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1102,7 +1104,7 @@ tests:
           no Matter messages for this step
       disabled: true
 
-    - label: "Step 6j: Operator operates switch (press briefly)"
+    - label: "Step 6j: Operator operates switch (press briefly) on the DUT"
       PICS: ""
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1133,7 +1135,7 @@ tests:
           [1697609943.498325][7767:7769] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6k: Operator releases switch"
+    - label: "Step 6k: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1166,8 +1168,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 6l: Briefly after 6k, operator operates switch again (press
-          briefly)"
+          "Step 6l: Briefly after 6k, operator operates switch again on the DUT
+          (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1226,7 +1228,7 @@ tests:
           [1659695330.923385][3912:3918] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6m: Operator releases switch"
+    - label: "Step 6m: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
@@ -1316,7 +1318,7 @@ tests:
           [1659698336.786360][4081:4086] CHIP:TOO:    }
       disabled: true
 
-    - label: "Step 6o: Operator releases switch"
+    - label: "Step 6o: Operator releases switch from the DUT"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
