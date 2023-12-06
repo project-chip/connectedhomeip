@@ -26,10 +26,11 @@ import enum
 
 from chip.exceptions import ChipStackException
 
-from .delegate import AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
+from .delegate import AttributePath, AttributePathIBstruct, CommandPathIBStruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
 
-__all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
-           "EventPath", "EventPathIBstruct", "Status", "InteractionModelError"]
+__all__ = ["AttributePath", "AttributePathIBstruct", "CommandPathIBStruct",
+           "DataVersionFilterIBstruct", "EventPath", "EventPathIBstruct",
+           "InteractionModelError", "Status"]
 
 
 # defined src/controller/python/chip/interaction_model/Delegate.h
