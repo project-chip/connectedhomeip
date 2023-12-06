@@ -32,5 +32,3 @@ void EnergyEvseManager::Shutdown()
 {
     GetInstance()->Instance::Shutdown();
 }
-
-void MatterEnergyEvsePluginServerInitCallback() {}

@@ -211,7 +211,7 @@ Status EnergyEvseDelegate::StartDiagnostics()
  * @param    Callback function
  */
 #if 0
-Status EnergyEvseDelegate::hwRegisterEvseHardwareCallback(int Callback) // TODO
+Status EnergyEvseDelegate::HwRegisterEvseHardwareCallback(int Callback) // TODO
 {
     // TODO
     return CHIP_NO_ERROR;
@@ -225,7 +225,7 @@ Status EnergyEvseDelegate::hwRegisterEvseHardwareCallback(int Callback) // TODO
  *
  * @param    currentmA
  */
-Status EnergyEvseDelegate::hwSetMaxHardwareCurrentLimit(int64_t currentmA)
+Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
     if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
     {
@@ -247,7 +247,7 @@ Status EnergyEvseDelegate::hwSetMaxHardwareCurrentLimit(int64_t currentmA)
  *
  * @param    currentmA
  */
-Status EnergyEvseDelegate::hwSetCircuitCapacity(int64_t currentmA)
+Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
     if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
     {
@@ -272,7 +272,7 @@ Status EnergyEvseDelegate::hwSetCircuitCapacity(int64_t currentmA)
  *
  * @param    currentmA
  */
-Status EnergyEvseDelegate::hwSetCableAssemblyLimit(int64_t currentmA)
+Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
     if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
     {
@@ -290,7 +290,7 @@ Status EnergyEvseDelegate::hwSetCableAssemblyLimit(int64_t currentmA)
  *
  * @param    StateEnum
  */
-Status EnergyEvseDelegate::hwSetState(StateEnum state)
+Status EnergyEvseDelegate::HwSetState(StateEnum state)
 {
     /* the only allowed states that the EVSE hardware can set are:
      *  kNotPluggedIn
@@ -326,7 +326,7 @@ Status EnergyEvseDelegate::hwSetState(StateEnum state)
  *
  * @param    FaultStateEnum
  */
-Status EnergyEvseDelegate::hwSetFault(FaultStateEnum fault)
+Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Fault()");
 

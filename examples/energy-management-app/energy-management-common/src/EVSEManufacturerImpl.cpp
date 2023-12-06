@@ -32,14 +32,14 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
 
     /* Set the EVSE Hardware Maximum current limit */
     // For Manufacturer to specify the hardware capability in mA
-    aInstance->GetDelegate()->hwSetMaxHardwareCurrentLimit(32000);
+    aInstance->GetDelegate()->HwSetMaxHardwareCurrentLimit(32000);
 
     // For Manufacturer to specify the CircuitCapacity (e.g. from DIP switches)
-    aInstance->GetDelegate()->hwSetCircuitCapacity(20000);
+    aInstance->GetDelegate()->HwSetCircuitCapacity(20000);
 
     /* For now let's pretend the EV is plugged in, and asking for demand */
-    aInstance->GetDelegate()->hwSetState(StateEnum::kPluggedInDemand);
-    aInstance->GetDelegate()->hwSetCableAssemblyLimit(63000);
+    aInstance->GetDelegate()->HwSetState(StateEnum::kPluggedInDemand);
+    aInstance->GetDelegate()->HwSetCableAssemblyLimit(63000);
 
     return CHIP_NO_ERROR;
 }

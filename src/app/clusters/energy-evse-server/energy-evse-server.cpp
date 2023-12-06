@@ -315,3 +315,8 @@ void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTar
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterEnergyEvsePluginServerInitCallback() {}
