@@ -21,19 +21,19 @@
 #include <protocols/bdx/BdxMessages.h>
 
 namespace {
-constexpr const char * kProtocolName = "Bulk Data Exchange";
+constexpr char kProtocolName[] = "Bulk Data Exchange";
 
-constexpr const char * kUnknown            = "Unknown";
-constexpr const char * kSendInit           = "Send Init";
-constexpr const char * kSendAccept         = "Send Accept";
-constexpr const char * kReceiveInit        = "Receive Init";
-constexpr const char * kReceiveAccept      = "Receive Accept";
-constexpr const char * kBlockQuery         = "Block Query";
-constexpr const char * kBlock              = "Block";
-constexpr const char * kBlockEOF           = "Block End Of File";
-constexpr const char * kBlockAck           = "Block Ack";
-constexpr const char * kBlockAckEOF        = "Block Ack End Of File";
-constexpr const char * kBlockQueryWithSkip = "Block Query With Skip";
+constexpr char kUnknown[]            = "Unknown";
+constexpr char kSendInit[]           = "Send Init";
+constexpr char kSendAccept[]         = "Send Accept";
+constexpr char kReceiveInit[]        = "Receive Init";
+constexpr char kReceiveAccept[]      = "Receive Accept";
+constexpr char kBlockQuery[]         = "Block Query";
+constexpr char kBlock[]              = "Block";
+constexpr char kBlockEOF[]           = "Block End Of File";
+constexpr char kBlockAck[]           = "Block Ack";
+constexpr char kBlockAckEOF[]        = "Block Ack End Of File";
+constexpr char kBlockQueryWithSkip[] = "Block Query With Skip";
 } // namespace
 
 using MessageType = chip::bdx::MessageType;

@@ -57,7 +57,7 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     FabricIndex fabricId = 1;
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
-
+    NodeId unknownNodeId = 6668;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
 
@@ -70,11 +70,16 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
         // Write some ClientInfos and see the counts are correct
         ICDClientInfo clientInfo1;
         clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId);
+        char val[5]           = "test";
         ICDClientInfo clientInfo2;
-        clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId);
+        clientInfo2.peer_node                     = ScopedNodeId(nodeId2, fabricId);
+        clientInfo2.user_active_mode_trigger_hint = 1;
+        memcpy(clientInfo2.user_active_mode_trigger_instruction, val, sizeof(val));
+        clientInfo2.has_instruction = true;
         ICDClientInfo clientInfo3;
-        clientInfo3.peer_node = ScopedNodeId(nodeId1, fabricId);
-        err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
+        clientInfo3.peer_node                     = ScopedNodeId(nodeId1, fabricId);
+        clientInfo3.user_active_mode_trigger_hint = 2;
+        err                                       = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = manager.StoreEntry(clientInfo1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -89,17 +94,23 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
         err = manager.StoreEntry(clientInfo3);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+        ICDClientInfo clientInfo;
+        manager.GetEntry(clientInfo3.peer_node, clientInfo);
+        NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
+        NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == manager.GetEntry(ScopedNodeId(unknownNodeId, fabricId), clientInfo));
         // Make sure iterator counts correctly
         auto * iterator = manager.IterateICDClientInfo();
         // same nodeId for clientInfo2 and clientInfo3, so the new one replace old one
         NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
 
-        ICDClientInfo clientInfo;
         NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
         NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
+        NL_TEST_ASSERT(apSuite, clientInfo.has_instruction);
+        NL_TEST_ASSERT(apSuite, strcmp(clientInfo.user_active_mode_trigger_instruction, val) == 0);
         NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
         NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
-
+        NL_TEST_ASSERT(apSuite, clientInfo.user_active_mode_trigger_hint == 2);
+        NL_TEST_ASSERT(apSuite, !clientInfo.has_instruction);
         iterator->Release();
 
         // Delete all and verify iterator counts 0

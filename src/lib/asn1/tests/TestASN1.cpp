@@ -67,8 +67,8 @@ enum
 // clang-format off
 static uint8_t kTestVal_09_BitString_AsOctetString[] = { 0xE7, 0xC0 };
 static uint8_t kTestVal_20_OctetString[]        = { 0x01, 0x03, 0x05, 0x07, 0x10, 0x30, 0x50, 0x70, 0x00 };
-static const char * kTestVal_21_PrintableString = "Sudden death in Venice";
-static const char * kTestVal_22_UTFString       = "Ond bra\xCC\x8A""d do\xCC\x88""d i Venedig";
+static const char kTestVal_21_PrintableString[] = "Sudden death in Venice";
+static const char kTestVal_22_UTFString[]       = "Ond bra\xCC\x8A""d do\xCC\x88""d i Venedig";
 // clang-format on
 
 // Manually copied from ASN1OID.h for testing.

@@ -147,7 +147,7 @@ static int _compareDaysAndSeconds(const int days, const int seconds)
 }
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
 #if CHIP_CRYPTO_BORINGSSL
@@ -204,7 +204,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 #if CHIP_CRYPTO_BORINGSSL
     aead = EVP_aead_aes_128_ccm_matter();
 
-    context = EVP_AEAD_CTX_new(aead, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), tag_length);
+    context = EVP_AEAD_CTX_new(aead, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), tag_length);
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     result = EVP_AEAD_CTX_seal_scatter(context, ciphertext, tag, &written_tag_len, tag_length, nonce, nonce_length, plaintext,
@@ -231,8 +231,8 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + nonce
-    static_assert(kAES_CCM128_Key_Length == sizeof(Aes128KeyByteArray), "Unexpected key length");
-    result = EVP_EncryptInit_ex(context, nullptr, nullptr, key.As<Aes128KeyByteArray>(), Uint8::to_const_uchar(nonce));
+    static_assert(kAES_CCM128_Key_Length == sizeof(Symmetric128BitsKeyByteArray), "Unexpected key length");
+    result = EVP_EncryptInit_ex(context, nullptr, nullptr, key.As<Symmetric128BitsKeyByteArray>(), Uint8::to_const_uchar(nonce));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in plain text length
@@ -282,7 +282,7 @@ exit:
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
 #if CHIP_CRYPTO_BORINGSSL
@@ -336,7 +336,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
 #if CHIP_CRYPTO_BORINGSSL
     aead = EVP_aead_aes_128_ccm_matter();
 
-    context = EVP_AEAD_CTX_new(aead, key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), tag_length);
+    context = EVP_AEAD_CTX_new(aead, key.As<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray), tag_length);
     VerifyOrExit(context != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
     result = EVP_AEAD_CTX_open_gather(context, plaintext, nonce, nonce_length, ciphertext, ciphertext_length, tag, tag_length, aad,
@@ -366,8 +366,8 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in key + nonce
-    static_assert(kAES_CCM128_Key_Length == sizeof(Aes128KeyByteArray), "Unexpected key length");
-    result = EVP_DecryptInit_ex(context, nullptr, nullptr, key.As<Aes128KeyByteArray>(), Uint8::to_const_uchar(nonce));
+    static_assert(kAES_CCM128_Key_Length == sizeof(Symmetric128BitsKeyByteArray), "Unexpected key length");
+    result = EVP_DecryptInit_ex(context, nullptr, nullptr, key.As<Symmetric128BitsKeyByteArray>(), Uint8::to_const_uchar(nonce));
     VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
 
     // Pass in cipher text length

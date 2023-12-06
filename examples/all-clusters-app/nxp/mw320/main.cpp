@@ -111,7 +111,7 @@ enum
 };
 static int Matter_Selection = MAX_SELECTION;
 #define RUN_RST_LT_DELAY 10
-static const char * TAG = "mw320";
+static const char TAG[] = "mw320";
 
 /*******************************************************************************
  * Variables
