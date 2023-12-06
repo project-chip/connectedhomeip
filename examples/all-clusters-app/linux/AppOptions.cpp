@@ -38,13 +38,13 @@ constexpr uint16_t kOptionCrashFilePath              = 0xFF05;
 
 static chip::Credentials::Examples::TestHarnessDACProvider mDacProvider;
 
-chip::Optional<std::string> mEndUserSupportLogFilePath;
-chip::Optional<std::string> mNetworkDiagnosticsLogFilePath;
-chip::Optional<std::string> mCrashLogFilePath;
+static std::optional<std::string> sEndUserSupportLogFilePath;
+static std::optional<std::string> sNetworkDiagnosticsLogFilePath;
+static std::optional<std::string> sCrashLogFilePath;
 
-bool AppOptions::IsNullOrEmpty(const char * value)
+bool AppOptions::IsNull(const char * value)
 {
-    return (value == nullptr || strlen(value) == 0 || strncmp(value, "", strlen(value)) == 0);
+    return (value == nullptr || strlen(value) == 0);
 }
 
 bool AppOptions::HandleOptions(const char * program, OptionSet * options, int identifier, const char * name, const char * value)
@@ -61,23 +61,23 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         break;
     }
     case kOptionEndUserSupportFilePath: {
-        if (!IsNullOrEmpty(value))
+        if (!IsNull(value))
         {
-            mEndUserSupportLogFilePath.SetValue(std::string{ value });
+            sEndUserSupportLogFilePath = std::string{ value };
         }
         break;
     }
     case kOptionNetworkDiagnosticsFilePath: {
-        if (!IsNullOrEmpty(value))
+        if (!IsNull(value))
         {
-            mNetworkDiagnosticsLogFilePath.SetValue(std::string{ value });
+            sNetworkDiagnosticsLogFilePath = std::string{ value };
         }
         break;
     }
     case kOptionCrashFilePath: {
-        if (!IsNullOrEmpty(value))
+        if (!IsNull(value))
         {
-            mCrashLogFilePath.SetValue(std::string{ value });
+            sCrashLogFilePath = std::string{ value };
         }
         break;
     }
@@ -123,17 +123,17 @@ chip::Credentials::DeviceAttestationCredentialsProvider * AppOptions::GetDACProv
     return &mDacProvider;
 }
 
-Optional<std::string> AppOptions::GetEndUserSupportLogFilePath()
+std::optional<std::string> AppOptions::GetEndUserSupportLogFilePath()
 {
-    return mEndUserSupportLogFilePath;
+    return sEndUserSupportLogFilePath;
 }
 
-Optional<std::string> AppOptions::GetNetworkDiagnosticsLogFilePath()
+std::optional<std::string> AppOptions::GetNetworkDiagnosticsLogFilePath()
 {
-    return mNetworkDiagnosticsLogFilePath;
+    return sNetworkDiagnosticsLogFilePath;
 }
 
-Optional<std::string> AppOptions::GetCrashLogFilePath()
+std::optional<std::string> AppOptions::GetCrashLogFilePath()
 {
-    return mCrashLogFilePath;
+    return sCrashLogFilePath;
 }

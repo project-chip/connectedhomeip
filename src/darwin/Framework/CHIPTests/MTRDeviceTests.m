@@ -2693,14 +2693,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
 
         [device downloadLogOfType:logType timeout:timeout queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
-            if (timeout > 0) {
-                XCTAssertNotNil(error);
-                XCTAssertNil(logResult);
-            } else {
-                XCTAssertNil(error);
-                XCTAssertNotNil(logResult);
-                XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:logFilePath andPath:[logResult path]]);
-            }
+            XCTAssertNil(error);
+            XCTAssertNotNil(logResult);
+            XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:logFilePath andPath:[logResult path]]);
             [expectation fulfill];
         }];
     });
@@ -2728,7 +2723,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Delay the request to allow the DiagnosticLogsServer to clean up and delete the DiagnosticLogsBDXTransferHandler object.
     // TODO: Fix #30537 to keep retrying for a number of retry counts until we don't get busy anymore.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kDownloadLogDelayTimeoutInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [self testDownloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 logFilePath:outFile logFileSize:(4 * 1024) expectation:expectation];
+        [self testDownloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 logFilePath:outFile logFileSize:(4 * 1024 + 200) expectation:expectation];
     });
     [self waitForExpectations:@[ expectation ] timeout:(kDownloadLogTimeoutInSeconds + kDownloadLogDelayTimeoutInSeconds)];
 }

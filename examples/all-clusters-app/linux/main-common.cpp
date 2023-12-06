@@ -268,9 +268,9 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "SetLogProviderDelegate");
-    DiagnosticLogsServer::Instance().SetLogProviderDelegate(endpoint, &LogProvider::getLogProvider());
+    DiagnosticLogsServer::Instance().SetLogProviderDelegate(endpoint, &LogProvider::GetInstance());
 
-    LogProvider::getLogProvider().SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
-    LogProvider::getLogProvider().SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
-    LogProvider::getLogProvider().SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
+    LogProvider::GetInstance().SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
+    LogProvider::GetInstance().SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
+    LogProvider::GetInstance().SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
 }

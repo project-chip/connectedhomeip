@@ -45,7 +45,7 @@ public:
 
     /**
      * Intializes the BDX transfer session by creating a new exchange context for the transfer session.
-     * It starts the BDX transfer session by calling InitiateTransfer of the which sends the SendInit BDX message
+     * It starts the BDX transfer session by calling InitiateTransfer which sends the SendInit BDX message
      * to the log requestor.
      *
      * @param[in] exchangeMgr  The exchange manager from the command handler object for the RetrieveLogsRequest command
@@ -77,12 +77,22 @@ private:
     /**
      * This method handles any error that might occur during the BDX session.
      * If the error occurs before SendAccept is received, it sends a command response
-     * with appropriate status to the requestor. After that, it resets state and
-     * deletes itself.
+     * with appropriate status to the requestor. After that, it resets its state and
+     * schedules an asynchronous deletion of the DiagnosticLogsBDXTransferHandler object.
      *
      * @param[in] error The error that occured during the BDX session
      */
     void HandleBDXError(CHIP_ERROR error);
+
+    /**
+     * This method calls Reset to clean up state and asynchronously deletes the
+     * DiagnosticLogsBDXTransferHandler object by scheduling the delete operation.
+     * This should be called only once on a DiagnosticLogsBDXTransferHandler object
+     * since whenever this is called the DiagnosticLogsBDXTransferHandler object will not
+     * exist and can't be used anymore.
+     *
+     */
+    void ScheduleCleanUp();
 
     Optional<FabricIndex> mFabricIndex;
     Optional<NodeId> mPeerNodeId;
@@ -93,7 +103,7 @@ private:
 
     uint64_t mNumBytesSent;
 
-    LogSessionHandle mLogSessionHandle;
+    LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
     LogProviderDelegate * mDelegate;
 

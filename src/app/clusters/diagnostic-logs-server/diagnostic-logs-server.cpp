@@ -34,6 +34,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
+#ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
 static constexpr size_t kDiagnosticLogsLogProviderDelegateTableSize =
     EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kDiagnosticLogsLogProviderDelegateTableSize < kEmberInvalidEndpointIndex,
@@ -96,17 +97,9 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
 
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mIntent               = intent;
+    mIntent = intent;
     ScopedNodeId scopedPeerNodeId;
-    if (exchangeCtx->HasSessionHandle())
-    {
-        auto sessionHandle = exchangeCtx->GetSessionHandle();
-
-        if (sessionHandle->IsSecureSession())
-        {
-            scopedPeerNodeId = sessionHandle->AsSecureSession()->GetPeer();
-        }
-    }
+    auto sessionHandle = exchangeCtx->GetSessionHandle();
 
     LogProviderDelegate * logProviderDelegate = GetLogProviderDelegate(endpointId);
 
@@ -120,6 +113,11 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
 
     // TODO: Need to resolve #30539. The spec says we should check the log size to see if it fits in the response payload.
     // If it fits, we send the content in the response and not initiate BDX.
+    if (sessionHandle->IsSecureSession())
+    {
+        scopedPeerNodeId = sessionHandle->AsSecureSession()->GetPeer();
+    }
+
     mDiagnosticLogsBDXTransferHandler = new DiagnosticLogsBDXTransferHandler();
     CHIP_ERROR error                  = mDiagnosticLogsBDXTransferHandler->InitializeTransfer(
         exchangeCtx->GetExchangeMgr(), exchangeCtx->GetSessionHandle(), scopedPeerNodeId.GetFabricIndex(),
@@ -264,3 +262,4 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(CommandHandler * co
 }
 
 void MatterDiagnosticLogsPluginServerInitCallback() {}
+#endif // #ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT

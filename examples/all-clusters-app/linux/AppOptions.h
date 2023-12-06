@@ -27,13 +27,13 @@ class AppOptions
 public:
     static chip::ArgParser::OptionSet * GetOptions();
     static chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
-    static chip::Optional<std::string> GetEndUserSupportLogFilePath();
-    static chip::Optional<std::string> GetNetworkDiagnosticsLogFilePath();
-    static chip::Optional<std::string> GetCrashLogFilePath();
+    static std::optional<std::string> GetEndUserSupportLogFilePath();
+    static std::optional<std::string> GetNetworkDiagnosticsLogFilePath();
+    static std::optional<std::string> GetCrashLogFilePath();
 
 private:
     static bool HandleOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
                               const char * value);
 
-    static bool IsNullOrEmpty(const char * value);
+    static bool IsNull(const char * value);
 };

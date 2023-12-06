@@ -36,6 +36,9 @@
 
 using namespace chip;
 
+// Spec mandated max file designator length
+const uint8_t kMaxFileDesignatorLen = 32;
+
 @interface MTRDiagnosticsLogDownloadTask ()
 @property (nonatomic, readonly) os_unfair_lock lock;
 @property (nonatomic) dispatch_source_t timerSource;
@@ -56,24 +59,56 @@ using namespace chip;
     return self;
 }
 
-- (NSString *)_toLogTypeString:(MTRDiagnosticLogType)type
+- (const char *)_toLogTypeAbbreviatedString:(MTRDiagnosticLogType)type
 {
     switch (type) {
     case MTRDiagnosticLogTypeEndUserSupport:
-        return @"EndUserSupport";
+        return "EndUser";
     case MTRDiagnosticLogTypeNetworkDiagnostics:
-        return @"NetworkDiag";
+        return "NWDiag";
     case MTRDiagnosticLogTypeCrash:
-        return @"Crash";
+        return "Crash";
     default:
-        return @"";
+        return "";
     }
 }
 
-- (NSString *)_getFileDesignatorForLogType:(MTRDiagnosticLogType)type
+- (const char *)_toLogTypeString:(MTRDiagnosticLogType)type
 {
-    NSString * fileDesignator = [NSString stringWithFormat:@"bdx:/%0llx/%s", _device.nodeID.unsignedLongLongValue, [self _toLogTypeString:type].UTF8String];
-    return fileDesignator;
+    switch (type) {
+    case MTRDiagnosticLogTypeEndUserSupport:
+        return "EndUserSupport";
+    case MTRDiagnosticLogTypeNetworkDiagnostics:
+        return "NetworkDiagnostics";
+    case MTRDiagnosticLogTypeCrash:
+        return "Crash";
+    default:
+        return "";
+    }
+}
+
+- (CHIP_ERROR)_generateFileDesignatorForLogType:(MTRDiagnosticLogType)type
+                                 fileDesignator:(MutableCharSpan)fileDesignator
+{
+    uint8_t nodeIdBytes[sizeof(NodeId)];
+    Encoding::BigEndian::Put64(nodeIdBytes, _device.nodeID.unsignedLongLongValue);
+
+    char nodeIdHex[sizeof(NodeId) * 2];
+    ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(nodeIdBytes, sizeof(nodeIdBytes), nodeIdHex, sizeof(nodeIdHex)));
+
+    const char kPrefix[] = "bdx://";
+    const char * fileNameAbbreviated = [self _toLogTypeAbbreviatedString:type];
+
+    // Reduce the buffer writer size by one to reserve the last byte for the null-terminator
+    Encoding::BufferWriter writer(Uint8::from_char(fileDesignator.data()), fileDesignator.size() - 1);
+    writer.Put(kPrefix, strlen(kPrefix));
+    writer.Put(nodeIdHex, sizeof(nodeIdHex));
+    writer.Put("/");
+    writer.Put(fileNameAbbreviated, strlen(fileNameAbbreviated));
+
+    VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    fileDesignator.reduce_size(writer.WritePos());
+    return CHIP_NO_ERROR;
 }
 
 - (void)_startTimerForDownload:(NSTimeInterval)timeout
@@ -107,7 +142,7 @@ using namespace chip;
 
     NSString * timeString = [dateFormatter stringFromDate:NSDate.now];
 
-    NSString * fileName = [NSString stringWithFormat:@"%s_%0llx_%s", timeString.UTF8String, _device.nodeID.unsignedLongLongValue, [self _toLogTypeString:type].UTF8String];
+    NSString * fileName = [NSString stringWithFormat:@"%s_%0llx_%s", timeString.UTF8String, _device.nodeID.unsignedLongLongValue, [self _toLogTypeString:type]];
 
     NSURL * filePath = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName] isDirectory:YES];
     NSError * error = nil;
@@ -216,10 +251,19 @@ using namespace chip::app::Clusters::DiagnosticLogs;
                 [self _startTimerForDownload:timeout];
             }
 
+            char fileDesignatorBuffer[kMaxFileDesignatorLen];
+            MutableCharSpan fileDesignator = MutableCharSpan(fileDesignatorBuffer);
+            CHIP_ERROR err = [self _generateFileDesignatorForLogType:type fileDesignator:fileDesignator];
+
+            if (err != CHIP_NO_ERROR) {
+                [self _handleResponse:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil] filepath:nil queue:queue completion:completion];
+                return;
+            }
+
             MTRDiagnosticLogsClusterRetrieveLogsRequestParams * requestParams = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
             requestParams.intent = @(type);
             requestParams.requestedProtocol = @(chip::to_underlying(chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx));
-            requestParams.transferFileDesignator = [self _getFileDesignatorForLogType:type];
+            requestParams.transferFileDesignator = [[NSString alloc] initWithCString:fileDesignator.data() encoding:NSUTF8StringEncoding];
 
             MTRClusterDiagnosticLogs * cluster = [[MTRClusterDiagnosticLogs alloc] initWithDevice:self->_device endpointID:@(0) queue:self.queue];
             [cluster retrieveLogsRequestWithParams:requestParams expectedValues:nil expectedValueInterval:nil

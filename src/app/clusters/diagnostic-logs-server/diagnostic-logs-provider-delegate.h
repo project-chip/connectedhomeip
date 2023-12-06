@@ -54,31 +54,25 @@ public:
 
     /**
      * Called to get the next chunk for the log session identified by logSessionHandle.
+     * The outBuffer is resized to the actual size of data that was successfully read from the file.
      * Should return CHIP_NO_ERROR if we were able to read successfully from the file into the buffer, otherwise
      * an appropriate error code is returned.
      *
      * @param[in] logSessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
      * @param[out] outBuffer        The buffer thats passed in by the caller to write to.
-     * @param[in] bufferLen         The size of the buffer passed in.
      * @param[out] outIsEOF         Set to true if EOF is reached otherwise set to false.
      */
     virtual CHIP_ERROR GetNextChunk(LogSessionHandle logSessionHandle, chip::MutableByteSpan & outBuffer, bool & outIsEOF) = 0;
 
     /**
-     * Called to end log collection for the log session identified by logSessionHandle
+     * Called to end log collection for the log session identified by logSessionHandle.
+     * This must be called if StartLogCollection happens successfully and a valid logSessionHandle has been
+     * returned from StartLogCollection.
      *
      * @param[in] logSessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
      *
      */
     virtual void EndLogCollection(LogSessionHandle logSessionHandle) = 0;
-
-    /**
-     * Called to get the total number of bytes consumed from the log session identified by logSessionHandle
-     *
-     * @param[in] logSessionHandle  The unique handle for this log session returned from a call to StartLogCollection.
-     *
-     */
-    virtual uint64_t GetTotalNumberOfBytesConsumed(LogSessionHandle logSessionHandle) = 0;
 };
 
 } // namespace DiagnosticLogs

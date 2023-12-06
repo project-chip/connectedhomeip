@@ -55,16 +55,9 @@ CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(Messaging::Excha
                                                                 NodeId peerNodeId, LogProviderDelegate * delegate,
                                                                 IntentEnum intent, CharSpan fileDesignator)
 {
-    if (mInitialized)
-    {
-        // Return busy if we are in a transfer session already with another node.
-        VerifyOrReturnError(mFabricIndex.Value() == fabricIndex && mPeerNodeId.Value() == peerNodeId, CHIP_ERROR_BUSY);
-
-        // Reset stale connection from the same Node if exists.
-        Reset();
-    }
-
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabricIndex != kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(peerNodeId != kUndefinedNodeId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Create a new exchange context to use for the BDX transfer session
@@ -97,6 +90,15 @@ CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(Messaging::Excha
     return CHIP_NO_ERROR;
 }
 
+void DiagnosticLogsBDXTransferHandler::ScheduleCleanUp()
+{
+    Reset();
+    DeviceLayer::SystemLayer().ScheduleLambda([this] {
+        delete this;
+        DiagnosticLogsServer::Instance().HandleBDXTransferDone();
+    });
+}
+
 void DiagnosticLogsBDXTransferHandler::HandleBDXError(CHIP_ERROR error)
 {
     VerifyOrReturn(error != CHIP_NO_ERROR);
@@ -107,11 +109,11 @@ void DiagnosticLogsBDXTransferHandler::HandleBDXError(CHIP_ERROR error)
     {
         DiagnosticLogsServer::Instance().SendCommandResponse(StatusEnum::kDenied);
     }
-    Reset();
-    DeviceLayer::SystemLayer().ScheduleLambda([this] {
-        delete this;
-        DiagnosticLogsServer::Instance().HandleBDXTransferDone();
-    });
+    // Call Reset to clean up state and schedule an asynchronous delete for the DiagnosticLogsBDXTransferHandler object.
+    // Since an error occured during BDX, before we delete the DiagnosticLogsBDXTransferHandler object, we need the base class -
+    // TransferFacilitator to stop polling for messages and clean up. Since the HandleBDXError is called only when BDX fails
+    // and transfer is stopped, this will not be called more than once for a DiagnosticLogsBDXTransferHandler object.
+    ScheduleCleanUp();
 }
 
 void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
@@ -125,11 +127,10 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kAckEOFReceived:
-        Reset();
-        DeviceLayer::SystemLayer().ScheduleLambda([this] {
-            delete this;
-            DiagnosticLogsServer::Instance().HandleBDXTransferDone();
-        });
+        // Call Reset to clean up state and schedule an asynchronous delete for the DiagnosticLogsBDXTransferHandler object.
+        // Since BDX has completed successfully, we need the base class - TransferFacilitator to stop polling for messages and clean
+        // up before we can delete the sub class. This will also be called once for a DiagnosticLogsBDXTransferHandler object.
+        ScheduleCleanUp();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "Got StatusReport %x", to_underlying(event.statusData.statusCode));
@@ -182,16 +183,9 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         [[fallthrough]];
     }
     case TransferSession::OutputEventType::kAckReceived: {
-        uint16_t blockSize   = mTransfer.GetTransferBlockSize();
-        uint16_t bytesToRead = blockSize;
+        uint16_t blockSize = mTransfer.GetTransferBlockSize();
 
-        if (mTransfer.GetTransferLength() > 0 && mNumBytesSent + blockSize > mTransfer.GetTransferLength())
-        {
-            // cast should be safe because of condition above
-            bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
-        }
-
-        System::PacketBufferHandle blockBuf = System::PacketBufferHandle::New(bytesToRead);
+        System::PacketBufferHandle blockBuf = System::PacketBufferHandle::New(blockSize);
         if (blockBuf.IsNull())
         {
             mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(CHIP_ERROR_NO_MEMORY));
@@ -200,7 +194,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
 
         MutableByteSpan buffer;
 
-        buffer = MutableByteSpan(blockBuf->Start(), bytesToRead);
+        buffer = MutableByteSpan(blockBuf->Start(), blockSize);
 
         bool isEOF = false;
 

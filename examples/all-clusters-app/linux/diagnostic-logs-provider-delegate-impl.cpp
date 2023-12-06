@@ -38,14 +38,13 @@ LogSessionHandle LogProvider::StartLogCollection(IntentEnum logType)
         return kInvalidLogSessionHandle;
     }
 
-    mIsInALogCollectionSession  = true;
     mTotalNumberOfBytesConsumed = 0;
 
     // Open the log file for reading.
-    Optional<std::string> filePath = GetLogFilePath(logType);
-    if (filePath.HasValue())
+    std::optional<std::string> filePath = GetLogFilePath(logType);
+    if (filePath.has_value())
     {
-        mFileStream.open(filePath.Value().c_str(), std::ios_base::binary | std::ios_base::in);
+        mFileStream.open(filePath.value().c_str(), std::ios_base::binary | std::ios_base::in);
         if (!mFileStream.good())
         {
             ChipLogError(BDX, "Failed to open the log file");
@@ -64,6 +63,7 @@ LogSessionHandle LogProvider::StartLogCollection(IntentEnum logType)
     {
         mLogSessionHandle = kInvalidLogSessionHandle;
     }
+    mIsInALogCollectionSession = true;
     return mLogSessionHandle;
 }
 
@@ -80,20 +80,19 @@ CHIP_ERROR LogProvider::GetNextChunk(LogSessionHandle logSessionHandle, MutableB
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mFileStream.seekg(mFileStream.end);
-    long long fileSize = mFileStream.tellg();
+    mFileStream.seekg(0, mFileStream.end);
+    auto fileSize = mFileStream.tellg();
+
+    mFileStream.seekg(0, mFileStream.beg);
 
     long long remainingBytesToBeRead = fileSize - static_cast<long long>(mTotalNumberOfBytesConsumed);
 
-    if ((remainingBytesToBeRead >= kMaxLogContentSize && outBuffer.size() < kMaxLogContentSize) ||
-        (remainingBytesToBeRead < kMaxLogContentSize && static_cast<long long>(outBuffer.size()) < remainingBytesToBeRead))
-    {
-        ChipLogError(BDX, "Buffer is too small to read the next chunk from file");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    long long bufferSize = static_cast<long long>(outBuffer.size());
+
+    long long bytesToRead = (remainingBytesToBeRead < bufferSize) ? remainingBytesToBeRead : bufferSize;
 
     mFileStream.seekg(static_cast<long long>(mTotalNumberOfBytesConsumed));
-    mFileStream.read(reinterpret_cast<char *>(outBuffer.data()), kMaxLogContentSize);
+    mFileStream.read(reinterpret_cast<char *>(outBuffer.data()), bytesToRead);
 
     if (!(mFileStream.good() || mFileStream.eof()))
     {
@@ -119,12 +118,7 @@ void LogProvider::EndLogCollection(LogSessionHandle logSessionHandle)
     mIsInALogCollectionSession = false;
 }
 
-uint64_t LogProvider::GetTotalNumberOfBytesConsumed(LogSessionHandle logSessionHandle)
-{
-    return mTotalNumberOfBytesConsumed;
-}
-
-Optional<std::string> LogProvider::GetLogFilePath(IntentEnum logType)
+std::optional<std::string> LogProvider::GetLogFilePath(IntentEnum logType)
 {
     switch (logType)
     {
@@ -135,21 +129,21 @@ Optional<std::string> LogProvider::GetLogFilePath(IntentEnum logType)
     case IntentEnum::kCrashLogs:
         return mCrashLogFilePath;
     default:
-        return NullOptional;
+        return std::nullopt;
     }
 }
 
-void LogProvider::SetEndUserSupportLogFilePath(Optional<std::string> logFilePath)
+void LogProvider::SetEndUserSupportLogFilePath(std::optional<std::string> logFilePath)
 {
     mEndUserSupportLogFilePath = logFilePath;
 }
 
-void LogProvider::SetNetworkDiagnosticsLogFilePath(Optional<std::string> logFilePath)
+void LogProvider::SetNetworkDiagnosticsLogFilePath(std::optional<std::string> logFilePath)
 {
     mNetworkDiagnosticsLogFilePath = logFilePath;
 }
 
-void LogProvider::SetCrashLogFilePath(Optional<std::string> logFilePath)
+void LogProvider::SetCrashLogFilePath(std::optional<std::string> logFilePath)
 {
     mCrashLogFilePath = logFilePath;
 }

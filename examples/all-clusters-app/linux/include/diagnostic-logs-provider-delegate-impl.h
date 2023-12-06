@@ -21,6 +21,7 @@
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-provider-delegate.h>
 #include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
+#include <filesystem>
 #include <fstream>
 
 namespace chip {
@@ -38,19 +39,17 @@ class LogProvider : public LogProviderDelegate
     static LogProvider sInstance;
 
 public:
-    LogSessionHandle StartLogCollection(IntentEnum logType);
+    LogSessionHandle StartLogCollection(IntentEnum logType) override;
 
-    CHIP_ERROR GetNextChunk(LogSessionHandle logSessionHandle, MutableByteSpan & outBuffer, bool & outIsEOF);
+    CHIP_ERROR GetNextChunk(LogSessionHandle logSessionHandle, MutableByteSpan & outBuffer, bool & outIsEOF) override;
 
-    void EndLogCollection(LogSessionHandle logSessionHandle);
+    void EndLogCollection(LogSessionHandle logSessionHandle) override;
 
-    uint64_t GetTotalNumberOfBytesConsumed(LogSessionHandle logSessionHandle);
+    void SetEndUserSupportLogFilePath(std::optional<std::string> logFilePath);
 
-    void SetEndUserSupportLogFilePath(Optional<std::string> logFilePath);
+    void SetNetworkDiagnosticsLogFilePath(std::optional<std::string> logFilePath);
 
-    void SetNetworkDiagnosticsLogFilePath(Optional<std::string> logFilePath);
-
-    void SetCrashLogFilePath(Optional<std::string> logFilePath);
+    void SetCrashLogFilePath(std::optional<std::string> logFilePath);
 
     LogProvider(){};
 
@@ -59,17 +58,17 @@ public:
     static inline LogProvider & GetInstance() { return sInstance; }
 
 private:
-    Optional<std::string> GetLogFilePath(IntentEnum logType);
+    std::optional<std::string> GetLogFilePath(IntentEnum logType);
 
-    Optional<std::string> mEndUserSupportLogFilePath;
-    Optional<std::string> mNetworkDiagnosticsLogFilePath;
-    Optional<std::string> mCrashLogFilePath;
+    std::optional<std::string> mEndUserSupportLogFilePath;
+    std::optional<std::string> mNetworkDiagnosticsLogFilePath;
+    std::optional<std::string> mCrashLogFilePath;
 
     std::ifstream mFileStream;
 
-    LogSessionHandle mLogSessionHandle;
+    LogSessionHandle mLogSessionHandle = kInvalidLogSessionHandle;
 
-    bool mIsInALogCollectionSession;
+    bool mIsInALogCollectionSession = false;
 
     uint64_t mTotalNumberOfBytesConsumed;
 };
