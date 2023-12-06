@@ -3074,8 +3074,12 @@
               - EffectIdentifierEnum
               - StartUpOnOffEnum
           LevelControl:
-              - MoveMode
-              - StepMode
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - MoveModeEnum
+              - StepModeEnum
           AccessControl:
               - AuthMode
               - ChangeTypeEnum
@@ -3245,7 +3249,10 @@
               - StatusEnum
               - LineupInfoTypeEnum
           TargetNavigator:
-              - TargetNavigatorStatusEnum
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           MediaPlayback:
               # StatusEnum was originally named MediaPlaybackStatusEnum, but we
               # generate the same API for the names with/without the cluster
@@ -3256,7 +3263,10 @@
               - InputTypeEnum
           KeypadInput:
               - CecKeyCode
-              - KeypadInputStatusEnum
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - StatusEnum
           ContentLauncher:
               - ContentLaunchStatusEnum
               - MetricTypeEnum
@@ -3320,10 +3330,14 @@
                   - On
                   - TogglePreviousOnOff
           LevelControl:
-              MoveMode:
+              # MoveModeEnum and StepModeEnum were originally named MoveMode and
+              # StepMode, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              MoveModeEnum:
                   - Up
                   - Down
-              StepMode:
+              StepModeEnum:
                   - Up
                   - Down
           AccessControl:
@@ -3995,7 +4009,10 @@
               LineupInfoTypeEnum:
                   - Mso
           TargetNavigator:
-              TargetNavigatorStatusEnum:
+              # StatusEnum was originally named TargetNavigatorStatusEnum, but
+              # we generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - TargetNotFound
                   - NotAllowed
@@ -4117,7 +4134,10 @@
                   - F4Yellow
                   - F5
                   - Data
-              KeypadInputStatusEnum:
+              # StatusEnum was originally named KeypadInputStatusEnum, but we
+              # generate the same API for the names with/without the cluster
+              # name at the beginning, so the name can just change here.
+              StatusEnum:
                   - Success
                   - UnsupportedKey
                   - InvalidKeyInCurrentState
@@ -7433,18 +7453,14 @@
           - ICDManagement
           - LaundryWasherMode
           - RefrigeratorAndTemperatureControlledCabinetMode
-          - RVCRunMode
-          - RVCCleanMode
           - DishwasherMode
           - LaundryWasherControls
-          - RVCOperationalState
           - DishwasherAlarm
           - SampleMEI
       attributes:
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7455,6 +7471,10 @@
           DoorLock:
               # Not stable yet
               - UnboltDoor
+          RVCOperationalState:
+              # Disallowed in the spec, but present in our XML?
+              - Start
+              - Stop
       enums:
           FanControl:
               # Not stable yet.
@@ -7550,9 +7570,6 @@
                   - CalendarFormat
   provisional:
       attributes:
-          # New things, not quite finalized.
-          PowerSource:
-              - EndpointList
           Descriptor:
               - TagList
       structs:
@@ -7717,6 +7734,7 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
   renames:
       enums:
           OTASoftwareUpdateProvider:
@@ -7747,15 +7765,296 @@
 - release: "Future"
   versions: "future"
   introduced:
+      clusters:
+          - RVCRunMode
+          - RVCCleanMode
+          - RVCOperationalState
+      attributes:
+          RVCRunMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCCleanMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerSource:
+              - EndpointList
+      commands:
+          RVCRunMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCCleanMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+      command fields:
+          RVCRunMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCCleanMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+      structs:
+          RVCOperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          RVCRunMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          RVCCleanMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+      struct fields:
+          RVCOperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          RVCRunMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          RVCCleanMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+      events:
+          RVCOperationalState:
+              - OperationalError
+              - OperationCompletion
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+          RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+      enums:
+          ContentLauncher:
+              - StatusEnum
+          KeypadInput:
+              - CECKeyCodeEnum
+          ThermostatUserInterfaceConfiguration:
+              - KeypadLockoutEnum
+              - ScheduleProgrammingVisibilityEnum
+              - TemperatureDisplayModeEnum
+          RVCOperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          RVCRunMode:
+              - ModeTag
+              - StatusCode
+          RVCCleanMode:
+              - ModeTag
+              - StatusCode
+      enum values:
+          ContentLauncher:
+              StatusEnum:
+                  - Success
+                  - URLNotAvailable
+                  - AuthFailed
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffHighAuto
+                  - OffHigh
+          KeypadInput:
+              CECKeyCodeEnum:
+                  - Select
+                  - Up
+                  - Down
+                  - Left
+                  - Right
+                  - RightUp
+                  - RightDown
+                  - LeftUp
+                  - LeftDown
+                  - RootMenu
+                  - SetupMenu
+                  - ContentsMenu
+                  - FavoriteMenu
+                  - Exit
+                  - MediaTopMenu
+                  - MediaContextSensitiveMenu
+                  - NumberEntryMode
+                  - Number11
+                  - Number12
+                  - Number0OrNumber10
+                  - Numbers1
+                  - Numbers2
+                  - Numbers3
+                  - Numbers4
+                  - Numbers5
+                  - Numbers6
+                  - Numbers7
+                  - Numbers8
+                  - Numbers9
+                  - Dot
+                  - Enter
+                  - Clear
+                  - NextFavorite
+                  - ChannelUp
+                  - ChannelDown
+                  - PreviousChannel
+                  - SoundSelect
+                  - InputSelect
+                  - DisplayInformation
+                  - Help
+                  - PageUp
+                  - PageDown
+                  - Power
+                  - VolumeUp
+                  - VolumeDown
+                  - Mute
+                  - Play
+                  - Stop
+                  - Pause
+                  - Record
+                  - Rewind
+                  - FastForward
+                  - Eject
+                  - Forward
+                  - Backward
+                  - StopRecord
+                  - PauseRecord
+                  - Reserved
+                  - Angle
+                  - SubPicture
+                  - VideoOnDemand
+                  - ElectronicProgramGuide
+                  - TimerProgramming
+                  - InitialConfiguration
+                  - SelectBroadcastType
+                  - SelectSoundPresentation
+                  - PlayFunction
+                  - PausePlayFunction
+                  - RecordFunction
+                  - PauseRecordFunction
+                  - StopFunction
+                  - MuteFunction
+                  - RestoreVolumeFunction
+                  - TuneFunction
+                  - SelectMediaFunction
+                  - SelectAvInputFunction
+                  - SelectAudioInputFunction
+                  - PowerToggleFunction
+                  - PowerOffFunction
+                  - PowerOnFunction
+                  - F1Blue
+                  - F2Red
+                  - F3Green
+                  - F4Yellow
+                  - F5
+                  - Data
+          ThermostatUserInterfaceConfiguration:
+              KeypadLockoutEnum:
+                  - NoLockout
+                  - Lockout1
+                  - Lockout2
+                  - Lockout3
+                  - Lockout4
+                  - Lockout5
+              ScheduleProgrammingVisibilityEnum:
+                  - ScheduleProgrammingPermitted
+                  - ScheduleProgrammingDenied
+              TemperatureDisplayModeEnum:
+                  - Celsius
+                  - Fahrenheit
+          RVCOperationalState:
+              OperationalStateEnum:
+                  - SeekingCharger
+                  - Charging
+                  - Docked
+              ErrorStateEnum:
+                  - FailedToFindChargingDock
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+          RVCRunMode:
+              ModeTag:
+                  - Idle
+                  - Cleaning
+              StatusCode:
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+                  - BatteryLow
+          RVCCleanMode:
+              ModeTag:
+                  - DeepClean
+                  - Vacuum
+                  - Mop
+              StatusCode:
+                  - CleaningInProgress
       bitmaps:
           Scenes:
               - CopyModeBitmap
-              - NameSupportBitmap
           AdministratorCommissioning:
+              - Feature
+          ContentLauncher:
+              - SupportedProtocolsBitmap
+          LevelControl:
+              - OptionsBitmap
+          RVCRunMode:
+              - Feature
+          RVCCleanMode:
               - Feature
       bitmap values:
           PumpConfigurationAndControl:
@@ -7764,22 +8063,48 @@
           Scenes:
               CopyModeBitmap:
                   - CopyAllScenes
-              NameSupportBitmap:
-                  - SceneNames
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
           AdministratorCommissioning:
               Feature:
                   - Basic
+          ContentLauncher:
+              SupportedProtocolsBitmap:
+                  - DASH
+                  - HLS
+          LevelControl:
+              OptionsBitmap:
+                  - ExecuteIfOff
+                  - CoupleColorTempToLevel
+          RVCRunMode:
+              Feature:
+                  - OnOff
+          RVCCleanMode:
+              Feature:
+                  - OnOff
   deprecated:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailure
+      enums:
+          ContentLauncher:
+              - ContentLaunchStatusEnum
+          KeypadInput:
+              - CecKeyCode
+      enum values:
+          FanControl:
+              FanModeSequenceEnum:
+                  - OffOnAuto
+                  - OffOn
       bitmaps:
           Scenes:
               - ScenesCopyMode
+          ContentLauncher:
+              - SupportedStreamingProtocol
+          LevelControl:
+              - LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7792,34 +8117,228 @@
           # Targeting Spring 2024 Matter release
           - MicrowaveOvenControl
           - MicrowaveOvenMode
+          - DemandResponseLoadControl
+          - BooleanSensorConfiguration
+          - ValveConfigurationAndControl
+          - Timer
+          - OvenMode
+          - LaundryDryerControls
+          - EnergyEVSE
+          - OvenCavityOperationalState
+          - ContentControl
+          - ContentAppObserver
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - SupportedWiFiBands
               - SupportedThreadFeatures
               - ThreadVersion
+          WakeOnLAN:
+              # Targeting Spring 2024 Matter release
+              - LinkLocalAddress
+          BasicInformation:
+              # Targeting Spring 2024 Matter release
+              - SpecificationVersion
+              - MaxPathsPerInvoke
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - FabricSceneInfo
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActiveAudioTrack
+              - AvailableAudioTracks
+              - ActiveTextTrack
+              - AvailableTextTracks
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
               - TimeSnapshot
               - TimeSnapshotResponse
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - QueryIdentity
+              - QueryIdentityResponse
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - GetProgramGuide
+              - ProgramGuideResponse
+              - RecordProgram
+              - CancelRecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActivateAudioTrack
+              - ActivateTextTrack
+              - DeactivateTextTrack
+      command fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              AddOrUpdateWiFiNetwork:
+                  - networkIdentity
+                  - clientIdentifier
+                  - possessionNonce
+              NetworkConfigResponse:
+                  - clientIdentity
+                  - possessionSignature
+              QueryIdentity:
+                  - keyIdentifier
+                  - possessionNonce
+              QueryIdentityResponse:
+                  - identity
+                  - possessionSignature
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Rewind:
+                  - audioAdvanceUnmuted
+              FastForward:
+                  - audioAdvanceUnmuted
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              LaunchContent:
+                  - playbackPreferences
+                  - useCurrentContext
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              Login:
+                  - node
+              Logout:
+                  - node
+      structs:
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - SceneInfoStruct
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ProgramStruct
+              - SeriesInfoStruct
+              - ProgramCategoryStruct
+              - ProgramCastStruct
+              - PageTokenStruct
+              - ChannelPagingStruct
+              - AdditionalInfoStruct
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - TrackStruct
+              - TrackAttributesStruct
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - PlaybackPreferencesStruct
+              - TrackPreferenceStruct
+      struct fields:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              NetworkInfoStruct:
+                  - networkIdentifier
+                  - clientIdentifier
+          Channel:
+              # Targeting Spring 2024 Matter release
+              ChannelInfoStruct:
+                  - identifier
+                  - type
+      events:
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - StateChanged
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              - LoggedOut
+          TargetNavigator:
+              # Targeting Spring 2024 Matter release
+              - TargetUpdated
+      enums:
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ChannelTypeEnum
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+      enum values:
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              ParameterEnum:
+                  - Season
+                  - Episode
+                  - Any
+              StatusEnum:
+                  - TextTrackNotAvailable
+                  - AudioTrackNotAvailable
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               - ThreadCapabilitiesBitmap
+          Scenes:
+              # Targeting Spring 2024 Matter release
+              - NameSupportBitmap
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - RecordingFlagBitmap
       bitmap values:
           OnOff:
               Feature:
                   # Targeting Spring 2024 Matter release
                   - OffOnly
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - PerDeviceCredentials
+              WiFiSecurityBitmap:
+                  - WPA3MatterPDC
+          Channel:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - ElectronicGuide
+                  - RecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - TextTracks
+                  - AudioTracks
+                  - AudioAdvance
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              SupportedProtocolsBitmap:
+                  - WebRTC
+              Feature:
+                  - AdvancedSeek
+                  - TextTracks
+                  - AudioTracks
   renames:
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   associationFailureCause: associationFailure
+      enums:
+          ContentLauncher:
+              StatusEnum: ContentLaunchStatusEnum
+          KeypadInput:
+              CECKeyCodeEnum: CecKeyCode
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  Record the rename here so that the old
+              # value name is generated for the old enum name.
+              ContentLaunchStatusEnum:
+                  URLNotAvailable: UrlNotAvailable
+          FanControl:
+              FanModeSequenceEnum:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
+              # FanModeSequenceType is the old name of
+              # FanModeSequenceEnum; we need this rename annotation
+              # here so we don't lose the old values under that old
+              # name.
+              FanModeSequenceType:
+                  OffHighAuto: OffOnAuto
+                  OffHigh: OffOn
       bitmaps:
           Scenes:
               CopyModeBitmap: ScenesCopyMode
+          ContentLauncher:
+              SupportedProtocolsBitmap: SupportedStreamingProtocol
+          LevelControl:
+              OptionsBitmap: LevelControlOptions
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7827,3 +8346,10 @@
           SoftwareDiagnostics:
               Feature:
                   Watermarks: WaterMarks
+  removed:
+      enum values:
+          ContentLauncher:
+              # The URLNotAvailable value got renamed at the same time
+              # as the enum.  The old enum name never had the new value name.
+              ContentLaunchStatusEnum:
+                  - URLNotAvailable

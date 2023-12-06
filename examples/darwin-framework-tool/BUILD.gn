@@ -113,12 +113,6 @@ action("build-darwin-framework") {
     args += [ "--no-enable-encoding-sentinel-enum-values" ]
   }
 
-  if (enable_provisional_features) {
-    args += [ "--enable-provisional-framework-features" ]
-  } else {
-    args += [ "--no-enable-provisional-framework-features" ]
-  }
-
   output_name = "Matter.framework"
   outputs = [
     "${root_out_dir}/macos_framework_output/Build/Products/${output_sdk_type}/${output_name}",

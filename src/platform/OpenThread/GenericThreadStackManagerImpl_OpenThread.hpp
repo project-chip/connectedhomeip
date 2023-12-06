@@ -65,9 +65,6 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-#include <app/server/Server.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -209,15 +206,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
-        {
-            // Refresh Multicast listening
-            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-            Server::GetInstance().RejoinExistingMulticastGroups();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_DETAIL_LOGGING
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
@@ -2090,7 +2078,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2190,7 +2178,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2239,7 +2227,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2264,7 +2252,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 

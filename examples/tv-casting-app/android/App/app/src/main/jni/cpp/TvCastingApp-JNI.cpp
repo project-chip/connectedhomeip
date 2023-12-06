@@ -609,7 +609,7 @@ JNI_METHOD(jboolean, levelControl_1step)
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->LevelControl_Step(
-        &endpoint, static_cast<chip::app::Clusters::LevelControl::StepMode>(stepMode), static_cast<uint8_t>(stepSize),
+        &endpoint, static_cast<chip::app::Clusters::LevelControl::StepModeEnum>(stepMode), static_cast<uint8_t>(stepSize),
         static_cast<uint16_t>(transitionTime), static_cast<uint8_t>(optionMask), static_cast<uint8_t>(optionOverride),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(LevelControl_Step).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
@@ -1663,7 +1663,7 @@ JNI_METHOD(jboolean, keypadInput_1sendKey)
                  ChipLogError(AppServer, "MatterCallbackHandlerJNI.SetUp failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = CastingServer::GetInstance()->KeypadInput_SendKey(
-        &endpoint, static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(keyCode),
+        &endpoint, static_cast<chip::app::Clusters::KeypadInput::CECKeyCodeEnum>(keyCode),
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getMediaCommandResponseHandler(KeypadInput_SendKey).Handle(err); });
     VerifyOrExit(CHIP_NO_ERROR == err,
                  ChipLogError(AppServer, "CastingServer.KeypadInput_SendKey failed %" CHIP_ERROR_FORMAT, err.Format()));

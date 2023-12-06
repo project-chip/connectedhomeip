@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,33 +24,45 @@ using namespace chip::AddressResolve;
 
 namespace {
 
+using chip::Dnssd::IPAddressSorter::IpScore;
+using chip::Dnssd::IPAddressSorter::ScoreIpAddress;
+
 constexpr uint8_t kNumberOfAvailableSlots = CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS;
 
 Transport::PeerAddress GetAddressWithLowScore(uint16_t port = CHIP_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null())
 {
-    // Embedded IPv4
+    // Unique Local - expect score "3"
     Inet::IPAddress ipAddress;
-    Inet::IPAddress::FromString("0:0:0:0:0:0:111.22.33.44", ipAddress);
-
+    if (!Inet::IPAddress::FromString("fdff:aabb:ccdd:1::4", ipAddress))
+    {
+        ChipLogError(NotSpecified, "!!!!!!!! IP Parse failure");
+    }
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
 Transport::PeerAddress GetAddressWithMediumScore(uint16_t port                 = CHIP_PORT,
                                                  Inet::InterfaceId interfaceId = Inet::InterfaceId::Null())
 {
-    // Unique Local
-    Inet::IPAddress ipAddress;
-    Inet::IPAddress::FromString("fdff:aabb:ccdd:1::4", ipAddress);
 
+    // Global Unicast - expect score '4'
+    Inet::IPAddress ipAddress;
+    if (!Inet::IPAddress::FromString("2001::aabb:ccdd:2233:4455", ipAddress))
+    {
+        ChipLogError(NotSpecified, "!!!!!!!! IP Parse failure");
+    }
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
 Transport::PeerAddress GetAddressWithHighScore(uint16_t port = CHIP_PORT, Inet::InterfaceId interfaceId = Inet::InterfaceId::Null())
 {
-    // Global Unicast
+    // LinkLocal - expect score '7'
+    // Likely that the interfaceId is wrong (link local needs it),
+    // however we do not expect sorter to care
     Inet::IPAddress ipAddress;
-    Inet::IPAddress::FromString("2001::aabb:ccdd:2233:4455", ipAddress);
-
+    if (!Inet::IPAddress::FromString("fe80::aabb:ccdd:2233:4455", ipAddress))
+    {
+        ChipLogError(NotSpecified, "!!!!!!!! IP Parse failure");
+    }
     return Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 }
 
@@ -65,6 +76,15 @@ void TestLookupResult(nlTestSuite * inSuite, void * inContext)
 
     ResolveResult highResult;
     highResult.address = GetAddressWithHighScore();
+
+    // Ensure test expectations regarding ordering is matched
+
+    IpScore lowScore    = ScoreIpAddress(lowResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    IpScore mediumScore = ScoreIpAddress(mediumResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+    IpScore highScore   = ScoreIpAddress(highResult.address.GetIPAddress(), Inet::InterfaceId::Null());
+
+    NL_TEST_ASSERT(inSuite, to_underlying(lowScore) < to_underlying(mediumScore));
+    NL_TEST_ASSERT(inSuite, to_underlying(mediumScore) < to_underlying(highScore));
 
     ResolveResult outResult;
 

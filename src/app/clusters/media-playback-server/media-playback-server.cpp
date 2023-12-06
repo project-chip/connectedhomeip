@@ -29,6 +29,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -45,6 +46,8 @@ using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using chip::Protocols::InteractionModel::Status;
+using StateChangedEvent = chip::app::Clusters::MediaPlayback::Events::StateChanged::Type;
+using chip::app::LogEvent;
 
 static constexpr size_t kMediaPlaybackDelegateTableSize =
     EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -131,6 +134,10 @@ private:
     CHIP_ERROR ReadPlaybackSpeedAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSeekRangeStartAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSeekRangeEndAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadActiveAudioTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadAvailableAudioTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadActiveTextTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadAvailableTextTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadFeatureFlagAttribute(EndpointId endpoint, app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
@@ -141,9 +148,23 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
+    // TODO: Add hasFeature condition
+
     if (isDelegateNull(delegate, endpoint))
     {
-        return CHIP_NO_ERROR;
+        switch (aPath.mAttributeId)
+        {
+        case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id: {
+            return aEncoder.EncodeEmptyList();
+        }
+        case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id: {
+            return aEncoder.EncodeEmptyList();
+        }
+        default: {
+            return CHIP_NO_ERROR;
+            break;
+        }
+        }
     }
 
     switch (aPath.mAttributeId)
@@ -168,6 +189,18 @@ CHIP_ERROR MediaPlaybackAttrAccess::Read(const app::ConcreteReadAttributePath & 
     }
     case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
         return ReadSeekRangeEndAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::ActiveAudioTrack::Id: {
+        return ReadActiveAudioTrackAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::AvailableAudioTracks::Id: {
+        return ReadAvailableAudioTracksAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::ActiveTextTrack::Id: {
+        return ReadActiveTextTrackAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaPlayback::Attributes::AvailableTextTracks::Id: {
+        return ReadAvailableTextTracksAttribute(aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
@@ -226,6 +259,26 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadSeekRangeEndAttribute(app::AttributeValu
 {
     uint64_t seekRangeEnd = delegate->HandleGetSeekRangeEnd();
     return aEncoder.Encode(seekRangeEnd);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadActiveAudioTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetActiveAudioTrack(aEncoder);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadAvailableAudioTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetAvailableAudioTracks(aEncoder);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadActiveTextTrackAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetActiveTextTrack(aEncoder);
+}
+
+CHIP_ERROR MediaPlaybackAttrAccess::ReadAvailableTextTracksAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    return delegate->HandleGetAvailableTextTracks(aEncoder);
 }
 
 } // anonymous namespace
@@ -312,11 +365,13 @@ bool emberAfMediaPlaybackClusterFastForwardCallback(app::CommandHandler * comman
     EndpointId endpoint = commandPath.mEndpointId;
     app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
 
+    auto & audioAdvanceUnmuted = commandData.audioAdvanceUnmuted;
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        delegate->HandleFastForward(responder);
+        delegate->HandleFastForward(responder, audioAdvanceUnmuted);
     }
 
 exit:
@@ -360,11 +415,13 @@ bool emberAfMediaPlaybackClusterRewindCallback(app::CommandHandler * command, co
     EndpointId endpoint = commandPath.mEndpointId;
     app::CommandResponseHelper<Commands::PlaybackResponse::Type> responder(command, commandPath);
 
+    auto & audioAdvanceUnmuted = commandData.audioAdvanceUnmuted;
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        delegate->HandleRewind(responder);
+        delegate->HandleRewind(responder, audioAdvanceUnmuted);
     }
 
 exit:
@@ -499,6 +556,150 @@ exit:
     }
 
     return true;
+}
+
+/**
+ * @brief Media Playback Cluster ActivateAudioTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterActivateAudioTrackCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
+
+    auto & trackId          = commandData.trackID;
+    auto & audioOutputIndex = commandData.audioOutputIndex;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    {
+        delegate->HandleActivateAudioTrack(trackId, audioOutputIndex);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterActivateAudioTrackCallback error: %s", err.AsString());
+        status = Status::Failure;
+    }
+
+    command->AddStatus(commandPath, status);
+    return true;
+}
+
+/**
+ * @brief Media Playback Cluster ActivateTextTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterActivateTextTrackCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
+
+    auto & trackId = commandData.trackID;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    {
+        delegate->HandleActivateTextTrack(trackId);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterActivateTextTrackCallback error: %s", err.AsString());
+        status = Status::Failure;
+    }
+
+    command->AddStatus(commandPath, status);
+    return true;
+}
+
+/**
+ * @brief Media Playback Cluster DeactivateTextTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterDeactivateTextTrackCallback(
+    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    Status status       = Status::Success;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+    {
+        delegate->HandleDeactivateTextTrack();
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaPlaybackClusterDeactivateTextTrackCallback error: %s", err.AsString());
+        status = Status::Failure;
+    }
+
+    command->AddStatus(commandPath, status);
+    return true;
+}
+
+/** @brief Media Playback Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterMediaPlaybackClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Media Playback Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
+
+    // TODO: Check if event feature is supported and only then continue
+    switch (attributePath.mAttributeId)
+    {
+    case app::Clusters::MediaPlayback::Attributes::CurrentState::Id:
+    case app::Clusters::MediaPlayback::Attributes::StartTime::Id:
+    case app::Clusters::MediaPlayback::Attributes::Duration::Id:
+    case app::Clusters::MediaPlayback::Attributes::SampledPosition::Id:
+    case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id:
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id:
+    case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
+        EventNumber eventNumber;
+
+        // TODO: Update values
+        PlaybackStateEnum currentState = static_cast<PlaybackStateEnum>(0);
+        uint64_t startTime             = static_cast<uint64_t>(0);
+        uint64_t duration              = static_cast<uint64_t>(0);
+        Structs::PlaybackPositionStruct::Type sampledPosition;
+        float playbackSpeed      = static_cast<float>(0);
+        uint64_t seekRangeEnd    = static_cast<uint64_t>(0);
+        uint64_t seekRangeStart  = static_cast<uint64_t>(0);
+        chip::ByteSpan data      = ByteSpan();
+        bool audioAdvanceUnmuted = false;
+
+        StateChangedEvent event{ currentState, startTime,      duration,           sampledPosition,    playbackSpeed,
+                                 seekRangeEnd, seekRangeStart, MakeOptional(data), audioAdvanceUnmuted };
+
+        // TODO: Add endpoint variable instead of 0
+        CHIP_ERROR logEventError = LogEvent(event, 0, eventNumber);
+
+        if (CHIP_NO_ERROR != logEventError)
+        {
+            // TODO: Add endpoint variable instead of 0
+            ChipLogError(Zcl, "[Notify] Unable to send notify event: %s [endpointId=%d]", logEventError.AsString(), 0);
+        }
+        break;
+    }
+
+    default: {
+        ChipLogProgress(Zcl, "Media Playback Server: unhandled attribute ID");
+        break;
+    }
+    }
 }
 
 void MatterMediaPlaybackPluginServerInitCallback()

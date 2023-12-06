@@ -19,8 +19,8 @@
 #include "CHIPCommand.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <core/CHIPBuildConfig.h>
 #include <credentials/attestation_verifier/FileAttestationTrustStore.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
@@ -37,13 +37,13 @@ std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
-constexpr chip::FabricId kIdentityNullFabricId    = chip::kUndefinedFabricId;
-constexpr chip::FabricId kIdentityAlphaFabricId   = 1;
-constexpr chip::FabricId kIdentityBetaFabricId    = 2;
-constexpr chip::FabricId kIdentityGammaFabricId   = 3;
-constexpr chip::FabricId kIdentityOtherFabricId   = 4;
-constexpr const char * kPAATrustStorePathVariable = "CHIPTOOL_PAA_TRUST_STORE_PATH";
-constexpr const char * kCDTrustStorePathVariable  = "CHIPTOOL_CD_TRUST_STORE_PATH";
+constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
+constexpr chip::FabricId kIdentityAlphaFabricId = 1;
+constexpr chip::FabricId kIdentityBetaFabricId  = 2;
+constexpr chip::FabricId kIdentityGammaFabricId = 3;
+constexpr chip::FabricId kIdentityOtherFabricId = 4;
+constexpr char kPAATrustStorePathVariable[]     = "CHIPTOOL_PAA_TRUST_STORE_PATH";
+constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH";
 
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
@@ -460,6 +460,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
         commissionerParams.controllerICAC               = icacSpan;
         commissionerParams.controllerNOC                = nocSpan;
         commissionerParams.permitMultiControllerFabrics = true;
+        commissionerParams.enableServerInteractions     = NeedsOperationalAdvertising();
     }
 
     // TODO: Initialize IPK epoch key in ExampleOperationalCredentials issuer rather than relying on DefaultIpkValue

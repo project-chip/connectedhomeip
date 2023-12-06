@@ -69,7 +69,7 @@ bool isValidTag(const uint8_t * tag, size_t tag_length)
 } // namespace
 
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length)
 {
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
@@ -123,7 +123,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
 }
 
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext)
 {
     VerifyOrReturnError(isBufferNonEmpty(nonce, nonce_length), CHIP_ERROR_INVALID_ARGUMENT);
@@ -479,7 +479,7 @@ static int CryptoRNG(void * ctxt, uint8_t * out_buffer, size_t out_length)
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(isBufferNonEmpty(msg, msg_length), CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ERROR error                      = CHIP_NO_ERROR;
@@ -558,7 +558,7 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
     CHIP_ERROR error                      = CHIP_NO_ERROR;
     psa_status_t status                   = PSA_SUCCESS;
@@ -728,7 +728,7 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     VerifyOrReturnError(isBufferNonEmpty(out_csr, csr_length), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
     MutableByteSpan csr(out_csr, csr_length);
     ReturnErrorOnFailure(GenerateCertificateSigningRequest(this, csr));

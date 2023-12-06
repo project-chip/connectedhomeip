@@ -34,7 +34,9 @@ class NetworkCommissioningCluster(
   class NetworkConfigResponse(
     val networkingStatus: UInt,
     val debugText: String?,
-    val networkIndex: UByte?
+    val networkIndex: UByte?,
+    val clientIdentity: ByteArray?,
+    val possessionSignature: ByteArray?
   )
 
   class ConnectNetworkResponse(
@@ -42,6 +44,8 @@ class NetworkCommissioningCluster(
     val debugText: String?,
     val errorValue: Int?
   )
+
+  class QueryIdentityResponse(val identity: ByteArray, val possessionSignature: ByteArray?)
 
   class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
@@ -79,6 +83,9 @@ class NetworkCommissioningCluster(
     ssid: ByteArray,
     credentials: ByteArray,
     breadcrumb: ULong?,
+    networkIdentity: ByteArray?,
+    clientIdentifier: ByteArray?,
+    possessionNonce: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
     val commandId = 2L
@@ -139,6 +146,20 @@ class NetworkCommissioningCluster(
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
     val commandId = 8L
+
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun queryIdentity(
+    keyIdentifier: ByteArray,
+    possessionNonce: ByteArray?,
+    timedInvokeTimeoutMs: Int? = null
+  ): QueryIdentityResponse {
+    val commandId = 9L
 
     if (timedInvokeTimeoutMs != null) {
       // Do the action with timedInvokeTimeoutMs

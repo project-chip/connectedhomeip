@@ -135,12 +135,12 @@ function(chip_configure_data_model APP_TARGET)
     target_sources(${APP_TARGET} ${SCOPE}
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-        ${CHIP_APP_BASE_DIR}/util/attribute-size-util.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
         ${CHIP_APP_BASE_DIR}/util/binding-table.cpp
         ${CHIP_APP_BASE_DIR}/icd/ICDMonitoringTable.cpp
-        ${CHIP_APP_BASE_DIR}/icd/ICDManagementServer.cpp
+        ${CHIP_APP_BASE_DIR}/icd/ICDNotifier.cpp
+        ${CHIP_APP_BASE_DIR}/icd/ICDConfigurationData.cpp
         ${CHIP_APP_BASE_DIR}/util/DataModelHandler.cpp
         ${CHIP_APP_BASE_DIR}/util/ember-compatibility-functions.cpp
         ${CHIP_APP_BASE_DIR}/util/generic-callback-stubs.cpp

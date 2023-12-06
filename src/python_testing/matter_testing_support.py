@@ -443,6 +443,8 @@ class MatterStackState:
             self._chip_stack = ChipStack(**kwargs)
             builtins.chipStack = self._chip_stack
 
+        chip.logging.RedirectToPythonLogging()
+
         self._storage = self._chip_stack.GetStorageManager()
         self._certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(chipStack=self._chip_stack)
         self._certificate_authority_manager.LoadAuthoritiesFromStorage()

@@ -21,10 +21,10 @@ import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
 
 class ScenesCluster(private val controller: MatterController, private val endpointId: UShort) {
-  class AddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+  class AddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class ViewSceneResponse(
-    val status: UShort,
+    val status: UByte,
     val groupID: UShort,
     val sceneID: UByte,
     val transitionTime: UShort?,
@@ -32,23 +32,23 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
   )
 
-  class RemoveSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+  class RemoveSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
-  class RemoveAllScenesResponse(val status: UShort, val groupID: UShort)
+  class RemoveAllScenesResponse(val status: UByte, val groupID: UShort)
 
-  class StoreSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+  class StoreSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class GetSceneMembershipResponse(
-    val status: UShort,
+    val status: UByte,
     val capacity: UByte?,
     val groupID: UShort,
     val sceneList: List<UByte>?
   )
 
-  class EnhancedAddSceneResponse(val status: UShort, val groupID: UShort, val sceneID: UByte)
+  class EnhancedAddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class EnhancedViewSceneResponse(
-    val status: UShort,
+    val status: UByte,
     val groupID: UShort,
     val sceneID: UByte,
     val transitionTime: UShort?,
@@ -57,12 +57,14 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   )
 
   class CopySceneResponse(
-    val status: UShort,
+    val status: UByte,
     val groupIdentifierFrom: UShort,
     val sceneIdentifierFrom: UByte
   )
 
   class LastConfiguredByAttribute(val value: ULong?)
+
+  class FabricSceneInfoAttribute(val value: List<ScenesClusterSceneInfoStruct>)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -279,11 +281,20 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     // Implementation needs to be added here
   }
 
-  suspend fun readRemainingCapacityAttribute(): UByte {
+  suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemainingCapacityAttribute(minInterval: Int, maxInterval: Int): UByte {
+  suspend fun readFabricSceneInfoAttributeWithFabricFilter(
+    isFabricFiltered: Boolean
+  ): FabricSceneInfoAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFabricSceneInfoAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): FabricSceneInfoAttribute {
     // Implementation needs to be added here
   }
 

@@ -21,5 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static chip.devicecontroller.ChipTLVType.*;
+
 public class ChipEventStructs {
 }

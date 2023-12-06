@@ -1,43 +1,39 @@
 # CI/CD Documentation
 
-## Known Issues
+```{toctree}
+:glob:
 
--   Python build running out of space
+tools/*
+```
+
+## Project Information
+
+-   [Build Guide](../guides/BUILDING.md)
+-   Sphinx documentation framework
+    -   New directories and individual files must be added to the
+        [tree](https://github.com/project-chip/connectedhomeip/blob/master/docs/index.md)
+    -   New files under directories must be added to the tree in the index file;
+        see above. Glob and regular expressions may be used to include all
+    -   The
+        [documentation page](https://project-chip.github.io/connectedhomeip-doc/)
+        is the end product
+        -   Links can be relative; links ending in ".md" in the code will be
+            reflected as ".html" on that page
+-   Pull Requests
+    -   Built in style and spelling checks must be satisfied
+    -   Larger changes should go through an approval process; reviewers are
+        automatically added
+    -   Smaller specific changes like ones to this file may be expedited with
+        the "fast track" label
+
+Work In Progress
+
+## Tasks
+
+-   [Issues List](https://github.com/project-chip/connectedhomeip/labels/CI%2FCD%20improvements)
 
 ## Tools
 
-### Daily Fail Summary
-
-#### Source
-
-Workflow:
-https://github.com/project-chip/connectedhomeip/blob/master/.github/workflows/recent_fail_summary.yaml
-
-Script:
-https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/summarize_fail.py
-
-Fail Definitions:
-https://github.com/project-chip/connectedhomeip/blob/master/scripts/tools/build_fail_definitions.yaml
-
-#### Summary
-
-Runs once per day; takes inventory of the previous day's workflow runs and
-parses them for fail statistics. Creates temporarily cached artifacts for easy
-data parsing. Also saves a daily pass percentage list of all workflows at
-https://github.com/project-chip/connectedhomeip/blob/daily_pass_percentage/docs/daily_pass_percentage.md.
-Fail definitions can be added to the file defined above to allow fast root cause
-determination of any fail with an error message.
-
-#### Improvement Ideas
-
--   Keep fail signature list updated to track causes of all common fails
--   Make script artifact more known and accessible so it can be easily shared
-    and used by everyone
--   Deliver daily fail summaries in short form through a Slack bot for easy
-    access
-
-## To Do
-
--   Cert image auto build
+-   [Daily Fail Summary](tools/daily_fail_summary.md)
 
 ## General Improvement Ideas

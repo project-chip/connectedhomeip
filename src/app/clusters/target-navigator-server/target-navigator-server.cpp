@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -43,7 +44,9 @@ using namespace chip::app::Clusters::TargetNavigator;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
+using TargetUpdatedEvent = chip::app::Clusters::TargetNavigator::Events::TargetUpdated::Type;
 
 static constexpr size_t kTargetNavigatorDelegateTableSize =
     EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -201,6 +204,49 @@ exit:
     }
 
     return true;
+}
+
+/** @brief Target Navigator Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    ChipLogProgress(Zcl, "Target Navigator Server Cluster Attribute changed [EP:%d, ID:0x%x]", attributePath.mEndpointId,
+                    (unsigned int) attributePath.mAttributeId);
+
+    // TODO: Check if event feature is supported and only then continue
+    switch (attributePath.mAttributeId)
+    {
+    case app::Clusters::TargetNavigator::Attributes::TargetList::Id:
+    case app::Clusters::TargetNavigator::Attributes::CurrentTarget::Id: {
+        EventNumber eventNumber;
+
+        // TODO: Update values
+        chip::app::DataModel::List<const Structs::TargetInfoStruct::Type> targetList;
+        uint8_t currentTarget = static_cast<uint8_t>(0);
+        chip::ByteSpan data   = ByteSpan();
+
+        TargetUpdatedEvent event{ targetList, currentTarget, data };
+
+        // TODO: Add endpoint variable instead of 0
+        CHIP_ERROR logEventError = LogEvent(event, 0, eventNumber);
+
+        if (CHIP_NO_ERROR != logEventError)
+        {
+            // TODO: Add endpoint variable instead of 0
+            ChipLogError(Zcl, "[Notify] Unable to send notify event: %s [endpointId=%d]", logEventError.AsString(), 0);
+        }
+        break;
+    }
+
+    default: {
+        ChipLogProgress(Zcl, "Media Playback Server: unhandled attribute ID");
+        break;
+    }
+    }
 }
 
 void MatterTargetNavigatorPluginServerInitCallback()

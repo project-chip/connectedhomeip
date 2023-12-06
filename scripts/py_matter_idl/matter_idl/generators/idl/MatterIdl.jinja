@@ -35,54 +35,43 @@
 {%  for cluster in idl.clusters %}
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
-{{cluster.api_maturity | idltxt}}{{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
-  {%- for enum in cluster.enums %}
+{{cluster.api_maturity | idltxt}}cluster {{cluster.name}} = {{cluster.code}} {
+  revision {{cluster.revision}};
 
+  {% for enum in cluster.enums %}
   enum {{enum.name}} : {{ enum.base_type}} {
     {% for entry in enum.entries %}
     {{entry.name}} = {{entry.code}};
     {% endfor %}
   }
+
   {% endfor %}
 
   {%- for bitmap in cluster.bitmaps %}
-
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
     {{entry.name}} = 0x{{"%X" | format(entry.code)}};
     {% endfor %}
   }
+
   {% endfor %}
 
   {%- for s in cluster.structs | rejectattr("tag") %}
-  {% if loop.first %}
-
-  {% endif %}
   {{render_struct(s)}}
-  {% if not loop.last %}
 
-  {% endif %}
   {% endfor %}
 
   {%- for e in cluster.events %}
-  {% if loop.first %}
-
-  {% endif %}
   {##}  {##}{% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
   {{e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
     {% for field in e.fields %}
     {{render_field(field)}}
     {% endfor %}
   }
-  {% if not loop.last %}
 
-  {% endif %}
   {% endfor %}
 
   {%- for a in cluster.attributes %}
-  {% if loop.first %}
-
-  {% endif %}
   {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
   {% endfor %}
 

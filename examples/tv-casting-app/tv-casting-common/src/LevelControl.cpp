@@ -21,9 +21,9 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 
-CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize, app::DataModel::Nullable<uint16_t> transitionTime,
-                               BitMask<LevelControl::LevelControlOptions> optionMask,
-                               BitMask<LevelControl::LevelControlOptions> optionOverride,
+CHIP_ERROR StepCommand::Invoke(LevelControl::StepModeEnum stepMode, uint8_t stepSize,
+                               app::DataModel::Nullable<uint16_t> transitionTime, BitMask<LevelControl::OptionsBitmap> optionMask,
+                               BitMask<LevelControl::OptionsBitmap> optionOverride,
                                std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::Step::Type request;
@@ -36,8 +36,8 @@ CHIP_ERROR StepCommand::Invoke(LevelControl::StepMode stepMode, uint8_t stepSize
 }
 
 CHIP_ERROR MoveToLevelCommand::Invoke(uint8_t level, app::DataModel::Nullable<uint16_t> transitionTime,
-                                      BitMask<LevelControl::LevelControlOptions> optionMask,
-                                      BitMask<LevelControl::LevelControlOptions> optionOverride,
+                                      BitMask<LevelControl::OptionsBitmap> optionMask,
+                                      BitMask<LevelControl::OptionsBitmap> optionOverride,
                                       std::function<void(CHIP_ERROR)> responseCallback)
 {
     LevelControl::Commands::MoveToLevel::Type request;

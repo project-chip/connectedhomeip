@@ -175,6 +175,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
+        "TestIcdManagementCluster.yaml",   # TODO(#30430): add ICD registration support in chip-repl
         "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -184,6 +185,8 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_DGGEN_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_DGGEN_2_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_LWM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_LWM_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_LWM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -235,6 +238,8 @@ def target_for_name(name: str):
         return TestTarget.OTA
     if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
         return TestTarget.BRIDGE
+    if name.startswith("TestIcd") or name.startswith("Test_TC_ICDM_"):
+        return TestTarget.LIT_ICD
     return TestTarget.ALL_CLUSTERS
 
 

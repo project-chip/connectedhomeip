@@ -29,7 +29,32 @@ issue uncovered via the manual test. Each ecosystem may implement an analysis
 that analyzes capture data, displays info to the user, probes the local
 environment and generates additional artifacts.
 
-## Getting started
+## Single host installation (no Raspberry Pi)
+
+All features of `idt` are available on macOS and Linux (tested with Debian based
+systems).  
+If you would prefer to execute capture and discovery from a Raspberry Pi, read
+the next section instead.
+
+The machine running `idt` should be connected to the same Wi-Fi network used for
+testing.  
+Follow the steps below to execute capture and discovery without a Raspberry Pi:
+
+-   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
+-   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
+    permanently.
+-   After `idt` aliases are available in your environment, calling any `idt`
+    command will automatically create a new virtual environment and install
+    python dependencies.
+    -   If you're missing non-Python dependencies, you'll be prompted to install
+        them until they're available.
+-   Bluetooth discovery on macOS will require granting the program where `idt`
+    is run, e.g. terminal emulator or IDE permission to access bluetooth in
+    macOS settings.
+    -   Failure to do so may result in any of the following:
+        -   A single `abort` message and no further output in the terminal.
+        -   Failure with a relevant stack trace in the terminal.
+        -   A prompt to allow the application access to bluetooth.
 
 ## Raspberry Pi installation
 
@@ -137,7 +162,7 @@ idt_clean
 ```
 
 NOTE the idt artifacts directory is contained in idt, so running this will
-delete any artifacts ([TODO] change).
+delete any artifacts.
 
 Then from the admin computer:
 
@@ -145,54 +170,13 @@ Then from the admin computer:
 idt_push
 ```
 
-## Single host installation (no Raspberry Pi)
-
-Follow the steps below to execute capture and discovery without a Raspberry Pi.
-
-### Linux installation
-
-#### Requirements
-
--   This package should work on most Debian (/based) systems.
--   `idt` is currently tested on `Python 3.11`.
--   `adb` and `tcpdump` are required.
--   The machine running `idt` should be connected to the same Wi-Fi network used
-    for testing.
-
-#### Setup
-
--   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
--   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
-    permanently.
-
-> You may use `idt` in a Python virtual environment OR using a container from
-> the idt image.
-
-#### Python virtual environment
-
--   After `idt` aliases are available in your environment, calling any `idt`
-    command will automatically create a new virtual environment and install
-    dependencies.
-
-#### Docker
-
--   Run `idt_build` and `idt_activate` to enter the `idt` container.
-
-[TODO] Podman
-
-### macOS installation
-
-Most features other than BLE should work on macOS.
-
-Follow the Linux installation steps above, but do not use Docker.
-
-[TODO] macOS BLE support
-
 ## User guide
 
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
-> `idt` invokes the `idt` python package.
+> `idt` invokes the `idt` python package.  
+> Output from `idt` will generally be colorized while output from sub processes
+> is generally not.
 
 RPi users, as needed:
 
@@ -208,44 +192,37 @@ RPi users, as needed:
 
 ### Capture
 
+> **_IMPORTANT_**  
+> Ensure you've made it to the log line "Starting real time analysis, press
+> enter to stop!" before launching the app under test.
+
 ```
 idt capture -h
 
-usage: idt capture [-h] [--platform {Android}]
-                   [--ecosystem {PlayServices,PlayServicesUser,ALL}]
-                   [--pcap {t,f}]
-                   [--interface {wlp0s20f3,docker0,lo}]
-                   [--additional {t,f}]
+usage: idt capture [-h] [--platform {Android}] [--ecosystem {PlayServicesUser,PlayServices,ALL}] [--pcap {t,f}] [--interface {wlp0s20f3,lo,docker0,any}]
 
 options:
   -h, --help            show this help message and exit
   --platform {Android}, -p {Android}
-                        Run capture for a particular platform
-                        (default Android)
-  --ecosystem {PlayServices,PlayServicesUser,ALL}, -e {PlayServices,PlayServicesUser,ALL}
-                        Run capture for a particular ecosystem or ALL
-                        ecosystems (default ALL)
+                        Run capture for a particular platform (default Android)
+  --ecosystem {PlayServicesUser,PlayServices,ALL}, -e {PlayServicesUser,PlayServices,ALL}
+                        Run capture for a particular ecosystem or ALL ecosystems (default ALL)
   --pcap {t,f}, -c {t,f}
                         Run packet capture (default t)
-  --interface {wlp0s20f3,docker0,lo}, -i {wlp0s20f3,docker0,lo}
-                        Run packet capture against a specified
-                        interface (default wlp0s20f3)
-  --additional {t,f}, -a {t,f}
-                        Run ble and mdns scanners in the background
-                        while capturing (default t)
+  --interface {wlp0s20f3,lo,docker0,any}, -i {wlp0s20f3,lo,docker0,any}
+                        Specify packet capture interface (default any)
 ```
+
+For packet capture interface (`-i`/`--interface`:
+
+-   On macOS, the only available interface is `any`.
+-   On Linux, `idt` checks available interfaces from `/sys/class/net/` as well
+    as allowing `any`.
 
 #### Artifacts
 
 Each ecosystem and platform involved in the capture will have their own
 subdirectory in the root artifact dir.
-
-To download your artifacts, run these commands from your admin computer:
-
-`idt_fetch_artifacts`
-
-On windows admin computers, you may use `FileZilla` to pull the archive listed
-at the end of output.
 
 ### Discovery
 
@@ -260,7 +237,7 @@ options:
                         Specify the type of discovery to execute
 ```
 
-#### ble
+#### BLE
 
 ```
 idt discover -t b
@@ -274,12 +251,89 @@ idt discover -t d
 
 #### Artifacts
 
-There is a per device log for ble scanning in `ble` subdirectory of the root
-artifact dir.
+There is a per device log in `ble` and `dnssd` subdirectory of the root artifact
+dir.
 
-[TODO] dnssd per device log
+### Probe
+
+```
+usage: idt probe [-h]
+
+options:
+  -h, --help  show this help message and exit
+```
+
+Collect contextually relevant networking info from the local environment and
+provide artifacts.
+
+## Troubleshooting
+
+-   Wireless `adb` may fail to connect indefinitely depending on network
+    configuration. Use a wired connection if wireless fails repeatedly.
+-   Change log level from `INFO` to `DEBUG` in root `config.py` for additional
+    logging.
+-   Compiling `tcpdump` for android may require additional dependencies.
+    -   If the build script fails for you, try
+        `idt_go && source idt/scripts/compilers.sh`.
+-   You may disable colors and splash by setting `enable_color` in `config.py`
+    to `False`.
+-   `idt_clean_child` will kill any stray `tcpdump` and `adb` commands.
+    -   `idt_check_child` will look for leftover processes.
+    -   Not expected to be needed outside of development scenarios.
+
+## Project overview
+
+-   The entry point is in `idt.py` which contains simple CLI parsing with
+    `argparse`.
+
+### `capture`
+
+-   `base` contains the base classes for ecosystems and platforms.
+-   `controller` contains the ecosystem and platform producer and controller
+-   `loader` is a generic class loader that dynamically imports classes matching
+    a given super class from a given directory.
+-   `/platform` and `/ecosystem` contain one package for each platform and
+    ecosystem, which should each contain one implementation of the respective
+    base class.
+
+### `discovery`
+
+-   `matter_ble` provides a simple ble scanner that shows matter devices being
+    discovered and lost, as well as their VID/PID, RSSI, etc.
+-   `matter_dnssd` provides a simple DNS-SD browser that searches for matter
+    devices and thread border routers.
+
+### `probe`
+
+-   `probe` contains the base class for (`idt`'s) host platform specific
+    implementation.
+    -   Reuses the dnssd discovery implementation to build probe targets.
+    -   Calls platform + addr type specific probe methods for each target.
+-   `linux` and `mac` contain `probe` implementations for each host platform.
+
+### `utils`
+
+-   `log` contains logging utilities used by everything in the project.
+-   `artifact` contains helper functions for managing artifacts.
+-   `shell` contains a simple helper class for background and foreground Bash
+    commands.
+-   `host_platform` contains helper functions for the interacting with the host
+    running `idt`.
+
+### Conventions
+
+-   `config.py` should be used to hold development configs within the directory
+    where they are needed.
+    -   It may also hold configs for flaky/cumbersome features that might need
+        to be disabled in an emergency.
+    -   `config.py` **should not** be used for everyday operation.
+-   When needed, execute builds in a folder called `BUILD` within the source
+    tree.
+    -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
 
 ## Extending functionality
+
+### Capture
 
 Ecosystem and Platform implementations are dynamically loaded.
 
@@ -299,14 +353,13 @@ $ idt capture -h
 usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
+> **IMPORTANT:** Note the following runtime expectations of ecosystems:  
+> `analyze_capture()` must not block the async event loop excessively and must
+> not interact with standard in
+
 The platform loader functions the same as `capture/ecosystem`.
 
 For each package in `capture/platform`, the platform loader expects a module
 name matching the package name.  
 This module must contain a single class which is a subclass of
 `capture.base.PlatformLogStreamer`.
-
-Note the following runtime expectations of platforms:
-
--   Start should be able to be called repeatedly without restarting streaming.
--   Stop should not cause an error even if the stream is not running.

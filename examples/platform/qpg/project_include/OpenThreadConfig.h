@@ -76,6 +76,7 @@
 
 #define OPENTHREAD_ENABLE_VENDOR_EXTENSION 0
 #define OPENTHREAD_EXAMPLES_SIMULATION 0
+#define OPENTHREAD_CONFIG_PLATFORM_BOOTLOADER_MODE_ENABLE 0
 
 // Use the Qorvo-supplied default platform configuration for remainder
 // of OpenThread config options.

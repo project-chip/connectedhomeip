@@ -135,8 +135,8 @@ CDFormat DetectCDFormat(const uint8_t * cd, uint32_t cdLen)
 {
     static const uint8_t cdRawPrefix1[] = { 0x30, 0x81 };
     static const uint8_t cdRawPrefix2[] = { 0x30, 0x82 };
-    static const char * cdHexPrefix     = "308";
-    static const char * cdB64Prefix     = "MI";
+    static const char cdHexPrefix[]     = "308";
+    static const char cdB64Prefix[]     = "MI";
 
     VerifyOrReturnError(cd != nullptr, kCDFormat_Unknown);
 

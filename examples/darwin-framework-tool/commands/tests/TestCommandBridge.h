@@ -41,7 +41,7 @@ const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
 const char * getScriptsFolder() { return basePath; }
 } // namespace
 
-inline constexpr const char * kDefaultKey = "default";
+inline constexpr char kDefaultKey[] = "default";
 
 @interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;

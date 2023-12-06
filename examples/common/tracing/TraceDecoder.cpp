@@ -28,31 +28,31 @@
 #include <transport/raw/MessageHeader.h>
 
 constexpr uint16_t kMaxLineLen    = 4096;
-constexpr const char * jsonPrefix = "    json\t";
+constexpr const char jsonPrefix[] = "    json\t";
 
 namespace chip {
 namespace trace {
 namespace {
 
 // Json keys
-constexpr const char * kProtocolIdKey         = "protocol_id";
-constexpr const char * kProtocolCodeKey       = "protocol_opcode";
-constexpr const char * kSessionIdKey          = "session_id";
-constexpr const char * kExchangeIdKey         = "exchange_id";
-constexpr const char * kMessageCounterKey     = "msg_counter";
-constexpr const char * kSecurityFlagsKey      = "security_flags";
-constexpr const char * kMessageFlagsKey       = "msg_flags";
-constexpr const char * kSourceNodeIdKey       = "source_node_id";
-constexpr const char * kDestinationNodeIdKey  = "dest_node_id";
-constexpr const char * kDestinationGroupIdKey = "group_id";
-constexpr const char * kExchangeFlagsKey      = "exchange_flags";
-constexpr const char * kIsInitiatorKey        = "is_initiator";
-constexpr const char * kNeedsAckKey           = "is_ack_requested";
-constexpr const char * kAckMsgKey             = "acknowledged_msg_counter";
-constexpr const char * kPayloadDataKey        = "payload_hex";
-constexpr const char * kPayloadSizeKey        = "payload_size";
-constexpr const char * kDirectionKey          = "direction";
-constexpr const char * kPeerAddress           = "peer_address";
+constexpr char kProtocolIdKey[]         = "protocol_id";
+constexpr char kProtocolCodeKey[]       = "protocol_opcode";
+constexpr char kSessionIdKey[]          = "session_id";
+constexpr char kExchangeIdKey[]         = "exchange_id";
+constexpr char kMessageCounterKey[]     = "msg_counter";
+constexpr char kSecurityFlagsKey[]      = "security_flags";
+constexpr char kMessageFlagsKey[]       = "msg_flags";
+constexpr char kSourceNodeIdKey[]       = "source_node_id";
+constexpr char kDestinationNodeIdKey[]  = "dest_node_id";
+constexpr char kDestinationGroupIdKey[] = "group_id";
+constexpr char kExchangeFlagsKey[]      = "exchange_flags";
+constexpr char kIsInitiatorKey[]        = "is_initiator";
+constexpr char kNeedsAckKey[]           = "is_ack_requested";
+constexpr char kAckMsgKey[]             = "acknowledged_msg_counter";
+constexpr char kPayloadDataKey[]        = "payload_hex";
+constexpr char kPayloadSizeKey[]        = "payload_size";
+constexpr char kDirectionKey[]          = "direction";
+constexpr char kPeerAddress[]           = "peer_address";
 
 bool IsOutbound(const Json::Value & json)
 {

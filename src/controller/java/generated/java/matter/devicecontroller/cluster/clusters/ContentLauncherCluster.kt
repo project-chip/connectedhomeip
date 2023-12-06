@@ -40,6 +40,8 @@ class ContentLauncherCluster(
     search: ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?,
+    playbackPreferences: ContentLauncherClusterPlaybackPreferencesStruct?,
+    useCurrentContext: Boolean?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
     val commandId = 0L
@@ -79,17 +81,6 @@ class ContentLauncherCluster(
 
   suspend fun readSupportedStreamingProtocolsAttribute(): UInt {
     // Implementation needs to be added here
-  }
-
-  suspend fun writeSupportedStreamingProtocolsAttribute(
-    value: ULong,
-    timedWriteTimeoutMs: Int? = null
-  ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
-    }
   }
 
   suspend fun subscribeSupportedStreamingProtocolsAttribute(

@@ -35,6 +35,8 @@ public:
     // ICDStateObserver
     void OnEnterActiveMode() override;
     void OnTransitionToIdle() override;
+    // No action is needed by the ReportScheduler on ICD operation Mode changes
+    void OnICDModeChange() override{};
 
     // ReadHandlerObserver
     void OnSubscriptionEstablished(ReadHandler * aReadHandler) final;
@@ -42,7 +44,7 @@ public:
     void OnSubscriptionReportSent(ReadHandler * aReadHandler) final;
     void OnReadHandlerDestroyed(ReadHandler * aReadHandler) override;
 
-    bool IsReportScheduled(ReadHandler * aReadHandler);
+    virtual bool IsReportScheduled(ReadHandler * aReadHandler);
 
     void ReportTimerCallback() override;
 

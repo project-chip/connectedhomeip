@@ -23,10 +23,17 @@
 namespace chip {
 namespace Credentials {
 
+// The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
+inline constexpr size_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
+
+// The TBSCerticate of a Network (Client) Identity has a fixed (smaller) size.
+inline constexpr size_t kNetworkIdentityTBSLength = 244;
+
 // Constants for Network (Client) Identities as per section 11.24 (Wi-Fi
 // Authentication with Per-Device Credentials) of the Matter spec.
-inline constexpr CharSpan kNetworkIdentityCN           = "*"_span;
-inline constexpr ByteSpan kNetworkIdentitySerialNumber = ByteSpan((uint8_t[1]){ 1 });
+inline constexpr CharSpan kNetworkIdentityCN                = "*"_span;
+inline constexpr uint8_t kNetworkIdentitySerialNumber       = 1;
+inline constexpr ByteSpan kNetworkIdentitySerialNumberBytes = ByteSpan((uint8_t[1]){ kNetworkIdentitySerialNumber });
 
 inline constexpr uint32_t kNetworkIdentityNotBeforeTime = 1;
 inline constexpr uint32_t kNetworkIdentityNotAfterTime  = kNullCertTime;
@@ -34,6 +41,12 @@ inline constexpr uint32_t kNetworkIdentityNotAfterTime  = kNullCertTime;
 inline constexpr auto kNetworkIdentityKeyUsage = BitFlags<KeyUsageFlags>(KeyUsageFlags::kDigitalSignature);
 inline constexpr auto kNetworkIdentityKeyPurpose =
     BitFlags<KeyPurposeFlags>(KeyPurposeFlags::kClientAuth, KeyPurposeFlags::kServerAuth);
+
+// Initializes a ChipDN as CN=kNetworkIdentityCN
+void InitNetworkIdentitySubject(ChipDN & name);
+
+// Emits a X.509 TBSCertificate for a Network (Client) Identity based on the specified key.
+CHIP_ERROR EncodeNetworkIdentityTBSCert(const Crypto::P256PublicKey & pubkey, ASN1::ASN1Writer & writer);
 
 } // namespace Credentials
 } // namespace chip

@@ -218,7 +218,11 @@ class {{filename}}: public TestCommandBridge
           {{/chip_tests_item_parameters}}
           [cluster writeAttribute{{>attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completion:^(NSError * _Nullable err) {
         {{/if}}
-            NSLog(@"{{label}} Error: %@", err);
+            if (err != nil) {
+              NSLog(@"{{label}}: Error: %@", err);
+            } else {
+              NSLog(@"{{label}}: Success");
+            }
 
             {{#chip_tests_item_responses}}
             {{#if error}}

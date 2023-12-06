@@ -27,9 +27,6 @@ static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronym
     switch (aEventId) {
         {{#zcl_events}}
         {{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
-        {{#if (isProvisional (asUpperCamelCase ../name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
-        #if MTR_ENABLE_PROVISIONAL
-        {{/if}}
         case Events::{{asUpperCamelCase name}}::Id: {
             Events::{{asUpperCamelCase name}}::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
@@ -52,9 +49,6 @@ static id _Nullable DecodeEventPayloadFor{{asUpperCamelCase name preserveAcronym
 
             return value;
         }
-        {{#if (isProvisional (asUpperCamelCase ../name preserveAcronyms=true) event=(asUpperCamelCase name preserveAcronyms=true))}}
-        #endif // MTR_ENABLE_PROVISIONAL
-        {{/if}}
         {{/if}}
         {{/zcl_events}}
         default: {

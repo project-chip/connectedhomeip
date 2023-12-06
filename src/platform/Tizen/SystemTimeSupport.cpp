@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <ctime>
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <system/SystemClock.h>
