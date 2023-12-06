@@ -26,7 +26,8 @@ import enum
 
 from chip.exceptions import ChipStackException
 
-from .delegate import AttributePath, AttributePathIBstruct, CommandPathIBStruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
+from .delegate import (AttributePath, AttributePathIBstruct, CommandPathIBStruct, DataVersionFilterIBstruct, EventPath,
+                       EventPathIBstruct)
 
 __all__ = ["AttributePath", "AttributePathIBstruct", "CommandPathIBStruct",
            "DataVersionFilterIBstruct", "EventPath", "EventPathIBstruct",

@@ -78,10 +78,13 @@ struct __attribute__((packed)) CommandPath
 class CommandSenderCallback : public CommandSender::Callback
 {
 public:
-    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) : mAppContext(appContext), mIsBatchedCommands(isBatchedCommands) {}
+    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
+        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
+    {}
 
-    void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                                      TLV::TLVReader * aData, const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                      const app::StatusIB & aStatus, TLV::TLVReader * aData,
+                                      const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
@@ -109,8 +112,8 @@ public:
         }
 
         chip::CommandRef commandRef = aAdditionalResponseData.mCommandRef.ValueOr(0);
-        size_t index = 0;
-        err = GetIndexFromCommandRef(commandRef, index);
+        size_t index                = 0;
+        err                         = GetIndexFromCommandRef(commandRef, index);
         if (err != CHIP_NO_ERROR && mIsBatchedCommands)
         {
             this->OnError(apCommandSender, err);
@@ -194,7 +197,8 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
-    std::unique_ptr<CommandSenderCallback> callback = std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/ false);
+    std::unique_ptr<CommandSenderCallback> callback =
+        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
@@ -234,8 +238,8 @@ exit:
 }
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                              uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
-                                              size_t n, ...)
+                                                   uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                                   size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -246,7 +250,8 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 
     // TODO I can also verify that exchanges is not for Group message
 
-    std::unique_ptr<CommandSenderCallback> callback = std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/ true);
+    std::unique_ptr<CommandSenderCallback> callback =
+        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
@@ -255,20 +260,20 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     va_start(args, n);
 
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
-    
+
     {
         for (size_t i = 0; i < n; i++)
         {
             void * commandPath = va_arg(args, void *);
-            void * tlv  = va_arg(args, void *);
-            int length  = va_arg(args, int);
+            void * tlv         = va_arg(args, void *);
+            int length         = va_arg(args, int);
 
             python::CommandPath invokeRequestInfoObj;
             memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
             uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
 
-            app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId, invokeRequestInfoObj.commandId,
-                                                 (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId,
+                                                 invokeRequestInfoObj.commandId, (app::CommandPathFlags::kEndpointIdValid) };
 
             CommandSender::AdditionalCommandParameters additionalParams;
 
@@ -321,8 +326,9 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
-    std::unique_ptr<CommandSenderCallback> callback = std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/ false);
-    std::unique_ptr<CommandSender> sender           = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
+    std::unique_ptr<CommandSenderCallback> callback =
+        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+    std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                                                             /* is timed request */ true, suppressResponse);
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
