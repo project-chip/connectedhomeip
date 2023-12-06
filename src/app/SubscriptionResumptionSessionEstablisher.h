@@ -25,18 +25,18 @@ namespace chip {
 namespace app {
 
 /**
- *  Helper to resume persistent subscription. A CASE session will be established upon invoking ResumeSubscription(),
- *  followed by the creation and intialization of a ReadHandler. This class helps prevent a scenario where all
- *  ReadHandlers in the pool grab the invalid session handle. In such scenario, if the device receives a new
- *  subscription request, it will crash as there is no evictable ReadHandler.
+ *  Session Esatblisher to resume persistent subscription. A CASE session will be established upon invoking
+ *  ResumeSubscription(), followed by the creation and intialization of a ReadHandler. This class helps prevent
+ *  a scenario where all ReadHandlers in the pool grab the invalid session handle. In such scenario, if the device
+ *  receives a new subscription request, it will crash as there is no evictable ReadHandler.
  */
 
-class SubscriptionResumptionHelper
+class SubscriptionResumptionSessionEstablisher
 {
 public:
-    SubscriptionResumptionHelper();
+    SubscriptionResumptionSessionEstablisher();
 
-    ~SubscriptionResumptionHelper() {}
+    ~SubscriptionResumptionSessionEstablisher() {}
 
     CHIP_ERROR ResumeSubscription(CASESessionManager & caseSessionManager,
                                   const SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);

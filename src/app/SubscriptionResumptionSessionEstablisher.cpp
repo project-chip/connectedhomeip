@@ -16,16 +16,16 @@
  */
 
 #include <app/InteractionModelEngine.h>
-#include <app/SubscriptionResumptionHelper.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 
 namespace chip {
 namespace app {
-SubscriptionResumptionHelper::SubscriptionResumptionHelper() :
+SubscriptionResumptionSessionEstablisher::SubscriptionResumptionSessionEstablisher() :
     mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
 
 CHIP_ERROR
-SubscriptionResumptionHelper::ResumeSubscription(CASESessionManager & caseSessionManager,
+SubscriptionResumptionSessionEstablisher::ResumeSubscription(CASESessionManager & caseSessionManager,
                                                  const SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo)
 {
     mSubscriptionInfo.mNodeId         = subscriptionInfo.mNodeId;
@@ -65,10 +65,10 @@ SubscriptionResumptionHelper::ResumeSubscription(CASESessionManager & caseSessio
     return CHIP_NO_ERROR;
 }
 
-void SubscriptionResumptionHelper::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                                          const SessionHandle & sessionHandle)
 {
-    SubscriptionResumptionHelper * _this                               = static_cast<SubscriptionResumptionHelper *>(context);
+    SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
@@ -89,9 +89,9 @@ void SubscriptionResumptionHelper::HandleDeviceConnected(void * context, Messagi
     delete _this;
 }
 
-void SubscriptionResumptionHelper::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
 {
-    SubscriptionResumptionHelper * _this                               = static_cast<SubscriptionResumptionHelper *>(context);
+    SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());

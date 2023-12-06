@@ -38,7 +38,7 @@
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
-#include <app/SubscriptionResumptionHelper.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -259,9 +259,10 @@ public:
      *
      *  @brief Initialize a ReadHandler for a resumed subsciption
      *
-     *  Used after the SubscriptionResumptionHelper establishs the CASE session
+     *  Used after the SubscriptionResumptionSessionEstablisher establishs the CASE session
      */
-    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper);
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle,
+                               SubscriptionResumptionSessionEstablisher & sessionEstablisher);
 #endif
 
 private:

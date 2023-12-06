@@ -1853,21 +1853,21 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             continue;
         }
 
-        auto subscriptionResumptionHelper = Platform::MakeUnique<SubscriptionResumptionHelper>();
-        if (subscriptionResumptionHelper == nullptr)
+        auto subscriptionResumptionSessionEstablisher = Platform::New<SubscriptionResumptionSessionEstablisher>();
+        if (subscriptionResumptionSessionEstablisher == nullptr)
         {
-            ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionHelper");
+            ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionSessionEstablisher");
             iterator->Release();
             return;
         }
 
-        if (subscriptionResumptionHelper->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) != CHIP_NO_ERROR)
+        if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) != CHIP_NO_ERROR)
         {
             ChipLogProgress(InteractionModel, "Failed to ResumeSubscription 0x%" PRIx32, subscriptionInfo.mSubscriptionId);
             iterator->Release();
+            Platform::Delete(subscriptionResumptionSessionEstablisher);
             return;
         }
-        subscriptionResumptionHelper.release();
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         resumedSubscriptions = true;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION

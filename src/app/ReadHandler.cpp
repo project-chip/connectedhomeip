@@ -88,7 +88,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mObserver = observer;
 }
 
-void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionHelper & helper)
+void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & helper)
 {
     mSubscriptionId          = helper.mSubscriptionInfo.mSubscriptionId;
     mMinIntervalFloorSeconds = helper.mSubscriptionInfo.mMinInterval;
