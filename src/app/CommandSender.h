@@ -69,20 +69,22 @@ public:
         virtual ~Callback() = default;
 
         /**
-         *
-         * OnDetailedResponse will be called when a successful response from server has been received and processed.
+         * OnResponseWithAdditionalData will be called when a successful response from the server has been received and processed.
          * Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
-         * This OnDetailedResponse is similar to OnResponse mentioned below, except it contains an additional parameter
+         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
          * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
-         * future to provide additional response data and only making changes to `AdditionalResponseData`, and not all the potential
-         * call sites.
+         * future to provide additional response data by only making changes to `AdditionalResponseData`, and not all the potential
+         * callees.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * It is advised that subclass should only override this or `OnResponse`. But, it shouldn't actually matter if both are
+         * overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -93,9 +95,9 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnDetailedResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                        const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                                        const AdditionalResponseData & aAdditionalResponseData)
+        virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                                  const AdditionalResponseData & aAdditionalResponseData)
         {
             OnResponse(apCommandSender, aPath, aStatusIB, apData);
         }
@@ -108,6 +110,9 @@ public:
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * It is advised that subclass should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
+         * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -174,7 +179,7 @@ public:
     };
 
     // PrepareCommand and FinishCommand are public SDK APIs, so we cannot break source
-    // compatibility for it. By having parameters to those APIs use this struct instead
+    // compatibility for them. By having parameters to those APIs use this struct instead
     // of individual function arguments, we centralize required changes to one file
     // when adding new functionality.
     struct AdditionalCommandParameters
@@ -191,9 +196,10 @@ public:
 
         // From the perspective of `PrepareCommand`, this is an out parameter. This value will be
         // set by `PrepareCommand` and is expected to be unchanged by caller until it is provided
-        // to the `FinishCommand`.
+        // to `FinishCommand`.
         Optional<uint16_t> mCommandRef;
-        // For both `PrepareCommand` and `FinishCommand` this is an in parameter.
+        // For both `PrepareCommand` and `FinishCommand` this is an in parameter. It must have
+        // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.
         bool mStartOrEndDataStruct = false;
     };
 
