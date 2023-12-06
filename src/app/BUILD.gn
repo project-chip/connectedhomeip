@@ -60,7 +60,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
-    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED"=${chip_enable_sending_batch_commands}",
+    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED=${chip_enable_sending_batch_commands}",
   ]
 
   visibility = [ ":app_config" ]
