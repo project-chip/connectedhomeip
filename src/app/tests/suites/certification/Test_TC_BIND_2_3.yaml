@@ -19,6 +19,7 @@ name:
 
 PICS:
     - BIND.C
+    - GRPKEY.C
 
 config:
     nodeId: 0x12344321

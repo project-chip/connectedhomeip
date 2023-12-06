@@ -72,8 +72,8 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
     // Add basic key, read it back, erase it
-    const char * kStringValue1 = "abcd";
-    err                        = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
+    static const char kStringValue1[] = "abcd";
+    err = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     memset(&buf[0], 0, sizeof(buf));
@@ -93,9 +93,9 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == actualSizeOfBuf);
 
     // Validate adding 2 different keys
-    const char * kStringValue2 = "0123abcd";
-    const char * kStringValue3 = "cdef89";
-    err                        = storage.SyncSetKeyValue("key2", kStringValue2, static_cast<uint16_t>(strlen(kStringValue2)));
+    static const char kStringValue2[] = "0123abcd";
+    static const char kStringValue3[] = "cdef89";
+    err = storage.SyncSetKeyValue("key2", kStringValue2, static_cast<uint16_t>(strlen(kStringValue2)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = storage.SyncSetKeyValue("key3", kStringValue3, static_cast<uint16_t>(strlen(kStringValue3)));
@@ -231,8 +231,8 @@ void TestBasicApi(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, 0 == memcmp(&buf[0], &all_zeroes[0], size));
 
     // Using key and value with base64 symbols
-    const char * kBase64SymbolsKey   = "key+/=";
-    const char * kBase64SymbolValues = "value+/=";
+    static const char kBase64SymbolsKey[]   = "key+/=";
+    static const char kBase64SymbolValues[] = "value+/=";
     err = storage.SyncSetKeyValue(kBase64SymbolsKey, kBase64SymbolValues, static_cast<uint16_t>(strlen(kBase64SymbolValues)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -318,8 +318,8 @@ void TestClearStorage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, size == sizeof(buf));
 
     // Add basic key, read it back
-    const char * kStringValue1 = "abcd";
-    err                        = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
+    static const char kStringValue1[] = "abcd";
+    err = storage.SyncSetKeyValue("roboto", kStringValue1, static_cast<uint16_t>(strlen(kStringValue1)));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, storage.GetNumKeys() == 1);
 

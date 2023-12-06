@@ -147,15 +147,16 @@ tests:
       verification: |
           On TH_CR2 send the below command
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool pairing onnetwork 2 20202021 --commissioner-name beta
 
           verify you got the following message in the TH_CR2(CHIP-TOOL) log
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          CHIP:TOO: Secure Pairing Failed
-          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+          [1700552012.724377][27528:27528] CHIP:DL: Inet Layer shutdown
+          [1700552012.724405][27528:27528] CHIP:DL: BLE shutdown
+          [1700552012.724445][27528:27528] CHIP:DL: System Layer shutdown
+          [1700552012.725294][27528:27528] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:589: CHIP Error 0x00000032: Timeout
       disabled: true
 
     - label:
@@ -268,13 +269,14 @@ tests:
       verification: |
           On TH_CR3 send the below command
 
-            Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
+          Below are the example command for using single RPI as multiple controller. Vendor should have the provision to use the equivalent command in their DUT or use multiple commissioners/controllers
 
           ./chip-tool pairing onnetwork 3 20202021 --commissioner-name gamma
 
-          verify you got the following message in the TH_CR3(Chip-tool) log
+          Verify you got the following message in the TH_CR3(Chip-tool) log
 
-          CHIP:SC: PASESession timed out while waiting for a response from the peer. Expected message type was 33
-          CHIP:TOO: Secure Pairing Failed
-          CHIP:TOO: Pairing Failure: ../../third_party/connectedhomeip/src/protocols/secure_channel/PASESession.cpp:324: CHIP Error 0x00000032: Timeout
+          [1700552012.724377][27528:27528] CHIP:DL: Inet Layer shutdown
+          [1700552012.724405][27528:27528] CHIP:DL: BLE shutdown
+          [1700552012.724445][27528:27528] CHIP:DL: System Layer shutdown
+          [1700552012.725294][27528:27528] CHIP:TOO: Run command failure: ../../examples/chip-tool/commands/common/CHIPCommand.cpp:589: CHIP Error 0x00000032: Timeout
       disabled: true

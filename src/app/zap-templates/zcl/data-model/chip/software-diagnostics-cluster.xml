@@ -30,7 +30,7 @@ limitations under the License.
     <code>0x0034</code>
     <define>SOFTWARE_DIAGNOSTICS_CLUSTER</define>
     <description>The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
-    <attribute side="server" code="0x00" define="THREAD_METRICS" type="ARRAY" entryType="ThreadMetricsStruct" length="254" writable="false" optional="true">ThreadMetrics</attribute>
+    <attribute side="server" code="0x00" define="THREAD_METRICS" type="array" entryType="ThreadMetricsStruct" length="254" writable="false" optional="true">ThreadMetrics</attribute>
     <attribute side="server" code="0x01" define="CURRENT_HEAP_FREE" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapFree</attribute>
     <attribute side="server" code="0x02" define="CURRENT_HEAP_USED" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapUsed</attribute>
     <attribute side="server" code="0x03" define="CURRENT_HEAP_HIGH_WATERMARK" type="int64u" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">CurrentHeapHighWatermark</attribute>

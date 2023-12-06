@@ -102,6 +102,7 @@ limitations under the License.
     <type id="0xF5" description="IPv6 Prefix"              name="ipv6pre"                     composite="true"/>
     <type id="0xF6" description="Hardware Address"         name="hwadr"                       composite="true"/>
 
+    <!-- TODO: Spec marks these as "compositte" yet they are set "discrete" here -->
     <type id="0xC9" description="Semantic Tag"             name="semtag"            size="4"  discrete="true" />
     <type id="0xCA" description="Namespace"                name="namespace"         size="1"  discrete="true" />
     <type id="0xCB" description="Tag"                      name="tag"               size="1"  discrete="true" />
