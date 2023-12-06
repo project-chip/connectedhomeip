@@ -132,6 +132,30 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
         params.SetDSTOffsets(mDSTOffsetList);
     }
 
+    if (!mSkipICDRegistration.ValueOr(false))
+    {
+        params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+
+        if (!mICDSymmetricKey.HasValue())
+        {
+            chip::Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
+        }
+        if (!mICDCheckInNodeId.HasValue())
+        {
+            mICDCheckInNodeId.SetValue(CurrentCommissioner().GetNodeId());
+        }
+        if (!mICDMonitoredSubject.HasValue())
+        {
+            mICDMonitoredSubject.SetValue(mICDCheckInNodeId.Value());
+        }
+        // These Optionals must have values now.
+        // The commissioner will verify these values.
+        params.SetICDSymmetricKey(mICDSymmetricKey.Value());
+        params.SetICDCheckInNodeId(mICDCheckInNodeId.Value());
+        params.SetICDMonitoredSubject(mICDMonitoredSubject.Value());
+    }
+
     return params;
 }
 
@@ -365,6 +389,28 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
 
     SetCommandExitStatus(err);
+}
+
+void PairingCommand::OnICDRegistrationInfoRequired()
+{
+    // Since we compute our ICD Registration info up front, we can call ICDRegistrationInfoReady() directly.
+    CurrentCommissioner().ICDRegistrationInfoReady();
+}
+
+void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
+{
+    char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
+
+    chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                               sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+
+    // TODO: Persist symmetric key.
+
+    ChipLogProgress(chipTool,
+                    "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
+                    ChipLogValueX64(nodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
 }
 
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)

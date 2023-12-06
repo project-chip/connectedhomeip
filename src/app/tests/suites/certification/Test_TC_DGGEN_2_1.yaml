@@ -29,16 +29,11 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: int64u
         defaultValue: "0x0000000000000003"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
     - label: "Step 1a: Reset Devices to factory defaults"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
@@ -56,6 +51,16 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Step 1a: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
 
     - label: "Step 1b: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -393,6 +398,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFE
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
     - label: "Wait for 2 hours and 5 minutes."
       PICS: DGGEN.S.A0003
       cluster: "DelayCommands"
@@ -432,6 +438,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    - label: "Step 10b: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -451,6 +467,7 @@ tests:
           constraints:
               type: int32u
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
     - label: "Wait for 1 hour 5 minutes."
       PICS: DGGEN.S.A0003
       cluster: "DelayCommands"

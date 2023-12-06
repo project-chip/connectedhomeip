@@ -26,7 +26,7 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-constexpr const char * kDefaultKey = "default";
+constexpr char kDefaultKey[] = "default";
 
 CHIP_ERROR DelayCommands::WaitForMs(const char * identity,
                                     const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)

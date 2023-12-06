@@ -880,7 +880,7 @@ class ChipDeviceControllerBase():
         return None
 
     async def WriteAttribute(self, nodeid: int,
-                             attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]],
+                             attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                              timedRequestTimeoutMs: typing.Union[None, int] = None,
                              interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
@@ -897,7 +897,7 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - [PyChipError] (list - one for each pth)
+            - [AttributeStatus] (list - one for each pth)
         '''
         self.CheckIsActive()
 

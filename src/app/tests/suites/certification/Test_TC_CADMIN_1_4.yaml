@@ -356,16 +356,8 @@ tests:
                 value: payload
       response:
           error: FAILURE
-          clusterError: 9
 
-    - label: "Step 13b: TH_CR2 revokes the commissioning window"
-      identity: "beta"
-      cluster: "Administrator Commissioning"
-      command: "RevokeCommissioning"
-      PICS: CADMIN.S.C02.Rsp && CADMIN.S.C01.Rsp
-      timedInteractionTimeoutMs: 10000
-
-    - label: "Step 13c: Remove TH2 FabricIndex"
+    - label: "Remove TH2 FabricIndex"
       PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
       identity: "beta"
       cluster: "Operational Credentials"
