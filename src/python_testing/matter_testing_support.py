@@ -616,7 +616,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             Test description is defined in the function called desc_<functionname>.
             ex for test test_TC_TEST_1_1, the steps are in a function called
-            steps_TC_TEST_1_1.
+            desc_TC_TEST_1_1.
 
             Format:
             <Test plan reference> [<test plan number>] <test plan name>
