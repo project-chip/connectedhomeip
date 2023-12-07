@@ -121,15 +121,9 @@
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
@@ -175,12 +169,8 @@
             "SpecificationVersion",
             "MaxPathsPerInvoke"
         ],
-        "Bridged Device Basic Information": [
-            "ProductAppearance"
-        ],
-        "Descriptor": [
-            "ClusterRevision"
-        ],
+        "Bridged Device Basic Information": ["ProductAppearance"],
+        "Descriptor": ["ClusterRevision"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -319,19 +309,10 @@
             "CurrentMaxRate",
             "OverrunCount"
         ],
-        "Channel": [
-            "Lineup",
-            "CurrentChannel"
-        ],
-        "Media Playback": [
-            "SampledPosition"
-        ],
-        "Application Launcher": [
-            "CurrentApp"
-        ],
-        "Application Basic": [
-            "Application"
-        ],
+        "Channel": ["Lineup", "CurrentChannel"],
+        "Media Playback": ["SampledPosition"],
+        "Application Launcher": ["CurrentApp"],
+        "Application Basic": ["Application"],
         "Time Synchronization": [
             "TrustedTimeSource",
             "DefaultNTP",
@@ -343,12 +324,7 @@
             "TimeZoneListMaxSize",
             "DSTOffsetListMaxSize"
         ],
-        "Temperature Control": [
-            "SupportedTemperatureLevels"
-        ],
-        "Laundry Dryer Controls": [
-            "SupportedDrynessLevels"
-        ],
+        "Temperature Control": ["SupportedTemperatureLevels"],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -356,11 +332,7 @@
             "OnMode",
             "FeatureMap"
         ],
-        "Microwave Oven Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -563,20 +535,10 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": [
-            "AirQuality",
-            "FeatureMap"
-        ]
+        "Air Quality": ["AirQuality", "FeatureMap"]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": [
-        "ARRAY",
-        "BITMAP",
-        "ENUM",
-        "NUMBER",
-        "STRING",
-        "STRUCT"
-    ],
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
