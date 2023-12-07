@@ -76,9 +76,7 @@ class TxtRecordParser:
 
 
 def unwrap_str(to_unwrap: str) -> str:
-    to_unwrap = to_unwrap.replace("\n", " ")
-    to_unwrap = to_unwrap.replace("\t", " ")
-    return re.sub(' +', ' ', to_unwrap)
+    return re.sub(r"\s+", ' ', to_unwrap)
 
 
 # TODO: Thread parser

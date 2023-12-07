@@ -22,8 +22,6 @@ from utils.shell import Bash, log
 from . import config
 
 _LOGGER = log.get_logger(__file__)
-_URLS_FILE = os.path.join(os.path.dirname(__file__), "urls.txt")
-_URLS_FILE_EXISTS = os.path.exists(_URLS_FILE)
 
 
 class PlayServicesProber:
@@ -68,12 +66,12 @@ class PlayServicesProber:
         self.platform.run_adb_command(f"shell ping -c 4 {self.target} {self.command_suffix}")
 
     async def probe_services(self) -> None:
-        if _URLS_FILE_EXISTS:
-            with open(_URLS_FILE) as urls_file:
-                for line in urls_file:
-                    self.target = line
-                    self.logger.info(f"Probing {self.target}")
-                    for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
-                        await getattr(self, probe_func)()
-        else:
+        if not os.path.exists(config.prober_urls_file_name):
             self.logger.info("No probe targets configured")
+            return
+        with open(config.prober_urls_file_name) as urls_file:
+            for line in urls_file:
+                self.target = line
+                self.logger.info(f"Probing {self.target}")
+                for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
+                    await getattr(self, probe_func)()
