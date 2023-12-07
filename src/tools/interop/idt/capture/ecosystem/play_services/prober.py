@@ -25,6 +25,7 @@ _LOGGER = log.get_logger(__file__)
 _URLS_FILE = os.path.join(os.path.dirname(__file__), "urls.txt")
 _URLS_FILE_EXISTS = os.path.exists(_URLS_FILE)
 
+
 class PlayServicesProber:
 
     def __init__(self, platform, artifact_dir):
