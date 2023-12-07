@@ -390,7 +390,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         if (mDeviceIsICD)
         {
             CHIP_ERROR deleteEntryError =
-                GetICDClientStorage().DeleteEntry(chip::ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
+                GetICDClientStorage().DeleteEntry(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
             if (deleteEntryError != CHIP_NO_ERROR)
             {
                 ChipLogError(chipTool, "Failed to delete ICD entry: %s", ErrorStr(err));
