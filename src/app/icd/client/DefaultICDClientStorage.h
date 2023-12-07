@@ -52,6 +52,10 @@ public:
 
     ICDClientInfoIterator * IterateICDClientInfo() override;
 
+   /**
+     * In order to add an ICD ClientInfo to the ClientInfoStore using its fabric index as the key and further iterate clientInfos in storage,
+     * this function need to store fabric index in dedicated table.
+     */
     CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
