@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP ICD handler which handles unsolicited checkin messages.
+ *      This file defines objects for a CHIP ICD handler which handles unsolicited Check-In messages.
  *
  */
 
@@ -37,6 +37,9 @@
 namespace chip {
 namespace app {
 
+inline constexpr uint32_t kCheckInCounterMax = UINT32_MAX;
+inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
+
 CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
                                        CheckInDelegate * delegate)
 {
@@ -44,9 +47,11 @@ CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeMana
     VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mpExchangeManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpICDClientStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     mpExchangeManager  = exchangeManager;
     mpICDClientStorage = clientStorage;
     mpCheckInDelegate  = delegate;
+
     return mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this);
 }
 
@@ -58,6 +63,7 @@ void CheckInMessageHandler::Shutdown()
         mpExchangeManager = nullptr;
     }
 }
+
 CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
 {
     // Return error for wrong message type
@@ -76,10 +82,18 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
-    bool needRefreshKey = false;
-    VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, needRefreshKey),
+    uint32_t counter = 0;
+    VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_ERROR_INCORRECT_STATE);
-    mpCheckInDelegate->OnCheckInComplete(clientInfo, needRefreshKey);
+    auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
+    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_SIGNATURE);
+    clientInfo.offset = counter - clientInfo.start_icd_counter;
+    bool refreshKey   = false;
+    if (checkInCounter > kKeyRefreshLimit)
+    {
+        refreshKey = true;
+    }
+    mpCheckInDelegate->OnCheckInComplete(clientInfo, refreshKey);
     return CHIP_NO_ERROR;
 }
 

@@ -19,13 +19,13 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SessionManager.h>
 
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CheckinMessage.h>
+#include <transport/SessionManager.h>
 
 using namespace chip;
 using namespace app;
@@ -218,27 +218,39 @@ void TestProcessCheckInPayload(nlTestSuite * apSuite, void * apContext)
     err = manager.UpdateFabricList(fabricId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // Populate clientInfo
-    ICDClientInfo clientInfo1;
-    clientInfo1.peer_node = ScopedNodeId(nodeId, fabricId);
+    ICDClientInfo clientInfo;
+    clientInfo.peer_node = ScopedNodeId(nodeId, fabricId);
 
-    err = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
+    err = manager.SetKey(clientInfo, ByteSpan(kKeyBuffer1));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreEntry(clientInfo1);
+    err = manager.StoreEntry(clientInfo);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t counter                  = 1;
     System::PacketBufferHandle buffer = MessagePacketBuffer::New(chip::Protocols::SecureChannel::CheckinMessage::sMinPayloadSize);
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
-    err = chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(clientInfo1.shared_key, counter, ByteSpan(),
+    err = chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(clientInfo.shared_key, counter, ByteSpan(),
                                                                                         output);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
-    ICDClientInfo clientInfo;
+    ICDClientInfo decodeClientInfo;
+    uint32_t checkInCounter = 0;
     ByteSpan payload{ buffer->Start(), buffer->DataLength() };
-    bool refreshKey;
-    err = manager.ProcessCheckInPayload(payload, clientInfo, refreshKey);
+    err = manager.ProcessCheckInPayload(payload, decodeClientInfo, checkInCounter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    // 2. Use a key not available in the storage for encoding
+    err = manager.SetKey(clientInfo, ByteSpan(kKeyBuffer2));
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = chip::Protocols::SecureChannel::CheckinMessage::GenerateCheckinMessagePayload(clientInfo.shared_key, counter, ByteSpan(),
+                                                                                        output);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    buffer->SetDataLength(static_cast<uint16_t>(output.size()));
+    ByteSpan payload1{ buffer->Start(), buffer->DataLength() };
+    err = manager.ProcessCheckInPayload(payload1, decodeClientInfo, checkInCounter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_FOUND);
 }
 
 /**
