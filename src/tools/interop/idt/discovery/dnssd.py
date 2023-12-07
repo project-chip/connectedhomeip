@@ -59,7 +59,7 @@ _TREL_SERVICE_INFO = ServiceTypeInfo(
     "A service for Thread Radio Encapsulation Link which is a method for thread BRs to exchange data on IP links."
 )
 
-_SERVICE_INFO = {
+_SERVICE_TYPE_INFO = {
     "_matterd._udp.local.": _COMMISSIONER_SERVICE_INFO,
     "_matterc._udp.local.": _COMMISSIONABLE_SERVICE_INFO,
     "_matter._tcp.local.": _OPERATIONAL_SERVICE_INFO,
@@ -315,8 +315,8 @@ class MatterDnssdListener(ServiceListener):
         to_log = "SERVICE EVENT\n"
         to_log += f"{name}\n"
         to_log += f"SERVICE {delta_type}\n"
-        to_log += _SERVICE_INFO[type_].type + "\n"
-        to_log += _SERVICE_INFO[type_].description + "\n"
+        to_log += _SERVICE_TYPE_INFO[type_].type + "\n"
+        to_log += _SERVICE_TYPE_INFO[type_].description + "\n"
         info = zc.get_service_info(type_, name)
         if info is not None:
             self.discovered_matter_devices[name] = info
@@ -339,8 +339,8 @@ class MatterDnssdListener(ServiceListener):
     def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         to_log = "SERVICE_EVENT\n"
         to_log += f"Service {name} removed\n"
-        to_log += _SERVICE_INFO[type_].type + "\n"
-        to_log += _SERVICE_INFO[type_].description
+        to_log += _SERVICE_TYPE_INFO[type_].type + "\n"
+        to_log += _SERVICE_TYPE_INFO[type_].description
         if name in self.discovered_matter_devices:
             del self.discovered_matter_devices[name]
         self.logger.warning(to_log)
@@ -348,7 +348,7 @@ class MatterDnssdListener(ServiceListener):
 
     def browse_interactive(self) -> None:
         zc = Zeroconf()
-        ServiceBrowser(zc, list(_SERVICE_INFO.keys()), self)
+        ServiceBrowser(zc, list(_SERVICE_TYPE_INFO.keys()), self)
         try:
             self.logger.warning(
                 dedent("\
@@ -363,7 +363,7 @@ class MatterDnssdListener(ServiceListener):
 
     async def browse_once(self, browse_time_seconds: int) -> Zeroconf:
         zc = Zeroconf()
-        ServiceBrowser(zc, list(_SERVICE_INFO.keys()), self)
+        ServiceBrowser(zc, list(_SERVICE_TYPE_INFO.keys()), self)
         await asyncio.sleep(browse_time_seconds)
         zc.close()
         return zc
