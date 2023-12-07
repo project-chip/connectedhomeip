@@ -254,7 +254,6 @@ private:
     char * mDiscoveryFilterInstanceName;
 
     bool mDeviceIsICD;
-    uint32_t mICDCounter;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     // For unpair

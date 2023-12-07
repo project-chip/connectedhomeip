@@ -383,54 +383,23 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
-        if (mDeviceIsICD)
-        {
-            PersistIcdInfo();
-        }
         ChipLogProgress(chipTool, "Device commissioning completed with success");
     }
     else
     {
+        if (mDeviceIsICD)
+        {
+            CHIP_ERROR deleteEntryError =
+                GetICDClientStorage().DeleteEntry(chip::ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
+            if (deleteEntryError != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "Failed to delete ICD entry: %s", ErrorStr(err));
+            }
+        }
         ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
     SetCommandExitStatus(err);
-}
-
-void PairingCommand::PersistIcdInfo()
-{
-    char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
-
-    chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                               sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-
-    chip::app::ICDClientInfo clientInfo;
-    clientInfo.peer_node         = chip::ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex());
-    clientInfo.monitored_subject = mICDMonitoredSubject.Value();
-    CHIP_ERROR err               = GetICDClientStorage().SetKey(clientInfo, mICDSymmetricKey.Value());
-    if (err == CHIP_NO_ERROR)
-    {
-        err = GetICDClientStorage().StoreEntry(clientInfo);
-    }
-
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(mNodeId));
-    }
-    else
-    {
-        // StoreEntry is unlikely to fail since it is a local operation for CHIP Tool.
-        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(mNodeId),
-                     err.AsString());
-        SetCommandExitStatus(err);
-        return;
-    }
-
-    ChipLogProgress(chipTool,
-                    "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
-                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
-                    ChipLogValueX64(mNodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
-                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
 }
 
 void PairingCommand::OnICDRegistrationInfoRequired()
@@ -442,10 +411,36 @@ void PairingCommand::OnICDRegistrationInfoRequired()
 
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
 {
-    // Note: For chip-tool, it is OK to persist the information in `OnCommissioningComplete`.
-    // For some real world cases, we may want to save the information and revert it if further
-    // commissioning steps failed so we won't miss any check-in messages.
-    mICDCounter = icdCounter;
+    char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
+
+    chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
+                               sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+
+    chip::app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = chip::ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
+    clientInfo.monitored_subject = mICDMonitoredSubject.Value();
+
+    CHIP_ERROR err = GetICDClientStorage().SetKey(clientInfo, mICDSymmetricKey.Value());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = GetICDClientStorage().StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // StoreEntry is unlikely to fail since it is a local operation for CHIP Tool.
+        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+                     ErrorStr(err));
+        SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
+    ChipLogProgress(chipTool,
+                    "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
+                    " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
+                    ChipLogValueX64(nodeId), ChipLogValueX64(mICDCheckInNodeId.Value()),
+                    ChipLogValueX64(mICDMonitoredSubject.Value()), icdSymmetricKeyHex);
 }
 
 void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
