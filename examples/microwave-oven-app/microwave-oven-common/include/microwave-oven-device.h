@@ -93,7 +93,7 @@ public:
     uint8_t GetPowerStep() const override { return kDefaultPowerStep; }
 
     // delegates from OperationalState cluster
-    using ModeTagStructType              = detail::Structs::ModeTagStruct::Type;
+    using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
     /**
      * Get the countdown time.
      * return actual cook time.
@@ -197,7 +197,6 @@ private:
     ModeBase::Instance mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
-
     // MicrowaveOvenMode types
     ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
     ModeTagStructType modeTagsDefrost[1] = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kDefrost) } };
@@ -234,8 +233,6 @@ private:
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-
 
 void MatterMicrowaveOvenServerInit();
 
