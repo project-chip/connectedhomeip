@@ -155,6 +155,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 
     // Retrieve first entry
     err = loading.Get(0, entry);
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
@@ -176,6 +177,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 
     // Remove first entry
     saving.Remove(0);
+
     ICDMonitoringEntry entry4(&keystore);
     entry4.checkInNodeID    = kClientNodeId13;
     entry4.monitoredSubject = kClientNodeId11;

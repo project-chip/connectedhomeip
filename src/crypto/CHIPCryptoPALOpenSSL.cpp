@@ -2343,5 +2343,24 @@ exit:
     return err;
 }
 
+void GetByteSpanFromSymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & keyHandle, ByteSpan & byteSpan)
+{
+    byteSpan = ByteSpan(keyHandle.As<Symmetric128BitsKeyByteArray>());
+}
+
+CHIP_ERROR GetSymmetric128BitsKeyHandleFromByteSpan(Symmetric128BitsKeyHandle & keyHandle, const ByteSpan & byteSpan)
+{
+    VerifyOrReturnError(byteSpan.size() == sizeof(Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+    memcpy(keyHandle.AsMutable<Symmetric128BitsKeyByteArray>(), byteSpan.data(), sizeof(Symmetric128BitsKeyByteArray));
+
+    return CHIP_NO_ERROR;
+}
+
+void CopySymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & from, Symmetric128BitsKeyHandle & to)
+{
+    memcpy(to.AsMutable<Symmetric128BitsKeyByteArray>(), from.As<Symmetric128BitsKeyByteArray>(),
+           sizeof(Symmetric128BitsKeyByteArray));
+}
+
 } // namespace Crypto
 } // namespace chip

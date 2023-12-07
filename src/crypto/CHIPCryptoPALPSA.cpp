@@ -1057,5 +1057,23 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
     return CHIP_NO_ERROR;
 }
 
+void GetByteSpanFromSymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & keyHandle, ByteSpan & byteSpan)
+{
+    byteSpan = ByteSpan(keyHandle.As<psa_key_id_t>());
+}
+
+CHIP_ERROR GetSymmetric128BitsKeyHandleFromByteSpan(Symmetric128BitsKeyHandle & keyHandle, const ByteSpan & byteSpan)
+{
+    VerifyOrReturnError(byteSpan.size() == sizeof(psa_key_id_t), CHIP_ERROR_INTERNAL);
+    memcpy(keyHandle.AsMutable<psa_key_id_t>(), buf.data(), sizeof(psa_key_id_t));
+
+    return CHIP_NO_ERROR;
+}
+
+void CopySymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & from, Symmetric128BitsKeyHandle & to)
+{
+    memcpy(to.AsMutable<psa_key_id_t>(), from.As<psa_key_id_t>(), sizeof(psa_key_id_t));
+}
+
 } // namespace Crypto
 } // namespace chip

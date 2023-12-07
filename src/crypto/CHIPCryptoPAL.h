@@ -1688,6 +1688,12 @@ CHIP_ERROR ExtractSubjectFromX509Cert(const ByteSpan & certificate, MutableByteS
  **/
 CHIP_ERROR ExtractIssuerFromX509Cert(const ByteSpan & certificate, MutableByteSpan & issuer);
 
+void GetByteSpanFromSymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & keyHandle, ByteSpan & byteSpan);
+
+CHIP_ERROR GetSymmetric128BitsKeyHandleFromByteSpan(Symmetric128BitsKeyHandle & keyHandle, const ByteSpan & byteSpan);
+
+void CopySymmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle & from, Symmetric128BitsKeyHandle & to);
+
 /**
  * @brief Checks for resigned version of the certificate in the list and returns it.
  *
