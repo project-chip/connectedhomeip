@@ -326,11 +326,11 @@ public:
     /**
      *  Activate the idle subscription.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `IdleSubscription` state and
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
      * resubscription can be triggered via OnActiveModeNotification().
      *
-     *  If the subscription is not in `IdleSubscription` state, this function will do nothing. So it is always safe to call this
-     * function when a check-in message is received.
+     *  If the subscription is not in `InactiveICDSubscription` state, this function will do nothing. So it is always safe to call
+     * this function when a check-in message is received.
      */
     void OnActiveModeNotification();
 
@@ -488,7 +488,7 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
-        IdleSubscription,          ///< The client is ICD and is sleeping
+        InactiveICDSubscription,   ///< The client is ICD and is sleeping
     };
 
     enum class ReportType
@@ -513,7 +513,7 @@ private:
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
-    bool IsIdleSubscription() const { return mState == ClientState::IdleSubscription; }
+    bool IsInactiveICDSubscription() const { return mState == ClientState::InactiveICDSubscription; }
     bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
@@ -531,7 +531,7 @@ private:
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
-    void TriggerResubscription();
+    void TriggerResubscription(CHIP_ERROR aReason);
 
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);

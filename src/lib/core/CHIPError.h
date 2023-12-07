@@ -618,7 +618,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
 
-// AVAILABLE: 0x16
+/**
+ *  @def CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT
+ *
+ *  @brief
+ *    Subscription timeout caused by ICD device inactive mode 
+ *
+ */
+#define CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT                     CHIP_CORE_ERROR(0x16)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE

@@ -223,8 +223,8 @@ const char * ReadClient::GetStateStr() const
         return "AwaitingSubscribeResponse";
     case ClientState::SubscriptionActive:
         return "SubscriptionActive";
-    case ClientState::IdleSubscription:
-        return "IdleSubscription";
+    case ClientState::InactiveICDSubscription:
+        return "InactiveICDSubscription";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -432,9 +432,10 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // Simply do nothing if the subscription is not at `IdleSubscription` state.
-    VerifyOrReturn(IsIdleSubscription());
-    TriggerResubscription();
+    // Simply do nothing if the subscription is not at `InactiveICDSubscription` state.
+    VerifyOrReturn(IsInactiveICDSubscription());
+    MoveToState(ClientState::Idle);
+    TriggerResubscription(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -904,20 +905,21 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
+    CHIP_ERROR reason = CHIP_ERROR_TIMEOUT;
     if (_this->mIsPeerICD)
     {
-        // If the device is idle, we mark the subscription as "IdleSubscription", and trigger resubscription on
-        // `OnActiveModeNotification`. Note: the liveness timeout is always longer than the MaxInterval (and idle duration), so we
-        // can move the device to `IdleSubcription` when liveness timeout is reached.
-        ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as IdleSubscription.");
-        _this->MoveToState(ClientState::IdleSubscription);
-        return;
+        // If the device is idle, we mark the subscription as "InactiveICDSubscription", readClient consumer decides whether it goes
+        // with retry or resubscription is triggered on `OnActiveModeNotification`. Note: the liveness timeout is always longer than
+        // the MaxInterval (and idle duration), so we can move the device to `IdleSubcription` when liveness timeout is reached.
+        ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
+        _this->MoveToState(ClientState::InactiveICDSubscription);
+        reason = CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
 
-    _this->TriggerResubscription();
+    _this->TriggerResubscription(reason);
 }
 
-void ReadClient::TriggerResubscription()
+void ReadClient::TriggerResubscription(CHIP_ERROR aReason)
 {
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
@@ -941,9 +943,7 @@ void ReadClient::TriggerResubscription()
         });
     }
 
-    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
-    // response timeouts).
-    Close(CHIP_ERROR_TIMEOUT);
+    Close(aReason);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)
@@ -1128,6 +1128,12 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
 CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
+    if (aTerminationCause == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT)
+    {
+        ChipLogProgress(DataManagement, "ICD device is inactive, not resubscribe within DefaultResubscribePolicy");
+        return CHIP_NO_ERROR;
+    }
+
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
     auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
@@ -1136,8 +1142,7 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
                     "ms due to error %" CHIP_ERROR_FORMAT,
                     GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()), mNumRetries, timeTillNextResubscription,
                     aTerminationCause.Format());
-    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
-    return CHIP_NO_ERROR;
+    return ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT);
 }
 
 void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,

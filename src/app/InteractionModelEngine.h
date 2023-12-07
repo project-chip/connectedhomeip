@@ -241,7 +241,7 @@ public:
     /**
      *  Activate the idle subscriptions.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to `IdleSubscription` state and
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
      * resubscription can be triggered via OnActiveModeNotification().
      */
     void OnActiveModeNotification(ScopedNodeId aPeer);
