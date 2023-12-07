@@ -37,8 +37,8 @@ tests:
       response:
           constraints:
               type: int16u
-              minValue: 4
-              maxValue: 5
+              minValue: 5
+              maxValue: 6
 
     - label: "Step 3a: Read the global attribute: FeatureMap"
       command: "readAttribute"
