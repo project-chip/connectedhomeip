@@ -193,7 +193,7 @@ public:
     ~TestAesKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Aes128BitsKeyHandle key;
+    Aes128KeyHandle key;
 };
 
 struct TestHmacKey
@@ -211,7 +211,7 @@ public:
     ~TestHmacKey() { keystore.DestroyKey(key); }
 
     DefaultSessionKeystore keystore;
-    Hmac128BitsKeyHandle key;
+    Hmac128KeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
@@ -899,16 +899,16 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
+static void TestHMAC_SHA256_RawKey(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_raw_key);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
-        hmac_sha256_vector v = hmac_sha256_test_vectors[numOfTestsExecuted];
+        hmac_sha256_vector v = hmac_sha256_test_vectors_raw_key[numOfTestsExecuted];
         size_t out_length    = v.output_hash_length;
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
@@ -916,6 +916,37 @@ static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
         mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
+}
+
+static void TestHMAC_SHA256_KeyHandle(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_key_handle);
+    int numOfTestsExecuted = 0;
+    TestHMAC_sha mHMAC;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hmac_sha256_vector v = hmac_sha256_test_vectors_key_handle[numOfTestsExecuted];
+        size_t out_length    = v.output_hash_length;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
+        out_buffer.Alloc(out_length);
+        NL_TEST_ASSERT(inSuite, out_buffer);
+        Crypto::DefaultSessionKeystore keystore;
+
+        Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(keyMaterial, v.key, v.key_length);
+
+        Hmac128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+
+        keystore.DestroyKey(keyHandle);
     }
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
 }
@@ -2970,7 +3001,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-    NL_TEST_DEF("Test HMAC SHA 256", TestHMAC_SHA256),
+    NL_TEST_DEF("Test HMAC SHA 256 - Raw Key", TestHMAC_SHA256_RawKey),
+    NL_TEST_DEF("Test HMAC SHA 256 - Key Handle", TestHMAC_SHA256_KeyHandle),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),

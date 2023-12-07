@@ -67,6 +67,8 @@
         "Disabled because darwin-framework-tool does not handle substraction in parameters",
         "Test_TC_S_2_3",
         "TestScenesMultiFabric",
-        "TestScenesFabricSceneInfo"
+        "TestScenesFabricSceneInfo",
+        "#30759: Darwin chip-tool does not support ICD registration during commissioning",
+        "TestIcdManagementCluster"
     ]
 }
