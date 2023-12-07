@@ -1,20 +1,22 @@
 # The Operational State cluster and its derived clusters
 
-The Operational State cluster is a normal cluster with ID 0x0060.
-It is also a base cluster from with other operational state clusters are derived.
+The Operational State cluster is a normal cluster with ID 0x0060. It is also a
+base cluster from with other operational state clusters are derived.
 
 ## How to use an Operational State cluster
 
-All Operational State derived clusters have their own `Instance` class within their respective namespace.
-This class is used to manage the SDK side of the cluster.
-This class requires an `OperationalState::Delegate` where the application specific logic is implemented.
+All Operational State derived clusters have their own `Instance` class within
+their respective namespace. This class is used to manage the SDK side of the
+cluster. This class requires an `OperationalState::Delegate` where the
+application specific logic is implemented.
 
 To use an Operational State cluster
 
 -   Create a class that inherits the `OperationalState::Delegate` class.
 -   For this class, implement the necessary virtual methods.
 -   In some translation unit (.c or .cpp file), instantiate the delegate class.
--   Instantiate the `Instance` class for your Operational State cluster using the delegate instance.
+-   Instantiate the `Instance` class for your Operational State cluster using
+    the delegate instance.
 -   Call the `Init()` method of your instance after the root `Server::Init()`.
 -   Alternatively, the last two steps can be done in the
     `emberAf<ClusterName>ClusterInitCallback` function.
