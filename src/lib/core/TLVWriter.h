@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include <lib/core/TLVTags.h>
+
 #include "TLVCommon.h"
 
 #include "TLVBackingStore.h"
@@ -61,6 +63,18 @@ class DLL_EXPORT TLVWriter
     friend class TLVUpdater;
 
 public:
+    TLVWriter() = default;
+
+    // TODO(#30825): We do not cleanly handle copies for all backing stores, but we don't disallow copy...
+#if 0
+    // Disable copy (and move) semantics.
+    TLVWriter(const TLVWriter&) = delete;
+    TLVWriter& operator=(const TLVWriter&) = delete;
+#endif
+
+    // Initialization cookie that is set when properly initialized. Randomly-picked 16 bit value.
+    static constexpr uint16_t kExpectedInitializationCookie = 0x52b1;
+
     /**
      * Initializes a TLVWriter object to write into a single output buffer.
      *
@@ -1165,6 +1179,12 @@ public:
      * @return the total remaining number of bytes.
      */
     uint32_t GetRemainingFreeLength() const { return mRemainingLen; }
+
+    /**
+     * @brief Returns true if this TLVWriter was properly initialized.
+     */
+    bool IsInitialized() const { return mInitializationCookie == kExpectedInitializationCookie; }
+
     /**
      * The profile id of tags that should be encoded in implicit form.
      *
@@ -1181,26 +1201,27 @@ public:
      * @note The value of the @p ImplicitProfileId member affects the encoding of profile-specific
      * tags only; the encoding of context-specific tags is unchanged.
      */
-    uint32_t ImplicitProfileId;
+    uint32_t ImplicitProfileId = kProfileIdNotSpecified;
 
     /**
      * A pointer field that can be used for application-specific data.
      */
-    void * AppData;
+    void * AppData = nullptr;
 
 protected:
-    TLVBackingStore * mBackingStore;
-    uint8_t * mBufStart;
-    uint8_t * mWritePoint;
-    uint32_t mRemainingLen;
-    uint32_t mLenWritten;
-    uint32_t mMaxLen;
-    uint32_t mReservedSize;
-    TLVType mContainerType;
+    TLVBackingStore * mBackingStore = nullptr;
+    uint8_t * mBufStart = nullptr;
+    uint8_t * mWritePoint = nullptr;
+    uint32_t mRemainingLen = 0;
+    uint32_t mLenWritten = 0;
+    uint32_t mMaxLen = 0;
+    uint32_t mReservedSize = 0;
+    TLVType mContainerType = kTLVType_NotSpecified;
+    uint16_t mInitializationCookie = 0;
 
 private:
-    bool mContainerOpen;
-    bool mCloseContainerReserved;
+    bool mContainerOpen = false;
+    bool mCloseContainerReserved = true;
 
 protected:
     bool IsContainerOpen() const { return mContainerOpen; }
