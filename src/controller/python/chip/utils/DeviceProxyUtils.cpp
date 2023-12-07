@@ -59,4 +59,23 @@ uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy * device, uint32
         ->ComputeRoundTripTimeout(System::Clock::Milliseconds32(upperLayerProcessingTimeoutMs))
         .count();
 }
+
+/**
+ * @brief
+ *
+ * This gets the MaxPathsPerInvoke supported by remote node.
+ *
+ * A valid DeviceProxy pointer with a valid, established session is required for this method.
+ */
+uint16_t pychip_DeviceProxy_GetMaxPathsPerInvoke(DeviceProxy * device, uint32_t upperLayerProcessingTimeoutMs)
+{
+    VerifyOrDie(device != nullptr);
+
+    auto * deviceProxy = static_cast<DeviceProxy *>(device);
+    VerifyOrDie(deviceProxy->GetSecureSession().HasValue());
+
+    auto remoteSessionParameters = deviceProxy->GetSecureSession().Value()->GetRemoteSessionParameters();
+
+    return remoteSessionParameters.GetMaxPathsPerInvoke();
+}
 }

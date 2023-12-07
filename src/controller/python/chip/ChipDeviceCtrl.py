@@ -808,6 +808,18 @@ class ChipDeviceControllerBase():
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
+    
+
+    def GetMaxPathsPerInvoke(self, nodeid) -> int:
+        ''' Returns the Max Paths Per Invoke supported by remote node associated with `nodeid`
+
+            This will result in a session being established if one wasn't already established.
+        '''
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetMaxPathsPerInvoke(
+            device.deviceProxy))
+        return res
+
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
                                                                    payload: ClusterObjects.ClusterCommand, responseType=None):
