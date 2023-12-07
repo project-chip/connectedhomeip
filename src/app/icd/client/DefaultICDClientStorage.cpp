@@ -42,7 +42,8 @@ namespace app {
 
 #define APPDATA_LENGTH 6
 
-CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
+CHIP_ERROR
+DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
     {
