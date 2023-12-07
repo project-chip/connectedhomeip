@@ -661,6 +661,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
 
     def setup_test(self):
         self.current_step_index = 0
