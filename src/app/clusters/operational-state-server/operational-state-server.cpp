@@ -346,8 +346,10 @@ void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::Dec
     }
 
     // Handle Pause-incompatible states for derived clusters.
-    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart) {
-        if (!IsDerivedClusterStatePauseCompatible(opState)) {
+    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart)
+    {
+        if (!IsDerivedClusterStatePauseCompatible(opState))
+        {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         }
     }
@@ -415,8 +417,10 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     }
 
     // Handle Resume-incompatible states for derived clusters.
-    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart) {
-        if (!IsDerivedClusterStateResumeCompatible(opState)) {
+    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart)
+    {
+        if (!IsDerivedClusterStateResumeCompatible(opState))
+        {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         }
     }
@@ -444,5 +448,5 @@ bool RvcOperationalState::Instance::IsDerivedClusterStatePauseCompatible(uint8_t
 bool RvcOperationalState::Instance::IsDerivedClusterStateResumeCompatible(uint8_t aState)
 {
     return (aState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
-        aState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
+            aState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
 }

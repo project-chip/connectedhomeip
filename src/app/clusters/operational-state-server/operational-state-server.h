@@ -30,7 +30,7 @@ namespace Clusters {
 namespace OperationalState {
 
 const uint8_t DerivedClusterNumberSpaceStart = 0x40;
-const uint8_t VendorNumberSpaceStart = 0x80;
+const uint8_t VendorNumberSpaceStart         = 0x80;
 
 class Uncopyable
 {
@@ -315,7 +315,8 @@ protected:
 
 namespace RvcOperationalState {
 
-class Instance: public OperationalState::Instance {
+class Instance : public OperationalState::Instance
+{
 public:
     /**
      * Creates an RVC operational state cluster instance.
@@ -326,8 +327,9 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      */
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId):
-        OperationalState::Instance(aDelegate, aEndpointId, Id) {}
+    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id)
+    {}
 
 protected:
     /**
@@ -347,11 +349,12 @@ protected:
     bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
 };
 
-} // RvcOperationalState
+} // namespace RvcOperationalState
 
 namespace OvenCavityOperationalState {
 
-class Instance: public OperationalState::Instance {
+class Instance : public OperationalState::Instance
+{
 public:
     /**
      * Creates an RVC operational state cluster instance.
@@ -362,11 +365,12 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      */
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId):
-        OperationalState::Instance(aDelegate, aEndpointId, Id) {}
+    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id)
+    {}
 };
 
-}
+} // namespace OvenCavityOperationalState
 
 } // namespace Clusters
 } // namespace app
