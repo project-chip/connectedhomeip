@@ -770,16 +770,12 @@ cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-<<<<<<< HEAD
-  readonly attribute int64u upTime = 2;
-=======
   readonly attribute optional int64u upTime = 2;
   readonly attribute optional int32u totalOperationalHours = 3;
   readonly attribute optional BootReasonEnum bootReason = 4;
   readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
->>>>>>> upstream/master
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1599,12 +1595,8 @@ endpoint 0 {
 
   server cluster GeneralDiagnostics {
     callback attribute networkInterfaces;
-<<<<<<< HEAD
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
-=======
     callback attribute rebootCount;
->>>>>>> upstream/master
+    callback attribute upTime;
     callback attribute testEventTriggersEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
