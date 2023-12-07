@@ -1210,17 +1210,17 @@ public:
 
 protected:
     TLVBackingStore * mBackingStore = nullptr;
-    uint8_t * mBufStart = nullptr;
-    uint8_t * mWritePoint = nullptr;
-    uint32_t mRemainingLen = 0;
-    uint32_t mLenWritten = 0;
-    uint32_t mMaxLen = 0;
-    uint32_t mReservedSize = 0;
-    TLVType mContainerType = kTLVType_NotSpecified;
-    uint16_t mInitializationCookie = 0;
+    uint8_t * mBufStart             = nullptr;
+    uint8_t * mWritePoint           = nullptr;
+    uint32_t mRemainingLen          = 0;
+    uint32_t mLenWritten            = 0;
+    uint32_t mMaxLen                = 0;
+    uint32_t mReservedSize          = 0;
+    TLVType mContainerType          = kTLVType_NotSpecified;
+    uint16_t mInitializationCookie  = 0;
 
 private:
-    bool mContainerOpen = false;
+    bool mContainerOpen          = false;
     bool mCloseContainerReserved = true;
 
 protected:

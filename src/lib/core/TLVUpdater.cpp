@@ -111,7 +111,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterWriter.SetContainerOpen(false);
     mUpdaterWriter.SetCloseContainerReserved(false);
 
-    mUpdaterWriter.ImplicitProfileId = aReader.ImplicitProfileId;
+    mUpdaterWriter.ImplicitProfileId     = aReader.ImplicitProfileId;
     mUpdaterWriter.mInitializationCookie = TLVWriter::kExpectedInitializationCookie;
 
     // Cache element start address for internal use

@@ -47,7 +47,10 @@
 #if 0
 #define ABORT_ON_UNINITIALIZED_IF_ENABLED() VerifyOrDie(IsInitialized() == true)
 #else
-#define ABORT_ON_UNINITIALIZED_IF_ENABLED() do {} while (0)
+#define ABORT_ON_UNINITIALIZED_IF_ENABLED()                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 #endif
 namespace chip {
 namespace TLV {
@@ -61,18 +64,18 @@ NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 
     // TODO(#30825): Need to ensure a single init path for this complex data.
     mInitializationCookie = 0;
-    mBackingStore           = nullptr;
-    mBufStart               = buf;
-    mWritePoint             = buf;
-    mRemainingLen           = actualMaxLen;
-    mLenWritten             = 0;
-    mMaxLen                 = actualMaxLen;
-    mContainerType          = kTLVType_NotSpecified;
-    mReservedSize           = 0;
+    mBackingStore         = nullptr;
+    mBufStart             = buf;
+    mWritePoint           = buf;
+    mRemainingLen         = actualMaxLen;
+    mLenWritten           = 0;
+    mMaxLen               = actualMaxLen;
+    mContainerType        = kTLVType_NotSpecified;
+    mReservedSize         = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
-    ImplicitProfileId = kProfileIdNotSpecified;
+    ImplicitProfileId     = kProfileIdNotSpecified;
     mInitializationCookie = kExpectedInitializationCookie;
 }
 
@@ -106,7 +109,8 @@ CHIP_ERROR TLVWriter::Finalize()
     if (mBackingStore != nullptr)
         err = mBackingStore->FinalizeBuffer(*this, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart));
 
-    // TODO(#30825) The following should be safe, but in some cases (without mBackingStore), there are incremental writes that start failing.
+        // TODO(#30825) The following should be safe, but in some cases (without mBackingStore), there are incremental writes that
+        // start failing.
 #if 0
     if (err == CHIP_NO_ERROR)
         mInitializationCookie = 0;
@@ -514,7 +518,7 @@ CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & 
     containerWriter.mContainerType = containerType;
     containerWriter.SetContainerOpen(false);
     containerWriter.SetCloseContainerReserved(IsCloseContainerReserved());
-    containerWriter.ImplicitProfileId = ImplicitProfileId;
+    containerWriter.ImplicitProfileId     = ImplicitProfileId;
     containerWriter.mInitializationCookie = kExpectedInitializationCookie;
 
     SetContainerOpen(true);
