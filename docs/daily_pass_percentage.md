@@ -1,15 +1,14 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| darwin                                  |          90 |
-| builds                                  |          90 |
-| qemu                                    |          95 |
+| docker-chip-images                      |           0 |
+| builds                                  |          84 |
+| darwin                                  |          95 |
 | tests                                   |          95 |
-| documentation-build                     |          95 |
+| cirque                                  |          95 |
 | build-example-linux-arm                 |         100 |
 | darwin-tests                            |         100 |
-| run-misspell                            |         100 |
-| cirque                                  |         100 |
+| documentation-build                     |         100 |
 | build-example-open-iot-sdk              |         100 |
 | build-example-esp32                     |         100 |
 | recent-fail-summary                     |         100 |
@@ -17,6 +16,7 @@
 | bloat-check                             |         100 |
 | build-example-bouffalolab               |         100 |
 | issue-labeler                           |         100 |
+| qemu                                    |         100 |
 | delete-old-artifacts                    |         100 |
 | unit-integration-tests                  |         100 |
 | zap                                     |         100 |
