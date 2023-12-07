@@ -28,6 +28,7 @@ const DrynessLevelEnum LaundryDryerControlDelegate::supportedDrynessLevelOptions
 
 LaundryDryerControlDelegate LaundryDryerControlDelegate::instance;
 
+// TODO: Add EndpointId to the API so that different values per endpoint may be possible in some implementations.
 CHIP_ERROR LaundryDryerControlDelegate::GetSupportedDrynessLevelAtIndex(size_t index, DrynessLevelEnum & supportedDrynessLevel)
 {
     if (index >= ArraySize(supportedDrynessLevelOptions))
