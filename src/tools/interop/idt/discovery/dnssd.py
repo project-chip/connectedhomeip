@@ -17,6 +17,7 @@
 
 import asyncio
 import os
+import re
 import traceback
 from dataclasses import dataclass
 from textwrap import dedent
@@ -31,104 +32,114 @@ logger = log.get_logger(__file__)
 
 
 @dataclass()
-class MdnsTypeInfo:
+class ServiceTypeInfo:
     type: str
     description: str
 
 
-commissioner = MdnsTypeInfo(
+_COMMISSIONER_SERVICE_INFO = ServiceTypeInfo(
     "COMMISSIONER",
-    "This is a service for a Matter commissioner aka. controller"
+    "A service for a Matter commissioner aka. controller"
 )
-commissionable = MdnsTypeInfo(
+_COMMISSIONABLE_SERVICE_INFO = ServiceTypeInfo(
     "COMMISSIONABLE / EXTENDED DISCOVERY",
-    "This is a service to be used in the commissioning process and provides more info about the device."
+    "A service to be used in the commissioning process and provides more info about the device."
 )
-operational = MdnsTypeInfo(
+_OPERATIONAL_SERVICE_INFO = ServiceTypeInfo(
     "OPERATIONAL",
-    "This is a service for a commissioned Matter device. It exposes limited info about the device."
+    "A service for a commissioned Matter device. It exposes limited info about the device."
 )
-border_router = MdnsTypeInfo(
+_TBR_SERVICE_INFO = ServiceTypeInfo(
     "THREAD BORDER ROUTER",
-    "This is a service for a thread border router; may be used for thread+Matter devices."
+    "A service for a thread border router; may be used for thread+Matter devices."
 )
 
-_MDNS_TYPES = {
-    "_matterd._udp.local.": commissioner,
-    "_matterc._udp.local.": commissionable,
-    "_matter._tcp.local.": operational,
-    "_meshcop._udp.local.": border_router,
+_TREL_SERVICE_INFO = ServiceTypeInfo(
+    "THREAD RADIO ENCAPSULATION LINK",
+    "A service for Thread Radio Encapsulation Link which is a method for thread BRs to exchange data on IP links."
+)
+
+_SERVICE_INFO = {
+    "_matterd._udp.local.": _COMMISSIONER_SERVICE_INFO,
+    "_matterc._udp.local.": _COMMISSIONABLE_SERVICE_INFO,
+    "_matter._tcp.local.": _OPERATIONAL_SERVICE_INFO,
+    "_meshcop._udp.local.": _TBR_SERVICE_INFO,
+    "_trel._udp.local.": _TREL_SERVICE_INFO,
 }
 
 
 @dataclass()
-class RecordParser:
+class TxtRecordParser:
     readable_name: str
     explanation: str
     parse: Callable[[str], str]
 
 
-# TODO: Meshcop parser
+def unwrap_str(to_unwrap: str) -> str:
+    to_unwrap = to_unwrap.replace("\n", " ")
+    to_unwrap = to_unwrap.replace("\t", " ")
+    return re.sub(' +', ' ', to_unwrap)
+
+
+# TODO: Thread parser
 
 class MatterTxtRecordParser:
 
     def __init__(self):
         self.parsers = {
-            "D": RecordParser("Discriminator",
-                              dedent("\
-                              Differentiates this instance of the device from others w/ same VID/PID that might be \n\
-                              in the environment."),
-                              MatterTxtRecordParser.parse_d),  # To hex
-            "VP": RecordParser("VID/PID",
-                               "The Vendor ID and Product ID (each are two bytes of hex) that identify this product.",
-                               MatterTxtRecordParser.parse_vp),  # Split + to hex
-            "CM": RecordParser("Commissioning mode",
-                               "Whether the device is in commissioning mode or not.",
-                               MatterTxtRecordParser.parse_cm),  # Decode
-            "DT": RecordParser("Device type",
-                               "Application type for this end device.",
-                               MatterTxtRecordParser.parse_dt),  # Decode
-            "DN": RecordParser("Device name",
-                               "Manufacturer provided device name. MAY match NodeLabel in Basic info cluster.",
-                               MatterTxtRecordParser.parse_pass_through),  # None
-            "RI": RecordParser("Rotating identifier",
-                               "Vendor specific, non-trackable per-device ID.",
-                               MatterTxtRecordParser.parse_pass_through),  # None
-            "PH": RecordParser("Pairing hint",
-                               dedent("\
-                               Given the current device state, follow these instructions to make the device \n\
-                               commissionable."),
-                               MatterTxtRecordParser.parse_ph),  # Decode
-            "PI": RecordParser("Pairing instructions",
-                               dedent("\
-                               Used with the Pairing hint. If the Pairing hint mentions N, this is the \n\
-                               value of N."),
-                               MatterTxtRecordParser.parse_pass_through),  # None
-            # General records
-            "SII": RecordParser("Session idle interval",
-                                "Message Reliability Protocol retry interval while the device is idle in milliseconds.",
-                                MatterTxtRecordParser.parse_pass_through),  # None
-            "SAI": RecordParser("Session active interval",
-                                dedent("\
-                                Message Reliability Protocol retry interval while the device is active \n\
-                                in milliseconds."),
-                                MatterTxtRecordParser.parse_pass_through),  # None
-            "SAT": RecordParser("Session active threshold",
-                                "Duration of time this device stays active after last activity in milliseconds.",
-                                MatterTxtRecordParser.parse_pass_through),  # None
-            "T": RecordParser("Supports TCP",
-                              "Whether this device supports TCP client and or Server.",
-                              MatterTxtRecordParser.parse_t),  # Decode
+            # Commissioning
+            "D": TxtRecordParser("Discriminator",
+                                 unwrap_str("Differentiates advertisements from this instance of the device from \
+                                             advertisement from others devices w/ the same VID/PID."),
+                                 MatterTxtRecordParser.parse_d),  # To hex
+            "VP": TxtRecordParser("VID/PID",
+                                  "The Vendor ID and Product ID (each two bytes of hex) that identify this product.",
+                                  MatterTxtRecordParser.parse_vp),  # Split + to hex
+            "CM": TxtRecordParser("Commissioning mode",
+                                  "Whether the device is in commissioning mode or not.",
+                                  MatterTxtRecordParser.parse_cm),  # Decode
+            "DT": TxtRecordParser("Device type",
+                                  "Application type for this end device.",
+                                  MatterTxtRecordParser.parse_dt),  # Decode map
+            "DN": TxtRecordParser("Device name",
+                                  "Manufacturer provided device name. MAY match NodeLabel in Basic info cluster.",
+                                  MatterTxtRecordParser.parse_pass_through),  # None
+            "RI": TxtRecordParser("Rotating identifier",
+                                  "Vendor specific, non-trackable per-device ID.",
+                                  MatterTxtRecordParser.parse_pass_through),  # None
+            "PH": TxtRecordParser("Pairing hint",
+                                  unwrap_str("Given the current device state, follow these instructions to make the \
+                                              device commissionable."),
+                                  MatterTxtRecordParser.parse_ph),  # Decode bitmap
+            "PI": TxtRecordParser("Pairing instructions",
+                                  unwrap_str("Used with the Pairing hint. If the Pairing hint mentions N, this \
+                                              is the value of N."),
+                                  MatterTxtRecordParser.parse_pass_through),  # None
+            # General
+            "SII": TxtRecordParser("Session idle interval",
+                                   unwrap_str("Message Reliability Protocol retry interval while the device is idle in \
+                                               milliseconds."),
+                                   MatterTxtRecordParser.parse_pass_through),  # None
+            "SAI": TxtRecordParser("Session active interval",
+                                   unwrap_str("Message Reliability Protocol retry interval while the device is \
+                                               active in milliseconds."),
+                                   MatterTxtRecordParser.parse_pass_through),  # None
+            "SAT": TxtRecordParser("Session active threshold",
+                                   "Duration of time this device stays active after last activity in milliseconds.",
+                                   MatterTxtRecordParser.parse_pass_through),  # None
+            "T": TxtRecordParser("Supports TCP",
+                                 "Whether this device supports TCP.",
+                                 MatterTxtRecordParser.parse_t),  # Decode
         }
         self.unparsed_records = ""
         self.parsed_records = ""
 
-    def parse_single_record(self, key: str, value: str):
-        parser: RecordParser = self.parsers[key]
+    def parse_single_txt_record(self, key: str, value: str):
+        parser: TxtRecordParser = self.parsers[key]
         self.parsed_records += add_border(parser.readable_name + "\n")
         self.parsed_records += parser.explanation + "\n\n"
         try:
-            self.parsed_records += "PARSED VALUE: " + parser.parse(value) + "\n"
+            self.parsed_records += "PARSED VALUE:\n" + parser.parse(value) + "\n"
         except Exception:
             logger.error("Exception parsing TXT record, appending raw value")
             logger.error(traceback.format_exc())
@@ -144,7 +155,7 @@ class MatterTxtRecordParser:
             ret += parsed_exp + self.parsed_records
         return ret
 
-    def parse_records(self, info: ServiceInfo) -> str:
+    def parse_txt_records(self, info: ServiceInfo) -> str:
         if info.properties is not None:
             for name, value in info.properties.items():
                 try:
@@ -158,7 +169,7 @@ class MatterTxtRecordParser:
                 if name not in self.parsers:
                     self.unparsed_records += f"KEY: {name} VALUE: {value}\n"
                 else:
-                    self.parse_single_record(name, value)
+                    self.parse_single_txt_record(name, value)
         return self.get_output()
 
     @staticmethod
@@ -301,20 +312,23 @@ class MatterDnssdListener(ServiceListener):
             type_: str,
             name: str,
             delta_type: str) -> None:
+        to_log = "SERVICE EVENT\n"
+        to_log += f"{name}\n"
+        to_log += f"SERVICE {delta_type}\n"
+        to_log += _SERVICE_INFO[type_].type + "\n"
+        to_log += _SERVICE_INFO[type_].description + "\n"
         info = zc.get_service_info(type_, name)
-        self.discovered_matter_devices[name] = info
-        to_log = f"{name}\n"
-        update_str = f"\nSERVICE {delta_type}\n"
-        to_log += ("*" * (len(update_str) - 2)) + update_str
-        to_log += _MDNS_TYPES[type_].type + "\n"
-        to_log += _MDNS_TYPES[type_].description + "\n"
-        to_log += f"A/SRV TTL: {str(info.host_ttl)}\n"
-        to_log += f"PTR/TXT TTL: {str(info.other_ttl)}\n"
-        txt_parser = MatterTxtRecordParser()
-        to_log += txt_parser.parse_records(info)
-        to_log += self.log_addr(info)
-        self.logger.info(to_log)
-        self.write_log(to_log, name)
+        if info is not None:
+            self.discovered_matter_devices[name] = info
+            to_log += f"A/SRV TTL: {str(info.host_ttl)}\n"
+            to_log += f"PTR/TXT TTL: {str(info.other_ttl)}\n"
+            txt_parser = MatterTxtRecordParser()
+            to_log += txt_parser.parse_txt_records(info)
+            to_log += self.log_addr(info)
+            self.logger.info(to_log)
+            self.write_log(to_log, name)
+        else:
+            self.logger.warning(f"No info found for {to_log}")
 
     def add_service(self, zc: Zeroconf, type_: str, name: str) -> None:
         self.handle_service_info(zc, type_, name, "ADDED")
@@ -323,9 +337,10 @@ class MatterDnssdListener(ServiceListener):
         self.handle_service_info(zc, type_, name, "UPDATED")
 
     def remove_service(self, zc: Zeroconf, type_: str, name: str) -> None:
-        to_log = f"Service {name} removed\n"
-        to_log += _MDNS_TYPES[type_].type + "\n"
-        to_log += _MDNS_TYPES[type_].description
+        to_log = "SERVICE_EVENT\n"
+        to_log += f"Service {name} removed\n"
+        to_log += _SERVICE_INFO[type_].type + "\n"
+        to_log += _SERVICE_INFO[type_].description
         if name in self.discovered_matter_devices:
             del self.discovered_matter_devices[name]
         self.logger.warning(to_log)
@@ -333,7 +348,7 @@ class MatterDnssdListener(ServiceListener):
 
     def browse_interactive(self) -> None:
         zc = Zeroconf()
-        ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
+        ServiceBrowser(zc, list(_SERVICE_INFO.keys()), self)
         try:
             self.logger.warning(
                 dedent("\
@@ -348,7 +363,7 @@ class MatterDnssdListener(ServiceListener):
 
     async def browse_once(self, browse_time_seconds: int) -> Zeroconf:
         zc = Zeroconf()
-        ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
+        ServiceBrowser(zc, list(_SERVICE_INFO.keys()), self)
         await asyncio.sleep(browse_time_seconds)
         zc.close()
         return zc
