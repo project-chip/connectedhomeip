@@ -429,29 +429,13 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ReadClient::OnActiveModeNotification()
+void ReadClient::OnActiveModeNotification()
 {
-    VerifyOrReturnError(IsSubscriptionType() && IsIdle(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mPeerActivePeriod != System::Clock::kZero, CHIP_ERROR_INCORRECT_STATE);
-    // TODO: Add Better the error code to inform the ActiveModeWakeUp and trigger the subscription retry
-    Close(CHIP_ERROR_TIMEOUT);
-    return CHIP_NO_ERROR;
-}
-
-void ReadClient::UpdateActivePeriod(System::Clock::Timeout aActivePeriod)
-{
-    mPeerActivePeriod = aActivePeriod;
-}
-
-CHIP_ERROR ReadClient::TouchPeerActiveTime(System::Clock::Timeout aActivePeriod)
-{
-    System::Clock::Timestamp time;
-
-    ReturnLogErrorOnFailure(System::SystemClock().GetClock_RealTimeMS(time));
-
-    mPeerActiveUntilTimestamp = time + aActivePeriod;
-
-    return CHIP_NO_ERROR;
+    VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+    // If the subscription is not at `IdleSubscription` state, then the liveness timeout is not triggerred.
+    // Simplily do nothing.
+    VerifyOrReturn(IsIdleSubscription());
+    TriggerResubscription();
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -921,51 +905,47 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mPeerActivePeriod != System::Clock::kZero)
+    if (_this->mIsPeerICD)
     {
-        // If device is sleeping, we mark the subscription as "IdleSubscription", and trigger resubscription on
+        // If device is idle, we mark the subscription as "IdleSubscription", and trigger resubscription on
         // `OnActiveModeNotification`.
-        System::Clock::Timestamp time;
-        CHIP_ERROR error = System::SystemClock().GetClock_RealTimeMS(time);
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(DataManagement, "Failed to get current time: %s", ErrorStr(error));
-            _this->Close(error, false);
-        }
-        if (time > _this->mPeerActiveUntilTimestamp)
-        {
-            ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as IdleSubscription.");
-            _this->MoveToState(ClientState::IdleSubscription);
-            return;
-        }
+        // Note: the liveness timeout is always longer than the MaxInterval (and idle duration), so we can move the
+        // device to `IdleSubcription` when liveness timeout reached.
+        ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as IdleSubscription.");
+        _this->MoveToState(ClientState::IdleSubscription);
+        return;
     }
 
+    _this->TriggerResubscription();
+}
+
+void ReadClient::TriggerResubscription()
+{
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
     // have not seen peer activity in at least as long as our session.
-    const auto & holder = _this->mReadPrepareParams.mSessionHolder;
+    const auto & holder = mReadPrepareParams.mSessionHolder;
     if (holder)
     {
         System::Clock::Timestamp lastPeerActivity = holder->AsSecureSession()->GetLastPeerActivityTime();
-        _this->mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
-            _this->mPeer, [&lastPeerActivity](auto * session) {
-                if (!session->IsCASESession())
-                {
-                    return;
-                }
+        mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(mPeer, [&lastPeerActivity](auto * session) {
+            if (!session->IsCASESession())
+            {
+                return;
+            }
 
-                if (session->GetLastPeerActivityTime() > lastPeerActivity)
-                {
-                    return;
-                }
+            if (session->GetLastPeerActivityTime() > lastPeerActivity)
+            {
+                return;
+            }
 
-                session->MarkAsDefunct();
-            });
+            session->MarkAsDefunct();
+        });
     }
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
-    _this->Close(CHIP_ERROR_TIMEOUT);
+    Close(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)
@@ -1044,17 +1024,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mPeerActivePeriod = aReadPrepareParams.mActivePeriod;
-    if (mPeerActivePeriod != System::Clock::kZero)
-    {
-        System::Clock::Timestamp time;
-        ReturnErrorOnFailure(System::SystemClock().GetClock_RealTimeMS(time));
-        mPeerActiveUntilTimestamp = mPeerActivePeriod;
-    }
-    else
-    {
-        mPeerActiveUntilTimestamp = System::Clock::kZero;
-    }
+    mIsPeerICD = aReadPrepareParams.mIsPeerICD;
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 

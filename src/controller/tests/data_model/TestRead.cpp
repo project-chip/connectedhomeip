@@ -2661,7 +2661,7 @@ void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * 
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-        readPrepareParams.mActivePeriod              = 999_ms;
+        readPrepareParams.mIsPeerICD                 = true;
 
         auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -2696,8 +2696,7 @@ void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * 
         ctx.GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
 
-        err = readClient.OnActiveModeNotification();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        readClient.OnActiveModeNotification();
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
 

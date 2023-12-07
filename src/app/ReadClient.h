@@ -326,33 +326,15 @@ public:
     /**
      *  Activate the idle subscription.
      *
-     *  When subscribing to an ICD, the subscriber is expected to set the `mActivePeriod`
-     * in `ReadPrepareParams`.
+     *  When subscriptiing to ICD and liveness timeout reached, the read client
+     * will move to `IdleSubscription` state and resubscription can be triggerred
+     * via OnActiveModeNotification().
      *
-     *  @retval #others fail to send read request
-     *  @retval #CHIP_NO_ERROR Successfully waked up the subscription.
-     *  @retval #CHIP_ERROR_INCORRECT_STATE The transcation is not an active subscription
+     *  If the subscription is not in `IdleSubscription` state, this function will
+     * do nothing. So it is always safe to call this function when a check-in message
+     * is received.
      */
-    CHIP_ERROR OnActiveModeNotification();
-
-    /**
-     *  Update the active period of the device. This method **will not** update the
-     * timestamp used to determine whether the device is idle.
-     *
-     *  A Zero period means the device will always be active.
-     */
-    void UpdateActivePeriod(System::Clock::Timeout aActivePeriod);
-
-    /**
-     *  Update the time used to determine whether the device is idle to the period from now.
-     * This method **will not** update the active period for future wake-ups.
-     *
-     *  A zero period means the device will become idle immediately.
-     *
-     *  @retval #CHIP_NO_ERROR Successfully updated the active time.
-     *  @retval #others failed to update the active time.
-     */
-    CHIP_ERROR TouchPeerActiveTime(System::Clock::Timeout aActivePeriod);
+    void OnActiveModeNotification();
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
@@ -532,7 +514,8 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsIdle() const { return mState == ClientState::Idle || mState == ClientState::IdleSubscription; }
+    bool IsIdle() const { return mState == ClientState::Idle; }
+    bool IsIdleSubscription() const { return mState == ClientState::IdleSubscription; }
     bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
@@ -549,6 +532,8 @@ private:
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
+
+    void TriggerResubscription();
 
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
@@ -644,11 +629,7 @@ private:
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
-    // mPeerActiveUntilTimestamp represents the active time for a subscription for an ICD, when the liveness timeout is fired after
-    // the mPeerActiveUntilTimestamp, the ReadClient will enter "IdleSubscription" state
-    // until OnActiveModeNotification() is called. The Zero value means the device should always be active.
-    System::Clock::Timeout mPeerActivePeriod           = System::Clock::kZero;
-    System::Clock::Timestamp mPeerActiveUntilTimestamp = System::Clock::kZero;
+    bool mIsPeerICD = false;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
