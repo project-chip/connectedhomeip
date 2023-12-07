@@ -881,6 +881,10 @@ class ChipDeviceControllerBase():
 
         Returns:
             - Array of command respones in the same order as what was given in `commands`. The type of the response is defined by the command.
+              Value of `None` indicated success.
+            - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
+              contain `interaction_model.Status.UnsupportedCommand`.
+            - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
         Raises:
             - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
         '''
