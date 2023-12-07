@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include "AllClustersCommandDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
