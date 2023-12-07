@@ -47,6 +47,11 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     nodeOperationalCredentialsCluster = "Node Operational Credentials Cluster"
     basicInformationCluster = "Basic Information Cluster"
     networkCommissioningCluster = "Network Commissioning Cluster"
+    diagnosticLogsCluster = "Diagnostic Logs Cluster"
+    thermostatUserInterfaceConfigurationCluster = "Thermostat User Interface Configuration Cluster"
+    wakeOnLANCluster = "Wake On LAN Cluster"
+    lowPowerCluster = "Low Power Cluster"
+    laundryModeCluster = "Laundry Mode Cluster"
 
     if otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
         clusterName = "OTA Software Update"
@@ -56,6 +61,18 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     elif groupKeyManagementCluster == clusterName:
         clusterName = "Group Communication"
+
+    elif diagnosticLogsCluster == clusterName:
+        clusterName = "Diagnostics Logs Cluster"
+
+    elif thermostatUserInterfaceConfigurationCluster == clusterName:
+        clusterName = "Thermostat User Configuration Cluster"
+
+    elif wakeOnLANCluster == clusterName or lowPowerCluster == clusterName:
+        clusterName = "Media Cluster"
+
+    elif laundryModeCluster == clusterName:
+        clusterName = "Laundry Washer Mode Cluster"
 
     elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
         clusterName = clusterName.replace("Cluster", "").strip()
@@ -255,8 +272,13 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             acceptedCommandListPicsList = []
             generatedCommandListPicsList = []
 
-            clusterClass = getattr(Clusters, devCtrl.GetClusterHandler().GetClusterInfoById(server)['clusterName'])
             clusterID = f"0x{server:04x}"
+
+            try:
+                clusterClass = getattr(Clusters, devCtrl.GetClusterHandler().GetClusterInfoById(server)['clusterName'])
+            except AttributeError:
+                console.print(f"[red]Cluster class not found for ({clusterID}) not found! ❌")
+                continue
 
             # Does the clusterInfoDict contain the found cluster ID?
             if clusterID not in clusterInfoDict:
@@ -372,6 +394,7 @@ if not xmlTemplatePathStr.endswith('/'):
 baseOutputPathStr = args.pics_output
 if not baseOutputPathStr.endswith('/'):
     baseOutputPathStr += '/'
+outputPathStr = baseOutputPathStr + "GeneratedPICS/"
 
 serverTag = ".S"
 clientTag = ".C"
@@ -421,13 +444,15 @@ print("Capture list of PICS XML templates")
 xmlFileList = os.listdir(xmlTemplatePathStr)
 
 # Setup output path
-baseOutputPath = pathlib.Path(baseOutputPathStr)
-if not baseOutputPath.exists():
+print(outputPathStr)
+
+outputPath = pathlib.Path(outputPathStr)
+if not outputPath.exists():
     print("Create output folder")
-    baseOutputPath.mkdir()
+    outputPath.mkdir()
 else:
     print("Clean output folder")
-    cleanDirectory(baseOutputPath)
+    cleanDirectory(outputPath)
 
 
 class DeviceMappingTest(MatterBaseTest):
@@ -439,7 +464,7 @@ class DeviceMappingTest(MatterBaseTest):
         console = Console()
 
         # Run device mapping function
-        await DeviceMapping(self.default_controller, self.dut_node_id, baseOutputPathStr)
+        await DeviceMapping(self.default_controller, self.dut_node_id, outputPathStr)
 
 
 if __name__ == "__main__":
