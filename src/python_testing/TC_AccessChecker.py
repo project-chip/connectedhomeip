@@ -127,7 +127,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 if ret is None:
                     self.success = False
 
-    async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
+    async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
             if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
@@ -138,33 +138,30 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
 
-            # TODO: I'm an idiot. This returns the error.
-
+            print(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            # Because we read everything with admin, we should have this in the wildcard read
+            # This will only not work if we end up with write-only attributes. We do not currently have any of these.
+            val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
             if operation_allowed(spec_requires, privilege):
                 # Write the default attribute. We don't care if this fails, as long as it fails with a DIFFERENT error than the access
                 # This is OK because access is required to be checked BEFORE any other thing to avoid leaking device information.
-                try:
-                    # TODO: Do we have any attributes that require a timed invoke (or whatever it's called on write)
-                    self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute())])
-                    # success is OK, no fail here
-                except InteractionModelError as e:
-                    if e.status == Status.UnsupportedAccess:
-                        self.record_error(test_name=test_name, location=location, problem="Unexpected UnsupportedAccess")
-                        self.success = False
-            else:
-                try:
-                    # TODO: Do we have any attributes that require a timed invoke (or whatever it's called on write)
-                    self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute())])
-                    # The above write should fail, so if we're here, that's an error
-                    self.record_error(test_name=test_name, location=location, problem="Unexpected success writing attribute")
+                if resp[0].Status == Status.UnsupportedAccess:
+                    self.record_error(test_name=test_name, location=location,
+                                      problem="Unexpected UnsupportedAccess writing attribute")
                     self.success = False
-                except InteractionModelError as e:
-                    if e.status != Status.UnsupportedAccess:
-                        self.record_error(test_name=test_name, location=location,
-                                          problem=f"Unexpected error writing attribute - expected Unsupported Access, got {e.status}")
-                        self.success = False
+            else:
+                if resp[0].Status != Status.UnsupportedAccess:
+                    self.record_error(test_name=test_name, location=location,
+                                      problem=f"Unexpected error writing attribute - expected Unsupported Access, got {e.status}")
+                    self.success = False
 
     async def run_access_test(self, test_type: AccessTestType):
+        # Read all the attributes on TH2 using admin access
+        if test_type == AccessTestType.WRITE:
+            await self._setup_acl(default_acl=self.default_acl, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+            wildcard_read = await self.TH2.Read(self.dut_node_id, [()])
+
         privilege_enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
@@ -178,7 +175,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     if test_type == AccessTestType.READ:
                         await self._run_read_access_test_for_cluster_privilege(endpoint_id, cluster_id, cluster, xml_cluster, privilege)
                     elif test_type == AccessTestType.WRITE:
-                        await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, cluster, xml_cluster, privilege)
+                        await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, cluster, xml_cluster, privilege, wildcard_read)
                     else:
                         self.fail_current_test("Unsupported test type")
         if not self.success:
