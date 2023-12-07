@@ -67,6 +67,10 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    if (IsInactiveICDSubscription())
+    {
+        return;
+    }
     MoveToState(ClientState::Idle);
 }
 
@@ -435,7 +439,7 @@ void ReadClient::OnActiveModeNotification()
     // Simply do nothing if the subscription is not at `InactiveICDSubscription` state.
     VerifyOrReturn(IsInactiveICDSubscription());
     MoveToState(ClientState::Idle);
-    TriggerResubscription(CHIP_ERROR_TIMEOUT);
+    Close(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -905,7 +909,6 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    CHIP_ERROR reason = CHIP_ERROR_TIMEOUT;
     if (_this->mIsPeerICD)
     {
         // If the device is idle, we mark the subscription as "InactiveICDSubscription", readClient consumer decides whether it goes
@@ -913,37 +916,36 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
         // the MaxInterval (and idle duration), so we can move the device to `IdleSubcription` when liveness timeout is reached.
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
         _this->MoveToState(ClientState::InactiveICDSubscription);
-        reason = CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT;
+        _this->Close(CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT);
+        return;
     }
 
-    _this->TriggerResubscription(reason);
-}
-
-void ReadClient::TriggerResubscription(CHIP_ERROR aReason)
-{
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
     // have not seen peer activity in at least as long as our session.
-    const auto & holder = mReadPrepareParams.mSessionHolder;
+    const auto & holder = _this->mReadPrepareParams.mSessionHolder;
     if (holder)
     {
         System::Clock::Timestamp lastPeerActivity = holder->AsSecureSession()->GetLastPeerActivityTime();
-        mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(mPeer, [&lastPeerActivity](auto * session) {
-            if (!session->IsCASESession())
-            {
-                return;
-            }
+        _this->mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
+            _this->mPeer, [&lastPeerActivity](auto * session) {
+                if (!session->IsCASESession())
+                {
+                    return;
+                }
 
-            if (session->GetLastPeerActivityTime() > lastPeerActivity)
-            {
-                return;
-            }
+                if (session->GetLastPeerActivityTime() > lastPeerActivity)
+                {
+                    return;
+                }
 
-            session->MarkAsDefunct();
-        });
+                session->MarkAsDefunct();
+            });
     }
 
-    Close(aReason);
+    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
+    // response timeouts).
+    _this->Close(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)

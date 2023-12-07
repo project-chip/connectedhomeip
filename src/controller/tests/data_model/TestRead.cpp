@@ -1654,6 +1654,10 @@ public:
     {
         mOnResubscriptionsAttempted++;
         mLastError = aTerminationCause;
+        if (aTerminationCause == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT)
+        {
+            return CHIP_NO_ERROR;
+        }
         return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
     }
 
@@ -2671,7 +2675,6 @@ void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * a
         NL_TEST_ASSERT(apSuite, callback.mOnSubscriptionEstablishedCount == 1);
         NL_TEST_ASSERT(apSuite, callback.mOnError == 0);
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
-
         chip::app::ReadHandler * readHandler = app::InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
 
         uint16_t minInterval;
@@ -2686,13 +2689,11 @@ void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * a
         //
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
-
-        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 0);
-        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT);
 
         ctx.GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
-
         app::InteractionModelEngine::GetInstance()->OnActiveModeNotification(
             ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
