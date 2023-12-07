@@ -196,7 +196,7 @@ private:
     OperationalState::Instance mOperationalStateInstance;
     ModeBase::Instance mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
-    
+
 
     // MicrowaveOvenMode types
     ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };

@@ -173,9 +173,9 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     VerifyOrExit(!cookMode.HasValue() || mMicrowaveOvenModeInstance.IsSupportedMode(cookMode.Value()),
                  status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
-    
+
     reqCookTime = cookTime.ValueOr(MicrowaveOvenControl::kDefaultCookTime);
-    VerifyOrExit(IsCookTimeInRange(reqCookTime), 
+    VerifyOrExit(IsCookTimeInRange(reqCookTime),
                  status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
