@@ -490,6 +490,8 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             new.name = alias_name
             clusters[id] = new
 
+    # TODO: All these fixups should be removed BEFORE SVE if at all possible
+
     # Workaround for temp control cluster - this is parsed incorrectly in the DM XML and is missing all its attributes
     # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
     temp_control_id = Clusters.TemperatureControl.id
@@ -504,5 +506,11 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none),
             0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none),
         }
+
+    # Workaround for incorrect parsing of access control cluster.
+    # Remove this workaround when https://github.com/csa-data-model/projects/issues/397 is fixed.
+    acl_id = Clusters.AccessControl.id
+    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Acl.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
+    clusters[acl_id].attributes[Clusters.AccessControl.Attributes.Extension.attribute_id].write_access = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
 
     return clusters, problems

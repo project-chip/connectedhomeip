@@ -153,7 +153,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             else:
                 if resp[0].Status != Status.UnsupportedAccess:
                     self.record_error(test_name=test_name, location=location,
-                                      problem=f"Unexpected error writing attribute - expected Unsupported Access, got {e.status}")
+                                      problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
                     self.success = False
 
     async def run_access_test(self, test_type: AccessTestType):
