@@ -622,7 +622,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT
  *
  *  @brief
- *    Subscription timeout caused by ICD device inactive mode 
+ *    Subscription timeout caused by ICD device inactive mode
  *
  */
 #define CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT                     CHIP_CORE_ERROR(0x16)
