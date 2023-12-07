@@ -22,9 +22,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-extern void MatterMicrowaveOvenServerInit();
-extern void MatterMicrowaveOvenServerShutdown();
-
 void ApplicationInit()
 {
     MatterMicrowaveOvenServerInit();

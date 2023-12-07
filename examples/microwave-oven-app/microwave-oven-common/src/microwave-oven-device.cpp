@@ -46,16 +46,8 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t>
     // placeholder implementation
     Status status;
     uint8_t reqCookMode;
-    if (cookMode.HasValue())
-    {
-        reqCookMode = cookMode.Value();
-    }
-    else
-    {
-        // set Microwave Oven cooking mode to normal mode(default).
-        reqCookMode = ModeNormal;
-    }
 
+    reqCookMode = cookMode.ValueOr(ModeNormal);
     if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(reqCookMode)) != Status::Success)
     {
         return status;
@@ -77,7 +69,7 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
  */
 app::DataModel::Nullable<uint32_t> ExampleMicrowaveOvenDevice::GetCountdownTime()
 {
-    return static_cast<app::DataModel::Nullable<uint32_t>>(mMicrowaveOvenControlInstance.GetCookTime());
+    return DataModel::MakeNullable(mMicrowaveOvenControlInstance.GetCookTime());
 }
 
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,

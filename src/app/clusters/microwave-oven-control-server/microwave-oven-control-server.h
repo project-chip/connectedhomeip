@@ -48,13 +48,13 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
-     * @param aOpStateInstance The pointer of Operational State Instance.
-     * @param aMicrowaveOvenModeInstance The pointer of Microwave Oven Mode Instance.
+     * @param aOpStateInstance The reference of Operational State Instance.
+     * @param aMicrowaveOvenModeInstance The reference of Microwave Oven Mode Instance.
      * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
      * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
-             Clusters::OperationalState::Instance * aOpStateInstance, Clusters::ModeBase::Instance * aMicrowaveOvenModeInstance);
+             Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
 
     ~Instance() override;
 
@@ -79,8 +79,8 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    Clusters::OperationalState::Instance * mOpStateInstance   = nullptr;
-    Clusters::ModeBase::Instance * mMicrowaveOvenModeInstance = nullptr;
+    Clusters::OperationalState::Instance & mOpStateInstance;
+    Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
     uint32_t mCookTime    = kDefaultCookTime;
     uint8_t mPowerSetting = kDefaultPowerSetting;
