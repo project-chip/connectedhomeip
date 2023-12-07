@@ -849,7 +849,7 @@ class AsyncWriteTransaction:
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except chip.exceptions.ChipStackException:
+        except (chip.exceptions.ChipStackException, ValueError):
             self._resultData.append(AttributeWriteResult(Path=path, Status=status))
 
     def handleError(self, chipError: PyChipError):
