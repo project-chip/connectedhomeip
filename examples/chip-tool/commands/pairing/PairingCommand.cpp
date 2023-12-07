@@ -387,6 +387,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
     else
     {
+        // When ICD device commissioning fails, the ICDClientInfo stored in OnICDRegistrationComplete needs to be removed.
         if (mDeviceIsICD)
         {
             CHIP_ERROR deleteEntryError =
