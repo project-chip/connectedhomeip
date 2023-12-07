@@ -1191,12 +1191,11 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
 
     if (commissioner->mPairingDelegate != nullptr)
     {
-        CommissioningDelegate::CommissioningReport report;
-
         commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
                                                                   data.ICDCounter);
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
+    CommissioningDelegate::CommissioningReport report;
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
