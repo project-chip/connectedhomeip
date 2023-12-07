@@ -44,7 +44,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
 
         // The following cast is valid only when `DefaultSessionKeystore` is `RawKeySessionKeystore`.
         Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
-                                icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+                             icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
         fprintf(stderr, "  | Symmetric Key: %60s |\n", icdSymmetricKeyHex);
     }
 
