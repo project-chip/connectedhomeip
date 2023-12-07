@@ -207,7 +207,7 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              DeviceAvailableFunc callback);
+                                              PyObject * context, DeviceAvailableFunc callback);
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
@@ -737,8 +737,8 @@ namespace {
 
 struct GetDeviceCallbacks
 {
-    GetDeviceCallbacks(DeviceAvailableFunc callback) :
-        mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
+    GetDeviceCallbacks(PyObject * context, DeviceAvailableFunc callback) :
+        mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mContext(context), mCallback(callback)
     {}
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -758,15 +758,16 @@ struct GetDeviceCallbacks
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
+    PyObject * const mContext;
     DeviceAvailableFunc mCallback;
 };
 } // anonymous namespace
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              DeviceAvailableFunc callback)
+                                              PyObject * context, DeviceAvailableFunc callback)
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
-    auto * callbacks = new GetDeviceCallbacks(callback);
+    auto * callbacks = new GetDeviceCallbacks(context, callback);
     return ToPyChipError(devCtrl->GetConnectedDevice(nodeId, &callbacks->mOnSuccess, &callbacks->mOnFailure));
 }
 
