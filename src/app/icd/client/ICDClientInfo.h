@@ -40,7 +40,7 @@ struct ICDClientInfo
     uint32_t user_active_mode_trigger_hint                                           = 0;
     char user_active_mode_trigger_instruction[kUserActiveModeTriggerInstructionSize] = { 0 };
     bool has_instruction                                                             = false;
-    Crypto::Aes128BitsKeyHandle shared_key                                           = Crypto::Aes128BitsKeyHandle();
+    Crypto::Aes128KeyHandle shared_key                                               = Crypto::Aes128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
