@@ -973,7 +973,7 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
     for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
     {
         auto pNextItem = pListItem->GetNextClient();
-        // It is possible that pListItem is destructed by the app in OnActiveModeNotification.
+        // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
         // Get the next item before invoking `OnActiveModeNotification`.
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
         {
