@@ -316,6 +316,7 @@ protected:
 namespace RvcOperationalState {
 
 class Instance: public OperationalState::Instance {
+public:
     /**
      * Creates an RVC operational state cluster instance.
      * The Init() function needs to be called for this instance to be registered and called by the
@@ -328,6 +329,7 @@ class Instance: public OperationalState::Instance {
     Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId):
         OperationalState::Instance(aDelegate, aEndpointId, Id) {}
 
+protected:
     /**
      * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is pause-compatible.
      * Note: if a state outside the derived cluster number-space is given, this method returns false.
@@ -350,6 +352,7 @@ class Instance: public OperationalState::Instance {
 namespace OvenCavityOperationalState {
 
 class Instance: public OperationalState::Instance {
+public:
     /**
      * Creates an RVC operational state cluster instance.
      * The Init() function needs to be called for this instance to be registered and called by the
