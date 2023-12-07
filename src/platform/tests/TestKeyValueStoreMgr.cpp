@@ -36,9 +36,9 @@ using namespace chip::DeviceLayer::PersistedStorage;
 
 static void TestKeyValueStoreMgr_EmptyString(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey   = "str_key";
-    constexpr const char kTestValue[] = "";
-    constexpr size_t kTestValueLen    = 0;
+    static constexpr char kTestKey[]   = "str_key";
+    static constexpr char kTestValue[] = "";
+    constexpr size_t kTestValueLen     = 0;
 
     char readValue[sizeof(kTestValue)];
     size_t readSize;
@@ -71,8 +71,8 @@ static void TestKeyValueStoreMgr_EmptyString(nlTestSuite * inSuite, void * inCon
 
 static void TestKeyValueStoreMgr_String(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey   = "str_key";
-    constexpr const char kTestValue[] = "test_value";
+    static constexpr char kTestKey[]   = "str_key";
+    static constexpr char kTestValue[] = "test_value";
 
     char readValue[sizeof(kTestValue)];
     size_t readSize;
@@ -97,7 +97,7 @@ static void TestKeyValueStoreMgr_String(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeyValueStoreMgr_Uint32(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey     = "uint32_key";
+    static constexpr char kTestKey[]    = "uint32_key";
     constexpr const uint32_t kTestValue = 5;
 
     uint32_t readValue = UINT32_MAX;
@@ -121,7 +121,7 @@ static void TestKeyValueStoreMgr_Uint32(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeyValueStoreMgr_Array(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey  = "array_key";
+    static constexpr char kTestKey[] = "array_key";
     constexpr uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
 
     uint32_t readValue[5];
@@ -153,7 +153,7 @@ static void TestKeyValueStoreMgr_Struct(nlTestSuite * inSuite, void * inContext)
         uint32_t value2;
     };
 
-    constexpr const char * kTestKey = "struct_key";
+    static constexpr char kTestKey[] = "struct_key";
     constexpr TestStruct kTestValue{ 1, 2 };
 
     TestStruct readValue;
@@ -180,7 +180,7 @@ static void TestKeyValueStoreMgr_Struct(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeyValueStoreMgr_UpdateValue(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey = "update_key";
+    static constexpr char kTestKey[] = "update_key";
 
     CHIP_ERROR err;
     uint32_t readValue;
@@ -201,8 +201,8 @@ static void TestKeyValueStoreMgr_UpdateValue(nlTestSuite * inSuite, void * inCon
 
 static void TestKeyValueStoreMgr_TooSmallBufferRead(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey = "too_small_buffer_read_key";
-    constexpr uint8_t kTestValue[]  = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+    static constexpr char kTestKey[] = "too_small_buffer_read_key";
+    constexpr uint8_t kTestValue[]   = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
     uint8_t readValue[9];
     size_t readSize;
@@ -254,7 +254,7 @@ static void TestKeyValueStoreMgr_AllCharactersKey(nlTestSuite * inSuite, void * 
 
 static void TestKeyValueStoreMgr_NonExistentDelete(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey = "non_existent";
+    static constexpr char kTestKey[] = "non_existent";
 
     CHIP_ERROR err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -263,7 +263,7 @@ static void TestKeyValueStoreMgr_NonExistentDelete(nlTestSuite * inSuite, void *
 #if !defined(__ZEPHYR__) && !defined(__MBED__)
 static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kTestKey  = "multi_key";
+    static constexpr char kTestKey[] = "multi_key";
     constexpr uint32_t kTestValue[5] = { 1, 2, 3, 4, 5 };
 
     CHIP_ERROR err = KeyValueStoreMgr().Put(kTestKey, kTestValue);
@@ -289,8 +289,8 @@ static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inConte
 #ifdef __ZEPHYR__
 static void TestKeyValueStoreMgr_DoFactoryReset(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr const char * kStrKey  = "string_with_weird_chars\\=_key";
-    constexpr const char * kUintKey = "some_uint_key";
+    static constexpr char kStrKey[]  = "string_with_weird_chars\\=_key";
+    static constexpr char kUintKey[] = "some_uint_key";
 
     NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Put(kStrKey, "some_string") == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, KeyValueStoreMgr().Put(kUintKey, uint32_t(1234)) == CHIP_NO_ERROR);

@@ -230,7 +230,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
 {
     int threadErr = THREAD_ERROR_NONE;
 
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(Thread::OperationalDataset::IsValid(netInfo), CHIP_ERROR_INVALID_ARGUMENT);
 
     threadErr = thread_network_set_active_dataset_tlvs(mThreadInstance, netInfo.data(), netInfo.size());
@@ -257,7 +257,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Thread::OperationalDatase
     uint8_t * tlvsData = nullptr;
     int tlvsLen;
 
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     threadErr = thread_network_get_active_dataset_tlvs(mThreadInstance, &tlvsData, &tlvsLen);
     VerifyOrExit(threadErr == THREAD_ERROR_NONE, ChipLogError(DeviceLayer, "FAIL: get active dataset tlvs"));
@@ -306,7 +306,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 {
     int threadErr = THREAD_ERROR_NONE;
 
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     bool isEnabled = sInstance._IsThreadEnabled();
 
     if (val && !isEnabled)
@@ -400,7 +400,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::Thr
     int threadErr = THREAD_ERROR_NONE;
     thread_device_type_e devType;
 
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     switch (deviceType)
     {
@@ -540,7 +540,7 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
                                                   const Span<const Dnssd::TextEntry> & aTxtEntries, uint32_t aLeaseInterval,
                                                   uint32_t aKeyLeaseInterval)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -576,7 +576,7 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
 
 CHIP_ERROR ThreadStackManagerImpl::_RemoveSrpService(const char * aInstanceName, const char * aName)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -640,7 +640,7 @@ exit:
 
 CHIP_ERROR ThreadStackManagerImpl::_SetupSrpHost(const char * aHostName)
 {
-    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aHostName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(strlen(aHostName) <= Dnssd::kHostNameMaxLength, CHIP_ERROR_INVALID_STRING_LENGTH);
 
