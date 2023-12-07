@@ -1177,18 +1177,25 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
 
-    CommissioningDelegate::CommissioningReport report;
-    auto pairingDelegate         = commissioner->GetPairingDelegate();
-    auto deviceBeingCommissioned = commissioner->mDeviceBeingCommissioned;
-    if (pairingDelegate != nullptr && deviceBeingCommissioned != nullptr)
+    if (commissioner->mCommissioningStage != CommissioningStage::kICDRegistration)
     {
-        pairingDelegate->OnICDRegistrationComplete(deviceBeingCommissioned->GetDeviceId(), data.ICDCounter);
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+        return;
     }
-    else
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
     {
-        commissioner->CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, report);
+        return;
+    }
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        CommissioningDelegate::CommissioningReport report;
+
+        commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                  data.ICDCounter);
+        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
     }
 }
 
