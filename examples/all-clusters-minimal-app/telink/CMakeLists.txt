@@ -21,35 +21,15 @@ get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
-  set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
+  set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay" CACHE STRING "" FORCE)
 else()
   unset(LOCAL_DTC_OVERLAY_FILE)
 endif()
 
-if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
-  set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
-else()
-  unset(GLOBAL_DTC_OVERLAY_FILE)
-endif()
+include( ${CHIP_ROOT}/config/telink/chip-module/CMakeLists.txt OPTIONAL)
+set_overlays() # from config/telink/chip-module/CMakeLists.txt
 
-if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
-  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
-  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
-else()
-  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
-  message(STATUS "Flash memory size is set to: 2mb")
-endif()
-
-if(DTC_OVERLAY_FILE)
-  set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
-    CACHE STRING "" FORCE
-  )
-else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
-endif()
-
-set(CONF_FILE prj.conf)
+set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
