@@ -21,8 +21,9 @@ from utils.shell import Bash, log
 
 from . import config
 
-logger = log.get_logger(__file__)
-
+_LOGGER = log.get_logger(__file__)
+_URLS_FILE = os.path.join(os.path.dirname(__file__), "urls.txt")
+_URLS_FILE_EXISTS = os.path.exists(_URLS_FILE)
 
 class PlayServicesProber:
 
@@ -30,10 +31,10 @@ class PlayServicesProber:
         # TODO: Handle all resolved addresses
         self.platform = platform
         self.artifact_dir = artifact_dir
-        self.logger = logger
+        self.logger = _LOGGER
         self.probe_artifact = os.path.join(self.artifact_dir, "net_probes.txt")
         self.command_suffix = f" 2>&1  | tee -a {self.probe_artifact}"
-        self.target = "googlehomefoyer-pa.googleapis.com"
+        self.target = ""
         self.tracert_limit = config.foyer_prober_traceroute_limit
 
     def run_command(self, command):
@@ -66,6 +67,12 @@ class PlayServicesProber:
         self.platform.run_adb_command(f"shell ping -c 4 {self.target} {self.command_suffix}")
 
     async def probe_services(self) -> None:
-        self.logger.info(f"Probing {self.target}")
-        for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
-            await getattr(self, probe_func)()
+        if _URLS_FILE_EXISTS:
+            with open(_URLS_FILE) as urls_file:
+                for line in urls_file:
+                    self.target = line
+                    self.logger.info(f"Probing {self.target}")
+                    for probe_func in [s for s in dir(self) if s.startswith('_probe')]:
+                        await getattr(self, probe_func)()
+        else:
+            self.logger.info("No probe targets configured")
