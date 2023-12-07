@@ -8230,7 +8230,6 @@
               NetworkInfoStruct:
                   - networkIdentifier
                   - clientIdentifier
-      enum values:
           Channel:
               # Targeting Spring 2024 Matter release
               ChannelInfoStruct:
