@@ -416,7 +416,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
-    chip::app::ICDClientInfo clientInfo;
+    app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
 
