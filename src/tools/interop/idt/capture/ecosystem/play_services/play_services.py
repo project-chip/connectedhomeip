@@ -111,7 +111,7 @@ class PlayServices(EcosystemCapture):
         self.analysis.show_analysis()
 
     async def probe_capture(self) -> None:
-        if config.enable_foyer_probers:
+        if config.enable_probers:
             await PlayServicesProber(self.platform, self.artifact_dir).probe_services()
         else:
-            logger.critical("Foyer probers disabled in config!")
+            logger.critical("Probers disabled in config!")

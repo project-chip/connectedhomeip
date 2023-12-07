@@ -15,5 +15,5 @@
 #    limitations under the License.
 #
 
-enable_foyer_probers = True
-foyer_prober_traceroute_limit = 32
+enable_probers = True
+prober_traceroute_limit = 32
