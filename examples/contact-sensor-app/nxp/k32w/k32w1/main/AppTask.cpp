@@ -202,7 +202,7 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s, %d", currentSoftwareVer, currentVersion);
 
-    auto& bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
+    auto & bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
     bleManager.RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
 
     return err;
