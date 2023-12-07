@@ -38,7 +38,7 @@
 #define DEFAULT_TRACE_FILTER_LENGTH 24
 #endif
 
-static const char * TRACE_GROUP = "CHIP";
+static const char TRACE_GROUP[] = "CHIP";
 
 namespace chip {
 namespace DeviceLayer {

@@ -66,7 +66,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Credentials;
 
-const char * TAG = "temperature-measurement-app";
+extern const char TAG[] = "temperature-measurement-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 

@@ -34,7 +34,7 @@ namespace Platform {
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    constexpr const char * kLogTag                = "CHIP";
+    static constexpr char kLogTag[]               = "CHIP";
     char msgBuf[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {
         0,
     };
