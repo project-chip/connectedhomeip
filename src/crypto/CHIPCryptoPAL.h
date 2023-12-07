@@ -55,8 +55,8 @@ inline constexpr size_t kMaxCertificateSerialNumberLength      = 20;
 inline constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
 inline constexpr size_t kMaxCRLDistributionPointURLLength      = 100;
 
-inline constexpr const char * kValidCDPURIHttpPrefix  = "http://";
-inline constexpr const char * kValidCDPURIHttpsPrefix = "https://";
+inline constexpr char kValidCDPURIHttpPrefix[]  = "http://";
+inline constexpr char kValidCDPURIHttpsPrefix[] = "https://";
 
 inline constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 inline constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -562,7 +562,7 @@ protected:
     bool mInitialized = false;
 };
 
-using Aes128KeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
 /**
  * @brief Platform-specific AES key

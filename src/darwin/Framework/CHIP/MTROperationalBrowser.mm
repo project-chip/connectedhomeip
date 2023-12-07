@@ -25,8 +25,8 @@
 #include <platform/LockTracker.h>
 
 namespace {
-constexpr const char kLocalDot[] = "local.";
-constexpr const char kOperationalType[] = "_matter._tcp";
+constexpr char kLocalDot[] = "local.";
+constexpr char kOperationalType[] = "_matter._tcp";
 constexpr DNSServiceFlags kBrowseFlags = 0;
 }
 

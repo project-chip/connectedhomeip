@@ -109,8 +109,8 @@ NVM_RegisterDataSet((void *) &chipConfigRamStructKeyString, 1, sizeof(chipConfig
                     NVM_ID_CHIP_CONFIG_DATA_KEY_STRING, gNVM_MirroredInRam_c);
 
 #elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
-const char * mt_key_int_file_name    = "mt_key_int";
-const char * mt_key_str_file_name    = "mt_key_str";
+const char mt_key_int_file_name[]    = "mt_key_int";
+const char mt_key_str_file_name[]    = "mt_key_str";
 #if CHIP_PLAT_SAVE_NVM_DATA_ON_IDLE
 static bool mt_key_int_save_in_flash = false;
 static bool mt_key_str_save_in_flash = false;
