@@ -56,7 +56,7 @@ namespace chip {
 namespace python {
 
 using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                 chip::CommandId commandId, chip::CommandRef commandRef,
+                                                 chip::CommandId commandId, size_t index,
                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
 using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,

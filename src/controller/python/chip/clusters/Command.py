@@ -162,9 +162,9 @@ class AsyncBatchCommandsTransaction:
             else:
                 self._responses[index] = None
 
-    def handleResponse(self, path: CommandPath, ref: int, status: Status, response: bytes):
+    def handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
         self._event_loop.call_soon_threadsafe(
-            self._handleResponse, path, ref, status, response)
+            self._handleResponse, path, index, status, response)
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
         if self._future.done():
@@ -201,7 +201,7 @@ class AsyncBatchCommandsTransaction:
 
 
 _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_uint16, c_uint8, c_void_p, c_uint32)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_size_t, c_uint16, c_uint8, c_void_p, c_uint32)
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint8, PyChipError)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
@@ -209,10 +209,10 @@ _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
 
 
 @_OnCommandSenderResponseCallbackFunct
-def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, ref: int,
+def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, command: int, index: int,
                                      imStatus: int, clusterStatus: int, payload, size):
     data = ctypes.string_at(payload, size)
-    closure.handleResponse(CommandPath(endpoint, cluster, command), ref, Status(
+    closure.handleResponse(CommandPath(endpoint, cluster, command), index, Status(
         imStatus, clusterStatus), data[:])
 
 
