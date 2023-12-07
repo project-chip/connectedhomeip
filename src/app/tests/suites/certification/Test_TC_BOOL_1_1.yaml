@@ -65,23 +65,7 @@ tests:
               type: list
               contains: [0, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 5: Read the global attribute: AcceptedCommandList"
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 6: Read the global attribute: GeneratedCommandList"
-      command: "readAttribute"
-      attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 7: Read the global attribute: EventList"
+    - label: "Step 5: Read the global attribute: EventList"
       PICS: BOOL.S.E00 && PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -90,10 +74,26 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 7: Read the global attribute: EventList"
+    - label: "Step 5: Read the global attribute: EventList"
       PICS: " !BOOL.S.E00 && PICS_EVENT_LIST_ENABLED "
       command: "readAttribute"
       attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
       response:
           value: []
           constraints:

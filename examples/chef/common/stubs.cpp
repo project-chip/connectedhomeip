@@ -3,10 +3,110 @@
 #include <app/data-model/Nullable.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
+#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#include "chef-air-quality.h"
+#endif // EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
+    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
+    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
+    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
+    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+#include "chef-concentration-measurement.h"
+#endif
 
 using chip::app::DataModel::Nullable;
 
 using namespace chip;
+
+EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
+{
+    switch (clusterId)
+    {
+#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+    case chip::app::Clusters::AirQuality::Id:
+        return chefAirQualityReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
+    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
+    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
+    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
+    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::OzoneConcentrationMeasurement::Id:
+    case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm1ConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm25ConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm10ConcentrationMeasurement::Id:
+    case chip::app::Clusters::RadonConcentrationMeasurement::Id:
+    case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+        return chefConcentrationMeasurementReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+#endif
+    default:
+        break;
+    }
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+/*
+ *
+Thread 3 "rootnode_airqua" hit Breakpoint 1, emberAfExternalAttributeWriteCallback (endpoint=1, clusterId=91,
+    attributeMetadata=0x555555791f30 <(anonymous namespace)::generatedAttributes+1904>, buffer=0x7ffff68464ac "\001")
+    at /home/erwinpan/matter/erwinpan1/master_1124_airqualitysensor/examples/chef/common/stubs.cpp:22
+(gdb) p *attributeMetadata
+$1 = {defaultValue = {ptrToDefaultValue = 0x0, defaultValue = 0, ptrToMinMaxValue = 0x0}, attributeId = 0, size = 1, attributeType =
+48 '0', mask = 16 '\020'} (gdb)
+*/
+
+EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+{
+    switch (clusterId)
+    {
+#ifdef EMBER_AF_PLUGIN_AIR_QUALITY_SERVER
+    case chip::app::Clusters::AirQuality::Id:
+        return chefAirQualityWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+#if defined(EMBER_AF_PLUGIN_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                   \
+    defined(EMBER_AF_PLUGIN_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                    \
+    defined(EMBER_AF_PLUGIN_NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                  \
+    defined(EMBER_AF_PLUGIN_OZONE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                             \
+    defined(EMBER_AF_PLUGIN_PM2__5_CONCENTRATION_MEASUREMENT_SERVER) ||                                                            \
+    defined(EMBER_AF_PLUGIN_FORMALDEHYDE_CONCENTRATION_MEASUREMENT_SERVER) ||                                                      \
+    defined(EMBER_AF_PLUGIN_PM1_CONCENTRATION_MEASUREMENT_SERVER) ||                                                               \
+    defined(EMBER_AF_PLUGIN_PM10_CONCENTRATION_MEASUREMENT_SERVER) ||                                                              \
+    defined(EMBER_AF_PLUGIN_TOTAL_VOLATILE_ORGANIC_COMPOUNDS_CONCENTRATION_MEASUREMENT_SERVER) ||                                  \
+    defined(EMBER_AF_PLUGIN_RADON_CONCENTRATION_MEASUREMENT_SERVER)
+    case chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::CarbonDioxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::Id:
+    case chip::app::Clusters::OzoneConcentrationMeasurement::Id:
+    case chip::app::Clusters::FormaldehydeConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm1ConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm25ConcentrationMeasurement::Id:
+    case chip::app::Clusters::Pm10ConcentrationMeasurement::Id:
+    case chip::app::Clusters::RadonConcentrationMeasurement::Id:
+    case chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+        return chefConcentrationMeasurementWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+#endif
+    default:
+        break;
+    }
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
 
 // Include door lock callbacks only when the server is enabled
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER

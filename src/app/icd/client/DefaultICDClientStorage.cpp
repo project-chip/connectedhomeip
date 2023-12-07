@@ -258,8 +258,27 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kMonitoredSubject)));
         ReturnErrorOnFailure(reader.Get(clientInfo.monitored_subject));
 
-        // Shared key
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
+        // UserActiveModeTriggerHint
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint)));
+        ReturnErrorOnFailure(reader.Get(clientInfo.user_active_mode_trigger_hint));
+
+        // UserActiveModeTriggerInstruction
+        ReturnErrorOnFailure(reader.Next());
+        err = reader.Expect(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction));
+        if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(
+                reader.GetString(clientInfo.user_active_mode_trigger_instruction, kUserActiveModeTriggerInstructionSize));
+            clientInfo.has_instruction = true;
+            // Shared key
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
+        }
+        else if (err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT)
+        {
+            err = reader.Expect(TLV::ContextTag(ClientInfoTag::kSharedKey));
+        }
+        ReturnErrorOnFailure(err);
+
         ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
         VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
@@ -288,6 +307,11 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
 }
 
+void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
+{
+    mpKeyStore->DestroyKey(clientInfo.shared_key);
+}
+
 CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
 {
     TLV::TLVType arrayType;
@@ -301,6 +325,15 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
+        ReturnErrorOnFailure(
+            writer.Put(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint), clientInfo.user_active_mode_trigger_hint));
+        if (clientInfo.has_instruction)
+        {
+            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction),
+                                                  clientInfo.user_active_mode_trigger_instruction,
+                                                  static_cast<uint32_t>(strlen(clientInfo.user_active_mode_trigger_instruction))));
+        }
+
         ByteSpan buf(clientInfo.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
@@ -386,6 +419,23 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
+CHIP_ERROR DefaultICDClientStorage::GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo)
+{
+    size_t clientInfoSize = 0;
+    std::vector<ICDClientInfo> clientInfoVector;
+    ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
+    IgnoreUnusedVariable(clientInfoSize);
+    for (auto & info : clientInfoVector)
+    {
+        if (peerNode.GetNodeId() == info.peer_node.GetNodeId())
+        {
+            clientInfo = info;
+            return CHIP_NO_ERROR;
+        }
+    }
+    return CHIP_ERROR_NOT_FOUND;
+}
+
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
     size_t clientInfoSize = 0;
@@ -396,7 +446,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
     {
         if (peerNode.GetNodeId() == it->peer_node.GetNodeId())
         {
-            mpKeyStore->DestroyKey(it->shared_key);
+            RemoveKey(*it);
             it = clientInfoVector.erase(it);
             break;
         }
@@ -431,7 +481,7 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     IgnoreUnusedVariable(clientInfoSize);
     for (auto & clientInfo : clientInfoVector)
     {
-        mpKeyStore->DestroyKey(clientInfo.shared_key);
+        RemoveKey(clientInfo);
     }
     ReturnErrorOnFailure(
         mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::ICDClientInfoKey(fabricIndex).KeyName()));

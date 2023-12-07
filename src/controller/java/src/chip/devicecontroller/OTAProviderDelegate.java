@@ -129,12 +129,32 @@ public interface OTAProviderDelegate {
     @Nullable Long softwareVersion;
     @Nullable String softwareVersionString;
     @Nullable String filePath;
+    QueryImageResponseStatusEnum status;
+    @Nullable Boolean userConsentNeeded = null;
+    @Nullable Long delayedActionTime = null;
 
     public QueryImageResponse(
-        @Nullable Long softwareVersion, @Nullable String softwareVersionString, String filePath) {
+        @Nullable Long softwareVersion,
+        @Nullable String softwareVersionString,
+        String filePath,
+        Boolean userConsentNeeded) {
+      this.status = QueryImageResponseStatusEnum.UpdateAvailable;
       this.softwareVersion = softwareVersion;
       this.softwareVersionString = softwareVersionString;
       this.filePath = filePath;
+      this.userConsentNeeded = userConsentNeeded;
+    }
+
+    public QueryImageResponse(
+        QueryImageResponseStatusEnum status, long delayedActionTime, Boolean userConsentNeeded) {
+      this.status = status;
+      this.delayedActionTime = delayedActionTime;
+      this.userConsentNeeded = userConsentNeeded;
+    }
+
+    public QueryImageResponse(QueryImageResponseStatusEnum status, Boolean userConsentNeeded) {
+      this.status = status;
+      this.userConsentNeeded = userConsentNeeded;
     }
 
     public Long getSoftwareVersion() {
@@ -147,6 +167,37 @@ public interface OTAProviderDelegate {
 
     public String getFilePath() {
       return filePath;
+    }
+
+    public int getStatus() {
+      return status.getValue();
+    }
+
+    public Long getDelayedActionTime() {
+      return delayedActionTime;
+    }
+
+    public Boolean getUserConsentNeeded() {
+      return userConsentNeeded;
+    }
+  }
+
+  // See Refer CompatEnumNames.h
+  public enum QueryImageResponseStatusEnum {
+    // Enum for QueryImageResponseStatusEnum
+    UpdateAvailable(0x00),
+    Busy(0x01),
+    NotAvailable(0x02),
+    DownloadProtocolNotSupported(0x03);
+
+    private int value;
+
+    QueryImageResponseStatusEnum(int value) {
+      this.value = value;
+    }
+
+    public int getValue() {
+      return value;
     }
   }
 

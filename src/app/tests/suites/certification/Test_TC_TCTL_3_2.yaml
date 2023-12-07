@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     178.2.4. [TC-TCTL-3.2] Optional temperature number functionality with DUT as
@@ -23,235 +22,150 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Temperature Control"
+    endpoint: 1
+    Step_5_setTemp:
+        type: temperature
+        defaultValue: 5
+    InvalidTemp:
+        type: temperature
+        defaultValue: 100
+    Step_10_setTemp:
+        type: temperature
+        defaultValue: 50
 
 tests:
-    - label: "Note"
-      verification: |
-          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
-
-          While verifying below test case we will get 0 and null value for few attributes, as per spec 0 and null value is default for those attributes.
-      disabled: true
-
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Step 2: Operate device such that a temperature number can be accepted"
       verification: |
           Operate device such that a temperature number can be accepted
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 3: TH reads from the DUT the MinTemperature attribute"
       PICS: TCTL.S.A0001
-      verification: |
-          ./chip-tool temperaturecontrol read min-temperature 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperature with value less than TCTL.S.A0002(MaxTemperature).
-
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0001 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   MinTemperature: 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "MinTemperature"
+      response:
+          saveAs: minTemp
+          constraints:
+              type: temperature
 
     - label: "Step 4: TH reads from the DUT the MaxTemperature attribute"
       PICS: TCTL.S.A0002
-      verification: |
-          ./chip-tool temperaturecontrol read max-temperature 1 1
-
-          On TH(chip-tool), Verify that the DUT response contains a temperature with value greater than TCTL.S.A0001(MinTemperature).
-
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0002 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   MaxTemperature: 0
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "MaxTemperature"
+      response:
+          saveAs: maxTemp
+          constraints:
+              type: temperature
 
     - label:
           "Step 5: TH sends command SetTemperatureCommand with a temperature
-          number between minTemp and maxTemp inclusive, saved as setTemp."
+          number between minTemp and maxTemp inclusive, saved as setTemp"
+      command: "SetTemperature"
       PICS: TCTL.S.C00.Rsp
-      verification: |
-          ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperature <5>
-          On TH(chip-tool), Verify that the DUT response contains SUCCESS
-          [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
-          [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
-          [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
-          [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
-          [1692260094.059971][13707:13710] CHIP:DMG:         [
-          [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
-          [1692260094.060051][13707:13710] CHIP:DMG:                 {
-          [1692260094.060094][13707:13710] CHIP:DMG:                         CommandStatusIB =
-          [1692260094.060134][13707:13710] CHIP:DMG:                         {
-          [1692260094.060173][13707:13710] CHIP:DMG:                                 CommandPathIB =
-          [1692260094.060217][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060261][13707:13710] CHIP:DMG:                                         EndpointId = 0x1,
-          [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
-          [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
-          [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:
-          [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
-          [1692260094.060539][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:
-          [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:
-          [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:
-          [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:
-          [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
-          [1692260094.060975][13707:13710] CHIP:DMG: },
-          [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
-          [1692260094.061110][13707:13710] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-      disabled: true
+      arguments:
+          values:
+              - name: "TargetTemperature"
+                value: Step_5_setTemp
 
-    - label:
-          "Step 6: After a few seconds, TH reads from the DUT the
-          TemperatureSetpoint attribute."
+    - label: "Wait for 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Step 6: TH reads from the DUT the TemperatureSetpoint attribute"
       PICS: TCTL.S.A0000
-      verification: |
-          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
-
-          ./chip-tool temperaturecontrol read temperature-setpoint 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   TemperatureSetpoint : 5
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          value: Step_5_setTemp
 
     - label:
-          "Step 7: TH sends command SetTemperatureCommand with an invalid value."
+          "Step 7: TH sends command SetTemperatureCommand with an invalid value"
       PICS: TCTL.S.C00.Rsp
-      verification: |
-          ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperature <100>
-          On TH(chip-tool), Verify DUT responds with status CONSTRAINT_ERROR(0x87)
-          [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
-          [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
-          [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
-          [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
-          [1692260094.059971][13707:13710] CHIP:DMG:         [
-          [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
-          [1692260094.060051][13707:13710] CHIP:DMG:                 {
-          [1692260094.060094][13707:13710] CHIP:DMG:                         CommandStatusIB =
-          [1692260094.060134][13707:13710] CHIP:DMG:                         {
-          [1692260094.060173][13707:13710] CHIP:DMG:                                 CommandPathIB =
-          [1692260094.060217][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060261][13707:13710] CHIP:DMG:                                         EndpointId = 0x1,
-          [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
-          [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
-          [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:
-          [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
-          [1692260094.060539][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
-          [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:
-          [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:
-          [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:
-          [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:
-          [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
-          [1692260094.060975][13707:13710] CHIP:DMG: },
-          [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
-          [1692260094.061110][13707:13710] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-      disabled: true
+      command: "SetTemperature"
+      arguments:
+          values:
+              - name: "TargetTemperature"
+                value: InvalidTemp
+      response:
+          error: CONSTRAINT_ERROR
 
-    - label:
-          "Step 8: After a few seconds, TH reads from the DUT the
-          TemperatureSetpoint attribute."
+    - label: "Wait for 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
+
+    - label: "Step 8: TH reads from the DUT the TemperatureSetpoint attribute"
       PICS: TCTL.S.A0000
-      verification: |
-          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
-
-          ./chip-tool temperaturecontrol read temperature-setpoint 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   TemperatureSetpoint : 5
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          value: Step_5_setTemp
 
     - label:
           "Step 9: Operate device such that a temperature number cannot be
           accepted"
-      PICS: TCTL.S.M.SupportsInvalidInMode
       verification: |
           Operate device such that a temperature number cannot be accepted
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 10: TH sends command SetTemperatureCommand with a temperature
-          number between minTemp and maxTemp inclusive that is different from
-          setTemp."
-      PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.C00.Rsp
-      verification: |
-          ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperature <50>
-          On TH(Chip-tool), Verify that the DUT response contains INVALID_IN_MODE
-          [1692260094.059761][13707:13710] CHIP:DMG: ICR moving to [ResponseRe]
-          [1692260094.059828][13707:13710] CHIP:DMG: InvokeResponseMessage =
-          [1692260094.059862][13707:13710] CHIP:DMG: {
-          [1692260094.059895][13707:13710] CHIP:DMG:         suppressResponse = false,
-          [1692260094.059929][13707:13710] CHIP:DMG:         InvokeResponseIBs =
-          [1692260094.059971][13707:13710] CHIP:DMG:         [
-          [1692260094.060005][13707:13710] CHIP:DMG:                 InvokeResponseIB =
-          [1692260094.060051][13707:13710] CHIP:DMG:                 {
-          [1692260094.060094][13707:13710] CHIP:DMG:                         CommandStatusIB =
-          [1692260094.060134][13707:13710] CHIP:DMG:                         {
-          [1692260094.060173][13707:13710] CHIP:DMG:                                 CommandPathIB =
-          [1692260094.060217][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060261][13707:13710] CHIP:DMG:                                         EndpointId = 0x1,
-          [1692260094.060310][13707:13710] CHIP:DMG:                                         ClusterId = 0x56,
-          [1692260094.060356][13707:13710] CHIP:DMG:                                         CommandId = 0x0,
-          [1692260094.060402][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060452][13707:13710] CHIP:DMG:
-          [1692260094.060493][13707:13710] CHIP:DMG:                                 StatusIB =
-          [1692260094.060539][13707:13710] CHIP:DMG:                                 {
-          [1692260094.060584][13707:13710] CHIP:DMG:                                         status = 0x03(INVALID_IN_MODE)
-          [1692260094.060629][13707:13710] CHIP:DMG:                                 },
-          [1692260094.060674][13707:13710] CHIP:DMG:
-          [1692260094.060712][13707:13710] CHIP:DMG:                         },
-          [1692260094.060756][13707:13710] CHIP:DMG:
-          [1692260094.060792][13707:13710] CHIP:DMG:                 },
-          [1692260094.060834][13707:13710] CHIP:DMG:
-          [1692260094.060867][13707:13710] CHIP:DMG:         ],
-          [1692260094.060909][13707:13710] CHIP:DMG:
-          [1692260094.060942][13707:13710] CHIP:DMG:         InteractionModelRevision = 10
-          [1692260094.060975][13707:13710] CHIP:DMG: },
-          [1692260094.061064][13707:13710] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x85
-          [1692260094.061110][13707:13710] CHIP:TOO: Error: IM Error 0x00000585: General error: 0x85 (INVALID_COMMAND)
-      disabled: true
+          number between minTemp and maxTemp inclusive, saved as setTemp"
+      command: "SetTemperature"
+      PICS: TCTL.S.C00.Rsp && PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      arguments:
+          values:
+              - name: "TargetTemperature"
+                value: Step_10_setTemp
+      response:
+          error: INVALID_IN_STATE
 
-    - label:
-          "Step 11: after a few seconds, TH reads from the DUT the
-          TemperatureSetpoint attribute."
-      PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.A0000
-      verification: |
-          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
+    - label: "Wait for 5s"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
-          ./chip-tool temperaturecontrol read temperature-setpoint 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
-          [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
-          [1689770673.417845][9280:9282] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770673.417851][9280:9282] CHIP:DMG: }
-          [1689770673.417920][9280:9282] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0000 DataVersion: 2844459846
-          [1689770673.417946][9280:9282] CHIP:TOO:   TemperatureSetpoint : 5
-          [1689770673.418017][9280:9282] CHIP:EM: <<< [E:21789i S:28147 M:181187483 (Ack:172880761)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-      disabled: true
+    - label: "Step 11: TH reads from the DUT the TemperatureSetpoint attribute"
+      PICS: TCTL.S.A0000 && TCTL.S.M.SupportsInvalidInMode
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          value: Step_5_setTemp
