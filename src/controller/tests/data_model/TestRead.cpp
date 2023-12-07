@@ -2628,8 +2628,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
 }
 
 /**
- * When the liveness timeout of a subscription to ICD reaches, the subscription will enter "IdleSubscription" state, the client
- * should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
+ * When the liveness timeout of a subscription to ICD reaches, the subscription will enter "InactiveICDSubscription" state, the
+ * client should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
  */
 void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * apSuite, void * apContext)
 {
