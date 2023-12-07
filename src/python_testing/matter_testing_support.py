@@ -281,7 +281,7 @@ class MatterTestConfig:
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
-    timeout: int = 90
+    timeout: typing.Union[int, None] = None
     endpoint: int = 0
 
     commissioning_method: Optional[str] = None
@@ -630,6 +630,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             return fn()
         except AttributeError:
             return test
+
+    # Override this if the test requires a different default timeout.
+    # This value will be overridden if a timeout is supplied on the command line.
+    @property
+    def default_timeout(self) -> int:
+        return 90
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
@@ -1157,7 +1163,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
-    config.timeout = 90 if args.timeout is None else args.timeout
+    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = 0 if args.endpoint is None else args.endpoint
 
     config.controller_node_id = args.controller_node_id
@@ -1211,7 +1217,7 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
-    basic_group.add_argument('--timeout', type=int, default=90, help="Test timeout in seconds")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
@@ -1306,7 +1312,8 @@ def async_test_body(body):
     """
 
     def async_runner(self: MatterBaseTest, *args, **kwargs):
-        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=self.matter_test_config.timeout)
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
         return asyncio.run(runner_with_timeout)
 
     return async_runner
