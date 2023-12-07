@@ -968,6 +968,21 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
+void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
+{
+    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    {
+        auto pNextItem = pListItem->GetNextClient();
+        // It is possible that pListItem is destructed by the app in OnActiveModeNotification.
+        // Get the next item before invoking `OnActiveModeNotification`.
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        {
+            pListItem->OnActiveModeNotification();
+        }
+        pListItem = pNextItem;
+    }
+}
+
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
     apReadClient->SetNextClient(mpActiveReadClientList);

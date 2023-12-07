@@ -42,8 +42,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Protocols;
 
-using namespace chip::System::Clock::Literals;
-
 namespace {
 
 constexpr EndpointId kTestEndpointId        = 1;
@@ -298,7 +296,7 @@ public:
     static void TestReadAttribute_ManyErrors(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeAttributeDeniedNotExistPath(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KeepSubscriptionTest(nlTestSuite * apSuite, void * apContext);
-    static void TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribe_OnActiveModeNotification(nlTestSuite * apSuite, void * apContext);
 
 private:
     static uint16_t mMaxInterval;
@@ -2630,11 +2628,10 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
 }
 
 /**
- * When the peer of the subscription is an ICD, the client should set the active duration before sending the
- * request. When the active timeout reached, the subscription will enter "IdleSubscription" state, the client
- * can call "WakeUp" to re-activate it again when the check-in message is received from the ICD.
+ * When the liveness timeout of a subscription to ICD reaches, the subscription will enter "IdleSubscription" state, the client
+ * should call "OnActiveModeNotification" to re-activate it again when the check-in message is received from the ICD.
  */
-void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
@@ -2696,7 +2693,8 @@ void TestReadInteraction::TestSubscribeIdleWakeUp(nlTestSuite * apSuite, void * 
         ctx.GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
 
-        readClient.OnActiveModeNotification();
+        app::InteractionModelEngine::GetInstance()->OnActiveModeNotification(
+            ScopedNodeId(readClient.GetPeerNodeId(), readClient.GetFabricIndex()));
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
 
@@ -4830,7 +4828,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestResubscribeAttributeTimeout", TestReadInteraction::TestResubscribeAttributeTimeout),
     NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_DEF("TestReadHandler_KeepSubscriptionTest", TestReadInteraction::TestReadHandler_KeepSubscriptionTest),
-    NL_TEST_DEF("TestSubscribeIdleWakeUp", TestReadInteraction::TestSubscribeIdleWakeUp),
+    NL_TEST_DEF("TestSubscribe_OnActiveModeNotification", TestReadInteraction::TestSubscribe_OnActiveModeNotification),
     NL_TEST_SENTINEL()
 };
 // clang-format on

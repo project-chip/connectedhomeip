@@ -326,13 +326,11 @@ public:
     /**
      *  Activate the idle subscription.
      *
-     *  When subscriptiing to ICD and liveness timeout reached, the read client
-     * will move to `IdleSubscription` state and resubscription can be triggerred
-     * via OnActiveModeNotification().
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `IdleSubscription` state and
+     * resubscription can be triggered via OnActiveModeNotification().
      *
-     *  If the subscription is not in `IdleSubscription` state, this function will
-     * do nothing. So it is always safe to call this function when a check-in message
-     * is received.
+     *  If the subscription is not in `IdleSubscription` state, this function will do nothing. So it is always safe to call this
+     * function when a check-in message is received.
      */
     void OnActiveModeNotification();
 

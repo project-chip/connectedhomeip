@@ -432,8 +432,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 void ReadClient::OnActiveModeNotification()
 {
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // If the subscription is not at `IdleSubscription` state, then the liveness timeout is not triggerred.
-    // Simplily do nothing.
+    // Simply do nothing if the subscription is not at `IdleSubscription` state.
     VerifyOrReturn(IsIdleSubscription());
     TriggerResubscription();
 }
@@ -907,10 +906,9 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     if (_this->mIsPeerICD)
     {
-        // If device is idle, we mark the subscription as "IdleSubscription", and trigger resubscription on
-        // `OnActiveModeNotification`.
-        // Note: the liveness timeout is always longer than the MaxInterval (and idle duration), so we can move the
-        // device to `IdleSubcription` when liveness timeout reached.
+        // If the device is idle, we mark the subscription as "IdleSubscription", and trigger resubscription on
+        // `OnActiveModeNotification`. Note: the liveness timeout is always longer than the MaxInterval (and idle duration), so we
+        // can move the device to `IdleSubcription` when liveness timeout is reached.
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as IdleSubscription.");
         _this->MoveToState(ClientState::IdleSubscription);
         return;
