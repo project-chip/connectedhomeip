@@ -42,13 +42,10 @@ CHIP_ERROR ICDListCommand::RunCommand()
                 static_cast<uint32_t>(info.peer_node.GetFabricIndex()), ChipLogValueX64(info.peer_node.GetNodeId()),
                 info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject));
 
-        if (std::is_same<Crypto::DefaultSessionKeystore, Crypto::RawKeySessionKeystore>::value)
-        {
-            // The following cast is valid only when `DefaultSessionKeystore` is `RawKeySessionKeystore`.
-            Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
-                                 icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-            fprintf(stderr, "  | Symmetric Key: %60s |\n", icdSymmetricKeyHex);
-        }
+        // The following cast is valid only when `DefaultSessionKeystore` is `RawKeySessionKeystore`.
+        Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
+                                icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+        fprintf(stderr, "  | Symmetric Key: %60s |\n", icdSymmetricKeyHex);
     }
 
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
@@ -60,11 +57,11 @@ CHIP_ERROR ICDListCommand::RunCommand()
 
 void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    const char * clusterName = "ICD";
+    const char * name = "ICD";
 
-    commands_list clusterCommands = {
+    commands_list commands = {
         make_unique<ICDListCommand>(credsIssuerConfig),
     };
 
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for client-side ICD management.");
+    commands.RegisterCommandSet(name, commands, "Commands for client-side ICD management.");
 }
