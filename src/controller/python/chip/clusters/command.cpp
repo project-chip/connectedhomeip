@@ -292,7 +292,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
             // CommandSender provides us with the CommandReference for this associated command. In order to match responses
             // we have to add CommandRef to index lookup.
             VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_UNEXPECTED_EVENT);
-            SuccessOrExit(callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
+            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
         }
     }
 
