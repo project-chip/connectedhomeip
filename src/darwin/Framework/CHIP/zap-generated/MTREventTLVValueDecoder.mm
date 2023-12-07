@@ -2822,8 +2822,12 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
         __auto_type * value = [MTREnergyEVSEClusterFaultEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.sessionID];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.sessionID.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.sessionID.Value()];
+            }
             value.sessionID = memberValue;
         } while (0);
         do {

@@ -1057,7 +1057,7 @@ provisional cluster EnergyEvse = 153 {
   }
 
   critical event Fault = 4 {
-    int32u sessionID = 0;
+    nullable int32u sessionID = 0;
     StateEnum state = 1;
     FaultStateEnum faultStatePreviousState = 2;
     FaultStateEnum faultStateCurrentState = 4;

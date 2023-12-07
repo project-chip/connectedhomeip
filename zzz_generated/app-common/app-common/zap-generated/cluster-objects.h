@@ -22443,7 +22443,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint32_t sessionID                     = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> sessionID;
     StateEnum state                        = static_cast<StateEnum>(0);
     FaultStateEnum faultStatePreviousState = static_cast<FaultStateEnum>(0);
     FaultStateEnum faultStateCurrentState  = static_cast<FaultStateEnum>(0);
@@ -22458,7 +22458,7 @@ public:
     static constexpr EventId GetEventId() { return Events::Fault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
 
-    uint32_t sessionID                     = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> sessionID;
     StateEnum state                        = static_cast<StateEnum>(0);
     FaultStateEnum faultStatePreviousState = static_cast<FaultStateEnum>(0);
     FaultStateEnum faultStateCurrentState  = static_cast<FaultStateEnum>(0);

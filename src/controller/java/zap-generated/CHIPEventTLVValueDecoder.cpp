@@ -4674,11 +4674,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_sessionID;
-            std::string value_sessionIDClassName     = "java/lang/Long";
-            std::string value_sessionIDCtorSignature = "(J)V";
-            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            if (cppValue.sessionID.IsNull())
+            {
+                value_sessionID = nullptr;
+            }
+            else
+            {
+                std::string value_sessionIDClassName     = "java/lang/Long";
+                std::string value_sessionIDCtorSignature = "(J)V";
+                jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            }
 
             jobject value_state;
             std::string value_stateClassName     = "java/lang/Integer";

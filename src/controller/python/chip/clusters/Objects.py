@@ -24331,13 +24331,13 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sessionID", Tag=0, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="state", Tag=1, Type=EnergyEvse.Enums.StateEnum),
                         ClusterObjectFieldDescriptor(Label="faultStatePreviousState", Tag=2, Type=EnergyEvse.Enums.FaultStateEnum),
                         ClusterObjectFieldDescriptor(Label="faultStateCurrentState", Tag=4, Type=EnergyEvse.Enums.FaultStateEnum),
                     ])
 
-            sessionID: 'uint' = 0
+            sessionID: 'typing.Union[Nullable, uint]' = NullValue
             state: 'EnergyEvse.Enums.StateEnum' = 0
             faultStatePreviousState: 'EnergyEvse.Enums.FaultStateEnum' = 0
             faultStateCurrentState: 'EnergyEvse.Enums.FaultStateEnum' = 0

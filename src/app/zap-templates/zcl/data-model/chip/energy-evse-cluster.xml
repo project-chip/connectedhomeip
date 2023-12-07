@@ -196,7 +196,7 @@ limitations under the License.
     </event>
     <event code="0x0004" name="Fault" priority="critical" apiMaturity="provisional">
       <description>Fault</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
+      <field id="0" name="SessionID" type="int32u" isNullable="true" apiMaturity="provisional"/>
       <field id="1" name="State" type="StateEnum" apiMaturity="provisional"/>
       <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" apiMaturity="provisional"/>
       <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" apiMaturity="provisional"/>
