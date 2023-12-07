@@ -113,7 +113,7 @@ void TestBasicImport(nlTestSuite * inSuite, void * inContext)
         Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
-        Aes128BitsKeyHandle keyHandle;
+        Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
 
         Platform::ScopedMemoryBuffer<uint8_t> ciphertext;
@@ -140,7 +140,7 @@ void TestDeriveKey(nlTestSuite * inSuite, void * inContext)
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
         secret.SetLength(strlen(test.secret));
 
-        Aes128BitsKeyHandle keyHandle;
+        Aes128KeyHandle keyHandle;
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.DeriveKey(secret, ToSpan(test.salt), ToSpan(test.info), keyHandle));
 
         uint8_t ciphertext[sizeof(test.ciphertext)];
@@ -162,8 +162,8 @@ void TestDeriveSessionKeys(nlTestSuite * inSuite, void * inContext)
         memcpy(secret.Bytes(), test.secret, strlen(test.secret));
         secret.SetLength(strlen(test.secret));
 
-        Aes128BitsKeyHandle i2r;
-        Aes128BitsKeyHandle r2i;
+        Aes128KeyHandle i2r;
+        Aes128KeyHandle r2i;
         AttestationChallenge challenge;
         NL_TEST_ASSERT_SUCCESS(
             inSuite, keystore.DeriveSessionKeys(ToSpan(test.secret), ToSpan(test.salt), ToSpan(test.info), i2r, r2i, challenge));

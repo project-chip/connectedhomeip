@@ -33,7 +33,7 @@ struct ICDClientInfo
     uint32_t start_icd_counter             = 0;
     uint32_t offset                        = 0;
     uint64_t monitored_subject             = static_cast<uint64_t>(0);
-    Crypto::Aes128BitsKeyHandle shared_key = Crypto::Aes128BitsKeyHandle();
+    Crypto::Aes128KeyHandle shared_key = Crypto::Aes128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
