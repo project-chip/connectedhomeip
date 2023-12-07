@@ -207,7 +207,7 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              PyObject * context, DeviceAvailableFunc callback);
+                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback);
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
@@ -737,7 +737,7 @@ namespace {
 
 struct GetDeviceCallbacks
 {
-    GetDeviceCallbacks(PyObject * context, DeviceAvailableFunc callback) :
+    GetDeviceCallbacks(chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback) :
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mContext(context), mCallback(callback)
     {}
 
@@ -758,13 +758,13 @@ struct GetDeviceCallbacks
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    PyObject * const mContext;
+    chip::Controller::Python::PyObject * const mContext;
     DeviceAvailableFunc mCallback;
 };
 } // anonymous namespace
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              PyObject * context, DeviceAvailableFunc callback)
+                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback)
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     auto * callbacks = new GetDeviceCallbacks(context, callback);
