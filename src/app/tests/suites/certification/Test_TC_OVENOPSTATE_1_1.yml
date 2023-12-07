@@ -14,12 +14,12 @@
 
 name: 3.1.1. [TC-OVENOPSTATE-1.1] Global attributes with server as DUT
 PICS:
-  - OVENOPSTATE.S
+    - OVENOPSTATE.S
 
 config:
-  nodeId: 0x12344321
-  cluster: "Oven Operational State"
-  endpoint: 1
+    nodeId: 0x12344321
+    cluster: "Oven Operational State"
+    endpoint: 1
 
 tests:
     - label: "Step 1: Wait for the commissioned device to be retrieved"

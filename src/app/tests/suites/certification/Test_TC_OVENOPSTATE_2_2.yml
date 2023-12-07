@@ -311,8 +311,8 @@ tests:
 
     - label: "Step 17: TH sends Start command to the DUT"
       PICS:
-          OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp &&
-          OVENOPSTATE.S.C04.Tx
+          OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp
+          && OVENOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
 
