@@ -41,9 +41,6 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 namespace chip {
 namespace app {
 
-inline constexpr uint32_t kCheckInCounterMax       = UINT32_MAX;
-inline constexpr uint32_t kCheckInRolloverConstant = (1U << 31);
-
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
@@ -465,24 +462,18 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, bool & refreshKey)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t & counter)
 {
-    uint32_t counter;
-    MutableByteSpan appData;
+    uint8_t testAppData[32];
+    MutableByteSpan appData(testAppData);
     auto * iterator = IterateICDClientInfo();
     while (iterator->Next(clientInfo))
     {
-        if (CHIP_NO_ERROR ==
-            chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload, counter,
-                                                                                       appData))
+        CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload,
+                                                                                                    counter, appData);
+        if (CHIP_NO_ERROR == err)
         {
-            auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-            VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_SIGNATURE);
-            clientInfo.offset = counter - clientInfo.start_icd_counter;
-            if (checkInCounter > kCheckInRolloverConstant)
-            {
-                refreshKey = true;
-            }
+            iterator->Release();
             return CHIP_NO_ERROR;
         }
     }
