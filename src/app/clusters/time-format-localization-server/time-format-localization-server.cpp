@@ -144,7 +144,7 @@ Optional<E> SafeCast(uint8_t value)
     {
         return NullOptional;
     }
-    return chip::MakeOptional(val);
+    return MakeOptional(val);
 }
 
 } // anonymous namespace
