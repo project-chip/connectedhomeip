@@ -42,6 +42,8 @@ Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClus
     mDelegate->SetInstance(this);
 }
 
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId) : Instance(aDelegate, aEndpointId, OperationalState::Id) {}
+
 Instance::~Instance()
 {
     InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
@@ -344,12 +346,8 @@ void Instance::HandlePauseState(HandlerContext & ctx, const Commands::Pause::Dec
     }
 
     // Handle Pause-incompatible states for derived clusters.
-    switch (mClusterId)
-    {
-    case RvcOperationalState::Id:
-        if (opState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
-            opState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked))
-        {
+    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart) {
+        if (!IsDerivedClusterStatePauseCompatible(opState)) {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         }
     }
@@ -417,11 +415,8 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     }
 
     // Handle Resume-incompatible states for derived clusters.
-    switch (mClusterId)
-    {
-    case RvcOperationalState::Id:
-        if (opState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
-        {
+    if (opState >= DerivedClusterNumberSpaceStart && opState < VendorNumberSpaceStart) {
+        if (!IsDerivedClusterStateResumeCompatible(opState)) {
             err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
         }
     }
@@ -437,4 +432,17 @@ void Instance::HandleResumeState(HandlerContext & ctx, const Commands::Resume::D
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+// RvcOperationalState
+
+bool RvcOperationalState::Instance::IsDerivedClusterStatePauseCompatible(uint8_t aState)
+{
+    return aState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
+}
+
+bool RvcOperationalState::Instance::IsDerivedClusterStateResumeCompatible(uint8_t aState)
+{
+    return (aState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
+        aState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
 }
