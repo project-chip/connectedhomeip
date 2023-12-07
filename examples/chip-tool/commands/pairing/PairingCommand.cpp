@@ -430,7 +430,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     {
         // StoreEntry is unlikely to fail since it is a local operation for CHIP Tool.
         ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
-                     ErrorStr(err));
+                     err.AsString());
         SetCommandExitStatus(err);
         return;
     }
