@@ -66,5 +66,5 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
         make_unique<ICDListCommand>(credsIssuerConfig),
     };
 
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for ICD management.");
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for client-side ICD management.");
 }
