@@ -80,7 +80,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
-                // keyHandle leaks in some implementations.
+                // key leaks in some implementations.
                 memcpy(aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
                        sizeof(Crypto::Symmetric128BitsKeyByteArray));
                 keyHandleValid = true;
@@ -101,7 +101,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
-                // keyHandle leaks in some implementations.
+                // key leaks in some implementations.
                 memcpy(hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
                        sizeof(Crypto::Symmetric128BitsKeyByteArray));
             }
@@ -133,7 +133,7 @@ CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    // TODO - Add function to call PSA key lifetime
+    // TODO - Add function to set PSA key lifetime
     ReturnErrorOnFailure(symmetricKeystore->CreateKey(keyMaterial, aesKeyHandle));
     CHIP_ERROR error = symmetricKeystore->CreateKey(keyMaterial, hmacKeyHandle);
 
