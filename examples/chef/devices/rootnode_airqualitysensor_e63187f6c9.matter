@@ -387,7 +387,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -447,11 +447,13 @@ cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -1901,8 +1903,6 @@ endpoint 0 {
 
   server cluster TimeFormatLocalization {
     persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
-    callback attribute supportedCalendarTypes;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1992,7 +1992,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 0x0001;
 
     handle command OpenCommissioningWindow;
-    handle command OpenBasicCommissioningWindow;
     handle command RevokeCommissioning;
   }
 
@@ -2083,9 +2082,9 @@ endpoint 1 {
   }
 
   server cluster TemperatureMeasurement {
-    persist  attribute measuredValue default = 0;
-    persist  attribute minMeasuredValue;
-    persist  attribute maxMeasuredValue default = 0x8000;
+    persist  attribute measuredValue default = 0x800;
+    persist  attribute minMeasuredValue default = 0x800;
+    persist  attribute maxMeasuredValue default = 0x800;
     persist  attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

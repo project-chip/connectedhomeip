@@ -61,14 +61,14 @@ void TestFlatAllocatedQName(nlTestSuite * inSuite, void * inContext)
 
 void SizeCompare(nlTestSuite * inSuite, void * inContext)
 {
-    const char kThis[]    = "this";
-    const char kIs[]      = "is";
-    const char kA[]       = "a";
-    const char kTest[]    = "test";
-    const char kVest[]    = "vest";
-    const char kBee[]     = "bee";
-    const char kRobbery[] = "robbery";
-    const char kExtra[]   = "extra";
+    static const char kThis[]    = "this";
+    static const char kIs[]      = "is";
+    static const char kA[]       = "a";
+    static const char kTest[]    = "test";
+    static const char kVest[]    = "vest";
+    static const char kBee[]     = "bee";
+    static const char kRobbery[] = "robbery";
+    static const char kExtra[]   = "extra";
 
     const char * kSameArraySameSize[4]        = { kThis, kIs, kA, kTest };
     const char * kDifferentArraySameSize[4]   = { kThis, kIs, kA, kVest };
@@ -97,11 +97,11 @@ void SizeCompare(nlTestSuite * inSuite, void * inContext)
 
 void BuildCompare(nlTestSuite * inSuite, void * inContext)
 {
-    const char kThis[]  = "this";
-    const char kIs[]    = "is";
-    const char kA[]     = "a";
-    const char kTest[]  = "test";
-    const char kExtra[] = "extra";
+    static const char kThis[]  = "this";
+    static const char kIs[]    = "is";
+    static const char kA[]     = "a";
+    static const char kTest[]  = "test";
+    static const char kExtra[] = "extra";
 
     const char * kSameArraySameSize[4]  = { kThis, kIs, kA, kTest };
     const char * kSameArrayExtraWord[5] = { kThis, kIs, kA, kTest, kExtra };

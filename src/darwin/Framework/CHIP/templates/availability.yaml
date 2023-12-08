@@ -7598,9 +7598,6 @@
                   - CalendarFormat
   provisional:
       attributes:
-          # New things, not quite finalized.
-          PowerSource:
-              - EndpointList
           Descriptor:
               - TagList
       structs:
@@ -7831,6 +7828,8 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          PowerSource:
+              - EndpointList
       commands:
           RVCRunMode:
               - ChangeToMode
@@ -8201,6 +8200,9 @@
           - LaundryDryerControls
           - EnergyEVSE
           - OvenCavityOperationalState
+          - ContentControl
+          - ContentAppObserver
+          - DeviceEnergyManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8217,6 +8219,12 @@
           Scenes:
               # Targeting Spring 2024 Matter release
               - FabricSceneInfo
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActiveAudioTrack
+              - AvailableAudioTracks
+              - ActiveTextTrack
+              - AvailableTextTracks
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
@@ -8226,6 +8234,17 @@
               # Targeting Spring 2024 Matter release
               - QueryIdentity
               - QueryIdentityResponse
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - GetProgramGuide
+              - ProgramGuideResponse
+              - RecordProgram
+              - CancelRecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActivateAudioTrack
+              - ActivateTextTrack
+              - DeactivateTextTrack
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8242,16 +8261,65 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Rewind:
+                  - audioAdvanceUnmuted
+              FastForward:
+                  - audioAdvanceUnmuted
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              LaunchContent:
+                  - playbackPreferences
+                  - useCurrentContext
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              Login:
+                  - node
+              Logout:
+                  - node
       structs:
           Scenes:
               # Targeting Spring 2024 Matter release
               - SceneInfoStruct
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ProgramStruct
+              - SeriesInfoStruct
+              - ProgramCategoryStruct
+              - ProgramCastStruct
+              - PageTokenStruct
+              - ChannelPagingStruct
+              - AdditionalInfoStruct
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - TrackStruct
+              - TrackAttributesStruct
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - PlaybackPreferencesStruct
+              - TrackPreferenceStruct
       struct fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               NetworkInfoStruct:
                   - networkIdentifier
                   - clientIdentifier
+          Channel:
+              # Targeting Spring 2024 Matter release
+              ChannelInfoStruct:
+                  - identifier
+                  - type
+      events:
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - StateChanged
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              - LoggedOut
+          TargetNavigator:
+              # Targeting Spring 2024 Matter release
+              - TargetUpdated
       enums:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -8263,6 +8331,30 @@
               - ACRefrigerantTypeEnum
               - ACTypeEnum
               - SetpointChangeSourceEnum
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ChannelTypeEnum
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+      enum values:
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              ParameterEnum:
+                  - Season
+                  - Episode
+                  - Any
+              StatusEnum:
+                  - TextTrackNotAvailable
+                  - AudioTrackNotAvailable
+          TimeFormatLocalization:
+              CalendarTypeEnum:
+                  - UseActiveLocale
+              HourFormatEnum:
+                  - UseActiveLocale
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8277,6 +8369,9 @@
               - ProgrammingOperationModeBitmap
               - RelayStateBitmap
               - RemoteSensingBitmap
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - RecordingFlagBitmap
       bitmap values:
           OnOff:
               Feature:
@@ -8288,6 +8383,25 @@
                   - PerDeviceCredentials
               WiFiSecurityBitmap:
                   - WPA3MatterPDC
+          Channel:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - ElectronicGuide
+                  - RecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - TextTracks
+                  - AudioTracks
+                  - AudioAdvance
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              SupportedProtocolsBitmap:
+                  - WebRTC
+              Feature:
+                  - AdvancedSeek
+                  - TextTracks
+                  - AudioTracks
   renames:
       structs:
           Thermostat:

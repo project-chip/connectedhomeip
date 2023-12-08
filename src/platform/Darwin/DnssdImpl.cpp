@@ -31,7 +31,7 @@ using namespace chip::Dnssd::Internal;
 
 namespace {
 
-constexpr const char * kLocalDot = "local.";
+constexpr char kLocalDot[] = "local.";
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = 0;

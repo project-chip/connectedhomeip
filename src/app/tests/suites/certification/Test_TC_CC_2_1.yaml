@@ -178,7 +178,7 @@ tests:
           constraints:
               type: int16u
               minValue: 0
-              maxValue: 65534
+              maxValue: 65535
 
     - label: "Step 17: TH reads ColorLoopStartEnhancedHue attribute from DUT"
       PICS: CC.S.A4005

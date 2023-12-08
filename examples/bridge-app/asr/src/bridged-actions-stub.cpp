@@ -62,7 +62,7 @@ CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, Att
 
 CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    const char SetupUrl[] = "https://example.com";
+    static const char SetupUrl[] = "https://example.com";
     return aEncoder.Encode(chip::Span<const char>(SetupUrl, strlen(SetupUrl)));
 }
 

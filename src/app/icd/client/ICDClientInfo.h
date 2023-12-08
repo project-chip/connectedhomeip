@@ -44,8 +44,9 @@ struct ICDClientInfo
         start_icd_counter = other.start_icd_counter;
         offset            = other.offset;
         monitored_subject = other.monitored_subject;
-        ByteSpan buf(other.shared_key.As<Crypto::Aes128KeyByteArray>());
-        memcpy(shared_key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        ByteSpan buf(other.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
+        memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         return *this;
     }
 };

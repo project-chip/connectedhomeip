@@ -506,18 +506,19 @@ namespace TimeFormatLocalization {
 // Enum for CalendarTypeEnum
 enum class CalendarTypeEnum : uint8_t
 {
-    kBuddhist  = 0x00,
-    kChinese   = 0x01,
-    kCoptic    = 0x02,
-    kEthiopian = 0x03,
-    kGregorian = 0x04,
-    kHebrew    = 0x05,
-    kIndian    = 0x06,
-    kIslamic   = 0x07,
-    kJapanese  = 0x08,
-    kKorean    = 0x09,
-    kPersian   = 0x0A,
-    kTaiwanese = 0x0B,
+    kBuddhist        = 0x00,
+    kChinese         = 0x01,
+    kCoptic          = 0x02,
+    kEthiopian       = 0x03,
+    kGregorian       = 0x04,
+    kHebrew          = 0x05,
+    kIndian          = 0x06,
+    kIslamic         = 0x07,
+    kJapanese        = 0x08,
+    kKorean          = 0x09,
+    kPersian         = 0x0A,
+    kTaiwanese       = 0x0B,
+    kUseActiveLocale = 0xFF,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -528,8 +529,9 @@ enum class CalendarTypeEnum : uint8_t
 // Enum for HourFormatEnum
 enum class HourFormatEnum : uint8_t
 {
-    k12hr = 0x00,
-    k24hr = 0x01,
+    k12hr            = 0x00,
+    k24hr            = 0x01,
+    kUseActiveLocale = 0xFF,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -2308,6 +2310,87 @@ enum class Feature : uint32_t
     kHeatingSource       = 0x40,
 };
 } // namespace DemandResponseLoadControl
+
+namespace DeviceEnergyManagement {
+
+// Enum for CauseEnum
+enum class CauseEnum : uint8_t
+{
+    kNormalCompletion = 0x00,
+    kOffline          = 0x01,
+    kFault            = 0x02,
+    kUserOptOut       = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for CostTypeEnum
+enum class CostTypeEnum : uint8_t
+{
+    kFinancial    = 0x00,
+    kGHGEmissions = 0x01,
+    kComfort      = 0x02,
+    kTemperature  = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Enum for ESAStateEnum
+enum class ESAStateEnum : uint8_t
+{
+    kOffline           = 0x00,
+    kOnline            = 0x01,
+    kFault             = 0x02,
+    kUserOptOut        = 0x03,
+    kPowerAdjustActive = 0x04,
+    kPaused            = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 6,
+};
+
+// Enum for ESATypeEnum
+enum class ESATypeEnum : uint8_t
+{
+    kEvse                = 0x00,
+    kSpaceHeating        = 0x01,
+    kWaterHeating        = 0x02,
+    kSpaceCooling        = 0x03,
+    kSpaceHeatingCooling = 0x04,
+    kBatteryStorage      = 0x05,
+    kSolarPV             = 0x06,
+    kFridgeFreezer       = 0x07,
+    kWashingMachine      = 0x08,
+    kDishwasher          = 0x09,
+    kCooking             = 0x0A,
+    kHomeWaterPump       = 0x0B,
+    kIrrigationWaterPump = 0x0C,
+    kPoolPump            = 0x0D,
+    kOther               = 0xFF,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 14,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPowerAdjustment        = 0x1,
+    kPowerForecastReporting = 0x2,
+    kStateForecastReporting = 0x4,
+    kForecastAdjustment     = 0x8,
+};
+} // namespace DeviceEnergyManagement
 
 namespace EnergyEvse {
 
