@@ -173,8 +173,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
     reqCookMode = cookMode.ValueOr(to_underlying(MicrowaveOvenMode::ModeTag::kNormal) - kDerivedModeTag);
-    VerifyOrExit(mMicrowaveOvenModeInstance.IsSupportedMode(reqCookMode),
-                 status = Status::InvalidCommand;
+    VerifyOrExit(mMicrowaveOvenModeInstance.IsSupportedMode(reqCookMode), status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
     reqCookTime = cookTime.ValueOr(MicrowaveOvenControl::kDefaultCookTime);
