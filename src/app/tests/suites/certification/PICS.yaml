@@ -8911,6 +8911,19 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: DRYERCTRL.S.A0001
+    
+
+     # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: DRYERCTRL.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DRYERCTRL.S.C01.Tx
 
     # RVC Clean Mode Cluster
 
