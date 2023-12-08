@@ -37,7 +37,7 @@
 namespace chip {
 namespace app {
 
-inline constexpr uint64_t kCheckInCounterMax = (1UL << 32);
+inline constexpr uint64_t kCheckInCounterMax = (1ULL << 32);
 inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
 
 CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
