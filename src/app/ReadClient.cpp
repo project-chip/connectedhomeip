@@ -437,7 +437,7 @@ void ReadClient::OnActiveModeNotification()
 {
     // This function just tries to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
-    // If we are not in InactiveICDSubscription state, that means the liveness timeout has not reached. Simply do nothing.
+    // If we are not in InactiveICDSubscription state, that means the liveness timeout has not been reached. Simply do nothing.
     VerifyOrReturn(IsInactiveICDSubscription());
 
     MoveToState(ClientState::Idle);
