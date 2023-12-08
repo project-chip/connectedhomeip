@@ -163,13 +163,13 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMod
 template <class T>
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<T> value)
 {
-    VerifyOrReturnError(value.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(value.HasValue(), CHIP_ERROR_UNINITIALIZED);
     return CopyTextRecordValue(buffer, bufferLen, value.Value());
 }
 
 CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<uint16_t> value1, chip::Optional<uint16_t> value2)
 {
-    VerifyOrReturnError(value1.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(value1.HasValue(), CHIP_ERROR_UNINITIALIZED);
     return value2.HasValue() ? CopyTextRecordValue(buffer, bufferLen, value1.Value(), value2.Value())
                              : CopyTextRecordValue(buffer, bufferLen, value1.Value());
 }
@@ -180,7 +180,7 @@ CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Opti
     VerifyOrReturnError((key == TxtFieldKey::kSessionIdleInterval || key == TxtFieldKey::kSessionActiveInterval ||
                          key == TxtFieldKey::kSessionActiveThreshold),
                         CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_UNINITIALIZED);
 
     CHIP_ERROR err;
     if (key == TxtFieldKey::kSessionActiveThreshold)
@@ -215,9 +215,9 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         // A ICD operating as a LIT should not advertise its slow polling interval
         if (params.GetICDOperatingAsLIT().HasValue() && params.GetICDOperatingAsLIT().Value())
         {
-            // returning WELL_UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
+            // Returning UNINITIALIZED ensures that the SII string isn't added by the AddTxtRecord
             // without erroring out the action.
-            return CHIP_ERROR_WELL_UNINITIALIZED;
+            return CHIP_ERROR_UNINITIALIZED;
         }
         FALLTHROUGH;
 #endif
@@ -261,7 +261,7 @@ CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCo
                         const T & params)
 {
     CHIP_ERROR error = CopyTxtRecord(key, buffer, bufferLen, params);
-    VerifyOrReturnError(CHIP_ERROR_WELL_UNINITIALIZED != error, CHIP_NO_ERROR);
+    VerifyOrReturnError(CHIP_ERROR_UNINITIALIZED != error, CHIP_NO_ERROR);
     VerifyOrReturnError(CHIP_NO_ERROR == error, error);
 
     entries[entriesCount++] = { Internal::txtFieldInfo[static_cast<int>(key)].keyStr, reinterpret_cast<const uint8_t *>(buffer),

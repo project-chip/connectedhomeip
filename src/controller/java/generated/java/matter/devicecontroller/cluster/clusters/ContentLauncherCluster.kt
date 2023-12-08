@@ -40,6 +40,8 @@ class ContentLauncherCluster(
     search: ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?,
+    playbackPreferences: ContentLauncherClusterPlaybackPreferencesStruct?,
+    useCurrentContext: Boolean?,
     timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
     val commandId = 0L

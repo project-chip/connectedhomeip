@@ -36,16 +36,28 @@ public:
     virtual ~SessionKeystore() {}
 
     /**
-     * @brief Import raw key material and return a key handle.
+     * @brief Import raw key material and return a key handle for a key that be used to do AES 128 encryption.
      *
      * @note This method should only be used when using the raw key material in the Matter stack
      * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
      * cryptographic operations in a secure environment.
      *
      * If the method returns no error, the application is responsible for destroying the handle
-     * using DestroyKey() method when the key is no longer needed.
+     * using the DestroyKey() method when the key is no longer needed.
      */
-    virtual CHIP_ERROR CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key) = 0;
+    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) = 0;
+
+    /**
+     * @brief Import raw key material and return a key handle for a key that can be used to do 128-bit HMAC.
+     *
+     * @note This method should only be used when using the raw key material in the Matter stack
+     * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
+     * cryptographic operations in a secure environment.
+     *
+     * If the method returns no error, the application is responsible for destroying the handle
+     * using the DestroyKey() method when the key is no longer needed.
+     */
+    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) = 0;
 
     /**
      * @brief Derive key from a shared secret.
@@ -78,7 +90,7 @@ public:
      * The method can take an uninitialized handle in which case it is a no-op.
      * As a result of calling this method, the handle is put in the uninitialized state.
      */
-    virtual void DestroyKey(Aes128KeyHandle & key) = 0;
+    virtual void DestroyKey(Symmetric128BitsKeyHandle & key) = 0;
 };
 
 /**

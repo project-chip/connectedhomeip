@@ -196,14 +196,14 @@ TestHarnessDACProvider::TestHarnessDACProvider()
 
 void TestHarnessDACProvider::Init(const char * filepath)
 {
-    constexpr const char kDacCertKey[]      = "dac_cert";
-    constexpr const char kDacPrivateKey[]   = "dac_private_key";
-    constexpr const char kDacPublicKey[]    = "dac_public_key";
-    constexpr const char kPaiCertKey[]      = "pai_cert";
-    constexpr const char kCertDecKey[]      = "certification_declaration";
-    constexpr const char kFirmwareInfoKey[] = "firmware_information";
-    constexpr const char kIsSuccessKey[]    = "is_success_case";
-    constexpr const char kDescription[]     = "description";
+    static constexpr char kDacCertKey[]      = "dac_cert";
+    static constexpr char kDacPrivateKey[]   = "dac_private_key";
+    static constexpr char kDacPublicKey[]    = "dac_public_key";
+    static constexpr char kPaiCertKey[]      = "pai_cert";
+    static constexpr char kCertDecKey[]      = "certification_declaration";
+    static constexpr char kFirmwareInfoKey[] = "firmware_information";
+    static constexpr char kIsSuccessKey[]    = "is_success_case";
+    static constexpr char kDescription[]     = "description";
 
     std::ifstream json(filepath, std::ifstream::binary);
     if (!json)

@@ -110,8 +110,8 @@ void EchoTimerHandler(chip::System::Layer * systemLayer, void * appState)
 
 CHIP_ERROR SendEchoRequest()
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    static const char kRequestFormat[] = "Echo Message %" PRIu64 "\n";
     char requestData[(sizeof kRequestFormat) + 20 /* uint64_t decimal digits */];
     snprintf(requestData, sizeof requestData, kRequestFormat, gEchoCount);
     chip::System::PacketBufferHandle && payloadBuf = chip::MessagePacketBuffer::NewWithData(requestData, strlen(requestData));

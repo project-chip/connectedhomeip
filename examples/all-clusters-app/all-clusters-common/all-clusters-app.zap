@@ -19,17 +19,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -12845,7 +12845,7 @@
               "code": 27,
               "mfgCode": null,
               "side": "server",
-              "type": "ThermostatControlSequenceEnum",
+              "type": "ControlSequenceOfOperationEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -12861,7 +12861,7 @@
               "code": 28,
               "mfgCode": null,
               "side": "server",
-              "type": "ThermostatSystemModeEnum",
+              "type": "SystemModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -22020,5 +22020,6 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

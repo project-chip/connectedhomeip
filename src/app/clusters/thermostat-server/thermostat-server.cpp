@@ -97,14 +97,14 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
-            chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> valueRemoteSensing;
+            BitMask<RemoteSensingBitmap> valueRemoteSensing;
             EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
                 StatusIB statusIB(ToInteractionModelStatus(status));
                 return statusIB.ToChipError();
             }
-            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature); // clear bit 1 (LocalTemperature RemoteSensing bit)
+            valueRemoteSensing.Clear(RemoteSensingBitmap::kLocalTemperature);
             return aEncoder.Encode(valueRemoteSensing);
         }
         break;
@@ -490,14 +490,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * com
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::SetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterGetRelayStatusLogCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData)
 {
     // TODO
     return false;

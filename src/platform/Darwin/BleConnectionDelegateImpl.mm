@@ -44,7 +44,7 @@ constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
 constexpr uint64_t kScanningWithoutDelegateTimeoutInSeconds = 120;
 constexpr uint64_t kCachePeripheralTimeoutInSeconds
     = static_cast<uint64_t>(CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX / 1000.0 * 8.0 * 0.625);
-constexpr const char * kBleWorkQueueName = "org.csa-iot.matter.framework.ble.workqueue";
+constexpr char kBleWorkQueueName[] = "org.csa-iot.matter.framework.ble.workqueue";
 
 typedef NS_ENUM(uint8_t, BleConnectionMode) {
     kUndefined = 0,

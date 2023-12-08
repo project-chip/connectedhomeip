@@ -1324,6 +1324,8 @@ public class ClusterWriteMapping {
     );
     writeDemandResponseLoadControlInteractionInfo.put("writeDefaultRandomDurationAttribute", writeDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo);
     writeAttributeMap.put("demandResponseLoadControl", writeDemandResponseLoadControlInteractionInfo);
+    Map<String, InteractionInfo> writeDeviceEnergyManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("deviceEnergyManagement", writeDeviceEnergyManagementInteractionInfo);
     Map<String, InteractionInfo> writeEnergyEvseInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeEnergyEvseUserMaximumChargeCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo energyEvseuserMaximumChargeCurrentCommandParameterInfo =
@@ -2039,6 +2041,28 @@ public class ClusterWriteMapping {
     writePumpConfigurationAndControlInteractionInfo.put("writeControlModeAttribute", writePumpConfigurationAndControlControlModeAttributeInteractionInfo);
     writeAttributeMap.put("pumpConfigurationAndControl", writePumpConfigurationAndControlInteractionInfo);
     Map<String, InteractionInfo> writeThermostatInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeThermostatHVACSystemTypeConfigurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatHVACSystemTypeConfigurationCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeThermostatHVACSystemTypeConfigurationCommandParams.put(
+        "value",
+        thermostatHVACSystemTypeConfigurationCommandParameterInfo
+    );
+    InteractionInfo writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster).writeHVACSystemTypeConfigurationAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeThermostatHVACSystemTypeConfigurationCommandParams
+    );
+    writeThermostatInteractionInfo.put("writeHVACSystemTypeConfigurationAttribute", writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatLocalTemperatureCalibrationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatlocalTemperatureCalibrationCommandParameterInfo =
         new CommandParameterInfo(
@@ -2589,28 +2613,28 @@ public class ClusterWriteMapping {
       writeThermostatACLouverPositionCommandParams
     );
     writeThermostatInteractionInfo.put("writeACLouverPositionAttribute", writeThermostatACLouverPositionAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeThermostatACCapacityFormatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostatACCapacityFormatCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeThermostatACCapacityformatCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCapacityformatCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeThermostatACCapacityFormatCommandParams.put(
+    writeThermostatACCapacityformatCommandParams.put(
         "value",
-        thermostatACCapacityFormatCommandParameterInfo
+        thermostatACCapacityformatCommandParameterInfo
     );
-    InteractionInfo writeThermostatACCapacityFormatAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeThermostatACCapacityformatAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityFormatAttribute(
+        ((ChipClusters.ThermostatCluster) cluster).writeACCapacityformatAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeThermostatACCapacityFormatCommandParams
+      writeThermostatACCapacityformatCommandParams
     );
-    writeThermostatInteractionInfo.put("writeACCapacityFormatAttribute", writeThermostatACCapacityFormatAttributeInteractionInfo);
+    writeThermostatInteractionInfo.put("writeACCapacityformatAttribute", writeThermostatACCapacityformatAttributeInteractionInfo);
     writeAttributeMap.put("thermostat", writeThermostatInteractionInfo);
     Map<String, InteractionInfo> writeFanControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeFanControlFanModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -3578,6 +3602,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("applicationBasic", writeApplicationBasicInteractionInfo);
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
+    Map<String, InteractionInfo> writeContentControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
+    Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =

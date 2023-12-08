@@ -2966,6 +2966,54 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     }
     }
 }
+static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagement;
+    switch (aAttributeId) {
+    case Attributes::ESAType::Id: {
+        return YES;
+    }
+    case Attributes::ESACanGenerate::Id: {
+        return YES;
+    }
+    case Attributes::ESAState::Id: {
+        return YES;
+    }
+    case Attributes::AbsMinPower::Id: {
+        return YES;
+    }
+    case Attributes::AbsMaxPower::Id: {
+        return YES;
+    }
+    case Attributes::PowerAdjustmentCapability::Id: {
+        return YES;
+    }
+    case Attributes::Forecast::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyEvse;
@@ -3480,6 +3528,9 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::PIHeatingDemand::Id: {
         return YES;
     }
+    case Attributes::HVACSystemTypeConfiguration::Id: {
+        return YES;
+    }
     case Attributes::LocalTemperatureCalibration::Id: {
         return YES;
     }
@@ -3517,9 +3568,6 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SystemMode::Id: {
-        return YES;
-    }
-    case Attributes::AlarmMask::Id: {
         return YES;
     }
     case Attributes::ThermostatRunningMode::Id: {
@@ -3597,7 +3645,7 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ACCoilTemperature::Id: {
         return YES;
     }
-    case Attributes::ACCapacityFormat::Id: {
+    case Attributes::ACCapacityformat::Id: {
         return YES;
     }
     case Attributes::PresetTypes::Id: {
@@ -5019,6 +5067,18 @@ static BOOL AttributeIsSpecifiedInMediaPlaybackCluster(AttributeId aAttributeId)
     case Attributes::SeekRangeStart::Id: {
         return YES;
     }
+    case Attributes::ActiveAudioTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableAudioTracks::Id: {
+        return YES;
+    }
+    case Attributes::ActiveTextTrack::Id: {
+        return YES;
+    }
+    case Attributes::AvailableTextTracks::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -5282,6 +5342,84 @@ static BOOL AttributeIsSpecifiedInApplicationBasicCluster(AttributeId aAttribute
 static BOOL AttributeIsSpecifiedInAccountLoginCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::AccountLogin;
+    switch (aAttributeId) {
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentControl;
+    switch (aAttributeId) {
+    case Attributes::Enabled::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatings::Id: {
+        return YES;
+    }
+    case Attributes::OnDemandRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatings::Id: {
+        return YES;
+    }
+    case Attributes::ScheduledContentRatingThreshold::Id: {
+        return YES;
+    }
+    case Attributes::ScreenDailyTime::Id: {
+        return YES;
+    }
+    case Attributes::RemainingScreenTime::Id: {
+        return YES;
+    }
+    case Attributes::BlockUnrated::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInContentAppObserverCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ContentAppObserver;
     switch (aAttributeId) {
     case Attributes::GeneratedCommandList::Id: {
         return YES;
@@ -6213,6 +6351,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
     }
+    case Clusters::DeviceEnergyManagement::Id: {
+        return AttributeIsSpecifiedInDeviceEnergyManagementCluster(aAttributeId);
+    }
     case Clusters::EnergyEvse::Id: {
         return AttributeIsSpecifiedInEnergyEVSECluster(aAttributeId);
     }
@@ -6326,6 +6467,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::AccountLogin::Id: {
         return AttributeIsSpecifiedInAccountLoginCluster(aAttributeId);
+    }
+    case Clusters::ContentControl::Id: {
+        return AttributeIsSpecifiedInContentControlCluster(aAttributeId);
+    }
+    case Clusters::ContentAppObserver::Id: {
+        return AttributeIsSpecifiedInContentAppObserverCluster(aAttributeId);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return AttributeIsSpecifiedInElectricalMeasurementCluster(aAttributeId);

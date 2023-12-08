@@ -30,6 +30,57 @@ limitations under the License.
     <field name="Setpoints" mask="0x200"/>
     <field name="Queued Presets Supported" mask="0x400"/>
   </bitmap>
+
+  <bitmap name="ACErrorCodeBitmap" type="bitmap32">
+    <cluster code="0x0201"/>
+    <field name="CompressorFail" mask="0x01"/>
+    <field name="RoomSensorFail" mask="0x02"/>
+    <field name="OutdoorSensorFail" mask="0x04"/>
+    <field name="CoilSensorFail" mask="0x08"/>
+    <field name="FanFail" mask="0x10"/>
+  </bitmap>
+
+  <bitmap name="HVACSystemTypeBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="CoolingStage" mask="0x03"/>
+    <field name="HeatingStage" mask="0x0C"/>
+    <field name="HeatingIsHeatPump" mask="0x10"/>
+    <field name="HeatingUsesFuel" mask="0x20"/>
+  </bitmap>
+
+  <bitmap name="ProgrammingOperationModeBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="ScheduleActive" mask="0x01"/>
+    <field name="AutoRecovery" mask="0x02"/>
+    <field name="Economy" mask="0x04"/>
+  </bitmap>
+
+  <bitmap name="ScheduleTypeFeaturesBitmap" type="bitmap16">
+    <cluster code="0x0201"/>
+    <field name="SupportsPresets" mask="0x01"/>
+    <field name="SupportsSetpoints" mask="0x02"/>
+    <field name="SupportsNames" mask="0x04"/>
+    <field name="SupportsOff" mask="0x08"/>
+  </bitmap>
+
+  <bitmap name="RelayStateBitmap" type="bitmap16">
+    <cluster code="0x0201"/>
+    <field name="Heat" mask="0x01"/>
+    <field name="Cool" mask="0x02"/>
+    <field name="Fan" mask="0x04"/>
+    <field name="HeatStage2" mask="0x08"/>
+    <field name="CoolStage2" mask="0x10"/>
+    <field name="FanStage2" mask="0x20"/>
+    <field name="FanStage3" mask="0x40"/>
+  </bitmap>
+
+  <bitmap name="RemoteSensingBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="LocalTemperature" mask="0x01"/>
+    <field name="OutdoorTemperature" mask="0x02"/>
+    <field name="Occupancy" mask="0x04"/>
+  </bitmap>
+
   <bitmap name="ScheduleDayOfWeekBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="Sunday" mask="0x01"/>
@@ -41,11 +92,25 @@ limitations under the License.
     <field name="Saturday" mask="0x40"/>
     <field name="Away" mask="0x80"/>
   </bitmap>
+
   <bitmap name="ScheduleModeBitmap" type="bitmap8">
     <cluster code="0x0201"/>
     <field name="HeatSetpointPresent" mask="0x01"/>
     <field name="CoolSetpointPresent" mask="0x02"/>
   </bitmap>
+
+  <bitmap name="PresetTypeFeaturesBitmap" type="bitmap16">
+    <cluster code="0x0201"/>
+    <field name="Automatic" mask="0x01"/>
+    <field name="SupportsNames" mask="0x02"/>
+  </bitmap>
+
+  <bitmap name="TemperatureSetpointHoldPolicyBitmap" type="bitmap8">
+    <cluster code="0x0201"/>
+    <field name="HoldDurationElapsed" mask="0x01"/>
+    <field name="HoldDurationElapsedOrPresetChanged" mask="0x02"/>
+  </bitmap>
+
   <enum name="SystemModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
@@ -58,12 +123,14 @@ limitations under the License.
     <item name="Dry" value="0x08"/>
     <item name="Sleep" value="0x09"/>
   </enum>
+
   <enum name="ThermostatRunningModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
     <item name="Cool" value="0x03"/>
     <item name="Heat" value="0x04"/>
   </enum>
+
   <enum name="StartOfWeekEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Sunday" value="0x00"/>
@@ -74,6 +141,7 @@ limitations under the License.
     <item name="Friday" value="0x05"/>
     <item name="Saturday" value="0x06"/>
   </enum>
+
   <enum name="ControlSequenceOfOperationEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="CoolingOnly" value="0x00"/>
@@ -83,27 +151,134 @@ limitations under the License.
     <item name="CoolingAndHeating" value="0x04"/>
     <item name="CoolingAndHeatingWithReheat" value="0x05"/>
   </enum>
+
   <enum name="TemperatureSetpointHoldEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="SetpointHoldOff" value="0x00"/>
     <item name="SetpointHoldOn" value="0x01"/>
   </enum>
+
   <enum name="SetpointRaiseLowerModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Heat" value="0x00"/>
     <item name="Cool" value="0x01"/>
     <item name="Both" value="0x02"/>
   </enum>
+  
+  <enum name="ACCapacityFormatEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="BTUh" value="0x00"/>
+  </enum>
+
+  <enum name="ACCompressorTypeEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Unknown" value="0x00"/>
+    <item name="T1" value="0x01"/>
+    <item name="T2" value="0x02"/>
+    <item name="T3" value="0x03"/>
+  </enum>
+
+  <enum name="ACLouverPositionEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Closed" value="0x01"/>
+    <item name="Open" value="0x02"/>
+    <item name="Quarter" value="0x03"/>
+    <item name="Half" value="0x04"/>
+    <item name="ThreeQuarters" value="0x05"/>
+  </enum>
+
+  <enum name="ACRefrigerantTypeEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Unknown" value="0x00"/>
+    <item name="R22" value="0x01"/>
+    <item name="R410a" value="0x02"/>
+    <item name="R407c" value="0x03"/>
+  </enum>
+
+  <enum name="ACTypeEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Unknown" value="0x00"/>
+    <item name="CoolingFixed" value="0x01"/>
+    <item name="HeatPumpFixed" value="0x02"/>
+    <item name="CoolingInverter" value="0x03"/>
+    <item name="HeatPumpInverter" value="0x04"/>
+  </enum>
+
+  <enum name="SetpointChangeSourceEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Manual" value="0x00"/>
+    <item name="Schedule" value="0x01"/>
+    <item name="External" value="0x02"/>
+  </enum>
+
+  <enum name="PresetScenarioEnum" type="enum8">
+    <cluster code="0x0201"/>
+    <item name="Unspecified" value="0x00"/>
+    <item name="Occupied" value="0x01"/>
+    <item name="Unoccupied" value="0x02"/>
+    <item name="Sleep" value="0x03"/>
+    <item name="Wake" value="0x04"/>
+    <item name="Vacation" value="0x05"/>
+    <item name="UserDefined" value="0x06"/>
+  </enum>
+
   <struct name="WeeklyScheduleTransitionStruct">
     <cluster code="0x0201"/>
-    <item fieldId="0" name="TransitionTime" type="int16u" max="1439"/>
-    <item fieldId="1" name="HeatSetpoint" type="temperature"/>
-    <item fieldId="2" name="CoolSetpoint" type="temperature"/>
+    <!-- See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6217 for HeatSetpoint and CoolSetpoint.  They might end up being nullable. -->
+    <item fieldId="0" name="TransitionTime" type="int16u" min="0" max="1439"/>
+    <item fieldId="1" name="HeatSetpoint" type="temperature" isNullable="true"/>
+    <item fieldId="2" name="CoolSetpoint" type="temperature" isNullable="true"/>
   </struct>
+
+  <struct name="ScheduleTypeStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="SystemMode" type="SystemModeEnum" min="0x0" max="0x9"/>
+    <item fieldId="1" name="NumberOfSchedules" type="int8u" default="0"/>
+    <item fieldId="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" min="0x0" max="0xF" default="0"/>
+  </struct>
+    <struct name="QueuedPresetStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="1" name="TransitionTimestamp" type="epoch_s" isNullable="true"/>
+  </struct>
+  <struct name="PresetStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="1" name="PresetScenario" type="PresetScenarioEnum" min="0x0" max="0x6"/>
+    <item fieldId="2" name="Name" type="char_string" length="64" isNullable="true" optional="true"/>
+    <item fieldId="3" name="CoolingSetpoint" type="temperature" optional="true" default="0x0A28"/>
+    <item fieldId="4" name="HeatingSetpoint" type="temperature" optional="true" default="0x07D0"/>
+    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true"/>
+  </struct>
+  <struct name="PresetTypeStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="PresetScenario" type="PresetScenarioEnum" min="0x0" max="0x6"/>
+    <item fieldId="1" name="NumberOfPresets" type="int8u" default="0"/>
+    <item fieldId="2" name="PresetTypeFeatures" type="PresetTypeFeaturesBitmap" min="0x0" max="0x3" default="0"/>
+  </struct>
+  <struct name="ScheduleStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="ScheduleHandle" type="octet_string" length="16" isNullable="true"/>
+    <item fieldId="1" name="SystemMode" type="SystemModeEnum" min="0x0" max="0x9"/>
+    <item fieldId="2" name="Name" type="char_string" length="64" optional="true"/>
+    <item fieldId="3" name="PresetHandle" type="octet_string" length="16" optional="true"/>
+    <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct" minLength="1"/>
+    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true" optional="true"/>
+  </struct>
+  <struct name="ScheduleTransitionStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+    <item fieldId="1" name="TransitionTime" type="int16u" min="0" max="1439"/>
+    <item fieldId="2" name="PresetHandle" type="octet_string" length="16" optional="true"/>
+    <item fieldId="3" name="SystemMode" type="SystemModeEnum" optional="true" min="0x0" max="0x9"/>
+    <item fieldId="4" name="CoolingSetpoint" type="temperature" optional="true"/>
+    <item fieldId="5" name="HeatingSetpoint" type="temperature" optional="true"/>
+  </struct>
+
   <cluster>
     <name>Thermostat</name>
     <domain>HVAC</domain>
-    <description>This cluster provides an interface to the functionality of a thermostat.</description>
+    <description>An interface for configuring and controlling the functionality of a thermostat.</description>
     <code>0x0201</code>
     <define>THERMOSTAT_CLUSTER</define>
     <client tick="false" init="false">true</client>
@@ -112,13 +287,20 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
     <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="bitmap8" writable="false" default="1" optional="true">Occupancy</attribute>
-    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" optional="true" default="0x02BC">AbsMinHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" optional="true" default="0x0BB8">AbsMaxHeatSetpointLimit</attribute>
-    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" writable="false" optional="true" default="0x0640">AbsMinCoolSetpointLimit</attribute>
-    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" writable="false" optional="true" default="0x0C80">AbsMaxCoolSetpointLimit</attribute>
+    <!-- OCCUPANCY -->
+    
+    <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="700" optional="true">AbsMinHeatSetpointLimit</attribute>
+    <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="3000" optional="true">AbsMaxHeatSetpointLimit</attribute>
+    <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="1600" optional="true">AbsMinCoolSetpointLimit</attribute>
+    <attribute side="server" code="0x0006" define="ABS_MAX_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="3200" optional="true">AbsMaxCoolSetpointLimit</attribute>
     <attribute side="server" code="0x0007" define="PI_COOLING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PICoolingDemand</attribute>
     <attribute side="server" code="0x0008" define="PI_HEATING_DEMAND" type="int8u" min="0" max="100" writable="false" reportable="true" optional="true">PIHeatingDemand</attribute>
-    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xE7" max="0x19" writable="true" optional="true" default="0x00">
+    <attribute side="server" code="0x0009" define="HVAC_SYSTEM_TYPE_CONFIGURATION" type="bitmap8" min="0x00" max="0xFF" writable="true" optional="true">
+      <description>HVACSystemTypeConfiguration</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0010" define="LOCAL_TEMPERATURE_CALIBRATION" type="int8s" min="0xE7" max="0x19" writable="true" default="0x00" optional="true">
       <description>LocalTemperatureCalibration</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -176,9 +358,9 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="RelayStateBitmap" writable="false" optional="true" min="0x0" max="0x7F">ThermostatRunningState</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="SetpointChangeSourceEnum" writable="false" optional="true" default="0" min="0x0" max="0x2">SetpointChangeSource</attribute>
-    <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="int16s" writable="false" optional="true" isNullable="true">SetpointChangeAmount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true" default="0">SetpointChangeSourceTimestamp</attribute>
-    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" min="0" max="0xFE">
+    <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="int16s" writable="false" default="0x8000" optional="true" isNullable="true">SetpointChangeAmount</attribute>
+    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true">SetpointChangeSourceTimestamp</attribute>
+    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true">
       <description>OccupiedSetback</description>
       <access op="write" privilege="manage"/>
     </attribute>
@@ -188,8 +370,8 @@ limitations under the License.
       <description>UnoccupiedSetback</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true" min="0" max="0xFE">UnoccupiedSetbackMin</attribute>
-    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true" min="0" max="0xFE">UnoccupiedSetbackMax</attribute>
+    <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMin</attribute>
+    <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMax</attribute>
     <attribute side="server" code="0x003A" define="EMERGENCY_HEAT_DELTA" type="int8u" writable="true" optional="true" default="0xFF">
       <description>EmergencyHeatDelta</description>
       <access op="write" privilege="manage"/>
@@ -218,9 +400,9 @@ limitations under the License.
       <description>ACLouverPosition</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" writable="false" optional="true" isNullable="true">ACCoilTemperature</attribute>
-    <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x0" max="0x0" writable="true" default="0" optional="true">
-      <description>ACCapacityFormat</description>
+    <attribute side="server" code="0x0046" define="AC_COIL_TEMPERATURE" type="temperature" writable="false" default="0x8000" optional="true" isNullable="true">ACCoilTemperature</attribute>
+    <attribute side="server" code="0x0047" define="AC_CAPACITY_FORMAT" type="ACCapacityFormatEnum" min="0x00" max="0xFF" writable="true" default="0" optional="true">
+      <description>ACCapacityformat</description>
       <access op="write" privilege="manage"/>
     </attribute>
     <attribute code="0x0050" side="server" type="ARRAY" entryType="PresetStruct" define="PRESETS" writable="true" optional="true">
@@ -232,7 +414,6 @@ limitations under the License.
     <attribute code="0x004D" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITION_PER_DAY" isNullable="true" writable="false" optional="true">NumberOfScheduleTransitionPerDay</attribute>
     <attribute code="0x004F" side="server" type="octet_string" define="ACTIVE_SCHEDULE_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActiveScheduleHandle</attribute>
     <attribute code="0x004B" side="server" type="int8u" define="NUMBER_OF_SCHEDULES" default="0" writable="false" optional="true">NumberOfSchedules</attribute>
-    <attribute code="0x001D" side="server" type="AlarmCodeBitmap" define="ALARM_MASK" default="0" writable="false" optional="true" min="0x0" max="0x7">AlarmMask</attribute>
     <attribute code="0x0049" side="server" type="ARRAY" entryType="ScheduleTypeStruct" define="SCHEDULE_TYPES" writable="false" optional="true">ScheduleTypes</attribute>
     <attribute code="0x0052" side="server" type="boolean" define="PRESETS_SCHEDULES_EDITABLE" writable="false" optional="true">PresetsSchedulesEditable</attribute>
     <attribute code="0x004A" side="server" type="int8u" define="NUMBER_OF_PRESETS" default="0" writable="false" optional="true">NumberOfPresets</attribute>
@@ -245,20 +426,26 @@ limitations under the License.
     <attribute code="0x0055" side="server" type="QueuedPresetStruct" define="QUEUED_PRESET" isNullable="true" writable="false" optional="true">QueuedPreset</attribute>
     <attribute code="0x004E" side="server" type="octet_string" define="ACTIVE_PRESET_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActivePresetHandle</attribute>
     <command source="client" code="0x00" name="SetpointRaiseLower" optional="false">
-      <description>Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. If the resulting value is outside the limits imposed by </description>
+      <description>
+        Command description for SetpointRaiseLower
+      </description>
       <arg name="Mode" type="SetpointRaiseLowerModeEnum" min="0x0" max="0x2"/>
       <arg name="Amount" type="int8s"/>
     </command>
     <command source="client" code="0x01" name="SetWeeklySchedule" optional="true">
-      <description>Upon receipt, the weekly schedule for updating setpoints SHALL be stored in the thermostat and SHOULD begin at the time of receipt. A status code SHALL be sent in response.</description>
+      <description>
+        Command description for SetWeeklySchedule
+      </description>
       <access op="invoke" privilege="manage"/>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
-      <arg name="Transitions" array="true" type="WeeklyScheduleTransitionStruct" length="10"/>
+      <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
     </command>
     <command source="client" code="0x02" name="GetWeeklySchedule" response="GetWeeklyScheduleResponse" optional="true">
-      <description>Upon receipt, the unit SHOULD send in return the Get Weekly Schedule Response command. The Days to Return and Mode to Return fields are defined as bitmask for the flexibility to support multiple days and multiple modes within one command. If thermostat cannot handle incoming command with multiple days and/or multiple modes within one command, it SHALL send default response of INVALID_COMMAND in return.</description>
+      <description>
+        Command description for GetWeeklySchedule
+      </description>
       <arg name="DaysToReturn" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeToReturn" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
     </command>
@@ -269,9 +456,9 @@ limitations under the License.
     <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true">
       <description>This command has the same payload format as the Set Weekly Schedule. Please refer to the payload detail in </description>
       <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekforSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
-      <arg name="Transitions" array="true" type="WeeklyScheduleTransitionStruct" length="10"/>
+      <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
     </command>
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>Upon receipt, this SHALL set the thermostat</description>
@@ -282,21 +469,9 @@ limitations under the License.
       <description>Upon receipt, this SHALL attempt to commit any pending changes to the </description>
       <access op="invoke" privilege="manage"/>
     </command>
-    <command source="server" code="0x01" name="GetRelayStatusLogResponse" optional="true">
-      <description>This command is sent from the thermostat cluster server in response to the Get Relay Status Log. After the Relay Status Entry is sent over the air to the requesting client, the specific entry will be cleared from the thermostat internal log.</description>
-      <arg name="TimeOfDay" type="int16u" min="0" max="1439"/>
-      <arg name="RelayStatus" type="RelayStateBitmap" min="0x0" max="0x7F"/>
-      <arg name="LocalTemperature" type="temperature" isNullable="true"/>
-      <arg name="HumidityInPercentage" type="int8u" isNullable="true" min="0" max="100"/>
-      <arg name="SetPoint" type="temperature"/>
-      <arg name="UnreadEntries" type="int16u"/>
-    </command>
     <command source="client" code="0x05" name="SetActiveScheduleRequest" optional="true">
       <description>Upon receipt, if the </description>
       <arg name="ScheduleHandle" type="octet_string" length="16"/>
-    </command>
-    <command source="client" code="0x04" name="GetRelayStatusLog" optional="true" response="GetRelayStatusLogResponse">
-      <description>This command is used to query the thermostat internal relay status log. This command has no payload.</description>
     </command>
     <command source="client" code="0x0A" name="CancelSetActivePresetRequest" optional="true">
       <description>This command is sent to cancel a queued preset specified by </description>
@@ -316,158 +491,4 @@ limitations under the License.
       <access op="invoke" privilege="manage"/>
     </command>
   </cluster>
-  <bitmap name="HVACSystemTypeBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="CoolingStage" mask="0x03"/>
-    <field name="HeatingStage" mask="0x0C"/>
-    <field name="HeatingIsHeatPump" mask="0x10"/>
-    <field name="HeatingUsesFuel" mask="0x20"/>
-  </bitmap>
-  <bitmap name="RemoteSensingBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="LocalTemperature" mask="0x01"/>
-    <field name="OutdoorTemperature" mask="0x02"/>
-    <field name="Occupancy" mask="0x04"/>
-  </bitmap>
-  <bitmap name="ACErrorCodeBitmap" type="bitmap32">
-    <cluster code="0x0201"/>
-    <field name="CompressorFail" mask="0x01"/>
-    <field name="RoomSensorFail" mask="0x02"/>
-    <field name="OutdoorSensorFail" mask="0x04"/>
-    <field name="CoilSensorFail" mask="0x08"/>
-    <field name="FanFail" mask="0x10"/>
-  </bitmap>
-  <bitmap name="AlarmCodeBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="Initialization" mask="0x01"/>
-    <field name="Hardware" mask="0x02"/>
-    <field name="SelfCalibration" mask="0x04"/>
-  </bitmap>
-  <bitmap name="PresetTypeFeaturesBitmap" type="bitmap16">
-    <cluster code="0x0201"/>
-    <field name="Automatic" mask="0x01"/>
-    <field name="SupportsNames" mask="0x02"/>
-  </bitmap>
-  <bitmap name="ProgrammingOperationModeBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="ScheduleActive" mask="0x01"/>
-    <field name="AutoRecovery" mask="0x02"/>
-    <field name="Economy" mask="0x04"/>
-  </bitmap>
-  <bitmap name="RelayStateBitmap" type="bitmap16">
-    <cluster code="0x0201"/>
-    <field name="Heat" mask="0x01"/>
-    <field name="Cool" mask="0x02"/>
-    <field name="Fan" mask="0x04"/>
-    <field name="HeatStage2" mask="0x08"/>
-    <field name="CoolStage2" mask="0x10"/>
-    <field name="FanStage2" mask="0x20"/>
-    <field name="FanStage3" mask="0x40"/>
-  </bitmap>
-  <bitmap name="ScheduleTypeFeaturesBitmap" type="bitmap16">
-    <cluster code="0x0201"/>
-    <field name="SupportsPresets" mask="0x01"/>
-    <field name="SupportsSetpoints" mask="0x02"/>
-    <field name="SupportsNames" mask="0x04"/>
-    <field name="SupportsOff" mask="0x08"/>
-  </bitmap>
-  <bitmap name="TemperatureSetpointHoldPolicyBitmap" type="bitmap8">
-    <cluster code="0x0201"/>
-    <field name="HoldDurationElapsed" mask="0x01"/>
-    <field name="HoldDurationElapsedOrPresetChanged" mask="0x02"/>
-  </bitmap>
-  <enum name="ACCompressorTypeEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Unknown" value="0x00"/>
-    <item name="T1" value="0x01"/>
-    <item name="T2" value="0x02"/>
-    <item name="T3" value="0x03"/>
-  </enum>
-  <enum name="ACRefrigerantTypeEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Unknown" value="0x00"/>
-    <item name="R22" value="0x01"/>
-    <item name="R410a" value="0x02"/>
-    <item name="R407c" value="0x03"/>
-  </enum>
-  <enum name="ACTypeEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Unknown" value="0x00"/>
-    <item name="CoolingFixed" value="0x01"/>
-    <item name="HeatPumpFixed" value="0x02"/>
-    <item name="CoolingInverter" value="0x03"/>
-    <item name="HeatPumpInverter" value="0x04"/>
-  </enum>
-  <enum name="PresetScenarioEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Unspecified" value="0x00"/>
-    <item name="Occupied" value="0x01"/>
-    <item name="Unoccupied" value="0x02"/>
-    <item name="Sleep" value="0x03"/>
-    <item name="Wake" value="0x04"/>
-    <item name="Vacation" value="0x05"/>
-    <item name="UserDefined" value="0x06"/>
-  </enum>
-  <enum name="ACCapacityFormatEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="BTUh" value="0x00"/>
-  </enum>
-  <enum name="ACLouverPositionEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Closed" value="0x01"/>
-    <item name="Open" value="0x02"/>
-    <item name="Quarter" value="0x03"/>
-    <item name="Half" value="0x04"/>
-    <item name="ThreeQuarters" value="0x05"/>
-  </enum>
-  <enum name="SetpointChangeSourceEnum" type="enum8">
-    <cluster code="0x0201"/>
-    <item name="Manual" value="0x00"/>
-    <item name="Schedule" value="0x01"/>
-    <item name="External" value="0x02"/>
-  </enum>
-  <struct name="ScheduleTypeStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="SystemMode" type="SystemModeEnum" min="0x0" max="0x9"/>
-    <item fieldId="1" name="NumberOfSchedules" type="int8u" default="0"/>
-    <item fieldId="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" min="0x0" max="0xF" default="0"/>
-  </struct>
-  <struct name="QueuedPresetStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="1" name="TransitionTimestamp" type="epoch_s" isNullable="true"/>
-  </struct>
-  <struct name="PresetStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="1" name="PresetScenario" type="PresetScenarioEnum" min="0x0" max="0x6"/>
-    <item fieldId="2" name="Name" type="char_string" length="64" isNullable="true" optional="true"/>
-    <item fieldId="3" name="CoolingSetpoint" type="temperature" optional="true" default="0x0A28"/>
-    <item fieldId="4" name="HeatingSetpoint" type="temperature" optional="true" default="0x07D0"/>
-    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true"/>
-  </struct>
-  <struct name="PresetTypeStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="PresetScenario" type="PresetScenarioEnum" min="0x0" max="0x6"/>
-    <item fieldId="1" name="NumberOfPresets" type="int8u" default="0"/>
-    <item fieldId="2" name="PresetTypeFeatures" type="PresetTypeFeaturesBitmap" min="0x0" max="0x3" default="0"/>
-  </struct>
-  <struct name="ScheduleStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="ScheduleHandle" type="octet_string" length="16" isNullable="true"/>
-    <item fieldId="1" name="SystemMode" type="SystemModeEnum" min="0x0" max="0x9"/>
-    <item fieldId="2" name="Name" type="char_string" length="64" optional="true"/>
-    <item fieldId="3" name="PresetHandle" type="octet_string" length="16" optional="true"/>
-    <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct" minLength="1"/>
-    <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true" optional="true"/>
-  </struct>
-  <struct name="ScheduleTransitionStruct" apiMaturity="provisional">
-    <cluster code="0x0201"/>
-    <item fieldId="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
-    <item fieldId="1" name="TransitionTime" type="int16u" min="0" max="1439"/>
-    <item fieldId="2" name="PresetHandle" type="octet_string" length="16" optional="true"/>
-    <item fieldId="3" name="SystemMode" type="SystemModeEnum" optional="true" min="0x0" max="0x9"/>
-    <item fieldId="4" name="CoolingSetpoint" type="temperature" optional="true"/>
-    <item fieldId="5" name="HeatingSetpoint" type="temperature" optional="true"/>
-  </struct>
 </configurator>

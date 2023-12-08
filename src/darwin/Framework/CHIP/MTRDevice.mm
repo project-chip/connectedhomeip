@@ -144,7 +144,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 @property (nonatomic) chip::FabricIndex fabricIndex;
 @property (nonatomic) MTRWeakReference<id<MTRDeviceDelegate>> * weakDelegate;
 @property (nonatomic) dispatch_queue_t delegateQueue;
-@property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
+@property (nonatomic) NSMutableArray<NSDictionary<NSString *, id> *> * unreportedEvents;
+@property (nonatomic) BOOL receivingReport;
+@property (nonatomic) BOOL receivingPrimingReport;
+
+// TODO: instead of all the BOOL properties that are some facet of the state, move to internal state machine that has (at least):
+//   Unsubscribed (not attemping)
+//   Attempting subscription
+//   Subscribed (gotten subscription response / in steady state with no OnError/OnDone)
+//   Actively receiving report
+//   Actively receiving priming report
 
 /**
  * If subscriptionActive is true that means that either we are in the middle of
@@ -187,6 +196,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
  * an OnDone for that ReadClient.
  */
 @property (nonatomic) ReadClient * currentReadClient;
+@property (nonatomic) SubscriptionCallback * currentSubscriptionCallback; // valid when and only when currentReadClient is valid
 
 @end
 
@@ -290,6 +300,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // nodeMayBeAdvertisingOperational is called we are running on the Matter
     // queue, and the ReadClient can't get destroyed while we are on that queue.
     ReadClient * readClientToResubscribe = nullptr;
+    SubscriptionCallback * subscriptionCallback = nullptr;
 
     os_unfair_lock_lock(&self->_lock);
 
@@ -301,10 +312,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _reattemptSubscriptionNowIfNeeded];
     } else {
         readClientToResubscribe = self->_currentReadClient;
+        subscriptionCallback = self->_currentSubscriptionCallback;
     }
     os_unfair_lock_unlock(&self->_lock);
 
     if (readClientToResubscribe) {
+        subscriptionCallback->ResetResubscriptionBackoff();
         readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
     }
 }
@@ -453,13 +466,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleReportBegin
 {
     os_unfair_lock_lock(&self->_lock);
-    [self _changeState:MTRDeviceStateReachable];
+    _receivingReport = YES;
+    if (_state != MTRDeviceStateReachable) {
+        _receivingPrimingReport = YES;
+        [self _changeState:MTRDeviceStateReachable];
+    } else {
+        _receivingPrimingReport = NO;
+    }
     os_unfair_lock_unlock(&self->_lock);
 }
 
 - (void)_handleReportEnd
 {
     os_unfair_lock_lock(&self->_lock);
+    _receivingReport = NO;
+    _receivingPrimingReport = NO;
     _estimatedStartTimeFromGeneralDiagnosticsUpTime = nil;
 // For unit testing only
 #ifdef DEBUG
@@ -499,11 +520,27 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_unlock(&self->_lock);
 }
 
+#ifdef DEBUG
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    dispatch_async(self.queue, ^{
+        [self _handleEventReport:eventReport];
+    });
+}
+#endif
+
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
     os_unfair_lock_lock(&self->_lock);
 
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
+    // Combine with previous unreported events, if they exist
+    NSMutableArray * reportToReturn;
+    if (_unreportedEvents) {
+        reportToReturn = _unreportedEvents;
+    } else {
+        reportToReturn = [NSMutableArray array];
+    }
     for (NSDictionary<NSString *, id> * eventDict in eventReport) {
         // Whenever a StartUp event is received, reset the estimated start time
         //   New subscription case
@@ -564,25 +601,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 _estimatedStartTime = potentialSystemStartTime;
             }
         }
+
+        NSMutableDictionary * eventToReturn = eventDict.mutableCopy;
+        if (_receivingPrimingReport) {
+            eventToReturn[MTREventIsHistoricalKey] = @(YES);
+        } else {
+            eventToReturn[MTREventIsHistoricalKey] = @(NO);
+        }
+
+        [reportToReturn addObject:eventToReturn];
     }
     if (oldEstimatedStartTime != _estimatedStartTime) {
         MTR_LOG_DEFAULT("%@ updated estimated start time to %@", self, _estimatedStartTime);
     }
 
-    // Combine with previous unreported events, if they exist
-    if (_unreportedEvents) {
-        eventReport = [_unreportedEvents arrayByAddingObjectsFromArray:eventReport];
-        _unreportedEvents = nil;
-    }
-
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
     if (delegate) {
+        _unreportedEvents = nil;
         dispatch_async(_delegateQueue, ^{
-            [delegate device:self receivedEventReport:eventReport];
+            [delegate device:self receivedEventReport:reportToReturn];
         });
     } else {
         // save unreported events
-        _unreportedEvents = eventReport;
+        _unreportedEvents = reportToReturn;
     }
 
     os_unfair_lock_unlock(&self->_lock);
@@ -704,6 +745,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            // holding a dangling pointer.
                            os_unfair_lock_lock(&self->_lock);
                            self->_currentReadClient = nullptr;
+                           self->_currentSubscriptionCallback = nullptr;
                            os_unfair_lock_unlock(&self->_lock);
                            dispatch_async(self.queue, ^{
                                // OnDone
@@ -756,6 +798,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    // when OnDone is called.
                    os_unfair_lock_lock(&self->_lock);
                    self->_currentReadClient = readClient.get();
+                   self->_currentSubscriptionCallback = callback.get();
                    os_unfair_lock_unlock(&self->_lock);
                    callback->AdoptReadClient(std::move(readClient));
                    callback->AdoptClusterStateCache(std::move(clusterStateCache));
@@ -1448,6 +1491,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         if (!attributeDataValue && !attributeError) {
             MTR_LOG_INFO("%@ report %@ no data value or error: %@", self, attributePath, attributeReponseValue);
             continue;
+        }
+
+        // Additional signal to help mark events as being received during priming report in the event the device rebooted and we get a subscription resumption priming report without noticing it became unreachable first
+        if (_receivingReport && AttributeHasChangesOmittedQuality(attributePath)) {
+            _receivingPrimingReport = YES;
         }
 
         // check if value is different than cache, and report if needed

@@ -239,8 +239,8 @@ public:
     CHIP_ERROR Parse(const char * label, const char * json)
     {
         Json::Value value;
-        constexpr const char kHexNumPrefix[] = "0x";
-        constexpr size_t kHexNumPrefixLen    = ArraySize(kHexNumPrefix) - 1;
+        static constexpr char kHexNumPrefix[] = "0x";
+        constexpr size_t kHexNumPrefixLen     = ArraySize(kHexNumPrefix) - 1;
         if (strncmp(json, kPayloadHexPrefix, kPayloadHexPrefixLen) == 0 ||
             strncmp(json, kPayloadSignedPrefix, kPayloadSignedPrefixLen) == 0 ||
             strncmp(json, kPayloadUnsignedPrefix, kPayloadUnsignedPrefixLen) == 0 ||

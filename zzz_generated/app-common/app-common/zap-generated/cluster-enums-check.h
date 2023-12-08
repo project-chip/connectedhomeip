@@ -397,6 +397,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     case EnumType::kKorean:
     case EnumType::kPersian:
     case EnumType::kTaiwanese:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(12);
@@ -409,6 +410,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     {
     case EnumType::k12hr:
     case EnumType::k24hr:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1599,6 +1601,76 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
         return val;
     default:
         return static_cast<EnumType>(13);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CauseEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CauseEnum;
+    switch (val)
+    {
+    case EnumType::kNormalCompletion:
+    case EnumType::kOffline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CostTypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CostTypeEnum;
+    switch (val)
+    {
+    case EnumType::kFinancial:
+    case EnumType::kGHGEmissions:
+    case EnumType::kComfort:
+    case EnumType::kTemperature:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESAStateEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESAStateEnum;
+    switch (val)
+    {
+    case EnumType::kOffline:
+    case EnumType::kOnline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+    case EnumType::kPowerAdjustActive:
+    case EnumType::kPaused:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESATypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESATypeEnum;
+    switch (val)
+    {
+    case EnumType::kEvse:
+    case EnumType::kSpaceHeating:
+    case EnumType::kWaterHeating:
+    case EnumType::kSpaceCooling:
+    case EnumType::kSpaceHeatingCooling:
+    case EnumType::kBatteryStorage:
+    case EnumType::kSolarPV:
+    case EnumType::kFridgeFreezer:
+    case EnumType::kWashingMachine:
+    case EnumType::kDishwasher:
+    case EnumType::kCooking:
+    case EnumType::kHomeWaterPump:
+    case EnumType::kIrrigationWaterPump:
+    case EnumType::kPoolPump:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(14);
     }
 }
 
@@ -2991,6 +3063,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnum val)
+{
+    using EnumType = Channel::ChannelTypeEnum;
+    switch (val)
+    {
+    case EnumType::kSatellite:
+    case EnumType::kCable:
+    case EnumType::kTerrestrial:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)
 {
     using EnumType = Channel::LineupInfoTypeEnum;
@@ -3030,6 +3115,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::Status
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::CharacteristicEnum val)
+{
+    using EnumType = MediaPlayback::CharacteristicEnum;
+    switch (val)
+    {
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
+        return val;
+    default:
+        return static_cast<EnumType>(18);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
 {
     using EnumType = MediaPlayback::PlaybackStateEnum;
@@ -3194,6 +3307,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::StatusEnum
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::CharacteristicEnum val)
+{
+    using EnumType = ContentLauncher::CharacteristicEnum;
+    switch (val)
+    {
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
+        return val;
+    default:
+        return static_cast<EnumType>(18);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::MetricTypeEnum val)
 {
     using EnumType = ContentLauncher::MetricTypeEnum;
@@ -3225,9 +3366,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
     case EnumType::kSportsTeam:
     case EnumType::kType:
     case EnumType::kVideo:
+    case EnumType::kSeason:
+    case EnumType::kEpisode:
+    case EnumType::kAny:
         return val;
     default:
-        return static_cast<EnumType>(14);
+        return static_cast<EnumType>(17);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
@@ -3238,9 +3382,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Status
     case EnumType::kSuccess:
     case EnumType::kURLNotAvailable:
     case EnumType::kAuthFailed:
+    case EnumType::kTextTrackNotAvailable:
+    case EnumType::kAudioTrackNotAvailable:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -3287,6 +3433,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationBasic::Appli
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentAppObserver::StatusEnum val)
+{
+    using EnumType = ContentAppObserver::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnexpectedData:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
     }
 }
 

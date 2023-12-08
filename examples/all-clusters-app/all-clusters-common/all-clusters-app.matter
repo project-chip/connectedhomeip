@@ -1159,7 +1159,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -1219,11 +1219,13 @@ cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -1763,13 +1765,13 @@ cluster NetworkCommissioning = 49 {
   }
 
   request struct QueryIdentityRequest {
-    OCTET_STRING<20> keyIdentifier = 0;
-    optional OCTET_STRING<32> possessionNonce = 1;
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
   }
 
   response struct QueryIdentityResponse = 10 {
-    OCTET_STRING<140> identity = 0;
-    optional OCTET_STRING<64> possessionSignature = 1;
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
   }
 
   /** Detemine the set of networks the device sees as available. */
@@ -1826,7 +1828,7 @@ cluster DiagnosticLogs = 50 {
 
   response struct RetrieveLogsResponse = 1 {
     StatusEnum status = 0;
-    LONG_OCTET_STRING logContent = 1;
+    long_octet_string logContent = 1;
     optional epoch_us UTCTimeStamp = 2;
     optional systime_us timeSinceBoot = 3;
   }
@@ -3955,7 +3957,7 @@ cluster PumpConfigurationAndControl = 512 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster provides an interface to the functionality of a thermostat. */
+/** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
   revision 6;
 
@@ -4063,12 +4065,6 @@ cluster Thermostat = 513 {
     kOutdoorSensorFail = 0x4;
     kCoilSensorFail = 0x8;
     kFanFail = 0x10;
-  }
-
-  bitmap AlarmCodeBitmap : bitmap8 {
-    kInitialization = 0x1;
-    kHardware = 0x2;
-    kSelfCalibration = 0x4;
   }
 
   bitmap Feature : bitmap32 {
@@ -4193,8 +4189,8 @@ cluster Thermostat = 513 {
 
   struct WeeklyScheduleTransitionStruct {
     int16u transitionTime = 0;
-    temperature heatSetpoint = 1;
-    temperature coolSetpoint = 2;
+    nullable temperature heatSetpoint = 1;
+    nullable temperature coolSetpoint = 2;
   }
 
   readonly attribute nullable temperature localTemperature = 0;
@@ -4206,6 +4202,7 @@ cluster Thermostat = 513 {
   readonly attribute optional temperature absMaxCoolSetpointLimit = 6;
   readonly attribute optional int8u PICoolingDemand = 7;
   readonly attribute optional int8u PIHeatingDemand = 8;
+  attribute access(write: manage) optional bitmap8 HVACSystemTypeConfiguration = 9;
   attribute access(write: manage) optional int8s localTemperatureCalibration = 16;
   attribute optional temperature occupiedCoolingSetpoint = 17;
   attribute optional temperature occupiedHeatingSetpoint = 18;
@@ -4219,7 +4216,6 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional RemoteSensingBitmap remoteSensing = 26;
   attribute access(write: manage) ControlSequenceOfOperationEnum controlSequenceOfOperation = 27;
   attribute access(write: manage) SystemModeEnum systemMode = 28;
-  readonly attribute optional AlarmCodeBitmap alarmMask = 29;
   readonly attribute optional ThermostatRunningModeEnum thermostatRunningMode = 30;
   readonly attribute optional StartOfWeekEnum startOfWeek = 32;
   readonly attribute optional int8u numberOfWeeklyTransitions = 33;
@@ -4245,7 +4241,7 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACErrorCodeBitmap ACErrorCode = 68;
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
-  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityFormat = 71;
+  attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
   readonly attribute optional PresetTypeStruct presetTypes[] = 72;
   readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
   readonly attribute optional int8u numberOfPresets = 74;
@@ -4274,25 +4270,16 @@ cluster Thermostat = 513 {
 
   response struct GetWeeklyScheduleResponse = 0 {
     int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
     ScheduleModeBitmap modeForSequence = 2;
     WeeklyScheduleTransitionStruct transitions[] = 3;
   }
 
   request struct SetWeeklyScheduleRequest {
     int8u numberOfTransitionsForSequence = 0;
-    ScheduleDayOfWeekBitmap dayOfWeekforSequence = 1;
+    ScheduleDayOfWeekBitmap dayOfWeekForSequence = 1;
     ScheduleModeBitmap modeForSequence = 2;
     WeeklyScheduleTransitionStruct transitions[] = 3;
-  }
-
-  response struct GetRelayStatusLogResponse = 1 {
-    int16u timeOfDay = 0;
-    RelayStateBitmap relayStatus = 1;
-    nullable temperature localTemperature = 2;
-    nullable int8u humidityInPercentage = 3;
-    temperature setPoint = 4;
-    int16u unreadEntries = 5;
   }
 
   request struct GetWeeklyScheduleRequest {
@@ -4317,16 +4304,14 @@ cluster Thermostat = 513 {
     TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
   }
 
-  /** Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them. If the resulting value is outside the limits imposed by */
+  /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
-  /** Upon receipt, the weekly schedule for updating setpoints SHALL be stored in the thermostat and SHOULD begin at the time of receipt. A status code SHALL be sent in response. */
+  /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
-  /** Upon receipt, the unit SHOULD send in return the Get Weekly Schedule Response command. The Days to Return and Mode to Return fields are defined as bitmask for the flexibility to support multiple days and multiple modes within one command. If thermostat cannot handle incoming command with multiple days and/or multiple modes within one command, it SHALL send default response of INVALID_COMMAND in return. */
+  /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   /** This command is used to clear the weekly schedule. The Clear weekly schedule has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** This command is used to query the thermostat internal relay status log. This command has no payload. */
-  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
   /** Upon receipt, if the */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** Upon receipt, this SHALL set the thermostat */
@@ -5878,7 +5863,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute int8s rangeRestrictedInt8s = 39;
   attribute int16u rangeRestrictedInt16u = 40;
   attribute int16s rangeRestrictedInt16s = 41;
-  attribute LONG_OCTET_STRING listLongOctetString[] = 42;
+  attribute long_octet_string listLongOctetString[] = 42;
   attribute TestFabricScoped listFabricScoped[] = 43;
   timedwrite attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
@@ -7295,8 +7280,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
-    handle command GetRelayStatusLogResponse;
-    handle command GetRelayStatusLog;
     handle command SetActiveScheduleRequest;
     handle command SetActivePresetRequest;
     handle command StartPresetsSchedulesEditRequest;

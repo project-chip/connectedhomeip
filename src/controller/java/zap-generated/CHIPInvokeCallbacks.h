@@ -766,21 +766,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPThermostatClusterGetRelayStatusLogResponseCallback
-    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
-{
-public:
-    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
-
-    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPChannelClusterChangeChannelResponseCallback
     : public Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>
 {
@@ -791,6 +776,20 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPChannelClusterProgramGuideResponseCallback : public Callback::Callback<CHIPChannelClusterProgramGuideResponseCallbackType>
+{
+public:
+    CHIPChannelClusterProgramGuideResponseCallback(jobject javaCallback);
+
+    ~CHIPChannelClusterProgramGuideResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -879,6 +878,37 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPContentControlClusterResetPINResponseCallback
+    : public Callback::Callback<CHIPContentControlClusterResetPINResponseCallbackType>
+{
+public:
+    CHIPContentControlClusterResetPINResponseCallback(jobject javaCallback);
+
+    ~CHIPContentControlClusterResetPINResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPContentAppObserverClusterContentAppMessageResponseCallback
+    : public Callback::Callback<CHIPContentAppObserverClusterContentAppMessageResponseCallbackType>
+{
+public:
+    CHIPContentAppObserverClusterContentAppMessageResponseCallback(jobject javaCallback);
+
+    ~CHIPContentAppObserverClusterContentAppMessageResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

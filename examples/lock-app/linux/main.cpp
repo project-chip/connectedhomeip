@@ -27,7 +27,7 @@ using namespace chip::app;
 
 namespace {
 // Variables for handling named pipe commands
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_lock_app_fifo-";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_lock_app_fifo-";
 NamedPipeCommands sChipNamedPipeCommands;
 LockAppCommandDelegate sLockAppCommandDelegate;
 

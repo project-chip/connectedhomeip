@@ -60,6 +60,10 @@ CHIP_ERROR TemperatureManager::Init()
     mCurrentTempCelsius     = ConvertToPrintableTemp((temp.IsNull()) ? static_cast<int16_t>(0.0) : temp.Value());
     mHeatingCelsiusSetPoint = ConvertToPrintableTemp(coolingSetpoint);
     mCoolingCelsiusSetPoint = ConvertToPrintableTemp(heatingSetpoint);
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     switch (systemMode)
     {
     case SystemModeEnum::kOff:

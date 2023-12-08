@@ -33,7 +33,10 @@
         "color-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
+        "content-app-observer-cluster.xml",
+        "content-control-cluster.xml",
         "descriptor-cluster.xml",
+        "device-energy-management-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
@@ -171,6 +174,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
+        "Device Energy Management": ["Forecast"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -310,7 +314,11 @@
             "OverrunCount"
         ],
         "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
+        "Media Playback": [
+            "SampledPosition",
+            "ActiveAudioTrack",
+            "ActiveTextTrack"
+        ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
         "Time Synchronization": [

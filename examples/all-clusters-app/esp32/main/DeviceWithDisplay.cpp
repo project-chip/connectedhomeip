@@ -28,7 +28,7 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static const char * TAG = "DeviceWithDisplay";
+static const char TAG[] = "DeviceWithDisplay";
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
@@ -679,6 +679,10 @@ void SetupPretendDevices()
     app::Clusters::Thermostat::Attributes::LocalTemperature::Set(1, static_cast<int16_t>(21 * 100));
     AddAttribute("SystemMode", "4");
     app::Clusters::Thermostat::Attributes::SystemMode::Set(1, chip::app::Clusters::Thermostat::SystemModeEnum::kHeat);
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     AddAttribute("CoolSetpoint", "19");
     app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Set(1, static_cast<int16_t>(19 * 100));
     AddAttribute("HeatSetpoint", "25");

@@ -32,12 +32,12 @@ using namespace ::chip::Controller;
 using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
-constexpr const char kDefaultSectionName[]  = "Default";
-constexpr const char kPortKey[]             = "ListenPort";
-constexpr const char kLoggingKey[]          = "LoggingLevel";
-constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
-constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
-constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
+constexpr char kDefaultSectionName[]       = "Default";
+constexpr char kPortKey[]                  = "ListenPort";
+constexpr char kLoggingKey[]               = "LoggingLevel";
+constexpr char kLocalNodeIdKey[]           = "LocalNodeId";
+constexpr char kCommissionerCATsKey[]      = "CommissionerCATs";
+constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Automation;
 
 const char * GetUsedDirectory(const char * directory)
 {
