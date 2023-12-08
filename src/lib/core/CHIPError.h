@@ -174,22 +174,13 @@ public:
      *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
      *  if they have the same error code, even if they have different source locations.
      */
-    bool operator==(const ChipError & other) const
-    {
-        return mError == other.mError;
-    }
-    bool operator!=(const ChipError & other) const
-    {
-        return mError != other.mError;
-    }
+    bool operator==(const ChipError & other) const { return mError == other.mError; }
+    bool operator!=(const ChipError & other) const { return mError != other.mError; }
 
     /**
      * Return an integer code for the error.
      */
-    constexpr StorageType AsInteger() const
-    {
-        return mError;
-    }
+    constexpr StorageType AsInteger() const { return mError; }
 
     /*
      * IsSuccess() is intended to support macros that can take either a ChipError or an integer error code.
@@ -198,14 +189,8 @@ public:
      * @note
      *  Normal code should use `status == CHIP_NO_ERROR` rather than `IsSuccess(status)`.
      */
-    static constexpr bool IsSuccess(ChipError error)
-    {
-        return error.mError == 0;
-    }
-    static constexpr bool IsSuccess(StorageType error)
-    {
-        return error == 0;
-    }
+    static constexpr bool IsSuccess(ChipError error) { return error.mError == 0; }
+    static constexpr bool IsSuccess(StorageType error) { return error == 0; }
 
     /**
      * Format an @a error for printing.
@@ -217,15 +202,9 @@ public:
      *  @endcode
      */
 #if CHIP_CONFIG_ERROR_FORMAT_AS_STRING
-    FormatType Format() const
-    {
-        return AsString();
-    }
+    FormatType Format() const { return AsString(); }
 #else  // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
-    FormatType Format() const
-    {
-        return mError;
-    }
+    FormatType Format() const { return mError; }
 #endif // CHIP_CONFIG_ERROR_FORMAT_AS_STRING
 
     /**
@@ -251,18 +230,12 @@ public:
     /**
      * Get the Range to which the @a error belongs.
      */
-    constexpr Range GetRange() const
-    {
-        return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError));
-    }
+    constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
 
     /**
      * Get the encapsulated value of an @a error.
      */
-    constexpr ValueType GetValue() const
-    {
-        return GetField(kValueStart, kValueLength, mError);
-    }
+    constexpr ValueType GetValue() const { return GetField(kValueStart, kValueLength, mError); }
 
     /**
      * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
@@ -295,10 +268,7 @@ public:
     /**
      * Get the SDK code for an SDK error.
      */
-    constexpr uint8_t GetSdkCode() const
-    {
-        return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError));
-    }
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
 
     /**
      * Test whether @a error is an SDK error representing an Interaction Model
@@ -320,10 +290,7 @@ public:
      * @note
      *  This will be `nullptr` if the error was not created with a file name.
      */
-    const char * GetFile() const
-    {
-        return mFile;
-    }
+    const char * GetFile() const { return mFile; }
 
     /**
      * Get the source line number of the point where the error occurred.
@@ -331,10 +298,7 @@ public:
      * @note
      *  This will be 0 if the error was not created with a file name.
      */
-    unsigned int GetLine() const
-    {
-        return mLine;
-    }
+    unsigned int GetLine() const { return mLine; }
 
 #endif // CHIP_CONFIG_ERROR_SOURCE
 
@@ -364,18 +328,9 @@ private:
     {
         return (value >> start) & ((1u << length) - 1);
     }
-    static constexpr StorageType MakeMask(unsigned int start, unsigned int length)
-    {
-        return ((1u << length) - 1) << start;
-    }
-    static constexpr StorageType MakeField(unsigned int start, StorageType value)
-    {
-        return value << start;
-    }
-    static constexpr bool FitsInField(unsigned int length, StorageType value)
-    {
-        return value < (1u << length);
-    }
+    static constexpr StorageType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
+    static constexpr StorageType MakeField(unsigned int start, StorageType value) { return value << start; }
+    static constexpr bool FitsInField(unsigned int length, StorageType value) { return value < (1u << length); }
 
     static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
