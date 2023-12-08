@@ -179,6 +179,7 @@ chip_test_suite_using_nltest("tests") {
   if (chip_device_platform != "nrfconnect" &&
       chip_device_platform != "openiotsdk" && chip_device_platform != "fake") {
     test_sources += [ "TestEventLogging.cpp" ]
+
     #Not sure why TestDefaultICDClientStorage fails on openiotsdk
     test_sources += [ "TestDefaultICDClientStorage.cpp" ]
   }
