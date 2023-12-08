@@ -25,7 +25,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekForSequence: UInt,
     val modeForSequence: UInt,
-    val transitions: List<ThermostatClusterThermostatScheduleTransition>
+    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -72,7 +72,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     numberOfTransitionsForSequence: UByte,
     dayOfWeekForSequence: UInt,
     modeForSequence: UInt,
-    transitions: List<ThermostatClusterThermostatScheduleTransition>,
+    transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId = 1L

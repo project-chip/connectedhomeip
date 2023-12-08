@@ -4791,7 +4791,7 @@
               "code": 27,
               "mfgCode": null,
               "side": "server",
-              "type": "ThermostatControlSequence",
+              "type": "ControlSequenceOfOperationEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

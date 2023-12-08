@@ -1444,11 +1444,22 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_NEWLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRThermostatClusterThermostatScheduleTransition : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct")
+@interface MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
