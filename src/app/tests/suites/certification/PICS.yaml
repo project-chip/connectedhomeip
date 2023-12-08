@@ -8879,11 +8879,11 @@ PICS:
 
     #  Laundry DRYER Mode Cluster
 
-    - label: "Does the device implement the LWM cluster as a server?"
+    - label: "Does the device implement the Dryer cluster as a server?"
       id: DRYERCTRL.S
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
-      id: DRYERCTRL.S.S.M.CAN_TEST_MODE_FAILURE
+      id: DRYERCTRL.S.M.CAN_TEST_MODE_FAILURE
 
     - label:
           "Id of mode the device will fail to transition to, given its current
