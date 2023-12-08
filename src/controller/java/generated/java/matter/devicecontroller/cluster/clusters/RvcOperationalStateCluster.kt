@@ -74,7 +74,7 @@ class RvcOperationalStateCluster(
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -106,7 +106,7 @@ class RvcOperationalStateCluster(
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -138,7 +138,7 @@ class RvcOperationalStateCluster(
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -170,7 +170,7 @@ class RvcOperationalStateCluster(
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -186,487 +186,439 @@ class RvcOperationalStateCluster(
   }
 
   suspend fun readPhaseListAttribute(): PhaseListAttribute {
-    val ATTRIBUTE_ID_PHASELIST: UInt = 0u
+    val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_PHASELIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_PHASELIST
-        }
-
-      requireNotNull(attributeData) { "Phaselist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<String>? =
-        if (!tlvReader.isNull()) {
-          buildList<String> {
-            tlvReader.enterArray(AnonymousTag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(tlvReader.getString(AnonymousTag))
-            }
-            tlvReader.exitContainer()
-          }
-        } else {
-          tlvReader.getNull(AnonymousTag)
-          null
-        }
-
-      return PhaseListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Phaselist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<String>? =
+      if (!tlvReader.isNull()) {
+        buildList<String> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getString(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return PhaseListAttribute(decodedValue)
   }
 
   suspend fun readCurrentPhaseAttribute(): CurrentPhaseAttribute {
-    val ATTRIBUTE_ID_CURRENTPHASE: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_CURRENTPHASE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_CURRENTPHASE
-        }
-
-      requireNotNull(attributeData) { "Currentphase attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          tlvReader.getNull(AnonymousTag)
-          null
-        }
-
-      return CurrentPhaseAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Currentphase attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return CurrentPhaseAttribute(decodedValue)
   }
 
   suspend fun readCountdownTimeAttribute(): CountdownTimeAttribute {
-    val ATTRIBUTE_ID_COUNTDOWNTIME: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_COUNTDOWNTIME
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_COUNTDOWNTIME
-        }
-
-      requireNotNull(attributeData) { "Countdowntime attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt? =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(AnonymousTag)) {
-            tlvReader.getUInt(AnonymousTag)
-          } else {
-            null
-          }
-        } else {
-          tlvReader.getNull(AnonymousTag)
-          null
-        }
-
-      return CountdownTimeAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Countdowntime attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUInt(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return CountdownTimeAttribute(decodedValue)
   }
 
   suspend fun readOperationalStateListAttribute(): OperationalStateListAttribute {
-    val ATTRIBUTE_ID_OPERATIONALSTATELIST: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_OPERATIONALSTATELIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_OPERATIONALSTATELIST
-        }
-
-      requireNotNull(attributeData) { "Operationalstatelist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<RvcOperationalStateClusterOperationalStateStruct> =
-        buildList<RvcOperationalStateClusterOperationalStateStruct> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(RvcOperationalStateClusterOperationalStateStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return OperationalStateListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Operationalstatelist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<RvcOperationalStateClusterOperationalStateStruct> =
+      buildList<RvcOperationalStateClusterOperationalStateStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(RvcOperationalStateClusterOperationalStateStruct.fromTlv(AnonymousTag, tlvReader))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return OperationalStateListAttribute(decodedValue)
   }
 
   suspend fun readOperationalStateAttribute(): UByte {
-    val ATTRIBUTE_ID_OPERATIONALSTATE: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_OPERATIONALSTATE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_OPERATIONALSTATE
-        }
-
-      requireNotNull(attributeData) { "Operationalstate attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Operationalstate attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readOperationalErrorAttribute(): OperationalErrorAttribute {
-    val ATTRIBUTE_ID_OPERATIONALERROR: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_OPERATIONALERROR
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_OPERATIONALERROR
-        }
-
-      requireNotNull(attributeData) { "Operationalerror attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: RvcOperationalStateClusterErrorStateStruct =
-        RvcOperationalStateClusterErrorStateStruct.fromTlv(AnonymousTag, tlvReader)
-
-      return OperationalErrorAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Operationalerror attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: RvcOperationalStateClusterErrorStateStruct =
+      RvcOperationalStateClusterErrorStateStruct.fromTlv(AnonymousTag, tlvReader)
+
+    return OperationalErrorAttribute(decodedValue)
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    val ATTRIBUTE_ID_GENERATEDCOMMANDLIST: UInt = 65528u
+    val ATTRIBUTE_ID: UInt = 65528u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_GENERATEDCOMMANDLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_GENERATEDCOMMANDLIST
-        }
-
-      requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return GeneratedCommandListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return GeneratedCommandListAttribute(decodedValue)
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    val ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST: UInt = 65529u
+    val ATTRIBUTE_ID: UInt = 65529u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
-        }
-
-      requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return AcceptedCommandListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AcceptedCommandListAttribute(decodedValue)
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID_EVENTLIST: UInt = 65530u
+    val ATTRIBUTE_ID: UInt = 65530u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_EVENTLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_EVENTLIST
-        }
-
-      requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return EventListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return EventListAttribute(decodedValue)
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    val ATTRIBUTE_ID_ATTRIBUTELIST: UInt = 65531u
+    val ATTRIBUTE_ID: UInt = 65531u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ATTRIBUTELIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ATTRIBUTELIST
-        }
-
-      requireNotNull(attributeData) { "Attributelist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return AttributeListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AttributeListAttribute(decodedValue)
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    val ATTRIBUTE_ID_FEATUREMAP: UInt = 65532u
+    val ATTRIBUTE_ID: UInt = 65532u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_FEATUREMAP
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_FEATUREMAP
-        }
-
-      requireNotNull(attributeData) { "Featuremap attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    val ATTRIBUTE_ID_CLUSTERREVISION: UInt = 65533u
+    val ATTRIBUTE_ID: UInt = 65533u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_CLUSTERREVISION
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_CLUSTERREVISION
-        }
-
-      requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+    return decodedValue
   }
 
   companion object {

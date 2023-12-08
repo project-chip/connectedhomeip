@@ -115,7 +115,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
@@ -137,7 +137,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun unlockWithTimeout(timeout: UShort, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
@@ -162,7 +162,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun setWeekDaySchedule(
@@ -212,7 +212,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun getWeekDaySchedule(
@@ -242,7 +242,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -335,7 +335,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun setYearDaySchedule(
@@ -373,7 +373,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun getYearDaySchedule(
@@ -403,7 +403,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -469,7 +469,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun setHolidaySchedule(
@@ -507,7 +507,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun getHolidaySchedule(
@@ -533,7 +533,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -597,7 +597,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun setUser(
@@ -648,7 +648,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun getUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetUserResponse {
@@ -671,7 +671,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -835,7 +835,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun setCredential(
@@ -880,7 +880,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -940,7 +940,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
@@ -1031,7 +1031,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
@@ -1053,207 +1053,187 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun readLockStateAttribute(): LockStateAttribute {
-    val ATTRIBUTE_ID_LOCKSTATE: UInt = 0u
+    val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_LOCKSTATE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_LOCKSTATE
-        }
-
-      requireNotNull(attributeData) { "Lockstate attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          tlvReader.getNull(AnonymousTag)
-          null
-        }
-
-      return LockStateAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Lockstate attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return LockStateAttribute(decodedValue)
   }
 
   suspend fun readLockTypeAttribute(): UByte {
-    val ATTRIBUTE_ID_LOCKTYPE: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_LOCKTYPE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_LOCKTYPE
-        }
-
-      requireNotNull(attributeData) { "Locktype attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Locktype attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readActuatorEnabledAttribute(): Boolean {
-    val ATTRIBUTE_ID_ACTUATORENABLED: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ACTUATORENABLED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ACTUATORENABLED
-        }
-
-      requireNotNull(attributeData) { "Actuatorenabled attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Actuatorenabled attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readDoorStateAttribute(): DoorStateAttribute {
-    val ATTRIBUTE_ID_DOORSTATE: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_DOORSTATE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_DOORSTATE
-        }
-
-      requireNotNull(attributeData) { "Doorstate attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(AnonymousTag)) {
-            tlvReader.getUByte(AnonymousTag)
-          } else {
-            null
-          }
-        } else {
-          tlvReader.getNull(AnonymousTag)
-          null
-        }
-
-      return DoorStateAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Doorstate attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return DoorStateAttribute(decodedValue)
   }
 
   suspend fun readDoorOpenEventsAttribute(): UInt? {
-    val ATTRIBUTE_ID_DOOROPENEVENTS: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_DOOROPENEVENTS
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_DOOROPENEVENTS
-        }
-
-      requireNotNull(attributeData) { "Dooropenevents attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUInt(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Dooropenevents attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeDoorOpenEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_DOOROPENEVENTS: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 4u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -1266,11 +1246,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_DOOROPENEVENTS
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -1281,7 +1257,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -1299,47 +1275,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readDoorClosedEventsAttribute(): UInt? {
-    val ATTRIBUTE_ID_DOORCLOSEDEVENTS: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_DOORCLOSEDEVENTS
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_DOORCLOSEDEVENTS
-        }
-
-      requireNotNull(attributeData) { "Doorclosedevents attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUInt(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Doorclosedevents attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeDoorClosedEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_DOORCLOSEDEVENTS: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 5u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -1352,11 +1324,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_DOORCLOSEDEVENTS
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -1367,7 +1335,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -1385,47 +1353,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readOpenPeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID_OPENPERIOD: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_OPENPERIOD
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_OPENPERIOD
-        }
-
-      requireNotNull(attributeData) { "Openperiod attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Openperiod attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_OPENPERIOD: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 6u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -1438,11 +1402,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_OPENPERIOD
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -1453,7 +1413,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -1471,537 +1431,483 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readNumberOfTotalUsersSupportedAttribute(): UShort? {
-    val ATTRIBUTE_ID_NUMBEROFTOTALUSERSSUPPORTED: UInt = 17u
+    val ATTRIBUTE_ID: UInt = 17u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFTOTALUSERSSUPPORTED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFTOTALUSERSSUPPORTED
-        }
-
-      requireNotNull(attributeData) {
-        "Numberoftotaluserssupported attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Numberoftotaluserssupported attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfPINUsersSupportedAttribute(): UShort? {
-    val ATTRIBUTE_ID_NUMBEROFPINUSERSSUPPORTED: UInt = 18u
+    val ATTRIBUTE_ID: UInt = 18u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFPINUSERSSUPPORTED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFPINUSERSSUPPORTED
-        }
-
-      requireNotNull(attributeData) { "Numberofpinuserssupported attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Numberofpinuserssupported attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfRFIDUsersSupportedAttribute(): UShort? {
-    val ATTRIBUTE_ID_NUMBEROFRFIDUSERSSUPPORTED: UInt = 19u
+    val ATTRIBUTE_ID: UInt = 19u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFRFIDUSERSSUPPORTED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFRFIDUSERSSUPPORTED
-        }
-
-      requireNotNull(attributeData) { "Numberofrfiduserssupported attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Numberofrfiduserssupported attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfWeekDaySchedulesSupportedPerUserAttribute(): UByte? {
-    val ATTRIBUTE_ID_NUMBEROFWEEKDAYSCHEDULESSUPPORTEDPERUSER: UInt = 20u
+    val ATTRIBUTE_ID: UInt = 20u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFWEEKDAYSCHEDULESSUPPORTEDPERUSER
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFWEEKDAYSCHEDULESSUPPORTEDPERUSER
-        }
-
-      requireNotNull(attributeData) {
-        "Numberofweekdayschedulessupportedperuser attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofweekdayschedulessupportedperuser attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfYearDaySchedulesSupportedPerUserAttribute(): UByte? {
-    val ATTRIBUTE_ID_NUMBEROFYEARDAYSCHEDULESSUPPORTEDPERUSER: UInt = 21u
+    val ATTRIBUTE_ID: UInt = 21u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFYEARDAYSCHEDULESSUPPORTEDPERUSER
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFYEARDAYSCHEDULESSUPPORTEDPERUSER
-        }
-
-      requireNotNull(attributeData) {
-        "Numberofyeardayschedulessupportedperuser attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofyeardayschedulessupportedperuser attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfHolidaySchedulesSupportedAttribute(): UByte? {
-    val ATTRIBUTE_ID_NUMBEROFHOLIDAYSCHEDULESSUPPORTED: UInt = 22u
+    val ATTRIBUTE_ID: UInt = 22u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFHOLIDAYSCHEDULESSUPPORTED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFHOLIDAYSCHEDULESSUPPORTED
-        }
-
-      requireNotNull(attributeData) {
-        "Numberofholidayschedulessupported attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofholidayschedulessupported attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readMaxPINCodeLengthAttribute(): UByte? {
-    val ATTRIBUTE_ID_MAXPINCODELENGTH: UInt = 23u
+    val ATTRIBUTE_ID: UInt = 23u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_MAXPINCODELENGTH
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_MAXPINCODELENGTH
-        }
-
-      requireNotNull(attributeData) { "Maxpincodelength attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maxpincodelength attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readMinPINCodeLengthAttribute(): UByte? {
-    val ATTRIBUTE_ID_MINPINCODELENGTH: UInt = 24u
+    val ATTRIBUTE_ID: UInt = 24u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_MINPINCODELENGTH
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_MINPINCODELENGTH
-        }
-
-      requireNotNull(attributeData) { "Minpincodelength attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Minpincodelength attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readMaxRFIDCodeLengthAttribute(): UByte? {
-    val ATTRIBUTE_ID_MAXRFIDCODELENGTH: UInt = 25u
+    val ATTRIBUTE_ID: UInt = 25u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_MAXRFIDCODELENGTH
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_MAXRFIDCODELENGTH
-        }
-
-      requireNotNull(attributeData) { "Maxrfidcodelength attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maxrfidcodelength attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readMinRFIDCodeLengthAttribute(): UByte? {
-    val ATTRIBUTE_ID_MINRFIDCODELENGTH: UInt = 26u
+    val ATTRIBUTE_ID: UInt = 26u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_MINRFIDCODELENGTH
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_MINRFIDCODELENGTH
-        }
-
-      requireNotNull(attributeData) { "Minrfidcodelength attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Minrfidcodelength attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readCredentialRulesSupportAttribute(): UByte? {
-    val ATTRIBUTE_ID_CREDENTIALRULESSUPPORT: UInt = 27u
+    val ATTRIBUTE_ID: UInt = 27u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_CREDENTIALRULESSUPPORT
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_CREDENTIALRULESSUPPORT
-        }
-
-      requireNotNull(attributeData) { "Credentialrulessupport attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Credentialrulessupport attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNumberOfCredentialsSupportedPerUserAttribute(): UByte? {
-    val ATTRIBUTE_ID_NUMBEROFCREDENTIALSSUPPORTEDPERUSER: UInt = 28u
+    val ATTRIBUTE_ID: UInt = 28u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_NUMBEROFCREDENTIALSSUPPORTEDPERUSER
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_NUMBEROFCREDENTIALSSUPPORTEDPERUSER
-        }
-
-      requireNotNull(attributeData) {
-        "Numberofcredentialssupportedperuser attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofcredentialssupportedperuser attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readLanguageAttribute(): String? {
-    val ATTRIBUTE_ID_LANGUAGE: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 33u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_LANGUAGE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_LANGUAGE
-        }
-
-      requireNotNull(attributeData) { "Language attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: String? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getString(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Language attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: String? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getString(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeLanguageAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_LANGUAGE: UInt = 33u
+    val ATTRIBUTE_ID: UInt = 33u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2014,11 +1920,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_LANGUAGE
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2029,7 +1931,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2047,47 +1949,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readLEDSettingsAttribute(): UByte? {
-    val ATTRIBUTE_ID_LEDSETTINGS: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 34u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_LEDSETTINGS
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_LEDSETTINGS
-        }
-
-      requireNotNull(attributeData) { "Ledsettings attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Ledsettings attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeLEDSettingsAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_LEDSETTINGS: UInt = 34u
+    val ATTRIBUTE_ID: UInt = 34u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2100,11 +1998,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_LEDSETTINGS
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2115,7 +2009,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2133,42 +2027,38 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readAutoRelockTimeAttribute(): UInt {
-    val ATTRIBUTE_ID_AUTORELOCKTIME: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 35u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_AUTORELOCKTIME
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_AUTORELOCKTIME
-        }
-
-      requireNotNull(attributeData) { "Autorelocktime attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Autorelocktime attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun writeAutoRelockTimeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_AUTORELOCKTIME: UInt = 35u
+    val ATTRIBUTE_ID: UInt = 35u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2181,11 +2071,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_AUTORELOCKTIME
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2196,7 +2082,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2214,47 +2100,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readSoundVolumeAttribute(): UByte? {
-    val ATTRIBUTE_ID_SOUNDVOLUME: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 36u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_SOUNDVOLUME
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_SOUNDVOLUME
-        }
-
-      requireNotNull(attributeData) { "Soundvolume attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Soundvolume attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeSoundVolumeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_SOUNDVOLUME: UInt = 36u
+    val ATTRIBUTE_ID: UInt = 36u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2267,11 +2149,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_SOUNDVOLUME
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2282,7 +2160,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2300,42 +2178,38 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readOperatingModeAttribute(): UByte {
-    val ATTRIBUTE_ID_OPERATINGMODE: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 37u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_OPERATINGMODE
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_OPERATINGMODE
-        }
-
-      requireNotNull(attributeData) { "Operatingmode attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Operatingmode attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun writeOperatingModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_OPERATINGMODE: UInt = 37u
+    val ATTRIBUTE_ID: UInt = 37u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2348,11 +2222,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_OPERATINGMODE
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2363,7 +2233,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2381,127 +2251,113 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readSupportedOperatingModesAttribute(): UShort {
-    val ATTRIBUTE_ID_SUPPORTEDOPERATINGMODES: UInt = 38u
+    val ATTRIBUTE_ID: UInt = 38u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_SUPPORTEDOPERATINGMODES
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_SUPPORTEDOPERATINGMODES
-        }
-
-      requireNotNull(attributeData) { "Supportedoperatingmodes attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Supportedoperatingmodes attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readDefaultConfigurationRegisterAttribute(): UShort? {
-    val ATTRIBUTE_ID_DEFAULTCONFIGURATIONREGISTER: UInt = 39u
+    val ATTRIBUTE_ID: UInt = 39u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_DEFAULTCONFIGURATIONREGISTER
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_DEFAULTCONFIGURATIONREGISTER
-        }
-
-      requireNotNull(attributeData) {
-        "Defaultconfigurationregister attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Defaultconfigurationregister attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readEnableLocalProgrammingAttribute(): Boolean? {
-    val ATTRIBUTE_ID_ENABLELOCALPROGRAMMING: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 40u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ENABLELOCALPROGRAMMING
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ENABLELOCALPROGRAMMING
-        }
-
-      requireNotNull(attributeData) { "Enablelocalprogramming attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Enablelocalprogramming attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeEnableLocalProgrammingAttribute(
     value: Boolean,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_ENABLELOCALPROGRAMMING: UInt = 40u
+    val ATTRIBUTE_ID: UInt = 40u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2514,11 +2370,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_ENABLELOCALPROGRAMMING
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2529,7 +2381,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2547,50 +2399,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readEnableOneTouchLockingAttribute(): Boolean? {
-    val ATTRIBUTE_ID_ENABLEONETOUCHLOCKING: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 41u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ENABLEONETOUCHLOCKING
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ENABLEONETOUCHLOCKING
-        }
-
-      requireNotNull(attributeData) { "Enableonetouchlocking attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Enableonetouchlocking attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeEnableOneTouchLockingAttribute(
     value: Boolean,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_ENABLEONETOUCHLOCKING: UInt = 41u
+    val ATTRIBUTE_ID: UInt = 41u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2603,11 +2451,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_ENABLEONETOUCHLOCKING
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2618,7 +2462,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2636,50 +2480,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readEnableInsideStatusLEDAttribute(): Boolean? {
-    val ATTRIBUTE_ID_ENABLEINSIDESTATUSLED: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 42u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ENABLEINSIDESTATUSLED
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ENABLEINSIDESTATUSLED
-        }
-
-      requireNotNull(attributeData) { "Enableinsidestatusled attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Enableinsidestatusled attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeEnableInsideStatusLEDAttribute(
     value: Boolean,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_ENABLEINSIDESTATUSLED: UInt = 42u
+    val ATTRIBUTE_ID: UInt = 42u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2692,11 +2532,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_ENABLEINSIDESTATUSLED
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2707,7 +2543,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2725,50 +2561,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readEnablePrivacyModeButtonAttribute(): Boolean? {
-    val ATTRIBUTE_ID_ENABLEPRIVACYMODEBUTTON: UInt = 43u
+    val ATTRIBUTE_ID: UInt = 43u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ENABLEPRIVACYMODEBUTTON
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ENABLEPRIVACYMODEBUTTON
-        }
-
-      requireNotNull(attributeData) { "Enableprivacymodebutton attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Enableprivacymodebutton attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeEnablePrivacyModeButtonAttribute(
     value: Boolean,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_ENABLEPRIVACYMODEBUTTON: UInt = 43u
+    val ATTRIBUTE_ID: UInt = 43u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2781,11 +2613,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_ENABLEPRIVACYMODEBUTTON
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2796,7 +2624,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2814,50 +2642,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readLocalProgrammingFeaturesAttribute(): UByte? {
-    val ATTRIBUTE_ID_LOCALPROGRAMMINGFEATURES: UInt = 44u
+    val ATTRIBUTE_ID: UInt = 44u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_LOCALPROGRAMMINGFEATURES
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_LOCALPROGRAMMINGFEATURES
-        }
-
-      requireNotNull(attributeData) { "Localprogrammingfeatures attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Localprogrammingfeatures attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeLocalProgrammingFeaturesAttribute(
     value: UByte,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_LOCALPROGRAMMINGFEATURES: UInt = 44u
+    val ATTRIBUTE_ID: UInt = 44u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2870,11 +2694,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_LOCALPROGRAMMINGFEATURES
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2885,7 +2705,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2903,47 +2723,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readWrongCodeEntryLimitAttribute(): UByte? {
-    val ATTRIBUTE_ID_WRONGCODEENTRYLIMIT: UInt = 48u
+    val ATTRIBUTE_ID: UInt = 48u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_WRONGCODEENTRYLIMIT
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_WRONGCODEENTRYLIMIT
-        }
-
-      requireNotNull(attributeData) { "Wrongcodeentrylimit attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Wrongcodeentrylimit attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeWrongCodeEntryLimitAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_WRONGCODEENTRYLIMIT: UInt = 48u
+    val ATTRIBUTE_ID: UInt = 48u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -2956,11 +2772,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_WRONGCODEENTRYLIMIT
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -2971,7 +2783,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -2989,52 +2801,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readUserCodeTemporaryDisableTimeAttribute(): UByte? {
-    val ATTRIBUTE_ID_USERCODETEMPORARYDISABLETIME: UInt = 49u
+    val ATTRIBUTE_ID: UInt = 49u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_USERCODETEMPORARYDISABLETIME
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_USERCODETEMPORARYDISABLETIME
-        }
-
-      requireNotNull(attributeData) {
-        "Usercodetemporarydisabletime attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UByte? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Usercodetemporarydisabletime attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeUserCodeTemporaryDisableTimeAttribute(
     value: UByte,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_USERCODETEMPORARYDISABLETIME: UInt = 49u
+    val ATTRIBUTE_ID: UInt = 49u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -3047,11 +2853,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_USERCODETEMPORARYDISABLETIME
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -3062,7 +2864,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -3080,47 +2882,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readSendPINOverTheAirAttribute(): Boolean? {
-    val ATTRIBUTE_ID_SENDPINOVERTHEAIR: UInt = 50u
+    val ATTRIBUTE_ID: UInt = 50u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_SENDPINOVERTHEAIR
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_SENDPINOVERTHEAIR
-        }
-
-      requireNotNull(attributeData) { "Sendpinovertheair attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sendpinovertheair attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeSendPINOverTheAirAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_SENDPINOVERTHEAIR: UInt = 50u
+    val ATTRIBUTE_ID: UInt = 50u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -3133,11 +2931,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_SENDPINOVERTHEAIR
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -3148,7 +2942,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -3166,52 +2960,46 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readRequirePINforRemoteOperationAttribute(): Boolean? {
-    val ATTRIBUTE_ID_REQUIREPINFORREMOTEOPERATION: UInt = 51u
+    val ATTRIBUTE_ID: UInt = 51u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_REQUIREPINFORREMOTEOPERATION
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_REQUIREPINFORREMOTEOPERATION
-        }
-
-      requireNotNull(attributeData) {
-        "Requirepinforremoteoperation attribute not found in response"
-      }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: Boolean? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getBoolean(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Requirepinforremoteoperation attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeRequirePINforRemoteOperationAttribute(
     value: Boolean,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID_REQUIREPINFORREMOTEOPERATION: UInt = 51u
+    val ATTRIBUTE_ID: UInt = 51u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -3224,11 +3012,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_REQUIREPINFORREMOTEOPERATION
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -3239,7 +3023,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -3257,47 +3041,43 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readExpiringUserTimeoutAttribute(): UShort? {
-    val ATTRIBUTE_ID_EXPIRINGUSERTIMEOUT: UInt = 53u
+    val ATTRIBUTE_ID: UInt = 53u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_EXPIRINGUSERTIMEOUT
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_EXPIRINGUSERTIMEOUT
-        }
-
-      requireNotNull(attributeData) { "Expiringusertimeout attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort? =
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Expiringusertimeout attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun writeExpiringUserTimeoutAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID_EXPIRINGUSERTIMEOUT: UInt = 53u
+    val ATTRIBUTE_ID: UInt = 53u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
@@ -3310,11 +3090,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
           listOf(
             WriteRequest(
               attributePath =
-                AttributePath(
-                  endpointId,
-                  clusterId = CLUSTER_ID,
-                  attributeId = ATTRIBUTE_ID_EXPIRINGUSERTIMEOUT
-                ),
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
@@ -3325,7 +3101,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
@@ -3343,241 +3119,217 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    val ATTRIBUTE_ID_GENERATEDCOMMANDLIST: UInt = 65528u
+    val ATTRIBUTE_ID: UInt = 65528u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_GENERATEDCOMMANDLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_GENERATEDCOMMANDLIST
-        }
-
-      requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return GeneratedCommandListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return GeneratedCommandListAttribute(decodedValue)
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    val ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST: UInt = 65529u
+    val ATTRIBUTE_ID: UInt = 65529u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
-        }
-
-      requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return AcceptedCommandListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AcceptedCommandListAttribute(decodedValue)
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID_EVENTLIST: UInt = 65530u
+    val ATTRIBUTE_ID: UInt = 65530u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_EVENTLIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_EVENTLIST
-        }
-
-      requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return EventListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return EventListAttribute(decodedValue)
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    val ATTRIBUTE_ID_ATTRIBUTELIST: UInt = 65531u
+    val ATTRIBUTE_ID: UInt = 65531u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_ATTRIBUTELIST
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_ATTRIBUTELIST
-        }
-
-      requireNotNull(attributeData) { "Attributelist attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: List<UInt> =
-        buildList<UInt> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
-      return AttributeListAttribute(decodedValue)
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AttributeListAttribute(decodedValue)
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    val ATTRIBUTE_ID_FEATUREMAP: UInt = 65532u
+    val ATTRIBUTE_ID: UInt = 65532u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_FEATUREMAP
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_FEATUREMAP
-        }
-
-      requireNotNull(attributeData) { "Featuremap attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    val ATTRIBUTE_ID_CLUSTERREVISION: UInt = 65533u
+    val ATTRIBUTE_ID: UInt = 65533u
 
     val attributePath =
-      AttributePath(
-        endpointId = endpointId,
-        clusterId = CLUSTER_ID,
-        attributeId = ATTRIBUTE_ID_CLUSTERREVISION
-      )
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
     val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
-
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == ATTRIBUTE_ID_CLUSTERREVISION
-        }
-
-      requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
-
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
-
-      return decodedValue
-    } else {
+    if (response.successes.isEmpty()) {
       logger.log(Level.WARNING, "Read command failed")
       throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+    return decodedValue
   }
 
   companion object {

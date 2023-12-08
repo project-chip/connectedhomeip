@@ -40,18 +40,18 @@
 {%- endmacro -%}
 
 {%- macro encode_tlv(encodable, tag, name, depth) %}
-  {%- if encodable.is_nullable and not encodable.is_optional -%}
+  {%- if encodable.is_optional and encodable.is_nullable -%}
     {{name}}?.let {
-      {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
-    }     
-  {%- elif encodable.is_optional and not encodable.is_nullable -%}
+      {{encode_tlv(encodable.without_optional().without_nullable(), tag, name, depth + 1)}}
+    }
+  {%- elif encodable.is_optional -%}
     {{name}}?.let {
       {{encode_tlv(encodable.without_optional(), tag, name, depth + 1)}}
     }
-  {%- elif encodable.is_optional and encodable.is_nullable -%}
+  {%- elif encodable.is_nullable -%}
     {{name}}?.let {
-      {{encode_tlv(encodable.without_optional().without_nullable(), tag, name, depth + 1)}}
-    }    
+      {{encode_tlv(encodable.without_nullable(), tag, name, depth + 1)}}
+    }     
   {%- elif encodable.is_list -%}
       tlvWriter.startArray({{tag}})
       for (item in {{name}}.iterator()) {
@@ -221,7 +221,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
       )
 
     val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
 
     {%- if command | hasResponse %}
 
@@ -260,12 +260,12 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {%- else -%}
   suspend fun read{{ attribute.definition.name | upfirst }}Attribute(): {{interfaceName}} {
 {%- endif -%}
-    val {{ attribute_id }}: UInt = {{attribute.definition.code}}u
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
 
     val attributePath = AttributePath(
       endpointId = endpointId, 
       clusterId = CLUSTER_ID,
-      attributeId = {{ attribute_id }}
+      attributeId = ATTRIBUTE_ID
     )
 
     val readRequest = ReadRequest(
@@ -275,31 +275,31 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
     
     val response = controller.read(readRequest)
 
-    if (response.successes.isNotEmpty()) {
-      logger.log(Level.INFO, "Read command succeeded")
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")     
+    }    
 
-      val attributeData =
-        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-          it.path.attributeId == {{ attribute_id }}
-        }        
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }        
        
-      requireNotNull(attributeData) { 
-        "{{ attribute.definition.name | capitalize }} attribute not found in response" 
-      }
+    requireNotNull(attributeData) { 
+      "{{ attribute.definition.name | capitalize }} attribute not found in response" 
+    }
 
-      // Decode the TLV data into the appropriate type
-      val tlvReader = TlvReader(attributeData.data)
-      val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
 
 {% if attribute.definition is is_field_global_name(typeLookup) %}
     return decodedValue
 {%- else %}
     return {{interfaceName}}(decodedValue)  
 {%- endif %}
-    } else {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}") 
-    }
   }
 {% if attribute.is_writable %}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
@@ -312,7 +312,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
     timedWriteTimeoutMs: Int? = null
 {%- endif %}
   ) {
-    val {{ attribute_id }}: UInt = {{attribute.definition.code}}u
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
 {% if attribute.requires_timed_write -%}
     val timeoutMs: Duration = Duration.ofMillis(timedWriteTimeoutMs.toLong())
 {%- else -%}
@@ -337,7 +337,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
             attributePath = AttributePath(
               endpointId,
               clusterId = CLUSTER_ID,
-              attributeId = {{ attribute_id }}
+              attributeId = ATTRIBUTE_ID
             ),
             tlvPayload = tlvWriter.getEncoded()
           )
@@ -349,7 +349,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 
     when (response) {
       is WriteResponse.Success -> {
-        logger.log(Level.INFO, "Write command succeeded")
+        logger.log(Level.FINE, "Write command succeeded")
       }
       is WriteResponse.PartialWriteFailure -> {
         val aggregatedErrorMessage =
