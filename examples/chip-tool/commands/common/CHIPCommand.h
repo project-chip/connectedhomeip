@@ -156,7 +156,7 @@ protected:
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+    static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;

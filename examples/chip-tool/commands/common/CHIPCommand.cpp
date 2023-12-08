@@ -102,11 +102,11 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
-    // A non-persistent keystore is initialized without PSA functionality, as the chip-tool does not yet support it.
+    // chip-tool uses a non-persistent keystore.
     // ICD storage lifetime is currently tied to the chip-tool's lifetime. Since chip-tool interactive mode is currently used for
     // ICD commissioning and check-in validation, this temporary storage meets the test requirements.
     // TODO: Implement persistent ICD storage for the chip-tool.
-    ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
+    ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &sSessionKeystore));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
@@ -114,7 +114,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
-    factoryInitParams.sessionKeystore          = &mSessionKeystore;
+    factoryInitParams.sessionKeystore          = &sSessionKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
