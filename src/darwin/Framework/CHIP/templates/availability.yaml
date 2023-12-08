@@ -8265,6 +8265,11 @@
               StatusEnum:
                   - TextTrackNotAvailable
                   - AudioTrackNotAvailable
+          TimeFormatLocalization:
+              CalendarTypeEnum:
+                  - UseActiveLocale
+              HourFormatEnum:
+                  - UseActiveLocale
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release

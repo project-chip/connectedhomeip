@@ -39,6 +39,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -103,6 +104,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -167,6 +169,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -231,6 +234,7 @@
     0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x0000002A, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
@@ -290,6 +294,7 @@
     0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x00000000, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
@@ -349,6 +354,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
