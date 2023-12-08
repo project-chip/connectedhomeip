@@ -313,15 +313,6 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
 
 } // namespace
 
-namespace chip {
-namespace app {
-bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
-{
-    return true;
-}
-} // namespace app
-} // namespace chip
-
 class TestReliableMessageProtocol
 {
 public:
