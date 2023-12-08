@@ -1142,7 +1142,7 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
     if (aTerminationCause == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT)
     {
-        ChipLogProgress(DataManagement, "ICD device is inactive, not resubscribe within DefaultResubscribePolicy");
+        ChipLogProgress(DataManagement, "ICD device is inactive, skipping scheduling resubscribe within DefaultResubscribePolicy");
         return CHIP_NO_ERROR;
     }
 
