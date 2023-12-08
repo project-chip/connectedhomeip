@@ -159,6 +159,7 @@ protected:
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

@@ -48,8 +48,7 @@ constexpr char kCDTrustStorePathVariable[]      = "CHIPTOOL_CD_TRUST_STORE_PATH"
 const chip::Credentials::AttestationTrustStore * CHIPCommand::sTrustStore = nullptr;
 chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGroupsPerFabric, kMaxGroupKeysPerFabric };
 // All fabrics share the same ICD client storage.
-
-chip::app::DefaultICDClientStorage sICDClientStorage;
+chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 namespace {
 
 CHIP_ERROR GetAttestationTrustStore(const char * paaTrustStorePath, const chip::Credentials::AttestationTrustStore ** trustStore)
