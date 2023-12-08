@@ -391,7 +391,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         if (mDeviceIsICD)
         {
             CHIP_ERROR deleteEntryError =
-                GetICDClientStorage().DeleteEntry(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
+                CHIPCommand::sICDClientStorage.DeleteEntry(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
             if (deleteEntryError != CHIP_NO_ERROR)
             {
                 ChipLogError(chipTool, "Failed to delete ICD entry: %s", ErrorStr(err));
@@ -422,15 +422,15 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
     clientInfo.start_icd_counter = icdCounter;
 
-    CHIP_ERROR err = GetICDClientStorage().SetKey(clientInfo, mICDSymmetricKey.Value());
+    CHIP_ERROR err = CHIPCommand::sICDClientStorage.SetKey(clientInfo, mICDSymmetricKey.Value());
     if (err == CHIP_NO_ERROR)
     {
-        err = GetICDClientStorage().StoreEntry(clientInfo);
+        err = CHIPCommand::sICDClientStorage.StoreEntry(clientInfo);
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        GetICDClientStorage().RemoveKey(clientInfo);
+        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
         ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
                      err.AsString());
         SetCommandExitStatus(err);

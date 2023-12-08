@@ -26,7 +26,7 @@ using namespace ::chip;
 CHIP_ERROR ICDListCommand::RunCommand()
 {
     app::ICDClientInfo info;
-    auto iter = GetICDClientStorage().IterateICDClientInfo();
+    auto iter = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");

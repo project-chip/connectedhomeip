@@ -174,8 +174,6 @@ protected:
 
     ChipDeviceCommissioner & GetCommissioner(std::string identity);
 
-    chip::app::DefaultICDClientStorage & GetICDClientStorage();
-
 private:
     CHIP_ERROR MaybeSetUpStack();
     void MaybeTearDownStack();

@@ -416,12 +416,6 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     return *item->second;
 }
 
-chip::app::DefaultICDClientStorage & CHIPCommand::GetICDClientStorage()
-{
-    // This method should not be called before MaybeSetUpStack or after MaybeShutdownStack
-    return sICDClientStorage;
-}
-
 void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 {
     mCommissioners[key].get()->Shutdown();
@@ -496,7 +490,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
             chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, fabricIndex, defaultIpk, compressed_fabric_id_span));
     }
 
-    GetICDClientStorage().UpdateFabricList(commissioner->GetFabricIndex());
+    CHIPCommand::sICDClientStorage.UpdateFabricList(commissioner->GetFabricIndex());
 
     mCommissioners[identity] = std::move(commissioner);
 
