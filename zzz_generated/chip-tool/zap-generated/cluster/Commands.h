@@ -8870,7 +8870,7 @@ public:
 private:
     chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type mRequest;
     TypedComplexArgument<
-        chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ThermostatScheduleTransition::Type>>
+        chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type>>
         mComplex_Transitions;
 };
 
@@ -20604,35 +20604,39 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                              Attributes::MaxCoolSetpointLimit::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<int8_t>>(Id, "min-setpoint-dead-band", INT8_MIN, INT8_MAX, Attributes::MinSetpointDeadBand::Id,
                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "remote-sensing", 0, UINT8_MAX, Attributes::RemoteSensing::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatControlSequence>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>>>(
+            Id, "remote-sensing", 0, UINT8_MAX, Attributes::RemoteSensing::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum>>(
             Id, "control-sequence-of-operation", 0, UINT8_MAX, Attributes::ControlSequenceOfOperation::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "system-mode", 0, UINT8_MAX, Attributes::SystemMode::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "thermostat-running-mode", 0, UINT8_MAX, Attributes::ThermostatRunningMode::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "start-of-week", 0, UINT8_MAX, Attributes::StartOfWeek::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::SystemModeEnum>>(
+            Id, "system-mode", 0, UINT8_MAX, Attributes::SystemMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ThermostatRunningModeEnum>>(
+            Id, "thermostat-running-mode", 0, UINT8_MAX, Attributes::ThermostatRunningMode::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::StartOfWeekEnum>>(
+            Id, "start-of-week", 0, UINT8_MAX, Attributes::StartOfWeek::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-weekly-transitions", 0, UINT8_MAX,
                                              Attributes::NumberOfWeeklyTransitions::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "number-of-daily-transitions", 0, UINT8_MAX,
                                              Attributes::NumberOfDailyTransitions::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "temperature-setpoint-hold", 0, UINT8_MAX, Attributes::TemperatureSetpointHold::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum>>(
+            Id, "temperature-setpoint-hold", 0, UINT8_MAX, Attributes::TemperatureSetpointHold::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
             Id, "temperature-setpoint-hold-duration", 0, UINT16_MAX, Attributes::TemperatureSetpointHoldDuration::Id,
             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "thermostat-programming-operation-mode", 0, UINT8_MAX,
-                                             Attributes::ThermostatProgrammingOperationMode::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "thermostat-running-state", 0, UINT16_MAX, Attributes::ThermostatRunningState::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "setpoint-change-source", 0, UINT8_MAX, Attributes::SetpointChangeSource::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>>>(
+            Id, "thermostat-programming-operation-mode", 0, UINT8_MAX, Attributes::ThermostatProgrammingOperationMode::Id,
+            WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>>>(
+            Id, "thermostat-running-state", 0, UINT16_MAX, Attributes::ThermostatRunningState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::SetpointChangeSourceEnum>>(
+            Id, "setpoint-change-source", 0, UINT8_MAX, Attributes::SetpointChangeSource::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(Id, "setpoint-change-amount", INT16_MIN, INT16_MAX,
                                                                              Attributes::SetpointChangeAmount::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -20658,23 +20662,26 @@ void registerClusterThermostat(Commands & commands, CredentialIssuerCommands * c
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "emergency-heat-delta", 0, UINT8_MAX, Attributes::EmergencyHeatDelta::Id,
                                              WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "actype", 0, UINT8_MAX, Attributes::ACType::Id, WriteCommandType::kWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACTypeEnum>>(Id, "actype", 0, UINT8_MAX, Attributes::ACType::Id,
+                                                                                 WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "accapacity", 0, UINT16_MAX, Attributes::ACCapacity::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "acrefrigerant-type", 0, UINT8_MAX, Attributes::ACRefrigerantType::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "accompressor-type", 0, UINT8_MAX, Attributes::ACCompressorType::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "acerror-code", 0, UINT32_MAX, Attributes::ACErrorCode::Id,
-                                              WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "aclouver-position", 0, UINT8_MAX, Attributes::ACLouverPosition::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum>>(
+            Id, "acrefrigerant-type", 0, UINT8_MAX, Attributes::ACRefrigerantType::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACCompressorTypeEnum>>(
+            Id, "accompressor-type", 0, UINT8_MAX, Attributes::ACCompressorType::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>>>(
+            Id, "acerror-code", 0, UINT32_MAX, Attributes::ACErrorCode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACLouverPositionEnum>>(
+            Id, "aclouver-position", 0, UINT8_MAX, Attributes::ACLouverPosition::Id, WriteCommandType::kWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(Id, "accoil-temperature", INT16_MIN, INT16_MAX,
                                                                              Attributes::ACCoilTemperature::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "accapacityformat", 0, UINT8_MAX, Attributes::ACCapacityformat::Id,
-                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>>(
+            Id, "accapacityformat", 0, UINT8_MAX, Attributes::ACCapacityformat::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
