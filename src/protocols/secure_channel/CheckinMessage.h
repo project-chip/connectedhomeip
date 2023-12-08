@@ -45,28 +45,39 @@ public:
     /**
      * @brief Generate Check-in Message payload
      *
-     * @param key       Key with which to encrypt the check-in payload
-     * @param counter   Check-in counter
-     * @param appData   Application Data to incorporate within the Check-in message. Allowed to be empty.
-     * @param output    Buffer in Which to store the generated payload. SUFFICIENT SPACE MUST BE ALLOCATED by the caller
-     *                  Required Buffer Size is : GetCheckinPayloadSize(appData.size())
+     * @note Function requires two key handles to generate the Check-In message.
+     *       Due to PSA requirements, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
+     *
+     * @param[in]  aes128KeyHandle   Key handle with which to encrypt the check-in payload with the AEAD
+     * @param[in]  hmac128KeyHandle  Key handle with which to generate the nonce the check-in payload with the HMAC
+     * @param[in]  counter           Check-in counter
+     * @param[in]  appData           Application Data to incorporate within the Check-in message. Allowed to be empty.
+     * @param[out] output            Buffer in Which to store the generated payload. SUFFICIENT SPACE MUST BE ALLOCATED by the
+     * caller Required Buffer Size is : GetCheckinPayloadSize(appData.size())
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, CounterType counter, const ByteSpan & appData,
-                                                    MutableByteSpan & output);
+    static CHIP_ERROR GenerateCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
+                                                    const Crypto::Hmac128KeyHandle & hmacKeyHandle, const CounterType & counter,
+                                                    const ByteSpan & appData, MutableByteSpan & output);
 
     /**
      * @brief Parse Check-in Message payload
+     * 
+     * @note Function requires two key handles to generate the Check-In message.
+     *       Due to PSA requirements, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
      *
-     * @param key       Key with which to decrypt the check-in payload
-     * @param payload   The received payload to decrypt and parse
-     * @param counter   The counter value retrieved from the payload
-     * @param appData   The optional application data decrypted. The size of appData must be at least the size of
-     *                  GetAppDataSize(payload) + sizeof(CounterType)
+     * @param[in]       aes128KeyHandle   Key handle with which to encrypt the check-in payload with the AEAD
+     * @param[in]       hmac128KeyHandle  Key handle with which to generate the nonce for the check-in payload with the HMAC
+     * @param[in]       payload           The received payload to decrypt and parse
+     * @param[out]      counter           The counter value retrieved from the payload
+     * @param[in,out]   appData           The optional application data decrypted. The size of appData must be at least the size of
+     *                                    GetAppDataSize(payload) + sizeof(CounterType).
+     *                                    appData is used as a work buffer for the decryption process
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
-                                                 MutableByteSpan & appData);
+    static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
+                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
+                                                 CounterType & counter, MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
 
@@ -81,8 +92,20 @@ public:
     static constexpr uint16_t sMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
-    // Issue #28603
-    static constexpr uint16_t sMaxAppDataSize = 1024;
+private:
+
+    /**
+     * @brief Generate the Nonce for the Check-In message
+     * 
+     * @param[in]   hmacKeyHandle Key handle to use with the HMAC algorithm
+     * @param[in]   counter       Check-In Counter value to use as message of the HMAC algorithm
+     * @param[out]  output        output buffer for the generated Nonce.
+     *                            SUFFICIENT SPACE MUST BE ALLOCATED by the caller
+     *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES 
+     * @return CHIP_ERROR 
+     */
+    static CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
+                                                  MutableByteSpan & output);
 };
 
 } // namespace SecureChannel
