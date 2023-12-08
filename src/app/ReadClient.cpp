@@ -915,7 +915,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     if (_this->mIsPeerICD)
     {
-        // If the device is idle, we mark the subscription as "InactiveICDSubscription", readClient consumer decides whether it goes
+        // If the device is idle, we mark the subscription as "InactiveICDSubscription", ReadClient consumer decides whether it goes
         // with retry or resubscription is triggered on `OnActiveModeNotification`. Note: the liveness timeout is always longer than
         // the MaxInterval (and idle duration), so we can move the device to `IdleSubcription` when liveness timeout is reached.
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
