@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,10 +119,10 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::UserActionEventHandler(AppEvent * aEvent)
+void AppTask::ApplicationEventHandler(AppEvent * aEvent)
 {
     VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Button);
-    // Trigger User Active Mode Event
+    // TODO - trigger some application event
 }
 
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
@@ -134,7 +133,7 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 
     if (button == APP_USER_ACTION)
     {
-        button_event.Handler = UserActionEventHandler;
+        button_event.Handler = ApplicationEventHandler;
         sAppTask.PostEvent(&button_event);
     }
     else if (button == APP_FUNCTION_BUTTON)

@@ -98,9 +98,9 @@ private:
 
     /**
      * @brief PB1 Button event processing function
-     *        Function triggers a user action sent to the CHIP task
+     *        Function triggers a application action sent to the CHIP task
      *
      * @param aEvent button event being processed
      */
-    static void UserActionEventHandler(AppEvent * aEvent);
+    static void ApplicationEventHandler(AppEvent * aEvent);
 };
