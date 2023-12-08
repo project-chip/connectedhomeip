@@ -86,7 +86,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_ERROR_INCORRECT_STATE);
     auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE);
+    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
     clientInfo.offset = checkInCounter;
     bool refreshKey   = (checkInCounter > kKeyRefreshLimit);
     mpCheckInDelegate->OnCheckInComplete(clientInfo, refreshKey);
