@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@
 namespace chip {
 namespace app {
 
-inline constexpr uint32_t kCheckInCounterMax = UINT32_MAX;
+inline constexpr uint64_t kCheckInCounterMax = (1UL << 32);
 inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
 
 CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
@@ -82,17 +82,13 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
-    uint32_t counter = 0;
+    CounterType counter = 0;
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_ERROR_INCORRECT_STATE);
     auto checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_INVALID_SIGNATURE);
-    clientInfo.offset = counter - clientInfo.start_icd_counter;
-    bool refreshKey   = false;
-    if (checkInCounter > kKeyRefreshLimit)
-    {
-        refreshKey = true;
-    }
+    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE);
+    clientInfo.offset = checkInCounter;
+    bool refreshKey   = (checkInCounter > kKeyRefreshLimit);
     mpCheckInDelegate->OnCheckInComplete(clientInfo, refreshKey);
     return CHIP_NO_ERROR;
 }

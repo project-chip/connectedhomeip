@@ -25,11 +25,13 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/CommonIterator.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <stddef.h>
 
 namespace chip {
 namespace app {
 
+using namespace Protocols::SecureChannel;
 /**
  * The ICDClientStorage class is an abstract interface that defines the operations
  * for storing, retrieving and deleting ICD client information in persistent storage.
@@ -103,9 +105,9 @@ public:
      * and populate the clientInfo with the stored information corresponding to the key.
      * @param[in] payload received checkIn Message payload
      * @param[out] clientInfo retrieved matched clientInfo from storage
-     * @param[out] counter counter value received in the checkIn message
+     * @param[out] counter counter value received in the CheckIn message
      */
-    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t & counter) = 0;
+    virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) = 0;
 };
 } // namespace app
 } // namespace chip

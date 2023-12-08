@@ -34,7 +34,7 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo,
 {
     mpStorage->StoreEntry(clientInfo);
     ChipLogProgress(
-        ICD, "Check In Message processing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
+        ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {

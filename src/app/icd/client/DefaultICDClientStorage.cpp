@@ -24,7 +24,6 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <limits>
-#include <protocols/secure_channel/CheckinMessage.h>
 
 namespace {
 // FabricIndex is uint8_t, the tlv size with anonymous tag is 1(control bytes) + 1(value) = 2
@@ -41,7 +40,7 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 namespace chip {
 namespace app {
 
-#define MIN_APPDATA_LENGTH 6
+#define APPDATA_LENGTH 6
 
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
@@ -464,13 +463,14 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t & counter)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
+                                                          CounterType & counter)
 {
     /*appDataBuffer is the working buffer that will be used to retrieve data from the payload.
      *counter to retrieve - 4 bytes
      *appData to retrieve - 2 bytes(activeModeThreshold)
      */
-    uint8_t appDataBuffer[MIN_APPDATA_LENGTH];
+    uint8_t appDataBuffer[APPDATA_LENGTH];
     MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();
     while (iterator->Next(clientInfo))
