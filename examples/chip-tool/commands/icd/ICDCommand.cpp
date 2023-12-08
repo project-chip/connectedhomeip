@@ -59,9 +59,9 @@ void registerCommandsICD(Commands & commands, CredentialIssuerCommands * credsIs
 {
     const char * name = "ICD";
 
-    commands_list commands = {
+    commands_list list = {
         make_unique<ICDListCommand>(credsIssuerConfig),
     };
 
-    commands.RegisterCommandSet(name, commands, "Commands for client-side ICD management.");
+    commands.RegisterCommandSet(name, list, "Commands for client-side ICD management.");
 }
