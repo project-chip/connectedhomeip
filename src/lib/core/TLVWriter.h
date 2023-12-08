@@ -972,7 +972,8 @@ public:
      *
      * @retval #CHIP_NO_ERROR      If the method succeeded.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied container writer is not in the correct state or if the TLVWriter is not initialized.
+     *                              If the supplied container writer is not in the correct state or if the TLVWriter is not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If another container writer has been opened on the supplied
      *                              container writer and not yet closed.
@@ -1051,7 +1052,8 @@ public:
      * @retval #CHIP_ERROR_INVALID_ARGUMENT
      *                              If the supplied reader uses a TLVBackingStore rather than a simple buffer.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on a container element or if the TLVWriter was not initialized.
+     *                              If the supplied reader is not positioned on a container element or if the TLVWriter was not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
@@ -1103,7 +1105,8 @@ public:
      * @retval #CHIP_ERROR_INVALID_ARGUMENT
      *                              If the supplied reader uses a TLVBackingStore rather than a simple buffer.
      * @retval #CHIP_ERROR_INCORRECT_STATE
-     *                              If the supplied reader is not positioned on a container element or of the TLVWriter was not initialized.
+     *                              If the supplied reader is not positioned on a container element or of the TLVWriter was not
+     * initialized.
      * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
      *                              If a container writer has been opened on the current writer and not
      *                              yet closed.
