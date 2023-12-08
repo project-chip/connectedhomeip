@@ -24,15 +24,18 @@ namespace Dnssd {
 
 CHIP_ERROR OpenThreadDnssdInit(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {
-    ReturnErrorOnFailure(ThreadStackMgr().SetSrpDnsCallbacks(initCallback, errorCallback, context));
-
+    CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     MutableByteSpan mac(macBuffer);
     char hostname[kHostNameMaxLength + 1] = "";
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
+    SuccessOrExit(error = ThreadStackMgr().SetSrpDnsCallbacks(initCallback, errorCallback, context));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac));
     MakeHostName(hostname, sizeof(hostname), mac);
+    error = ThreadStackMgr().ClearSrpHost(hostname);
 
-    return ThreadStackMgr().ClearSrpHost(hostname);
+exit:
+    initCallback(context, error);
+    return error;
 }
 
 const char * GetProtocolString(DnssdServiceProtocol protocol)
