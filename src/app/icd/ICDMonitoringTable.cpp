@@ -43,12 +43,10 @@ CHIP_ERROR ICDMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kCheckInNodeID), checkInNodeID));
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kMonitoredSubject), monitoredSubject));
 
-    ByteSpan aesKeybuf;
-    Crypto::GetByteSpanFromSymmetric128BitsKeyHandle(aesKeyHandle, aesKeybuf);
+    ByteSpan aesKeybuf(aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>());
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kAesKeyHandle), aesKeybuf));
 
-    ByteSpan hmacKeybuf;
-    Crypto::GetByteSpanFromSymmetric128BitsKeyHandle(hmacKeyHandle, hmacKeybuf);
+    ByteSpan hmacKeybuf(hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>());
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(Fields::kHmacKeyHandle), hmacKeybuf));
 
     ReturnErrorOnFailure(writer.EndContainer(outer));
@@ -83,7 +81,8 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
                 // keyHandle leakage in some implementations.
-                ReturnErrorOnFailure(Crypto::GetSymmetric128BitsKeyHandleFromByteSpan(aesKeyHandle, buf));
+                memcpy(aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+                       sizeof(Crypto::Symmetric128BitsKeyByteArray));
                 keyHandleValid = true;
             }
             break;
@@ -103,14 +102,8 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
                 // keyHandle leakage in some implementations.
-                error = Crypto::GetSymmetric128BitsKeyHandleFromByteSpan(hmacKeyHandle, buf);
-                if (error != CHIP_NO_ERROR)
-                {
-                    // If setting the KeyHandle from the buffer failed, we need to set an invalid key handle
-                    // even if the AesKeyHandle is valid.
-                    keyHandleValid = false;
-                    return error;
-                }
+                memcpy(hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+                       sizeof(Crypto::Symmetric128BitsKeyByteArray));
             }
             break;
             default:
@@ -220,8 +213,12 @@ ICDMonitoringEntry & ICDMonitoringEntry::operator=(const ICDMonitoringEntry & ic
     index             = icdMonitoringEntry.index;
     keyHandleValid    = icdMonitoringEntry.keyHandleValid;
     symmetricKeystore = icdMonitoringEntry.symmetricKeystore;
-    Crypto::CopySymmetric128BitsKeyHandle(icdMonitoringEntry.aesKeyHandle, aesKeyHandle);
-    Crypto::CopySymmetric128BitsKeyHandle(icdMonitoringEntry.hmacKeyHandle, hmacKeyHandle);
+    memcpy(aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           icdMonitoringEntry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+           sizeof(Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           icdMonitoringEntry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+           sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     return *this;
 }
@@ -262,8 +259,10 @@ CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & en
     e.monitoredSubject = entry.monitoredSubject;
     e.index            = index;
 
-    Crypto::CopySymmetric128BitsKeyHandle(entry.aesKeyHandle, e.aesKeyHandle);
-    Crypto::CopySymmetric128BitsKeyHandle(entry.hmacKeyHandle, e.hmacKeyHandle);
+    memcpy(e.aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(e.hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     return e.Save(this->mStorage);
 }
