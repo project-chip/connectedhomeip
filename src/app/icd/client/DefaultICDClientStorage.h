@@ -53,13 +53,15 @@ public:
     ICDClientInfoIterator * IterateICDClientInfo() override;
 
     /**
-     * When decrypting check-in message, we need to run through all keys from all ICD clientInfos, 
-     * ICDClientInfos for the same fabric are stored in storage using fabricIndex as the key, in order to 
-     * retrieve all ICD ClientInfo from stroage, we need to know all fabricIndex in advance. UpdateFabricList
-     * function provides a way to inject new created fabricIndex into a dedicated table. It is recommended to
-     * be called whenever  the fabric is successfully created.
-     * 
-     * @param[in] fabricIndex  the new created fabric index
+     * When decrypting check-in messages, the system needs to iterate through all keys
+     * from all ICD clientInfos. ICDClientInfos for the same fabric are stored in
+     * storage using the fabricIndex as the key. To retrieve all relevant ICDClientInfos
+     * from storage, the system needs to know all fabricIndices in advance. The
+     * `UpdateFabricList` function provides a way to inject newly created fabricIndices
+     * into a dedicated table. It is recommended to call this function whenever a new
+     * fabric is successfully created.
+     *
+     * @param[in] fabricIndex The newly created fabric index.
      */
     CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 
