@@ -227,7 +227,7 @@ limitations under the License.
     <attribute side="server" code="0x0011" define="OCCUPIED_COOLING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">OccupiedCoolingSetpoint</attribute>
     <attribute side="server" code="0x0012" define="OCCUPIED_HEATING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">OccupiedHeatingSetpoint</attribute>
     <attribute side="server" code="0x0013" define="UNOCCUPIED_COOLING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2600" optional="true">UnoccupiedCoolingSetpoint</attribute>
-    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">UnoccupiedHeatingSetpoint</attribute>    
+    <attribute side="server" code="0x0014" define="UNOCCUPIED_HEATING_SETPOINT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="2000" optional="true">UnoccupiedHeatingSetpoint</attribute>
     <attribute side="server" code="0x0015" define="MIN_HEAT_SETPOINT_LIMIT" type="int16s" min="-27315" max="0x7FFF" writable="true" default="700" optional="true">
       <description>MinHeatSetpointLimit</description>
       <access op="write" privilege="manage"/>
@@ -279,8 +279,8 @@ limitations under the License.
     <attribute side="server" code="0x0029" define="THERMOSTAT_RUNNING_STATE" type="RelayStateBitmap" writable="false" optional="true" min="0x0" max="0x7F">ThermostatRunningState</attribute>
     <attribute side="server" code="0x0030" define="SETPOINT_CHANGE_SOURCE" type="SetpointChangeSourceEnum" writable="false" optional="true" default="0" min="0x0" max="0x2">SetpointChangeSource</attribute>
     <attribute side="server" code="0x0031" define="SETPOINT_CHANGE_AMOUNT" type="int16s" writable="false" default="0x8000" optional="true" isNullable="true">SetpointChangeAmount</attribute>
-    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true" default="0">SetpointChangeSourceTimestamp</attribute>
-    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true" default="0xFF" min="0" max="0xFE">
+    <attribute side="server" code="0x0032" define="SETPOINT_CHANGE_SOURCE_TIMESTAMP" type="epoch_s" writable="false" optional="true">SetpointChangeSourceTimestamp</attribute>
+    <attribute side="server" code="0x0034" define="OCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true">
       <description>OccupiedSetback</description>
       <access op="write" privilege="manage"/>
     </attribute>

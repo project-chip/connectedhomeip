@@ -169,7 +169,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
                                                     0,       // buffer size
                                                     false);  // write?
 
-
     // if we dont support that attribute
     if (metadata == nullptr)
     {
@@ -203,7 +202,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         uint16_t dataLen                  = emberAfAttributeSize(metadata);
         const uint8_t * minBytes;
         const uint8_t * maxBytes;
-
         if (dataLen <= 2)
         {
             static_assert(sizeof(minv.defaultValue) == 2, "if statement relies on size of minv.defaultValue being 2");
