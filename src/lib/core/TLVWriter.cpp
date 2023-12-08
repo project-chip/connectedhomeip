@@ -57,6 +57,21 @@ namespace TLV {
 
 using namespace chip::Encoding;
 
+TLVWriter::TLVWriter() :
+    ImplicitProfileId(kProfileIdNotSpecified),
+    AppData(nullptr),
+    mBackingStore(nullptr),
+    mBufStart(nullptr),
+    mWritePoint(nullptr),
+    mRemainingLen(0),
+    mLenWritten(0),
+    mMaxLen(0),
+    mReservedSize(0),
+    mContainerType(kTLVType_NotSpecified),
+    mInitializationCookie(0),
+    mContainerOpen(false),
+    mCloseContainerReserved(true) {}
+
 NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
     // TODO: Maybe we can just make mMaxLen, LenWritten, mRemainingLen size_t instead?

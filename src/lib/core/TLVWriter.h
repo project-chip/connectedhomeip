@@ -63,7 +63,7 @@ class DLL_EXPORT TLVWriter
     friend class TLVUpdater;
 
 public:
-    TLVWriter() = default;
+    TLVWriter();
 
     // TODO(#30825): We do not cleanly handle copies for all backing stores, but we don't disallow copy...
 #if 0
@@ -1201,27 +1201,27 @@ public:
      * @note The value of the @p ImplicitProfileId member affects the encoding of profile-specific
      * tags only; the encoding of context-specific tags is unchanged.
      */
-    uint32_t ImplicitProfileId = kProfileIdNotSpecified;
+    uint32_t ImplicitProfileId;
 
     /**
      * A pointer field that can be used for application-specific data.
      */
-    void * AppData = nullptr;
+    void * AppData;
 
 protected:
-    TLVBackingStore * mBackingStore = nullptr;
-    uint8_t * mBufStart             = nullptr;
-    uint8_t * mWritePoint           = nullptr;
-    uint32_t mRemainingLen          = 0;
-    uint32_t mLenWritten            = 0;
-    uint32_t mMaxLen                = 0;
-    uint32_t mReservedSize          = 0;
-    TLVType mContainerType          = kTLVType_NotSpecified;
-    uint16_t mInitializationCookie  = 0;
+    TLVBackingStore * mBackingStore;
+    uint8_t * mBufStart;
+    uint8_t * mWritePoint;
+    uint32_t mRemainingLen;
+    uint32_t mLenWritten;
+    uint32_t mMaxLen;
+    uint32_t mReservedSize;
+    TLVType mContainerType;
+    uint16_t mInitializationCookie;
 
 private:
-    bool mContainerOpen          = false;
-    bool mCloseContainerReserved = true;
+    bool mContainerOpen;
+    bool mCloseContainerReserved;
 
 protected:
     bool IsContainerOpen() const { return mContainerOpen; }
