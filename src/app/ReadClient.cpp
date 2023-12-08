@@ -435,7 +435,7 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
 
 void ReadClient::OnActiveModeNotification()
 {
-    // This function just try to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
+    // This function just tries to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
     VerifyOrDie(mpImEngine->InActiveReadClientList(this));
     // If we are not in InactiveICDSubscription state, that means the liveness timeout has not reached. Simply do nothing.
     VerifyOrReturn(IsInactiveICDSubscription());
