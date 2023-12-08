@@ -16,11 +16,10 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <rvc-modes.h>
+#include <oven-modes.h>
 
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::RvcRunMode;
-using namespace chip::app::Clusters::RvcCleanMode;
+using namespace chip::app::Clusters::OvenMode;
 using chip::Protocols::InteractionModel::Status;
 template <typename T>
 using List              = chip::app::DataModel::List<T>;
@@ -28,30 +27,20 @@ using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::T
 
 // RVC Run
 
-static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
-static ModeBase::Instance * gRvcRunModeInstance = nullptr;
+static OvenModeDelegate * gOvenModeDelegate = nullptr;
+static ModeBase::Instance * gOvenModeInstance = nullptr;
 
-CHIP_ERROR RvcRunModeDelegate::Init()
+CHIP_ERROR OvenModeDelegate::Init()
 {
     return CHIP_NO_ERROR;
 }
 
-void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void OvenModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
-
-    // Our business logic states that we can only switch into the mapping state from the idle state.
-    if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
-    {
-        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
-        return;
-    }
-
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR OvenModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -60,7 +49,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::Muta
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR OvenModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -70,7 +59,7 @@ CHIP_ERROR RvcRunModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR OvenModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
 {
     if (modeIndex >= ArraySize(kModeOptions))
     {
@@ -88,120 +77,31 @@ CHIP_ERROR RvcRunModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTa
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * RvcRunMode::Instance()
+ModeBase::Instance * OvenMode::Instance()
 {
-    return gRvcRunModeInstance;
+    return gOvenModeInstance;
 }
 
-void RvcRunMode::Shutdown()
+void OvenMode::Shutdown()
 {
-    if (gRvcRunModeInstance != nullptr)
+    if (gOvenModeInstance != nullptr)
     {
-        delete gRvcRunModeInstance;
-        gRvcRunModeInstance = nullptr;
+        delete gOvenModeInstance;
+        gOvenModeInstance = nullptr;
     }
-    if (gRvcRunModeDelegate != nullptr)
+    if (gOvenModeDelegate != nullptr)
     {
-        delete gRvcRunModeDelegate;
-        gRvcRunModeDelegate = nullptr;
+        delete gOvenModeDelegate;
+        gOvenModeDelegate = nullptr;
     }
 }
 
-void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
+void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
-    gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
-    gRvcRunModeInstance->Init();
-}
-
-// RVC Clean
-static RvcCleanModeDelegate * gRvcCleanModeDelegate = nullptr;
-static ModeBase::Instance * gRvcCleanModeInstance   = nullptr;
-
-CHIP_ERROR RvcCleanModeDelegate::Init()
-{
-    return CHIP_NO_ERROR;
-}
-
-void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
-{
-    uint8_t rvcRunCurrentMode = gRvcRunModeInstance->GetCurrentMode();
-
-    if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
-    {
-        response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a clean"));
-        return;
-    }
-
-    response.status = to_underlying(ModeBase::StatusCode::kSuccess);
-}
-
-CHIP_ERROR RvcCleanModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
-}
-
-CHIP_ERROR RvcCleanModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    value = kModeOptions[modeIndex].mode;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR RvcCleanModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
-{
-    if (modeIndex >= ArraySize(kModeOptions))
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-
-    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    std::copy(kModeOptions[modeIndex].modeTags.begin(), kModeOptions[modeIndex].modeTags.end(), tags.begin());
-    tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
-
-    return CHIP_NO_ERROR;
-}
-
-ModeBase::Instance * RvcCleanMode::Instance()
-{
-    return gRvcCleanModeInstance;
-}
-
-void RvcCleanMode::Shutdown()
-{
-    if (gRvcCleanModeInstance != nullptr)
-    {
-        delete gRvcCleanModeInstance;
-        gRvcCleanModeInstance = nullptr;
-    }
-    if (gRvcCleanModeDelegate != nullptr)
-    {
-        delete gRvcCleanModeDelegate;
-        gRvcCleanModeDelegate = nullptr;
-    }
-}
-
-void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
-    gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
-    gRvcCleanModeInstance->Init();
+    VerifyOrDie(gOvenModeDelegate == nullptr && gOvenModeInstance == nullptr);
+    gOvenModeDelegate = new OvenMode::OvenModeDelegate;
+    gOvenModeInstance =
+        new ModeBase::Instance(gOvenModeDelegate, 0x1, OvenMode::Id, chip::to_underlying(OvenMode::Feature::kOnOff));
+    gOvenModeInstance->Init();
 }
