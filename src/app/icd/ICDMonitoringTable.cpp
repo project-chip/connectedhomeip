@@ -80,7 +80,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
-                // keyHandle leakage in some implementations.
+                // keyHandle leaks in some implementations.
                 memcpy(aesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
                        sizeof(Crypto::Symmetric128BitsKeyByteArray));
                 keyHandleValid = true;
@@ -101,7 +101,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // Since we are storing either the raw key or a key ID, we must
                 // simply copy the data as is in the keyHandle.
                 // Calling SetKey here would create another keyHandle in storage and will cause
-                // keyHandle leakage in some implementations.
+                // keyHandle leaks in some implementations.
                 memcpy(hmacKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
                        sizeof(Crypto::Symmetric128BitsKeyByteArray));
             }
@@ -144,7 +144,7 @@ CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
     }
     else
     {
-        // Creation of the HmacKeyHandle failed, we need to delete the AesKeyHandle to avoid a key leakage
+        // Creation of the HmacKeyHandle failed, we need to delete the AesKeyHandle to avoid a key leak
         symmetricKeystore->DestroyKey(this->aesKeyHandle);
     }
 
@@ -272,7 +272,7 @@ CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
     ICDMonitoringEntry entry(mSymmetricKeystore, this->mFabric);
 
     // Retrieve entry and delete the keyHandle first as to not
-    // cause any key leakages.
+    // cause any key leaks.
     this->Get(index, entry);
     ReturnErrorOnFailure(entry.DeleteKey());
 
