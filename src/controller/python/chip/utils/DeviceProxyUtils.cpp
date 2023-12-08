@@ -33,6 +33,21 @@
 
 using namespace chip;
 
+namespace python {
+
+struct __attribute__((packed)) SessionParametersStruct
+{
+    uint32_t sessionIdleInterval      = 0;
+    uint32_t sessionActiveInterval    = 0;
+    uint16_t sessionActiveThreshold   = 0;
+    uint16_t dataModelRevision        = 0;
+    uint16_t interactionModelRevision = 0;
+    uint32_t speficiationVersion      = 0;
+    uint16_t maxPathsPerInvoke        = 0;
+};
+
+} // namespace python
+
 extern "C" {
 
 /**
@@ -61,21 +76,29 @@ uint32_t pychip_DeviceProxy_ComputeRoundTripTimeout(DeviceProxy * device, uint32
 }
 
 /**
- * @brief
+ * @brief This gets the Session Parameters reported by remote node.
  *
- * This gets the MaxPathsPerInvoke supported by remote node.
- *
- * A valid DeviceProxy pointer with a valid, established session is required for this method.
+ * A valid DeviceProxy pointer with a valid established session is required for this method.
  */
-uint16_t pychip_DeviceProxy_GetMaxPathsPerInvoke(DeviceProxy * device, uint32_t upperLayerProcessingTimeoutMs)
+PyChipError pychip_DeviceProxy_GetRemoteSessionParameters(DeviceProxy * device, void * sessionParametersStructPointer)
 {
-    VerifyOrDie(device != nullptr);
+    VerifyOrReturnError(device != nullptr || sessionParametersStructPointer, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
     auto * deviceProxy = static_cast<DeviceProxy *>(device);
-    VerifyOrDie(deviceProxy->GetSecureSession().HasValue());
+    VerifyOrReturnError(deviceProxy->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
     auto remoteSessionParameters = deviceProxy->GetSecureSession().Value()->GetRemoteSessionParameters();
+    auto remoteMrpConfig         = remoteSessionParameters.GetMRPConfig();
 
-    return remoteSessionParameters.GetMaxPathsPerInvoke();
+    python::SessionParametersStruct * sessionParam = static_cast<python::SessionParametersStruct *>(sessionParametersStructPointer);
+
+    sessionParam->sessionIdleInterval      = remoteMrpConfig.mIdleRetransTimeout.count();
+    sessionParam->sessionActiveInterval    = remoteMrpConfig.mActiveRetransTimeout.count();
+    sessionParam->sessionActiveThreshold   = remoteMrpConfig.mActiveThresholdTime.count();
+    sessionParam->dataModelRevision        = remoteSessionParameters.GetDataModelRevision().ValueOr(0);
+    sessionParam->interactionModelRevision = remoteSessionParameters.GetInteractionModelRevision().ValueOr(0);
+    sessionParam->speficiationVersion      = remoteSessionParameters.GetSpecificationVersion().ValueOr(0);
+    sessionParam->maxPathsPerInvoke        = remoteSessionParameters.GetMaxPathsPerInvoke();
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 }
