@@ -7515,4 +7515,34 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic fabricIndex;
 @end
 
+@implementation MTRSampleMEIClusterPingedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSampleMEIClusterPingedEvent alloc] init];
+
+    other.arg1 = self.arg1;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _arg1, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 NS_ASSUME_NONNULL_END

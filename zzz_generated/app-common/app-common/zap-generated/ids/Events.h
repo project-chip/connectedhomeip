@@ -623,6 +623,16 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace UnitTesting
 
+namespace SampleMei {
+namespace Events {
+
+namespace Pinged {
+static constexpr EventId Id = 0x00000000;
+} // namespace Pinged
+
+} // namespace Events
+} // namespace SampleMei
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

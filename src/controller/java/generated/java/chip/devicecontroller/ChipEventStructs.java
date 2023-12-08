@@ -4713,4 +4713,65 @@ public static class UnitTestingClusterTestFabricScopedEventEvent {
     return output.toString();
   }
 }
+public static class SampleMeiClusterPingedEvent {
+  public Integer arg1;
+  public Integer fabricIndex;
+  private static final long ARG1_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public SampleMeiClusterPingedEvent(
+    Integer arg1,
+    Integer fabricIndex
+  ) {
+    this.arg1 = arg1;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ARG1_ID, new UIntType(arg1)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static SampleMeiClusterPingedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer arg1 = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ARG1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          arg1 = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new SampleMeiClusterPingedEvent(
+      arg1,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SampleMeiClusterPingedEvent {\n");
+    output.append("\targ1: ");
+    output.append(arg1);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 }

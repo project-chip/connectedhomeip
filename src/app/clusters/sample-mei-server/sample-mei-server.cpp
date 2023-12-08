@@ -6,6 +6,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -67,6 +68,7 @@ SampleMeiContent::SampleMeiContent(EndpointId aEndpoint)
 // *****************************************************************************
 // SampleMeiServer
 
+static uint8_t gPinged = 0;
 void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
 {
     auto endpoint      = ctxt.mRequestPath.mEndpointId;
@@ -82,7 +84,17 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     case Commands::Ping::Id:
         HandleCommand<Commands::Ping::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
             ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+            Events::Pinged::Type event{ .arg1 = gPinged++, .fabricIndex = 1 };
+            chip::EventNumber n = gPinged;
+            if (CHIP_NO_ERROR != LogEvent(event, 1 /*endpoint*/, n))
+            {
+                // TBD
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+            }
+            else
+            {
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+            }
         });
         return;
     case Commands::AddArguments::Id:

@@ -1491,6 +1491,11 @@ cluster FixedLabel = 64 {
 cluster SampleMei = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
+  fabric_sensitive info event Pinged = 0 {
+    int8u arg1 = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1825,9 +1830,11 @@ endpoint 1 {
   }
 
   server cluster SampleMei {
+    emits event Pinged;
     ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

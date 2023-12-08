@@ -7281,4 +7281,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     MTREventIDTypeClusterUnitTestingEventTestEventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTREventIDTypeClusterUnitTestingEventTestFabricScopedEventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
 
+    // Cluster SampleMEI events
+    MTREventIDTypeClusterSampleMEIEventPingedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+
 };
