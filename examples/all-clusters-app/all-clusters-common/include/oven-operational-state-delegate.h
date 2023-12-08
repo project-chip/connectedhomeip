@@ -31,10 +31,10 @@ namespace Clusters {
 
 // typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::GenericOperationalError & err);
 
-namespace OvenOperationalState {
+namespace OvenCavityOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class OvenOperationalStateDelegate : public OperationalState::Delegate
+class OvenCavityOperationalStateDelegate : public OperationalState::Delegate
 {
 private:
     const Clusters::OperationalState::GenericOperationalState mOperationalStateList[8] = {
@@ -42,10 +42,10 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::OvenOperationalState::OperationalStateEnum::kPreheating)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::OvenOperationalState::OperationalStateEnum::kPreheated)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::OvenOperationalState::OperationalStateEnum::kCoolingDown)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::OvenOperationalState::OperationalStateEnum::kSelfCleaning))
+        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPreheating)),
+        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPreheated)),
+        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kCoolingDown)),
+        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kSelfCleaning))
     };
 
     const Clusters::OperationalState::GenericOperationalPhase mOperationalPhaseList[1] = {
@@ -135,7 +135,7 @@ public:
 
 //void Shutdown();
 
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
 } // namespace Clusters
 } // namespace app
 } // namespace chip

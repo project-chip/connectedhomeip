@@ -20,9 +20,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OvenOperationalState;
+using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-CHIP_ERROR OvenOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
+CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                    OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= ArraySize(mOperationalStateList))
@@ -33,7 +33,7 @@ CHIP_ERROR OvenOperationalStateDelegate::GetOperationalStateAtIndex(size_t index
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OvenOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
+CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
                                                                    OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index >= ArraySize(mOperationalPhaseList))
