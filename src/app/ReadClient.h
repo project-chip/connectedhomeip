@@ -324,7 +324,7 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     /**
-     *  Activate the idle subscription.
+     *  Re-activate an idle subscription.
      *
      *  When subscribing to ICD and liveness timeout reached, the read client will move to the `InactiveICDSubscription` state and
      * resubscription can be triggered via OnActiveModeNotification().
