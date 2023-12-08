@@ -75,7 +75,7 @@ SessionParametersStruct = Struct(
     "SessionActiveThreshold" / Int16ul,
     "DataModelRevision" / Int16ul,
     "InteractionModelRevision" / Int16ul,
-    "SpeficiationVersion" / Int32ul,
+    "SpecificationVersion" / Int32ul,
     "MaxPathsPerInvoke" / Int16ul,
 )
 
@@ -124,7 +124,7 @@ class SessionParameters:
     sessionActiveThreshold: typing.Optional[int]
     dataModelRevision: typing.Optional[int]
     interactionModelRevision: typing.Optional[int]
-    speficiationVersion: typing.Optional[int]
+    specficiationVersion: typing.Optional[int]
     maxPathsPerInvoke: int
 
 
