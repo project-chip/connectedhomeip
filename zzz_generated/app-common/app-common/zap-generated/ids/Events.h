@@ -626,9 +626,9 @@ static constexpr EventId Id = 0x00000002;
 namespace SampleMei {
 namespace Events {
 
-namespace Pinged {
+namespace PingCountEvent {
 static constexpr EventId Id = 0x00000000;
-} // namespace Pinged
+} // namespace PingCountEvent
 
 } // namespace Events
 } // namespace SampleMei

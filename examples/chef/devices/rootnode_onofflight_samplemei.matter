@@ -1491,8 +1491,8 @@ cluster FixedLabel = 64 {
 cluster SampleMei = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
-  fabric_sensitive info event Pinged = 0 {
-    int8u arg1 = 1;
+  fabric_sensitive info event PingCountEvent = 0 {
+    int32u count = 1;
     fabric_idx fabricIndex = 254;
   }
 
@@ -1830,7 +1830,7 @@ endpoint 1 {
   }
 
   server cluster SampleMei {
-    emits event Pinged;
+    emits event PingCountEvent;
     ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

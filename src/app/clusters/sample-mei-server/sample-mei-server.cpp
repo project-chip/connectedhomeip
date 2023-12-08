@@ -60,6 +60,7 @@ SampleMeiContent::SampleMeiContent() : SampleMeiContent(kInvalidEndpointId) {}
 SampleMeiContent::SampleMeiContent(EndpointId aEndpoint)
 {
     endpoint = aEndpoint;
+    pingCount = 10000;
 
     // Attribute default values
     flipflop = false;
@@ -68,10 +69,10 @@ SampleMeiContent::SampleMeiContent(EndpointId aEndpoint)
 // *****************************************************************************
 // SampleMeiServer
 
-static uint8_t gPinged = 0;
 void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
 {
     auto endpoint      = ctxt.mRequestPath.mEndpointId;
+    auto fabricIndex   = ctxt.mCommandHandler.GetAccessingFabricIndex();
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
@@ -82,19 +83,16 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::Ping::Id:
-        HandleCommand<Commands::Ping::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
+        HandleCommand<Commands::Ping::DecodableType>(ctxt, [this, endpoint, fabricIndex, endpointIndex, ctxt](HandlerContext & ctx, const auto & req) {
             ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
-            Events::Pinged::Type event{ .arg1 = ++gPinged, .fabricIndex = 1 };
-            chip::EventNumber n = gPinged;
-            if (CHIP_NO_ERROR != LogEvent(event, 1 /*endpoint*/, n))
+            Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++, .fabricIndex = fabricIndex };
+            chip::EventNumber placeholderEventNumber;
+            CHIP_ERROR err = LogEvent(event, endpoint, placeholderEventNumber);
+            if (CHIP_NO_ERROR != err)
             {
-                // TBD
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+                ChipLogError(Zcl, "Failed to record event on endpoint %d: %" CHIP_ERROR_FORMAT, static_cast<int>(endpoint), err.Format());
             }
-            else
-            {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
-            }
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
         });
         return;
     case Commands::AddArguments::Id:

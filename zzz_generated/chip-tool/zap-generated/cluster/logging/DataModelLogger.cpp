@@ -6263,14 +6263,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const SampleMei::Events::Pinged::DecodableType & value)
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const SampleMei::Events::PingCountEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("Arg1", indent + 1, value.arg1);
+        CHIP_ERROR err = DataModelLogger::LogValue("Count", indent + 1, value.count);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Arg1'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Count'");
             return err;
         }
     }
@@ -17794,10 +17795,10 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     case SampleMei::Id: {
         switch (header.mPath.mEventId)
         {
-        case SampleMei::Events::Pinged::Id: {
-            chip::app::Clusters::SampleMei::Events::Pinged::DecodableType value;
+        case SampleMei::Events::PingCountEvent::Id: {
+            chip::app::Clusters::SampleMei::Events::PingCountEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Pinged", 1, value);
+            return DataModelLogger::LogValue("PingCountEvent", 1, value);
         }
         }
         break;

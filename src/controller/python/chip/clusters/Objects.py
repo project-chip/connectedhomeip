@@ -46873,7 +46873,7 @@ class SampleMei(Cluster):
 
     class Events:
         @dataclass
-        class Pinged(ClusterEvent):
+        class PingCountEvent(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0xFFF1FC20
@@ -46886,10 +46886,10 @@ class SampleMei(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="arg1", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="count", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
-            arg1: 'uint' = 0
+            count: 'uint' = 0
             fabricIndex: 'uint' = 0
 

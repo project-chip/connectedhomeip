@@ -32,9 +32,11 @@ class SampleMeiContent
 {
 public:
     EndpointId endpoint;
+    uint32_t pingCount;
 
     // Attribute List
     bool flipflop; /* Attributes::FlipFlop::Id */
+
 
     SampleMeiContent(EndpointId endpoint);
     SampleMeiContent();

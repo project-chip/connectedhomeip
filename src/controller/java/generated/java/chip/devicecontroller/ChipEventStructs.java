@@ -4713,39 +4713,39 @@ public static class UnitTestingClusterTestFabricScopedEventEvent {
     return output.toString();
   }
 }
-public static class SampleMeiClusterPingedEvent {
-  public Integer arg1;
+public static class SampleMeiClusterPingCountEventEvent {
+  public Long count;
   public Integer fabricIndex;
-  private static final long ARG1_ID = 1L;
+  private static final long COUNT_ID = 1L;
   private static final long FABRIC_INDEX_ID = 254L;
 
-  public SampleMeiClusterPingedEvent(
-    Integer arg1,
+  public SampleMeiClusterPingCountEventEvent(
+    Long count,
     Integer fabricIndex
   ) {
-    this.arg1 = arg1;
+    this.count = count;
     this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ARG1_ID, new UIntType(arg1)));
+    values.add(new StructElement(COUNT_ID, new UIntType(count)));
     values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
 
-  public static SampleMeiClusterPingedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static SampleMeiClusterPingCountEventEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer arg1 = null;
+    Long count = null;
     Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ARG1_ID) {
+      if (element.contextTagNum() == COUNT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          arg1 = castingValue.value(Integer.class);
+          count = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -4754,8 +4754,8 @@ public static class SampleMeiClusterPingedEvent {
         }
       }
     }
-    return new SampleMeiClusterPingedEvent(
-      arg1,
+    return new SampleMeiClusterPingCountEventEvent(
+      count,
       fabricIndex
     );
   }
@@ -4763,9 +4763,9 @@ public static class SampleMeiClusterPingedEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("SampleMeiClusterPingedEvent {\n");
-    output.append("\targ1: ");
-    output.append(arg1);
+    output.append("SampleMeiClusterPingCountEventEvent {\n");
+    output.append("\tcount: ");
+    output.append(count);
     output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
