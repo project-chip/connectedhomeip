@@ -394,7 +394,7 @@ cluster OnOff = 6 {
 }
 
 /** Attributes and commands for configuring On/Off switching devices. */
-cluster OnOffSwitchConfiguration = 7 {
+deprecated cluster OnOffSwitchConfiguration = 7 {
   revision 1; // NOTE: Default/not specifically set
 
   readonly attribute enum8 switchType = 0;
@@ -533,7 +533,7 @@ cluster LevelControl = 8 {
 }
 
 /** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
-cluster BinaryInputBasic = 15 {
+deprecated cluster BinaryInputBasic = 15 {
   revision 1; // NOTE: Default/not specifically set
 
   attribute optional char_string<16> activeText = 4;
@@ -554,7 +554,7 @@ cluster BinaryInputBasic = 15 {
 }
 
 /** Cluster to control pulse width modulation */
-provisional cluster PulseWidthModulation = 28 {
+deprecated cluster PulseWidthModulation = 28 {
   revision 1; // NOTE: Default/not specifically set
 
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -5439,7 +5439,7 @@ cluster WindowCovering = 258 {
 }
 
 /** This cluster provides control of a barrier (garage door). */
-cluster BarrierControl = 259 {
+deprecated cluster BarrierControl = 259 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap BarrierControlCapabilities : bitmap8 {
@@ -8067,7 +8067,7 @@ cluster ContentAppObserver = 1296 {
 }
 
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
-cluster ElectricalMeasurement = 2820 {
+deprecated cluster ElectricalMeasurement = 2820 {
   revision 3;
 
   readonly attribute optional bitmap32 measurementType = 0;
