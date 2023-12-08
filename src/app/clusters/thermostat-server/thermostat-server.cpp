@@ -194,8 +194,6 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     bool CoolSupported      = false;
     bool OccupancySupported = false;
 
-    ChipLogError(Zcl, "WTF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
     if (FeatureMap::Get(endpoint, &OurFeatureMap) != EMBER_ZCL_STATUS_SUCCESS)
         OurFeatureMap = FEATURE_MAP_DEFAULT;
 
