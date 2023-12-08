@@ -17,13 +17,12 @@
 
 import xml.etree.ElementTree as ElementTree
 
+import chip.clusters as Clusters
 from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml
+from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-from spec_parsing_support import XmlCluster, ClusterParser
-from global_attribute_ids import GlobalAttributeIds
-
-import chip.clusters as Clusters
+from spec_parsing_support import ClusterParser, XmlCluster
 
 # TODO: I realize this is not a full accounting of all the stuff being parsed yet.
 # I am going to build up the testing support here as I go to make sure we don't regress, but
