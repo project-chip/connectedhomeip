@@ -280,7 +280,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
                 auto writer = sender->GetCommandDataIBTLVWriter();
                 VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
                 TLV::TLVReader reader;
-                reader.Init(tlvBuffer, length);
+                reader.Init(tlvBuffer, static_cast<uint32_t>(length));
                 reader.Next();
                 SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
             }
