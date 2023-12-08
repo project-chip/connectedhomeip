@@ -41,6 +41,8 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 namespace chip {
 namespace app {
 
+#define MIN_APPDATA_LENGTH 6
+
 CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
@@ -464,8 +466,12 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 
 CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, uint32_t & counter)
 {
-    uint8_t testAppData[32];
-    MutableByteSpan appData(testAppData);
+    /*appDataBuffer is the working buffer that will be used to retrieve data from the payload.
+     *counter to retrieve - 4 bytes
+     *appData to retrieve - 2 bytes(activeModeThreshold)
+     */
+    uint8_t appDataBuffer[MIN_APPDATA_LENGTH];
+    MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();
     while (iterator->Next(clientInfo))
     {
