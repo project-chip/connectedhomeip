@@ -44,6 +44,8 @@
 #define NO_INLINE __attribute__((noinline))
 #endif // DOXYGEN
 
+// You can enable this block manually to abort on usage of uninitialized writers in
+// your codebase. There are no such usages in the SDK (outside of tests).
 #if 0
 #define ABORT_ON_UNINITIALIZED_IF_ENABLED() VerifyOrDie(IsInitialized() == true)
 #else
@@ -52,6 +54,7 @@
     {                                                                                                                              \
     } while (0)
 #endif
+
 namespace chip {
 namespace TLV {
 
@@ -65,7 +68,7 @@ TLVWriter::TLVWriter() :
 
 NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
-    // TODO: Maybe we can just make mMaxLen, LenWritten, mRemainingLen size_t instead?
+    // TODO: Maybe we can just make mMaxLen, mLenWritten, mRemainingLen size_t instead?
     uint32_t actualMaxLen = maxLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(maxLen);
 
     // TODO(#30825): Need to ensure a single init path for this complex data.
@@ -534,6 +537,10 @@ CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & 
 
 CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     if (!TLVTypeIsContainer(containerWriter.mContainerType))
         return CHIP_ERROR_INCORRECT_STATE;
 
@@ -591,6 +598,10 @@ CHIP_ERROR TLVWriter::StartContainer(Tag tag, TLVType containerType, TLVType & o
 
 CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     if (!TLVTypeIsContainer(mContainerType))
         return CHIP_ERROR_INCORRECT_STATE;
 
@@ -621,6 +632,10 @@ CHIP_ERROR TLVWriter::CopyContainer(TLVReader & container)
 
 CHIP_ERROR TLVWriter::CopyContainer(Tag tag, TLVReader & container)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     // NOTE: This function MUST be used with a TVLReader that is reading from a contiguous buffer.
     if (container.mBackingStore != nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -647,6 +662,8 @@ CHIP_ERROR TLVWriter::CopyContainer(Tag tag, TLVReader & container)
 
 CHIP_ERROR TLVWriter::CopyContainer(Tag tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     TLVReader reader;
 
     reader.Init(encodedContainer, encodedContainerLen);
