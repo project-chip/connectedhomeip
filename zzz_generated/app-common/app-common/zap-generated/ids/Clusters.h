@@ -148,9 +148,18 @@ static constexpr ClusterId Id = 0x00000045;
 namespace IcdManagement {
 static constexpr ClusterId Id = 0x00000046;
 } // namespace IcdManagement
-namespace OvenOperationalState {
+namespace Timer {
+static constexpr ClusterId Id = 0x00000047;
+} // namespace Timer
+namespace OvenCavityOperationalState {
 static constexpr ClusterId Id = 0x00000048;
-} // namespace OvenOperationalState
+} // namespace OvenCavityOperationalState
+namespace OvenMode {
+static constexpr ClusterId Id = 0x00000049;
+} // namespace OvenMode
+namespace LaundryDryerControls {
+static constexpr ClusterId Id = 0x0000004A;
+} // namespace LaundryDryerControls
 namespace ModeSelect {
 static constexpr ClusterId Id = 0x00000050;
 } // namespace ModeSelect
@@ -205,6 +214,21 @@ static constexpr ClusterId Id = 0x00000071;
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
+namespace BooleanSensorConfiguration {
+static constexpr ClusterId Id = 0x00000080;
+} // namespace BooleanSensorConfiguration
+namespace ValveConfigurationAndControl {
+static constexpr ClusterId Id = 0x00000081;
+} // namespace ValveConfigurationAndControl
+namespace DemandResponseLoadControl {
+static constexpr ClusterId Id = 0x00000096;
+} // namespace DemandResponseLoadControl
+namespace DeviceEnergyManagement {
+static constexpr ClusterId Id = 0x00000098;
+} // namespace DeviceEnergyManagement
+namespace EnergyEvse {
+static constexpr ClusterId Id = 0x00000099;
+} // namespace EnergyEvse
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
@@ -316,6 +340,12 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
+namespace ContentControl {
+static constexpr ClusterId Id = 0x0000050F;
+} // namespace ContentControl
+namespace ContentAppObserver {
+static constexpr ClusterId Id = 0x00000510;
+} // namespace ContentAppObserver
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
