@@ -42,7 +42,6 @@ CHIP_ERROR ICDListCommand::RunCommand()
                 static_cast<uint32_t>(info.peer_node.GetFabricIndex()), ChipLogValueX64(info.peer_node.GetNodeId()),
                 info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject));
 
-        // The following cast is valid only when `DefaultSessionKeystore` is `RawKeySessionKeystore`.
         static_assert(std::is_same<Crypto::DefaultSessionKeystore, Crypto::RawKeySessionKeystore>::value,
                       "DefaultSessionKeystore` is expected to be `RawKeySessionKeystore`");
         Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
