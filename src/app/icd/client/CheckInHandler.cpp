@@ -93,6 +93,7 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     {
         refreshKey = true;
     }
+    mpICDClientStorage->StoreEntry(clientInfo);
     mpCheckInDelegate->OnCheckInComplete(clientInfo, refreshKey);
     return CHIP_NO_ERROR;
 }

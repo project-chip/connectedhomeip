@@ -24,7 +24,7 @@ namespace app {
 
 void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
 {
-    ChipLogProgress(ICD, "Check In Message preocessing complete");
+    ChipLogProgress(ICD, "Check In Message preocessing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId, clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {
         // TODO : Refresh key and re-register client

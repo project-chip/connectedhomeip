@@ -51,7 +51,28 @@ protected:
     // TODO : Follow up to check if this really needs to be a pure virtual function in Exchange delegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override {
+        return CheckInExchangeDispatch::Instance();
+    }
+
 private:
+    class CheckInExchangeDispatch : public Messaging::ExchangeMessageDispatch
+    {
+    public:
+        static ExchangeMessageDispatch & Instance()
+        {
+            static CheckInExchangeDispatch instance;
+            return instance;
+        }
+
+        CheckInExchangeDispatch() {}
+        ~CheckInExchangeDispatch() override {}
+
+    protected:
+        bool MessagePermitted(Protocols::Id, uint8_t type) override { return type == to_underlying(Protocols::SecureChannel::MsgType::ICD_CheckIn); }
+        bool IsEncryptionRequired() const override { return false; }
+    };
+
     Messaging::ExchangeManager * mpExchangeManager = nullptr;
     CheckInDelegate * mpCheckInDelegate            = nullptr;
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeManager; }

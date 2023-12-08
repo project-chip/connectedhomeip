@@ -420,6 +420,7 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
     clientInfo.monitored_subject = mICDMonitoredSubject.Value();
+    clientInfo.start_icd_counter = icdCounter;
 
     CHIP_ERROR err = GetICDClientStorage().SetKey(clientInfo, mICDSymmetricKey.Value());
     if (err == CHIP_NO_ERROR)
