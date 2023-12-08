@@ -18,9 +18,8 @@
 import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
-from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 from spec_parsing_support import ClusterParser, XmlCluster
 
