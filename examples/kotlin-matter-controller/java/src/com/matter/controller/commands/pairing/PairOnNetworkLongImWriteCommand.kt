@@ -52,7 +52,7 @@ class PairOnNetworkLongImWriteCommand(
       try {
         val basicInformationCluster =
           BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
-        basicInformationCluster.writeNodeLabelAttribute("Test Node Lable")
+        basicInformationCluster.writeNodeLabelAttribute("Test Node Label")
         logger.log(Level.INFO, "Write command succeeded")
 
         val nodeLabel = basicInformationCluster.readNodeLabelAttribute()

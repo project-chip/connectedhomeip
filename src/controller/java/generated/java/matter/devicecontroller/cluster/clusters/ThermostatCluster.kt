@@ -34,7 +34,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val numberOfTransitionsForSequence: UByte,
     val dayOfWeekForSequence: UByte,
     val modeForSequence: UByte,
-    val transitions: List<ThermostatClusterThermostatScheduleTransition>
+    val transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>
   )
 
   class LocalTemperatureAttribute(val value: Short?)
@@ -97,7 +97,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     numberOfTransitionsForSequence: UByte,
     dayOfWeekForSequence: UByte,
     modeForSequence: UByte,
-    transitions: List<ThermostatClusterThermostatScheduleTransition>,
+    transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId: UInt = 1u
@@ -182,10 +182,10 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
     val TAG_TRANSITIONS: Int = 3
     val transitions_decoded =
-      buildList<ThermostatClusterThermostatScheduleTransition> {
+      buildList<ThermostatClusterWeeklyScheduleTransitionStruct> {
         tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
         while (!tlvReader.isEndOfContainer()) {
-          add(ThermostatClusterThermostatScheduleTransition.fromTlv(AnonymousTag, tlvReader))
+          add(ThermostatClusterWeeklyScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
       }
