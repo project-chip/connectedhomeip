@@ -60,7 +60,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 } // namespace
 
-const char * TAG = "bridge-app";
+extern const char TAG[] = "bridge-app";
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;

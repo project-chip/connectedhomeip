@@ -262,6 +262,10 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
+     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+endif()
+
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
@@ -489,7 +493,7 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x

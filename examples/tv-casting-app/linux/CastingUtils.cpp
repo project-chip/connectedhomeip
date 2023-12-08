@@ -26,8 +26,8 @@ using namespace chip::DeviceLayer;
 using namespace chip::Dnssd;
 
 // TODO: Accept these values over CLI
-const char * kContentUrl        = "https://www.test.com/videoid";
-const char * kContentDisplayStr = "Test video";
+const char kContentUrl[]        = "https://www.test.com/videoid";
+const char kContentDisplayStr[] = "Test video";
 int gInitialContextVal          = 121212;
 
 CHIP_ERROR DiscoverCommissioners()

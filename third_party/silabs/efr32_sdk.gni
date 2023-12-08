@@ -380,7 +380,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
-      defines += [ "SL_SYSTEM_VIEW=1" ]
+      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT=1" ]
     }
 
     defines += board_defines

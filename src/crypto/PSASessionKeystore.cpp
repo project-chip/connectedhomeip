@@ -47,15 +47,49 @@ private:
     psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
 };
 
+class HmacKeyAttributes
+{
+public:
+    HmacKeyAttributes()
+    {
+        psa_set_key_type(&mAttrs, PSA_KEY_TYPE_HMAC);
+        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_SHA_256));
+        psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_SIGN_MESSAGE);
+        psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
+    }
+
+    ~HmacKeyAttributes() { psa_reset_key_attributes(&mAttrs); }
+
+    const psa_key_attributes_t & Get() { return mAttrs; }
+
+private:
+    psa_key_attributes_t mAttrs = PSA_KEY_ATTRIBUTES_INIT;
+};
+
 } // namespace
 
-CHIP_ERROR PSASessionKeystore::CreateKey(const Aes128KeyByteArray & keyMaterial, Aes128KeyHandle & key)
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
 
     AesKeyAttributes attrs;
-    psa_status_t status = psa_import_key(&attrs.Get(), keyMaterial, sizeof(Aes128KeyByteArray), &key.AsMutable<psa_key_id_t>());
+    psa_status_t status =
+        psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
+    VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key)
+{
+    // Destroy the old key if already allocated
+    psa_destroy_key(key.As<psa_key_id_t>());
+
+    HmacKeyAttributes attrs;
+    psa_status_t status =
+        psa_import_key(&attrs.Get(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray), &key.AsMutable<psa_key_id_t>());
+
     VerifyOrReturnError(status == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
@@ -96,7 +130,7 @@ exit:
     return error;
 }
 
-void PSASessionKeystore::DestroyKey(Aes128KeyHandle & key)
+void PSASessionKeystore::DestroyKey(Symmetric128BitsKeyHandle & key)
 {
     auto & keyId = key.AsMutable<psa_key_id_t>();
 
