@@ -26,6 +26,7 @@ source_set("manager") {
   deps = [ "${chip_root}/src/lib/core" ]
   public_deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols",

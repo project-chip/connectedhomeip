@@ -18,12 +18,14 @@
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <app/InteractionModelEngine.h>
 
 namespace chip {
 namespace app {
 
 void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
 {
+    InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
     ChipLogProgress(ICD, "Check In Message preocessing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId, clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {

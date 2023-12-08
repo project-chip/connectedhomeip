@@ -47,7 +47,7 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds = 0;
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
-    bool mIsPeerICD                     = false;
+    bool mIsPeerICD                     = true;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
