@@ -97,7 +97,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
-            BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap> valueRemoteSensing;
+            BitMask<RemoteSensingBitmap> valueRemoteSensing;
             EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
