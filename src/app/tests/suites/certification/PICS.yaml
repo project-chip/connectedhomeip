@@ -8877,7 +8877,6 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: LWM.S.C01.Tx
 
-
     #  Laundry DRYER Mode Cluster
 
     - label: "Does the device implement the LWM cluster as a server?"
@@ -8912,7 +8911,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: DRYERCTRL.S.A0001
-
 
     # RVC Clean Mode Cluster
 
