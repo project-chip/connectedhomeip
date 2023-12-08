@@ -23,7 +23,7 @@ import sys
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
 from dataclasses import dataclass
-from typing import Any, List, Tuple, Type, Union
+from typing import Any, List, Optional, Tuple, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
@@ -43,10 +43,10 @@ class CommandPath:
 
 
 @dataclass
-class InvokeRequest(CommandPath):
-    Data: Any
-    ResponseType: Union[None, Type]
-    Reference: int
+class InvokeRequestInfo:
+    EndpointId: int
+    Command: ClusterCommand
+    ResponseType: Optional[Type] = None
 
 
 @dataclass
@@ -102,8 +102,8 @@ class AsyncCommandTransaction:
                 self._future.set_result(None)
 
     def handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
-        # For AsyncCommandTransaction we only expect to ever get one response so we don't both
-        # checking `index`, we just share a callback API with batch commands. If we ever get a
+        # For AsyncCommandTransaction we only expect to ever get one response so we don't bother
+        # checking `index`. We just share a callback API with batch commands. If we ever get a
         # second call to `handleResponse` we will see a different error on trying to set future
         # that has already been set.
         self._event_loop.call_soon_threadsafe(
@@ -116,9 +116,12 @@ class AsyncCommandTransaction:
             self._future.set_exception(chipError.to_exception())
         else:
             try:
+                # If you got an exception from this call other than AttributeError please
+                # add it to the except block below. We changed Exception->AttributeError as
+                # that is what we thought we are trying to catch here.
                 self._future.set_exception(
                     chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
-            except Exception:
+            except AttributeError:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure, imError.ClusterStatus))
@@ -138,7 +141,7 @@ class AsyncBatchCommandsTransaction:
         self._future = future
         self._expect_types = expectTypes
         default_im_failure = chip.interaction_model.InteractionModelError(
-            chip.interaction_model.Status.Failure)
+            chip.interaction_model.Status.Timeout)
         self._responses = [default_im_failure] * len(expectTypes)
 
     def _handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
@@ -155,10 +158,12 @@ class AsyncBatchCommandsTransaction:
 
             if self._expect_types[index]:
                 try:
+                    # If you got an exception from this call other than AttributeError please
+                    # add it to the except block below. We changed Exception->AttributeError as
+                    # that is what we thought we are trying to catch here.
                     self._responses[index] = self._expect_types[index].FromTLV(response)
-                except Exception as ex:
-                    self._handleError(
-                        status, 0, ex)
+                except AttributeError as ex:
+                    self._handleError(status, 0, ex)
             else:
                 self._responses[index] = None
 
@@ -168,8 +173,8 @@ class AsyncBatchCommandsTransaction:
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
         if self._future.done():
-            # TODO Right now this even happens if there was a legit IM Status error on one command. We need to update OnError to
-            # allow providing a CommandRef that we can try associating with it.
+            # TODO Right now this even callback happens if there was a real IM Status error on one command.
+            # We need to update OnError to allow providing a CommandRef that we can try associating with it.
             logger.exception(f"Recieved another error, but we have sent error. imError:{imError}, chipError {chipError}")
             return
         if exception:
@@ -178,9 +183,12 @@ class AsyncBatchCommandsTransaction:
             self._future.set_exception(chipError.to_exception())
         else:
             try:
+                # If you got an exception from this call other than AttributeError please
+                # add it to the except block below. We changed Exception->AttributeError as
+                # that is what we thought we are trying to catch here.
                 self._future.set_exception(
                     chip.interaction_model.InteractionModelError(chip.interaction_model.Status(imError.IMStatus), imError.ClusterStatus))
-            except Exception:
+            except AttributeError:
                 logger.exception("Failed to map interaction model status received: %s. Remapping to Failure." % imError)
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure, imError.ClusterStatus))
@@ -283,9 +291,9 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
         ))
 
 
-def SendBatchCommands(future: Future, eventLoop, device, commands: List[Tuple[int, ClusterCommand, Type]],
-                      timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None,
-                      suppressResponse: Union[None, bool] = None) -> PyChipError:
+def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+                      timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
+                      suppressResponse: Optional[bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -303,19 +311,18 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[Tuple[in
     responseTypes = []
     commandargs = []
     for command in commands:
-        endpoint = command[0]
-        clusterCommand = command[1]
-        responseType = command[2]
+        endpoint = command.EndpointId
+        clusterCommand = command.Command
+        responseType = command.ResponseType
         if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
             raise ValueError("responseType must be a ClusterCommand or None")
         if clusterCommand.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
-        commandPath = chip.interaction_model.CommandPathIBStruct.parse(
-            b'\x00' * chip.interaction_model.CommandPathIBStruct.sizeof())
-        commandPath.EndpointId = endpoint
-        commandPath.ClusterId = clusterCommand.cluster_id
-        commandPath.CommandId = clusterCommand.command_id
-        commandPath = chip.interaction_model.CommandPathIBStruct.build(commandPath)
+
+        commandPath = chip.interaction_model.CommandPathIBStruct.build({
+            "EndpointId": command.EndpointId,
+            "ClusterId": clusterCommand.cluster_id,
+            "CommandId": clusterCommand.command_id})
         payloadTLV = clusterCommand.ToTLV()
 
         commandargs.append(c_char_p(commandPath))

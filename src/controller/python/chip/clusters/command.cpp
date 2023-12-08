@@ -268,7 +268,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 
             python::CommandPath invokeRequestInfoObj;
             memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
-            uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
+            const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
 
             app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId,
                                                  invokeRequestInfoObj.commandId, (app::CommandPathFlags::kEndpointIdValid) };
@@ -291,7 +291,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 
             // CommandSender provides us with the CommandReference for this associated command. In order to match responses
             // we have to add CommandRef to index lookup.
-            VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_UNEXPECTED_EVENT);
+            VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
             SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
         }
     }
