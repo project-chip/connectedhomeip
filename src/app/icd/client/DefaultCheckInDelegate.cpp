@@ -33,7 +33,9 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
 void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
 {
     mpStorage->StoreEntry(clientInfo);
-    ChipLogProgress(ICD, "Check In Message processing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId, clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
+    ChipLogProgress(
+        ICD, "Check In Message processing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
+        clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {
         // TODO : Refresh key and re-register client
