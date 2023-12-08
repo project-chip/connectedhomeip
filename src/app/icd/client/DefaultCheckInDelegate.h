@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/icd/client/CheckInDelegate.h>
-
+#include <app/icd/client/ICDClientStorage.h>
 namespace chip {
 namespace app {
 
@@ -28,7 +28,11 @@ class DefaultCheckInDelegate : public CheckInDelegate
 {
 public:
     virtual ~DefaultCheckInDelegate() {}
+    CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) override;
+
+private:
+    ICDClientStorage * mpStorage = nullptr;
 };
 
 } // namespace app

@@ -22,9 +22,18 @@
 namespace chip {
 namespace app {
 
-void DefaultCheckInDelegate ::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
+CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
 {
-    ChipLogProgress(ICD, "Check In Message preocessing complete");
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mpStorage == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpStorage = storage;
+    return CHIP_NO_ERROR;
+}
+
+void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
+{
+    mpStorage->StoreEntry(clientInfo);
+    ChipLogProgress(ICD, "Check In Message processing complete: counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId, clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {
         // TODO : Refresh key and re-register client
