@@ -101,10 +101,10 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
 
-    // Initialized with a non-persistent keystore without PSA(chip-tool has not yet build with PSA).
-    // The lifetime for ICD storage is same as chip tool. Currently we use chip-tool interactive mode for
-    // ICD commissioning and check-in validation, and this lifetime for ICDStorage meets the test requirement.
-    // TODO: Add the real ICD persistent storage for chip-tool
+    // A non-persistent keystore is initialized without PSA functionality, as the chip-tool does not yet support it.
+    // ICD storage lifetime is currently tied to the chip-tool's lifetime. Since chip-tool interactive mode is currently used for
+    // ICD commissioning and check-in validation, this temporary storage meets the test requirements.
+    // TODO: Implement persistent ICD storage for the chip-tool.
     ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
 
     chip::Controller::FactoryInitParams factoryInitParams;
