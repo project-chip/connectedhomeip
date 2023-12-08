@@ -41,10 +41,12 @@ namespace Test {
 CHIP_ERROR AppContext::SetUpTestSuite()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit((err = chip::Platform::MemoryInit()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init CHIP memory failed: %" CHIP_ERROR_FORMAT, err.Format()));
-    VerifyOrExit((err = LoopbackTransportManager::Init()) == CHIP_NO_ERROR,
-                 ChipLogError(AppServer, "Init LoopbackTransportManager failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    VerifyOrExit((err = LoopbackMessagingContext::Init()) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Base class init failed: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // Chip stack is specific to the app context. Anything else will go
+    // to the base class (in particular memory and loopback transports)
     VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
                  ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
 exit:
@@ -54,8 +56,7 @@ exit:
 void AppContext::TearDownTestSuite()
 {
     chip::DeviceLayer::PlatformMgr().Shutdown();
-    LoopbackTransportManager::Shutdown();
-    chip::Platform::MemoryShutdown();
+    LoopbackMessagingContext::Shutdown();
 }
 
 CHIP_ERROR AppContext::SetUp()
