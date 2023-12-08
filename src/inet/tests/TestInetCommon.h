@@ -60,7 +60,7 @@ extern chip::Inet::UDPEndPointManagerImpl gUDP;
 extern bool gDone;
 
 void InitTestInetCommon();
-void InitSystemLayer();
+CHIP_ERROR InitSystemLayer();
 void ShutdownSystemLayer();
 void ShutdownTestInetCommon();
 void InetFailError(CHIP_ERROR err, const char * msg);

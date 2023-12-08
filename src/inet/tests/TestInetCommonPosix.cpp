@@ -158,18 +158,20 @@ void ShutdownTestInetCommon()
     chip::Platform::MemoryShutdown();
 }
 
-void InitSystemLayer()
+CHIP_ERROR InitSystemLayer()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
     // The CHIP stack initialization is required then.
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    if (CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack(); err != CHIP_NO_ERROR) {
+      return err;
+    }
 #ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
 #endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    DeviceLayer::SystemLayer().Init();
+    return DeviceLayer::SystemLayer().Init();
 }
 
 void ShutdownSystemLayer()
