@@ -26,7 +26,17 @@ and two Unify protocol controllers.
 More Information about the Unify Framework can be found
 [here](https://siliconlabs.github.io/UnifySDK/doc/UnifySDK.html)
 
-## Trying Out the Unify Matter Bridge
+## Trying Out the Unify Matter Bridge using Portable Runtime Environment.
+
+The Unify Portable Runtime Environment strives to get the unify matter bridge running as fast as
+possible on your desktop. Prerequisites for bringing up unify matter bridge with portable runtime
+are given [here](https://siliconlabs.github.io/UnifySDK/portable_runtime/readme_user_cli.html).
+
+Detailed steps to quick start unify matter bridge using GUI can be found [here](https://siliconlabs.github.io/UnifySDK/portable_runtime/readme_user_gui.html).
+
+Detailed steps to quick start unify matter bridge using cli can be found [here](https://siliconlabs.github.io/UnifySDK/portable_runtime/readme_user_cli.html#Unify-Matter-Bridge-selection).
+
+## Trying Out the Unify Matter Bridge Manually
 
 To test the Unify Matter Bridge, a Raspberry Pi 4 is recommended. Install the
 latest release of the Unify SDK following the
