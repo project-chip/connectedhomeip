@@ -54,7 +54,7 @@ public:
 
     /**
      * When decrypting check-in messages, the system needs to iterate through all keys
-     * from all ICD clientInfos. ICDClientInfos for the same fabric are stored in
+     * from all ICD clientInfos. In DefaultICDClientStorage, ICDClientInfos for the same fabric are stored in
      * storage using the fabricIndex as the key. To retrieve all relevant ICDClientInfos
      * from storage, the system needs to know all fabricIndices in advance. The
      * `UpdateFabricList` function provides a way to inject newly created fabricIndices
