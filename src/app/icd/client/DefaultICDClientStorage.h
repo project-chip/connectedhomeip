@@ -58,8 +58,8 @@ public:
      * storage using the fabricIndex as the key. To retrieve all relevant ICDClientInfos
      * from storage, the system needs to know all fabricIndices in advance. The
      * `UpdateFabricList` function provides a way to inject newly created fabricIndices
-     * into a dedicated table. It is recommended to call this function whenever a new
-     * fabric is successfully created.
+     * into a dedicated table. It is recommended to call this function whenever a controller is created
+     * with a new fabric index.
      *
      * @param[in] fabricIndex The newly created fabric index.
      */
