@@ -31,10 +31,11 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTime    = 30;
-constexpr uint8_t kDefaultPowerSetting = 100;
-constexpr uint32_t kMaxCookTime        = 65535;
-constexpr uint32_t kMinCookTime        = 1;
+constexpr uint32_t kDefaultCookTime    = 30u;
+constexpr uint8_t kDefaultPowerSetting = 100u;
+constexpr uint32_t kMaxCookTime        = 65535u;
+constexpr uint32_t kMinCookTime        = 1u;
+constexpr uint16_t kDerivedModeTag     = 16384u;
 
 class Delegate;
 
@@ -130,7 +131,7 @@ public:
      *   @param  cookTime: the input cook time value
      *   @param  powerSetting: the input power setting value
      */
-    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime,
+    virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                    uint8_t powerSetting) = 0;
 
     /**

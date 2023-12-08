@@ -41,14 +41,11 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  * MicrowaveOvenControl cluster
  */
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(Optional<uint8_t> cookMode, uint32_t cookTime, uint8_t powerSetting)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
 {
     // placeholder implementation
     Status status;
-    uint8_t reqCookMode;
-
-    reqCookMode = cookMode.ValueOr(ModeNormal);
-    if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(reqCookMode)) != Status::Success)
+    if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
     {
         return status;
     }

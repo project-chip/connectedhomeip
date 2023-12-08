@@ -30,6 +30,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
 using namespace chip::app::Clusters::ModeBase;
+using namespace chip::app::Clusters::MicrowaveOvenMode;
 using namespace chip::app::Clusters::MicrowaveOvenControl::Attributes;
 using Status = Protocols::InteractionModel::Status;
 
@@ -158,6 +159,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     ChipLogDetail(Zcl, "Microwave Oven Control: HandleSetCookingParameters");
     Status status;
     uint8_t opState;
+    uint8_t reqCookMode;
     uint32_t reqCookTime;
     uint8_t reqPowerSetting;
     auto & cookMode     = req.cookMode;
@@ -170,7 +172,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     VerifyOrExit(cookMode.HasValue() || cookTime.HasValue() || powerSetting.HasValue(), status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
-    VerifyOrExit(!cookMode.HasValue() || mMicrowaveOvenModeInstance.IsSupportedMode(cookMode.Value()),
+    reqCookMode = cookMode.ValueOr(to_underlying(MicrowaveOvenMode::ModeTag::kNormal) - kDerivedModeTag);
+    VerifyOrExit(mMicrowaveOvenModeInstance.IsSupportedMode(reqCookMode),
                  status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
@@ -183,7 +186,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                  status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookPower, cookPower value is out of range"));
 
-    status = mDelegate->HandleSetCookingParametersCallback(cookMode, reqCookTime, reqPowerSetting);
+    status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqPowerSetting);
 
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
