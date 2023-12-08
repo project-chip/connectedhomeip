@@ -387,11 +387,14 @@ public:
 
         /**
          * Gets called when a fabric is newly added to Fabric Table.
+         *
+         * OnFabricUpdated will also get called with this callback.
          **/
         virtual void OnFabricAdded(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
         /**
-         * Gets called when operational credentials are changed, which may not be persistent.
+         * Gets called when operational credentials changes due to the addition of a new fabric or updates
+         * to an existing fabric, which may not be persistent.
          *
          * Can be used to affect what is needed for UpdateNOC prior to commit.
          **/
