@@ -8912,8 +8912,7 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: DRYERCTRL.S.A0001
 
-
-     # server / Commands received
+      # server / Commands received
     #
     - label: "Does the device implement receiving the ChangeToMode command?"
       id: DRYERCTRL.S.C00.Rsp
