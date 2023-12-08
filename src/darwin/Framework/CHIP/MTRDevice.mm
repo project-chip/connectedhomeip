@@ -196,6 +196,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
  * an OnDone for that ReadClient.
  */
 @property (nonatomic) ReadClient * currentReadClient;
+@property (nonatomic) SubscriptionCallback * currentSubscriptionCallback; // valid when and only when currentReadClient is valid
 
 @end
 
@@ -299,6 +300,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // nodeMayBeAdvertisingOperational is called we are running on the Matter
     // queue, and the ReadClient can't get destroyed while we are on that queue.
     ReadClient * readClientToResubscribe = nullptr;
+    SubscriptionCallback * subscriptionCallback = nullptr;
 
     os_unfair_lock_lock(&self->_lock);
 
@@ -310,10 +312,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _reattemptSubscriptionNowIfNeeded];
     } else {
         readClientToResubscribe = self->_currentReadClient;
+        subscriptionCallback = self->_currentSubscriptionCallback;
     }
     os_unfair_lock_unlock(&self->_lock);
 
     if (readClientToResubscribe) {
+        subscriptionCallback->ResetResubscriptionBackoff();
         readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
     }
 }
@@ -741,6 +745,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            // holding a dangling pointer.
                            os_unfair_lock_lock(&self->_lock);
                            self->_currentReadClient = nullptr;
+                           self->_currentSubscriptionCallback = nullptr;
                            os_unfair_lock_unlock(&self->_lock);
                            dispatch_async(self.queue, ^{
                                // OnDone
@@ -793,6 +798,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    // when OnDone is called.
                    os_unfair_lock_lock(&self->_lock);
                    self->_currentReadClient = readClient.get();
+                   self->_currentSubscriptionCallback = callback.get();
                    os_unfair_lock_unlock(&self->_lock);
                    callback->AdoptReadClient(std::move(readClient));
                    callback->AdoptClusterStateCache(std::move(clusterStateCache));
