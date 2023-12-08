@@ -2662,7 +2662,7 @@ void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * a
         constexpr uint16_t maxIntervalCeilingSeconds = 1;
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
-        readPrepareParams.mIsPeerICD                 = true;
+        readPrepareParams.mIsPeerLIT                 = true;
 
         auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

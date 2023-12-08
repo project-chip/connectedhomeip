@@ -329,8 +329,8 @@ public:
      *  When subscribing to ICD and liveness timeout reached, the read client will move to the `InactiveICDSubscription` state and
      * resubscription can be triggered via OnActiveModeNotification().
      *
-     *  If the subscription is not in the`InactiveICDSubscription` state, this function will do nothing. So it is always safe to call
-     * this function when a check-in message is received.
+     *  If the subscription is not in the`InactiveICDSubscription` state, this function will do nothing. So it is always safe to
+     * call this function when a check-in message is received.
      */
     void OnActiveModeNotification();
 
@@ -488,7 +488,7 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
-        InactiveICDSubscription,   ///< The client is ICD and is sleeping
+        InactiveICDSubscription,   ///< The client is waiting to resubscribe for LIT device
     };
 
     enum class ReportType
@@ -626,7 +626,7 @@ private:
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
-    bool mIsPeerICD = false;
+    bool mIsPeerLIT = false;
 
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;

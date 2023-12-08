@@ -67,6 +67,10 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    // When a ReadClient is waiting to resubscribe with a LIT ICD Device while in the `InactiveICDSubscription` state, 
+    // it attempts to call `OnActiveModeNotification` upon receiving a check-in message. To determine if resubscription
+    // should proceed, the client checks whether its current state is inactiveICDSubscription. As a result, moving the device to the `Idle` state at this point
+    // would interfere with the resubscription logic and is therefore not permissible.
     if (IsInactiveICDSubscription())
     {
         return;
@@ -913,7 +917,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
-    if (_this->mIsPeerICD)
+    if (_this->mIsPeerLIT)
     {
         // If the device is idle, we mark the subscription as "InactiveICDSubscription", ReadClient consumer decides whether it goes
         // with retry or resubscription is triggered on `OnActiveModeNotification`. Note: the liveness timeout is always longer than
@@ -1034,7 +1038,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
 
-    mIsPeerICD = aReadPrepareParams.mIsPeerICD;
+    mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
