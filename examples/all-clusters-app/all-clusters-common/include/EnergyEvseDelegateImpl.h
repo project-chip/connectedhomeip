@@ -49,8 +49,8 @@ public:
      * @param minimumChargeCurrent (in mA)
      * @param maximumChargeCurrent (in mA)
      */
-    Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
-                          const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) override;
+    Status EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil, const int64_t & minimumChargeCurrent,
+                          const int64_t & maximumChargeCurrent) override;
 
     /**
      * @brief   Called when EVSE cluster receives EnableDischarging command
@@ -58,7 +58,7 @@ public:
      * @param dischargingEnabledUntil
      * @param maximumChargeCurrent (in mA)
      */
-    Status EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
+    Status EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
                              const int64_t & maximumDischargeCurrent) override;
 
     /**
@@ -74,6 +74,8 @@ public:
     Status HwSetCableAssemblyLimit(int64_t currentmA);
     Status HwSetState(StateEnum state);
     Status HwSetFault(FaultStateEnum fault);
+    Status HwSetRFID(chip::CharSpan RFID);
+    Status HwSetVehicleID(chip::CharSpan);
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -125,7 +127,7 @@ public:
     DataModel::Nullable<chip::Percent> GetStateOfCharge() override;
     DataModel::Nullable<int64_t> GetBatteryCapacity() override;
     /* PNC attributes*/
-    char * GetVehicleID() override;
+    DataModel::Nullable<chip::CharSpan> GetVehicleID() override;
     /* Session SESS attributes */
     DataModel::Nullable<uint32_t> GetSessionID() override;
     DataModel::Nullable<uint32_t> GetSessionDuration() override;
@@ -134,11 +136,9 @@ public:
 
 private:
     /* Constants */
-    static constexpr int MAX_CURRENT_LOWER_BOUND             = 0;
-    static constexpr int MAX_CURRENT_UPPER_BOUND             = 80000;
-    static constexpr int DEFAULT_MIN_CHARGE_CURRENT          = 6000;  /* 6A */
-    static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT = 80000; /* 80A */
-    static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW  = 600;   /* 600s */
+    static constexpr int DEFAULT_MIN_CHARGE_CURRENT          = 6000;                  /* 6A */
+    static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT = kMaximumChargeCurrent; /* 80A */
+    static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW  = 600;                   /* 600s */
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
@@ -178,7 +178,7 @@ private:
     DataModel::Nullable<int64_t> mBatteryCapacity;
 
     /* PNC attributes*/
-    char * mVehicleID;
+    DataModel::Nullable<chip::CharSpan> mVehicleID;
 
     /* Session SESS attributes */
     DataModel::Nullable<uint32_t> mSessionID;

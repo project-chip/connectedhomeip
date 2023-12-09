@@ -61,15 +61,15 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & enableChargeTime,
-                                  const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) = 0;
+    virtual Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime, const int64_t & minimumChargeCurrent,
+                                  const int64_t & maximumChargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Discharging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & enableDischargeTime,
+    virtual Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
                                      const int64_t & maximumDischargeCurrent) = 0;
 
     /**
@@ -106,8 +106,7 @@ public:
     virtual DataModel::Nullable<int64_t> GetBatteryCapacity()     = 0;
 
     /* PNC attributes*/
-    // TODO make nullable
-    virtual char * GetVehicleID() = 0;
+    virtual DataModel::Nullable<chip::CharSpan> GetVehicleID() = 0;
 
     /* Session SESS attributes */
     virtual DataModel::Nullable<uint32_t> GetSessionID()              = 0;

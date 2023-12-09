@@ -28,18 +28,22 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
     /* Manufacturers should modify this to do any custom initialisation */
 
     /* Register callbacks */
+    EnergyEvseDelegate * dg = aInstance->GetDelegate();
     // TODO EnergyEvseManager::GetInstance()->GetDelegate()->RegisterCallbacks();
 
     /* Set the EVSE Hardware Maximum current limit */
     // For Manufacturer to specify the hardware capability in mA
-    aInstance->GetDelegate()->HwSetMaxHardwareCurrentLimit(32000);
+    dg->HwSetMaxHardwareCurrentLimit(32000);
 
     // For Manufacturer to specify the CircuitCapacity (e.g. from DIP switches)
-    aInstance->GetDelegate()->HwSetCircuitCapacity(20000);
+    dg->HwSetCircuitCapacity(20000);
 
     /* For now let's pretend the EV is plugged in, and asking for demand */
-    aInstance->GetDelegate()->HwSetState(StateEnum::kPluggedInDemand);
-    aInstance->GetDelegate()->HwSetCableAssemblyLimit(63000);
+    dg->HwSetState(StateEnum::kPluggedInDemand);
+    dg->HwSetCableAssemblyLimit(63000);
+
+    /* For now let's pretend the vehicle ID is set */
+    dg->HwSetVehicleID(CharSpan("TEST_VEHICLE_123456789", 22));
 
     return CHIP_NO_ERROR;
 }

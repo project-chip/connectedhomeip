@@ -108,7 +108,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     /* PNC attributes*/
     case VehicleID::Id:
-        // TODO return aEncoder.Encode(mDelegate.GetVehicleID());
+        return aEncoder.Encode(mDelegate.GetVehicleID());
 
     /* Session SESS attributes */
     case SessionID::Id:
@@ -233,13 +233,13 @@ void Instance::HandleEnableCharging(HandlerContext & ctx, const Commands::Enable
     auto & minimumChargeCurrent = commandData.minimumChargeCurrent;
     auto & maximumChargeCurrent = commandData.maximumChargeCurrent;
 
-    if ((minimumChargeCurrent < 0) || (minimumChargeCurrent > kMaximumChargeCurrent))
+    if ((minimumChargeCurrent < kMinimumChargeCurrent) || (minimumChargeCurrent > kMaximumChargeCurrent))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if ((maximumChargeCurrent < 0) || (maximumChargeCurrent > kMaximumChargeCurrent))
+    if ((maximumChargeCurrent < kMinimumChargeCurrent) || (maximumChargeCurrent > kMaximumChargeCurrent))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
@@ -263,7 +263,7 @@ void Instance::HandleEnableDischarging(HandlerContext & ctx, const Commands::Ena
     auto & dischargingEnabledUntil = commandData.dischargingEnabledUntil;
     auto & maximumDischargeCurrent = commandData.maximumDischargeCurrent;
 
-    if ((maximumDischargeCurrent < 0) || (maximumDischargeCurrent > kMaximumChargeCurrent))
+    if ((maximumDischargeCurrent < kMinimumChargeCurrent) || (maximumDischargeCurrent > kMaximumChargeCurrent))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;

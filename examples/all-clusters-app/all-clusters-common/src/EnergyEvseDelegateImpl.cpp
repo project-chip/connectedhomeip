@@ -88,13 +88,13 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < MAX_CURRENT_LOWER_BOUND || maximumChargeCurrent > MAX_CURRENT_UPPER_BOUND)
+    if (maximumChargeCurrent < kMinimumChargeCurrent || maximumChargeCurrent > kMaximumChargeCurrent)
     {
         ChipLogError(NotSpecified, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < MAX_CURRENT_LOWER_BOUND || minimumChargeCurrent > MAX_CURRENT_UPPER_BOUND)
+    if (minimumChargeCurrent < kMinimumChargeCurrent || minimumChargeCurrent > kMaximumChargeCurrent)
     {
         ChipLogError(NotSpecified, "Maximum Current outside limits");
         return Status::ConstraintError;
@@ -227,7 +227,7 @@ Status EnergyEvseDelegate::HwRegisterEvseHardwareCallback(int Callback) // TODO
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -249,7 +249,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -274,7 +274,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -348,6 +348,20 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
     SetFaultState(fault);
 
     // TODO: Generate events
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HwSetVehicleID(chip::CharSpan newValue)
+{
+    DataModel::Nullable<chip::CharSpan> oldValue = mVehicleID;
+
+    mVehicleID = MakeNullable(newValue);
+    if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data())))
+    {
+        ChipLogDetail(AppServer, "VehicleID updated to %s", mVehicleID.Value().data());
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+    }
 
     return Status::Success;
 }
@@ -689,9 +703,8 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 }
 
 /* PNC attributes*/
-char * EnergyEvseDelegate::GetVehicleID()
+DataModel::Nullable<chip::CharSpan> EnergyEvseDelegate::GetVehicleID()
 {
-    // TODO handle this properly
     return mVehicleID;
 }
 
