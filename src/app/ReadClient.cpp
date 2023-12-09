@@ -926,8 +926,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
         // In the case of a liveness timeout, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is passed to application and indicate LIT
         // ICD device is inactive. In the case of a check-in message, the `OnActiveModeNotification` callback is invoked and
         // the `InactiveICDSubscription` state is specifically checked. Note that the liveness timeout duration always exceeds
-        // the maximum interval time (and hence the idle duration). Therefore, transitioning the device to `InactiveICDSubscription` upon reaching the liveness
-        // timeout is safe and consistent.
+        // the maximum interval time (and hence the idle duration). Therefore, transitioning the device to `InactiveICDSubscription`
+        // upon reaching the liveness timeout is safe and consistent.
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
         _this->MoveToState(ClientState::InactiveICDSubscription);
         _this->Close(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
