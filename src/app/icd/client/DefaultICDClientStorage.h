@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-// Do not use the DefaultICDClientStorage class in settings where fabric indices are not stable. 
-// This class relies on the stability of fabric indices for efficient storage and retrieval of ICD client information. 
+// Do not use the DefaultICDClientStorage class in settings where fabric indices are not stable.
+// This class relies on the stability of fabric indices for efficient storage and retrieval of ICD client information.
 // If fabric indices are not stable, the functionality of this class will be compromised and can lead to unexpected behavior.
 
 #pragma once
