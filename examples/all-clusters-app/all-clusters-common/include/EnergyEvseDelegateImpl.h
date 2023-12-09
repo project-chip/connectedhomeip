@@ -49,7 +49,7 @@ public:
      * @param minimumChargeCurrent (in mA)
      * @param maximumChargeCurrent (in mA)
      */
-    Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
+    Status EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil,
                           const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) override;
 
     /**
