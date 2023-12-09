@@ -19,15 +19,17 @@
 #include <EnergyEvseDelegateImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/EventLogging.h>
 
 using namespace chip;
-using chip::Protocols::InteractionModel::Status;
-
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
+
+using chip::app::LogEvent;
+using chip::Protocols::InteractionModel::Status;
 
 /**
  * @brief   Called when EVSE cluster receives Disable command
@@ -83,7 +85,7 @@ Status EnergyEvseDelegate::Disable()
  * @param minimumChargeCurrent (in mA)
  * @param maximumChargeCurrent (in mA)
  */
-Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
+Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil,
                                           const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
@@ -163,7 +165,7 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
  * @param dischargingEnabledUntil (can be null to indefinite discharging)
  * @param maximumChargeCurrent (in mA)
  */
-Status EnergyEvseDelegate::EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
+Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
                                              const int64_t & maximumDischargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
@@ -352,9 +354,32 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
     return Status::Success;
 }
 
-Status EnergyEvseDelegate::HwSetVehicleID(chip::CharSpan newValue)
+/**
+ * @brief    Called by EVSE Hardware to Send a RFID event
+ *
+ * @param    ByteSpan RFID tag value (max 10 octets)
+ */
+Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 {
-    DataModel::Nullable<chip::CharSpan> oldValue = mVehicleID;
+    Events::Rfid::Type event{ .uid = uid };
+    EventNumber eventNumber;
+    CHIP_ERROR error = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "[Notify] Unable to send notify event: %s [endpointId=%d]", error.AsString(), mEndpointId);
+        return Status::Failure;
+    }
+
+    return Status::Success;
+}
+/**
+ * @brief    Called by EVSE Hardware to share the VehicleID
+ *
+ * @param    C
+ */
+Status EnergyEvseDelegate::HwSetVehicleID(CharSpan newValue)
+{
+    DataModel::Nullable<CharSpan> oldValue = mVehicleID;
 
     mVehicleID = MakeNullable(newValue);
     if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data())))
@@ -668,7 +693,7 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
-DataModel::Nullable<chip::Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
 {
     return mNextChargeTargetSoC;
 }
@@ -693,7 +718,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(uint16_t newValue)
 }
 
 /* SOC attributes */
-DataModel::Nullable<chip::Percent> EnergyEvseDelegate::GetStateOfCharge()
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
@@ -703,7 +728,7 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 }
 
 /* PNC attributes*/
-DataModel::Nullable<chip::CharSpan> EnergyEvseDelegate::GetVehicleID()
+DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID()
 {
     return mVehicleID;
 }

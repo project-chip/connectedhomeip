@@ -45,6 +45,10 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
     /* For now let's pretend the vehicle ID is set */
     dg->HwSetVehicleID(CharSpan("TEST_VEHICLE_123456789", 22));
 
+    /* For now let's pretend the RFID sensor was triggered - send an event */
+    uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
+    dg->HwSetRFID(ByteSpan(uid));
+
     return CHIP_NO_ERROR;
 }
 

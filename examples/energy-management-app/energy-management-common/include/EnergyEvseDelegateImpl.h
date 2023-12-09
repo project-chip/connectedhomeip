@@ -74,8 +74,8 @@ public:
     Status HwSetCableAssemblyLimit(int64_t currentmA);
     Status HwSetState(StateEnum state);
     Status HwSetFault(FaultStateEnum fault);
-    Status HwSetRFID(chip::CharSpan RFID);
-    Status HwSetVehicleID(chip::CharSpan);
+    Status HwSetRFID(ByteSpan uid);
+    Status HwSetVehicleID(CharSpan vehID);
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -118,16 +118,16 @@ public:
     DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
     DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
     DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
-    DataModel::Nullable<chip::Percent> GetNextChargeTargetSoC() override;
+    DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
 
     DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
     CHIP_ERROR SetApproximateEVEfficiency(uint16_t) override;
 
     /* SOC attributes */
-    DataModel::Nullable<chip::Percent> GetStateOfCharge() override;
+    DataModel::Nullable<Percent> GetStateOfCharge() override;
     DataModel::Nullable<int64_t> GetBatteryCapacity() override;
     /* PNC attributes*/
-    DataModel::Nullable<chip::CharSpan> GetVehicleID() override;
+    DataModel::Nullable<CharSpan> GetVehicleID() override;
     /* Session SESS attributes */
     DataModel::Nullable<uint32_t> GetSessionID() override;
     DataModel::Nullable<uint32_t> GetSessionDuration() override;
@@ -170,15 +170,15 @@ private:
     DataModel::Nullable<uint32_t> mNextChargeStartTime;
     DataModel::Nullable<uint32_t> mNextChargeTargetTime;
     DataModel::Nullable<int64_t> mNextChargeRequiredEnergy;
-    DataModel::Nullable<chip::Percent> mNextChargeTargetSoC;
+    DataModel::Nullable<Percent> mNextChargeTargetSoC;
     DataModel::Nullable<uint16_t> mApproximateEVEfficiency;
 
     /* SOC attributes */
-    DataModel::Nullable<chip::Percent> mStateOfCharge;
+    DataModel::Nullable<Percent> mStateOfCharge;
     DataModel::Nullable<int64_t> mBatteryCapacity;
 
     /* PNC attributes*/
-    DataModel::Nullable<chip::CharSpan> mVehicleID;
+    DataModel::Nullable<CharSpan> mVehicleID;
 
     /* Session SESS attributes */
     DataModel::Nullable<uint32_t> mSessionID;
