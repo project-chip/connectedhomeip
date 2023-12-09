@@ -1654,7 +1654,7 @@ public:
     {
         mOnResubscriptionsAttempted++;
         mLastError = aTerminationCause;
-        if (aTerminationCause == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT)
+        if (aTerminationCause == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
         {
             return CHIP_NO_ERROR;
         }
@@ -2690,7 +2690,7 @@ void TestReadInteraction::TestSubscribe_OnActiveModeNotification(nlTestSuite * a
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
         ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)), [&]() { return false; });
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
-        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_ICD_SUBSCRIBE_INACTIVE_TIMEOUT);
+        NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
         ctx.GetLoopback().mNumMessagesToDrop = 0;
         callback.ClearCounters();
