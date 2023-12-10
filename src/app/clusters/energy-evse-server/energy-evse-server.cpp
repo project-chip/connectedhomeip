@@ -333,24 +333,53 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleEnableCharging(ctx, commandData); });
         return;
     case EnableDischarging::Id:
-        HandleCommand<EnableDischarging::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleEnableDischarging(ctx, commandData); });
+        if (!HasFeature(Feature::kV2x))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<EnableDischarging::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
+                HandleEnableDischarging(ctx, commandData);
+            });
+        }
         return;
     case StartDiagnostics::Id:
         HandleCommand<StartDiagnostics::DecodableType>(
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStartDiagnostics(ctx, commandData); });
         return;
     case SetTargets::Id:
-        HandleCommand<SetTargets::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleSetTargets(ctx, commandData); });
+        if (!HasFeature(Feature::kChargingPreferences))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<SetTargets::DecodableType>(
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleSetTargets(ctx, commandData); });
+        }
         return;
     case GetTargets::Id:
-        HandleCommand<GetTargets::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTargets(ctx, commandData); });
+        if (!HasFeature(Feature::kChargingPreferences))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<GetTargets::DecodableType>(
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleGetTargets(ctx, commandData); });
+        }
         return;
     case ClearTargets::Id:
-        HandleCommand<ClearTargets::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleClearTargets(ctx, commandData); });
+        if (!HasFeature(Feature::kChargingPreferences))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<ClearTargets::DecodableType>(
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleClearTargets(ctx, commandData); });
+        }
         return;
     }
 }
