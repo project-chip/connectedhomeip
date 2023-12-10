@@ -225,7 +225,7 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
             // port
             err = reader.Get(mCdPort);
             break;
-        case kNameTag:
+        case kDeviceNameTag:
             // deviceName
             err = reader.GetString(mDeviceName, sizeof(mDeviceName));
             break;
@@ -242,9 +242,10 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
             mRotatingIdLen = reader.GetLength();
             err            = reader.GetBytes(mRotatingId, sizeof(mRotatingId));
             break;
-        case kAppVendorIdListTag:
+        case kTargetAppListTag:
             // app vendor list
             {
+                ChipLogError(AppServer, "TLV found an applist");
                 chip::TLV::TLVType listContainerType = chip::TLV::kTLVType_List;
                 ReturnErrorOnFailure(reader.EnterContainer(listContainerType));
 
@@ -252,15 +253,45 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                 {
                     containerTag = reader.GetTag();
                     tagNum       = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
-                    if (tagNum == kAppVendorIdTag)
+                    if (tagNum == kTargetAppTag)
                     {
-                        err = reader.Get(mAppVendorIds[mNumAppVendorIds]);
-                        mNumAppVendorIds++;
+                        ReturnErrorOnFailure(reader.EnterContainer(outerContainerType));
+                        uint16_t appVendorId  = 0;
+                        uint16_t appProductId = 0;
+
+                        while ((err = reader.Next()) == CHIP_NO_ERROR)
+                        {
+                            containerTag = reader.GetTag();
+                            tagNum       = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
+                            if (tagNum == kAppVendorIdTag)
+                            {
+                                err = reader.Get(appVendorId);
+                            }
+                            else if (tagNum == kAppProductIdTag)
+                            {
+                                err = reader.Get(appProductId);
+                                ChipLogError(AppServer, "unsupported product id tag %d", tagNum);
+                            }
+                        }
+                        if (err == CHIP_END_OF_TLV)
+                        {
+                            ChipLogProgress(AppServer, "TLV end of struct TLV");
+                            ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
+                        }
+                        if (appVendorId != 0)
+                        {
+                            mAppVendorIds[mNumAppVendorIds] = appVendorId;
+                            mNumAppVendorIds++;
+                        }
+                    }
+                    else
+                    {
+                        ChipLogError(AppServer, "unrecognized tag %d", tagNum);
                     }
                 }
                 if (err == CHIP_END_OF_TLV)
                 {
-                    ChipLogError(AppServer, "TLV end of array TLV");
+                    ChipLogProgress(AppServer, "TLV end of array");
                     ReturnErrorOnFailure(reader.ExitContainer(listContainerType));
                 }
             }

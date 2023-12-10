@@ -131,6 +131,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
+    factoryParams.enableServerInteractions = true;
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -182,6 +183,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerNOC      = nocSpan;
 
     params.defaultCommissioner = &gAutoCommissioner;
+    params.enableServerInteractions = true;
 
     // assign prefered feature settings
     CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();

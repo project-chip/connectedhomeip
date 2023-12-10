@@ -120,7 +120,8 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kVendorIdTag), GetVendorId())), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kProductIdTag), GetProductId())), LogErrorOnFailure(err));
-    VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutString(chip::TLV::ContextTag(kNameTag), mDeviceName)), LogErrorOnFailure(err));
+    VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutString(chip::TLV::ContextTag(kDeviceNameTag), mDeviceName)),
+                 LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutString(chip::TLV::ContextTag(kPairingInstTag), mPairingInst)),
                  LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kPairingHintTag), mPairingHint)), LogErrorOnFailure(err));
@@ -134,12 +135,20 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
     // AppVendorIdList
     VerifyOrExit(
         CHIP_NO_ERROR ==
-            (err = writer.StartContainer(chip::TLV::ContextTag(kAppVendorIdListTag), chip::TLV::kTLVType_List, listContainerType)),
+            (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppListTag), chip::TLV::kTLVType_List, listContainerType)),
         LogErrorOnFailure(err));
     for (size_t i = 0; i < mNumAppVendorIds; i++)
     {
+        // start the TargetApp structure
+        VerifyOrExit(CHIP_NO_ERROR ==
+                         (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppTag), chip::TLV::kTLVType_Structure,
+                                                      outerContainerType)),
+                     LogErrorOnFailure(err));
+        // add the vendor Id
         VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kAppVendorIdTag), mAppVendorIds[i])),
                      LogErrorOnFailure(err));
+        // end the TargetApp structure
+        VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     }
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(listContainerType)), LogErrorOnFailure(err));
 
