@@ -46,7 +46,16 @@ void ApplicationInit()
         gDelegate = new EnergyEvseDelegate();
         if (gDelegate != nullptr)
         {
-            gInstance = new EnergyEvseManager(EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate);
+            /* Manufacturer may optionally not support all features, commands & attributes */
+            gInstance = new EnergyEvseManager(
+                EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
+                BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences,
+                                                       EnergyEvse::Feature::kPlugAndCharge, EnergyEvse::Feature::kRfid,
+                                                       EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
+                BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                      OptionalAttributes::kSupportsRandomizationWindow,
+                                                      OptionalAttributes::kSupportsApproximateEvEfficiency),
+                BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
             gInstance->Init(); /* Register Attribute & Command handlers */
         }
     }
