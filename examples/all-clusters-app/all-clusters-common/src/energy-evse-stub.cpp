@@ -17,6 +17,8 @@
  */
 
 #include <EnergyEvseManager.h>
+
+using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
@@ -30,7 +32,16 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
     gDelegate = new EnergyEvseDelegate();
     if (gDelegate != nullptr)
     {
-        gInstance = new EnergyEvseManager(endpointId, *gDelegate);
+        gInstance =
+            new EnergyEvseManager(endpointId, *gDelegate,
+                                  BitMask<EnergyEvse::Feature, uint32_t>(
+                                      EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
+                                      EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
+                                  BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                                        OptionalAttributes::kSupportsRandomizationWindow,
+                                                                        OptionalAttributes::kSupportsApproximateEvEfficiency),
+                                  BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
+
         gInstance->Init(); /* Register Attribute & Command handlers */
     }
 }
