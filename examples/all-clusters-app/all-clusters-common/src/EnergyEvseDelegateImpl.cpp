@@ -19,15 +19,17 @@
 #include <EnergyEvseDelegateImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/EventLogging.h>
 
 using namespace chip;
-using chip::Protocols::InteractionModel::Status;
-
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
+
+using chip::app::LogEvent;
+using chip::Protocols::InteractionModel::Status;
 
 /**
  * @brief   Called when EVSE cluster receives Disable command
@@ -83,18 +85,18 @@ Status EnergyEvseDelegate::Disable()
  * @param minimumChargeCurrent (in mA)
  * @param maximumChargeCurrent (in mA)
  */
-Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & chargingEnabledUntil,
+Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil,
                                           const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < MAX_CURRENT_LOWER_BOUND || maximumChargeCurrent > MAX_CURRENT_UPPER_BOUND)
+    if (maximumChargeCurrent < kMinimumChargeCurrent || maximumChargeCurrent > kMaximumChargeCurrent)
     {
         ChipLogError(NotSpecified, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < MAX_CURRENT_LOWER_BOUND || minimumChargeCurrent > MAX_CURRENT_UPPER_BOUND)
+    if (minimumChargeCurrent < kMinimumChargeCurrent || minimumChargeCurrent > kMaximumChargeCurrent)
     {
         ChipLogError(NotSpecified, "Maximum Current outside limits");
         return Status::ConstraintError;
@@ -163,7 +165,7 @@ Status EnergyEvseDelegate::EnableCharging(const chip::app::DataModel::Nullable<u
  * @param dischargingEnabledUntil (can be null to indefinite discharging)
  * @param maximumChargeCurrent (in mA)
  */
-Status EnergyEvseDelegate::EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
+Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
                                              const int64_t & maximumDischargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
@@ -227,7 +229,7 @@ Status EnergyEvseDelegate::HwRegisterEvseHardwareCallback(int Callback) // TODO
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -249,7 +251,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -274,7 +276,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < MAX_CURRENT_LOWER_BOUND || currentmA > MAX_CURRENT_UPPER_BOUND)
+    if (currentmA < kMinimumChargeCurrent || currentmA > kMaximumChargeCurrent)
     {
         return Status::ConstraintError;
     }
@@ -348,6 +350,43 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
     SetFaultState(fault);
 
     // TODO: Generate events
+
+    return Status::Success;
+}
+
+/**
+ * @brief    Called by EVSE Hardware to Send a RFID event
+ *
+ * @param    ByteSpan RFID tag value (max 10 octets)
+ */
+Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
+{
+    Events::Rfid::Type event{ .uid = uid };
+    EventNumber eventNumber;
+    CHIP_ERROR error = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Zcl, "[Notify] Unable to send notify event: %s [endpointId=%d]", error.AsString(), mEndpointId);
+        return Status::Failure;
+    }
+
+    return Status::Success;
+}
+/**
+ * @brief    Called by EVSE Hardware to share the VehicleID
+ *
+ * @param    C
+ */
+Status EnergyEvseDelegate::HwSetVehicleID(CharSpan newValue)
+{
+    DataModel::Nullable<CharSpan> oldValue = mVehicleID;
+
+    mVehicleID = MakeNullable(newValue);
+    if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data())))
+    {
+        ChipLogDetail(AppServer, "VehicleID updated to %s", mVehicleID.Value().data());
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+    }
 
     return Status::Success;
 }
@@ -654,7 +693,7 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetNextChargeRequiredEnergy()
 {
     return mNextChargeRequiredEnergy;
 }
-DataModel::Nullable<chip::Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetNextChargeTargetSoC()
 {
     return mNextChargeTargetSoC;
 }
@@ -679,7 +718,7 @@ CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(uint16_t newValue)
 }
 
 /* SOC attributes */
-DataModel::Nullable<chip::Percent> EnergyEvseDelegate::GetStateOfCharge()
+DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
@@ -689,9 +728,8 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 }
 
 /* PNC attributes*/
-char * EnergyEvseDelegate::GetVehicleID()
+DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID()
 {
-    // TODO handle this properly
     return mVehicleID;
 }
 

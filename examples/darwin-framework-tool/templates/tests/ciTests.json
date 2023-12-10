@@ -58,12 +58,17 @@
         "Test_TC_TCCM_3_3",
         "Test_TC_RVCRUNM_3_1",
         "Test_TC_TCTL_2_1",
+        "Test_TC_LWM_3_1",
+        "Test_TC_LWM_3_2",
+        "Test_TC_LWM_3_3",
         "Disabled because darwin-framework-tool does not support constraints arithmetic operations",
         "Test_TC_FLW_2_1",
         "Test_TC_RH_2_1",
         "Disabled because darwin-framework-tool does not handle substraction in parameters",
         "Test_TC_S_2_3",
         "TestScenesMultiFabric",
-        "TestScenesFabricSceneInfo"
+        "TestScenesFabricSceneInfo",
+        "#30759: Darwin chip-tool does not support ICD registration during commissioning",
+        "TestIcdManagementCluster"
     ]
 }

@@ -262,6 +262,10 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
+     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+endif()
+
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()

@@ -61,15 +61,15 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableCharging(const chip::app::DataModel::Nullable<uint32_t> & enableChargeTime,
-                                  const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent) = 0;
+    virtual Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime, const int64_t & minimumChargeCurrent,
+                                  const int64_t & maximumChargeCurrent) = 0;
 
     /**
      * @brief Delegate should implement a handler to enable EVSE Discharging.
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status EnableDischarging(const chip::app::DataModel::Nullable<uint32_t> & enableDischargeTime,
+    virtual Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
                                      const int64_t & maximumDischargeCurrent) = 0;
 
     /**
@@ -106,8 +106,7 @@ public:
     virtual DataModel::Nullable<int64_t> GetBatteryCapacity()     = 0;
 
     /* PNC attributes*/
-    // TODO make nullable
-    virtual char * GetVehicleID() = 0;
+    virtual DataModel::Nullable<chip::CharSpan> GetVehicleID() = 0;
 
     /* Session SESS attributes */
     virtual DataModel::Nullable<uint32_t> GetSessionID()              = 0;
@@ -125,12 +124,25 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
+enum class OptionalAttributes : uint32_t
+{
+    kSupportsUserMaximumChargingCurrent = 0x1,
+    kSupportsRandomizationWindow        = 0x2,
+    kSupportsApproximateEvEfficiency    = 0x4
+};
+
+enum class OptionalCommands : uint32_t
+{
+    kSupportsStartDiagnostics = 0x1
+};
+
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
+             OptionalCommands aOptionalCmds) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate)
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -141,10 +153,14 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
+    bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
+    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
+    BitMask<OptionalAttributes> mOptionalAttrs;
+    BitMask<OptionalCommands> mOptionalCmds;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
