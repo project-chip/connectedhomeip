@@ -357,7 +357,7 @@ class Instance : public OperationalState::Instance
 {
 public:
     /**
-     * Creates an RVC operational state cluster instance.
+     * Creates an oven cavity operational state cluster instance.
      * The Init() function needs to be called for this instance to be registered and called by the
      * interaction model at the appropriate times.
      * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
