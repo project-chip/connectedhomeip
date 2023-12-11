@@ -25,6 +25,7 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   chip_software_version = 0
+  chip_simple_hash_verification = 0
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -177,6 +178,10 @@ action("binsign") {
   script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
   output_name = "bignsign.log"
   outputs = [ "${root_build_dir}/${output_name}" ]
+
+  if (chip_simple_hash_verification == 1) {
+    args = [ "--simple-hash" ]
+  }
 }
 
 group("default") {

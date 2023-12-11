@@ -52,8 +52,8 @@ namespace Internal {
 
 namespace {
 
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };

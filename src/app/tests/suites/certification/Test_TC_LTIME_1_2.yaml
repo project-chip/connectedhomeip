@@ -67,9 +67,9 @@ tests:
               contains: [0, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: TH reads optional attribute(ActiveCalendarType) in
+          "Step 4b: TH reads feature dependent attribute(ActiveCalendarType) in
           AttributeList from DUT"
-      PICS: LTIME.S.A0001
+      PICS: LTIME.S.F00 && LTIME.S.A0001
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -78,9 +78,9 @@ tests:
               contains: [1]
 
     - label:
-          "Step 4c: TH reads optional attribute(SupportedCalendarTypes) in
-          AttributeList from DUT"
-      PICS: LTIME.S.A0002
+          "Step 4c: TH reads feature dependent attribute(SupportedCalendarTypes)
+          in AttributeList from DUT"
+      PICS: LTIME.S.F00 && LTIME.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:

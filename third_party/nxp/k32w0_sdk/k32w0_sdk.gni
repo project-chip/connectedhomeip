@@ -47,6 +47,21 @@ declare_args() {
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
+  use_antenna_diversity = 0
+
+  #ICD Matter Configuration flags
+
+  chip_ot_idle_interval_ms = 2000  # 2s Idle Intervals
+  chip_ot_active_interval_ms = 500  # 500ms Active Intervals
+
+  nxp_idle_mode_interval_s = 600  # 10min Idle Mode Interval
+  nxp_active_mode_interval_ms = 10000  # 10s Active Mode Interval
+  nxp_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+  nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+
+  chip_with_ota_encryption = 0
+  chip_with_ota_key = "1234567890ABCDEFA1B2C3D4E5F6F1B4"
+  chip_with_sdk_package = 1
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -132,6 +147,12 @@ template("k32w0_sdk") {
     chip_with_ntag = 0
   }
 
+  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/k32w0_sdk/repo/core" ||
+      k32w0_sdk_root == "/opt/sdk/core") {
+    chip_with_sdk_package = 0
+  } else {
+    chip_with_sdk_package = 1
+  }
   print("device:", device)
   print("board:", board)
   print("ntag:", chip_with_ntag)
@@ -153,6 +174,7 @@ template("k32w0_sdk") {
     print("ECC crypto lib: ", chip_crypto_flavor)
   }
 
+  print("chip_with_sdk_package:", chip_with_sdk_package)
   device_lowercase = string_replace(board, "dk6", "")
 
   sdk_target_name = target_name
@@ -204,26 +226,7 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/serial_manager",
       "${k32w0_sdk_root}/components/uart",
       "${k32w0_sdk_root}/devices/${device}",
-      "${k32w0_sdk_root}/devices/K32W061/drivers",
-      "${k32w0_sdk_root}/drivers/common",
-      "${k32w0_sdk_root}/drivers/lpc_gpio",
-      "${k32w0_sdk_root}/drivers/aes",
-      "${k32w0_sdk_root}/drivers/jn_iocon",
-      "${k32w0_sdk_root}/drivers/lpc_adc",
-      "${k32w0_sdk_root}/drivers/aes",
-      "${k32w0_sdk_root}/drivers/jn_flash",
-      "${k32w0_sdk_root}/drivers/sha",
-      "${k32w0_sdk_root}/drivers/flexcomm",
-      "${k32w0_sdk_root}/drivers/lpc_dma",
-      "${k32w0_sdk_root}/drivers/pint",
-      "${k32w0_sdk_root}/drivers/inputmux",
-      "${k32w0_sdk_root}/drivers/spifi",
-      "${k32w0_sdk_root}/drivers/jn_rtc",
-      "${k32w0_sdk_root}/drivers/fmeas",
-      "${k32w0_sdk_root}/drivers/jn_rng",
-      "${k32w0_sdk_root}/drivers/ctimer",
-      "${k32w0_sdk_root}/drivers/wwdt",
-      "${k32w0_sdk_root}/drivers/gint",
+
       "${k32w0_sdk_root}/utilities/debug_console/str",
       "${k32w0_sdk_root}/utilities/debug_console",
       "${k32w0_sdk_root}/devices/${device}/utilities",
@@ -267,6 +270,32 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/include/private",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/third_party/unity/src",
     ]
+    if (chip_with_sdk_package == 1) {
+      _sdk_include_dirs += [ "${k32w0_sdk_root}/devices/${device}/drivers" ]
+    } else {
+      _sdk_include_dirs += [
+        "${k32w0_sdk_root}/devices/K32W061/drivers",
+        "${k32w0_sdk_root}/drivers/common",
+        "${k32w0_sdk_root}/drivers/lpc_gpio",
+        "${k32w0_sdk_root}/drivers/aes",
+        "${k32w0_sdk_root}/drivers/jn_iocon",
+        "${k32w0_sdk_root}/drivers/lpc_adc",
+        "${k32w0_sdk_root}/drivers/aes",
+        "${k32w0_sdk_root}/drivers/jn_flash",
+        "${k32w0_sdk_root}/drivers/sha",
+        "${k32w0_sdk_root}/drivers/flexcomm",
+        "${k32w0_sdk_root}/drivers/lpc_dma",
+        "${k32w0_sdk_root}/drivers/pint",
+        "${k32w0_sdk_root}/drivers/inputmux",
+        "${k32w0_sdk_root}/drivers/spifi",
+        "${k32w0_sdk_root}/drivers/jn_rtc",
+        "${k32w0_sdk_root}/drivers/fmeas",
+        "${k32w0_sdk_root}/drivers/jn_rng",
+        "${k32w0_sdk_root}/drivers/ctimer",
+        "${k32w0_sdk_root}/drivers/wwdt",
+        "${k32w0_sdk_root}/drivers/gint",
+      ]
+    }
 
     libs = [
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller_peripheral_commissioning.a",
@@ -317,6 +346,7 @@ template("k32w0_sdk") {
       "gAppUseBonding_d=0",
       "gAppUsePairing_d=0",
       "gAppUsePrivacy_d=0",
+      "gController_ReducedRxThoughput=1",
       "gPasskeyValue_c=999999",
       "gSupportBle=1",
       "SUPPORT_FOR_BLE=1",
@@ -324,6 +354,9 @@ template("k32w0_sdk") {
       "gConnPhyUpdateReqTxPhySettings_c=(gLePhy2MFlag_c)",
       "gConnPhyUpdateReqRxPhySettings_c=(gLePhy2MFlag_c)",
       "gConnPhyUpdateReqPhyOptions_c=(gLeCodingNoPreference_c)",
+      "BLE_HIGH_TX_POWER=0",
+      "gAdvertisingPowerLeveldBm_c=0",
+      "gConnectPowerLeveldBm_c=0",
       "DUAL_MODE_APP=1",
       "gMainThreadStackSize_c=5096",
       "HEAP_SIZE=gTotalHeapSize_c",
@@ -332,6 +365,15 @@ template("k32w0_sdk") {
       "gSecLibUseSha256Alt_d=1",
       "gOTA_UseSecLibAes=1",
       "gResetSystemReset_d=1",
+
+      # TODO: move these platform specific defines to args.gni
+      "NXP_OT_IDLE_INTERVAL=${chip_ot_idle_interval_ms}",
+      "NXP_OT_ACTIVE_INTERVAL=${chip_ot_active_interval_ms}",
+      "NXP_ICD_ENABLED=1",
+      "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
+      "NXP_ACTIVE_MODE_INTERVAL=${nxp_active_mode_interval_ms}",
+      "NXP_IDLE_MODE_INTERVAL=${nxp_idle_mode_interval_s}",
+      "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
     # If OTA default processors are enabled, then OTA custom entry structure
@@ -370,6 +412,15 @@ template("k32w0_sdk") {
       defines += [ "PDM_ENCRYPTION=1" ]
     } else {
       defines += [ "PDM_ENCRYPTION=0" ]
+    }
+
+    if (chip_with_ota_encryption == 1) {
+      defines += [
+        "OTA_ENCRYPTION_ENABLE=1",
+        "OTA_ENCRYPTION_KEY=\"${chip_with_ota_key}\"",
+      ]
+    } else {
+      defines += [ "OTA_ENCRYPTION_ENABLE=0" ]
     }
 
     if (chip_mdns == "platform") {
@@ -539,27 +590,6 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/components/uart/usart_adapter.c",
       "${k32w0_sdk_root}/devices/${device}/mcuxpresso/startup_${device_lowercase}.c",
       "${k32w0_sdk_root}/devices/${device}/system_${device}.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
-      "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
-      "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
-      "${k32w0_sdk_root}/drivers/common/fsl_common.c",
-      "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
-      "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
-      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
-      "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
-      "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
-      "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
-      "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
-      "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
-      "${k32w0_sdk_root}/drivers/jn_rng/fsl_rng.c",
-      "${k32w0_sdk_root}/drivers/jn_rtc/fsl_rtc.c",
-      "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
-      "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
-      "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
-      "${k32w0_sdk_root}/drivers/sha/fsl_sha.c",
-      "${k32w0_sdk_root}/drivers/spifi/fsl_spifi.c",
       "${k32w0_sdk_root}/middleware/wireless/ble_controller/config/controller_config.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_conn_manager.c",
       "${k32w0_sdk_root}/middleware/wireless/bluetooth/application/common/ble_host_tasks.c",
@@ -599,9 +629,60 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/queue.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
       "${k32w0_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
-      "${k32w0_sdk_root}/utilities/debug_console/fsl_debug_console.c",
-      "${k32w0_sdk_root}/utilities/debug_console/str/fsl_str.c",
     ]
+    if (chip_with_sdk_package == 1) {
+      sources += [
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_adc.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_aes.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_clock.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_common.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_ctimer.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flash.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_flexcomm.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_fmeas.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_gpio.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_i2c_freertos.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_inputmux.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_pint.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_power.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_reset.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rng.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_rtc.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_sha.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_spifi.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_usart.c",
+        "${k32w0_sdk_root}/devices/${device}/drivers/fsl_wtimer.c",
+        "${k32w0_sdk_root}/devices/${device}/utilities/debug_console/fsl_debug_console.c",
+        "${k32w0_sdk_root}/devices/${device}/utilities/str/fsl_str.c",
+      ]
+    } else {
+      sources += [
+        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_clock.c",
+        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_power.c",
+        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_reset.c",
+        "${k32w0_sdk_root}/devices/K32W061/drivers/fsl_wtimer.c",
+        "${k32w0_sdk_root}/drivers/aes/fsl_aes.c",
+        "${k32w0_sdk_root}/drivers/common/fsl_common.c",
+        "${k32w0_sdk_root}/drivers/ctimer/fsl_ctimer.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_flexcomm.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_i2c_freertos.c",
+        "${k32w0_sdk_root}/drivers/flexcomm/fsl_usart.c",
+        "${k32w0_sdk_root}/drivers/fmeas/fsl_fmeas.c",
+        "${k32w0_sdk_root}/drivers/inputmux/fsl_inputmux.c",
+        "${k32w0_sdk_root}/drivers/jn_flash/fsl_flash.c",
+        "${k32w0_sdk_root}/drivers/jn_rng/fsl_rng.c",
+        "${k32w0_sdk_root}/drivers/jn_rtc/fsl_rtc.c",
+        "${k32w0_sdk_root}/drivers/lpc_adc/fsl_adc.c",
+        "${k32w0_sdk_root}/drivers/lpc_gpio/fsl_gpio.c",
+        "${k32w0_sdk_root}/drivers/pint/fsl_pint.c",
+        "${k32w0_sdk_root}/drivers/sha/fsl_sha.c",
+        "${k32w0_sdk_root}/drivers/spifi/fsl_spifi.c",
+        "${k32w0_sdk_root}/utilities/debug_console/fsl_debug_console.c",
+        "${k32w0_sdk_root}/utilities/debug_console/str/fsl_str.c",
+      ]
+    }
 
     if (chip_with_DK6) {
       sources += [

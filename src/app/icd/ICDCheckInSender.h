@@ -50,7 +50,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
-    Crypto::Aes128BitsKeyHandle mKey = Crypto::Aes128BitsKeyHandle();
+    Crypto::Aes128KeyHandle mAesKeyHandle = Crypto::Aes128KeyHandle();
 
     uint32_t mICDCounter = 0;
 };
