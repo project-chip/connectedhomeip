@@ -27,8 +27,13 @@ from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVe
                     SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
-# Global variable for hash ID
-hash_id = "CE47BA5E"
+# A magic value used in the factory data integrity check.
+# The value will be checked at runtime, before verifying the
+# factory data integrity. Factory data header has the following format:
+# | hash id (4 bytes) | size (4 bytes) | hash (4 bytes) |
+# If the hash id check fails, it means the factory data is either missing
+# or has become corrupted.
+HASH_ID = "CE47BA5E"
 
 
 def set_logger():
@@ -158,7 +163,7 @@ class KlvGenerator:
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
-                hashId = bytearray.fromhex(hash_id)
+                hashId = bytearray.fromhex(HASH_ID)
                 hashId.reverse()
                 fullContentCipher = hashId + fullContentCipher
 
