@@ -1729,17 +1729,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
-- (NSArray *)supportedClientDataClasses {
-    return @[[NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class]];
+- (NSArray *)supportedClientDataClasses
+{
+    return @[ [NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class] ];
 }
 
-- (NSArray * _Nullable)clientDataKeys {
+- (NSArray * _Nullable)clientDataKeys
+{
     return [self.temporaryMetaDataCache allKeys];
 }
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key
 {
-    if ( key == nil ) return nil;
+    if (key == nil)
+        return nil;
 
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
@@ -1748,7 +1751,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
 
-    if ( key == nil || value == nil ) return;
+    if (key == nil || value == nil)
+        return;
 
     if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
@@ -1757,14 +1761,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (void)removeClientDataForKey:(NSString *)key {
-    if ( key == nil ) return;
+- (void)removeClientDataForKey:(NSString *)key
+{
+    if (key == nil)
+        return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (NSArray * _Nullable)clientDataKeys {
-    if ( endpointID == nil ) return nil;
+- (NSArray * _Nullable)clientDataKeys
+{
+    if (endpointID == nil)
+        return nil;
     // TODO: When hooked up to storage, enumerate this better
 
     return [self.temporaryMetaDataCache allKeys];
@@ -1772,14 +1780,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
 {
-    if ( key == nil || endpointID == nil ) return nil;
+    if (key == nil || endpointID == nil)
+        return nil;
 
     return [self.temporaryMetaDataCache objectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
 - (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value
 {
-    if ( key == nil || value == nil || endpointID == nil ) return;
+    if (key == nil || value == nil || endpointID == nil)
+        return;
 
     if (self.temporaryMetaDataCache == nil) {
         self.temporaryMetaDataCache = [NSMutableDictionary dictionary];
@@ -1788,12 +1798,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache setObject:value forKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
 
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID {
-    if ( key == nil || endpointID == nil ) return;
+- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID
+{
+    if (key == nil || endpointID == nil)
+        return;
 
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:%@", key, endpointID]];
 }
-
 
 @end
 
