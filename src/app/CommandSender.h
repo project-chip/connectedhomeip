@@ -111,7 +111,7 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * It is advised that subclass should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
+         * It is advised that subclasses should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
          * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
