@@ -172,10 +172,10 @@ CHIP_ERROR BLEManagerCommon::_Init()
         xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
     VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
+    sImplInstance = GetImplInstance();
+
     /* BLE platform code initialization */
     SuccessOrExit(err = InitHostController(&blekw_generic_cb));
-
-    sImplInstance = GetImplInstance();
 
     /* Register the GATT server callback */
     VerifyOrExit(GattServer_RegisterCallback(blekw_gatt_server_cb) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
@@ -914,6 +914,13 @@ void BLEManagerCommon::DoBleProcessing(void)
     }
 }
 
+void BLEManagerCommon::RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
+                                            BLECallbackDelegate::GattServerCallback gattCallback)
+{
+    callbackDelegate.gapCallback  = gapCallback;
+    callbackDelegate.gattCallback = gattCallback;
+}
+
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
@@ -1078,6 +1085,11 @@ void BLEManagerCommon::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
     /* Call BLE Conn Manager */
     BleConnManager_GenericEvent(pGenericEvent);
 
+    if (sImplInstance->callbackDelegate.gapCallback)
+    {
+        sImplInstance->callbackDelegate.gapCallback(pGenericEvent);
+    }
+
     switch (pGenericEvent->eventType)
     {
     case gInternalError_c:
@@ -1162,6 +1174,9 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+        PWR_DisallowDeviceToSleep();
+#endif
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
         ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
 
@@ -1220,6 +1235,11 @@ void BLEManagerCommon::blekw_stop_connection_timeout(void)
 
 void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent)
 {
+    if (sImplInstance->callbackDelegate.gattCallback)
+    {
+        sImplInstance->callbackDelegate.gattCallback(deviceId, pServerEvent);
+    }
+
     switch (pServerEvent->eventType)
     {
     case gEvtMtuChanged_c: {

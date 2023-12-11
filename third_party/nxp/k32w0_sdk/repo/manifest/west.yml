@@ -11,7 +11,7 @@ manifest:
         remote: nxpmicro
     projects:
         - name: mcux-sdk
-          revision: b1ce670e8433142a3c78dca7f4597326eb5f5342
+          revision: 7219c54f5dbd5a8636242f9f1771ddb70be146c9
           path: core
         - name: amazon-freertos
           url: https://github.com/NXP/amazon-freertos.git
@@ -23,7 +23,7 @@ manifest:
           revision: 15458495823165de372f62c3dad621a8da6c86e3
         - name: framework
           url: https://github.com/NXP/mcux-sdk-middleware-connectivity-framework.git
-          revision: a45ed24bc5f8d54312c4d9243c4423d226084412
+          revision: 2ccc3df70ee5b73c451fceee13e6172518412518
           path: core/middleware/wireless/framework
         - name: ble_controller
           url: https://github.com/NXP/mcux-sdk-middleware-bluetooth-controller.git
@@ -35,9 +35,9 @@ manifest:
           path: core/middleware/wireless/bluetooth
         - name: ieee-802.15.4
           url: https://github.com/NXP/mcux-sdk-middleware-ieee_802.15.4.git
-          revision: 7cca871d58e53c78a703a39b269c4366b03f26e4
+          revision: e8c96197346a7e37ce3a872096a22bf4aee47e3d
           path: core/middleware/wireless/ieee-802.15.4
         - name: examples
           url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
-          revision: 39eed09d6a8485dcf365a24cd6ef957e7cc6fbf8
+          revision: 6735550f5a41dfb997d4dd3ce6eebfe1f1d41054
           path: core/boards
