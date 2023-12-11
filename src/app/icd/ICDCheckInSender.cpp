@@ -61,7 +61,8 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     // Encoded ActiveModeThreshold in littleEndian for Check-In message application data
     uint8_t activeModeThresholdBuffer[2] = {};
     ByteSpan activeModeThresholdByteSpan(activeModeThresholdBuffer);
-    Encoding::LittleEndian::Put16((uint8_t *) activeModeThresholdByteSpan.data(), ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+    Encoding::LittleEndian::Put16((uint8_t *) activeModeThresholdByteSpan.data(),
+                                  ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
 
     ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mAes128KeyHandle, mHmac128KeyHandle, mICDCounter,
                                                                        activeModeThresholdByteSpan, output));
