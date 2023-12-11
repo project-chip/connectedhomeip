@@ -634,12 +634,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 {
-    char service_data[sizeof(Ble::ChipBLEDeviceIdentificationInfo)] = {
-        0x0,
-    }; // need to fill advertising data. 5.2.3.8.6. Advertising Data, CHIP Specification
-    Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo = {
-        0x0,
-    };
+    Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
     PlatformVersion version;
     CHIP_ERROR err;
     int ret;
@@ -688,9 +683,8 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    memcpy(service_data, &deviceIdInfo, sizeof(service_data));
     ret = bt_adapter_le_add_advertising_service_data(mAdvertiser, BT_ADAPTER_LE_PACKET_ADVERTISING, chip_ble_service_uuid_short,
-                                                     service_data, sizeof(service_data));
+                                                     reinterpret_cast<const char *>(&deviceIdInfo), sizeof(deviceIdInfo));
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_add_advertising_service_data() failed: %s", get_error_message(ret)));
 
@@ -1395,11 +1389,9 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    ScanFilterData data = {
-        { 0x0 },
-    };
+    ScanFilterData data = {};
 
-    ChipLogProgress(DeviceLayer, "Initiate Scan");
+    ChipLogProgress(DeviceLayer, "Initiate scan");
 
     /* Check Scanning state */
     if (scanType == BleScanState::kNotScanning)
@@ -1412,13 +1404,9 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (!mFlags.Has(Flags::kTizenBLELayerInitialized))
     {
         err = CHIP_ERROR_INCORRECT_STATE;
-        ChipLogError(DeviceLayer, "Tizen BLE Layer is not yet initialized");
+        ChipLogError(DeviceLayer, "Tizen BLE layer is not yet initialized");
         goto exit;
     }
-    /* Setup ScanFilter */
-    memset(&data.service_data, 0x00, sizeof(data.service_data));
-    data.service_data_len = 0;
-    strcpy(data.service_uuid, chip_ble_service_uuid_short);
 
     /* Acquire Chip Device Scanner */
     if (!mDeviceScanner)
@@ -1427,13 +1415,14 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (!mDeviceScanner)
     {
         err = CHIP_ERROR_INTERNAL;
-        ChipLogError(DeviceLayer, "Failed to create a BLE device scanner");
+        ChipLogError(DeviceLayer, "Failed to create BLE device scanner");
         goto exit;
     }
 
     /* Send StartChipScan Request to Scanner Class */
+    strcpy(data.service_uuid, chip_ble_service_uuid_short);
     err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start a BLE scan"));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start BLE scan"));
 
     ChipLogProgress(DeviceLayer, "BLE scan initiation successful");
     mBLEScanConfig.mBleScanState = scanType;
