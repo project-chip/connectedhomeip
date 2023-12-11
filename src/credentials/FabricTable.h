@@ -388,7 +388,7 @@ public:
         /**
          * Gets called when a fabric is newly added to Fabric Table.
          *
-         * OnFabricUpdated will also get called with this callback.
+         * OnFabricUpdated will also get called for the same FabricIndex value.
          **/
         virtual void OnFabricAdded(const FabricTable & fabricTable, FabricIndex fabricIndex){};
 
