@@ -235,6 +235,24 @@ client cluster IMProtocol = 0xFFFF0001 {
     StatusIB status = 1;
   }
 
+  struct AttributionData {
+    // NOTE: 0 is missing
+    int8u context_information = 1;
+    int32u source_context = 2;
+
+    // at-most-one-of {
+    int64u node_id = 3;
+    int16u group_id = 4;
+    // }
+
+    // at-most-one-of {
+    int64u epoch_timestamp = 5;
+    int64u system_timestamp = 6;
+    // }
+
+    int8u fabric_index = 0xFE;
+  }
+
   struct AttributeData {
     optional int32u data_version = 0;
     AttributePathIB path = 1;
@@ -264,6 +282,8 @@ client cluster IMProtocol = 0xFFFF0001 {
     //  }
 
     cluster_event_payload data = 7;
+
+    AttributionData attribution_data = 8;
   }
 
   struct EventReportIB {
@@ -286,6 +306,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int32u data_version = 0;
     AttributePathIB path = 1;
     cluster_attribute_payload data = 2;
+    AttributionData attribution_data = 3;
   }
 
   struct WriteRequestMessage {
