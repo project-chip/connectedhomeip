@@ -70,16 +70,11 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
         // Write some ClientInfos and see the counts are correct
         ICDClientInfo clientInfo1;
         clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId);
-        char val[5]           = "test";
         ICDClientInfo clientInfo2;
-        clientInfo2.peer_node                     = ScopedNodeId(nodeId2, fabricId);
-        clientInfo2.user_active_mode_trigger_hint = 1;
-        memcpy(clientInfo2.user_active_mode_trigger_instruction, val, sizeof(val));
-        clientInfo2.has_instruction = true;
+        clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId);
         ICDClientInfo clientInfo3;
-        clientInfo3.peer_node                     = ScopedNodeId(nodeId1, fabricId);
-        clientInfo3.user_active_mode_trigger_hint = 2;
-        err                                       = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
+        clientInfo3.peer_node = ScopedNodeId(nodeId1, fabricId);
+        err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = manager.StoreEntry(clientInfo1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -105,12 +100,9 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
 
         NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
         NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
-        NL_TEST_ASSERT(apSuite, clientInfo.has_instruction);
-        NL_TEST_ASSERT(apSuite, strcmp(clientInfo.user_active_mode_trigger_instruction, val) == 0);
         NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
         NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
-        NL_TEST_ASSERT(apSuite, clientInfo.user_active_mode_trigger_hint == 2);
-        NL_TEST_ASSERT(apSuite, !clientInfo.has_instruction);
+
         iterator->Release();
 
         // Delete all and verify iterator counts 0
