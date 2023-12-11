@@ -39,7 +39,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH reads from the DUT the mandatory attribute: SupportedDrynessLevels"
+    - label:
+          "Step 2: TH reads from the DUT the mandatory attribute:
+          SupportedDrynessLevels"
       PICS: DRYERCTRL.S.A0000
       command: "readAttribute"
       attribute: "SupportedDrynessLevels"
@@ -48,7 +50,9 @@ tests:
               type: list
               maxLength: 16
 
-    - label: "Step 3: TH reads from the DUT the mandatory attribute: SelectedDrynessLevel"
+    - label:
+          "Step 3: TH reads from the DUT the mandatory attribute:
+          SelectedDrynessLevel"
       PICS: DRYERCTRL.S.A0001
       command: "readAttribute"
       attribute: "SelectedDrynessLevel"
@@ -76,7 +80,8 @@ tests:
                 value: 2000
 
     - label:
-          "Step 5: after a few seconds, TH reads from the DUT the SelectedDrynessLevel attribute"
+          "Step 5: after a few seconds, TH reads from the DUT the
+          SelectedDrynessLevel attribute"
       PICS: DRYERCTRL.S.A0001
       command: "readAttribute"
       attribute: "SelectedDrynessLevel"
