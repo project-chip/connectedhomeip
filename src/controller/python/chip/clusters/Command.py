@@ -23,7 +23,7 @@ import sys
 from asyncio.futures import Future
 from ctypes import CFUNCTYPE, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple, Type, Union
+from typing import List, Optional, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
@@ -311,7 +311,6 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
     responseTypes = []
     commandargs = []
     for command in commands:
-        endpoint = command.EndpointId
         clusterCommand = command.Command
         responseType = command.ResponseType
         if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
