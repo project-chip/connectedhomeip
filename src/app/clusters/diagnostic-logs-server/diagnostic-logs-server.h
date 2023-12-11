@@ -20,7 +20,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/clusters/diagnostic-logs-server/DiagnosticLogs.h>
 #include <app/clusters/diagnostic-logs-server/DiagnosticLogsProviderDelegate.h>
 
 namespace chip {

@@ -20,6 +20,9 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <lib/support/ScopedBuffer.h>
+#include <protocols/bdx/DiagnosticLogs.h>
+
+#include "BDXDiagnosticLogsProvider.h"
 
 #ifdef EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT
 static constexpr size_t kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize =
@@ -30,8 +33,8 @@ static_assert(kDiagnosticLogsDiagnosticLogsProviderDelegateTableSize < kEmberInv
 using namespace chip::app::Clusters::DiagnosticLogs;
 using chip::Protocols::InteractionModel::Status;
 
-using chip::app::Clusters::DiagnosticLogs::bdx::kMaxFileDesignatorLen;
-using chip::app::Clusters::DiagnosticLogs::bdx::kMaxLogContentSize;
+using chip::bdx::DiagnosticLogs::kMaxFileDesignatorLen;
+using chip::bdx::DiagnosticLogs::kMaxLogContentSize;
 
 namespace chip {
 namespace app {
@@ -75,6 +78,10 @@ void AddResponse(CommandHandler * commandObj, const ConcreteCommandPath & path, 
 
     commandObj->AddResponse(path, response);
 }
+
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+BDXDiagnosticLogsProvider gBDXDiagnosticLogsProvider;
+#endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 
 } // anonymous namespace
 
@@ -134,12 +141,17 @@ void DiagnosticLogsServer::HandleLogRequestForBdx(CommandHandler * commandObj, c
     VerifyOrReturn(delegate->GetSizeForIntent(intent) > kMaxLogContentSize,
                    HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted));
 
-    // TODO: BDX is not implemented, so we always fall back to ResponsePayload at the moment.
     // If the RequestedProtocol is set to BDX and either the Node does not support BDX or it is not possible for the Node
     // to establish a BDX session, then the Node SHALL utilize the LogContent field of the RetrieveLogsResponse command
     // to transfer as much of the current logs as it can fit within the response, and the Status field of the
     // RetrieveLogsResponse SHALL be set to Exhausted.
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+    VerifyOrReturn(!gBDXDiagnosticLogsProvider.IsBusy(), AddResponse(commandObj, path, StatusEnum::kBusy));
+    auto err = gBDXDiagnosticLogsProvider.InitializeTransfer(commandObj, path, delegate, intent, transferFileDesignator.Value());
+    VerifyOrReturn(CHIP_NO_ERROR == err, AddResponse(commandObj, path, StatusEnum::kDenied));
+#else
     HandleLogRequestForResponsePayload(commandObj, path, intent, StatusEnum::kExhausted);
+#endif // CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 }
 
 } // namespace DiagnosticLogs

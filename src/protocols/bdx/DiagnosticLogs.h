@@ -19,18 +19,14 @@
 #pragma once
 
 namespace chip {
-namespace app {
-namespace Clusters {
-namespace DiagnosticLogs {
 namespace bdx {
+namespace DiagnosticLogs {
 // Spec mandated max file designator length
 static constexpr uint8_t kMaxFileDesignatorLen = 32;
 
 // Spec mandated max size of the log content field in the Response payload
 static constexpr uint16_t kMaxLogContentSize = 1024;
 
-} // namespace bdx
 } // namespace DiagnosticLogs
-} // namespace Clusters
-} // namespace app
+} // namespace bdx
 } // namespace chip

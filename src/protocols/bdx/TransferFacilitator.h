@@ -120,6 +120,9 @@ public:
                                   uint16_t maxBlockSize, System::Clock::Timeout timeout,
                                   System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
     void ResetTransfer();
 };
 
@@ -145,6 +148,10 @@ public:
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                 System::Clock::Timeout timeout,
                                 System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+    /**
+     * Calls reset on the TransferSession object and stops the poll timer.
+     */
+    void ResetTransfer();
 };
 
 } // namespace bdx
