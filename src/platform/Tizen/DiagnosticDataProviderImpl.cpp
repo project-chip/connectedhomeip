@@ -28,9 +28,11 @@
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/Tizen/DiagnosticDataProviderImpl.h>
 
+#include <errno.h>
 #include <ifaddrs.h>
 #include <linux/if_link.h>
 #include <malloc.h>
+#include <string.h>
 
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer::Internal;
@@ -63,7 +65,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -72,7 +74,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
     {
         if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
         {
-            ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
+            ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface: %s", StringOrNullMarker(ifa->ifa_name));
             break;
         }
     }
@@ -123,7 +125,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -290,7 +292,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -341,11 +343,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         }
     }
 
-    *netifpp = head;
-    err      = CHIP_NO_ERROR;
+    if (head != nullptr)
+    {
+        *netifpp = head;
+        err      = CHIP_NO_ERROR;
+    }
 
     freeifaddrs(ifaddr);
-
     return err;
 }
 
@@ -451,7 +455,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -619,7 +623,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
