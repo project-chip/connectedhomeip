@@ -258,27 +258,8 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kMonitoredSubject)));
         ReturnErrorOnFailure(reader.Get(clientInfo.monitored_subject));
 
-        // UserActiveModeTriggerHint
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint)));
-        ReturnErrorOnFailure(reader.Get(clientInfo.user_active_mode_trigger_hint));
-
-        // UserActiveModeTriggerInstruction
-        ReturnErrorOnFailure(reader.Next());
-        err = reader.Expect(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction));
-        if (err == CHIP_NO_ERROR)
-        {
-            ReturnErrorOnFailure(
-                reader.GetString(clientInfo.user_active_mode_trigger_instruction, kUserActiveModeTriggerInstructionSize));
-            clientInfo.has_instruction = true;
-            // Shared key
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
-        }
-        else if (err == CHIP_ERROR_UNEXPECTED_TLV_ELEMENT)
-        {
-            err = reader.Expect(TLV::ContextTag(ClientInfoTag::kSharedKey));
-        }
-        ReturnErrorOnFailure(err);
-
+        // Shared key
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
         ByteSpan buf;
         ReturnErrorOnFailure(reader.Get(buf));
         VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
@@ -325,15 +306,6 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ReturnErrorOnFailure(
-            writer.Put(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerHint), clientInfo.user_active_mode_trigger_hint));
-        if (clientInfo.has_instruction)
-        {
-            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(ClientInfoTag::kUserActiveModeTriggerInstruction),
-                                                  clientInfo.user_active_mode_trigger_instruction,
-                                                  static_cast<uint32_t>(strlen(clientInfo.user_active_mode_trigger_instruction))));
-        }
-
         ByteSpan buf(clientInfo.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));

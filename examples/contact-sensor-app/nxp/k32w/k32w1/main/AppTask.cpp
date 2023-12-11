@@ -46,6 +46,8 @@
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
+#include <src/platform/nxp/k32w/k32w1/BLEManagerImpl.h>
+
 #include "K32W1PersistentStorageOpKeystore.h"
 
 #include "LEDWidget.h"
@@ -105,6 +107,18 @@ static BDXDownloader gDownloader __attribute__((section(".data")));
 
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
+
+static void app_gap_callback(gapGenericEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
+}
+
+static void app_gatt_callback(deviceId_t id, gattServerEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
+}
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -187,6 +201,9 @@ CHIP_ERROR AppTask::Init()
     err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
     K32W_LOG("Current Software Version: %s, %d", currentSoftwareVer, currentVersion);
+
+    auto & bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager.RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
 
     return err;
 }

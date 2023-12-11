@@ -329,3 +329,12 @@ air-purifier-app/**/README
 
 network-manager-app/README
 ```
+
+## Lit ICD example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lit-icd-app/**/README
+```
