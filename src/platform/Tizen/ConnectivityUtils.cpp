@@ -37,10 +37,6 @@
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 using namespace ::chip::app::Clusters::EthernetNetworkDiagnostics;
 
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-
 namespace {
 
 constexpr uint16_t Map2400MHz(const uint8_t inChannel)
@@ -169,7 +165,7 @@ CHIP_ERROR GetWiFiParameter(int sock,            /* Socket to the kernel */
                             int request,         /* WE ID */
                             struct iwreq * pwrq) /* Fixed part of the request */
 {
-    Platform::CopyString(pwrq->ifr_name, ifname);
+    chip::Platform::CopyString(pwrq->ifr_name, ifname);
     if (ioctl(sock, request, pwrq) < 0)
         return CHIP_ERROR_BAD_REQUEST;
     return CHIP_NO_ERROR;
@@ -186,6 +182,9 @@ CHIP_ERROR GetWiFiStats(int sock, const char * ifname, struct iw_statistics * st
 
 } // namespace
 
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 namespace ConnectivityUtils {
 
 InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
