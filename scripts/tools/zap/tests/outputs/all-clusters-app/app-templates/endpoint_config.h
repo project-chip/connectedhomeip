@@ -310,7 +310,7 @@
             { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                \
             { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x19 },        /* MinSetpointDeadBand */                                 \
             { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                          \
-            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x7 },          /* SystemMode */                                          \
+            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fan Control (server) */                                                                       \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x6 },  /* FanMode */                                                     \
@@ -1005,11 +1005,11 @@
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
-            { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LocalTemperature */         \
-            { ZAP_SIMPLE_DEFAULT(0x02BC), 0x00000003, 2, ZAP_TYPE(INT16S), 0 },                     /* AbsMinHeatSetpointLimit */  \
-            { ZAP_SIMPLE_DEFAULT(0x0BB8), 0x00000004, 2, ZAP_TYPE(INT16S), 0 },                     /* AbsMaxHeatSetpointLimit */  \
-            { ZAP_SIMPLE_DEFAULT(0x0640), 0x00000005, 2, ZAP_TYPE(INT16S), 0 },                     /* AbsMinCoolSetpointLimit */  \
-            { ZAP_SIMPLE_DEFAULT(0x0C80), 0x00000006, 2, ZAP_TYPE(INT16S), 0 },                     /* AbsMaxCoolSetpointLimit */  \
+            { ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(TEMPERATURE), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LocalTemperature */    \
+            { ZAP_SIMPLE_DEFAULT(0x02BC), 0x00000003, 2, ZAP_TYPE(TEMPERATURE), 0 }, /* AbsMinHeatSetpointLimit */                 \
+            { ZAP_SIMPLE_DEFAULT(0x0BB8), 0x00000004, 2, ZAP_TYPE(TEMPERATURE), 0 }, /* AbsMaxHeatSetpointLimit */                 \
+            { ZAP_SIMPLE_DEFAULT(0x0640), 0x00000005, 2, ZAP_TYPE(TEMPERATURE), 0 }, /* AbsMinCoolSetpointLimit */                 \
+            { ZAP_SIMPLE_DEFAULT(0x0C80), 0x00000006, 2, ZAP_TYPE(TEMPERATURE), 0 }, /* AbsMaxCoolSetpointLimit */                 \
             { ZAP_MIN_MAX_DEFAULTS_INDEX(12), 0x00000011, 2, ZAP_TYPE(INT16S),                                                     \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OccupiedCoolingSetpoint */                          \
             { ZAP_MIN_MAX_DEFAULTS_INDEX(13), 0x00000012, 2, ZAP_TYPE(INT16S),                                                     \
