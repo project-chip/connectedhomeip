@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UInt) {
+class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UByte) {
   override fun toString(): String = buildString {
     append("SmokeCoAlarmClusterInterconnectCOAlarmEvent {\n")
     append("\talarmSeverityLevel : $alarmSeverityLevel\n")
@@ -42,7 +42,7 @@ class SmokeCoAlarmClusterInterconnectCOAlarmEvent(val alarmSeverityLevel: UInt) 
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SmokeCoAlarmClusterInterconnectCOAlarmEvent {
       tlvReader.enterStructure(tlvTag)
-      val alarmSeverityLevel = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
+      val alarmSeverityLevel = tlvReader.getUByte(ContextSpecificTag(TAG_ALARM_SEVERITY_LEVEL))
 
       tlvReader.exitContainer()
 

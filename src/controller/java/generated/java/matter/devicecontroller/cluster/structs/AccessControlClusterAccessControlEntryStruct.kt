@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class AccessControlClusterAccessControlEntryStruct(
-  val privilege: UInt,
-  val authMode: UInt,
+  val privilege: UByte,
+  val authMode: UByte,
   val subjects: List<ULong>?,
   val targets: List<AccessControlClusterAccessControlTargetStruct>?,
   val fabricIndex: UByte
@@ -77,8 +77,8 @@ class AccessControlClusterAccessControlEntryStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlEntryStruct {
       tlvReader.enterStructure(tlvTag)
-      val privilege = tlvReader.getUInt(ContextSpecificTag(TAG_PRIVILEGE))
-      val authMode = tlvReader.getUInt(ContextSpecificTag(TAG_AUTH_MODE))
+      val privilege = tlvReader.getUByte(ContextSpecificTag(TAG_PRIVILEGE))
+      val authMode = tlvReader.getUByte(ContextSpecificTag(TAG_AUTH_MODE))
       val subjects =
         if (!tlvReader.isNull()) {
           buildList<ULong> {

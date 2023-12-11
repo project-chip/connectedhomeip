@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 class AccessControlClusterAccessControlExtensionChangedEvent(
   val adminNodeID: ULong?,
   val adminPasscodeID: UShort?,
-  val changeType: UInt,
+  val changeType: UByte,
   val latestValue:
     matter.devicecontroller.cluster.structs.AccessControlClusterAccessControlExtensionStruct?,
   val fabricIndex: UByte
@@ -90,7 +90,7 @@ class AccessControlClusterAccessControlExtensionChangedEvent(
           tlvReader.getNull(ContextSpecificTag(TAG_ADMIN_PASSCODE_I_D))
           null
         }
-      val changeType = tlvReader.getUInt(ContextSpecificTag(TAG_CHANGE_TYPE))
+      val changeType = tlvReader.getUByte(ContextSpecificTag(TAG_CHANGE_TYPE))
       val latestValue =
         if (!tlvReader.isNull()) {
           matter.devicecontroller.cluster.structs.AccessControlClusterAccessControlExtensionStruct

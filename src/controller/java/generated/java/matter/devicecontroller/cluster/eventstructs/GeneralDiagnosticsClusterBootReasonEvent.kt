@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UInt) {
+class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UByte) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterBootReasonEvent {\n")
     append("\tbootReason : $bootReason\n")
@@ -42,7 +42,7 @@ class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UInt) {
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
       tlvReader.enterStructure(tlvTag)
-      val bootReason = tlvReader.getUInt(ContextSpecificTag(TAG_BOOT_REASON))
+      val bootReason = tlvReader.getUByte(ContextSpecificTag(TAG_BOOT_REASON))
 
       tlvReader.exitContainer()
 

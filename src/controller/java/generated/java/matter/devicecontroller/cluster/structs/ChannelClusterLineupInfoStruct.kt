@@ -27,7 +27,7 @@ class ChannelClusterLineupInfoStruct(
   val operatorName: String,
   val lineupName: Optional<String>,
   val postalCode: Optional<String>,
-  val lineupInfoType: UInt
+  val lineupInfoType: UByte
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterLineupInfoStruct {\n")
@@ -76,7 +76,7 @@ class ChannelClusterLineupInfoStruct(
         } else {
           Optional.empty()
         }
-      val lineupInfoType = tlvReader.getUInt(ContextSpecificTag(TAG_LINEUP_INFO_TYPE))
+      val lineupInfoType = tlvReader.getUByte(ContextSpecificTag(TAG_LINEUP_INFO_TYPE))
 
       tlvReader.exitContainer()
 
