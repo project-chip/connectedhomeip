@@ -59,6 +59,12 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   class SessionIDAttribute(val value: UInt?)
 
+  class SessionDurationAttribute(val value: UInt?)
+
+  class SessionEnergyChargedAttribute(val value: Long?)
+
+  class SessionEnergyDischargedAttribute(val value: Long?)
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -1237,7 +1243,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     return SessionIDAttribute(decodedValue)
   }
 
-  suspend fun readSessionDurationAttribute(): UInt {
+  suspend fun readSessionDurationAttribute(): SessionDurationAttribute {
     val ATTRIBUTE_ID: UInt = 65u
 
     val attributePath =
@@ -1263,12 +1269,18 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+    val decodedValue: UInt? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
 
-    return decodedValue
+    return SessionDurationAttribute(decodedValue)
   }
 
-  suspend fun readSessionEnergyChargedAttribute(): Long {
+  suspend fun readSessionEnergyChargedAttribute(): SessionEnergyChargedAttribute {
     val ATTRIBUTE_ID: UInt = 66u
 
     val attributePath =
@@ -1294,12 +1306,18 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Long = tlvReader.getLong(AnonymousTag)
+    val decodedValue: Long? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getLong(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
 
-    return decodedValue
+    return SessionEnergyChargedAttribute(decodedValue)
   }
 
-  suspend fun readSessionEnergyDischargedAttribute(): Long? {
+  suspend fun readSessionEnergyDischargedAttribute(): SessionEnergyDischargedAttribute {
     val ATTRIBUTE_ID: UInt = 67u
 
     val attributePath =
@@ -1326,13 +1344,18 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: Long? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getLong(AnonymousTag)
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getLong(AnonymousTag)
+        } else {
+          null
+        }
       } else {
+        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return decodedValue
+    return SessionEnergyDischargedAttribute(decodedValue)
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
