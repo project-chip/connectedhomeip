@@ -1747,7 +1747,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
-    
+
     if ( key == nil || value == nil ) return;
 
     if (self.temporaryMetaDataCache == nil) {
@@ -1766,7 +1766,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (NSArray * _Nullable)clientDataKeys {
     if ( endpointID == nil ) return nil;
     // TODO: When hooked up to storage, enumerate this better
-    
+
     return [self.temporaryMetaDataCache allKeys];
 }
 
