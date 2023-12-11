@@ -275,15 +275,6 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
         System::Clock::Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT &&
-            GetSlowPollingInterval() > GetSITPollingThreshold())
-        {
-            slowPollInterval = GetSITPollingThreshold();
-        }
-#endif
-
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
 
