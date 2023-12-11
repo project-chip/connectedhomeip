@@ -52,6 +52,17 @@ constexpr uint16_t Map2400MHz(const uint8_t inChannel)
     return 0;
 }
 
+constexpr uint8_t MapFrequencyToChannel(const uint16_t frequency)
+{
+    if (frequency < 2412)
+        return 0;
+    if (frequency < 2484)
+        return static_cast<uint8_t>((frequency - 2407) / 5);
+    if (frequency == 2484)
+        return 14;
+    return static_cast<uint8_t>(frequency / 5 - 1000);
+}
+
 constexpr uint16_t Map5000MHz(const uint8_t inChannel)
 {
     switch (inChannel)
@@ -176,36 +187,6 @@ CHIP_ERROR GetWiFiStats(int sock, const char * ifname, struct iw_statistics * st
 } // namespace
 
 namespace ConnectivityUtils {
-
-uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel)
-{
-    uint16_t frequency = 0;
-
-    if (inBand == kWiFi_BAND_2_4_GHZ)
-    {
-        frequency = Map2400MHz(inChannel);
-    }
-    else if (inBand == kWiFi_BAND_5_0_GHZ)
-    {
-        frequency = Map5000MHz(inChannel);
-    }
-
-    return frequency;
-}
-
-uint8_t MapFrequencyToChannel(const uint16_t frequency)
-{
-    if (frequency < 2412)
-        return 0;
-
-    if (frequency < 2484)
-        return static_cast<uint8_t>((frequency - 2407) / 5);
-
-    if (frequency == 2484)
-        return 14;
-
-    return static_cast<uint8_t>(frequency / 5 - 1000);
-}
 
 InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname)
 {

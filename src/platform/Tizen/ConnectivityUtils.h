@@ -40,8 +40,6 @@ static constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
 
 namespace ConnectivityUtils {
 
-uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
-uint8_t MapFrequencyToChannel(const uint16_t frequency);
 app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
 CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
 CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
