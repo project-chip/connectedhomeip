@@ -149,8 +149,23 @@ class TimeSynchronizationCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_D_S_T_OFFSET_REQUIRED: Int = 0
-    val DSTOffsetRequired_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_D_S_T_OFFSET_REQUIRED))
+    var DSTOffsetRequired_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_D_S_T_OFFSET_REQUIRED)) {
+        DSTOffsetRequired_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (DSTOffsetRequired_decoded == null) {
+      throw IllegalStateException("DSTOffsetRequired not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return SetTimeZoneResponse(DSTOffsetRequired_decoded)

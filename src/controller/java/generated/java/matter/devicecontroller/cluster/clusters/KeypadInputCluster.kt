@@ -65,7 +65,23 @@ class KeypadInputCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return SendKeyResponse(status_decoded)

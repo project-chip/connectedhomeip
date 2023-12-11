@@ -247,53 +247,130 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_WEEK_DAY_INDEX: Int = 0
-    val weekDayIndex_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_WEEK_DAY_INDEX))
+    var weekDayIndex_decoded: UByte? = null
 
     val TAG_USER_INDEX: Int = 1
-    val userIndex_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
+    var userIndex_decoded: UShort? = null
 
     val TAG_STATUS: Int = 2
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_DAYS_MASK: Int = 3
-    val daysMask_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DAYS_MASK))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_DAYS_MASK))
-      } else {
-        null
-      }
+    var daysMask_decoded: UByte? = null
 
     val TAG_START_HOUR: Int = 4
-    val startHour_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_HOUR))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_START_HOUR))
-      } else {
-        null
-      }
+    var startHour_decoded: UByte? = null
 
     val TAG_START_MINUTE: Int = 5
-    val startMinute_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_START_MINUTE))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_START_MINUTE))
-      } else {
-        null
-      }
+    var startMinute_decoded: UByte? = null
 
     val TAG_END_HOUR: Int = 6
-    val endHour_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_HOUR))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_END_HOUR))
-      } else {
-        null
-      }
+    var endHour_decoded: UByte? = null
 
     val TAG_END_MINUTE: Int = 7
-    val endMinute_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_END_MINUTE))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_END_MINUTE))
-      } else {
-        null
+    var endMinute_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_WEEK_DAY_INDEX)) {
+        weekDayIndex_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+        userIndex_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DAYS_MASK)) {
+        daysMask_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_START_HOUR)) {
+        startHour_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_START_MINUTE)) {
+        startMinute_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_END_HOUR)) {
+        endHour_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_END_MINUTE)) {
+        endMinute_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (weekDayIndex_decoded == null) {
+      throw IllegalStateException("weekDayIndex not found in TLV")
+    }
+
+    if (userIndex_decoded == null) {
+      throw IllegalStateException("userIndex not found in TLV")
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetWeekDayScheduleResponse(
@@ -408,29 +485,79 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_YEAR_DAY_INDEX: Int = 0
-    val yearDayIndex_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_YEAR_DAY_INDEX))
+    var yearDayIndex_decoded: UByte? = null
 
     val TAG_USER_INDEX: Int = 1
-    val userIndex_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
+    var userIndex_decoded: UShort? = null
 
     val TAG_STATUS: Int = 2
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_LOCAL_START_TIME: Int = 3
-    val localStartTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOCAL_START_TIME))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_LOCAL_START_TIME))
-      } else {
-        null
-      }
+    var localStartTime_decoded: UInt? = null
 
     val TAG_LOCAL_END_TIME: Int = 4
-    val localEndTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOCAL_END_TIME))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_LOCAL_END_TIME))
-      } else {
-        null
+    var localEndTime_decoded: UInt? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_YEAR_DAY_INDEX)) {
+        yearDayIndex_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+        userIndex_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
+        localStartTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
+        localEndTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (yearDayIndex_decoded == null) {
+      throw IllegalStateException("yearDayIndex not found in TLV")
+    }
+
+    if (userIndex_decoded == null) {
+      throw IllegalStateException("userIndex not found in TLV")
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetYearDayScheduleResponse(
@@ -538,34 +665,85 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_HOLIDAY_INDEX: Int = 0
-    val holidayIndex_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_HOLIDAY_INDEX))
+    var holidayIndex_decoded: UByte? = null
 
     val TAG_STATUS: Int = 1
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_LOCAL_START_TIME: Int = 2
-    val localStartTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOCAL_START_TIME))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_LOCAL_START_TIME))
-      } else {
-        null
-      }
+    var localStartTime_decoded: UInt? = null
 
     val TAG_LOCAL_END_TIME: Int = 3
-    val localEndTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOCAL_END_TIME))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_LOCAL_END_TIME))
-      } else {
-        null
-      }
+    var localEndTime_decoded: UInt? = null
 
     val TAG_OPERATING_MODE: Int = 4
-    val operatingMode_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATING_MODE))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_OPERATING_MODE))
-      } else {
-        null
+    var operatingMode_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_HOLIDAY_INDEX)) {
+        holidayIndex_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_LOCAL_START_TIME)) {
+        localStartTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_LOCAL_END_TIME)) {
+        localEndTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPERATING_MODE)) {
+        operatingMode_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (holidayIndex_decoded == null) {
+      throw IllegalStateException("holidayIndex not found in TLV")
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetHolidayScheduleResponse(
@@ -676,130 +854,191 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_USER_INDEX: Int = 0
-    val userIndex_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
+    var userIndex_decoded: UShort? = null
 
     val TAG_USER_NAME: Int = 1
-    val userName_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_NAME))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getString(ContextSpecificTag(TAG_USER_NAME))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_NAME))
-          null
-        }
-      } else {
-        null
-      }
+    var userName_decoded: String? = null
 
     val TAG_USER_UNIQUE_I_D: Int = 2
-    val userUniqueID_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_UNIQUE_I_D))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_USER_UNIQUE_I_D))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_UNIQUE_I_D))
-          null
-        }
-      } else {
-        null
-      }
+    var userUniqueID_decoded: UInt? = null
 
     val TAG_USER_STATUS: Int = 3
-    val userStatus_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_STATUS))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_USER_STATUS))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_STATUS))
-          null
-        }
-      } else {
-        null
-      }
+    var userStatus_decoded: UByte? = null
 
     val TAG_USER_TYPE: Int = 4
-    val userType_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_TYPE))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_USER_TYPE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_TYPE))
-          null
-        }
-      } else {
-        null
-      }
+    var userType_decoded: UByte? = null
 
     val TAG_CREDENTIAL_RULE: Int = 5
-    val credentialRule_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIAL_RULE))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_CREDENTIAL_RULE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CREDENTIAL_RULE))
-          null
-        }
-      } else {
-        null
-      }
+    var credentialRule_decoded: UByte? = null
 
     val TAG_CREDENTIALS: Int = 6
-    val credentials_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREDENTIALS))) {
-        if (!tlvReader.isNull()) {
-          buildList<DoorLockClusterCredentialStruct> {
-            tlvReader.enterArray(ContextSpecificTag(TAG_CREDENTIALS))
-            while (!tlvReader.isEndOfContainer()) {
-              add(DoorLockClusterCredentialStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CREDENTIALS))
-          null
-        }
-      } else {
-        null
-      }
+    var credentials_decoded: List<DoorLockClusterCredentialStruct>? = null
 
     val TAG_CREATOR_FABRIC_INDEX: Int = 7
-    val creatorFabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var creatorFabricIndex_decoded: UByte? = null
 
     val TAG_LAST_MODIFIED_FABRIC_INDEX: Int = 8
-    val lastModifiedFabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var lastModifiedFabricIndex_decoded: UByte? = null
 
     val TAG_NEXT_USER_INDEX: Int = 9
-    val nextUserIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEXT_USER_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_NEXT_USER_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_NEXT_USER_INDEX))
-          null
-        }
-      } else {
-        null
+    var nextUserIndex_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+        userIndex_decoded = tlvReader.getUShort(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_USER_NAME)) {
+        userName_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getString(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_UNIQUE_I_D)) {
+        userUniqueID_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUInt(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_STATUS)) {
+        userStatus_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_TYPE)) {
+        userType_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIAL_RULE)) {
+        credentialRule_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIALS)) {
+        credentials_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              buildList<DoorLockClusterCredentialStruct> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(DoorLockClusterCredentialStruct.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
+        creatorFabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
+        lastModifiedFabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NEXT_USER_INDEX)) {
+        nextUserIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userIndex_decoded == null) {
+      throw IllegalStateException("userIndex not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetUserResponse(
@@ -885,33 +1124,59 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_USER_INDEX: Int = 1
-    val userIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var userIndex_decoded: UShort? = null
 
     val TAG_NEXT_CREDENTIAL_INDEX: Int = 2
-    val nextCredentialIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))
-          null
-        }
-      } else {
-        null
+    var nextCredentialIndex_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+        userIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
+        nextCredentialIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return SetCredentialResponse(status_decoded, userIndex_decoded, nextCredentialIndex_decoded)
@@ -945,59 +1210,95 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_CREDENTIAL_EXISTS: Int = 0
-    val credentialExists_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_CREDENTIAL_EXISTS))
+    var credentialExists_decoded: Boolean? = null
 
     val TAG_USER_INDEX: Int = 1
-    val userIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_USER_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var userIndex_decoded: UShort? = null
 
     val TAG_CREATOR_FABRIC_INDEX: Int = 2
-    val creatorFabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var creatorFabricIndex_decoded: UByte? = null
 
     val TAG_LAST_MODIFIED_FABRIC_INDEX: Int = 3
-    val lastModifiedFabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX))
-          null
-        }
-      } else {
-        null
-      }
+    var lastModifiedFabricIndex_decoded: UByte? = null
 
     val TAG_NEXT_CREDENTIAL_INDEX: Int = 4
-    val nextCredentialIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUShort(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX))
-          null
-        }
-      } else {
-        null
+    var nextCredentialIndex_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_CREDENTIAL_EXISTS)) {
+        credentialExists_decoded = tlvReader.getBoolean(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_USER_INDEX)) {
+        userIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CREATOR_FABRIC_INDEX)) {
+        creatorFabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_LAST_MODIFIED_FABRIC_INDEX)) {
+        lastModifiedFabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NEXT_CREDENTIAL_INDEX)) {
+        nextCredentialIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (credentialExists_decoded == null) {
+      throw IllegalStateException("credentialExists not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetCredentialStatusResponse(

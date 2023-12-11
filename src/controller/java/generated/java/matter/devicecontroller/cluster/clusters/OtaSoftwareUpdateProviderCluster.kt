@@ -120,63 +120,142 @@ class OtaSoftwareUpdateProviderCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_DELAYED_ACTION_TIME: Int = 1
-    val delayedActionTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DELAYED_ACTION_TIME))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_DELAYED_ACTION_TIME))
-      } else {
-        null
-      }
+    var delayedActionTime_decoded: UInt? = null
 
     val TAG_IMAGE_U_R_I: Int = 2
-    val imageURI_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_IMAGE_U_R_I))) {
-        tlvReader.getString(ContextSpecificTag(TAG_IMAGE_U_R_I))
-      } else {
-        null
-      }
+    var imageURI_decoded: String? = null
 
     val TAG_SOFTWARE_VERSION: Int = 3
-    val softwareVersion_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOFTWARE_VERSION))) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      } else {
-        null
-      }
+    var softwareVersion_decoded: UInt? = null
 
     val TAG_SOFTWARE_VERSION_STRING: Int = 4
-    val softwareVersionString_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SOFTWARE_VERSION_STRING))) {
-        tlvReader.getString(ContextSpecificTag(TAG_SOFTWARE_VERSION_STRING))
-      } else {
-        null
-      }
+    var softwareVersionString_decoded: String? = null
 
     val TAG_UPDATE_TOKEN: Int = 5
-    val updateToken_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_UPDATE_TOKEN))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_UPDATE_TOKEN))
-      } else {
-        null
-      }
+    var updateToken_decoded: ByteArray? = null
 
     val TAG_USER_CONSENT_NEEDED: Int = 6
-    val userConsentNeeded_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_USER_CONSENT_NEEDED))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_USER_CONSENT_NEEDED))
-      } else {
-        null
-      }
+    var userConsentNeeded_decoded: Boolean? = null
 
     val TAG_METADATA_FOR_REQUESTOR: Int = 7
-    val metadataForRequestor_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_FOR_REQUESTOR))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_METADATA_FOR_REQUESTOR))
-      } else {
-        null
+    var metadataForRequestor_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
+        delayedActionTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_IMAGE_U_R_I)) {
+        imageURI_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION)) {
+        softwareVersion_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUInt(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SOFTWARE_VERSION_STRING)) {
+        softwareVersionString_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_UPDATE_TOKEN)) {
+        updateToken_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_USER_CONSENT_NEEDED)) {
+        userConsentNeeded_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_METADATA_FOR_REQUESTOR)) {
+        metadataForRequestor_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return QueryImageResponse(
@@ -223,10 +302,34 @@ class OtaSoftwareUpdateProviderCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ACTION: Int = 0
-    val action_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ACTION))
+    var action_decoded: UByte? = null
 
     val TAG_DELAYED_ACTION_TIME: Int = 1
-    val delayedActionTime_decoded = tlvReader.getUInt(ContextSpecificTag(TAG_DELAYED_ACTION_TIME))
+    var delayedActionTime_decoded: UInt? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ACTION)) {
+        action_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
+        delayedActionTime_decoded = tlvReader.getUInt(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (action_decoded == null) {
+      throw IllegalStateException("action not found in TLV")
+    }
+
+    if (delayedActionTime_decoded == null) {
+      throw IllegalStateException("delayedActionTime not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ApplyUpdateResponse(action_decoded, delayedActionTime_decoded)

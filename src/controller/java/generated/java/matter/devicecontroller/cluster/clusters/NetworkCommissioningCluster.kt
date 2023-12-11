@@ -106,53 +106,99 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_WI_FI_SCAN_RESULTS: Int = 2
-    val wiFiScanResults_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS))) {
-        buildList<NetworkCommissioningClusterWiFiInterfaceScanResultStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              NetworkCommissioningClusterWiFiInterfaceScanResultStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
-      }
+    var wiFiScanResults_decoded: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>? =
+      null
 
     val TAG_THREAD_SCAN_RESULTS: Int = 3
-    val threadScanResults_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_THREAD_SCAN_RESULTS))) {
-        buildList<NetworkCommissioningClusterThreadInterfaceScanResultStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_THREAD_SCAN_RESULTS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(
-              NetworkCommissioningClusterThreadInterfaceScanResultStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
+    var threadScanResults_decoded:
+      List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>? =
+      null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS)) {
+        wiFiScanResults_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<NetworkCommissioningClusterWiFiInterfaceScanResultStruct> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    NetworkCommissioningClusterWiFiInterfaceScanResultStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_THREAD_SCAN_RESULTS)) {
+        threadScanResults_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<NetworkCommissioningClusterThreadInterfaceScanResultStruct> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    NetworkCommissioningClusterThreadInterfaceScanResultStruct.fromTlv(
+                      AnonymousTag,
+                      tlvReader
+                    )
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ScanNetworksResponse(
@@ -217,39 +263,91 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_NETWORK_INDEX: Int = 2
-    val networkIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
-      } else {
-        null
-      }
+    var networkIndex_decoded: UByte? = null
 
     val TAG_CLIENT_IDENTITY: Int = 3
-    val clientIdentity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
-      } else {
-        null
-      }
+    var clientIdentity_decoded: ByteArray? = null
 
     val TAG_POSSESSION_SIGNATURE: Int = 4
-    val possessionSignature_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
-      } else {
-        null
+    var possessionSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+        networkIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+        clientIdentity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+        possessionSignature_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NetworkConfigResponse(
@@ -293,39 +391,91 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_NETWORK_INDEX: Int = 2
-    val networkIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
-      } else {
-        null
-      }
+    var networkIndex_decoded: UByte? = null
 
     val TAG_CLIENT_IDENTITY: Int = 3
-    val clientIdentity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
-      } else {
-        null
-      }
+    var clientIdentity_decoded: ByteArray? = null
 
     val TAG_POSSESSION_SIGNATURE: Int = 4
-    val possessionSignature_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
-      } else {
-        null
+    var possessionSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+        networkIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+        clientIdentity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+        possessionSignature_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NetworkConfigResponse(
@@ -369,39 +519,91 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_NETWORK_INDEX: Int = 2
-    val networkIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
-      } else {
-        null
-      }
+    var networkIndex_decoded: UByte? = null
 
     val TAG_CLIENT_IDENTITY: Int = 3
-    val clientIdentity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
-      } else {
-        null
-      }
+    var clientIdentity_decoded: ByteArray? = null
 
     val TAG_POSSESSION_SIGNATURE: Int = 4
-    val possessionSignature_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
-      } else {
-        null
+    var possessionSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+        networkIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+        clientIdentity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+        possessionSignature_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NetworkConfigResponse(
@@ -445,28 +647,58 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_ERROR_VALUE: Int = 2
-    val errorValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_VALUE))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_ERROR_VALUE))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ERROR_VALUE))
-          null
-        }
-      } else {
-        null
+    var errorValue_decoded: Int? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ERROR_VALUE)) {
+        errorValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getInt(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ConnectNetworkResponse(networkingStatus_decoded, debugText_decoded, errorValue_decoded)
@@ -508,39 +740,91 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NETWORKING_STATUS: Int = 0
-    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+    var networkingStatus_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
-      }
+    var debugText_decoded: String? = null
 
     val TAG_NETWORK_INDEX: Int = 2
-    val networkIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
-      } else {
-        null
-      }
+    var networkIndex_decoded: UByte? = null
 
     val TAG_CLIENT_IDENTITY: Int = 3
-    val clientIdentity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
-      } else {
-        null
-      }
+    var clientIdentity_decoded: ByteArray? = null
 
     val TAG_POSSESSION_SIGNATURE: Int = 4
-    val possessionSignature_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
-      } else {
-        null
+    var possessionSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NETWORKING_STATUS)) {
+        networkingStatus_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NETWORK_INDEX)) {
+        networkIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_CLIENT_IDENTITY)) {
+        clientIdentity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+        possessionSignature_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (networkingStatus_decoded == null) {
+      throw IllegalStateException("networkingStatus not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NetworkConfigResponse(
@@ -586,15 +870,40 @@ class NetworkCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_IDENTITY: Int = 0
-    val identity_decoded = tlvReader.getByteArray(ContextSpecificTag(TAG_IDENTITY))
+    var identity_decoded: ByteArray? = null
 
     val TAG_POSSESSION_SIGNATURE: Int = 1
-    val possessionSignature_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
-        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
-      } else {
-        null
+    var possessionSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_IDENTITY)) {
+        identity_decoded = tlvReader.getByteArray(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_POSSESSION_SIGNATURE)) {
+        possessionSignature_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getByteArray(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (identity_decoded == null) {
+      throw IllegalStateException("identity not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return QueryIdentityResponse(identity_decoded, possessionSignature_decoded)

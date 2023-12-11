@@ -103,20 +103,41 @@ class GeneralDiagnosticsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_SYSTEM_TIME_US: Int = 0
-    val systemTimeUs_decoded = tlvReader.getULong(ContextSpecificTag(TAG_SYSTEM_TIME_US))
+    var systemTimeUs_decoded: ULong? = null
 
     val TAG_U_T_C_TIME_US: Int = 1
-    val UTCTimeUs_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_U_T_C_TIME_US))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_U_T_C_TIME_US))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_U_T_C_TIME_US))
-          null
-        }
-      } else {
-        null
+    var UTCTimeUs_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_SYSTEM_TIME_US)) {
+        systemTimeUs_decoded = tlvReader.getULong(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_U_T_C_TIME_US)) {
+        UTCTimeUs_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (systemTimeUs_decoded == null) {
+      throw IllegalStateException("systemTimeUs not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TimeSnapshotResponse(systemTimeUs_decoded, UTCTimeUs_decoded)

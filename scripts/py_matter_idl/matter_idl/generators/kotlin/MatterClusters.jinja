@@ -227,19 +227,52 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    {%- for field in (cluster.structs | named(command.output_param)).fields %}
+    {%- set struct = cluster.structs | named(command.output_param) -%}    
+    {%- for field in struct.fields %}
     val TAG_{{field.name | constcase}}: Int = {{field.code}}
     {% set encodable = field | asEncodable(typeLookup) -%}
-    {%- if encodable.is_nullable -%}
-    val {{field.name | lowfirst_except_acronym}}_decoded = if (tlvReader.isNextTag(ContextSpecificTag(TAG_{{field.name | constcase}}))) {
-      {{decode_tlv(cluster, encodable, "ContextSpecificTag(TAG_" + field.name | constcase + ")", 0)}}
-    } else {
-      null
-    }
+    {%- if encodable.is_optional or encodable.is_nullable-%}
+    var {{field.name | lowfirst_except_acronym}}_decoded: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}} = null
     {%- else -%}
-    val {{field.name | lowfirst_except_acronym}}_decoded = {{decode_tlv(cluster, encodable, "ContextSpecificTag(TAG_" + field.name | constcase + ")", 0)}}
+    var {{field.name | lowfirst_except_acronym}}_decoded: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}? = null
     {%- endif %}
-    {% endfor -%}
+    {% endfor %}
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      {% for field in struct.fields %}
+      if (tag == ContextSpecificTag(TAG_{{field.name | constcase}})) {
+        {%- set encodable = field | asEncodable(typeLookup) -%}
+        {%- if encodable.is_optional or encodable.is_nullable -%}
+        {{field.name | lowfirst_except_acronym}}_decoded = 
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            {{decode_tlv(cluster, encodable, "tag", 0)}}  
+          }
+        {%- else -%}
+        {{field.name | lowfirst_except_acronym}}_decoded = {{decode_tlv(cluster, encodable, "tag", 0)}}
+        {%- endif -%}
+      }  
+      {% endfor %}
+
+      else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    {% for field in struct.fields %}
+    {% set encodable = field | asEncodable(typeLookup) -%}
+    {% if not encodable.is_optional and not encodable.is_nullable %}
+    if ({{field.name | lowfirst_except_acronym}}_decoded == null) {
+      throw IllegalStateException("{{field.name | lowfirst_except_acronym}} not found in TLV")  
+    }
+    {%- endif %}
+    {% endfor %}
+
     tlvReader.exitContainer()
 
     return {{callbackName}}(

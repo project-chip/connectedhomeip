@@ -170,25 +170,63 @@ class ThermostatCluster(private val controller: MatterController, private val en
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE: Int = 0
-    val numberOfTransitionsForSequence_decoded =
-      tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE))
+    var numberOfTransitionsForSequence_decoded: UByte? = null
 
     val TAG_DAY_OF_WEEK_FOR_SEQUENCE: Int = 1
-    val dayOfWeekForSequence_decoded =
-      tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))
+    var dayOfWeekForSequence_decoded: UByte? = null
 
     val TAG_MODE_FOR_SEQUENCE: Int = 2
-    val modeForSequence_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_MODE_FOR_SEQUENCE))
+    var modeForSequence_decoded: UByte? = null
 
     val TAG_TRANSITIONS: Int = 3
-    val transitions_decoded =
-      buildList<ThermostatClusterWeeklyScheduleTransitionStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_TRANSITIONS))
-        while (!tlvReader.isEndOfContainer()) {
-          add(ThermostatClusterWeeklyScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader))
-        }
-        tlvReader.exitContainer()
+    var transitions_decoded: List<ThermostatClusterWeeklyScheduleTransitionStruct>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE)) {
+        numberOfTransitionsForSequence_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)) {
+        dayOfWeekForSequence_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_MODE_FOR_SEQUENCE)) {
+        modeForSequence_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_TRANSITIONS)) {
+        transitions_decoded =
+          buildList<ThermostatClusterWeeklyScheduleTransitionStruct> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(ThermostatClusterWeeklyScheduleTransitionStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (numberOfTransitionsForSequence_decoded == null) {
+      throw IllegalStateException("numberOfTransitionsForSequence not found in TLV")
+    }
+
+    if (dayOfWeekForSequence_decoded == null) {
+      throw IllegalStateException("dayOfWeekForSequence not found in TLV")
+    }
+
+    if (modeForSequence_decoded == null) {
+      throw IllegalStateException("modeForSequence not found in TLV")
+    }
+
+    if (transitions_decoded == null) {
+      throw IllegalStateException("transitions not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetWeeklyScheduleResponse(

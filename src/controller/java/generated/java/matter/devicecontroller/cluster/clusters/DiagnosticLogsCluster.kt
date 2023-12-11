@@ -86,26 +86,68 @@ class DiagnosticLogsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_LOG_CONTENT: Int = 1
-    val logContent_decoded = tlvReader.getByteArray(ContextSpecificTag(TAG_LOG_CONTENT))
+    var logContent_decoded: ByteArray? = null
 
     val TAG_U_T_C_TIME_STAMP: Int = 2
-    val UTCTimeStamp_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_U_T_C_TIME_STAMP))) {
-        tlvReader.getULong(ContextSpecificTag(TAG_U_T_C_TIME_STAMP))
-      } else {
-        null
-      }
+    var UTCTimeStamp_decoded: ULong? = null
 
     val TAG_TIME_SINCE_BOOT: Int = 3
-    val timeSinceBoot_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TIME_SINCE_BOOT))) {
-        tlvReader.getULong(ContextSpecificTag(TAG_TIME_SINCE_BOOT))
-      } else {
-        null
+    var timeSinceBoot_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_LOG_CONTENT)) {
+        logContent_decoded = tlvReader.getByteArray(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_U_T_C_TIME_STAMP)) {
+        UTCTimeStamp_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getULong(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_TIME_SINCE_BOOT)) {
+        timeSinceBoot_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getULong(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (logContent_decoded == null) {
+      throw IllegalStateException("logContent not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return RetrieveLogsResponse(

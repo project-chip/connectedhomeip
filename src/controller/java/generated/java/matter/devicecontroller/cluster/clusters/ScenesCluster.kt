@@ -131,13 +131,45 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return AddSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
@@ -175,43 +207,102 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
 
     val TAG_TRANSITION_TIME: Int = 3
-    val transitionTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSITION_TIME))) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      } else {
-        null
-      }
+    var transitionTime_decoded: UShort? = null
 
     val TAG_SCENE_NAME: Int = 4
-    val sceneName_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SCENE_NAME))) {
-        tlvReader.getString(ContextSpecificTag(TAG_SCENE_NAME))
-      } else {
-        null
-      }
+    var sceneName_decoded: String? = null
 
     val TAG_EXTENSION_FIELD_SETS: Int = 5
-    val extensionFieldSets_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS))) {
-        buildList<ScenesClusterExtensionFieldSet> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
+    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+        transitionTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+        sceneName_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
+        extensionFieldSets_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<ScenesClusterExtensionFieldSet> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ViewSceneResponse(
@@ -256,13 +347,45 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return RemoveSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
@@ -296,10 +419,34 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return RemoveAllScenesResponse(status_decoded, groupID_decoded)
@@ -337,13 +484,45 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return StoreSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
@@ -413,37 +592,75 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_CAPACITY: Int = 1
-    val capacity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAPACITY))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_CAPACITY))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CAPACITY))
-          null
-        }
-      } else {
-        null
-      }
+    var capacity_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 2
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_LIST: Int = 3
-    val sceneList_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SCENE_LIST))) {
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SCENE_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
+    var sceneList_decoded: List<UByte>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_CAPACITY)) {
+        capacity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
+        sceneList_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<UByte> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUByte(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetSceneMembershipResponse(
@@ -502,13 +719,45 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return EnhancedAddSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
@@ -546,43 +795,102 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_SCENE_I_D: Int = 2
-    val sceneID_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_I_D))
+    var sceneID_decoded: UByte? = null
 
     val TAG_TRANSITION_TIME: Int = 3
-    val transitionTime_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_TRANSITION_TIME))) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      } else {
-        null
-      }
+    var transitionTime_decoded: UShort? = null
 
     val TAG_SCENE_NAME: Int = 4
-    val sceneName_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SCENE_NAME))) {
-        tlvReader.getString(ContextSpecificTag(TAG_SCENE_NAME))
-      } else {
-        null
-      }
+    var sceneName_decoded: String? = null
 
     val TAG_EXTENSION_FIELD_SETS: Int = 5
-    val extensionFieldSets_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS))) {
-        buildList<ScenesClusterExtensionFieldSet> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
+    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+        transitionTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+        sceneName_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
+        extensionFieldSets_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<ScenesClusterExtensionFieldSet> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return EnhancedViewSceneResponse(
@@ -639,15 +947,45 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_IDENTIFIER_FROM: Int = 1
-    val groupIdentifierFrom_decoded =
-      tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM))
+    var groupIdentifierFrom_decoded: UShort? = null
 
     val TAG_SCENE_IDENTIFIER_FROM: Int = 2
-    val sceneIdentifierFrom_decoded =
-      tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM))
+    var sceneIdentifierFrom_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
+        groupIdentifierFrom_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
+        sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupIdentifierFrom_decoded == null) {
+      throw IllegalStateException("groupIdentifierFrom not found in TLV")
+    }
+
+    if (sceneIdentifierFrom_decoded == null) {
+      throw IllegalStateException("sceneIdentifierFrom not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return CopySceneResponse(

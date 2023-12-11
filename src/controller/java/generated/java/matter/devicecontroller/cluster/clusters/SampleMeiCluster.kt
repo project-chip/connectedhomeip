@@ -92,7 +92,23 @@ class SampleMeiCluster(private val controller: MatterController, private val end
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_RETURN_VALUE: Int = 0
-    val returnValue_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_RETURN_VALUE))
+    var returnValue_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
+        returnValue_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (returnValue_decoded == null) {
+      throw IllegalStateException("returnValue not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return AddArgumentsResponse(returnValue_decoded)

@@ -75,18 +75,51 @@ class ContentAppObserverCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_STATUS))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
-      } else {
-        null
-      }
+    var status_decoded: UByte? = null
 
     val TAG_DATA: Int = 1
-    val data_decoded = tlvReader.getString(ContextSpecificTag(TAG_DATA))
+    var data_decoded: String? = null
 
     val TAG_ENCODING_HINT: Int = 2
-    val encodingHint_decoded = tlvReader.getString(ContextSpecificTag(TAG_ENCODING_HINT))
+    var encodingHint_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
+        data_decoded = tlvReader.getString(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_ENCODING_HINT)) {
+        encodingHint_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (data_decoded == null) {
+      throw IllegalStateException("data not found in TLV")
+    }
+
+    if (encodingHint_decoded == null) {
+      throw IllegalStateException("encodingHint not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ContentAppMessageResponse(status_decoded, data_decoded, encodingHint_decoded)

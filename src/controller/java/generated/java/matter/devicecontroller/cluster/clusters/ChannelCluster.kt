@@ -79,15 +79,40 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_DATA: Int = 1
-    val data_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DATA))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DATA))
-      } else {
-        null
+    var data_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
+        data_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ChangeChannelResponse(status_decoded, data_decoded)
@@ -210,18 +235,41 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_CHANNEL_PAGING_STRUCT: Int = 0
-    val channelPagingStruct_decoded =
-      tlvReader.getShort(ContextSpecificTag(TAG_CHANNEL_PAGING_STRUCT))
+    var channelPagingStruct_decoded: Short? = null
 
     val TAG_PROGRAM_LIST: Int = 1
-    val programList_decoded =
-      buildList<ChannelClusterProgramStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_PROGRAM_LIST))
-        while (!tlvReader.isEndOfContainer()) {
-          add(ChannelClusterProgramStruct.fromTlv(AnonymousTag, tlvReader))
-        }
-        tlvReader.exitContainer()
+    var programList_decoded: List<ChannelClusterProgramStruct>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_CHANNEL_PAGING_STRUCT)) {
+        channelPagingStruct_decoded = tlvReader.getShort(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_PROGRAM_LIST)) {
+        programList_decoded =
+          buildList<ChannelClusterProgramStruct> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(ChannelClusterProgramStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (channelPagingStruct_decoded == null) {
+      throw IllegalStateException("channelPagingStruct not found in TLV")
+    }
+
+    if (programList_decoded == null) {
+      throw IllegalStateException("programList not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ProgramGuideResponse(channelPagingStruct_decoded, programList_decoded)

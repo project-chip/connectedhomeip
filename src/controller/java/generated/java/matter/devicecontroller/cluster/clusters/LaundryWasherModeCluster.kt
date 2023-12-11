@@ -77,15 +77,40 @@ class LaundryWasherModeCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_STATUS_TEXT: Int = 1
-    val statusText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_STATUS_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_STATUS_TEXT))
-      } else {
-        null
+    var statusText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+        statusText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ChangeToModeResponse(status_decoded, statusText_decoded)

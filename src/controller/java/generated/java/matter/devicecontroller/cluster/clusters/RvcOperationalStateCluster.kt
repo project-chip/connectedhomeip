@@ -79,11 +79,24 @@ class RvcOperationalStateCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    val commandResponseState_decoded =
-      RvcOperationalStateClusterErrorStateStruct.fromTlv(
-        ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE),
-        tlvReader
-      )
+    var commandResponseState_decoded: RvcOperationalStateClusterErrorStateStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
+        commandResponseState_decoded =
+          RvcOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (commandResponseState_decoded == null) {
+      throw IllegalStateException("commandResponseState not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return OperationalCommandResponse(commandResponseState_decoded)
@@ -111,11 +124,24 @@ class RvcOperationalStateCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    val commandResponseState_decoded =
-      RvcOperationalStateClusterErrorStateStruct.fromTlv(
-        ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE),
-        tlvReader
-      )
+    var commandResponseState_decoded: RvcOperationalStateClusterErrorStateStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
+        commandResponseState_decoded =
+          RvcOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (commandResponseState_decoded == null) {
+      throw IllegalStateException("commandResponseState not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return OperationalCommandResponse(commandResponseState_decoded)
@@ -143,11 +169,24 @@ class RvcOperationalStateCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    val commandResponseState_decoded =
-      RvcOperationalStateClusterErrorStateStruct.fromTlv(
-        ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE),
-        tlvReader
-      )
+    var commandResponseState_decoded: RvcOperationalStateClusterErrorStateStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
+        commandResponseState_decoded =
+          RvcOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (commandResponseState_decoded == null) {
+      throw IllegalStateException("commandResponseState not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return OperationalCommandResponse(commandResponseState_decoded)
@@ -175,11 +214,24 @@ class RvcOperationalStateCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_COMMAND_RESPONSE_STATE: Int = 0
-    val commandResponseState_decoded =
-      RvcOperationalStateClusterErrorStateStruct.fromTlv(
-        ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE),
-        tlvReader
-      )
+    var commandResponseState_decoded: RvcOperationalStateClusterErrorStateStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_COMMAND_RESPONSE_STATE)) {
+        commandResponseState_decoded =
+          RvcOperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (commandResponseState_decoded == null) {
+      throw IllegalStateException("commandResponseState not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return OperationalCommandResponse(commandResponseState_decoded)

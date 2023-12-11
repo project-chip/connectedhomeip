@@ -247,7 +247,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_RETURN_VALUE: Int = 0
-    val returnValue_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_RETURN_VALUE))
+    var returnValue_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
+        returnValue_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (returnValue_decoded == null) {
+      throw IllegalStateException("returnValue not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestSpecificResponse(returnValue_decoded)
@@ -305,7 +321,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_RETURN_VALUE: Int = 0
-    val returnValue_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_RETURN_VALUE))
+    var returnValue_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
+        returnValue_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (returnValue_decoded == null) {
+      throw IllegalStateException("returnValue not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestAddArgumentsResponse(returnValue_decoded)
@@ -339,7 +371,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_RETURN_VALUE: Int = 0
-    val returnValue_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_RETURN_VALUE))
+    var returnValue_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
+        returnValue_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (returnValue_decoded == null) {
+      throw IllegalStateException("returnValue not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestSimpleArgumentResponse(returnValue_decoded)
@@ -409,50 +457,106 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ARG1: Int = 0
-    val arg1_decoded =
-      buildList<UnitTestingClusterNestedStructList> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG1))
-        while (!tlvReader.isEndOfContainer()) {
-          add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
-        }
-        tlvReader.exitContainer()
-      }
+    var arg1_decoded: List<UnitTestingClusterNestedStructList>? = null
 
     val TAG_ARG2: Int = 1
-    val arg2_decoded =
-      buildList<UnitTestingClusterSimpleStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG2))
-        while (!tlvReader.isEndOfContainer()) {
-          add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
-        }
-        tlvReader.exitContainer()
-      }
+    var arg2_decoded: List<UnitTestingClusterSimpleStruct>? = null
 
     val TAG_ARG3: Int = 2
-    val arg3_decoded =
-      buildList<UByte> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG3))
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUByte(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
+    var arg3_decoded: List<UByte>? = null
 
     val TAG_ARG4: Int = 3
-    val arg4_decoded =
-      buildList<Boolean> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG4))
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getBoolean(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
+    var arg4_decoded: List<Boolean>? = null
 
     val TAG_ARG5: Int = 4
-    val arg5_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ARG5))
+    var arg5_decoded: UByte? = null
 
     val TAG_ARG6: Int = 5
-    val arg6_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG6))
+    var arg6_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ARG1)) {
+        arg1_decoded =
+          buildList<UnitTestingClusterNestedStructList> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG2)) {
+        arg2_decoded =
+          buildList<UnitTestingClusterSimpleStruct> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG3)) {
+        arg3_decoded =
+          buildList<UByte> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUByte(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG4)) {
+        arg4_decoded =
+          buildList<Boolean> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getBoolean(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG5)) {
+        arg5_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG6)) {
+        arg6_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (arg1_decoded == null) {
+      throw IllegalStateException("arg1 not found in TLV")
+    }
+
+    if (arg2_decoded == null) {
+      throw IllegalStateException("arg2 not found in TLV")
+    }
+
+    if (arg3_decoded == null) {
+      throw IllegalStateException("arg3 not found in TLV")
+    }
+
+    if (arg4_decoded == null) {
+      throw IllegalStateException("arg4 not found in TLV")
+    }
+
+    if (arg5_decoded == null) {
+      throw IllegalStateException("arg5 not found in TLV")
+    }
+
+    if (arg6_decoded == null) {
+      throw IllegalStateException("arg6 not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestStructArrayArgumentResponse(
@@ -493,7 +597,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -527,7 +647,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -565,7 +701,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -603,7 +755,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -637,7 +805,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -675,7 +859,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: Boolean? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getBoolean(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return BooleanResponse(value_decoded)
@@ -713,14 +913,30 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ARG1: Int = 0
-    val arg1_decoded =
-      buildList<UByte> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG1))
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUByte(AnonymousTag))
-        }
-        tlvReader.exitContainer()
+    var arg1_decoded: List<UByte>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ARG1)) {
+        arg1_decoded =
+          buildList<UByte> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUByte(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
       }
+    }
+
+    if (arg1_decoded == null) {
+      throw IllegalStateException("arg1 not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestListInt8UReverseResponse(arg1_decoded)
@@ -758,10 +974,34 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ARG1: Int = 0
-    val arg1_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_ARG1))
+    var arg1_decoded: UShort? = null
 
     val TAG_ARG2: Int = 1
-    val arg2_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ARG2))
+    var arg2_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ARG1)) {
+        arg1_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_ARG2)) {
+        arg2_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (arg1_decoded == null) {
+      throw IllegalStateException("arg1 not found in TLV")
+    }
+
+    if (arg2_decoded == null) {
+      throw IllegalStateException("arg2 not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestEnumsResponse(arg1_decoded, arg2_decoded)
@@ -795,40 +1035,79 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_WAS_PRESENT: Int = 0
-    val wasPresent_decoded = tlvReader.getBoolean(ContextSpecificTag(TAG_WAS_PRESENT))
+    var wasPresent_decoded: Boolean? = null
 
     val TAG_WAS_NULL: Int = 1
-    val wasNull_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_WAS_NULL))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_WAS_NULL))
-      } else {
-        null
-      }
+    var wasNull_decoded: Boolean? = null
 
     val TAG_VALUE: Int = 2
-    val value_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALUE))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_VALUE))
-      } else {
-        null
-      }
+    var value_decoded: UByte? = null
 
     val TAG_ORIGINAL_VALUE: Int = 3
-    val originalValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ORIGINAL_VALUE))) {
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_ORIGINAL_VALUE))) {
-            tlvReader.getUByte(ContextSpecificTag(TAG_ORIGINAL_VALUE))
-          } else {
-            null
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_ORIGINAL_VALUE))
-          null
-        }
-      } else {
-        null
+    var originalValue_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_WAS_PRESENT)) {
+        wasPresent_decoded = tlvReader.getBoolean(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_WAS_NULL)) {
+        wasNull_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_ORIGINAL_VALUE)) {
+        originalValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(tag)) {
+                tlvReader.getUByte(tag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (wasPresent_decoded == null) {
+      throw IllegalStateException("wasPresent not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestNullableOptionalResponse(
@@ -943,207 +1222,434 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_NULLABLE_INT_WAS_NULL: Int = 0
-    val nullableIntWasNull_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_INT_WAS_NULL))
+    var nullableIntWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_INT_VALUE: Int = 1
-    val nullableIntValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_INT_VALUE))) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_NULLABLE_INT_VALUE))
-      } else {
-        null
-      }
+    var nullableIntValue_decoded: UShort? = null
 
     val TAG_OPTIONAL_INT_WAS_PRESENT: Int = 2
-    val optionalIntWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT))
+    var optionalIntWasPresent_decoded: Boolean? = null
 
     val TAG_OPTIONAL_INT_VALUE: Int = 3
-    val optionalIntValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_INT_VALUE))) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_OPTIONAL_INT_VALUE))
-      } else {
-        null
-      }
+    var optionalIntValue_decoded: UShort? = null
 
     val TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT: Int = 4
-    val nullableOptionalIntWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT))
+    var nullableOptionalIntWasPresent_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_INT_WAS_NULL: Int = 5
-    val nullableOptionalIntWasNull_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL))
-      } else {
-        null
-      }
+    var nullableOptionalIntWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_INT_VALUE: Int = 6
-    val nullableOptionalIntValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE))) {
-        tlvReader.getUShort(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE))
-      } else {
-        null
-      }
+    var nullableOptionalIntValue_decoded: UShort? = null
 
     val TAG_NULLABLE_STRING_WAS_NULL: Int = 7
-    val nullableStringWasNull_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL))
+    var nullableStringWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_STRING_VALUE: Int = 8
-    val nullableStringValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_STRING_VALUE))) {
-        tlvReader.getString(ContextSpecificTag(TAG_NULLABLE_STRING_VALUE))
-      } else {
-        null
-      }
+    var nullableStringValue_decoded: String? = null
 
     val TAG_OPTIONAL_STRING_WAS_PRESENT: Int = 9
-    val optionalStringWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT))
+    var optionalStringWasPresent_decoded: Boolean? = null
 
     val TAG_OPTIONAL_STRING_VALUE: Int = 10
-    val optionalStringValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE))) {
-        tlvReader.getString(ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE))
-      } else {
-        null
-      }
+    var optionalStringValue_decoded: String? = null
 
     val TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT: Int = 11
-    val nullableOptionalStringWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT))
+    var nullableOptionalStringWasPresent_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL: Int = 12
-    val nullableOptionalStringWasNull_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL))
-      } else {
-        null
-      }
+    var nullableOptionalStringWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_STRING_VALUE: Int = 13
-    val nullableOptionalStringValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE))) {
-        tlvReader.getString(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE))
-      } else {
-        null
-      }
+    var nullableOptionalStringValue_decoded: String? = null
 
     val TAG_NULLABLE_STRUCT_WAS_NULL: Int = 14
-    val nullableStructWasNull_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL))
+    var nullableStructWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_STRUCT_VALUE: Int = 15
-    val nullableStructValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE))) {
-        UnitTestingClusterSimpleStruct.fromTlv(
-          ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE),
-          tlvReader
-        )
-      } else {
-        null
-      }
+    var nullableStructValue_decoded: UnitTestingClusterSimpleStruct? = null
 
     val TAG_OPTIONAL_STRUCT_WAS_PRESENT: Int = 16
-    val optionalStructWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT))
+    var optionalStructWasPresent_decoded: Boolean? = null
 
     val TAG_OPTIONAL_STRUCT_VALUE: Int = 17
-    val optionalStructValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE))) {
-        UnitTestingClusterSimpleStruct.fromTlv(
-          ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE),
-          tlvReader
-        )
-      } else {
-        null
-      }
+    var optionalStructValue_decoded: UnitTestingClusterSimpleStruct? = null
 
     val TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT: Int = 18
-    val nullableOptionalStructWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT))
+    var nullableOptionalStructWasPresent_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL: Int = 19
-    val nullableOptionalStructWasNull_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL))
-      } else {
-        null
-      }
+    var nullableOptionalStructWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_STRUCT_VALUE: Int = 20
-    val nullableOptionalStructValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE))) {
-        UnitTestingClusterSimpleStruct.fromTlv(
-          ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE),
-          tlvReader
-        )
-      } else {
-        null
-      }
+    var nullableOptionalStructValue_decoded: UnitTestingClusterSimpleStruct? = null
 
     val TAG_NULLABLE_LIST_WAS_NULL: Int = 21
-    val nullableListWasNull_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL))
+    var nullableListWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_LIST_VALUE: Int = 22
-    val nullableListValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_LIST_VALUE))) {
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_NULLABLE_LIST_VALUE))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
-      }
+    var nullableListValue_decoded: List<UByte>? = null
 
     val TAG_OPTIONAL_LIST_WAS_PRESENT: Int = 23
-    val optionalListWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT))
+    var optionalListWasPresent_decoded: Boolean? = null
 
     val TAG_OPTIONAL_LIST_VALUE: Int = 24
-    val optionalListValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE))) {
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
-      }
+    var optionalListValue_decoded: List<UByte>? = null
 
     val TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT: Int = 25
-    val nullableOptionalListWasPresent_decoded =
-      tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT))
+    var nullableOptionalListWasPresent_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL: Int = 26
-    val nullableOptionalListWasNull_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL))) {
-        tlvReader.getBoolean(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL))
-      } else {
-        null
-      }
+    var nullableOptionalListWasNull_decoded: Boolean? = null
 
     val TAG_NULLABLE_OPTIONAL_LIST_VALUE: Int = 27
-    val nullableOptionalListValue_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE))) {
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      } else {
-        null
+    var nullableOptionalListValue_decoded: List<UByte>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_INT_WAS_NULL)) {
+        nullableIntWasNull_decoded = tlvReader.getBoolean(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_INT_VALUE)) {
+        nullableIntValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_WAS_PRESENT)) {
+        optionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_INT_VALUE)) {
+        optionalIntValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_PRESENT)) {
+        nullableOptionalIntWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_WAS_NULL)) {
+        nullableOptionalIntWasNull_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT_VALUE)) {
+        nullableOptionalIntValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_WAS_NULL)) {
+        nullableStringWasNull_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRING_VALUE)) {
+        nullableStringValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_WAS_PRESENT)) {
+        optionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRING_VALUE)) {
+        optionalStringValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_PRESENT)) {
+        nullableOptionalStringWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_WAS_NULL)) {
+        nullableOptionalStringWasNull_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRING_VALUE)) {
+        nullableOptionalStringValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_WAS_NULL)) {
+        nullableStructWasNull_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_STRUCT_VALUE)) {
+        nullableStructValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_WAS_PRESENT)) {
+        optionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_STRUCT_VALUE)) {
+        optionalStructValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_PRESENT)) {
+        nullableOptionalStructWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_WAS_NULL)) {
+        nullableOptionalStructWasNull_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT_VALUE)) {
+        nullableOptionalStructValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_WAS_NULL)) {
+        nullableListWasNull_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_LIST_VALUE)) {
+        nullableListValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<UByte> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUByte(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_WAS_PRESENT)) {
+        optionalListWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_OPTIONAL_LIST_VALUE)) {
+        optionalListValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<UByte> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUByte(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_PRESENT)) {
+        nullableOptionalListWasPresent_decoded = tlvReader.getBoolean(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_WAS_NULL)) {
+        nullableOptionalListWasNull_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getBoolean(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST_VALUE)) {
+        nullableOptionalListValue_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<UByte> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUByte(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (nullableIntWasNull_decoded == null) {
+      throw IllegalStateException("nullableIntWasNull not found in TLV")
+    }
+
+    if (optionalIntWasPresent_decoded == null) {
+      throw IllegalStateException("optionalIntWasPresent not found in TLV")
+    }
+
+    if (nullableOptionalIntWasPresent_decoded == null) {
+      throw IllegalStateException("nullableOptionalIntWasPresent not found in TLV")
+    }
+
+    if (nullableStringWasNull_decoded == null) {
+      throw IllegalStateException("nullableStringWasNull not found in TLV")
+    }
+
+    if (optionalStringWasPresent_decoded == null) {
+      throw IllegalStateException("optionalStringWasPresent not found in TLV")
+    }
+
+    if (nullableOptionalStringWasPresent_decoded == null) {
+      throw IllegalStateException("nullableOptionalStringWasPresent not found in TLV")
+    }
+
+    if (nullableStructWasNull_decoded == null) {
+      throw IllegalStateException("nullableStructWasNull not found in TLV")
+    }
+
+    if (optionalStructWasPresent_decoded == null) {
+      throw IllegalStateException("optionalStructWasPresent not found in TLV")
+    }
+
+    if (nullableOptionalStructWasPresent_decoded == null) {
+      throw IllegalStateException("nullableOptionalStructWasPresent not found in TLV")
+    }
+
+    if (nullableListWasNull_decoded == null) {
+      throw IllegalStateException("nullableListWasNull not found in TLV")
+    }
+
+    if (optionalListWasPresent_decoded == null) {
+      throw IllegalStateException("optionalListWasPresent not found in TLV")
+    }
+
+    if (nullableOptionalListWasPresent_decoded == null) {
+      throw IllegalStateException("nullableOptionalListWasPresent not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestComplexNullableOptionalResponse(
@@ -1206,8 +1712,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ARG1: Int = 0
-    val arg1_decoded =
-      UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_ARG1), tlvReader)
+    var arg1_decoded: UnitTestingClusterSimpleStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ARG1)) {
+        arg1_decoded = UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (arg1_decoded == null) {
+      throw IllegalStateException("arg1 not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return SimpleStructResponse(arg1_decoded)
@@ -1291,7 +1812,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getULong(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getULong(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestEmitTestEventResponse(value_decoded)
@@ -1325,7 +1862,23 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_VALUE: Int = 0
-    val value_decoded = tlvReader.getULong(ContextSpecificTag(TAG_VALUE))
+    var value_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_VALUE)) {
+        value_decoded = tlvReader.getULong(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (value_decoded == null) {
+      throw IllegalStateException("value not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return TestEmitTestFabricScopedEventResponse(value_decoded)

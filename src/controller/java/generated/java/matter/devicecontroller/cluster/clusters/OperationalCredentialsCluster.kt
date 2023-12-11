@@ -86,12 +86,34 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ATTESTATION_ELEMENTS: Int = 0
-    val attestationElements_decoded =
-      tlvReader.getByteArray(ContextSpecificTag(TAG_ATTESTATION_ELEMENTS))
+    var attestationElements_decoded: ByteArray? = null
 
     val TAG_ATTESTATION_SIGNATURE: Int = 1
-    val attestationSignature_decoded =
-      tlvReader.getByteArray(ContextSpecificTag(TAG_ATTESTATION_SIGNATURE))
+    var attestationSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ATTESTATION_ELEMENTS)) {
+        attestationElements_decoded = tlvReader.getByteArray(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
+        attestationSignature_decoded = tlvReader.getByteArray(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (attestationElements_decoded == null) {
+      throw IllegalStateException("attestationElements not found in TLV")
+    }
+
+    if (attestationSignature_decoded == null) {
+      throw IllegalStateException("attestationSignature not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return AttestationResponse(attestationElements_decoded, attestationSignature_decoded)
@@ -125,7 +147,23 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_CERTIFICATE: Int = 0
-    val certificate_decoded = tlvReader.getByteArray(ContextSpecificTag(TAG_CERTIFICATE))
+    var certificate_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_CERTIFICATE)) {
+        certificate_decoded = tlvReader.getByteArray(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (certificate_decoded == null) {
+      throw IllegalStateException("certificate not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return CertificateChainResponse(certificate_decoded)
@@ -165,11 +203,34 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_N_O_C_S_R_ELEMENTS: Int = 0
-    val NOCSRElements_decoded = tlvReader.getByteArray(ContextSpecificTag(TAG_N_O_C_S_R_ELEMENTS))
+    var NOCSRElements_decoded: ByteArray? = null
 
     val TAG_ATTESTATION_SIGNATURE: Int = 1
-    val attestationSignature_decoded =
-      tlvReader.getByteArray(ContextSpecificTag(TAG_ATTESTATION_SIGNATURE))
+    var attestationSignature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_N_O_C_S_R_ELEMENTS)) {
+        NOCSRElements_decoded = tlvReader.getByteArray(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
+        attestationSignature_decoded = tlvReader.getByteArray(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (NOCSRElements_decoded == null) {
+      throw IllegalStateException("NOCSRElements not found in TLV")
+    }
+
+    if (attestationSignature_decoded == null) {
+      throw IllegalStateException("attestationSignature not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return CSRResponse(NOCSRElements_decoded, attestationSignature_decoded)
@@ -219,23 +280,57 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS_CODE: Int = 0
-    val statusCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
+    var statusCode_decoded: UByte? = null
 
     val TAG_FABRIC_INDEX: Int = 1
-    val fabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_FABRIC_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      } else {
-        null
-      }
+    var fabricIndex_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 2
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)
@@ -273,23 +368,57 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS_CODE: Int = 0
-    val statusCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
+    var statusCode_decoded: UByte? = null
 
     val TAG_FABRIC_INDEX: Int = 1
-    val fabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_FABRIC_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      } else {
-        null
-      }
+    var fabricIndex_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 2
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)
@@ -320,23 +449,57 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS_CODE: Int = 0
-    val statusCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
+    var statusCode_decoded: UByte? = null
 
     val TAG_FABRIC_INDEX: Int = 1
-    val fabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_FABRIC_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      } else {
-        null
-      }
+    var fabricIndex_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 2
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)
@@ -367,23 +530,57 @@ class OperationalCredentialsCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS_CODE: Int = 0
-    val statusCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS_CODE))
+    var statusCode_decoded: UByte? = null
 
     val TAG_FABRIC_INDEX: Int = 1
-    val fabricIndex_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_FABRIC_INDEX))) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      } else {
-        null
-      }
+    var fabricIndex_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 2
-    val debugText_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
-        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
-      } else {
-        null
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS_CODE)) {
+        statusCode_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUByte(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (statusCode_decoded == null) {
+      throw IllegalStateException("statusCode not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)

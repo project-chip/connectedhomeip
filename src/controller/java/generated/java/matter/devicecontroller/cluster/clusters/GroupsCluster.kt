@@ -78,10 +78,34 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return AddGroupResponse(status_decoded, groupID_decoded)
@@ -112,13 +136,45 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
 
     val TAG_GROUP_NAME: Int = 2
-    val groupName_decoded = tlvReader.getString(ContextSpecificTag(TAG_GROUP_NAME))
+    var groupName_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_NAME)) {
+        groupName_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (groupName_decoded == null) {
+      throw IllegalStateException("groupName not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ViewGroupResponse(status_decoded, groupID_decoded, groupName_decoded)
@@ -156,27 +212,48 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_CAPACITY: Int = 0
-    val capacity_decoded =
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAPACITY))) {
-        if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_CAPACITY))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_CAPACITY))
-          null
-        }
-      } else {
-        null
-      }
+    var capacity_decoded: UByte? = null
 
     val TAG_GROUP_LIST: Int = 1
-    val groupList_decoded =
-      buildList<UShort> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_GROUP_LIST))
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUShort(AnonymousTag))
-        }
-        tlvReader.exitContainer()
+    var groupList_decoded: List<UShort>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_CAPACITY)) {
+        capacity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
       }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_LIST)) {
+        groupList_decoded =
+          buildList<UShort> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUShort(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (groupList_decoded == null) {
+      throw IllegalStateException("groupList not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetGroupMembershipResponse(capacity_decoded, groupList_decoded)
@@ -207,10 +284,34 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_STATUS: Int = 0
-    val status_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+    var status_decoded: UByte? = null
 
     val TAG_GROUP_I_D: Int = 1
-    val groupID_decoded = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_I_D))
+    var groupID_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return RemoveGroupResponse(status_decoded, groupID_decoded)

@@ -228,18 +228,41 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_DAY_OF_WEEKFOR_SEQUENCE: Int = 0
-    val dayOfWeekforSequence_decoded =
-      tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE))
+    var dayOfWeekforSequence_decoded: UByte? = null
 
     val TAG_CHARGING_TARGETS: Int = 1
-    val chargingTargets_decoded =
-      buildList<EnergyEvseClusterChargingTargetStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_CHARGING_TARGETS))
-        while (!tlvReader.isEndOfContainer()) {
-          add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
-        }
-        tlvReader.exitContainer()
+    var chargingTargets_decoded: List<EnergyEvseClusterChargingTargetStruct>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE)) {
+        dayOfWeekforSequence_decoded = tlvReader.getUByte(tag)
       }
+
+      if (tag == ContextSpecificTag(TAG_CHARGING_TARGETS)) {
+        chargingTargets_decoded =
+          buildList<EnergyEvseClusterChargingTargetStruct> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(EnergyEvseClusterChargingTargetStruct.fromTlv(AnonymousTag, tlvReader))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (dayOfWeekforSequence_decoded == null) {
+      throw IllegalStateException("dayOfWeekforSequence not found in TLV")
+    }
+
+    if (chargingTargets_decoded == null) {
+      throw IllegalStateException("chargingTargets not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetTargetsResponse(dayOfWeekforSequence_decoded, chargingTargets_decoded)

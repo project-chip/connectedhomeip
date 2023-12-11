@@ -103,11 +103,23 @@ class GroupKeyManagementCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_GROUP_KEY_SET: Int = 0
-    val groupKeySet_decoded =
-      GroupKeyManagementClusterGroupKeySetStruct.fromTlv(
-        ContextSpecificTag(TAG_GROUP_KEY_SET),
-        tlvReader
-      )
+    var groupKeySet_decoded: GroupKeyManagementClusterGroupKeySetStruct? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_GROUP_KEY_SET)) {
+        groupKeySet_decoded = GroupKeyManagementClusterGroupKeySetStruct.fromTlv(tag, tlvReader)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (groupKeySet_decoded == null) {
+      throw IllegalStateException("groupKeySet not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return KeySetReadResponse(groupKeySet_decoded)
@@ -160,14 +172,30 @@ class GroupKeyManagementCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_GROUP_KEY_SET_I_DS: Int = 0
-    val groupKeySetIDs_decoded =
-      buildList<UShort> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_GROUP_KEY_SET_I_DS))
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUShort(AnonymousTag))
-        }
-        tlvReader.exitContainer()
+    var groupKeySetIDs_decoded: List<UShort>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_GROUP_KEY_SET_I_DS)) {
+        groupKeySetIDs_decoded =
+          buildList<UShort> {
+            tlvReader.enterArray(tag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUShort(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
       }
+    }
+
+    if (groupKeySetIDs_decoded == null) {
+      throw IllegalStateException("groupKeySetIDs not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return KeySetReadAllIndicesResponse(groupKeySetIDs_decoded)

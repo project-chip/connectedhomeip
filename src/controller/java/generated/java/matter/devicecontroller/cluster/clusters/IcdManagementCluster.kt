@@ -91,7 +91,23 @@ class IcdManagementCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_I_C_D_COUNTER: Int = 0
-    val ICDCounter_decoded = tlvReader.getUInt(ContextSpecificTag(TAG_I_C_D_COUNTER))
+    var ICDCounter_decoded: UInt? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_I_C_D_COUNTER)) {
+        ICDCounter_decoded = tlvReader.getUInt(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (ICDCounter_decoded == null) {
+      throw IllegalStateException("ICDCounter not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return RegisterClientResponse(ICDCounter_decoded)
@@ -151,8 +167,23 @@ class IcdManagementCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_PROMISED_ACTIVE_DURATION: Int = 0
-    val promisedActiveDuration_decoded =
-      tlvReader.getUInt(ContextSpecificTag(TAG_PROMISED_ACTIVE_DURATION))
+    var promisedActiveDuration_decoded: UInt? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_PROMISED_ACTIVE_DURATION)) {
+        promisedActiveDuration_decoded = tlvReader.getUInt(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (promisedActiveDuration_decoded == null) {
+      throw IllegalStateException("promisedActiveDuration not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return StayActiveResponse(promisedActiveDuration_decoded)

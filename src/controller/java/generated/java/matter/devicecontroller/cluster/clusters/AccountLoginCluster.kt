@@ -70,7 +70,23 @@ class AccountLoginCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_SETUP_P_I_N: Int = 0
-    val setupPIN_decoded = tlvReader.getString(ContextSpecificTag(TAG_SETUP_P_I_N))
+    var setupPIN_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_SETUP_P_I_N)) {
+        setupPIN_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (setupPIN_decoded == null) {
+      throw IllegalStateException("setupPIN not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return GetSetupPINResponse(setupPIN_decoded)

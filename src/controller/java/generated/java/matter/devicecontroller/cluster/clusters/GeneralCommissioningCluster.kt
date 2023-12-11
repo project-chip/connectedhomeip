@@ -83,10 +83,34 @@ class GeneralCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ERROR_CODE: Int = 0
-    val errorCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_CODE))
+    var errorCode_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded = tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
+        errorCode_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (errorCode_decoded == null) {
+      throw IllegalStateException("errorCode not found in TLV")
+    }
+
+    if (debugText_decoded == null) {
+      throw IllegalStateException("debugText not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ArmFailSafeResponse(errorCode_decoded, debugText_decoded)
@@ -128,10 +152,34 @@ class GeneralCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ERROR_CODE: Int = 0
-    val errorCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_CODE))
+    var errorCode_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded = tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
+        errorCode_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (errorCode_decoded == null) {
+      throw IllegalStateException("errorCode not found in TLV")
+    }
+
+    if (debugText_decoded == null) {
+      throw IllegalStateException("debugText not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return SetRegulatoryConfigResponse(errorCode_decoded, debugText_decoded)
@@ -161,10 +209,34 @@ class GeneralCommissioningCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_ERROR_CODE: Int = 0
-    val errorCode_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_CODE))
+    var errorCode_decoded: UByte? = null
 
     val TAG_DEBUG_TEXT: Int = 1
-    val debugText_decoded = tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+    var debugText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ERROR_CODE)) {
+        errorCode_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
+        debugText_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (errorCode_decoded == null) {
+      throw IllegalStateException("errorCode not found in TLV")
+    }
+
+    if (debugText_decoded == null) {
+      throw IllegalStateException("debugText not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return CommissioningCompleteResponse(errorCode_decoded, debugText_decoded)

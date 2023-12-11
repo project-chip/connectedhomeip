@@ -95,7 +95,23 @@ class ContentControlCluster(
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
     val TAG_P_I_N_CODE: Int = 0
-    val PINCode_decoded = tlvReader.getString(ContextSpecificTag(TAG_P_I_N_CODE))
+    var PINCode_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_P_I_N_CODE)) {
+        PINCode_decoded = tlvReader.getString(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (PINCode_decoded == null) {
+      throw IllegalStateException("PINCode not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
     return ResetPINResponse(PINCode_decoded)
