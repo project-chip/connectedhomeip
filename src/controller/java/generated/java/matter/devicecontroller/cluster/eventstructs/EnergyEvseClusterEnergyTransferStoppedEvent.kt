@@ -24,8 +24,8 @@ import matter.tlv.TlvWriter
 
 class EnergyEvseClusterEnergyTransferStoppedEvent(
   val sessionID: UInt,
-  val state: UInt,
-  val reason: UInt,
+  val state: UByte,
+  val reason: UByte,
   val energyTransferred: Long
 ) {
   override fun toString(): String = buildString {
@@ -57,8 +57,8 @@ class EnergyEvseClusterEnergyTransferStoppedEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEnergyTransferStoppedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
-      val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
-      val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
+      val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
+      val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val energyTransferred = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_TRANSFERRED))
 
       tlvReader.exitContainer()

@@ -39,7 +39,7 @@ class ChannelClusterProgramStruct(
   val dvbiUrl: Optional<String>,
   val releaseDate: Optional<String>,
   val parentalGuidanceText: Optional<String>,
-  val recordingFlag: Optional<ULong>,
+  val recordingFlag: Optional<UInt>,
   val seriesInfo: Optional<ChannelClusterSeriesInfoStruct>?,
   val categoryList: Optional<List<ChannelClusterProgramCategoryStruct>>,
   val castList: Optional<List<ChannelClusterProgramCastStruct>>,
@@ -262,7 +262,7 @@ class ChannelClusterProgramStruct(
         }
       val recordingFlag =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_RECORDING_FLAG))) {
-          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_RECORDING_FLAG)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RECORDING_FLAG)))
         } else {
           Optional.empty()
         }

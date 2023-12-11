@@ -24,9 +24,9 @@ import matter.tlv.TlvWriter
 
 class EnergyEvseClusterFaultEvent(
   val sessionID: UInt?,
-  val state: UInt,
-  val faultStatePreviousState: UInt,
-  val faultStateCurrentState: UInt
+  val state: UByte,
+  val faultStatePreviousState: UByte,
+  val faultStateCurrentState: UByte
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterFaultEvent {\n")
@@ -67,11 +67,11 @@ class EnergyEvseClusterFaultEvent(
           tlvReader.getNull(ContextSpecificTag(TAG_SESSION_I_D))
           null
         }
-      val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
+      val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val faultStatePreviousState =
-        tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
+        tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_PREVIOUS_STATE))
       val faultStateCurrentState =
-        tlvReader.getUInt(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
+        tlvReader.getUByte(ContextSpecificTag(TAG_FAULT_STATE_CURRENT_STATE))
 
       tlvReader.exitContainer()
 

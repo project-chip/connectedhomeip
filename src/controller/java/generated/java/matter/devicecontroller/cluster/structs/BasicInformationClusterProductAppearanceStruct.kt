@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BasicInformationClusterProductAppearanceStruct(val finish: UInt, val primaryColor: UInt?) {
+class BasicInformationClusterProductAppearanceStruct(val finish: UByte, val primaryColor: UByte?) {
   override fun toString(): String = buildString {
     append("BasicInformationClusterProductAppearanceStruct {\n")
     append("\tfinish : $finish\n")
@@ -49,10 +49,10 @@ class BasicInformationClusterProductAppearanceStruct(val finish: UInt, val prima
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tlvTag)
-      val finish = tlvReader.getUInt(ContextSpecificTag(TAG_FINISH))
+      val finish = tlvReader.getUByte(ContextSpecificTag(TAG_FINISH))
       val primaryColor =
         if (!tlvReader.isNull()) {
-          tlvReader.getUInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
+          tlvReader.getUByte(ContextSpecificTag(TAG_PRIMARY_COLOR))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
           null

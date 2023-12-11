@@ -3628,5 +3628,6 @@
       "endpointId": 0,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

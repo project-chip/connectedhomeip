@@ -25,8 +25,8 @@ import matter.tlv.TlvWriter
 class ActionsClusterActionFailedEvent(
   val actionID: UShort,
   val invokeID: UInt,
-  val newState: UInt,
-  val error: UInt
+  val newState: UByte,
+  val error: UByte
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionFailedEvent {\n")
@@ -58,8 +58,8 @@ class ActionsClusterActionFailedEvent(
       tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUShort(ContextSpecificTag(TAG_ACTION_I_D))
       val invokeID = tlvReader.getUInt(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
-      val error = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR))
+      val newState = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_STATE))
+      val error = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR))
 
       tlvReader.exitContainer()
 
