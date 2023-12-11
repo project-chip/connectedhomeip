@@ -3396,7 +3396,7 @@ enum class Feature : uint32_t
     kHeating                     = 0x1,
     kCooling                     = 0x2,
     kOccupancy                   = 0x4,
-    kZigbeeScheduleConfiguration = 0x8,
+    kScheduleConfiguration       = 0x8,
     kSetback                     = 0x10,
     kAutoMode                    = 0x20,
     kLocalTemperatureNotExposed  = 0x40,
