@@ -163,8 +163,9 @@ CHIP_ERROR InitSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
     // The CHIP stack initialization is required then.
-    if (CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack(); err != CHIP_NO_ERROR) {
-      return err;
+    if (CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().InitChipStack(); err != CHIP_NO_ERROR)
+    {
+        return err;
     }
 #ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
@@ -176,8 +177,9 @@ CHIP_ERROR InitSystemLayer()
 
 void ShutdownSystemLayer()
 {
-    if (DeviceLayer::SystemLayer().IsInitialized()) {
-      DeviceLayer::SystemLayer().Shutdown();
+    if (DeviceLayer::SystemLayer().IsInitialized())
+    {
+        DeviceLayer::SystemLayer().Shutdown();
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -435,13 +437,15 @@ CHIP_ERROR InitNetwork()
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     CHIP_ERROR err = gTCP.Init(DeviceLayer::SystemLayer());
-    if (err != CHIP_NO_ERROR) {
-      return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
     }
 
     err = gUDP.Init(DeviceLayer::SystemLayer());
-    if (err != CHIP_NO_ERROR) {
-      return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
     }
 
     return CHIP_NO_ERROR;

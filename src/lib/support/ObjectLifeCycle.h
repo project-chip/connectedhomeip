@@ -104,23 +104,25 @@ public:
     State GetState() const { return mState; }
 
 private:
-    const char* StateToString(State state) {
-      switch (state) {
+    const char * StateToString(State state)
+    {
+        switch (state)
+        {
         case State::Uninitialized:
-          return "Uninitialized";
+            return "Uninitialized";
         case State::Initializing:
-          return "Initializing";
+            return "Initializing";
         case State::Initialized:
-          return "Initialized";
+            return "Initialized";
         case State::ShuttingDown:
-          return "ShuttingDown";
+            return "ShuttingDown";
         case State::Shutdown:
-          return "Shutdown";
+            return "Shutdown";
         case State::Destroyed:
-          return "Destroyed";
-      }
-      VerifyOrDie(false);
-      return nullptr;
+            return "Destroyed";
+        }
+        VerifyOrDie(false);
+        return nullptr;
     }
 
     bool Transition(State from, State to)
@@ -130,7 +132,8 @@ private:
             mState = to;
             return true;
         }
-        ChipLogError(DeviceLayer, "Cannot transition to %s. Expected state was %s but is %s", StateToString(to), StateToString(from), StateToString(mState));
+        ChipLogError(DeviceLayer, "Cannot transition to %s. Expected state was %s but is %s", StateToString(to),
+                     StateToString(from), StateToString(mState));
         return false;
     }
 

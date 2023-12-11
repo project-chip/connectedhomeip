@@ -38,8 +38,8 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetArgParser.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include "TestInetCommon.h"
 #include "TestInetCommonOptions.h"
@@ -268,14 +268,16 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    if (InitSystemLayer() != CHIP_NO_ERROR) {
-      lSuccessful = false;
-      goto exit;
+    if (InitSystemLayer() != CHIP_NO_ERROR)
+    {
+        lSuccessful = false;
+        goto exit;
     }
 
-    if (InitNetwork() != CHIP_NO_ERROR) {
-      lSuccessful = false;
-      goto exit;
+    if (InitNetwork() != CHIP_NO_ERROR)
+    {
+        lSuccessful = false;
+        goto exit;
     }
 
     // At this point, we should have valid network interfaces,
@@ -549,7 +551,8 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
 
         gSendIntervalExpired = false;
         DeviceLayer::SystemLayer().CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete,
+                                              nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -770,7 +773,8 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete,
+                                              nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {

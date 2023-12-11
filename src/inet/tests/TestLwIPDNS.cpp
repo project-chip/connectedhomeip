@@ -223,12 +223,14 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (InitSystemLayer() != CHIP_NO_ERROR) {
-      exit(EXIT_FAILURE);
+    if (InitSystemLayer() != CHIP_NO_ERROR)
+    {
+        exit(EXIT_FAILURE);
     }
 
-    if (InitNetwork() != CHIP_NO_ERROR) {
-      exit(EXIT_FAILURE);
+    if (InitNetwork() != CHIP_NO_ERROR)
+    {
+        exit(EXIT_FAILURE);
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
