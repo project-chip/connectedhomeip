@@ -121,15 +121,27 @@
  *    limitations under the License.
  */
 
-package matter.devicecontroller.cluster.clusters
+package matter.controller.cluster.clusters
 
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.time.Duration
-import matter.controller.*
+import matter.controller.MatterController
+import matter.controller.ReadRequest
+import matter.controller.ReadData
+import matter.controller.ReadFailure
+import matter.controller.ReadResponse
+import matter.controller.SubscribeRequest
+import matter.controller.SubscriptionState
+import matter.controller.WriteRequest
+import matter.controller.WriteRequests
+import matter.controller.WriteResponse
+import matter.controller.AttributeWriteError
+import matter.controller.InvokeRequest
+import matter.controller.InvokeResponse
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
-import matter.devicecontroller.cluster.structs.*
+import matter.controller.cluster.structs.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
