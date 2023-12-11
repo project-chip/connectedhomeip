@@ -30,16 +30,27 @@ namespace Test {
 CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR) {
+      return err;
+    }
+
     chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationMgrImpl());
 
-    InitSystemLayer();
-    InitNetwork();
+    err = InitSystemLayer();
+    if (err != CHIP_NO_ERROR) {
+      return err;
+    }
+
+    err = InitNetwork();
+    if (err != CHIP_NO_ERROR) {
+      return err;
+    }
 
     mSystemLayer        = &DeviceLayer::SystemLayer();
     mTCPEndPointManager = &gTCP;
     mUDPEndPointManager = &gUDP;
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 // Shutdown all layers, finalize operations

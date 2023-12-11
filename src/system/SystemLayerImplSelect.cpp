@@ -53,6 +53,7 @@ constexpr Clock::Seconds64 kDefaultMinSleepPeriod = Clock::Seconds64(60 * 60 * 2
 
 CHIP_ERROR LayerImplSelect::Init()
 {
+    ChipLogProgress(DeviceLayer, "LayerImplSelect::Init");
     VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
 
     RegisterPOSIXErrorFormatter();

@@ -66,12 +66,14 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP system layer.
-    err = SystemLayer().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "SystemLayer initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+    if (!SystemLayer().IsInitialized()) {
+      err = SystemLayer().Init();
+      if (err != CHIP_NO_ERROR)
+      {
+         ChipLogError(DeviceLayer, "SystemLayer initialization failed: %" CHIP_ERROR_FORMAT, err.Format());
+      }
+      SuccessOrExit(err);
     }
-    SuccessOrExit(err);
 
     // Initialize the Configuration Manager.
     err = ConfigurationMgr().Init();

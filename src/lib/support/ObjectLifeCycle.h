@@ -96,12 +96,33 @@ public:
             mState = State::Destroyed;
             return true;
         }
+
+        ChipLogError(DeviceLayer, "Cannot destroy. State is %s", StateToString(mState));
         return false;
     }
 
     State GetState() const { return mState; }
 
 private:
+    const char* StateToString(State state) {
+      switch (state) {
+        case State::Uninitialized:
+          return "Uninitialized";
+        case State::Initializing:
+          return "Initializing";
+        case State::Initialized:
+          return "Initialized";
+        case State::ShuttingDown:
+          return "ShuttingDown";
+        case State::Shutdown:
+          return "Shutdown";
+        case State::Destroyed:
+          return "Destroyed";
+      }
+      VerifyOrDie(false);
+      return nullptr;
+    }
+
     bool Transition(State from, State to)
     {
         if (mState == from)
@@ -109,6 +130,7 @@ private:
             mState = to;
             return true;
         }
+        ChipLogError(DeviceLayer, "Cannot transition to %s. Expected state was %s but is %s", StateToString(to), StateToString(from), StateToString(mState));
         return false;
     }
 

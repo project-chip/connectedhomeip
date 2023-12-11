@@ -171,13 +171,14 @@ CHIP_ERROR InitSystemLayer()
 #endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    return DeviceLayer::SystemLayer().Init();
+    return DeviceLayer::SystemLayer().IsInitialized() ? CHIP_NO_ERROR : DeviceLayer::SystemLayer().Init();
 }
 
 void ShutdownSystemLayer()
 {
-
-    DeviceLayer::SystemLayer().Shutdown();
+    if (DeviceLayer::SystemLayer().IsInitialized()) {
+      DeviceLayer::SystemLayer().Shutdown();
+    }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // LwIP implementation uses the event loop for servicing events.
@@ -236,7 +237,7 @@ static void PrintNetworkState()
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
-void InitNetwork()
+CHIP_ERROR InitNetwork()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
@@ -433,8 +434,17 @@ void InitNetwork()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
-    gTCP.Init(DeviceLayer::SystemLayer());
-    gUDP.Init(DeviceLayer::SystemLayer());
+    CHIP_ERROR err = gTCP.Init(DeviceLayer::SystemLayer());
+    if (err != CHIP_NO_ERROR) {
+      return err;
+    }
+
+    err = gUDP.Init(DeviceLayer::SystemLayer());
+    if (err != CHIP_NO_ERROR) {
+      return err;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)

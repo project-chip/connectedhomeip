@@ -38,6 +38,7 @@
 #include <CHIPVersion.h>
 
 #include <inet/InetArgParser.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"
@@ -541,8 +542,8 @@ void HandleTCPConnectionComplete(TCPEndPoint * aEndPoint, CHIP_ERROR aError)
         aEndPoint = nullptr;
 
         gSendIntervalExpired = false;
-        gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
-        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        DeviceLayer::SystemLayer().CancelTimer(Common::HandleSendTimerComplete, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         SetStatusFailed(sTestState.mStatus);
     }
@@ -763,7 +764,7 @@ void DriveSend()
     else
     {
         gSendIntervalExpired = false;
-        gSystemLayer.StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(gSendIntervalMs), Common::HandleSendTimerComplete, nullptr);
 
         if (sTestState.mStats.mTransmit.mActual < sTestState.mStats.mTransmit.mExpected)
         {
@@ -870,7 +871,7 @@ static void StartTest()
 static void CleanupTest()
 {
     gSendIntervalExpired = false;
-    gSystemLayer.CancelTimer(Common::HandleSendTimerComplete, nullptr);
+    DeviceLayer::SystemLayer().CancelTimer(Common::HandleSendTimerComplete, nullptr);
 
     // Release the resources associated with the allocated end points.
 

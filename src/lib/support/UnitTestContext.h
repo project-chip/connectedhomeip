@@ -22,6 +22,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 /**
  *  @def NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, inCondition)
@@ -71,12 +72,14 @@ inline int ExecuteTestsWithContext(struct _nlTestSuite * suite, Args &&... args)
         nlTestRunner(suite, ctx.get());
     }
 
+    VerifyOrDie(!DeviceLayer::SystemLayer().IsInitialized());
     return nlTestRunnerStats(suite);
 }
 
 inline int ExecuteTestsWithoutContext(struct _nlTestSuite * suite)
 {
     nlTestRunner(suite, nullptr);
+    VerifyOrDie(!DeviceLayer::SystemLayer().IsInitialized());
     return nlTestRunnerStats(suite);
 }
 

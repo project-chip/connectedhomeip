@@ -52,8 +52,6 @@
         InetFailError((ERR), (MSG));                                                                                               \
     } while (0)
 
-extern chip::System::LayerImpl gSystemLayer;
-
 extern chip::Inet::TCPEndPointManagerImpl gTCP;
 extern chip::Inet::UDPEndPointManagerImpl gUDP;
 
@@ -65,7 +63,7 @@ void ShutdownSystemLayer();
 void ShutdownTestInetCommon();
 void InetFailError(CHIP_ERROR err, const char * msg);
 
-void InitNetwork();
+CHIP_ERROR InitNetwork();
 void ServiceEvents(uint32_t aSleepTimeMilliseconds);
 void ShutdownNetwork();
 void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t rowWidth);
