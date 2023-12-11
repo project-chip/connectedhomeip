@@ -113,8 +113,8 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // then init network
-    InitSystemLayer();
-    InitNetwork();
+    NL_TEST_ASSERT(inSuite, InitSystemLayer() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, InitNetwork() == CHIP_NO_ERROR);
 }
 
 static void TestInetError(nlTestSuite * inSuite, void * inContext)

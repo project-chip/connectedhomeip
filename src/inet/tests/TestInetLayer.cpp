@@ -268,9 +268,15 @@ int main(int argc, char * argv[])
         goto exit;
     }
 
-    InitSystemLayer();
+    if (InitSystemLayer() != CHIP_NO_ERROR) {
+      lSuccessful = false;
+      goto exit;
+    }
 
-    InitNetwork();
+    if (InitNetwork() != CHIP_NO_ERROR) {
+      lSuccessful = false;
+      goto exit;
+    }
 
     // At this point, we should have valid network interfaces,
     // including LwIP TUN/TAP shim interfaces. Validate the
