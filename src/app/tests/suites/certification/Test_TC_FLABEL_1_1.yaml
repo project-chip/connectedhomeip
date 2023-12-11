@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 98.1.1. [TC-FLABEL-1.1] Global Attributes [DUT-server]
+name: 110.1.1. [TC-FLABEL-1.1] Global Attributes with DUT as Server
 
 PICS:
     - FLABEL.S

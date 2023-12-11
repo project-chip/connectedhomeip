@@ -1484,16 +1484,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  }
  *
  *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
- *  Empty EFS Scene Max name size: 33bytes
- *  Scene Max name size + OnOff : 51 bytes
- *  Scene Max name size + LevelControl : 60 bytes
- *  Scene Max name size + ColorControl : 126 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 171 bytes
+ *  Empty EFS Scene Max name size: 37 bytes
+ *  Scene Max name size + OnOff : 55 bytes
+ *  Scene Max name size + LevelControl : 64 bytes
+ *  Scene Max name size + ColorControl : 130 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
  *
  *  Cluster Sizes:
- *  OnOff Cluster Max Size: 18 bytes
- *  LevelControl Cluster Max Size: 27 bytes
- *  Color Control Cluster Max Size: 93 bytes
+ *  OnOff Cluster Max Size: 21 bytes
+ *  LevelControl Cluster Max Size: 30 bytes
+ *  Color Control Cluster Max Size: 96 bytes
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256

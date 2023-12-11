@@ -28,39 +28,13 @@ class AppContext : public LoopbackMessagingContext
 {
 public:
     // Performs shared setup for all tests in the test suite
-    virtual CHIP_ERROR SetUpTestSuite();
+    CHIP_ERROR SetUpTestSuite() override;
     // Performs shared teardown for all tests in the test suite
-    virtual void TearDownTestSuite();
+    void TearDownTestSuite() override;
     // Performs setup for each individual test in the test suite
-    virtual CHIP_ERROR SetUp();
+    CHIP_ERROR SetUp() override;
     // Performs teardown for each individual test in the test suite
-    virtual void TearDown();
-
-    // Helpers that can be used directly by the nlTestSuite
-
-    static int nlTestSetUpTestSuite(void * context)
-    {
-        auto err = static_cast<AppContext *>(context)->SetUpTestSuite();
-        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-    }
-
-    static int nlTestTearDownTestSuite(void * context)
-    {
-        static_cast<AppContext *>(context)->TearDownTestSuite();
-        return SUCCESS;
-    }
-
-    static int nlTestSetUp(void * context)
-    {
-        auto err = static_cast<AppContext *>(context)->SetUp();
-        return err == CHIP_NO_ERROR ? SUCCESS : FAILURE;
-    }
-
-    static int nlTestTearDown(void * context)
-    {
-        static_cast<AppContext *>(context)->TearDown();
-        return SUCCESS;
-    }
+    void TearDown() override;
 };
 
 } // namespace Test

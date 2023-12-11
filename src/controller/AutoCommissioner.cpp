@@ -828,10 +828,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
         case CommissioningStage::kICDGetRegistrationInfo:
-            // Noting to od. The ICD registation info is handled elsewhere.
+            // Noting to do. The ICD registation info is handled elsewhere.
             break;
         case CommissioningStage::kICDRegistration:
-            // Noting to od. DevicePairingDelegate will handle this.
+            // Noting to do. DevicePairingDelegate will handle this.
             break;
         case CommissioningStage::kICDSendStayActive:
             // Nothing to do.
