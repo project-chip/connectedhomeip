@@ -55,9 +55,10 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0060" name="Operational State" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="The Pause and Resume commands are usable in all compatible states"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="OPSTATE" scope="Endpoint"/>
   <dataTypes>
@@ -146,56 +147,6 @@ Davis, CA 95616, USA
       <constraint type="desc"/>
     </attribute>
   </attributes>
-  <commands>
-    <command id="0x00" name="Pause" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="Resume"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-      <field id="0" name="CommandResponseState" type="ErrorStateStruct">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x01" name="Stop" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="Start"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </command>
-    <command id="0x02" name="Start" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <optionalConform/>
-    </command>
-    <command id="0x03" name="Resume" response="OperationalCommandResponse">
-      <access invokePrivilege="operate"/>
-      <otherwiseConform>
-        <mandatoryConform>
-          <attribute name="Pause"/>
-        </mandatoryConform>
-        <optionalConform/>
-      </otherwiseConform>
-    </command>
-    <command id="0x04" name="OperationalCommandResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <orTerm>
-          <attribute name="Pause"/>
-          <attribute name="Stop"/>
-          <attribute name="Start"/>
-          <attribute name="Resume"/>
-        </orTerm>
-      </mandatoryConform>
-      <field id="0" name="CommandResponseState" type="ErrorStateStruct">
-        <mandatoryConform/>
-      </field>
-    </command>
-  </commands>
   <events>
     <event id="0x00" name="OperationalError" priority="critical">
       <access readPrivilege="view"/>

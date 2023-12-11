@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0043" name="Water Leak Detector" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0042" name="Water Valve" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
@@ -65,16 +65,8 @@ Davis, CA 95616, USA
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0045" name="Boolean State" side="server">
+    <cluster id="0x0081" name="Valve Configuration and Control" side="server">
       <mandatoryConform/>
-      <events>
-        <event id="" name="StateChange">
-          <mandatoryConform/>
-        </event>
-      </events>
-    </cluster>
-    <cluster id="0x0080" name="Boolean State Configuration" side="server">
-      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

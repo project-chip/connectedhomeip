@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="3" summary="Added SpecificationVersion attribute"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="BINFO" scope="Node"/>
   <dataTypes>
@@ -175,6 +175,7 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0001" name="VendorName" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
       <access read="true" readPrivilege="view"/>
@@ -293,12 +294,6 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
       <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform/>
-      <constraint type="min" value="1"/>
     </attribute>
   </attributes>
   <events>

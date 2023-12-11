@@ -63,11 +63,6 @@ Davis, CA 95616, USA
     <revision revision="4" summary="New data model format and notation; add IdentifyType"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="I" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="QRY" name="Query" summary="Multicast query for identification state">
-      <optionalConform/>
-    </feature>
-  </features>
   <dataTypes>
     <enum name="EffectIdentifierEnum">
       <item value="0" name="Blink" summary="e.g., Light is turned on/off once.">
@@ -138,21 +133,6 @@ Davis, CA 95616, USA
       <field id="0" name="IdentifyTime" type="uint16">
         <mandatoryConform/>
       </field>
-    </command>
-    <command id="0x00" name="IdentifyQueryResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="QRY"/>
-      </mandatoryConform>
-      <field id="0" name="Timeout" type="uint16">
-        <mandatoryConform/>
-      </field>
-    </command>
-    <command id="0x01" name="IdentifyQuery" response="IdentifyQueryResponse">
-      <access invokePrivilege="manage"/>
-      <mandatoryConform>
-        <feature name="QRY"/>
-      </mandatoryConform>
     </command>
     <command id="0x40" name="TriggerEffect" response="Y">
       <access invokePrivilege="manage"/>

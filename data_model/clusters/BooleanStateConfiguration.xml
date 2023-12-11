@@ -55,150 +55,160 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0081" name="Valve Configuration and Control" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0080" name="Boolean State Configuration" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="VALCC" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="BOOLCFG" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
-    <feature bit="1" code="LVL" name="Level" summary="Device supports setting the specific position of the valve">
+    <feature bit="0" code="VIS" name="Visual" summary="Supports visual alarms">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="AUD" name="Audible" summary="Supports audible alarms">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="SPRS" name="AlarmSuppress" summary="Supports ability to suppress or acknowledge alarms">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="SENSLVL" name="SensitivityLevel" summary="Supports ability to set sensor sensitivity">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="ValveStateEnum">
-      <item value="0" name="Closed" summary="Valve is in closed position">
-        <mandatoryConform/>
-      </item>
-      <item value="1" name="Open" summary="Valve is in open position">
-        <mandatoryConform/>
-      </item>
-      <item value="2" name="Transitioning" summary="Valve is transitioning between closed and open positions or between levels">
-        <mandatoryConform/>
-      </item>
-    </enum>
-    <bitmap name="ValveFaultBitmap">
+    <bitmap name="AlarmModeBitmap">
+      <bitfield name="Visual" bit="0" summary="Visual alarming">
+        <mandatoryConform>
+          <feature name="VIS"/>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="Audible" bit="1" summary="Audible alarming">
+        <mandatoryConform>
+          <feature name="AUD"/>
+        </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="SensorFaultBitmap">
       <bitfield name="GeneralFault" bit="0" summary="Unspecified fault detected">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Blocked" bit="1" summary="Valve is blocked">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="Leaking" bit="2" summary="Valve has detected a leak">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="NotConnected" bit="3" summary="No valve is connected to controller">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="ShortCircuit" bit="4" summary="Short circuit is detected">
-        <mandatoryConform/>
-      </bitfield>
-      <bitfield name="CurrentExceeded" bit="5" summary="The available current has been exceeded">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="OpenDuration" type="elapsed-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-      <constraint type="min" value="1"/>
-    </attribute>
-    <attribute id="0x0001" name="DefaultOpenDuration" type="elapsed-s" default="null">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
-      <mandatoryConform/>
-      <constraint type="min" value="1"/>
-    </attribute>
-    <attribute id="0x0002" name="AutoCloseTime" type="epoch-us" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="TS"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0003" name="RemainingDuration" type="elapsed-s" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0004" name="CurrentState" type="ValveStateEnum" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0005" name="TargetState" type="ValveStateEnum" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0006" name="CurrentLevel" type="percent" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="LVL"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0007" name="TargetLevel" type="percent" default="null">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="LVL"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0008" name="DefaultOpenLevel" type="percent" default="100">
+    <attribute id="0x0000" name="CurrentSensitivityLevel" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
-      <optionalConform>
-        <feature name="LVL"/>
-      </optionalConform>
-      <constraint type="between" from="1" to="100"/>
+      <mandatoryConform>
+        <feature name="SENSLVL"/>
+      </mandatoryConform>
+      <constraint type="max" value="SupportedSensitivityLevels"/>
     </attribute>
-    <attribute id="0x0009" name="ValveFault" type="ValveFaultBitmap" default="0">
+    <attribute id="0x0001" name="SupportedSensitivityLevels" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="SENSLVL"/>
+      </mandatoryConform>
+      <constraint type="between" from="2" to="10"/>
+    </attribute>
+    <attribute id="0x0002" name="DefaultSensitivityLevel" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <optionalConform>
+        <feature name="SENSLVL"/>
+      </optionalConform>
+      <constraint type="max" value="SupportedSensitivityLevels"/>
+    </attribute>
+    <attribute id="0x0003" name="AlarmsActive" type="AlarmModeBitmap">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <andTerm>
+          <orTerm>
+            <feature name="VIS"/>
+            <feature name="AUD"/>
+          </orTerm>
+          <feature name="SPRS"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0005" name="AlarmsEnabled" type="AlarmModeBitmap">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0006" name="AlarmsSupported" type="AlarmModeBitmap">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="SensorFault" type="SensorFaultBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
   </attributes>
   <commands>
-    <command id="0x00" name="Open" response="Y">
+    <command id="0x00" name="SuppressAlarm" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
-      <field id="0" name="OpenDuration" type="elapsed-s">
-        <quality nullable="true"/>
-        <optionalConform/>
-        <constraint type="min" value="1"/>
-      </field>
-      <field id="1" name="TargetLevel" type="percent">
-        <optionalConform>
-          <feature name="LVL"/>
-        </optionalConform>
-        <constraint type="min" value="1"/>
+      <mandatoryConform>
+        <feature name="SPRS"/>
+      </mandatoryConform>
+      <field id="0" name="AlarmsToSuppress" type="AlarmModeBitmap">
+        <mandatoryConform/>
       </field>
     </command>
-    <command id="0x01" name="Close" response="Y">
+    <command id="0x01" name="EnableDisableAlarm" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="AlarmsToEnableDisable" type="AlarmModeBitmap">
+        <mandatoryConform/>
+      </field>
     </command>
   </commands>
   <events>
-    <event id="0x00" name="ValveStateChanged" priority="info">
+    <event id="0x00" name="AlarmsStateChanged" priority="info">
       <access readPrivilege="view"/>
-      <optionalConform/>
-      <field id="0" name="ValveState" type="ValveStateEnum">
+      <mandatoryConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </mandatoryConform>
+      <field id="0" name="AlarmsActive" type="AlarmModeBitmap">
         <mandatoryConform/>
       </field>
-      <field id="1" name="ValveLevel" type="percent">
+      <field id="1" name="AlarmsSuppressed" type="AlarmModeBitmap">
         <mandatoryConform>
-          <feature name="LVL"/>
+          <feature name="SPRS"/>
         </mandatoryConform>
       </field>
     </event>
-    <event id="0x01" name="ValveFault" priority="info">
+    <event id="0x01" name="SensorFault" priority="info">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="ValveFault" type="ValveFaultBitmap">
+      <field id="0" name="SensorFault" type="SensorFaultBitmap">
         <mandatoryConform/>
       </field>
     </event>

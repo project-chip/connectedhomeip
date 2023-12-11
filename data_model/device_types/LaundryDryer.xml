@@ -76,7 +76,7 @@ Davis, CA 95616, USA
     <cluster id="0x004a" name="Laundry Dryer Controls" side="server">
       <optionalConform/>
     </cluster>
-    <cluster id="0x0051" name="Laundry Mode" side="server">
+    <cluster id="0x0051" name="Laundry Washer Mode" side="server">
       <optionalConform/>
       <features>
         <feature code="" name="OnOff">

@@ -58,7 +58,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
-    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Require at least one standard mode tag."/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>

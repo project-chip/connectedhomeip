@@ -55,10 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002f" name="Power Source" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002f" name="Power Source" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
+    <revision revision="3" summary="Added features CHGM and DCHGM, related attributes (0x0020..0x002A) and related updates to enums"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="PS" scope="Node"/>
   <features>
@@ -678,6 +679,7 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="WIRED"/>
       </optionalConform>
+      <constraint type="max" value="8"/>
     </attribute>
     <attribute id="0x000b" name="BatVoltage" type="uint32">
       <access read="true" readPrivilege="view"/>
@@ -732,6 +734,7 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="BAT"/>
       </optionalConform>
+      <constraint type="max" value="8"/>
     </attribute>
     <attribute id="0x0013" name="BatReplacementDescription" type="string">
       <access read="true" readPrivilege="view"/>

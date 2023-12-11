@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0043" name="Water Leak Detector" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0041" name="Water Freeze Detector" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
@@ -73,7 +73,7 @@ Davis, CA 95616, USA
         </event>
       </events>
     </cluster>
-    <cluster id="0x0080" name="Boolean State Configuration" side="server">
+    <cluster id="0x0080" name="Boolean Sensor Configuration" side="server">
       <optionalConform/>
     </cluster>
   </clusters>

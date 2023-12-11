@@ -64,7 +64,7 @@ Davis, CA 95616, USA
     <feature bit="0" code="BALA" name="EnergyBalance" summary="Device can balance energy consumption vs. another priority">
       <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="0" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
+    <feature bit="1" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
       <optionalConform choice="a" more="true"/>
     </feature>
   </features>
@@ -84,10 +84,9 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="BalanceStruct">
-      <field id="0" name="Step" type="uint8" default="MS">
+      <field id="0" name="Step" type="percent" default="MS">
         <access read="true"/>
         <mandatoryConform/>
-        <constraint type="allowed" value="percent"/>
       </field>
       <field id="1" name="Label" type="string">
         <access read="true"/>
@@ -111,15 +110,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0001" name="CurrentLowPowerModeSensitivity" type="uint8">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="LPMS"/>
-      </mandatoryConform>
-      <constraint type="desc"/>
     </attribute>
     <attribute id="0x0002" name="EnergyPriorities" type="list[EnergyPriorityEnum Type]">
       <access read="true" readPrivilege="view"/>
@@ -135,7 +125,14 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="LPMS"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint type="between" from="2" to="10"/>
+    </attribute>
+    <attribute id="0x0004" name="CurrentLowPowerModeSensitivity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="LPMS"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
 </cluster>
