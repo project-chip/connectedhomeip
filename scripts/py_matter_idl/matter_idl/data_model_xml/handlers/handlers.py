@@ -511,6 +511,7 @@ class RevisionHistoryHandler(BaseHandler):
        </revisionHistory>
     '''
     """
+
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
