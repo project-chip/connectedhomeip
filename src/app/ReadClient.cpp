@@ -447,7 +447,7 @@ void ReadClient::OnActiveModeNotification()
     MoveToState(ClientState::Idle);
     // When we reach here, the subscription definitely exceeds the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
-    TriggerResubscriptionForLivenessTimeout();
+    TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
@@ -930,16 +930,19 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
         // upon reaching the liveness timeout is safe and consistent.
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
         _this->MoveToState(ClientState::InactiveICDSubscription);
-        _this->Close(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+
+        // Mark defunct immediately as usual flow does 
+        _this->TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+
         // Return early here since the peer is idle and cannot receive any messages. The resubscription will be deferred until
         // `OnActiveModeNotification` is invoked.
         return;
     }
 
-    _this->TriggerResubscriptionForLivenessTimeout();
+    _this->TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
 }
 
-void ReadClient::TriggerResubscriptionForLivenessTimeout()
+void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
 {
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
@@ -965,7 +968,7 @@ void ReadClient::TriggerResubscriptionForLivenessTimeout()
 
     // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
     // response timeouts).
-    Close(CHIP_ERROR_TIMEOUT);
+    Close(aReason);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)
