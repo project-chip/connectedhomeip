@@ -141,7 +141,7 @@ class AsyncBatchCommandsTransaction:
         self._future = future
         self._expect_types = expectTypes
         default_im_failure = chip.interaction_model.InteractionModelError(
-            chip.interaction_model.Status.Timeout)
+            chip.interaction_model.Status.NoCommandResponse)
         self._responses = [default_im_failure] * len(expectTypes)
 
     def _handleResponse(self, path: CommandPath, index: int, status: Status, response: bytes):
