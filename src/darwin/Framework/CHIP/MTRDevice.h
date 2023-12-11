@@ -243,11 +243,19 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 /**
  *
  * This set of functions allows clients to store metadata for either an entire device or for a specific endpoint.
- * Values must conform to NSSecureCoding
  *
  * Notes:
  *   • Client data will be removed automatically when devices are deleted from the fabric
+ *   • Supported client data object types are currently only:
+ *         NSData, NSString, NSArray, NSDictionary, NSNumber
  */
+
+/**
+ *
+ * List of all client data types supported
+ *
+ */
+- (NSArray *)supportedClientDataClasses MTR_NEWLY_AVAILABLE;
 
 /**
  *

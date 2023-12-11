@@ -1729,6 +1729,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // Client Metadata Storage
 
+- (NSArray *)supportedClientDataClasses {
+    return @[[NSData class], [NSString class], [NSNumber class], [NSDictionary class], [NSArray class]];
+}
+
 - (NSArray * _Nullable)clientDataKeys {
     return [self.temporaryMetaDataCache allKeys];
 }
@@ -1742,6 +1746,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
+    // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
+    
     if ( key == nil || value == nil ) return;
 
     if (self.temporaryMetaDataCache == nil) {
