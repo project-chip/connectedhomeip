@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
+#include <map>
 
 using namespace chip;
 using namespace chip::app;
@@ -30,10 +31,57 @@ using namespace chip::app::Clusters::AirQuality;
 
 static chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kFair, Feature::kModerate, Feature::kVeryPoor,
                                                            Feature::kExtremelyPoor);
-static Instance gAirQualityClusterInstance = Instance(1, airQualityFeatures);
+static std::map<int, Instance *> gAirQualityClusterInstance{};
 
 void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
 {
-    gAirQualityClusterInstance.Init();
+    Instance * clusterInstance = new Instance(endpointId, airQualityFeatures);
+    clusterInstance->Init();
+    gAirQualityClusterInstance[endpointId] = clusterInstance;
+}
+
+EmberAfStatus chefAirQualityWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+{
+    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+
+    if (gAirQualityClusterInstance.find(endpoint) == gAirQualityClusterInstance.end())
+    {
+        ChipLogError(DeviceLayer, "Invalid Endpoind ID: %d", endpoint);
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    }
+
+    Instance * clusterInstance = gAirQualityClusterInstance[endpoint];
+    AttributeId attributeId    = attributeMetadata->attributeId;
+
+    switch (attributeId)
+    {
+    case chip::app::Clusters::AirQuality::Attributes::AirQuality::Id: {
+        AirQualityEnum m                           = static_cast<AirQualityEnum>(buffer[0]);
+        Protocols::InteractionModel::Status status = clusterInstance->UpdateAirQuality(m);
+        if (Protocols::InteractionModel::Status::Success == status)
+        {
+            break;
+        }
+        ret = EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+        ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(status));
+    }
+    break;
+    default:
+        ret = EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
+        break;
+    }
+
+    return ret;
+}
+
+EmberAfStatus chefAirQualityReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                         const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                         uint16_t maxReadLength)
+{
+    EmberAfStatus ret = EMBER_ZCL_STATUS_SUCCESS;
+
+    return ret;
 }
 #endif

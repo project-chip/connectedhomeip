@@ -450,6 +450,13 @@
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                         \
+    { chip::app::Clusters::DeviceEnergyManagement::Id, "Device Energy Management" },
+#else
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ENERGY_EVSE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER { chip::app::Clusters::EnergyEvse::Id, "Energy EVSE" },
 #else
@@ -817,6 +824,7 @@
     CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
     CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \

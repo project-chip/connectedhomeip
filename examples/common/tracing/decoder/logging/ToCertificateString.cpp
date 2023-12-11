@@ -103,16 +103,16 @@ namespace logging {
 
 const char * ToCertificateString(const ByteSpan & source, MutableCharSpan destination)
 {
-    constexpr const char * kCertificateHeader = "-----BEGIN CERTIFICATE-----";
-    constexpr const char * kCertificateFooter = "-----END CERTIFICATE-----";
+    static constexpr char kCertificateHeader[] = "-----BEGIN CERTIFICATE-----";
+    static constexpr char kCertificateFooter[] = "-----END CERTIFICATE-----";
 
     return ToCertificate(source, destination, kCertificateHeader, kCertificateFooter);
 }
 
 const char * ToCertificateRequestString(const ByteSpan & source, MutableCharSpan destination)
 {
-    constexpr const char * kCertificateHeader = "-----BEGIN CERTIFICATE REQUEST-----";
-    constexpr const char * kCertificateFooter = "-----END CERTIFICATE REQUEST-----";
+    static constexpr char kCertificateHeader[] = "-----BEGIN CERTIFICATE REQUEST-----";
+    static constexpr char kCertificateFooter[] = "-----END CERTIFICATE REQUEST-----";
 
     return ToCertificate(source, destination, kCertificateHeader, kCertificateFooter);
 }

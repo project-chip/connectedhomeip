@@ -1173,6 +1173,31 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
+void DeviceCommissioner::OnICDManagementRegisterClientResponse(
+    void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
+
+    if (commissioner->mCommissioningStage != CommissioningStage::kICDRegistration)
+    {
+        return;
+    }
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
+    {
+        return;
+    }
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                  data.ICDCounter);
+    }
+    CommissioningDelegate::CommissioningReport report;
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                            OnExtendFailsafeFailure onFailure)
@@ -2362,6 +2387,16 @@ CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
+{
+    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
+
+    // need to advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
@@ -3005,6 +3040,41 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+    }
+    break;
+    case CommissioningStage::kICDGetRegistrationInfo: {
+        GetPairingDelegate()->OnICDRegistrationInfoRequired();
+        return;
+    }
+    break;
+    case CommissioningStage::kICDRegistration: {
+        IcdManagement::Commands::RegisterClient::Type request;
+
+        if (!(params.GetICDCheckInNodeId().HasValue() && params.GetICDMonitoredSubject().HasValue() &&
+              params.GetICDSymmetricKey().HasValue()))
+        {
+            ChipLogError(Controller, "No ICD Registration information provided!");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        request.checkInNodeID    = params.GetICDCheckInNodeId().Value();
+        request.monitoredSubject = params.GetICDMonitoredSubject().Value();
+        request.key              = params.GetICDSymmetricKey().Value();
+
+        CHIP_ERROR err = SendCommand(proxy, request, OnICDManagementRegisterClientResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send IcdManagement.RegisterClient command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kICDSendStayActive: {
+        // TODO(#24259): Send StayActiveRequest once server supports this.
+        CommissioningStageComplete(CHIP_NO_ERROR);
     }
     break;
     case CommissioningStage::kFindOperational: {
