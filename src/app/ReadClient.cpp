@@ -931,7 +931,7 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
         ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
         _this->MoveToState(ClientState::InactiveICDSubscription);
 
-        // Mark defunct immediately as usual flow does 
+        // Mark defunct immediately as usual flow does
         _this->TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
 
         // Return early here since the peer is idle and cannot receive any messages. The resubscription will be deferred until
