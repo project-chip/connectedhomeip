@@ -19,17 +19,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -7099,6 +7099,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "switch type",
@@ -7505,6 +7506,7 @@
           "define": "BINARY_INPUT_BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "out of service",
@@ -12538,6 +12540,7 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -13168,7 +13171,7 @@
               "code": 17,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13184,7 +13187,7 @@
               "code": 18,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13200,7 +13203,7 @@
               "code": 21,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13216,7 +13219,7 @@
               "code": 22,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13232,7 +13235,7 @@
               "code": 23,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13248,7 +13251,7 @@
               "code": 24,
               "mfgCode": null,
               "side": "server",
-              "type": "temperature",
+              "type": "int16s",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -13349,7 +13352,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -18480,6 +18483,7 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "measurement type",
