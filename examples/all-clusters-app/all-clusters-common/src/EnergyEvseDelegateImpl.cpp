@@ -382,7 +382,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(CharSpan newValue)
     DataModel::Nullable<CharSpan> oldValue = mVehicleID;
 
     mVehicleID = MakeNullable(newValue);
-    if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data())))
+    if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data()) != 0))
     {
         ChipLogDetail(AppServer, "VehicleID updated to %s", mVehicleID.Value().data());
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
