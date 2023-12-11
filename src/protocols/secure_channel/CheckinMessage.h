@@ -62,7 +62,7 @@ public:
 
     /**
      * @brief Parse Check-in Message payload
-     * 
+     *
      * @note Function requires two key handles to generate the Check-In message.
      *       Due to PSA requirements, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
      *
@@ -96,13 +96,13 @@ private:
 
     /**
      * @brief Generate the Nonce for the Check-In message
-     * 
+     *
      * @param[in]   hmacKeyHandle Key handle to use with the HMAC algorithm
      * @param[in]   counter       Check-In Counter value to use as message of the HMAC algorithm
      * @param[out]  output        output buffer for the generated Nonce.
      *                            SUFFICIENT SPACE MUST BE ALLOCATED by the caller
-     *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES 
-     * @return CHIP_ERROR 
+     *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES
+     * @return CHIP_ERROR
      */
     static CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
                                                   MutableByteSpan & output);

@@ -90,7 +90,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
                                                        MutableByteSpan & output)
 {
     VerifyOrReturnError(output.size() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
 
     chip::Crypto::HMAC_sha shaHandler;
