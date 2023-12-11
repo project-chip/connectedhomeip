@@ -547,7 +547,7 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
-        "Thermostat": ["QueuedPreset"]
+        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
