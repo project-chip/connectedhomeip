@@ -43,7 +43,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
                 info.start_icd_counter, info.offset, ChipLogValueX64(info.monitored_subject));
 
         static_assert(std::is_same<decltype(CHIPCommand::sSessionKeystore), Crypto::RawKeySessionKeystore>::value,
-                      "CHIP Tool does not use the PSA crypto backend and only use RawKeySessionKeystore");
+                      "The following BytesToHex can copy/encode the key bytes from sharedKey to hexadecimal format, which only works for RawKeySessionKeystore");
         Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
                              icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
         fprintf(stderr, "  | Symmetric Key: %60s |\n", icdSymmetricKeyHex);
