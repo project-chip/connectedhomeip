@@ -633,29 +633,24 @@ double ConnectivityUtils::ConvertFrequencyToFloat(const iw_freq * in)
     return result;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int skfd,            /* Socket to the kernel */
+CHIP_ERROR ConnectivityUtils::GetWiFiParameter(int sock,            /* Socket to the kernel */
                                                const char * ifname, /* Device name */
                                                int request,         /* WE ID */
                                                struct iwreq * pwrq) /* Fixed part of the request */
 {
     Platform::CopyString(pwrq->ifr_name, ifname);
-
-    if (ioctl(skfd, request, pwrq) < 0)
+    if (ioctl(sock, request, pwrq) < 0)
         return CHIP_ERROR_BAD_REQUEST;
-
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityUtils::GetWiFiStats(int skfd, const char * ifname, struct iw_statistics * stats)
+CHIP_ERROR ConnectivityUtils::GetWiFiStats(int sock, const char * ifname, struct iw_statistics * stats)
 {
-    struct iwreq wrq;
-
+    struct iwreq wrq   = {};
     wrq.u.data.pointer = (caddr_t) stats;
-    wrq.u.data.length  = sizeof(struct iw_statistics);
-    wrq.u.data.flags   = 1; /*Clear updated flag */
-    Platform::CopyString(wrq.ifr_name, ifname);
-
-    return GetWiFiParameter(skfd, ifname, SIOCGIWSTATS, &wrq);
+    wrq.u.data.length  = sizeof(*stats);
+    wrq.u.data.flags   = 1; /* Clear updated flag */
+    return GetWiFiParameter(sock, ifname, SIOCGIWSTATS, &wrq);
 }
 
 } // namespace Internal
