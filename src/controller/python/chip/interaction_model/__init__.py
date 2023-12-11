@@ -83,6 +83,8 @@ class Status(enum.IntEnum):
     PathsExhausted = 0xc8
     TimedRequestMismatch = 0xc9
     FailsafeRequired = 0xca
+    InvalidInState = 0xcb
+    NoCommandResponse = 0xcc
 
 
 class InteractionModelError(ChipStackException):
