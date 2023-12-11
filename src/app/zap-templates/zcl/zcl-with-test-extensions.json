@@ -327,7 +327,6 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Laundry Dryer Controls": ["SupportedDrynessLevels"],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",

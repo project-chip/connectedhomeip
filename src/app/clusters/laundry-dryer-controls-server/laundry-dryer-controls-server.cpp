@@ -173,6 +173,7 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
                 // Or can't get the correct supported list
                 return Status::InvalidInState;
             }
+            static_assert(sizeof(DrynessLevelEnum) == sizeof(*value), "Enum size doesn't match parameter size");
             if (supportedDryness == static_cast<DrynessLevelEnum>(*value))
             {
                 // The written attribute is one of the supported item
