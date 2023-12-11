@@ -23,9 +23,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterPresetTypeStruct(
-  val presetScenario: UInt,
+  val presetScenario: UByte,
   val numberOfPresets: UByte,
-  val presetTypeFeatures: UInt
+  val presetTypeFeatures: UShort
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterPresetTypeStruct {\n")
@@ -52,9 +52,9 @@ class ThermostatClusterPresetTypeStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterPresetTypeStruct {
       tlvReader.enterStructure(tlvTag)
-      val presetScenario = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_SCENARIO))
+      val presetScenario = tlvReader.getUByte(ContextSpecificTag(TAG_PRESET_SCENARIO))
       val numberOfPresets = tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER_OF_PRESETS))
-      val presetTypeFeatures = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_TYPE_FEATURES))
+      val presetTypeFeatures = tlvReader.getUShort(ContextSpecificTag(TAG_PRESET_TYPE_FEATURES))
 
       tlvReader.exitContainer()
 

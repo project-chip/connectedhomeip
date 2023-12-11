@@ -23,9 +23,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterScheduleTypeStruct(
-  val systemMode: UInt,
+  val systemMode: UByte,
   val numberOfSchedules: UByte,
-  val scheduleTypeFeatures: UInt
+  val scheduleTypeFeatures: UShort
 ) {
   override fun toString(): String = buildString {
     append("ThermostatClusterScheduleTypeStruct {\n")
@@ -52,9 +52,9 @@ class ThermostatClusterScheduleTypeStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterScheduleTypeStruct {
       tlvReader.enterStructure(tlvTag)
-      val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
+      val systemMode = tlvReader.getUByte(ContextSpecificTag(TAG_SYSTEM_MODE))
       val numberOfSchedules = tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER_OF_SCHEDULES))
-      val scheduleTypeFeatures = tlvReader.getUInt(ContextSpecificTag(TAG_SCHEDULE_TYPE_FEATURES))
+      val scheduleTypeFeatures = tlvReader.getUShort(ContextSpecificTag(TAG_SCHEDULE_TYPE_FEATURES))
 
       tlvReader.exitContainer()
 

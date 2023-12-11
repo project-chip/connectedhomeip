@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterScheduleStruct(
   val scheduleHandle: ByteArray?,
-  val systemMode: UInt,
+  val systemMode: UByte,
   val name: Optional<String>,
   val presetHandle: Optional<ByteArray>,
   val transitions: List<ThermostatClusterScheduleTransitionStruct>,
@@ -94,7 +94,7 @@ class ThermostatClusterScheduleStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_SCHEDULE_HANDLE))
           null
         }
-      val systemMode = tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE))
+      val systemMode = tlvReader.getUByte(ContextSpecificTag(TAG_SYSTEM_MODE))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

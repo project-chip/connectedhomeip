@@ -24,10 +24,10 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ThermostatClusterScheduleTransitionStruct(
-  val dayOfWeek: UInt,
+  val dayOfWeek: UByte,
   val transitionTime: UShort,
   val presetHandle: Optional<ByteArray>,
-  val systemMode: Optional<UInt>,
+  val systemMode: Optional<UByte>,
   val coolingSetpoint: Optional<Short>,
   val heatingSetpoint: Optional<Short>
 ) {
@@ -77,7 +77,7 @@ class ThermostatClusterScheduleTransitionStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterScheduleTransitionStruct {
       tlvReader.enterStructure(tlvTag)
-      val dayOfWeek = tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEK))
+      val dayOfWeek = tlvReader.getUByte(ContextSpecificTag(TAG_DAY_OF_WEEK))
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
       val presetHandle =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_PRESET_HANDLE))) {
@@ -87,7 +87,7 @@ class ThermostatClusterScheduleTransitionStruct(
         }
       val systemMode =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_SYSTEM_MODE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_SYSTEM_MODE)))
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_SYSTEM_MODE)))
         } else {
           Optional.empty()
         }

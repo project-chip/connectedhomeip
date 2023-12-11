@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ThermostatClusterPresetStruct(
   val presetHandle: ByteArray?,
-  val presetScenario: UInt,
+  val presetScenario: UByte,
   val name: Optional<String>?,
   val coolingSetpoint: Optional<Short>,
   val heatingSetpoint: Optional<Short>,
@@ -93,7 +93,7 @@ class ThermostatClusterPresetStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_PRESET_HANDLE))
           null
         }
-      val presetScenario = tlvReader.getUInt(ContextSpecificTag(TAG_PRESET_SCENARIO))
+      val presetScenario = tlvReader.getUByte(ContextSpecificTag(TAG_PRESET_SCENARIO))
       val name =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
