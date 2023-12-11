@@ -42,7 +42,7 @@ struct __attribute__((packed)) SessionParametersStruct
     uint16_t sessionActiveThreshold   = 0;
     uint16_t dataModelRevision        = 0;
     uint16_t interactionModelRevision = 0;
-    uint32_t speficiationVersion      = 0;
+    uint32_t specificationVersion     = 0;
     uint16_t maxPathsPerInvoke        = 0;
 };
 
@@ -97,7 +97,7 @@ PyChipError pychip_DeviceProxy_GetRemoteSessionParameters(DeviceProxy * device, 
     sessionParam->sessionActiveThreshold   = remoteMrpConfig.mActiveThresholdTime.count();
     sessionParam->dataModelRevision        = remoteSessionParameters.GetDataModelRevision().ValueOr(0);
     sessionParam->interactionModelRevision = remoteSessionParameters.GetInteractionModelRevision().ValueOr(0);
-    sessionParam->speficiationVersion      = remoteSessionParameters.GetSpecificationVersion().ValueOr(0);
+    sessionParam->specificationVersion     = remoteSessionParameters.GetSpecificationVersion().ValueOr(0);
     sessionParam->maxPathsPerInvoke        = remoteSessionParameters.GetMaxPathsPerInvoke();
     return ToPyChipError(CHIP_NO_ERROR);
 }
