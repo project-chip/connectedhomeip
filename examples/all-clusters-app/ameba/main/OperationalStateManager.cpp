@@ -138,7 +138,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
 static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
-RvcOperationalState::Instance * OperationalState::GetRVCOperationalStateInstance()
+RvcOperationalState::Instance * RvcOperationalState::GetRvcOperationalStateInstance()
 {
     return gRvcOperationalStateInstance;
 }
