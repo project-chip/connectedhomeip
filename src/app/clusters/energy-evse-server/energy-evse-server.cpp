@@ -80,10 +80,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetDischargingEnabledUntil());
-        }
+        return aEncoder.Encode(mDelegate.GetDischargingEnabledUntil());
     case CircuitCapacity::Id:
         return aEncoder.Encode(mDelegate.GetCircuitCapacity());
     case MinimumChargeCurrent::Id:
@@ -96,124 +93,85 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetMaximumDischargeCurrent());
-        }
+        return aEncoder.Encode(mDelegate.GetMaximumDischargeCurrent());
 
     case UserMaximumChargeCurrent::Id:
         if (!SupportsOptAttr(OptionalAttributes::kSupportsUserMaximumChargingCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
-        }
+        return aEncoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
     case RandomizationDelayWindow::Id:
         /* Optional */
         if (!SupportsOptAttr(OptionalAttributes::kSupportsRandomizationWindow))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetRandomizationDelayWindow());
-        }
+        return aEncoder.Encode(mDelegate.GetRandomizationDelayWindow());
     /* PREF - ChargingPreferences attributes */
     case NumberOfWeeklyTargets::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNumberOfWeeklyTargets());
-        }
+        return aEncoder.Encode(mDelegate.GetNumberOfWeeklyTargets());
     case NumberOfDailyTargets::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNumberOfDailyTargets());
-        }
+        return aEncoder.Encode(mDelegate.GetNumberOfDailyTargets());
     case NextChargeStartTime::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNextChargeStartTime());
-        }
+        return aEncoder.Encode(mDelegate.GetNextChargeStartTime());
     case NextChargeTargetTime::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNextChargeTargetTime());
-        }
+        return aEncoder.Encode(mDelegate.GetNextChargeTargetTime());
     case NextChargeRequiredEnergy::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
-        }
+        return aEncoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
     case NextChargeTargetSoC::Id:
         if (!HasFeature(Feature::kChargingPreferences))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetNextChargeTargetSoC());
-        }
+        return aEncoder.Encode(mDelegate.GetNextChargeTargetSoC());
     case ApproximateEVEfficiency::Id:
         if ((!HasFeature(Feature::kChargingPreferences)) ||
             (!SupportsOptAttr(OptionalAttributes::kSupportsApproximateEvEfficiency)))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetApproximateEVEfficiency());
-        }
+        return aEncoder.Encode(mDelegate.GetApproximateEVEfficiency());
     /* SOC attributes */
     case StateOfCharge::Id:
         if (!HasFeature(Feature::kSoCReporting))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetStateOfCharge());
-        }
+        return aEncoder.Encode(mDelegate.GetStateOfCharge());
     case BatteryCapacity::Id:
         if (!HasFeature(Feature::kSoCReporting))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetBatteryCapacity());
-        }
+        return aEncoder.Encode(mDelegate.GetBatteryCapacity());
     /* PNC attributes*/
     case VehicleID::Id:
         if (!HasFeature(Feature::kPlugAndCharge))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            return aEncoder.Encode(mDelegate.GetVehicleID());
-        }
+        return aEncoder.Encode(mDelegate.GetVehicleID());
     /* Session SESS attributes */
     case SessionID::Id:
         return aEncoder.Encode(mDelegate.GetSessionID());
@@ -238,13 +196,11 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            int64_t newValue;
-            ReturnErrorOnFailure(aDecoder.Decode(newValue));
-            ReturnErrorOnFailure(mDelegate.SetUserMaximumChargeCurrent(newValue));
-            return CHIP_NO_ERROR;
-        }
+
+        int64_t newValue;
+        ReturnErrorOnFailure(aDecoder.Decode(newValue));
+        ReturnErrorOnFailure(mDelegate.SetUserMaximumChargeCurrent(newValue));
+        return CHIP_NO_ERROR;
     }
     case RandomizationDelayWindow::Id: {
         // Optional Attribute
@@ -252,13 +208,10 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            uint32_t newValue;
-            ReturnErrorOnFailure(aDecoder.Decode(newValue));
-            ReturnErrorOnFailure(mDelegate.SetRandomizationDelayWindow(newValue));
-            return CHIP_NO_ERROR;
-        }
+        uint32_t newValue;
+        ReturnErrorOnFailure(aDecoder.Decode(newValue));
+        ReturnErrorOnFailure(mDelegate.SetRandomizationDelayWindow(newValue));
+        return CHIP_NO_ERROR;
     }
     case ApproximateEVEfficiency::Id: {
         // Optional Attribute if ChargingPreferences is supported
@@ -267,13 +220,10 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-        else
-        {
-            uint16_t newValue;
-            ReturnErrorOnFailure(aDecoder.Decode(newValue));
-            ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(newValue));
-            return CHIP_NO_ERROR;
-        }
+        uint16_t newValue;
+        ReturnErrorOnFailure(aDecoder.Decode(newValue));
+        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(newValue));
+        return CHIP_NO_ERROR;
     }
 
     default:
