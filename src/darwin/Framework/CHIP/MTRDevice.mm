@@ -1750,6 +1750,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value
 {
     // TODO: Check supported data types, and also if they conform to NSSecureCoding, when we store these
+    // TODO: Need to add a delegate method, so when this value changes we call back to the client
 
     if (key == nil || value == nil)
         return;
