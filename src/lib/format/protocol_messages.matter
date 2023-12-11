@@ -321,10 +321,29 @@ client cluster IMProtocol = 0xFFFF0001 {
     cluster_command_payload data = 1;
   }
 
+  enum SuppliedAttributionContextInformation : enum8 {
+     kDefaultClientAction = 0;
+     kUserInteraction = 1;
+     kClientAutomationRule = 2;
+     kClientSchedule = 3;
+     kClientTimer = 4;
+  }
+
+  struct  SuppliedAttribution {
+     SuppliedAttributeContextInformation context_information = 0;
+     int32u source_context = 1;
+  }
+
   struct InvokeRequestMessage {
     boolean suppress_response = 0;
     boolean timed_request = 1;
     CommandDataIB invoke_requests[] = 2;
+    int16u command_ref = 2; // specific to batch processing
+
+    // at-most-one-of {
+    SuppliedAttribution supplied_attribution_data = 3;
+    int16u supplied_attribution_data_repeat = 4;
+    // }
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;
