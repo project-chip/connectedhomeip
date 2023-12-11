@@ -745,14 +745,14 @@ struct GetDeviceCallbacks
     {
         auto * self                   = static_cast<GetDeviceCallbacks *>(context);
         auto * operationalDeviceProxy = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);
-        self->mCallback(operationalDeviceProxy, ToPyChipError(CHIP_NO_ERROR));
+        self->mCallback(context, operationalDeviceProxy, ToPyChipError(CHIP_NO_ERROR));
         delete self;
     }
 
     static void OnConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
-        self->mCallback(nullptr, ToPyChipError(error));
+        self->mCallback(context, nullptr, ToPyChipError(error));
         delete self;
     }
 
