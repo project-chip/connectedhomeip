@@ -24,11 +24,11 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 CHIP_ERROR EnergyEvseManager::Init()
 {
-    GetInstance()->Instance::Init();
+    this->Instance::Init();
     return CHIP_NO_ERROR;
 }
 
 void EnergyEvseManager::Shutdown()
 {
-    GetInstance()->Instance::Shutdown();
+    this->Instance::Shutdown();
 }

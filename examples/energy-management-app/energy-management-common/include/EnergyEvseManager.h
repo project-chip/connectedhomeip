@@ -35,7 +35,6 @@ public:
                       OptionalCommands aOptionalCmds) :
         EnergyEvse::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds)
     {
-        mInstance = this;
         mDelegate = &aDelegate;
     }
 
@@ -47,11 +46,9 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
-    EnergyEvse::Instance * GetInstance() { return mInstance; };
     EnergyEvseDelegate * GetDelegate() { return mDelegate; };
 
 private:
-    EnergyEvse::Instance * mInstance;
     EnergyEvseDelegate * mDelegate;
 };
 
