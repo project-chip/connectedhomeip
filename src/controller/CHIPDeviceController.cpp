@@ -1177,19 +1177,25 @@ void DeviceCommissioner::OnICDManagementRegisterClientResponse(
     void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
 
+    if (commissioner->mCommissioningStage != CommissioningStage::kICDRegistration)
+    {
+        return;
+    }
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
+    {
+        return;
+    }
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                  data.ICDCounter);
+    }
     CommissioningDelegate::CommissioningReport report;
-    auto pairingDelegate         = commissioner->GetPairingDelegate();
-    auto deviceBeingCommissioned = commissioner->mDeviceBeingCommissioned;
-    if (pairingDelegate != nullptr && deviceBeingCommissioned != nullptr)
-    {
-        pairingDelegate->OnICDRegistrationComplete(deviceBeingCommissioned->GetDeviceId(), data.ICDCounter);
-        commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
-    }
-    else
-    {
-        commissioner->CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, report);
-    }
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,

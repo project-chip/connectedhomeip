@@ -23,5 +23,9 @@ declare_args() {
 
   # Matter SDK Configuration flag to make the ICD manager emit a report on entering active mode
   chip_report_on_active_mode = false
+
   icd_max_notification_subscribers = 1
+
+  # Set to true to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
+  icd_enforce_sit_slow_poll_limit = false
 }
