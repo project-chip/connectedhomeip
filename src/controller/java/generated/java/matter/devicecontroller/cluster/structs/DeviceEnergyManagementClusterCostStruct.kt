@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterCostStruct(
-  val costType: UInt,
+  val costType: UByte,
   val value: Int,
   val decimalPoints: UByte,
   val currency: Optional<UShort>
@@ -60,7 +60,7 @@ class DeviceEnergyManagementClusterCostStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterCostStruct {
       tlvReader.enterStructure(tlvTag)
-      val costType = tlvReader.getUInt(ContextSpecificTag(TAG_COST_TYPE))
+      val costType = tlvReader.getUByte(ContextSpecificTag(TAG_COST_TYPE))
       val value = tlvReader.getInt(ContextSpecificTag(TAG_VALUE))
       val decimalPoints = tlvReader.getUByte(ContextSpecificTag(TAG_DECIMAL_POINTS))
       val currency =

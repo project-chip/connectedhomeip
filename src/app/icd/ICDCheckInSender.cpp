@@ -61,7 +61,7 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
-    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mKey, mICDCounter, ByteSpan(), output));
+    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mAesKeyHandle, mICDCounter, ByteSpan(), output));
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
 
     VerifyOrReturnError(mExchangeManager->GetSessionManager() != nullptr, CHIP_ERROR_INTERNAL);
@@ -89,8 +89,8 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
 
     AddressResolve::NodeLookupRequest request(peerId);
 
-    memcpy(mKey.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), entry.key.As<Crypto::Symmetric128BitsKeyByteArray>(),
-           sizeof(Crypto::Symmetric128BitsKeyByteArray));
+    memcpy(mAesKeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 

@@ -87,9 +87,9 @@ tests:
               contains: [4]
 
     - label:
-          "Step 4c: TH reads the optional attribute(OnMode) in AttributeList
-          from the DUT"
-      PICS: MOD.S.A0005
+          "Step 4c: TH reads the feature dependent attribute(OnMode) in
+          AttributeList from the DUT"
+      PICS: MOD.S.F00 && MOD.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
       response:

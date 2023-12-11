@@ -24,40 +24,26 @@
 #include <lib/support/CodeUtils.h>
 #include <stddef.h>
 
-namespace {
-constexpr size_t kUserActiveModeTriggerInstructionSize = 128;
-} // namespace
-
 namespace chip {
 namespace app {
 
 struct ICDClientInfo
 {
     ScopedNodeId peer_node;
-    uint32_t start_icd_counter                                                       = 0;
-    uint32_t offset                                                                  = 0;
-    uint64_t monitored_subject                                                       = static_cast<uint64_t>(0);
-    uint32_t user_active_mode_trigger_hint                                           = 0;
-    char user_active_mode_trigger_instruction[kUserActiveModeTriggerInstructionSize] = { 0 };
-    bool has_instruction                                                             = false;
-    Crypto::Aes128BitsKeyHandle shared_key                                           = Crypto::Aes128BitsKeyHandle();
+    uint32_t start_icd_counter         = 0;
+    uint32_t offset                    = 0;
+    uint64_t monitored_subject         = static_cast<uint64_t>(0);
+    Crypto::Aes128KeyHandle shared_key = Crypto::Aes128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
 
     ICDClientInfo & operator=(const ICDClientInfo & other)
     {
-        peer_node                     = other.peer_node;
-        start_icd_counter             = other.start_icd_counter;
-        offset                        = other.offset;
-        monitored_subject             = other.monitored_subject;
-        user_active_mode_trigger_hint = other.user_active_mode_trigger_hint;
-        if (other.has_instruction)
-        {
-            memcpy(user_active_mode_trigger_instruction, other.user_active_mode_trigger_instruction,
-                   kUserActiveModeTriggerInstructionSize);
-        }
-        has_instruction = other.has_instruction;
+        peer_node         = other.peer_node;
+        start_icd_counter = other.start_icd_counter;
+        offset            = other.offset;
+        monitored_subject = other.monitored_subject;
         ByteSpan buf(other.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
         memcpy(shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));

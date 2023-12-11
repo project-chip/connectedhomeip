@@ -23,7 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UInt) {
+class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UShort) {
   override fun toString(): String = buildString {
     append("DishwasherModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -55,7 +55,7 @@ class DishwasherModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val valu
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

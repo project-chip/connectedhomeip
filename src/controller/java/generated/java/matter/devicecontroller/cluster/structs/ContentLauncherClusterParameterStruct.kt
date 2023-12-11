@@ -25,7 +25,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ContentLauncherClusterParameterStruct(
-  val type: UInt,
+  val type: UByte,
   val value: String,
   val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>
 ) {
@@ -61,7 +61,7 @@ class ContentLauncherClusterParameterStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
       tlvReader.enterStructure(tlvTag)
-      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       val externalIDList =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {

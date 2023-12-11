@@ -1140,7 +1140,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 19: TH sends AddGroupIfIdentifying command to DUT on
+          "Step 19a: TH sends AddGroupIfIdentifying command to DUT on
           PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID
           as 0x0000 GroupName as Gp45"
       PICS: G.S.C05.Rsp
@@ -1153,6 +1153,22 @@ tests:
           [1658307266.719482][3251:3256] CHIP:DMG:                                {
           [1658307266.719527][3251:3256] CHIP:DMG:                                        status = 0x87 (CONSTRAINT_ERROR),
           [1658307266.719573][3251:3256] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "Step 19b: TH sends AddGroupIfIdentifying command to DUT on
+          PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID
+          as 0x0006 + maxgroups, GroupName as Gp123456789123456"
+      PICS: G.S.C05.Rsp && G.S.F00
+      verification: |
+          ./chip-tool groups  add-group-if-identifying 0x0012 Gp123456789123456 1 0
+
+          Verify the status is CONSTRAINT_ERROR (when GroupName is of length greater than 16) on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1701784815.714772][15290:15292] CHIP:DMG:                                 StatusIB =
+          [1701784815.714776][15290:15292] CHIP:DMG:                                 {
+          [1701784815.714779][15290:15292] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
+          [1701784815.714782][15290:15292] CHIP:DMG:                                 },
       disabled: true
 
     - label:

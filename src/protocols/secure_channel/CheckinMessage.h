@@ -52,8 +52,8 @@ public:
      *                  Required Buffer Size is : GetCheckinPayloadSize(appData.size())
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, CounterType counter,
-                                                    const ByteSpan & appData, MutableByteSpan & output);
+    static CHIP_ERROR GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, CounterType counter, const ByteSpan & appData,
+                                                    MutableByteSpan & output);
 
     /**
      * @brief Parse Check-in Message payload
@@ -65,7 +65,7 @@ public:
      *                  GetAppDataSize(payload) + sizeof(CounterType)
      * @return CHIP_ERROR
      */
-    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, ByteSpan & payload, CounterType & counter,
+    static CHIP_ERROR ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
                                                  MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
