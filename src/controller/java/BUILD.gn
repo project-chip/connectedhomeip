@@ -377,6 +377,7 @@ kotlin_library("kotlin_matter_controller") {
 
   sources += matter_structs_sources
   sources += matter_eventstructs_sources
+  sources += matter_clusters_sources
 
   if (matter_enable_java_compilation) {
     deps += [
