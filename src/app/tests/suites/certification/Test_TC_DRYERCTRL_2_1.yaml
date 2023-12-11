@@ -22,9 +22,9 @@ config:
     cluster: "Laundry Dryer Controls"
     endpoint: 1
 
-unsupportedSelectedDrynessLevel:
-    type: int8u
-    defaultValue: 4
+    unsupportedSelectedDrynessLevel:
+        type: int8u
+        defaultValue: 4
 
     SupportedDrynessLevel:
         type: int8u
