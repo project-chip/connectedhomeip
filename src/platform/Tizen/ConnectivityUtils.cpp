@@ -17,9 +17,7 @@
 
 #include "ConnectivityUtils.h"
 
-#include <platform/Tizen/ConnectivityUtils.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
+#include <errno.h>
 #include <ifaddrs.h>
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
@@ -33,6 +31,8 @@
 
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Tizen/ConnectivityUtils.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 using namespace ::chip::app::Clusters::EthernetNetworkDiagnostics;
@@ -78,7 +78,7 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to open socket");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return ret;
     }
 
@@ -120,7 +120,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -147,7 +147,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -189,7 +189,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -231,7 +231,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -258,13 +258,13 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
     if ((err = GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq)) == CHIP_NO_ERROR)
     {
-        double freq = ConvertFrequenceToFloat(&(wrq.u.freq));
+        double freq = ConvertFrequencyToFloat(&(wrq.u.freq));
         VerifyOrReturnError((freq / 1000000) <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
 
@@ -272,7 +272,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t
     }
     else
     {
-        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).")
+        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).");
     }
 
     close(skfd);
@@ -287,7 +287,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -350,7 +350,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiBeaconLostCount(const char * ifname, uint32
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -372,7 +372,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
@@ -397,7 +397,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
 
     if (getifaddrs(&ifaddr) == -1)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
         return err;
     }
 
@@ -431,13 +431,13 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, PHYRateEnum & p
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
     if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
     {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
+        ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno));
         close(skfd);
         return CHIP_ERROR_READ_FAILED;
     }
@@ -500,13 +500,13 @@ CHIP_ERROR ConnectivityUtils::GetEthFullDuplex(const char * ifname, bool & fullD
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
+        ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno));
         return CHIP_ERROR_OPEN_FAILED;
     }
 
     if (ioctl(skfd, SIOCETHTOOL, &ifr) == -1)
     {
-        ChipLogError(DeviceLayer, "Cannot get device settings");
+        ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno));
         err = CHIP_ERROR_READ_FAILED;
     }
     else
@@ -673,7 +673,7 @@ uint16_t ConnectivityUtils::Map5000MHz(const uint8_t inChannel)
     return frequency;
 }
 
-double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
+double ConnectivityUtils::ConvertFrequencyToFloat(const iw_freq * in)
 {
     double result = (double) in->m;
 
