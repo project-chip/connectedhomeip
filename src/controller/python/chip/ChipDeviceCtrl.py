@@ -76,7 +76,7 @@ _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
 # else seems to do it.
-_DeviceAvailableFunct = CFUNCTYPE(None, py_object, c_void_p, PyChipError)
+_DeviceAvailableCallbackFunct = CFUNCTYPE(None, py_object, c_void_p, PyChipError)
 
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
@@ -98,6 +98,11 @@ class NOCChain:
     rcacBytes: bytes
     ipkBytes: bytes
     adminSubject: int
+
+
+@_DeviceAvailableCallbackFunct
+def _DeviceAvailableCallback(closure, device, err):
+    closure.deviceAvailable(device, err)
 
 
 @_IssueNOCChainCallbackPythonCallbackFunct
@@ -767,8 +772,7 @@ class ChipDeviceControllerBase():
                 return DeviceProxyWrapper(returnDevice)
 
         class DeviceAvailableClosure():
-            @_DeviceAvailableFunct
-            def DeviceAvailableCallback(self, device, err):
+            def deviceAvailable(self, device, err):
                 nonlocal returnDevice
                 nonlocal returnErr
                 nonlocal deviceAvailableCV
@@ -781,7 +785,7 @@ class ChipDeviceControllerBase():
         closure = DeviceAvailableClosure()
         ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, ctypes.py_object(closure), closure.DeviceAvailableCallback),
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
             timeoutMs).raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
@@ -1543,7 +1547,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
-                c_void_p, c_uint64, py_object, _DeviceAvailableFunct]
+                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
 
             self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
