@@ -1835,11 +1835,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace BooleanSensorConfiguration {
 namespace Attributes {
 
-namespace SensitivityLevel {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum * value); // SensitivityEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum value);
-} // namespace SensitivityLevel
+namespace CurrentSensitivityLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace CurrentSensitivityLevel
+
+namespace SupportedSensitivityLevels {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace SupportedSensitivityLevels
+
+namespace DefaultSensitivityLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace DefaultSensitivityLevel
 
 namespace AlarmsActive {
 EmberAfStatus Get(chip::EndpointId endpoint,
@@ -1858,6 +1867,19 @@ EmberAfStatus Get(chip::EndpointId endpoint,
                   chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value); // AlarmModeBitmap
 EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value);
 } // namespace AlarmsEnabled
+
+namespace AlarmsSupported {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value); // AlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value);
+} // namespace AlarmsSupported
+
+namespace SensorFault {
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> * value); // SensorFaultBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> value);
+} // namespace SensorFault
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1960,6 +1982,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace ValveConfigurationAndControl
+
+namespace ElectricalEnergyMeasurement {
+namespace Attributes {
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalEnergyMeasurement
 
 namespace DemandResponseLoadControl {
 namespace Attributes {

@@ -23,7 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MicrowaveOvenModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UInt) {
+class MicrowaveOvenModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val value: UShort) {
   override fun toString(): String = buildString {
     append("MicrowaveOvenModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -55,7 +55,7 @@ class MicrowaveOvenModeClusterModeTagStruct(val mfgCode: Optional<UShort>, val v
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

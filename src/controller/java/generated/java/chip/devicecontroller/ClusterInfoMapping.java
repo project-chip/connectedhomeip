@@ -10008,6 +10008,195 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedElectricalEnergyMeasurementClusterAccuracyAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.AccuracyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(ChipStructs.ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterCumulativeEnergyImportedAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.CumulativeEnergyImportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterCumulativeEnergyExportedAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.CumulativeEnergyExportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterPeriodicEnergyImportedAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.PeriodicEnergyImportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterPeriodicEnergyExportedAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.PeriodicEnergyExportedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterAcceptedCommandListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterEventListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedElectricalEnergyMeasurementClusterAttributeListAttributeCallback implements ChipClusters.ElectricalEnergyMeasurementCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedDemandResponseLoadControlClusterLoadControlProgramsAttributeCallback implements ChipClusters.DemandResponseLoadControlCluster.LoadControlProgramsAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -19302,6 +19491,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ValveConfigurationAndControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("valveConfigurationAndControl", valveConfigurationAndControlClusterInfo);
 
+    ClusterInfo electricalEnergyMeasurementClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.ElectricalEnergyMeasurementCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("electricalEnergyMeasurement", electricalEnergyMeasurementClusterInfo);
+
     ClusterInfo demandResponseLoadControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.DemandResponseLoadControlCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("demandResponseLoadControl", demandResponseLoadControlClusterInfo);
@@ -19555,6 +19748,7 @@ public class ClusterInfoMapping {
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
     destination.get("booleanSensorConfiguration").combineCommands(source.get("booleanSensorConfiguration"));
     destination.get("valveConfigurationAndControl").combineCommands(source.get("valveConfigurationAndControl"));
+    destination.get("electricalEnergyMeasurement").combineCommands(source.get("electricalEnergyMeasurement"));
     destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
     destination.get("deviceEnergyManagement").combineCommands(source.get("deviceEnergyManagement"));
     destination.get("energyEvse").combineCommands(source.get("energyEvse"));
@@ -22408,22 +22602,39 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> booleanSensorConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
-    booleanSensorConfigurationsuppressRequestCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo);
-    InteractionInfo booleanSensorConfigurationsuppressRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo booleanSensorConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
+    booleanSensorConfigurationsuppressAlarmCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo);
+    InteractionInfo booleanSensorConfigurationsuppressAlarmInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
-        .suppressRequest((DefaultClusterCallback) callback
+        .suppressAlarm((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("alarmsToSuppress")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        booleanSensorConfigurationsuppressRequestCommandParams
+        booleanSensorConfigurationsuppressAlarmCommandParams
     );
-    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressRequest", booleanSensorConfigurationsuppressRequestInteractionInfo);
+    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressAlarm", booleanSensorConfigurationsuppressAlarmInteractionInfo);
+
+    Map<String, CommandParameterInfo> booleanSensorConfigurationenableDisableAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo booleanSensorConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo = new CommandParameterInfo("alarmsToEnableDisable", Integer.class, Integer.class);
+    booleanSensorConfigurationenableDisableAlarmCommandParams.put("alarmsToEnableDisable",booleanSensorConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo);
+    InteractionInfo booleanSensorConfigurationenableDisableAlarmInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
+        .enableDisableAlarm((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("alarmsToEnableDisable")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        booleanSensorConfigurationenableDisableAlarmCommandParams
+    );
+    booleanSensorConfigurationClusterInteractionInfoMap.put("enableDisableAlarm", booleanSensorConfigurationenableDisableAlarmInteractionInfo);
 
     commandMap.put("booleanSensorConfiguration", booleanSensorConfigurationClusterInteractionInfoMap);
 
@@ -22481,6 +22692,10 @@ public class ClusterInfoMapping {
     valveConfigurationAndControlClusterInteractionInfoMap.put("setLevel", valveConfigurationAndControlsetLevelInteractionInfo);
 
     commandMap.put("valveConfigurationAndControl", valveConfigurationAndControlClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> electricalEnergyMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("electricalEnergyMeasurement", electricalEnergyMeasurementClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> demandResponseLoadControlClusterInteractionInfoMap = new LinkedHashMap<>();
 

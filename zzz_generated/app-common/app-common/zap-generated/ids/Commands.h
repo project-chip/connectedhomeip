@@ -916,9 +916,13 @@ static constexpr CommandId Id = 0x00000000;
 namespace BooleanSensorConfiguration {
 namespace Commands {
 
-namespace SuppressRequest {
+namespace SuppressAlarm {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SuppressRequest
+} // namespace SuppressAlarm
+
+namespace EnableDisableAlarm {
+static constexpr CommandId Id = 0x00000001;
+} // namespace EnableDisableAlarm
 
 } // namespace Commands
 } // namespace BooleanSensorConfiguration

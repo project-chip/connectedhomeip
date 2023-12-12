@@ -8638,17 +8638,39 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readBooleanSensorConfigurationInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readBooleanSensorConfigurationSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readBooleanSensorConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readSensitivityLevelAttribute(
+            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readCurrentSensitivityLevelAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationSensitivityLevelCommandParams
+          readBooleanSensorConfigurationCurrentSensitivityLevelCommandParams
         );
-        result.put("readSensitivityLevelAttribute", readBooleanSensorConfigurationSensitivityLevelAttributeInteractionInfo);
+        result.put("readCurrentSensitivityLevelAttribute", readBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanSensorConfigurationSupportedSensitivityLevelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanSensorConfigurationSupportedSensitivityLevelsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readSupportedSensitivityLevelsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBooleanSensorConfigurationSupportedSensitivityLevelsCommandParams
+        );
+        result.put("readSupportedSensitivityLevelsAttribute", readBooleanSensorConfigurationSupportedSensitivityLevelsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanSensorConfigurationDefaultSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanSensorConfigurationDefaultSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readDefaultSensitivityLevelAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBooleanSensorConfigurationDefaultSensitivityLevelCommandParams
+        );
+        result.put("readDefaultSensitivityLevelAttribute", readBooleanSensorConfigurationDefaultSensitivityLevelAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsActiveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBooleanSensorConfigurationAlarmsActiveAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8682,6 +8704,28 @@ public class ClusterReadMapping {
           readBooleanSensorConfigurationAlarmsEnabledCommandParams
         );
         result.put("readAlarmsEnabledAttribute", readBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanSensorConfigurationAlarmsSupportedAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAlarmsSupportedAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBooleanSensorConfigurationAlarmsSupportedCommandParams
+        );
+        result.put("readAlarmsSupportedAttribute", readBooleanSensorConfigurationAlarmsSupportedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanSensorConfigurationSensorFaultCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanSensorConfigurationSensorFaultAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readSensorFaultAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readBooleanSensorConfigurationSensorFaultCommandParams
+        );
+        result.put("readSensorFaultAttribute", readBooleanSensorConfigurationSensorFaultAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readBooleanSensorConfigurationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readBooleanSensorConfigurationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8928,6 +8972,76 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlClusterRevisionCommandParams
         );
         result.put("readClusterRevisionAttribute", readValveConfigurationAndControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readElectricalEnergyMeasurementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalEnergyMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterGeneratedCommandListAttributeCallback(),
+          readElectricalEnergyMeasurementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readElectricalEnergyMeasurementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterAcceptedCommandListAttributeCallback(),
+          readElectricalEnergyMeasurementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readElectricalEnergyMeasurementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readEventListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterEventListAttributeCallback(),
+          readElectricalEnergyMeasurementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readElectricalEnergyMeasurementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterAttributeListAttributeCallback(),
+          readElectricalEnergyMeasurementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readElectricalEnergyMeasurementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalEnergyMeasurementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readElectricalEnergyMeasurementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readElectricalEnergyMeasurementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readElectricalEnergyMeasurementClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -19392,6 +19506,7 @@ public class ClusterReadMapping {
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
             put("booleanSensorConfiguration", readBooleanSensorConfigurationInteractionInfo());
             put("valveConfigurationAndControl", readValveConfigurationAndControlInteractionInfo());
+            put("electricalEnergyMeasurement", readElectricalEnergyMeasurementInteractionInfo());
             put("demandResponseLoadControl", readDemandResponseLoadControlInteractionInfo());
             put("deviceEnergyManagement", readDeviceEnergyManagementInteractionInfo());
             put("energyEvse", readEnergyEvseInteractionInfo());

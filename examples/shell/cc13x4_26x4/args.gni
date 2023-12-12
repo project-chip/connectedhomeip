@@ -25,7 +25,7 @@ ti_simplelink_board = "LP_EM_CC1354P10_6"
 # use -Os instead of -Og, LWIP release build
 is_debug = false
 
-chip_enable_ota_requestor = false
+chip_enable_ota_requestor = true
 
 # Disable FTD Build for all-clusters app to save Flash
 chip_openthread_ftd = false
@@ -48,4 +48,4 @@ chip_stack_lock_tracking = "none"
 matter_device_vid = "0xFFF1"
 matter_device_pid = "0x8006"
 matter_software_ver = "0x0001"
-matter_software_ver_str = "1.0d1"
+matter_software_ver_str = "1.0.1+1"

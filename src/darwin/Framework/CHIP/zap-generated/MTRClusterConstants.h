@@ -150,6 +150,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000072,
     MTRClusterIDTypeBooleanSensorConfigurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
     MTRClusterIDTypeValveConfigurationAndControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000081,
+    MTRClusterIDTypeElectricalEnergyMeasurementID MTR_PROVISIONALLY_AVAILABLE = 0x00000091,
     MTRClusterIDTypeDemandResponseLoadControlID MTR_PROVISIONALLY_AVAILABLE = 0x00000096,
     MTRClusterIDTypeDeviceEnergyManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000098,
     MTRClusterIDTypeEnergyEVSEID MTR_PROVISIONALLY_AVAILABLE = 0x00000099,
@@ -2576,10 +2577,14 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterActivatedCarbonFilterMonitoringAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster BooleanSensorConfiguration attributes
-    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsActiveID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsSuppressedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeCurrentSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeSupportedSensitivityLevelsID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeDefaultSensitivityLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsActiveID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsSuppressedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsSupportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeSensorFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2604,6 +2609,19 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ElectricalEnergyMeasurement attributes
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAccuracyID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyImportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeCumulativeEnergyExportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyImportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributePeriodicEnergyExportedID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterElectricalEnergyMeasurementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster DemandResponseLoadControl attributes
     MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6233,7 +6251,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster BooleanSensorConfiguration commands
-    MTRCommandIDTypeClusterBooleanSensorConfigurationCommandSuppressRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterBooleanSensorConfigurationCommandSuppressAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterBooleanSensorConfigurationCommandEnableDisableAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster ValveConfigurationAndControl commands
     MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7137,6 +7156,10 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster ValveConfigurationAndControl events
     MTREventIDTypeClusterValveConfigurationAndControlEventValveStateChangedID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterValveConfigurationAndControlEventValveFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+
+    // Cluster ElectricalEnergyMeasurement events
+    MTREventIDTypeClusterElectricalEnergyMeasurementEventCumulativeEnergyMeasuredID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTREventIDTypeClusterElectricalEnergyMeasurementEventPeriodicEnergyMeasuredID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
 
     // Cluster DemandResponseLoadControl events
     MTREventIDTypeClusterDemandResponseLoadControlEventLoadControlEventStatusChangeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

@@ -2823,7 +2823,13 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
 {
     using namespace Clusters::BooleanSensorConfiguration;
     switch (aAttributeId) {
-    case Attributes::SensitivityLevel::Id: {
+    case Attributes::CurrentSensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSensitivityLevels::Id: {
+        return YES;
+    }
+    case Attributes::DefaultSensitivityLevel::Id: {
         return YES;
     }
     case Attributes::AlarmsActive::Id: {
@@ -2833,6 +2839,12 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
         return YES;
     }
     case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSupported::Id: {
+        return YES;
+    }
+    case Attributes::SensorFault::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2890,6 +2902,48 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
         return YES;
     }
     case Attributes::ValveFault::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aAttributeId) {
+    case Attributes::Accuracy::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6305,6 +6359,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);

@@ -9378,11 +9378,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace BooleanSensorConfiguration {
 namespace Attributes {
 
-namespace SensitivityLevel {
+namespace CurrentSensitivityLevel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
@@ -9394,9 +9394,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorC
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum>;
+    using Traits = NumericAttributeTraits<uint8_t>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9404,10 +9404,72 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::BooleanSensorC
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace SensitivityLevel
+} // namespace CurrentSensitivityLevel
+
+namespace SupportedSensitivityLevels {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace SupportedSensitivityLevels
+
+namespace DefaultSensitivityLevel {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DefaultSensitivityLevel
 
 namespace AlarmsActive {
 
@@ -9504,6 +9566,71 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 }
 
 } // namespace AlarmsEnabled
+
+namespace AlarmsSupported {
+
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+} // namespace AlarmsSupported
+
+namespace SensorFault {
+
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> * value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap>>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> value)
+{
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap>>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+}
+
+} // namespace SensorFault
 
 namespace FeatureMap {
 
@@ -10129,6 +10256,74 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace Attributes
 } // namespace ValveConfigurationAndControl
+
+namespace ElectricalEnergyMeasurement {
+namespace Attributes {
+
+namespace FeatureMap {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalEnergyMeasurement
 
 namespace DemandResponseLoadControl {
 namespace Attributes {

@@ -25,9 +25,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DoorLockClusterLockOperationErrorEvent(
-  val lockOperationType: UInt,
-  val operationSource: UInt,
-  val operationError: UInt,
+  val lockOperationType: UByte,
+  val operationSource: UByte,
+  val operationError: UByte,
   val userIndex: UShort?,
   val fabricIndex: UByte?,
   val sourceNode: ULong?,
@@ -94,9 +94,9 @@ class DoorLockClusterLockOperationErrorEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockOperationErrorEvent {
       tlvReader.enterStructure(tlvTag)
-      val lockOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
-      val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
-      val operationError = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_ERROR))
+      val lockOperationType = tlvReader.getUByte(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
+      val operationSource = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATION_SOURCE))
+      val operationError = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATION_ERROR))
       val userIndex =
         if (!tlvReader.isNull()) {
           tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))

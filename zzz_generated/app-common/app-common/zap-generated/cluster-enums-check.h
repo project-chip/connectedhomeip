@@ -1508,20 +1508,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BooleanSensorConfiguration::SensitivityEnum val)
-{
-    using EnumType = BooleanSensorConfiguration::SensitivityEnum;
-    switch (val)
-    {
-    case EnumType::kHigh:
-    case EnumType::kStandard:
-    case EnumType::kLow:
-        return val;
-    default:
-        return static_cast<EnumType>(3);
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
 {
     using EnumType = ValveConfigurationAndControl::ValveStateEnum;
@@ -1532,6 +1518,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndCo
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalEnergyMeasurement::MeasurementTypeEnum val)
+{
+    using EnumType = ElectricalEnergyMeasurement::MeasurementTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kVoltage:
+    case EnumType::kActiveCurrent:
+    case EnumType::kReactiveCurrent:
+    case EnumType::kApparentCurrent:
+    case EnumType::kActivePower:
+    case EnumType::kReactivePower:
+    case EnumType::kApparentPower:
+    case EnumType::kRMSVoltage:
+    case EnumType::kRMSCurrent:
+    case EnumType::kRMSPower:
+    case EnumType::kFrequency:
+    case EnumType::kPowerFactor:
+    case EnumType::kNeutralCurrent:
+    case EnumType::kElectricalEnergy:
+        return val;
+    default:
+        return static_cast<EnumType>(15);
     }
 }
 

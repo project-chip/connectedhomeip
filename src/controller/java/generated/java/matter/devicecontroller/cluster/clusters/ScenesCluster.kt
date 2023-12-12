@@ -17,8 +17,17 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import matter.controller.MatterController
+import java.time.Duration
+import java.util.logging.Level
+import java.util.logging.Logger
+import matter.controller.*
+import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
 import matter.devicecontroller.cluster.structs.*
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ScenesCluster(private val controller: MatterController, private val endpointId: UShort) {
   class AddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
@@ -82,13 +91,88 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): AddSceneResponse {
-    val commandId = 0L
+    val commandId: UInt = 0u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+
+    val TAG_TRANSITION_TIME_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
+
+    val TAG_SCENE_NAME_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_NAME_REQ), sceneName)
+
+    val TAG_EXTENSION_FIELD_SETS_REQ: Int = 4
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS_REQ))
+    for (item in extensionFieldSets.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
     }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return AddSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
   }
 
   suspend fun viewScene(
@@ -96,13 +180,139 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): ViewSceneResponse {
-    val commandId = 1L
+    val commandId: UInt = 1u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    val TAG_TRANSITION_TIME: Int = 3
+    var transitionTime_decoded: UShort? = null
+
+    val TAG_SCENE_NAME: Int = 4
+    var sceneName_decoded: String? = null
+
+    val TAG_EXTENSION_FIELD_SETS: Int = 5
+    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+        transitionTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+        sceneName_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
+        extensionFieldSets_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<ScenesClusterExtensionFieldSet> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return ViewSceneResponse(
+      status_decoded,
+      groupID_decoded,
+      sceneID_decoded,
+      transitionTime_decoded,
+      sceneName_decoded,
+      extensionFieldSets_decoded
+    )
   }
 
   suspend fun removeScene(
@@ -110,26 +320,136 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): RemoveSceneResponse {
-    val commandId = 2L
+    val commandId: UInt = 2u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return RemoveSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
   }
 
   suspend fun removeAllScenes(
     groupID: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): RemoveAllScenesResponse {
-    val commandId = 3L
+    val commandId: UInt = 3u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return RemoveAllScenesResponse(status_decoded, groupID_decoded)
   }
 
   suspend fun storeScene(
@@ -137,13 +457,75 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): StoreSceneResponse {
-    val commandId = 4L
+    val commandId: UInt = 4u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return StoreSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
   }
 
   suspend fun recallScene(
@@ -152,26 +534,141 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     transitionTime: UShort?,
     timedInvokeTimeoutMs: Int? = null
   ) {
-    val commandId = 5L
+    val commandId: UInt = 5u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+
+    val TAG_TRANSITION_TIME_REQ: Int = 2
+    transitionTime?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
     }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
   suspend fun getSceneMembership(
     groupID: UShort,
     timedInvokeTimeoutMs: Int? = null
   ): GetSceneMembershipResponse {
-    val commandId = 6L
+    val commandId: UInt = 6u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_CAPACITY: Int = 1
+    var capacity_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 2
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_LIST: Int = 3
+    var sceneList_decoded: List<UByte>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_CAPACITY)) {
+        capacity_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(tag)
+            } else {
+              tlvReader.getNull(tag)
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_LIST)) {
+        sceneList_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<UByte> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUByte(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetSceneMembershipResponse(
+      status_decoded,
+      capacity_decoded,
+      groupID_decoded,
+      sceneList_decoded
+    )
   }
 
   suspend fun enhancedAddScene(
@@ -182,13 +679,88 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedAddSceneResponse {
-    val commandId = 64L
+    val commandId: UInt = 64u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+
+    val TAG_TRANSITION_TIME_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
+
+    val TAG_SCENE_NAME_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_NAME_REQ), sceneName)
+
+    val TAG_EXTENSION_FIELD_SETS_REQ: Int = 4
+    tlvWriter.startArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS_REQ))
+    for (item in extensionFieldSets.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
     }
+    tlvWriter.endArray()
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
+    }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return EnhancedAddSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
   }
 
   suspend fun enhancedViewScene(
@@ -196,166 +768,734 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedViewSceneResponse {
-    val commandId = 65L
+    val commandId: UInt = 65u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_GROUP_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
+
+    val TAG_SCENE_I_D_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_I_D: Int = 1
+    var groupID_decoded: UShort? = null
+
+    val TAG_SCENE_I_D: Int = 2
+    var sceneID_decoded: UByte? = null
+
+    val TAG_TRANSITION_TIME: Int = 3
+    var transitionTime_decoded: UShort? = null
+
+    val TAG_SCENE_NAME: Int = 4
+    var sceneName_decoded: String? = null
+
+    val TAG_EXTENSION_FIELD_SETS: Int = 5
+    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
+        groupID_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
+        sceneID_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+        transitionTime_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getUShort(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
+        sceneName_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      }
+
+      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
+        extensionFieldSets_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              buildList<ScenesClusterExtensionFieldSet> {
+                tlvReader.enterArray(tag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+          }
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupID_decoded == null) {
+      throw IllegalStateException("groupID not found in TLV")
+    }
+
+    if (sceneID_decoded == null) {
+      throw IllegalStateException("sceneID not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return EnhancedViewSceneResponse(
+      status_decoded,
+      groupID_decoded,
+      sceneID_decoded,
+      transitionTime_decoded,
+      sceneName_decoded,
+      extensionFieldSets_decoded
+    )
   }
 
   suspend fun copyScene(
-    mode: UInt,
+    mode: UByte,
     groupIdentifierFrom: UShort,
     sceneIdentifierFrom: UByte,
     groupIdentifierTo: UShort,
     sceneIdentifierTo: UByte,
     timedInvokeTimeoutMs: Int? = null
   ): CopySceneResponse {
-    val commandId = 66L
+    val commandId: UInt = 66u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_MODE_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_MODE_REQ), mode)
+
+    val TAG_GROUP_IDENTIFIER_FROM_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM_REQ), groupIdentifierFrom)
+
+    val TAG_SCENE_IDENTIFIER_FROM_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM_REQ), sceneIdentifierFrom)
+
+    val TAG_GROUP_IDENTIFIER_TO_REQ: Int = 3
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_IDENTIFIER_TO_REQ), groupIdentifierTo)
+
+    val TAG_SCENE_IDENTIFIER_TO_REQ: Int = 4
+    tlvWriter.put(ContextSpecificTag(TAG_SCENE_IDENTIFIER_TO_REQ), sceneIdentifierTo)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_GROUP_IDENTIFIER_FROM: Int = 1
+    var groupIdentifierFrom_decoded: UShort? = null
+
+    val TAG_SCENE_IDENTIFIER_FROM: Int = 2
+    var sceneIdentifierFrom_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_GROUP_IDENTIFIER_FROM)) {
+        groupIdentifierFrom_decoded = tlvReader.getUShort(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
+        sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
+      } else {
+        // Skip unknown tags
+        tlvReader.skipElement()
+      }
     }
+
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    if (groupIdentifierFrom_decoded == null) {
+      throw IllegalStateException("groupIdentifierFrom not found in TLV")
+    }
+
+    if (sceneIdentifierFrom_decoded == null) {
+      throw IllegalStateException("sceneIdentifierFrom not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return CopySceneResponse(
+      status_decoded,
+      groupIdentifierFrom_decoded,
+      sceneIdentifierFrom_decoded
+    )
   }
 
-  suspend fun readSceneCountAttribute(): UByte {
-    // Implementation needs to be added here
+  suspend fun readSceneCountAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 0u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Scenecount attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
-  suspend fun subscribeSceneCountAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
+  suspend fun readCurrentSceneAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Currentscene attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
-  suspend fun readCurrentSceneAttribute(): UByte {
-    // Implementation needs to be added here
+  suspend fun readCurrentGroupAttribute(): UShort? {
+    val ATTRIBUTE_ID: UInt = 2u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Currentgroup attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
-  suspend fun subscribeCurrentSceneAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
-  }
+  suspend fun readSceneValidAttribute(): Boolean? {
+    val ATTRIBUTE_ID: UInt = 3u
 
-  suspend fun readCurrentGroupAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-  suspend fun subscribeCurrentGroupAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
-  }
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
-  suspend fun readSceneValidAttribute(): Boolean {
-    // Implementation needs to be added here
-  }
+    val response = controller.read(readRequest)
 
-  suspend fun subscribeSceneValidAttribute(minInterval: Int, maxInterval: Int): Boolean {
-    // Implementation needs to be added here
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Scenevalid attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
   }
 
   suspend fun readNameSupportAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 4u
 
-  suspend fun subscribeNameSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Namesupport attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readLastConfiguredByAttribute(): LastConfiguredByAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 5u
 
-  suspend fun subscribeLastConfiguredByAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LastConfiguredByAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Lastconfiguredby attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ULong? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getULong(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return LastConfiguredByAttribute(decodedValue)
   }
 
   suspend fun readSceneTableSizeAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 6u
 
-  suspend fun subscribeSceneTableSizeAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Scenetablesize attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 7u
 
-  suspend fun readFabricSceneInfoAttributeWithFabricFilter(
-    isFabricFiltered: Boolean
-  ): FabricSceneInfoAttribute {
-    // Implementation needs to be added here
-  }
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-  suspend fun subscribeFabricSceneInfoAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): FabricSceneInfoAttribute {
-    // Implementation needs to be added here
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Fabricsceneinfo attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ScenesClusterSceneInfoStruct> =
+      buildList<ScenesClusterSceneInfoStruct> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(ScenesClusterSceneInfoStruct.fromTlv(AnonymousTag, tlvReader))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return FabricSceneInfoAttribute(decodedValue)
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65528u
 
-  suspend fun subscribeGeneratedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return GeneratedCommandListAttribute(decodedValue)
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65529u
 
-  suspend fun subscribeAcceptedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AcceptedCommandListAttribute(decodedValue)
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65530u
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return EventListAttribute(decodedValue)
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65531u
 
-  suspend fun subscribeAttributeListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AttributeListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UInt> =
+      buildList<UInt> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUInt(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return AttributeListAttribute(decodedValue)
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65532u
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+    return decodedValue
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID: UInt = 65533u
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+    return decodedValue
   }
 
   companion object {
+    private val logger = Logger.getLogger(ScenesCluster::class.java.name)
     const val CLUSTER_ID: UInt = 5u
   }
 }
