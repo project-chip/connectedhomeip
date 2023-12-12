@@ -6221,20 +6221,13 @@ class ChipClusters:
                 "commandName": "Open",
                 "args": {
                     "openDuration": "int",
+                    "targetLevel": "int",
                 },
             },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Close",
                 "args": {
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "SetLevel",
-                "args": {
-                    "level": "int",
-                    "openDuration": "int",
                 },
             },
         },
@@ -6244,38 +6237,36 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000001: {
-                "attributeName": "AutoCloseTime",
+                "attributeName": "DefaultOpenDuration",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "RemainingDuration",
+                "attributeName": "AutoCloseTime",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentState",
+                "attributeName": "RemainingDuration",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "TargetState",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "StartUpState",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000006: {
                 "attributeName": "CurrentLevel",
@@ -6290,7 +6281,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000008: {
-                "attributeName": "OpenLevel",
+                "attributeName": "DefaultOpenLevel",
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,

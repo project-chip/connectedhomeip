@@ -2433,6 +2433,15 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.valveState)];
             value.valveState = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.valveLevel.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.valveLevel.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.valveLevel = memberValue;
+        } while (0);
 
         return value;
     }

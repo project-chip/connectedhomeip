@@ -2590,14 +2590,14 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
 
     // Cluster ValveConfigurationAndControl attributes
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeStartUpStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAutoCloseTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeRemainingDurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeCurrentLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeTargetLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeOpenLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeDefaultOpenLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
@@ -6252,7 +6252,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     // Cluster ValveConfigurationAndControl commands
     MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterValveConfigurationAndControlCommandCloseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterValveConfigurationAndControlCommandSetLevelID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
 
     // Cluster DemandResponseLoadControl commands
     MTRCommandIDTypeClusterDemandResponseLoadControlCommandRegisterLoadControlProgramRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

@@ -2865,6 +2865,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::OpenDuration::Id: {
         return YES;
     }
+    case Attributes::DefaultOpenDuration::Id: {
+        return YES;
+    }
     case Attributes::AutoCloseTime::Id: {
         return YES;
     }
@@ -2877,16 +2880,13 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::TargetState::Id: {
         return YES;
     }
-    case Attributes::StartUpState::Id: {
-        return YES;
-    }
     case Attributes::CurrentLevel::Id: {
         return YES;
     }
     case Attributes::TargetLevel::Id: {
         return YES;
     }
-    case Attributes::OpenLevel::Id: {
+    case Attributes::DefaultOpenLevel::Id: {
         return YES;
     }
     case Attributes::ValveFault::Id: {

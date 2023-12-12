@@ -9777,6 +9777,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedValveConfigurationAndControlClusterDefaultOpenDurationAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.DefaultOpenDurationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedValveConfigurationAndControlClusterAutoCloseTimeAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.AutoCloseTimeAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -9883,27 +9904,6 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedValveConfigurationAndControlClusterTargetLevelAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.TargetLevelAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedValveConfigurationAndControlClusterOpenLevelAttributeCallback implements ChipClusters.ValveConfigurationAndControlCluster.OpenLevelAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -22627,12 +22627,17 @@ public class ClusterInfoMapping {
 
     CommandParameterInfo valveConfigurationAndControlopenopenDurationCommandParameterInfo = new CommandParameterInfo("openDuration", Optional.class, Long.class);
     valveConfigurationAndControlopenCommandParams.put("openDuration",valveConfigurationAndControlopenopenDurationCommandParameterInfo);
+
+    CommandParameterInfo valveConfigurationAndControlopentargetLevelCommandParameterInfo = new CommandParameterInfo("targetLevel", Optional.class, Integer.class);
+    valveConfigurationAndControlopenCommandParams.put("targetLevel",valveConfigurationAndControlopentargetLevelCommandParameterInfo);
     InteractionInfo valveConfigurationAndControlopenInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ValveConfigurationAndControlCluster) cluster)
         .open((DefaultClusterCallback) callback
         , (Optional<Long>)
         commandArguments.get("openDuration")
+        , (Optional<Integer>)
+        commandArguments.get("targetLevel")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -22651,28 +22656,6 @@ public class ClusterInfoMapping {
         valveConfigurationAndControlcloseCommandParams
     );
     valveConfigurationAndControlClusterInteractionInfoMap.put("close", valveConfigurationAndControlcloseInteractionInfo);
-
-    Map<String, CommandParameterInfo> valveConfigurationAndControlsetLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo valveConfigurationAndControlsetLevellevelCommandParameterInfo = new CommandParameterInfo("level", Integer.class, Integer.class);
-    valveConfigurationAndControlsetLevelCommandParams.put("level",valveConfigurationAndControlsetLevellevelCommandParameterInfo);
-
-    CommandParameterInfo valveConfigurationAndControlsetLevelopenDurationCommandParameterInfo = new CommandParameterInfo("openDuration", Optional.class, Long.class);
-    valveConfigurationAndControlsetLevelCommandParams.put("openDuration",valveConfigurationAndControlsetLevelopenDurationCommandParameterInfo);
-    InteractionInfo valveConfigurationAndControlsetLevelInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ValveConfigurationAndControlCluster) cluster)
-        .setLevel((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("level")
-        , (Optional<Long>)
-        commandArguments.get("openDuration")
-        );
-      },
-      () -> new DelegatedDefaultClusterCallback(),
-        valveConfigurationAndControlsetLevelCommandParams
-    );
-    valveConfigurationAndControlClusterInteractionInfoMap.put("setLevel", valveConfigurationAndControlsetLevelInteractionInfo);
 
     commandMap.put("valveConfigurationAndControl", valveConfigurationAndControlClusterInteractionInfoMap);
 

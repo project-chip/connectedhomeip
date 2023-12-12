@@ -19748,11 +19748,6 @@ struct Type;
 struct DecodableType;
 } // namespace Close
 
-namespace SetLevel {
-struct Type;
-struct DecodableType;
-} // namespace SetLevel
-
 } // namespace Commands
 
 namespace Commands {
@@ -19760,6 +19755,7 @@ namespace Open {
 enum class Fields : uint8_t
 {
     kOpenDuration = 0,
+    kTargetLevel  = 1,
 };
 
 struct Type
@@ -19769,7 +19765,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Open::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
 
-    Optional<uint32_t> openDuration;
+    Optional<DataModel::Nullable<uint32_t>> openDuration;
+    Optional<chip::Percent> targetLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -19784,7 +19781,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Open::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
 
-    Optional<uint32_t> openDuration;
+    Optional<DataModel::Nullable<uint32_t>> openDuration;
+    Optional<chip::Percent> targetLevel;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Open
@@ -19816,41 +19814,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Close
-namespace SetLevel {
-enum class Fields : uint8_t
-{
-    kLevel        = 0,
-    kOpenDuration = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetLevel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
-
-    chip::Percent level = static_cast<chip::Percent>(0);
-    Optional<uint32_t> openDuration;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetLevel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
-
-    chip::Percent level = static_cast<chip::Percent>(0);
-    Optional<uint32_t> openDuration;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetLevel
 } // namespace Commands
 
 namespace Attributes {
@@ -19867,6 +19830,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OpenDuration
+namespace DefaultOpenDuration {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOpenDuration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultOpenDuration
 namespace AutoCloseTime {
 struct TypeInfo
 {
@@ -19917,18 +19892,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TargetState
-namespace StartUpState {
-struct TypeInfo
-{
-    using Type             = chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum;
-    using DecodableType    = chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum;
-    using DecodableArgType = chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::StartUpState::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace StartUpState
 namespace CurrentLevel {
 struct TypeInfo
 {
@@ -19953,18 +19916,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TargetLevel
-namespace OpenLevel {
+namespace DefaultOpenLevel {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
+    using Type             = chip::Percent;
+    using DecodableType    = chip::Percent;
+    using DecodableArgType = chip::Percent;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OpenLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOpenLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace OpenLevel
+} // namespace DefaultOpenLevel
 namespace ValveFault {
 struct TypeInfo
 {
@@ -20023,15 +19986,14 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::OpenDuration::TypeInfo::DecodableType openDuration;
+        Attributes::DefaultOpenDuration::TypeInfo::DecodableType defaultOpenDuration;
         Attributes::AutoCloseTime::TypeInfo::DecodableType autoCloseTime;
         Attributes::RemainingDuration::TypeInfo::DecodableType remainingDuration;
         Attributes::CurrentState::TypeInfo::DecodableType currentState;
         Attributes::TargetState::TypeInfo::DecodableType targetState;
-        Attributes::StartUpState::TypeInfo::DecodableType startUpState =
-            static_cast<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>(0);
         Attributes::CurrentLevel::TypeInfo::DecodableType currentLevel;
         Attributes::TargetLevel::TypeInfo::DecodableType targetLevel;
-        Attributes::OpenLevel::TypeInfo::DecodableType openLevel;
+        Attributes::DefaultOpenLevel::TypeInfo::DecodableType defaultOpenLevel = static_cast<chip::Percent>(0);
         Attributes::ValveFault::TypeInfo::DecodableType valveFault =
             static_cast<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
@@ -20050,6 +20012,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kValveState = 0,
+    kValveLevel = 1,
 };
 
 struct Type
@@ -20061,6 +20024,7 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     ValveStateEnum valveState = static_cast<ValveStateEnum>(0);
+    Optional<chip::Percent> valveLevel;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -20073,6 +20037,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ValveConfigurationAndControl::Id; }
 
     ValveStateEnum valveState = static_cast<ValveStateEnum>(0);
+    Optional<chip::Percent> valveLevel;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

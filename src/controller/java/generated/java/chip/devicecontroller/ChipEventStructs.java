@@ -2970,17 +2970,22 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
 }
 public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
   public Integer valveState;
+  public Optional<Integer> valveLevel;
   private static final long VALVE_STATE_ID = 0L;
+  private static final long VALVE_LEVEL_ID = 1L;
 
   public ValveConfigurationAndControlClusterValveStateChangedEvent(
-    Integer valveState
+    Integer valveState,
+    Optional<Integer> valveLevel
   ) {
     this.valveState = valveState;
+    this.valveLevel = valveLevel;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(VALVE_STATE_ID, new UIntType(valveState)));
+    values.add(new StructElement(VALVE_LEVEL_ID, valveLevel.<BaseTLVType>map((nonOptionalvalveLevel) -> new UIntType(nonOptionalvalveLevel)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -2990,16 +2995,23 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
       return null;
     }
     Integer valveState = null;
+    Optional<Integer> valveLevel = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == VALVE_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           valveState = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == VALVE_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valveLevel = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ValveConfigurationAndControlClusterValveStateChangedEvent(
-      valveState
+      valveState,
+      valveLevel
     );
   }
 
@@ -3009,6 +3021,9 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
     output.append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n");
     output.append("\tvalveState: ");
     output.append(valveState);
+    output.append("\n");
+    output.append("\tvalveLevel: ");
+    output.append(valveLevel);
     output.append("\n");
     output.append("}\n");
     return output.toString();

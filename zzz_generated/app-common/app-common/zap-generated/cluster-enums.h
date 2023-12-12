@@ -2159,16 +2159,28 @@ enum class Feature : uint32_t
 
 namespace ValveConfigurationAndControl {
 
-// Enum for ValveStateEnum
-enum class ValveStateEnum : uint8_t
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
 {
-    kOpen   = 0x00,
-    kClosed = 0x01,
+    kFailureDueToFault = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ValveStateEnum
+enum class ValveStateEnum : uint8_t
+{
+    kClosed        = 0x00,
+    kOpen          = 0x01,
+    kTransitioning = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for Feature
@@ -2181,9 +2193,12 @@ enum class Feature : uint32_t
 // Bitmap for ValveFaultBitmap
 enum class ValveFaultBitmap : uint16_t
 {
-    kGeneralFault = 0x1,
-    kBlocked      = 0x2,
-    kLeaking      = 0x4,
+    kGeneralFault    = 0x1,
+    kBlocked         = 0x2,
+    kLeaking         = 0x4,
+    kNotConnected    = 0x8,
+    kShortCircuit    = 0x10,
+    kCurrentExceeded = 0x20,
 };
 } // namespace ValveConfigurationAndControl
 

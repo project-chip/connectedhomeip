@@ -35,6 +35,8 @@ class ValveConfigurationAndControlCluster(
 ) {
   class OpenDurationAttribute(val value: UInt?)
 
+  class DefaultOpenDurationAttribute(val value: UInt?)
+
   class AutoCloseTimeAttribute(val value: ULong?)
 
   class RemainingDurationAttribute(val value: UInt?)
@@ -47,8 +49,6 @@ class ValveConfigurationAndControlCluster(
 
   class TargetLevelAttribute(val value: UByte?)
 
-  class OpenLevelAttribute(val value: UByte?)
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -57,7 +57,7 @@ class ValveConfigurationAndControlCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun open(openDuration: UInt?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun open(openDuration: UInt?, targetLevel: UByte?, timedInvokeTimeoutMs: Int? = null) {
     val commandId: UInt = 0u
     val timeoutMs: Duration =
       timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
@@ -67,6 +67,9 @@ class ValveConfigurationAndControlCluster(
 
     val TAG_OPEN_DURATION_REQ: Int = 0
     openDuration?.let { tlvWriter.put(ContextSpecificTag(TAG_OPEN_DURATION_REQ), openDuration) }
+
+    val TAG_TARGET_LEVEL_REQ: Int = 1
+    targetLevel?.let { tlvWriter.put(ContextSpecificTag(TAG_TARGET_LEVEL_REQ), targetLevel) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -87,32 +90,6 @@ class ValveConfigurationAndControlCluster(
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setLevel(level: UByte, openDuration: UInt?, timedInvokeTimeoutMs: Int? = null) {
-    val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_LEVEL_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_LEVEL_REQ), level)
-
-    val TAG_OPEN_DURATION_REQ: Int = 1
-    openDuration?.let { tlvWriter.put(ContextSpecificTag(TAG_OPEN_DURATION_REQ), openDuration) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -163,50 +140,45 @@ class ValveConfigurationAndControlCluster(
     return OpenDurationAttribute(decodedValue)
   }
 
-  suspend fun writeOpenDurationAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+  suspend fun readDefaultOpenDurationAttribute(): DefaultOpenDurationAttribute {
+    val ATTRIBUTE_ID: UInt = 1u
 
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
-    val response: WriteResponse = controller.write(writeRequests)
+    val response = controller.read(readRequest)
 
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Defaultopenduration attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return DefaultOpenDurationAttribute(decodedValue)
   }
 
   suspend fun readAutoCloseTimeAttribute(): AutoCloseTimeAttribute {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -247,7 +219,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readRemainingDurationAttribute(): RemainingDurationAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -274,11 +246,7 @@ class ValveConfigurationAndControlCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UInt? =
       if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUInt(AnonymousTag)
-        } else {
-          null
-        }
+        tlvReader.getUInt(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -288,7 +256,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readCurrentStateAttribute(): CurrentStateAttribute {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -325,7 +293,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readTargetStateAttribute(): TargetStateAttribute {
-    val ATTRIBUTE_ID: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -359,84 +327,6 @@ class ValveConfigurationAndControlCluster(
       }
 
     return TargetStateAttribute(decodedValue)
-  }
-
-  suspend fun readStartUpStateAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 5u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Startupstate attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeStartUpStateAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
   }
 
   suspend fun readCurrentLevelAttribute(): CurrentLevelAttribute {
@@ -521,7 +411,7 @@ class ValveConfigurationAndControlCluster(
     return TargetLevelAttribute(decodedValue)
   }
 
-  suspend fun readOpenLevelAttribute(): OpenLevelAttribute {
+  suspend fun readDefaultOpenLevelAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
@@ -543,26 +433,21 @@ class ValveConfigurationAndControlCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Openlevel attribute not found in response" }
+    requireNotNull(attributeData) { "Defaultopenlevel attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OpenLevelAttribute(decodedValue)
+    return decodedValue
   }
 
-  suspend fun writeOpenLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDefaultOpenLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     val ATTRIBUTE_ID: UInt = 8u
     val timeoutMs: Duration =
       timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO

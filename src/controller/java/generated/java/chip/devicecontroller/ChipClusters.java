@@ -27749,14 +27749,14 @@ public class ChipClusters {
     public static final long CLUSTER_ID = 129L;
 
     private static final long OPEN_DURATION_ATTRIBUTE_ID = 0L;
-    private static final long AUTO_CLOSE_TIME_ATTRIBUTE_ID = 1L;
-    private static final long REMAINING_DURATION_ATTRIBUTE_ID = 2L;
-    private static final long CURRENT_STATE_ATTRIBUTE_ID = 3L;
-    private static final long TARGET_STATE_ATTRIBUTE_ID = 4L;
-    private static final long START_UP_STATE_ATTRIBUTE_ID = 5L;
+    private static final long DEFAULT_OPEN_DURATION_ATTRIBUTE_ID = 1L;
+    private static final long AUTO_CLOSE_TIME_ATTRIBUTE_ID = 2L;
+    private static final long REMAINING_DURATION_ATTRIBUTE_ID = 3L;
+    private static final long CURRENT_STATE_ATTRIBUTE_ID = 4L;
+    private static final long TARGET_STATE_ATTRIBUTE_ID = 5L;
     private static final long CURRENT_LEVEL_ATTRIBUTE_ID = 6L;
     private static final long TARGET_LEVEL_ATTRIBUTE_ID = 7L;
-    private static final long OPEN_LEVEL_ATTRIBUTE_ID = 8L;
+    private static final long DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID = 8L;
     private static final long VALVE_FAULT_ATTRIBUTE_ID = 9L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
@@ -27775,17 +27775,21 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void open(DefaultClusterCallback callback, Optional<Long> openDuration) {
-      open(callback, openDuration, 0);
+    public void open(DefaultClusterCallback callback, @Nullable Optional<Long> openDuration, Optional<Integer> targetLevel) {
+      open(callback, openDuration, targetLevel, 0);
     }
 
-    public void open(DefaultClusterCallback callback, Optional<Long> openDuration, int timedInvokeTimeoutMs) {
+    public void open(DefaultClusterCallback callback, @Nullable Optional<Long> openDuration, Optional<Integer> targetLevel, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long openDurationFieldID = 0L;
-      BaseTLVType openDurationtlvValue = openDuration.<BaseTLVType>map((nonOptionalopenDuration) -> new UIntType(nonOptionalopenDuration)).orElse(new EmptyType());
+      BaseTLVType openDurationtlvValue = openDuration != null ? openDuration.<BaseTLVType>map((nonOptionalopenDuration) -> new UIntType(nonOptionalopenDuration)).orElse(new EmptyType()) : new NullType();
       elements.add(new StructElement(openDurationFieldID, openDurationtlvValue));
+
+      final long targetLevelFieldID = 1L;
+      BaseTLVType targetLeveltlvValue = targetLevel.<BaseTLVType>map((nonOptionaltargetLevel) -> new UIntType(nonOptionaltargetLevel)).orElse(new EmptyType());
+      elements.add(new StructElement(targetLevelFieldID, targetLeveltlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -27811,31 +27815,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void setLevel(DefaultClusterCallback callback, Integer level, Optional<Long> openDuration) {
-      setLevel(callback, level, openDuration, 0);
-    }
-
-    public void setLevel(DefaultClusterCallback callback, Integer level, Optional<Long> openDuration, int timedInvokeTimeoutMs) {
-      final long commandId = 2L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long levelFieldID = 0L;
-      BaseTLVType leveltlvValue = new UIntType(level);
-      elements.add(new StructElement(levelFieldID, leveltlvValue));
-
-      final long openDurationFieldID = 1L;
-      BaseTLVType openDurationtlvValue = openDuration.<BaseTLVType>map((nonOptionalopenDuration) -> new UIntType(nonOptionalopenDuration)).orElse(new EmptyType());
-      elements.add(new StructElement(openDurationFieldID, openDurationtlvValue));
-
-      StructType value = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, value, timedInvokeTimeoutMs);
-    }
-
     public interface OpenDurationAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface DefaultOpenDurationAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
     }
 
@@ -27860,10 +27844,6 @@ public class ChipClusters {
     }
 
     public interface TargetLevelAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-    }
-
-    public interface OpenLevelAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
     }
 
@@ -27896,15 +27876,6 @@ public class ChipClusters {
         }, OPEN_DURATION_ATTRIBUTE_ID, true);
     }
 
-    public void writeOpenDurationAttribute(DefaultClusterCallback callback, Long value) {
-      writeOpenDurationAttribute(callback, value, 0);
-    }
-
-    public void writeOpenDurationAttribute(DefaultClusterCallback callback, Long value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), OPEN_DURATION_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeOpenDurationAttribute(
         OpenDurationAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPEN_DURATION_ATTRIBUTE_ID);
@@ -27915,6 +27886,31 @@ public class ChipClusters {
             @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, OPEN_DURATION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readDefaultOpenDurationAttribute(
+        DefaultOpenDurationAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OPEN_DURATION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, DEFAULT_OPEN_DURATION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeDefaultOpenDurationAttribute(
+        DefaultOpenDurationAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OPEN_DURATION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, DEFAULT_OPEN_DURATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readAutoCloseTimeAttribute(
@@ -28017,40 +28013,6 @@ public class ChipClusters {
         }, TARGET_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readStartUpStateAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_STATE_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, START_UP_STATE_ATTRIBUTE_ID, true);
-    }
-
-    public void writeStartUpStateAttribute(DefaultClusterCallback callback, Integer value) {
-      writeStartUpStateAttribute(callback, value, 0);
-    }
-
-    public void writeStartUpStateAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), START_UP_STATE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
-    public void subscribeStartUpStateAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, START_UP_STATE_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, START_UP_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
     public void readCurrentLevelAttribute(
         CurrentLevelAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_LEVEL_ATTRIBUTE_ID);
@@ -28101,38 +28063,38 @@ public class ChipClusters {
         }, TARGET_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readOpenLevelAttribute(
-        OpenLevelAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPEN_LEVEL_ATTRIBUTE_ID);
+    public void readDefaultOpenLevelAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, OPEN_LEVEL_ATTRIBUTE_ID, true);
+        }, DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID, true);
     }
 
-    public void writeOpenLevelAttribute(DefaultClusterCallback callback, Integer value) {
-      writeOpenLevelAttribute(callback, value, 0);
+    public void writeDefaultOpenLevelAttribute(DefaultClusterCallback callback, Integer value) {
+      writeDefaultOpenLevelAttribute(callback, value, 0);
     }
 
-    public void writeOpenLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = value != null ? new UIntType(value) : new NullType();
-      writeAttribute(new WriteAttributesCallbackImpl(callback), OPEN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    public void writeDefaultOpenLevelAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeOpenLevelAttribute(
-        OpenLevelAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPEN_LEVEL_ATTRIBUTE_ID);
+    public void subscribeDefaultOpenLevelAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
-        }, OPEN_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, DEFAULT_OPEN_LEVEL_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readValveFaultAttribute(

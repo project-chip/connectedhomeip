@@ -7456,6 +7456,21 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         }
         return value;
     }
+    case Attributes::DefaultOpenDuration::Id: {
+        using TypeInfo = Attributes::DefaultOpenDuration::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedInt:cppValue.Value()];
+        }
+        return value;
+    }
     case Attributes::AutoCloseTime::Id: {
         using TypeInfo = Attributes::AutoCloseTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -7516,17 +7531,6 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         }
         return value;
     }
-    case Attributes::StartUpState::Id: {
-        using TypeInfo = Attributes::StartUpState::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
-        return value;
-    }
     case Attributes::CurrentLevel::Id: {
         using TypeInfo = Attributes::CurrentLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -7557,19 +7561,15 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         }
         return value;
     }
-    case Attributes::OpenLevel::Id: {
-        using TypeInfo = Attributes::OpenLevel::TypeInfo;
+    case Attributes::DefaultOpenLevel::Id: {
+        using TypeInfo = Attributes::DefaultOpenLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nullable value;
-        if (cppValue.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
-        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
     case Attributes::ValveFault::Id: {

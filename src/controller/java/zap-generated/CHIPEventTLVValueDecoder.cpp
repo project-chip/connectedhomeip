@@ -3774,6 +3774,23 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_valveStateClassName.c_str(), value_valveStateCtorSignature.c_str(), jnivalue_valveState, value_valveState);
 
+            jobject value_valveLevel;
+            if (!cppValue.valveLevel.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_valveLevel);
+            }
+            else
+            {
+                jobject value_valveLevelInsideOptional;
+                std::string value_valveLevelInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_valveLevelInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_valveLevelInsideOptional                  = static_cast<jint>(cppValue.valveLevel.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_valveLevelInsideOptionalClassName.c_str(), value_valveLevelInsideOptionalCtorSignature.c_str(),
+                    jnivalue_valveLevelInsideOptional, value_valveLevelInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_valveLevelInsideOptional, value_valveLevel);
+            }
+
             jclass valveStateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent",
@@ -3785,7 +3802,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jmethodID valveStateChangedStructCtor =
-                env->GetMethodID(valveStateChangedStructClass, "<init>", "(Ljava/lang/Integer;)V");
+                env->GetMethodID(valveStateChangedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
             if (valveStateChangedStructCtor == nullptr)
             {
                 ChipLogError(
@@ -3793,7 +3810,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value = env->NewObject(valveStateChangedStructClass, valveStateChangedStructCtor, value_valveState);
+            jobject value =
+                env->NewObject(valveStateChangedStructClass, valveStateChangedStructCtor, value_valveState, value_valveLevel);
 
             return value;
         }
