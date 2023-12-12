@@ -131,7 +131,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if !CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - setting factoryParams.enableServerInteractions to true.");
     factoryParams.enableServerInteractions = true;
 #else
@@ -188,7 +188,7 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerNOC      = nocSpan;
 
     params.defaultCommissioner = &gAutoCommissioner;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if !CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - setting params.enableServerInteractions to true.");
     params.enableServerInteractions = true;
 #else
