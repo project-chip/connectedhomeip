@@ -17,17 +17,8 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import java.time.Duration
-import java.util.logging.Level
-import java.util.logging.Logger
-import matter.controller.*
-import matter.controller.model.AttributePath
-import matter.controller.model.CommandPath
+import matter.controller.MatterController
 import matter.devicecontroller.cluster.structs.*
-import matter.tlv.AnonymousTag
-import matter.tlv.ContextSpecificTag
-import matter.tlv.TlvReader
-import matter.tlv.TlvWriter
 
 class ElectricalMeasurementCluster(
   private val controller: MatterController,
@@ -42,5269 +33,1293 @@ class ElectricalMeasurementCluster(
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int? = null) {
-    val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val commandId = 0L
 
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun getMeasurementProfileCommand(
     attributeId: UShort,
     startTime: UInt,
-    numberOfIntervals: UByte,
+    numberOfIntervals: UInt,
     timedInvokeTimeoutMs: Int? = null
   ) {
-    val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val commandId = 1L
 
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_ATTRIBUTE_ID_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_ATTRIBUTE_ID_REQ), attributeId)
-
-    val TAG_START_TIME_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_START_TIME_REQ), startTime)
-
-    val TAG_NUMBER_OF_INTERVALS_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_NUMBER_OF_INTERVALS_REQ), numberOfIntervals)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun readMeasurementTypeAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 0u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measurementtype attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasurementTypeAttribute(): UInt {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 256u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcvoltage attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasurementTypeAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcVoltageMinAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 257u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcvoltagemin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcVoltageAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcVoltageMaxAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 258u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcvoltagemax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 259u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcVoltageMinAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcCurrentMinAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 260u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dccurrentmin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcVoltageMinAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcCurrentMaxAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 261u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dccurrentmax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcVoltageMaxAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcPowerAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 262u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcpower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcVoltageMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcPowerMinAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 263u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcpowermin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcPowerMaxAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 264u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcpowermax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcCurrentAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcVoltageMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 512u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcvoltagemultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcCurrentMinAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcVoltageDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 513u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcvoltagedivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcCurrentMinAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcCurrentMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 514u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dccurrentmultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcCurrentMaxAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcCurrentDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 515u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dccurrentdivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcCurrentMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcPowerMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 516u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcpowermultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcPowerAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readDcPowerDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 517u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Dcpowerdivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcPowerAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAcFrequencyAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 768u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acfrequency attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcPowerMinAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAcFrequencyMinAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 769u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acfrequencymin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcPowerMinAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAcFrequencyMaxAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 770u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acfrequencymax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcPowerMaxAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readNeutralCurrentAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 771u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Neutralcurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcPowerMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readTotalActivePowerAttribute(): Int? {
-    val ATTRIBUTE_ID: UInt = 772u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Totalactivepower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Int? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcVoltageMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readTotalReactivePowerAttribute(): Int? {
-    val ATTRIBUTE_ID: UInt = 773u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Totalreactivepower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Int? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readTotalApparentPowerAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 774u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Totalapparentpower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcVoltageDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured1stHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 775u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured1stharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured3rdHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 776u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured3rdharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcCurrentMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured5thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 777u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured5thharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured7thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 778u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured7thharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcCurrentDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured9thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 779u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured9thharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasured11thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 780u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Measured11thharmoniccurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcPowerMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase1stHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 781u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase1stharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase3rdHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 782u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase3rdharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readDcPowerDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase5thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 783u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase5thharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeDcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase7thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 784u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase7thharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcFrequencyAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase9thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 785u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase9thharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcFrequencyAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readMeasuredPhase11thHarmonicCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 786u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Measuredphase11thharmoniccurrent attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcFrequencyMinAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAcFrequencyMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1024u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acfrequencymultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcFrequencyMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAcFrequencyDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1025u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acfrequencydivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcFrequencyMaxAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readPowerMultiplierAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 1026u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Powermultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcFrequencyMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readPowerDivisorAttribute(): UInt? {
-    val ATTRIBUTE_ID: UInt = 1027u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Powerdivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUInt(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readNeutralCurrentAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readHarmonicCurrentMultiplierAttribute(): Byte? {
-    val ATTRIBUTE_ID: UInt = 1028u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Harmoniccurrentmultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeNeutralCurrentAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readPhaseHarmonicCurrentMultiplierAttribute(): Byte? {
-    val ATTRIBUTE_ID: UInt = 1029u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Phaseharmoniccurrentmultiplier attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readTotalActivePowerAttribute(): Int {
+    // Implementation needs to be added here
   }
 
-  suspend fun readInstantaneousVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1280u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Instantaneousvoltage attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeTotalActivePowerAttribute(minInterval: Int, maxInterval: Int): Int {
+    // Implementation needs to be added here
   }
 
-  suspend fun readInstantaneousLineCurrentAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1281u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Instantaneouslinecurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readTotalReactivePowerAttribute(): Int {
+    // Implementation needs to be added here
   }
 
-  suspend fun readInstantaneousActiveCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1282u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Instantaneousactivecurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeTotalReactivePowerAttribute(minInterval: Int, maxInterval: Int): Int {
+    // Implementation needs to be added here
   }
 
-  suspend fun readInstantaneousReactiveCurrentAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1283u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Instantaneousreactivecurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readTotalApparentPowerAttribute(): UInt {
+    // Implementation needs to be added here
   }
 
-  suspend fun readInstantaneousPowerAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1284u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Instantaneouspower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeTotalApparentPowerAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1285u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltage attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured1stHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageMinAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1286u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagemin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured1stHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageMaxAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1287u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagemax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured3rdHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsCurrentAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1288u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrent attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured3rdHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsCurrentMinAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1289u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentmin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured5thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsCurrentMaxAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1290u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentmax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured5thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readActivePowerAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1291u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured7thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readActivePowerMinAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1292u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowermin attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured7thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readActivePowerMaxAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1293u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowermax attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured9thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readReactivePowerAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1294u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Reactivepower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured9thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readApparentPowerAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1295u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Apparentpower attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readMeasured11thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readPowerFactorAttribute(): Byte? {
-    val ATTRIBUTE_ID: UInt = 1296u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Powerfactor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeMeasured11thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAverageRmsVoltageMeasurementPeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1297u
+  suspend fun readMeasuredPhase1stHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeMeasuredPhase1stHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readMeasuredPhase3rdHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeMeasuredPhase3rdHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readMeasuredPhase5thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeMeasuredPhase5thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readMeasuredPhase7thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) {
-      "Averagermsvoltagemeasurementperiod attribute not found in response"
-    }
+  suspend fun subscribeMeasuredPhase7thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readMeasuredPhase9thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeMeasuredPhase9thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMeasuredPhase11thHarmonicCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMeasuredPhase11thHarmonicCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyDivisorAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPowerMultiplierAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPowerDivisorAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePowerDivisorAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readHarmonicCurrentMultiplierAttribute(): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeHarmonicCurrentMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhaseHarmonicCurrentMultiplierAttribute(): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhaseHarmonicCurrentMultiplierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousVoltageAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousLineCurrentAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousLineCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousActiveCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousActiveCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousReactiveCurrentAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousReactiveCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousPowerAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousPowerAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsVoltageAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsVoltageAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsVoltageMinAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsVoltageMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsVoltageMaxAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsVoltageMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsCurrentAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsCurrentAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsCurrentMinAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsCurrentMinAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRmsCurrentMaxAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRmsCurrentMaxAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActivePowerAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActivePowerAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActivePowerMinAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActivePowerMinAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActivePowerMaxAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActivePowerMaxAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readReactivePowerAttribute(): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeReactivePowerAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readApparentPowerAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeApparentPowerAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPowerFactorAttribute(): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePowerFactorAttribute(minInterval: Int, maxInterval: Int): Byte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAverageRmsVoltageMeasurementPeriodAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID: UInt = 1297u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readAverageRmsUnderVoltageCounterAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1299u
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsundervoltagecounter attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAverageRmsUnderVoltageCounterAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeAverageRmsUnderVoltageCounterAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID: UInt = 1299u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readRmsExtremeOverVoltagePeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1300u
+  suspend fun subscribeAverageRmsUnderVoltageCounterAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsextremeovervoltageperiod attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readRmsExtremeOverVoltagePeriodAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeRmsExtremeOverVoltagePeriodAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID: UInt = 1300u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readRmsExtremeUnderVoltagePeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1301u
+  suspend fun subscribeRmsExtremeOverVoltagePeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsextremeundervoltageperiod attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readRmsExtremeUnderVoltagePeriodAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    val ATTRIBUTE_ID: UInt = 1301u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readRmsVoltageSagPeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1302u
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagesagperiod attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readRmsVoltageSagPeriodAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 1302u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readRmsVoltageSwellPeriodAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1303u
+  suspend fun subscribeRmsVoltageSagPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltageswellperiod attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readRmsVoltageSwellPeriodAttribute(): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 1303u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
   }
 
-  suspend fun readAcVoltageMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1536u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acvoltagemultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeRmsVoltageSwellPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcVoltageDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1537u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
 
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acvoltagedivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcVoltageMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcCurrentMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1538u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Accurrentmultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcCurrentDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1539u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Accurrentdivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcVoltageDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcPowerMultiplierAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1540u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
 
-    requireNotNull(attributeData) { "Acpowermultiplier attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcPowerDivisorAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 1541u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
 
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acpowerdivisor attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcCurrentMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readOverloadAlarmsMaskAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 1792u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Overloadalarmsmask attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 1792u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
+  suspend fun subscribeAcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readVoltageOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1793u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Voltageoverload attribute not found in response" }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcCurrentDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readCurrentOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 1794u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentoverload attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcOverloadAlarmsMaskAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2048u
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acoverloadalarmsmask attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
-    val ATTRIBUTE_ID: UInt = 2048u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timeoutMs
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
+  suspend fun readAcPowerMultiplierAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcVoltageOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2049u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acvoltageoverload attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcCurrentOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2050u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
 
-    requireNotNull(attributeData) { "Accurrentoverload attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readAcPowerDivisorAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcActivePowerOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2051u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
 
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acactivepoweroverload attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun subscribeAcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAcReactivePowerOverloadAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2052u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acreactivepoweroverload attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readOverloadAlarmsMaskAttribute(): UByte {
+    // Implementation needs to be added here
   }
-
-  suspend fun readAverageRmsOverVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2053u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Averagermsovervoltage attribute not found in response" }
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun subscribeOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun readVoltageOverloadAttribute(): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readAverageRmsUnderVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2054u
+  suspend fun subscribeVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun readCurrentOverloadAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun subscribeCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun readAcOverloadAlarmsMaskAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+    if (timedWriteTimeoutMs != null) {
+      // Do the action with timedWriteTimeoutMs
+    } else {
+      // Do the action without timedWriteTimeoutMs
     }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  }
 
-    requireNotNull(attributeData) { "Averagermsundervoltage attribute not found in response" }
+  suspend fun subscribeAcOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readAcVoltageOverloadAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeAcVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsExtremeOverVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2055u
+  suspend fun readAcCurrentOverloadAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeAcCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readAcActivePowerOverloadAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeAcActivePowerOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readAcReactivePowerOverloadAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeAcReactivePowerOverloadAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readAverageRmsOverVoltageAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsextremeovervoltage attribute not found in response" }
+  suspend fun subscribeAverageRmsOverVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readAverageRmsUnderVoltageAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeAverageRmsUnderVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsExtremeUnderVoltageAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2056u
+  suspend fun readRmsExtremeOverVoltageAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeRmsExtremeOverVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readRmsExtremeUnderVoltageAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeRmsExtremeUnderVoltageAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readRmsVoltageSagAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeRmsVoltageSagAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readRmsVoltageSwellAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsextremeundervoltage attribute not found in response" }
+  suspend fun subscribeRmsVoltageSwellAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readLineCurrentPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeLineCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageSagAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2057u
+  suspend fun readActiveCurrentPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeActiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readReactiveCurrentPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeReactiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readRmsVoltagePhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeRmsVoltagePhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readRmsVoltageMinPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsvoltagesag attribute not found in response" }
+  suspend fun subscribeRmsVoltageMinPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readRmsVoltageMaxPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeRmsVoltageMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageSwellAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2058u
+  suspend fun readRmsCurrentPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeRmsCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readRmsCurrentMinPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeRmsCurrentMinPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readRmsCurrentMaxPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeRmsCurrentMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readActivePowerPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsvoltageswell attribute not found in response" }
+  suspend fun subscribeActivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readActivePowerMinPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeActivePowerMinPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
   }
 
-  suspend fun readLineCurrentPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2305u
+  suspend fun readActivePowerMaxPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeActivePowerMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readReactivePowerPhaseBAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeReactivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readApparentPowerPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeApparentPowerPhaseBAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readPowerFactorPhaseBAttribute(): Byte {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Linecurrentphaseb attribute not found in response" }
+  suspend fun subscribePowerFactorPhaseBAttribute(minInterval: Int, maxInterval: Int): Byte {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readActiveCurrentPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2306u
+  suspend fun readAverageRmsOverVoltageCounterPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeAverageRmsOverVoltageCounterPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readAverageRmsUnderVoltageCounterPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeAverageRmsUnderVoltageCounterPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readRmsExtremeOverVoltagePeriodPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeRmsExtremeOverVoltagePeriodPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readRmsExtremeUnderVoltagePeriodPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Activecurrentphaseb attribute not found in response" }
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readRmsVoltageSagPeriodPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeRmsVoltageSagPeriodPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readReactiveCurrentPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2307u
+  suspend fun readRmsVoltageSwellPeriodPhaseBAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeRmsVoltageSwellPeriodPhaseBAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readLineCurrentPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeLineCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readActiveCurrentPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeActiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readReactiveCurrentPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Reactivecurrentphaseb attribute not found in response" }
+  suspend fun subscribeReactiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readRmsVoltagePhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeRmsVoltagePhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltagePhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2309u
+  suspend fun readRmsVoltageMinPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeRmsVoltageMinPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readRmsVoltageMaxPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeRmsVoltageMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readRmsCurrentPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeRmsCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readRmsCurrentMinPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsvoltagephaseb attribute not found in response" }
+  suspend fun subscribeRmsCurrentMinPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readRmsCurrentMaxPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeRmsCurrentMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageMinPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2310u
+  suspend fun readActivePowerPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeActivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readActivePowerMinPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeActivePowerMinPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readActivePowerMaxPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeActivePowerMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readReactivePowerPhaseCAttribute(): Short {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsvoltageminphaseb attribute not found in response" }
+  suspend fun subscribeReactivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Short {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readApparentPowerPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeApparentPowerPhaseCAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsVoltageMaxPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2311u
+  suspend fun readPowerFactorPhaseCAttribute(): Byte {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribePowerFactorPhaseCAttribute(minInterval: Int, maxInterval: Int): Byte {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
+  suspend fun readAverageRmsOverVoltageCounterPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    logger.log(Level.FINE, "Read command succeeded")
+  suspend fun subscribeAverageRmsOverVoltageCounterPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
+  suspend fun readAverageRmsUnderVoltageCounterPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    requireNotNull(attributeData) { "Rmsvoltagemaxphaseb attribute not found in response" }
+  suspend fun subscribeAverageRmsUnderVoltageCounterPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
+  suspend fun readRmsExtremeOverVoltagePeriodPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    return decodedValue
+  suspend fun subscribeRmsExtremeOverVoltagePeriodPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
   }
 
-  suspend fun readRmsCurrentPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2312u
+  suspend fun readRmsExtremeUnderVoltagePeriodPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+  suspend fun readRmsVoltageSagPeriodPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
+  }
 
-    val response = controller.read(readRequest)
+  suspend fun subscribeRmsVoltageSagPeriodPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
 
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsCurrentMinPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2313u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentminphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsCurrentMaxPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2314u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentmaxphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2315u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowerphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerMinPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2316u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowerminphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerMaxPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2317u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowermaxphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readReactivePowerPhaseBAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2318u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Reactivepowerphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readApparentPowerPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2319u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Apparentpowerphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readPowerFactorPhaseBAttribute(): Byte? {
-    val ATTRIBUTE_ID: UInt = 2320u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Powerfactorphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2321u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsvoltagemeasurementperiodphaseb attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsOverVoltageCounterPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2322u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsovervoltagecounterphaseb attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsUnderVoltageCounterPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2323u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsundervoltagecounterphaseb attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsExtremeOverVoltagePeriodPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2324u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Rmsextremeovervoltageperiodphaseb attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsExtremeUnderVoltagePeriodPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2325u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Rmsextremeundervoltageperiodphaseb attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltageSagPeriodPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2326u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagesagperiodphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltageSwellPeriodPhaseBAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2327u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltageswellperiodphaseb attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readLineCurrentPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2561u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Linecurrentphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActiveCurrentPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2562u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activecurrentphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readReactiveCurrentPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2563u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Reactivecurrentphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltagePhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2565u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagephasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltageMinPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2566u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltageminphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltageMaxPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2567u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagemaxphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsCurrentPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2568u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsCurrentMinPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2569u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentminphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsCurrentMaxPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2570u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmscurrentmaxphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2571u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowerphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerMinPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2572u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowerminphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readActivePowerMaxPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2573u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Activepowermaxphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readReactivePowerPhaseCAttribute(): Short? {
-    val ATTRIBUTE_ID: UInt = 2574u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Reactivepowerphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Short? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readApparentPowerPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2575u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Apparentpowerphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readPowerFactorPhaseCAttribute(): Byte? {
-    val ATTRIBUTE_ID: UInt = 2576u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Powerfactorphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Byte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2577u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsvoltagemeasurementperiodphasec attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsOverVoltageCounterPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2578u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsovervoltagecounterphasec attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readAverageRmsUnderVoltageCounterPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2579u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Averagermsundervoltagecounterphasec attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsExtremeOverVoltagePeriodPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2580u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Rmsextremeovervoltageperiodphasec attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsExtremeUnderVoltagePeriodPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2581u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) {
-      "Rmsextremeundervoltageperiodphasec attribute not found in response"
-    }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun readRmsVoltageSagPeriodPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2582u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltagesagperiodphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
+  suspend fun readRmsVoltageSwellPeriodPhaseCAttribute(): UShort {
+    // Implementation needs to be added here
   }
-
-  suspend fun readRmsVoltageSwellPeriodPhaseCAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2583u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Rmsvoltageswellperiodphasec attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
 
-    return decodedValue
+  suspend fun subscribeRmsVoltageSwellPeriodPhaseCAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    val ATTRIBUTE_ID: UInt = 65528u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return GeneratedCommandListAttribute(decodedValue)
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    val ATTRIBUTE_ID: UInt = 65529u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return AcceptedCommandListAttribute(decodedValue)
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    val ATTRIBUTE_ID: UInt = 65531u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Attributelist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return AttributeListAttribute(decodedValue)
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    val ATTRIBUTE_ID: UInt = 65532u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Featuremap attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
-
-    return decodedValue
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    val ATTRIBUTE_ID: UInt = 65533u
+    // Implementation needs to be added here
+  }
 
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
-
-    return decodedValue
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
   }
 
   companion object {
-    private val logger = Logger.getLogger(ElectricalMeasurementCluster::class.java.name)
     const val CLUSTER_ID: UInt = 2820u
   }
 }

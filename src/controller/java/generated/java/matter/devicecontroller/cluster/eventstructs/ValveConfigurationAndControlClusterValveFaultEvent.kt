@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ValveConfigurationAndControlClusterValveFaultEvent(val valveFault: UShort) {
+class ValveConfigurationAndControlClusterValveFaultEvent(val valveFault: UInt) {
   override fun toString(): String = buildString {
     append("ValveConfigurationAndControlClusterValveFaultEvent {\n")
     append("\tvalveFault : $valveFault\n")
@@ -45,7 +45,7 @@ class ValveConfigurationAndControlClusterValveFaultEvent(val valveFault: UShort)
       tlvReader: TlvReader
     ): ValveConfigurationAndControlClusterValveFaultEvent {
       tlvReader.enterStructure(tlvTag)
-      val valveFault = tlvReader.getUShort(ContextSpecificTag(TAG_VALVE_FAULT))
+      val valveFault = tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_FAULT))
 
       tlvReader.exitContainer()
 

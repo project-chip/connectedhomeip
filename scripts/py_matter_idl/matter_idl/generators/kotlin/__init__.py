@@ -65,9 +65,9 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
 
     if isinstance(actual, BasicString):
         if actual.is_binary:
-            return 'ByteArray'
+            return 'OctetString'
         else:
-            return 'String'
+            return 'CharString'
     elif isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
@@ -351,11 +351,6 @@ class EncodableValue:
         self.attrs = attrs
 
     @property
-    def is_basic_type(self):
-        """Returns True if this type is a basic type in Kotlin"""
-        return self.kotlin_type != "Any"
-
-    @property
     def is_nullable(self):
         return EncodableValueAttr.NULLABLE in self.attrs
 
@@ -457,23 +452,15 @@ class EncodableValue:
             else:
                 return "String"
         elif isinstance(t, IdlEnumType):
-            if t.base_type.byte_count <= 1:
-                return "UByte"
-            elif t.base_type.byte_count <= 2:
-                return "UShort"
-            elif t.base_type.byte_count <= 4:
-                return "UInt"
-            else:
+            if t.base_type.byte_count >= 3:
                 return "ULong"
+            else:
+                return "UInt"
         elif isinstance(t, IdlBitmapType):
-            if t.base_type.byte_count <= 1:
-                return "UByte"
-            elif t.base_type.byte_count <= 2:
-                return "UShort"
-            elif t.base_type.byte_count <= 4:
-                return "UInt"
-            else:
+            if t.base_type.byte_count >= 3:
                 return "ULong"
+            else:
+                return "UInt"
         else:
             return "Any"
 

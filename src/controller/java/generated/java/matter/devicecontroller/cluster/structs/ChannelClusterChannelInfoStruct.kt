@@ -30,7 +30,7 @@ class ChannelClusterChannelInfoStruct(
   val callSign: Optional<String>,
   val affiliateCallSign: Optional<String>,
   val identifier: Optional<String>,
-  val type: Optional<UByte>
+  val type: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterChannelInfoStruct {\n")
@@ -112,7 +112,7 @@ class ChannelClusterChannelInfoStruct(
         }
       val type =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_TYPE))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TYPE)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TYPE)))
         } else {
           Optional.empty()
         }

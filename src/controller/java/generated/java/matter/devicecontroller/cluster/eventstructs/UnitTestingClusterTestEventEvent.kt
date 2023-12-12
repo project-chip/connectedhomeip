@@ -25,11 +25,11 @@ import matter.tlv.TlvWriter
 
 class UnitTestingClusterTestEventEvent(
   val arg1: UByte,
-  val arg2: UByte,
+  val arg2: UInt,
   val arg3: Boolean,
   val arg4: matter.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct,
   val arg5: List<matter.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct>,
-  val arg6: List<UByte>
+  val arg6: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestEventEvent {\n")
@@ -74,7 +74,7 @@ class UnitTestingClusterTestEventEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestEventEvent {
       tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUByte(ContextSpecificTag(TAG_ARG1))
-      val arg2 = tlvReader.getUByte(ContextSpecificTag(TAG_ARG2))
+      val arg2 = tlvReader.getUInt(ContextSpecificTag(TAG_ARG2))
       val arg3 = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))
       val arg4 =
         matter.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
@@ -95,10 +95,10 @@ class UnitTestingClusterTestEventEvent(
           tlvReader.exitContainer()
         }
       val arg6 =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ARG6))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUByte(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

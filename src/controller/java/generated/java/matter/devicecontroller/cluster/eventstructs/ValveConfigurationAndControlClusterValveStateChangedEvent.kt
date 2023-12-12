@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ValveConfigurationAndControlClusterValveStateChangedEvent(val valveState: UByte) {
+class ValveConfigurationAndControlClusterValveStateChangedEvent(val valveState: UInt) {
   override fun toString(): String = buildString {
     append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n")
     append("\tvalveState : $valveState\n")
@@ -45,7 +45,7 @@ class ValveConfigurationAndControlClusterValveStateChangedEvent(val valveState: 
       tlvReader: TlvReader
     ): ValveConfigurationAndControlClusterValveStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val valveState = tlvReader.getUByte(ContextSpecificTag(TAG_VALVE_STATE))
+      val valveState = tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_STATE))
 
       tlvReader.exitContainer()
 

@@ -24,7 +24,7 @@ import matter.tlv.TlvWriter
 
 class GroupKeyManagementClusterGroupKeySetStruct(
   val groupKeySetID: UShort,
-  val groupKeySecurityPolicy: UByte,
+  val groupKeySecurityPolicy: UInt,
   val epochKey0: ByteArray?,
   val epochStartTime0: ULong?,
   val epochKey1: ByteArray?,
@@ -98,7 +98,7 @@ class GroupKeyManagementClusterGroupKeySetStruct(
       tlvReader.enterStructure(tlvTag)
       val groupKeySetID = tlvReader.getUShort(ContextSpecificTag(TAG_GROUP_KEY_SET_I_D))
       val groupKeySecurityPolicy =
-        tlvReader.getUByte(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
+        tlvReader.getUInt(ContextSpecificTag(TAG_GROUP_KEY_SECURITY_POLICY))
       val epochKey0 =
         if (!tlvReader.isNull()) {
           tlvReader.getByteArray(ContextSpecificTag(TAG_EPOCH_KEY0))

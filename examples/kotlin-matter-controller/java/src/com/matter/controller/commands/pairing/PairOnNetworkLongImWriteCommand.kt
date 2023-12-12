@@ -18,11 +18,17 @@
 package com.matter.controller.commands.pairing
 
 import com.matter.controller.commands.common.CredentialsIssuer
+import java.time.Duration
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
-import matter.devicecontroller.cluster.clusters.BasicInformationCluster
+import matter.controller.WriteRequest
+import matter.controller.WriteRequests
+import matter.controller.WriteResponse
+import matter.controller.model.AttributePath
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvWriter
 
 class PairOnNetworkLongImWriteCommand(
   controller: MatterController,
@@ -37,6 +43,25 @@ class PairOnNetworkLongImWriteCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
+    val tlvWriter1 = TlvWriter()
+    tlvWriter1.put(AnonymousTag, true)
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId = 0u,
+                  clusterId = CLUSTER_ID_BASIC,
+                  attributeId = ATTR_ID_LOCAL_CONFIG_DISABLED
+                ),
+              tlvPayload = tlvWriter1.getEncoded()
+            )
+          ),
+        timedRequest = Duration.ZERO
+      )
+
     currentCommissioner()
       .pairDevice(
         getNodeId(),
@@ -50,13 +75,24 @@ class PairOnNetworkLongImWriteCommand(
 
     runBlocking {
       try {
-        val basicInformationCluster =
-          BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
-        basicInformationCluster.writeNodeLabelAttribute("Test Node Label")
-        logger.log(Level.INFO, "Write command succeeded")
+        val response: WriteResponse = currentCommissioner().write(writeRequests)
 
-        val nodeLabel = basicInformationCluster.readNodeLabelAttribute()
-        logger.log(Level.INFO, "Read command succeeded, NodeLabel:${nodeLabel}")
+        if (response is WriteResponse.Success) {
+          logger.log(Level.INFO, "Write command succeeded")
+        } else if (response is WriteResponse.PartialWriteFailure) {
+          logger.log(
+            Level.WARNING,
+            "Partial write failure occurred with ${response.failures.size} errors"
+          )
+
+          for ((index, error) in response.failures.withIndex()) {
+            logger.log(Level.WARNING, "Error ${index + 1}:")
+            logger.log(Level.WARNING, "Attribute Path: ${error.attributePath}")
+            logger.log(Level.WARNING, "Exception Message: ${error.ex.message}")
+          }
+
+          setFailure("invoke failure")
+        }
       } catch (ex: Exception) {
         setFailure("invoke failure: ${ex.message}")
       } catch (ex: Exception) {
@@ -72,7 +108,9 @@ class PairOnNetworkLongImWriteCommand(
 
   companion object {
     private val logger = Logger.getLogger(PairOnNetworkLongImWriteCommand::class.java.name)
+
     private const val MATTER_PORT = 5540
-    private const val DEFAULT_ENDPOINT: UShort = 0u
+    private const val CLUSTER_ID_BASIC = 0x0028u
+    private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16u
   }
 }

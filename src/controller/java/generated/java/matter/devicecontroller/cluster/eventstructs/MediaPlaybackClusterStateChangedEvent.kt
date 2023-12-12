@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class MediaPlaybackClusterStateChangedEvent(
-  val currentState: UByte,
+  val currentState: UInt,
   val startTime: ULong,
   val duration: ULong,
   val sampledPosition:
@@ -81,7 +81,7 @@ class MediaPlaybackClusterStateChangedEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val currentState = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_STATE))
+      val currentState = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_STATE))
       val startTime = tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
       val duration = tlvReader.getULong(ContextSpecificTag(TAG_DURATION))
       val sampledPosition =

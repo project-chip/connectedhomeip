@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
   val mfgCode: Optional<UShort>,
-  val value: UShort
+  val value: UInt
 ) {
   override fun toString(): String = buildString {
     append("RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct {\n")
@@ -61,7 +61,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct(
         } else {
           Optional.empty()
         }
-      val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

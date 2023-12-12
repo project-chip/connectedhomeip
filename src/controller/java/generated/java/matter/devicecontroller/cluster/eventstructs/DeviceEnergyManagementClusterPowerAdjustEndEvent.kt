@@ -23,7 +23,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DeviceEnergyManagementClusterPowerAdjustEndEvent(
-  val cause: UByte,
+  val cause: UInt,
   val duration: UInt,
   val energyUse: Long
 ) {
@@ -55,7 +55,7 @@ class DeviceEnergyManagementClusterPowerAdjustEndEvent(
       tlvReader: TlvReader
     ): DeviceEnergyManagementClusterPowerAdjustEndEvent {
       tlvReader.enterStructure(tlvTag)
-      val cause = tlvReader.getUByte(ContextSpecificTag(TAG_CAUSE))
+      val cause = tlvReader.getUInt(ContextSpecificTag(TAG_CAUSE))
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
       val energyUse = tlvReader.getLong(ContextSpecificTag(TAG_ENERGY_USE))
 

@@ -23,8 +23,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class BridgedDeviceBasicInformationClusterProductAppearanceStruct(
-  val finish: UByte,
-  val primaryColor: UByte?
+  val finish: UInt,
+  val primaryColor: UInt?
 ) {
   override fun toString(): String = buildString {
     append("BridgedDeviceBasicInformationClusterProductAppearanceStruct {\n")
@@ -55,10 +55,10 @@ class BridgedDeviceBasicInformationClusterProductAppearanceStruct(
       tlvReader: TlvReader
     ): BridgedDeviceBasicInformationClusterProductAppearanceStruct {
       tlvReader.enterStructure(tlvTag)
-      val finish = tlvReader.getUByte(ContextSpecificTag(TAG_FINISH))
+      val finish = tlvReader.getUInt(ContextSpecificTag(TAG_FINISH))
       val primaryColor =
         if (!tlvReader.isNull()) {
-          tlvReader.getUByte(ContextSpecificTag(TAG_PRIMARY_COLOR))
+          tlvReader.getUInt(ContextSpecificTag(TAG_PRIMARY_COLOR))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PRIMARY_COLOR))
           null

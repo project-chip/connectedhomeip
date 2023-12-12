@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
   val duration: UShort,
-  val control: UShort,
+  val control: UInt,
   val temperatureControl: Optional<DemandResponseLoadControlClusterTemperatureControlStruct>,
   val averageLoadControl: Optional<DemandResponseLoadControlClusterAverageLoadControlStruct>,
   val dutyCycleControl: Optional<DemandResponseLoadControlClusterDutyCycleControlStruct>,
@@ -88,7 +88,7 @@ class DemandResponseLoadControlClusterLoadControlEventTransitionStruct(
     ): DemandResponseLoadControlClusterLoadControlEventTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val duration = tlvReader.getUShort(ContextSpecificTag(TAG_DURATION))
-      val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))
+      val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
       val temperatureControl =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {
           Optional.of(

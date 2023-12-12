@@ -25,8 +25,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class DoorLockClusterLockOperationEvent(
-  val lockOperationType: UByte,
-  val operationSource: UByte,
+  val lockOperationType: UInt,
+  val operationSource: UInt,
   val userIndex: UShort?,
   val fabricIndex: UByte?,
   val sourceNode: ULong?,
@@ -90,8 +90,8 @@ class DoorLockClusterLockOperationEvent(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterLockOperationEvent {
       tlvReader.enterStructure(tlvTag)
-      val lockOperationType = tlvReader.getUByte(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
-      val operationSource = tlvReader.getUByte(ContextSpecificTag(TAG_OPERATION_SOURCE))
+      val lockOperationType = tlvReader.getUInt(ContextSpecificTag(TAG_LOCK_OPERATION_TYPE))
+      val operationSource = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATION_SOURCE))
       val userIndex =
         if (!tlvReader.isNull()) {
           tlvReader.getUShort(ContextSpecificTag(TAG_USER_INDEX))

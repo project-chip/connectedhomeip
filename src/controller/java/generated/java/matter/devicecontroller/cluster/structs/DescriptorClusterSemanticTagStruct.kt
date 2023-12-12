@@ -25,8 +25,8 @@ import matter.tlv.TlvWriter
 
 class DescriptorClusterSemanticTagStruct(
   val mfgCode: UShort?,
-  val namespaceID: UByte,
-  val tag: UByte,
+  val namespaceID: UInt,
+  val tag: UInt,
   val label: Optional<String>?
 ) {
   override fun toString(): String = buildString {
@@ -75,8 +75,8 @@ class DescriptorClusterSemanticTagStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_MFG_CODE))
           null
         }
-      val namespaceID = tlvReader.getUByte(ContextSpecificTag(TAG_NAMESPACE_I_D))
-      val tag = tlvReader.getUByte(ContextSpecificTag(TAG_TAG))
+      val namespaceID = tlvReader.getUInt(ContextSpecificTag(TAG_NAMESPACE_I_D))
+      val tag = tlvReader.getUInt(ContextSpecificTag(TAG_TAG))
       val label =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {

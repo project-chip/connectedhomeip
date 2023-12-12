@@ -23,7 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PowerSourceClusterBatFaultChangeEvent(val current: List<UByte>, val previous: List<UByte>) {
+class PowerSourceClusterBatFaultChangeEvent(val current: List<UInt>, val previous: List<UInt>) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterBatFaultChangeEvent {\n")
     append("\tcurrent : $current\n")
@@ -55,18 +55,18 @@ class PowerSourceClusterBatFaultChangeEvent(val current: List<UByte>, val previo
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatFaultChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val current =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUByte(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUByte(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

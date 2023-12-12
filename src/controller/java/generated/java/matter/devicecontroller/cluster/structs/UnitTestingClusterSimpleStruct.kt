@@ -25,10 +25,10 @@ import matter.tlv.TlvWriter
 class UnitTestingClusterSimpleStruct(
   val a: UByte,
   val b: Boolean,
-  val c: UByte,
+  val c: UInt,
   val d: ByteArray,
   val e: String,
-  val f: UByte,
+  val f: UInt,
   val g: Float,
   val h: Double
 ) {
@@ -74,10 +74,10 @@ class UnitTestingClusterSimpleStruct(
       tlvReader.enterStructure(tlvTag)
       val a = tlvReader.getUByte(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c = tlvReader.getUByte(ContextSpecificTag(TAG_C))
+      val c = tlvReader.getUInt(ContextSpecificTag(TAG_C))
       val d = tlvReader.getByteArray(ContextSpecificTag(TAG_D))
       val e = tlvReader.getString(ContextSpecificTag(TAG_E))
-      val f = tlvReader.getUByte(ContextSpecificTag(TAG_F))
+      val f = tlvReader.getUInt(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
 

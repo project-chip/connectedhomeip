@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UByte) {
+class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterDoorLockAlarmEvent {\n")
     append("\talarmCode : $alarmCode\n")
@@ -42,7 +42,7 @@ class DoorLockClusterDoorLockAlarmEvent(val alarmCode: UByte) {
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterDoorLockAlarmEvent {
       tlvReader.enterStructure(tlvTag)
-      val alarmCode = tlvReader.getUByte(ContextSpecificTag(TAG_ALARM_CODE))
+      val alarmCode = tlvReader.getUInt(ContextSpecificTag(TAG_ALARM_CODE))
 
       tlvReader.exitContainer()
 

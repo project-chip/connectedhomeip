@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 
 class ContentLauncherClusterTrackPreferenceStruct(
   val languageCode: String,
-  val characteristics: Optional<List<UByte>>,
+  val characteristics: Optional<List<UInt>>,
   val audioOutputIndex: UByte
 ) {
   override fun toString(): String = buildString {
@@ -65,10 +65,10 @@ class ContentLauncherClusterTrackPreferenceStruct(
       val characteristics =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_CHARACTERISTICS))) {
           Optional.of(
-            buildList<UByte> {
+            buildList<UInt> {
               tlvReader.enterArray(ContextSpecificTag(TAG_CHARACTERISTICS))
               while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUByte(AnonymousTag))
+                add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
             }

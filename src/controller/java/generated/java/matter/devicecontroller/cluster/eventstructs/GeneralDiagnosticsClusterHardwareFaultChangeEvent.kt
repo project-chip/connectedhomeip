@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class GeneralDiagnosticsClusterHardwareFaultChangeEvent(
-  val current: List<UByte>,
-  val previous: List<UByte>
+  val current: List<UInt>,
+  val previous: List<UInt>
 ) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterHardwareFaultChangeEvent {\n")
@@ -61,18 +61,18 @@ class GeneralDiagnosticsClusterHardwareFaultChangeEvent(
     ): GeneralDiagnosticsClusterHardwareFaultChangeEvent {
       tlvReader.enterStructure(tlvTag)
       val current =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUByte(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUByte(AnonymousTag))
+            this.add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

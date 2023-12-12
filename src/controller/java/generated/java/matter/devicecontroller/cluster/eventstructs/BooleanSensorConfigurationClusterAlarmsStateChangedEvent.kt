@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-  val alarmsActive: UByte,
-  val alarmsSuppressed: Optional<UByte>
+  val alarmsActive: UInt,
+  val alarmsSuppressed: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n")
@@ -55,10 +55,10 @@ class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
       tlvReader: TlvReader
     ): BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val alarmsActive = tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_ACTIVE))
+      val alarmsActive = tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_ACTIVE))
       val alarmsSuppressed =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
         } else {
           Optional.empty()
         }

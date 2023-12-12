@@ -23,7 +23,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class PowerSourceClusterWiredFaultChangeType(val current: List<UByte>, val previous: List<UByte>) {
+class PowerSourceClusterWiredFaultChangeType(val current: List<UInt>, val previous: List<UInt>) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterWiredFaultChangeType {\n")
     append("\tcurrent : $current\n")
@@ -55,18 +55,18 @@ class PowerSourceClusterWiredFaultChangeType(val current: List<UByte>, val previ
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterWiredFaultChangeType {
       tlvReader.enterStructure(tlvTag)
       val current =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<UByte> {
+        buildList<UInt> {
           tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
+            add(tlvReader.getUInt(AnonymousTag))
           }
           tlvReader.exitContainer()
         }

@@ -27,10 +27,10 @@ import matter.tlv.TlvWriter
 class DemandResponseLoadControlClusterLoadControlEventStruct(
   val eventID: ByteArray,
   val programID: ByteArray?,
-  val control: UShort,
-  val deviceClass: UInt,
+  val control: UInt,
+  val deviceClass: ULong,
   val enrollmentGroup: Optional<UByte>,
-  val criticality: UByte,
+  val criticality: UInt,
   val startTime: UInt?,
   val transitions: List<DemandResponseLoadControlClusterLoadControlEventTransitionStruct>
 ) {
@@ -100,15 +100,15 @@ class DemandResponseLoadControlClusterLoadControlEventStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_PROGRAM_I_D))
           null
         }
-      val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))
-      val deviceClass = tlvReader.getUInt(ContextSpecificTag(TAG_DEVICE_CLASS))
+      val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
+      val deviceClass = tlvReader.getULong(ContextSpecificTag(TAG_DEVICE_CLASS))
       val enrollmentGroup =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENROLLMENT_GROUP))) {
           Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ENROLLMENT_GROUP)))
         } else {
           Optional.empty()
         }
-      val criticality = tlvReader.getUByte(ContextSpecificTag(TAG_CRITICALITY))
+      val criticality = tlvReader.getUInt(ContextSpecificTag(TAG_CRITICALITY))
       val startTime =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))

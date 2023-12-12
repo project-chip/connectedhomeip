@@ -31,7 +31,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
   val hardwareAddress: ByteArray,
   val IPv4Addresses: List<ByteArray>,
   val IPv6Addresses: List<ByteArray>,
-  val type: UByte
+  val type: UInt
 ) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterNetworkInterface {\n")
@@ -128,7 +128,7 @@ class GeneralDiagnosticsClusterNetworkInterface(
           }
           tlvReader.exitContainer()
         }
-      val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
 
       tlvReader.exitContainer()
 

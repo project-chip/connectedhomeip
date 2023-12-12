@@ -233,9 +233,6 @@ exceptions:
             - "**/src/controller/java/generated/java/**/*"
 
 naming:
-    VariableNaming:
-        excludes:
-            - "**/src/controller/java/generated/java/**/*"
     FunctionNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"

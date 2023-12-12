@@ -26,7 +26,7 @@ import matter.tlv.TlvWriter
 class ActionsClusterEndpointListStruct(
   val endpointListID: UShort,
   val name: String,
-  val type: UByte,
+  val type: UInt,
   val endpoints: List<UShort>
 ) {
   override fun toString(): String = buildString {
@@ -63,7 +63,7 @@ class ActionsClusterEndpointListStruct(
       tlvReader.enterStructure(tlvTag)
       val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val endpoints =
         buildList<UShort> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ENDPOINTS))

@@ -23,7 +23,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailureCause: UByte,
+  val associationFailureCause: UInt,
   val status: UShort
 ) {
   override fun toString(): String = buildString {
@@ -52,7 +52,7 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
     ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
       val associationFailureCause =
-        tlvReader.getUByte(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
+        tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE_CAUSE))
       val status = tlvReader.getUShort(ContextSpecificTag(TAG_STATUS))
 
       tlvReader.exitContainer()
