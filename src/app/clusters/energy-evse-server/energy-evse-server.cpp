@@ -77,10 +77,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mDelegate.GetChargingEnabledUntil());
     case DischargingEnabledUntil::Id:
         /* V2X */
-        if (!HasFeature(Feature::kV2x))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetDischargingEnabledUntil());
     case CircuitCapacity::Id:
         return aEncoder.Encode(mDelegate.GetCircuitCapacity());
@@ -90,88 +86,35 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mDelegate.GetMaximumChargeCurrent());
     case MaximumDischargeCurrent::Id:
         /* V2X */
-        if (!HasFeature(Feature::kV2x))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetMaximumDischargeCurrent());
 
     case UserMaximumChargeCurrent::Id:
-        if (!SupportsOptAttr(OptionalAttributes::kSupportsUserMaximumChargingCurrent))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetUserMaximumChargeCurrent());
     case RandomizationDelayWindow::Id:
         /* Optional */
-        if (!SupportsOptAttr(OptionalAttributes::kSupportsRandomizationWindow))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetRandomizationDelayWindow());
     /* PREF - ChargingPreferences attributes */
     case NumberOfWeeklyTargets::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNumberOfWeeklyTargets());
     case NumberOfDailyTargets::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNumberOfDailyTargets());
     case NextChargeStartTime::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNextChargeStartTime());
     case NextChargeTargetTime::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNextChargeTargetTime());
     case NextChargeRequiredEnergy::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNextChargeRequiredEnergy());
     case NextChargeTargetSoC::Id:
-        if (!HasFeature(Feature::kChargingPreferences))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetNextChargeTargetSoC());
     case ApproximateEVEfficiency::Id:
-        if ((!HasFeature(Feature::kChargingPreferences)) ||
-            (!SupportsOptAttr(OptionalAttributes::kSupportsApproximateEvEfficiency)))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetApproximateEVEfficiency());
     /* SOC attributes */
     case StateOfCharge::Id:
-        if (!HasFeature(Feature::kSoCReporting))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetStateOfCharge());
     case BatteryCapacity::Id:
-        if (!HasFeature(Feature::kSoCReporting))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetBatteryCapacity());
     /* PNC attributes*/
     case VehicleID::Id:
-        if (!HasFeature(Feature::kPlugAndCharge))
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return aEncoder.Encode(mDelegate.GetVehicleID());
     /* Session SESS attributes */
     case SessionID::Id:
