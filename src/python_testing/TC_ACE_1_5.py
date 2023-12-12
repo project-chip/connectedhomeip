@@ -19,6 +19,7 @@ import logging
 import time
 
 import chip.clusters as Clusters
+import chip.clusters.enum
 from chip.interaction_model import Status
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
@@ -37,34 +38,28 @@ class TC_ACE_1_5(MatterBaseTest):
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
-    
-    # async def CommissionToStageSendCompleteAndCleanup(
-    #         self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
-    #     logging.info("-----------------Fail on step {}-------------------------".format(stage))
-    #     params = self.OpenCommissioningWindow()
-    #     self.th2.ResetTestCommissioner()
-    #     # This will run the commissioning up to the point where stage x is run and the
-    #     # response is sent before the test commissioner simulates a failure
-    #     self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
-    #     errcode = self.th2.CommissionOnNetwork(
-    #         nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-    #         filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
-    #     logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
-    #     asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
-    #     asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
-    #     asserts.assert_true(errcode.sdk_code == expectedErrCode, 'Unexpected error code returned from CommissioningComplete')
-    #     revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
-    #     await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
-    #     # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
-    #     time.sleep(1)
-
-    async def read_currentfabricindex_expected_success(self, th) -> str:
+    async def read_currentfabricindex_expected_success(self, th) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        print("Current Fabric Index: %s" % current_fabric_index)
-        return "100"
+        return current_fabric_index
+
+    async def write_acl(self, acl):
+        # This returns an attribute status
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
+        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
+
+    async def read_descriptor_expect_success(self, th):
+        cluster = Clusters.Objects.Descriptor
+        attribute = Clusters.Descriptor.Attributes.DeviceTypeList
+        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+
+    async def read_basic_expect_unsupported_access(self, th):
+        cluster = Clusters.Objects.BasicInformation
+        attribute = Clusters.BasicInformation.Attributes.VendorID
+        await self.read_single_attribute_expect_error(
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     @async_test_body
     async def test_TC_ACE_1_5(self):
@@ -84,7 +79,10 @@ class TC_ACE_1_5(MatterBaseTest):
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
+
+        TH1_nodeid = self.matter_test_config.controller_node_id
         TH2_nodeid = self.matter_test_config.controller_node_id + 2
+
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                          paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
@@ -96,7 +94,44 @@ class TC_ACE_1_5(MatterBaseTest):
         
         self.print_step(4, "TH2 Reads CurrentFabricIndex ")
         th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
-        print(th2FabricIndex)
+        print("th2FabricIndex: %d" % (th2FabricIndex))
+
+        self.print_step(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
+        admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects = [TH1_nodeid],
+            targets = [Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
+        descriptor_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Descriptor.id)])
+        acl = [admin_acl, descriptor_view]
+        await self.write_acl(acl)
+
+        self.print_step(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
+        admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex = th2FabricIndex,
+            privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects = [TH2_nodeid],
+            targets = [Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
+        descriptor_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            fabricIndex = th2FabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.BasicInformation.id)])
+        acl = [admin_acl, descriptor_view]
+        await self.write_acl(acl)
+
+        self.print_step(7, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
+        await self.read_descriptor_expect_success(self.th1)
+
+        self.print_step(8, "TH1 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
+        await self.read_basic_expect_unsupported_access(self.th1)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
