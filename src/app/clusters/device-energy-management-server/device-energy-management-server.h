@@ -17,6 +17,7 @@
  */
 
 #pragma once
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
@@ -31,9 +32,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
-
-// TODO: Spec-defined constraints ?
-constexpr int64_t kMinimumChargeCurrent = 0;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -143,7 +141,7 @@ public:
     virtual int64_t GetAbsMinPower()                                                             = 0;
     virtual int64_t GetAbsMaxPower()                                                             = 0;
     virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
-    virtual Structs::ForecastStruct::Type GetForecast()                                          = 0;
+    virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()                     = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
@@ -153,7 +151,7 @@ public:
     virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                               = 0;
     virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                               = 0;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type &) = 0;
-    virtual CHIP_ERROR SetForecast(Structs::ForecastStruct::Type &)                                          = 0;
+    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> &)                     = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -162,8 +160,15 @@ protected:
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate);
-    ~Instance();
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature)
+    {
+        /* set the base class delegates endpointId */
+        mDelegate.SetEndpointId(aEndpointId);
+    }
+
+    ~Instance() { Shutdown(); }
 
     CHIP_ERROR Init();
     void Shutdown();
@@ -172,7 +177,6 @@ public:
 
 private:
     Delegate & mDelegate;
-    EndpointId mEndpointId;
     BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
