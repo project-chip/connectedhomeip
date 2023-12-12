@@ -8803,6 +8803,11 @@ internal cluster FaultInjection = 4294048774 {
 cluster SampleMei = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
 
+  fabric_sensitive info event PingCountEvent = 0 {
+    int32u count = 1;
+    fabric_idx fabricIndex = 254;
+  }
+
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

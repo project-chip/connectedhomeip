@@ -169,6 +169,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/RefrigeratorAlarmClusterNotifyEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/RvcOperationalStateClusterOperationalErrorEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/RvcOperationalStateClusterOperationCompletionEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/SampleMeiClusterPingCountEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/SmokeCoAlarmClusterCOAlarmEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/SmokeCoAlarmClusterInterconnectCOAlarmEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/SmokeCoAlarmClusterInterconnectSmokeAlarmEvent.kt",
