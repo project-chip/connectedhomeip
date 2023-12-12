@@ -56,7 +56,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        // Two disctint key material buffers to force the PSA unit tests to create two different Key IDs
+        // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
         Symmetric128BitsKeyByteArray aesKeyMaterial;
         memcpy(aesKeyMaterial, test.key, test.key_len);
 
