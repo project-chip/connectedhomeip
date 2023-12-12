@@ -902,7 +902,7 @@ class ChipDeviceControllerBase():
         the type will be automatically deduced from the metadata received over the wire.
 
         nodeId: Target's Node ID
-        commands: A list of Onvoke tuples of type (endpoint, cluster-object, response-type):
+        commands: A list of InvokeRequestInfo containing the commands to invoke.
         timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
@@ -911,7 +911,7 @@ class ChipDeviceControllerBase():
 
         Returns:
             - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
-                      Value of `None` indicates success.
+                      - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
                       - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
