@@ -35,15 +35,16 @@ namespace EnergyEvse {
 
 CHIP_ERROR Instance::Init()
 {
-    registerAttributeAccessOverride(this);
-    InteractionModelEngine::GetInstance()->RegisterCommandHandler(this);
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+
     return CHIP_NO_ERROR;
 }
 
 void Instance::Shutdown()
 {
-    unregisterAttributeAccessOverride(this);
     InteractionModelEngine::GetInstance()->UnregisterCommandHandler(this);
+    unregisterAttributeAccessOverride(this);
 }
 
 bool Instance::HasFeature(Feature aFeature) const
