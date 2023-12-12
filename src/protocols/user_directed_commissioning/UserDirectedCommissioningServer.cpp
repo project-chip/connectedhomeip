@@ -209,6 +209,11 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         chip::TLV::Tag containerTag = reader.GetTag();
+        if (!TLV::IsContextTag(containerTag))
+        {
+            ChipLogError(AppServer, "Unexpected non-context TLV tag.");
+            return CHIP_ERROR_INVALID_TLV_TAG;
+        }
         uint8_t tagNum              = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
 
         switch (tagNum)
@@ -245,13 +250,18 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
         case kTargetAppListTag:
             // app vendor list
             {
-                ChipLogError(AppServer, "TLV found an applist");
+                ChipLogProgress(AppServer, "TLV found an applist");
                 chip::TLV::TLVType listContainerType = chip::TLV::kTLVType_List;
                 ReturnErrorOnFailure(reader.EnterContainer(listContainerType));
 
-                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumAppVendorIds < sizeof(mAppVendorIds))
+                while ((err = reader.Next()) == CHIP_NO_ERROR && mNumTargetAppInfos < sizeof(mTargetAppInfos))
                 {
                     containerTag = reader.GetTag();
+                    if (!TLV::IsContextTag(containerTag))
+                    {
+                        ChipLogError(AppServer, "Unexpected non-context TLV tag.");
+                        return CHIP_ERROR_INVALID_TLV_TAG;
+                    }
                     tagNum       = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
                     if (tagNum == kTargetAppTag)
                     {
@@ -262,6 +272,11 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                         while ((err = reader.Next()) == CHIP_NO_ERROR)
                         {
                             containerTag = reader.GetTag();
+                            if (!TLV::IsContextTag(containerTag))
+                            {
+                                ChipLogError(AppServer, "Unexpected non-context TLV tag.");
+                                return CHIP_ERROR_INVALID_TLV_TAG;
+                            }
                             tagNum       = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
                             if (tagNum == kAppVendorIdTag)
                             {
@@ -270,7 +285,6 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                             else if (tagNum == kAppProductIdTag)
                             {
                                 err = reader.Get(appProductId);
-                                ChipLogError(AppServer, "unsupported product id tag %d", tagNum);
                             }
                         }
                         if (err == CHIP_END_OF_TLV)
@@ -280,8 +294,9 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
                         }
                         if (appVendorId != 0)
                         {
-                            mAppVendorIds[mNumAppVendorIds] = appVendorId;
-                            mNumAppVendorIds++;
+                            mTargetAppInfos[mNumTargetAppInfos].vendorId  = appVendorId;
+                            mTargetAppInfos[mNumTargetAppInfos].productId = appProductId;
+                            mNumTargetAppInfos++;
                         }
                     }
                     else
