@@ -157,8 +157,8 @@ void TestUDCServerInstanceNameResolver(nlTestSuite * inSuite, void * inContext)
     udcClient.EncodeUDCMessage(payloadBuf);
 
     // prepare peerAddress for handleMessage
-    Inet::IPAddress commissioner;
-    Inet::IPAddress::FromString("127.0.0.1", commissioner);
+    chip::Inet::IPAddress commissioner;
+    chip::Inet::IPAddress::FromString("127.0.0.1", commissioner);
     uint16_t port                      = 11100;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(commissioner, port);
 
@@ -283,8 +283,8 @@ void TestUDCClientState(nlTestSuite * inSuite, void * inContext)
 {
     UDCClients<3> mUdcClients;
     const char * instanceName1 = "test1";
-    Inet::IPAddress address;
-    Inet::IPAddress::FromString("127.0.0.1", address);
+    chip::Inet::IPAddress address;
+    chip::Inet::IPAddress::FromString("127.0.0.1", address);
     uint16_t port              = 333;
     uint16_t longDiscriminator = 1234;
     uint16_t vendorId          = 1111;
