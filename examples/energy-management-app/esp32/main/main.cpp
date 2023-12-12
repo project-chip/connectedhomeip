@@ -235,5 +235,4 @@ extern "C" void app_main()
     ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-
 }
