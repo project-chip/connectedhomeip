@@ -1770,7 +1770,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     [self.temporaryMetaDataCache removeObjectForKey:[NSString stringWithFormat:@"%@:-1", key]];
 }
 
-- (NSArray * _Nullable)clientDataKeys
+- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID
 {
     if (endpointID == nil)
         return nil;
