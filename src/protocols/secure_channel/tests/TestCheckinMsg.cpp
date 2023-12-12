@@ -96,7 +96,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
         uint8_t gargantuaBuffer[2048]    = { 0 };
 
-        // Two disctint key material buffers to force the PSA unit tests to create two different Key IDs
+        // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
         Symmetric128BitsKeyByteArray aesKeyMaterial;
         memcpy(aesKeyMaterial, test.key, test.key_len);
 
@@ -157,7 +157,7 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
     userData                         = chip::ByteSpan(data);
     const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
 
-    // Two disctint key material buffers to force the PSA unit tests to create two different Key IDs
+    // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
     Symmetric128BitsKeyByteArray aesKeyMaterial;
     memcpy(aesKeyMaterial, test.key, test.key_len);
 
