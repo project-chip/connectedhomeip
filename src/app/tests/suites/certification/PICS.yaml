@@ -2006,6 +2006,12 @@ PICS:
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BINFO.S.A0014
 
+    - label: "Does the DUT(server) support the SpecificationVersion attribute?"
+      id: BINFO.S.A0015
+
+    - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
+      id: BINFO.S.A0016
+
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
