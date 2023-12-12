@@ -58,7 +58,7 @@ CHIP_ERROR ChipDeviceScanner::Init(ChipDeviceScannerDelegate * delegate)
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    mCancellable = g_cancellable_new();
+    mCancellable = GAutoPtr<GCancellable>(g_cancellable_new());
     mDelegate    = delegate;
 
     mIsInitialized = true;
@@ -78,8 +78,7 @@ void ChipDeviceScanner::Shutdown()
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
     }
 
-    if (mCancellable != nullptr)
-        g_object_unref(mCancellable);
+    mCancellable = nullptr;
 
     mIsInitialized = false;
 }
@@ -131,7 +130,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     VerifyOrReturnError(!mIsStopping, CHIP_NO_ERROR);
 
     mIsStopping = true;
-    g_cancellable_cancel(mCancellable); // in case we are currently running a scan
+    g_cancellable_cancel(mCancellable.get()); // in case we are currently running a scan
 
     if (mObjectAddedSignal)
     {
@@ -264,7 +263,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     GVariant * filter = g_variant_builder_end(&filterBuilder);
 
     ChipLogProgress(Ble, "BLE setting discovery Name adapter. %s", self->mEndpoint.GetAdapterName());
-    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mEndpoint.GetAdapter(), filter, self->mCancellable,
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mEndpoint.GetAdapter(), filter, self->mCancellable.get(),
                                                        &MakeUniquePointerReceiver(error).Get()))
     {
         // Not critical: ignore if fails
@@ -273,7 +272,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
-    if (!bluez_adapter1_call_start_discovery_sync(self->mEndpoint.GetAdapter(), self->mCancellable,
+    if (!bluez_adapter1_call_start_discovery_sync(self->mEndpoint.GetAdapter(), self->mCancellable.get(),
                                                   &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);

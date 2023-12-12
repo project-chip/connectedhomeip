@@ -61,7 +61,7 @@ public:
     const char * GetAlias() const { return mCurrent.alias.c_str(); }
     const char * GetName() const { return mCurrent.name.c_str(); }
     bool IsPowered() const { return mCurrent.powered; }
-    BluezAdapter1 * GetAdapter() const { return mCurrent.adapter; }
+    BluezAdapter1 * GetAdapter() const { return mCurrent.adapter.get(); }
 
 private:
     /// Sets up the DBUS manager and loads the list
@@ -76,9 +76,9 @@ private:
     static constexpr size_t kMaxAddressLength = 19; // xx:xx:xx:xx:xx:xx
     static constexpr size_t kMaxNameLength    = 64;
 
-    GDBusObjectManager * mManager = nullptr; // DBus connection
-    GList * mObjectList           = nullptr; // listing of objects on the bus
-    GList * mCurrentListItem      = nullptr; // current item viewed in the list
+    GAutoPtr<GDBusObjectManager> mManager; // DBus connection
+    GList * mObjectList      = nullptr;    // listing of objects on the bus
+    GList * mCurrentListItem = nullptr;    // current item viewed in the list
 
     // data valid only if Next() returns true
     struct
@@ -88,7 +88,7 @@ private:
         std::string alias;
         std::string name;
         bool powered;
-        BluezAdapter1 * adapter;
+        GAutoPtr<BluezAdapter1> adapter;
     } mCurrent = { 0 };
 };
 

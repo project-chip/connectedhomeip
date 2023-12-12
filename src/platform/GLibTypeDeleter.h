@@ -115,6 +115,24 @@ struct GAutoPtrDeleter<GDBusConnection>
 };
 
 template <>
+struct GAutoPtrDeleter<GDBusObjectManager>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GDBusObjectManagerServer>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GCancellable>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GError>
 {
     using deleter = GErrorDeleter;
