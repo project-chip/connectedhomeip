@@ -27,14 +27,13 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
 // TODO: Spec-defined constraints ?
-constexpr int64_t kMinimumChargeCurrent         = 0;
+constexpr int64_t kMinimumChargeCurrent = 0;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -51,7 +50,8 @@ public:
      * @brief Delegate should implement a handler to begin to adjust client power
      *        consumption/generation to the level requested.
      *
-     * @param power Milli-Watts the ESA SHALL use during the adjustment period. Positive values indicate the direction of current flow -towards- a load.
+     * @param power Milli-Watts the ESA SHALL use during the adjustment period. Positive values indicate the direction of current
+     * flow -towards- a load.
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
@@ -65,7 +65,6 @@ public:
      */
     virtual Status CancelPowerAdjustRequest() = 0;
 
-
     /**
      * @brief Delegate for the ESA SHALL update its Forecast attribute with the RequestedStartTime including a new ForecastId.
      *
@@ -75,8 +74,10 @@ public:
      *   A client can estimate the entire Forecast sequence duration by computing the EndTime - StartTime fields from the
      *   Forecast attribute, and therefore avoid scheduling the start time too late.
      *
-     * @param requestedStartTime The requested start time in UTC that the client would like the appliance to shift its power forecast to.
-     * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate IM_Status.
+     * @param requestedStartTime The requested start time in UTC that the client would like the appliance to shift its power
+     * forecast to.
+     * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
+     * IM_Status.
      */
     virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) = 0;
 
@@ -89,7 +90,8 @@ public:
      *   basic control system operational).
      *   The ESA SHALL also generate a Paused Event and the ESAState SHALL be restored to Paused.
      *
-     * @param duration Duration that the ESA SHALL be paused for. SHALL be between MinPauseDuration & MaxPauseDuration for current slot.
+     * @param duration Duration that the ESA SHALL be paused for. SHALL be between MinPauseDuration & MaxPauseDuration for current
+     * slot.
      * @return  Success if the ESA is paused, otherwise returns other IM_Statuses.
      */
     virtual Status PauseRequest(const uint32_t duration) = 0;
@@ -117,7 +119,8 @@ public:
      * @return  Success if the entire list of SlotAdjustmentStruct are accepted, otherwise the command
      * SHALL be rejected returning other IM_Statuss.
      */
-    virtual Status ModifyForecastRequest( const uint32_t forecastId, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments) = 0;
+    virtual Status ModifyForecastRequest(const uint32_t forecastId,
+                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments) = 0;
 
     /**
      * @brief Delegate should implement:
@@ -129,33 +132,32 @@ public:
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successfull, otherwise the command SHALL be rejected returning other IM_Statuss.
      */
-    virtual Status RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type>  & constraints) = 0;
+    virtual Status
+    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints) = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
-    virtual ESATypeEnum GetESAType()                       = 0;
-    virtual bool GetESACanGenerate()                       = 0;
-    virtual ESAStateEnum GetESAState()                     = 0;
-    virtual int64_t GetAbsMinPower()                       = 0;
-    virtual int64_t GetAbsMaxPower()                       = 0;
-    virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type  GetPowerAdjustmentCapability() = 0;
-    virtual Structs::ForecastStruct::Type  GetForecast()   = 0;
-
+    virtual ESATypeEnum GetESAType()                                                             = 0;
+    virtual bool GetESACanGenerate()                                                             = 0;
+    virtual ESAStateEnum GetESAState()                                                           = 0;
+    virtual int64_t GetAbsMinPower()                                                             = 0;
+    virtual int64_t GetAbsMaxPower()                                                             = 0;
+    virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
+    virtual Structs::ForecastStruct::Type GetForecast()                                          = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetESAType(ESATypeEnum) = 0;
-    virtual CHIP_ERROR SetESACanGenerate(bool)      = 0;
-    virtual CHIP_ERROR SetESAState(ESAStateEnum)    = 0;
-    virtual CHIP_ERROR SetAbsMinPower(int64_t)      = 0;
-    virtual CHIP_ERROR SetAbsMaxPower(int64_t)      = 0;
+    virtual CHIP_ERROR SetESAType(ESATypeEnum)                                                               = 0;
+    virtual CHIP_ERROR SetESACanGenerate(bool)                                                               = 0;
+    virtual CHIP_ERROR SetESAState(ESAStateEnum)                                                             = 0;
+    virtual CHIP_ERROR SetAbsMinPower(int64_t)                                                               = 0;
+    virtual CHIP_ERROR SetAbsMaxPower(int64_t)                                                               = 0;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type &) = 0;
-    virtual CHIP_ERROR SetForecast(Structs::ForecastStruct::Type &) = 0;
+    virtual CHIP_ERROR SetForecast(Structs::ForecastStruct::Type &)                                          = 0;
 
 protected:
     EndpointId mEndpointId = 0;
 };
-
 
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
@@ -174,21 +176,22 @@ private:
     BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
-    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
-    void HandlePowerAdjustRequest       (HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);
-    void HandleCancelPowerAdjustRequest (HandlerContext & ctx, const Commands::CancelPowerAdjustRequest::DecodableType & commandData);
-    void HandleStartTimeAdjustRequest   (HandlerContext & ctx, const Commands::StartTimeAdjustRequest::DecodableType & commandData);
-    void HandlePauseRequest             (HandlerContext & ctx, const Commands::PauseRequest::DecodableType & commandData);
-    void HandleResumeRequest            (HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData);
-    void HandleModifyForecastRequest    (HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData);
-    void HandleRequestConstraintBasedForecast(HandlerContext & ctx, const Commands::RequestConstraintBasedForecast::DecodableType & commandData);
-
+    void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);
+    void HandleCancelPowerAdjustRequest(HandlerContext & ctx,
+                                        const Commands::CancelPowerAdjustRequest::DecodableType & commandData);
+    void HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands::StartTimeAdjustRequest::DecodableType & commandData);
+    void HandlePauseRequest(HandlerContext & ctx, const Commands::PauseRequest::DecodableType & commandData);
+    void HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData);
+    void HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData);
+    void HandleRequestConstraintBasedForecast(HandlerContext & ctx,
+                                              const Commands::RequestConstraintBasedForecast::DecodableType & commandData);
 };
 
 } // namespace DeviceEnergyManagement

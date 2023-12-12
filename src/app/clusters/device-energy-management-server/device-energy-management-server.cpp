@@ -21,7 +21,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -29,7 +28,6 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
-
 
 namespace chip {
 namespace app {
@@ -67,7 +65,6 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -95,7 +92,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
 CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;    // Nothing writable in this cluster !
+    return CHIP_ERROR_NOT_IMPLEMENTED; // Nothing writable in this cluster !
 }
 
 // CommandHandlerInterface
@@ -134,11 +131,13 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         return;
     case CancelPowerAdjustRequest::Id:
         HandleCommand<CancelPowerAdjustRequest::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelPowerAdjustRequest(ctx, commandData); });
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleCancelPowerAdjustRequest(ctx, commandData); });
         return;
     case StartTimeAdjustRequest::Id:
         HandleCommand<StartTimeAdjustRequest::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStartTimeAdjustRequest(ctx, commandData); });
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleStartTimeAdjustRequest(ctx, commandData); });
         return;
     case PauseRequest::Id:
         HandleCommand<PauseRequest::DecodableType>(
@@ -149,38 +148,40 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
             handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleResumeRequest(ctx, commandData); });
         return;
     case ModifyForecastRequest::Id:
-        HandleCommand<ModifyForecastRequest::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleModifyForecastRequest(ctx, commandData); });
+        HandleCommand<ModifyForecastRequest::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
+            HandleModifyForecastRequest(ctx, commandData);
+        });
         return;
     case RequestConstraintBasedForecast::Id:
         HandleCommand<RequestConstraintBasedForecast::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleRequestConstraintBasedForecast(ctx, commandData); });
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleRequestConstraintBasedForecast(ctx, commandData); });
         return;
     }
 }
 
 void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData)
 {
-    int64_t  power       = commandData.power;
+    int64_t power        = commandData.power;
     uint32_t durationSec = commandData.duration;
-    bool     validArgs   = false;
-    Status   status      = Status::Success;
+    bool validArgs       = false;
+    Status status        = Status::Success;
 
     auto powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
 
     if (powerAdjustmentCapability.IsNull())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s powerAdjustmentCapability IsNull",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s powerAdjustmentCapability IsNull", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
     for (auto pas : powerAdjustmentCapability.Value())
     {
-        if (   (power >= pas.minPower) && (durationSec >= pas.minDuration)
-            && (power <= pas.maxPower) && (durationSec <= pas.maxDuration))
+        if ((power >= pas.minPower) && (durationSec >= pas.minDuration) && (power <= pas.maxPower) &&
+            (durationSec <= pas.maxDuration))
         {
-            ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good PowerAdjustment args",  __FUNCTION__);
+            ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good PowerAdjustment args", __FUNCTION__);
             validArgs = true;
             break;
         }
@@ -188,13 +189,13 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 
     if (!validArgs)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s invalid request range",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s invalid request range", __FUNCTION__);
         // TODO: raise event ?
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good PowerAdjustRequest() args.",  __FUNCTION__);
+    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good PowerAdjustRequest() args.", __FUNCTION__);
 
     // TODO:  Generate a PowerAdjustStart Event, then begins to adjust its power. How is this done, Async?
     // When done, raise PowerAdjustEnd & ESAState set to kOnline.
@@ -202,63 +203,64 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed to PowerAdjustRequest() args.",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed to PowerAdjustRequest() args.", __FUNCTION__);
     }
 
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Partly implemented",  __FUNCTION__);
+    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Partly implemented", __FUNCTION__);
     return;
 }
 
-
-void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx, const Commands::CancelPowerAdjustRequest::DecodableType & commandData)
+void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
+                                              const Commands::CancelPowerAdjustRequest::DecodableType & commandData)
 {
-    Status     status = Status::Success;
-    ESAStateEnum  esaStatus;
+    Status status = Status::Success;
+    ESAStateEnum esaStatus;
 
     esaStatus = mDelegate.GetESAState();
 
     if (ESAStateEnum::kPowerAdjustActive != esaStatus)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - kPowerAdjustActive != esaStatus",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - kPowerAdjustActive != esaStatus", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
     /* TODO:  If the command is accepted, the ESA SHALL generate an PowerAdjustEnd Event.    */
 
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good CancelPowerAdjustRequest() args.",  __FUNCTION__);
+    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Good CancelPowerAdjustRequest() args.", __FUNCTION__);
     status = mDelegate.CancelPowerAdjustRequest();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed to PowerAdjustRequest() args.",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Failed to PowerAdjustRequest() args.", __FUNCTION__);
         return;
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s partly implemented",  __FUNCTION__);
+    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s partly implemented", __FUNCTION__);
     return;
 }
 
-void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands::StartTimeAdjustRequest::DecodableType & commandData)
+void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
+                                            const Commands::StartTimeAdjustRequest::DecodableType & commandData)
 {
-    Status      status = Status::Success;
-    uint32_t earliestStartTime = 0;
-    uint32_t latestEndTime     = 0;
+    Status status                          = Status::Success;
+    uint32_t earliestStartTime             = 0;
+    uint32_t latestEndTime                 = 0;
     Structs::ForecastStruct::Type forecast = mDelegate.GetForecast();
-    uint32_t duration = forecast.endTime - forecast.startTime;      // the current entire forecast duration
-    uint32_t requestedStartTime = commandData.requestedStartTime;
+    uint32_t duration                      = forecast.endTime - forecast.startTime; // the current entire forecast duration
+    uint32_t requestedStartTime            = commandData.requestedStartTime;
 
-    if (! HasFeature(Feature::kForecastAdjustment))
+    if (!HasFeature(Feature::kForecastAdjustment))
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
         return;
     }
 
     if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState = kUserOptOut",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState = kUserOptOut", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -272,7 +274,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands
     }
     else
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - NullOptional earliestStartTime.",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - NullOptional earliestStartTime.", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -283,27 +285,26 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands
     }
     else
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - NullOptional latestEndTime.",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - NullOptional latestEndTime.", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
-    if (   (requestedStartTime < earliestStartTime)
-        || ((requestedStartTime + duration) > latestEndTime))
+    if ((requestedStartTime < earliestStartTime) || ((requestedStartTime + duration) > latestEndTime))
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Bad requestedStartTime %d.",  __FUNCTION__, requestedStartTime);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Bad requestedStartTime %d.", __FUNCTION__, requestedStartTime);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
     else
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Good requestedStartTime %d.",  __FUNCTION__, requestedStartTime);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Good requestedStartTime %d.", __FUNCTION__, requestedStartTime);
 
         status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         if (status != Status::Success)
         {
-            ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - StartTimeAdjustRequest(%d) FAILURE",  __FUNCTION__, requestedStartTime);
+            ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - StartTimeAdjustRequest(%d) FAILURE", __FUNCTION__, requestedStartTime);
             return;
         }
 
@@ -312,27 +313,27 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands
         mDelegate.SetForecast(forecast);
     }
 
-    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Partially implemented",  __FUNCTION__);
+    ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Partially implemented", __FUNCTION__);
     return;
 }
 
 void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseRequest::DecodableType & commandData)
 {
-    Status      status = Status::Success;
-    CHIP_ERROR  err    = CHIP_NO_ERROR;
+    Status status                          = Status::Success;
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
     Structs::ForecastStruct::Type forecast = mDelegate.GetForecast();
-    uint32_t duration = commandData.duration;
+    uint32_t duration                      = commandData.duration;
 
-    if (! HasFeature(Feature::kForecastAdjustment))
+    if (!HasFeature(Feature::kForecastAdjustment))
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
         return;
     }
 
     if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState = kUserOptOut",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState = kUserOptOut", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -343,7 +344,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     uint16_t activeSlotNumber;
     if (forecast.activeSlotNumber.IsNull())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - activeSlotNumber Is Null",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - activeSlotNumber Is Null", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -351,23 +352,23 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     activeSlotNumber = forecast.activeSlotNumber.Value();
     if (activeSlotNumber >= forecast.slots.size())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Bad activeSlotNumber %d , size()=%d.",  __FUNCTION__,
-                        activeSlotNumber, static_cast<int>(forecast.slots.size()));
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - Bad activeSlotNumber %d , size()=%d.", __FUNCTION__, activeSlotNumber,
+                        static_cast<int>(forecast.slots.size()));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
-    if (! forecast.slots[activeSlotNumber].slotIsPauseable )
+    if (!forecast.slots[activeSlotNumber].slotIsPauseable)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - activeSlotNumber %d Is not pausible.",  __FUNCTION__, activeSlotNumber);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - activeSlotNumber %d Is not pausible.", __FUNCTION__, activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if (   (duration < forecast.slots[activeSlotNumber].minPauseDuration)
-        && (duration > forecast.slots[activeSlotNumber].maxPauseDuration))
+    if ((duration < forecast.slots[activeSlotNumber].minPauseDuration) &&
+        (duration > forecast.slots[activeSlotNumber].maxPauseDuration))
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - out of range pause duration %d",  __FUNCTION__, duration);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - out of range pause duration %d", __FUNCTION__, duration);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
@@ -375,7 +376,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     err = mDelegate.SetESAState(ESAStateEnum::kPaused);
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - SetESAState(paused) FAILURE",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - SetESAState(paused) FAILURE", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -384,7 +385,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - mDelegate.PauseRequest(%d) FAILURE",  __FUNCTION__, duration);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - mDelegate.PauseRequest(%d) FAILURE", __FUNCTION__, duration);
         return;
     }
 
@@ -393,19 +394,19 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
 
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
 {
-    Status      status = Status::Success;
+    Status status                          = Status::Success;
     Structs::ForecastStruct::Type forecast = mDelegate.GetForecast();
 
-    if (! HasFeature(Feature::kForecastAdjustment))
+    if (!HasFeature(Feature::kForecastAdjustment))
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s Feature kForecastAdjustment not enabled", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::UnsupportedCommand);
         return;
     }
 
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState not Paused.",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - ESAState not Paused.", __FUNCTION__);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -414,29 +415,27 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     if (status != Status::Success)
     {
-        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - mDelegate.ResumeRequest() FAILURE",  __FUNCTION__);
+        ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - mDelegate.ResumeRequest() FAILURE", __FUNCTION__);
         return;
     }
 
     // TODO: The ESA SHALL also generate a Resumed Event and the ESAState SHALL be updated accordingly to reflect its current state.
-    ChipLogProgress(Zcl, "DEM: %s not fully implemented",  __FUNCTION__);
+    ChipLogProgress(Zcl, "DEM: %s not fully implemented", __FUNCTION__);
     return;
 }
 
 void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData)
-{
+{}
 
-}
+void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
+                                                    const Commands::RequestConstraintBasedForecast::DecodableType & commandData)
+{}
 
-void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx, const Commands::RequestConstraintBasedForecast::DecodableType & commandData)
-{
-}
+} // namespace DeviceEnergyManagement
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
-} // chip
-} // app
-} // Clusters
-} // DeviceEnergyManagement
-
-void emberAfDeviceEnergyManagementClusterServerInitCallback(chip::EndpointId endpoint)  {}
+void emberAfDeviceEnergyManagementClusterServerInitCallback(chip::EndpointId endpoint) {}
 
 void MatterDeviceEnergyManagementPluginServerInitCallback() {}
