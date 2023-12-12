@@ -28,6 +28,9 @@ config:
     crash_log_file_path: "/tmp/crash_log.txt"
     crash_log_file_content: "Crash Log Content"
 
+    bdx_transfer_file_path: "/tmp/end_user_support_bdx_output.txt"
+    bdx_transfer_file_name: "end_user_support_bdx_output.txt"
+
 tests:
     #
     # Set up the test by adding some destination log files for the target accessory:
@@ -67,6 +70,36 @@ tests:
       cluster: "SystemCommands"
       command: "Stop"
 
+    - label: "Create End User Support logs"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+              - name: "fileContent"
+                value: end_user_support_log_file_content
+
+    - label: "Create NetworkDiag logs"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: network_diagnostics_log_file_path
+              - name: "fileContent"
+                value: network_diagnostics_log_file_content
+
+    - label: "Create CrashLogs logs"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: crash_log_file_path
+              - name: "fileContent"
+                value: crash_log_file_content
+
     - label: "Start the accessory with the destination logs files"
       cluster: "SystemCommands"
       command: "Start"
@@ -98,31 +131,6 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 2 # NoLogs
-              - name: "LogContent"
-                value: ""
-
-    - label: "Create End User Support logs"
-      cluster: "SystemCommands"
-      command: "CreateFile"
-      arguments:
-          values:
-              - name: "filePath"
-                value: end_user_support_log_file_path
-              - name: "fileContent"
-                value: end_user_support_log_file_content
-
-    - label: "Read End User Support log intent"
-      command: "RetrieveLogsRequest"
-      arguments:
-          values:
-              - name: "Intent"
-                value: 0 # EndUserSupport
-              - name: "RequestedProtocol"
-                value: 0 # ResponsePayload
-      response:
-          values:
-              - name: "Status"
                 value: 0 # Success
               - name: "LogContent"
                 value: end_user_support_log_file_content
@@ -138,59 +146,9 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 2 # NoLogs
-              - name: "LogContent"
-                value: ""
-
-    - label: "Create NetworkDiag logs"
-      cluster: "SystemCommands"
-      command: "CreateFile"
-      arguments:
-          values:
-              - name: "filePath"
-                value: network_diagnostics_log_file_path
-              - name: "fileContent"
-                value: network_diagnostics_log_file_content
-
-    - label: "Read NetworkDiag intent"
-      command: "RetrieveLogsRequest"
-      arguments:
-          values:
-              - name: "Intent"
-                value: 1 # NetworkDiag
-              - name: "RequestedProtocol"
-                value: 0 # ResponsePayload
-      response:
-          values:
-              - name: "Status"
                 value: 0 # Success
               - name: "LogContent"
                 value: network_diagnostics_log_file_content
-
-    - label: "Read CrashLogs intent"
-      command: "RetrieveLogsRequest"
-      arguments:
-          values:
-              - name: "Intent"
-                value: 2 # CrashLogs
-              - name: "RequestedProtocol"
-                value: 0 # ResponsePayload
-      response:
-          values:
-              - name: "Status"
-                value: 2 # NoLogs
-              - name: "LogContent"
-                value: ""
-
-    - label: "Create CrashLogs logs"
-      cluster: "SystemCommands"
-      command: "CreateFile"
-      arguments:
-          values:
-              - name: "filePath"
-                value: crash_log_file_path
-              - name: "fileContent"
-                value: crash_log_file_content
 
     - label: "Read CrashLogs intent"
       command: "RetrieveLogsRequest"
@@ -267,6 +225,108 @@ tests:
               - name: "LogContent"
                 value: end_user_support_log_file_content
 
+    - label: "Write End User Support logs to be over the 1024 bytes limit"
+      cluster: "SystemCommands"
+      command: "CreateFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: end_user_support_log_file_path
+              - name: "fileContent"
+                value: end_user_support_log_file_content_long
+
+    # If the RequestedProtocol is set to BDX the Node SHOULD immediately realize the RetrieveLogsResponse command by initiating a BDX
+    # Transfer, sending a BDX SendInit message with the File Designator field of the message set to the value of the TransferFileDesignator
+    # field of the RetrieveLogsRequest.
+    # On reception of a BDX SendAccept message the Node SHALL send a RetrieveLogsResponse command with a Status field set to Success and
+    # proceed with the log transfer over BDX.
+    - label: "Delete possible leftover from previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: bdx_transfer_file_name
+      response:
+          values:
+              - name: "Status"
+                value: 0 # Success
+              - name: "LogContent"
+                value: ""
+
+    - label:
+          "BDX: Request End User Support while the previous request is running"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: "ItDoesNotMatterForThisBusyTest"
+      response:
+          values:
+              - name: "Status"
+                value: 3 # Busy
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path
+
+    # If a failure StatusReport is received in response to the SendInit message, the Node SHALL send a RetrieveLogsResponse command with a
+    # Status of Denied.
+    - label:
+          "BDX: Request End User Support log with a special
+          TransferFileDesignator name that forces the responder to issue an
+          error when SendInit is received"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: "Error:OnTransferBegin" # Should issue an error when SendInit is received.
+      response:
+          values:
+              - name: "Status"
+                value: 4 # Denied
+              - name: "LogContent"
+                value: ""
+
     #
     # If the Intent and/or the RequestedProtocol arguments contain invalid (out of range) values the command SHALL fail with a Status Code of INVALID_COMMAND.
     #
@@ -323,3 +383,278 @@ tests:
                 value: "ThisNameIsLongerThanThekMaxFileDesignatorLenCharacterConstraint"
       response:
           error: "CONSTRAINT_ERROR"
+
+    #
+    # Validate that a new BDX transfer can be started after a previous successful BDX transfer
+    #
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: bdx_transfer_file_name
+      response:
+          values:
+              - name: "Status"
+                value: 0 # Success
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: bdx_transfer_file_name
+      response:
+          values:
+              - name: "Status"
+                value: 0 # Success
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    #
+    # Validate that a new BDX transfer can be started after a previous unsuccessful BDX transfer
+    #
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: "Error:OnTransferBegin" # Should issue an error when SendInit is received.
+      response:
+          values:
+              - name: "Status"
+                value: 4 # kDenied
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: bdx_transfer_file_name
+      response:
+          values:
+              - name: "Status"
+                value: 0 # Success
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    #
+    # Validate that a new BDX transfer can be started after a previous unsuccessful BDX transfer
+    # stopped once the RetrieveLogsResponse has been sent/received.
+    #
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
+
+    - label: "Delete possible leftover from previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: "/tmp/Error:OnTransferData"
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: "Error:OnTransferData" # Should issue an error after SendInit is received.
+      response:
+          values:
+              - name: "Status"
+                value: 0 # kSuccess
+              - name: "LogContent"
+                value: ""
+
+    - label:
+          "BDX: Wait for 'Diagnostic logs transfer: StatusReport Error' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: StatusReport Error"
+
+    - label: "BDX: Request End User Support"
+      command: "RetrieveLogsRequest"
+      arguments:
+          values:
+              - name: "Intent"
+                value: 0 # EndUserSupport
+              - name: "RequestedProtocol"
+                value: 1 # BDX
+              - name: "TransferFileDesignator"
+                value: bdx_transfer_file_name
+      response:
+          values:
+              - name: "Status"
+                value: 0 # Success
+              - name: "LogContent"
+                value: ""
+
+    - label: "BDX: Wait for 'Diagnostic logs transfer: Success' message"
+      cluster: "DelayCommands"
+      command: "WaitForMessage"
+      arguments:
+          values:
+              - name: "registerKey"
+                value: "default"
+              - name: "message"
+                value: "Diagnostic logs transfer: Success"
+
+    - label:
+          "Compare the content the original log and the file that has been
+          created as the result of the BDX transfer"
+      cluster: "SystemCommands"
+      command: "CompareFiles"
+      arguments:
+          values:
+              - name: "file1"
+                value: end_user_support_log_file_path
+              - name: "file2"
+                value: bdx_transfer_file_path
+
+    - label: "Delete the result of the previous run"
+      cluster: "SystemCommands"
+      command: "DeleteFile"
+      arguments:
+          values:
+              - name: "filePath"
+                value: bdx_transfer_file_path
