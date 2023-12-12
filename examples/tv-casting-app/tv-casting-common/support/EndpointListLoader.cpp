@@ -119,7 +119,8 @@ void EndpointListLoader::Complete()
         for (unsigned long i = 0; i < mNewEndpointsToLoad; i++)
         {
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
-            std::shared_ptr<Endpoint> endpoint(new Endpoint(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes));
+            std::shared_ptr<Endpoint> endpoint =
+                std::make_shared<Endpoint>(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes);
             for (chip::ClusterId clusterId : mEndpointServerLists[i])
             {
                 switch (clusterId)

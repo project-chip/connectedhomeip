@@ -34,10 +34,10 @@ class BaseCluster
 {
 private:
 protected:
-    memory::Weak<Endpoint> endpoint;
+    memory::Weak<Endpoint> mEndpoint;
 
 public:
-    BaseCluster(memory::Weak<Endpoint> endpoint) { this->endpoint = endpoint; }
+    BaseCluster(memory::Weak<Endpoint> endpoint) { this->mEndpoint = endpoint; }
 
     virtual ~BaseCluster() {}
 
@@ -46,7 +46,7 @@ public:
     void operator=(const BaseCluster &) = delete;
 
 protected:
-    memory::Weak<Endpoint> GetEndpoint() const { return endpoint.lock(); }
+    memory::Weak<Endpoint> GetEndpoint() const { return mEndpoint.lock(); }
 };
 
 }; // namespace core
