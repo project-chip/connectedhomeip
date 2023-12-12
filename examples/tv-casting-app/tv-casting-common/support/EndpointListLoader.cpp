@@ -172,14 +172,14 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
         endpointAttributes,
         [](void * context,
            chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType decodableVendorId) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
-            endpointAttributes->mVendorId           = decodableVendorId;
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
+            _endpointAttributes->mVendorId           = decodableVendorId;
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             ChipLogError(AppServer, "EndpointListLoader ReadAttribute(VendorID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
-                         endpointAttributes->mId, err.Format());
+                         _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
 }
@@ -192,15 +192,15 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
         endpointAttributes,
         [](void * context,
            chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo::DecodableArgType decodableProductId) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
-            endpointAttributes->mProductId          = decodableProductId;
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
+            _endpointAttributes->mProductId          = decodableProductId;
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             ChipLogError(AppServer,
                          "EndpointListLoader ReadAttribute(ProductID) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
-                         endpointAttributes->mId, err.Format());
+                         _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
 }
@@ -213,20 +213,20 @@ CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointA
         endpointAttributes,
         [](void * context,
            chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::TypeInfo::DecodableArgType decodableDeviceTypeList) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
-            auto iter                               = decodableDeviceTypeList.begin();
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
+            auto iter                                = decodableDeviceTypeList.begin();
             while (iter.Next())
             {
                 auto & deviceType = iter.GetValue();
-                endpointAttributes->mDeviceTypeList.push_back(deviceType);
+                _endpointAttributes->mDeviceTypeList.push_back(deviceType);
             }
             EndpointListLoader::GetInstance()->Complete();
         },
         [](void * context, CHIP_ERROR err) {
-            EndpointAttributes * endpointAttributes = static_cast<EndpointAttributes *>(context);
+            EndpointAttributes * _endpointAttributes = static_cast<EndpointAttributes *>(context);
             ChipLogError(AppServer,
                          "EndpointListLoader ReadAttribute(DeviceTypeList) failed for endpointID %d. Err: %" CHIP_ERROR_FORMAT,
-                         endpointAttributes->mId, err.Format());
+                         _endpointAttributes->mId, err.Format());
             EndpointListLoader::GetInstance()->Complete();
         });
 }
@@ -239,12 +239,12 @@ CHIP_ERROR EndpointListLoader::ReadServerList(std::vector<chip::ClusterId> * end
         endpointServerList,
         [](void * context,
            chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo::DecodableArgType decodableServerList) {
-            std::vector<chip::ClusterId> * endpointServerList = static_cast<std::vector<chip::ClusterId> *>(context);
-            auto iter                                         = decodableServerList.begin();
+            std::vector<chip::ClusterId> * _endpointServerList = static_cast<std::vector<chip::ClusterId> *>(context);
+            auto iter                                          = decodableServerList.begin();
             while (iter.Next())
             {
                 auto & clusterId = iter.GetValue();
-                endpointServerList->push_back(clusterId);
+                _endpointServerList->push_back(clusterId);
             }
             EndpointListLoader::GetInstance()->Complete();
         },
