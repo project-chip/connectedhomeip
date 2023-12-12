@@ -306,7 +306,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx, const Commands
             ChipLogProgress(Zcl, "zzzzzzzzzzDEM: %s - StartTimeAdjustRequest(%d) FAILURE",  __FUNCTION__, requestedStartTime);
             return;
         }
-        
+
         forecast.startTime = requestedStartTime;
         forecast.endTime   = requestedStartTime + duration;
         mDelegate.SetForecast(forecast);

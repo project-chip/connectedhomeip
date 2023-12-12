@@ -50,7 +50,7 @@ public:
     /**
      * @brief Delegate should implement a handler to begin to adjust client power
      *        consumption/generation to the level requested.
-     * 
+     *
      * @param power Milli-Watts the ESA SHALL use during the adjustment period. Positive values indicate the direction of current flow -towards- a load.
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
@@ -60,7 +60,7 @@ public:
     /**
      * @brief Delegate SHALL make the ESA end the active power adjustment session & return to normal (or idle) power levels.
      *        The ESA SHALL also generate an PowerAdjustEnd Event and the ESAState SHALL be restored to Online.
-     * 
+     *
      * @return It should report SUCCESS if successful and FAILURE otherwise.
      */
     virtual Status CancelPowerAdjustRequest() = 0;
@@ -68,13 +68,13 @@ public:
 
     /**
      * @brief Delegate for the ESA SHALL update its Forecast attribute with the RequestedStartTime including a new ForecastId.
-     * 
+     *
      *   If the ESA supports ForecastAdjustment, and the ESAState is not UserOptOut and the RequestedStartTime is after
      *   the EarliestStartTime and the resulting EndTime is before the LatestEndTime, then ESA SHALL accept the request
      *   to modify the Start Time.
      *   A client can estimate the entire Forecast sequence duration by computing the EndTime - StartTime fields from the
      *   Forecast attribute, and therefore avoid scheduling the start time too late.
-     * 
+     *
      * @param requestedStartTime The requested start time in UTC that the client would like the appliance to shift its power forecast to.
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate IM_Status.
      */
@@ -83,12 +83,12 @@ public:
     /**
      * @brief Delegate implementation:
      *   If the ESA supports FA and either the SlotIsPauseable field is true in the ActiveSlotNumber index in the
-     *   Slots list, or the IsPausable field is true in the Forecast attribute structure, and the ESAState is not 
+     *   Slots list, or the IsPausable field is true in the Forecast attribute structure, and the ESAState is not
      *   UserOptOut then the ESA SHALL pause its current operation.
      *   During this state the ESA SHALL not consume or produce significant power (other than required to keep its
      *   basic control system operational).
      *   The ESA SHALL also generate a Paused Event and the ESAState SHALL be restored to Paused.
-     * 
+     *
      * @param duration Duration that the ESA SHALL be paused for. SHALL be between MinPauseDuration & MaxPauseDuration for current slot.
      * @return  Success if the ESA is paused, otherwise returns other IM_Statuses.
      */
@@ -97,9 +97,9 @@ public:
     /**
      * @brief Delegate implementation:
      *   If the ESA supports FA and it is currently Paused then the ESA SHALL resume its operation.
-     *   The ESA SHALL also generate a Resumed Event and the ESAState SHALL be updated accordingly to 
+     *   The ESA SHALL also generate a Resumed Event and the ESAState SHALL be updated accordingly to
      *   reflect its current state.
-     * 
+     *
      * @return  Success if the ESA is resumed, otherwise returns other IM_Statuss.
      */
     virtual Status ResumeRequest() = 0;
@@ -111,7 +111,7 @@ public:
      *   Attempts to modify slots which have already past, SHALL result in the entire command being rejected.
      *   If the ESA accepts the requested Forecast then it SHALL update its Forecast attribute (incrementing its ForecastId)
      *   and run the revised Forecast as its new intended operation.
-     * 
+     *
      * @param forecastId Indicates the ESA ForecastId that is to be modified.
      * @param slotAdjustments List of adjustments to be applied to the ESA, corresponding to the expected ESA forecastId.
      * @return  Success if the entire list of SlotAdjustmentStruct are accepted, otherwise the command
@@ -122,10 +122,10 @@ public:
     /**
      * @brief Delegate should implement:
      *   The ESA SHALL inspect the requested power limits to ensure that there are no overlapping elements. The ESA
-     *   manufacturer may also reject the request if it could cause the user’s preferences to be breached (e.g. may 
+     *   manufacturer may also reject the request if it could cause the user’s preferences to be breached (e.g. may
      *   cause the home to be too hot or too cold, or a battery to be insufficiently charged).
      *   If the ESA can meet the requested power limits, it SHALL regenerate a new Power Forecast with a new ForecastId.
-     * 
+     *
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successfull, otherwise the command SHALL be rejected returning other IM_Statuss.
      */
