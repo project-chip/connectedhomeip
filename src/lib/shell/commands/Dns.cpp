@@ -67,7 +67,7 @@ public:
         // Schedule a retry. Not called directly so we do not recurse in OnNodeAddressResolved
         DeviceLayer::SystemLayer().ScheduleLambda([this] {
             CHIP_ERROR err = AddressResolve::Resolver::Instance().TryNextResult(Handle());
-            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_WELL_EMPTY)
+            if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_FOUND)
             {
                 ChipLogError(Discovery, "Failed to list next result: %" CHIP_ERROR_FORMAT, err.Format());
             }

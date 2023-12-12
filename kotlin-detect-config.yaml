@@ -233,6 +233,9 @@ exceptions:
             - "**/src/controller/java/generated/java/**/*"
 
 naming:
+    VariableNaming:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
     FunctionNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
@@ -280,6 +283,7 @@ complexity:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/GroupSettingFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OtaProviderClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/GenericChipDeviceListener.kt"

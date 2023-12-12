@@ -112,6 +112,12 @@ template("ti_sysconfig") {
     sources = invoker.sources
     outputs = gen_outputs
 
+    if (defined(invoker.rtos)) {
+      rtos = invoker.rtos
+    } else {
+      rtos = "freertos"
+    }
+
     if (ti_simplelink_device == "") {
       args = [
         ti_sysconfig_root,
@@ -125,7 +131,7 @@ template("ti_sysconfig") {
         "--board",
         "/ti/boards/" + ti_simplelink_board,
         "--rtos",
-        "freertos",
+        rtos,
       ]
     } else {
       args = [
@@ -140,7 +146,7 @@ template("ti_sysconfig") {
         "--device",
         ti_simplelink_device,
         "--rtos",
-        "freertos",
+        rtos,
       ]
     }
 

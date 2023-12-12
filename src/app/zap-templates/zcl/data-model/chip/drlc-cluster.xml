@@ -185,10 +185,10 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="ARRAY" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
+    <attribute side="server" code="0x0000" define="LOAD_CONTROL_PROGRAMS" type="array" entryType="LoadControlProgramStruct" writable="false">LoadControlPrograms</attribute>
     <attribute side="server" code="0x0001" define="NUMBER_OF_LOAD_CONTROL_PROGRAMS" type="int8u" min="5" writable="false" default="5">NumberOfLoadControlPrograms</attribute>
-    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">Events</attribute>
-    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="ARRAY" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
+    <attribute side="server" code="0x0002" define="LOAD_CONTROL_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">Events</attribute>
+    <attribute side="server" code="0x0003" define="LOAD_CONTROL_ACTIVE_EVENTS" type="array" entryType="LoadControlEventStruct" writable="false">ActiveEvents</attribute>
     <attribute side="server" code="0x0004" define="NUMBER_OF_EVENTS_PER_PROGRAM" type="int8u" min="10" writable="false" default="10">NumberOfEventsPerProgram</attribute>
     <attribute side="server" code="0x0005" define="NUMBER_OF_TRANSITIONS" type="int8u" min="3" writable="false" default="3">NumberOfTransitions</attribute>
     <attribute side="server" code="0x0006" define="DEFAULT_RANDOM_START" type="int8u" min="0" max="0x3C" default="0x1E" writable="true">

@@ -28,8 +28,8 @@ public class MatterCommandReceiver extends BroadcastReceiver {
 
     switch (intentAction) {
       case MatterIntentConstants.ACTION_MATTER_COMMAND:
-        int commandId = intent.getIntExtra(MatterIntentConstants.EXTRA_COMMAND_ID, -1);
-        int clusterId = intent.getIntExtra(MatterIntentConstants.EXTRA_CLUSTER_ID, -1);
+        long commandId = intent.getLongExtra(MatterIntentConstants.EXTRA_COMMAND_ID, -1);
+        long clusterId = intent.getLongExtra(MatterIntentConstants.EXTRA_CLUSTER_ID, -1);
         if (commandId != -1) {
           byte[] commandPayload =
               intent.getByteArrayExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD);
@@ -56,7 +56,7 @@ public class MatterCommandReceiver extends BroadcastReceiver {
 
           sendResponseViaPendingIntent(context, intent, response);
         } else {
-          int attributeId = intent.getIntExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, -1);
+          long attributeId = intent.getLongExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ID, -1);
           String attributeAction =
               intent.getStringExtra(MatterIntentConstants.EXTRA_ATTRIBUTE_ACTION);
           if (attributeAction.equals(MatterIntentConstants.ATTRIBUTE_ACTION_READ)) {

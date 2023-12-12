@@ -17,6 +17,8 @@ name: 119.2.1. [TC-BIND-2.1] Binding Cluster Attributes-Node [DUT-Controller]
 
 PICS:
     - BIND.C
+    - MCORE.ROLE.CONTROLLER
+    - "!MCORE.DT_SW_COMP"
 
 config:
     nodeId: 0x12344321

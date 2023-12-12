@@ -15,12 +15,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="NameSupportBitmap" type="BITMAP8">
+  <bitmap name="NameSupportBitmap" type="bitmap8">
       <cluster code="0x0005"/>
       <field name="SceneNames" mask="0x80"/>
   </bitmap>
 
-  <bitmap name="CopyModeBitmap" type="BITMAP8">
+  <bitmap name="CopyModeBitmap" type="bitmap8">
     <cluster code="0x0005"/>
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
@@ -64,7 +64,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="NameSupportBitmap" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>
-    <attribute side="server" code="0x0007" define="FABRIC_SCENE_INFO" type="ARRAY" entryType="SceneInfoStruct" writable="false" optional="false">FabricSceneInfo</attribute>
+    <attribute side="server" code="0x0007" define="FABRIC_SCENE_INFO" type="array" entryType="SceneInfoStruct" writable="false" optional="false">FabricSceneInfo</attribute>
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
         Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'

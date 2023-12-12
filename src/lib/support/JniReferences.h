@@ -190,12 +190,8 @@ private:
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;
 
-    // These are global refs and therefore safe to persist.
     jclass mHashMapClass   = nullptr;
     jclass mListClass      = nullptr;
     jclass mArrayListClass = nullptr;
-    jclass mOptionalClass  = nullptr;
-
-    bool use_java8_optional = false;
 };
 } // namespace chip

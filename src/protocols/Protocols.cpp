@@ -24,7 +24,7 @@
 namespace chip {
 namespace Protocols {
 
-static const char * sUnknownTypeName = "----";
+static const char sUnknownTypeName[] = "----";
 
 static const char * LookupMessageTypeName(const MessageTypeNameLookup * lookupTable, size_t tableSize, uint8_t msgType)
 {

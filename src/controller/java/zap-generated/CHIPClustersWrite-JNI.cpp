@@ -5934,8 +5934,8 @@ JNI_METHOD(void, ThermostatCluster, writeRemoteSensingAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6202,8 +6202,8 @@ JNI_METHOD(void, ThermostatCluster, writeThermostatProgrammingOperationModeAttri
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue =
-        static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6634,7 +6634,8 @@ JNI_METHOD(void, ThermostatCluster, writeACErrorCodeAttribute)
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
     std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
 
-    cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(chip::JniReferences::GetInstance().LongToPrimitive(value));
+    cppValue.SetRaw(static_cast<std::remove_reference_t<decltype(cppValue)>::IntegerType>(
+        chip::JniReferences::GetInstance().LongToPrimitive(value)));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

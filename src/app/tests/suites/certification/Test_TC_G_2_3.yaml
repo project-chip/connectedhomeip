@@ -48,9 +48,10 @@ tests:
           cluster to DUT on EP0 using a key that is pre-installed on the TH.
           GroupKeySet fields are as follows: GroupKeySetID: 1
           GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
-          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
-          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
-          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 1 EpochKey1:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 18446744073709551613
+          EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2:
+          18446744073709551614"
       verification: |
           ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
 
@@ -1139,7 +1140,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 19: TH sends AddGroupIfIdentifying command to DUT on
+          "Step 19a: TH sends AddGroupIfIdentifying command to DUT on
           PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID
           as 0x0000 GroupName as Gp45"
       PICS: G.S.C05.Rsp
@@ -1152,6 +1153,22 @@ tests:
           [1658307266.719482][3251:3256] CHIP:DMG:                                {
           [1658307266.719527][3251:3256] CHIP:DMG:                                        status = 0x87 (CONSTRAINT_ERROR),
           [1658307266.719573][3251:3256] CHIP:DMG:                                },
+      disabled: true
+
+    - label:
+          "Step 19b: TH sends AddGroupIfIdentifying command to DUT on
+          PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID
+          as 0x0006 + maxgroups, GroupName as Gp123456789123456"
+      PICS: G.S.C05.Rsp && G.S.F00
+      verification: |
+          ./chip-tool groups  add-group-if-identifying 0x0012 Gp123456789123456 1 0
+
+          Verify the status is CONSTRAINT_ERROR (when GroupName is of length greater than 16) on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1701784815.714772][15290:15292] CHIP:DMG:                                 StatusIB =
+          [1701784815.714776][15290:15292] CHIP:DMG:                                 {
+          [1701784815.714779][15290:15292] CHIP:DMG:                                         status = 0x87 (CONSTRAINT_ERROR),
+          [1701784815.714782][15290:15292] CHIP:DMG:                                 },
       disabled: true
 
     - label:

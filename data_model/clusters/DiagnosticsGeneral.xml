@@ -258,6 +258,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
+    <attribute id="0x0009" name="DoNotUse">
+      <disallowConform/>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="TestEventTrigger" response="Y">

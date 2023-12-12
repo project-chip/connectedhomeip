@@ -23,7 +23,7 @@
 #include <platform/ConfigurationManager.h>
 #include <string>
 
-constexpr const char * kNullHexMACAddress = "000000000000";
+constexpr char kNullHexMACAddress[] = "000000000000";
 
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
