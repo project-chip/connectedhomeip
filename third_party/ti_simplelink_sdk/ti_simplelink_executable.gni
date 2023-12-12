@@ -37,13 +37,6 @@ assert(matter_software_ver_str != "",
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
 
-  if (chip_enable_ota_requestor) {
-    # Generating the ota binary image
-    final_target = "${target_name}.ota"
-  } else {
-    # The executable is the final target.
-    final_target = "${simplelink_target_name}.out"
-  }
   output_base_name = get_path_info(invoker.output_name, "name")
 
   #used for OTA image creator for the cc13xx
@@ -109,103 +102,339 @@ template("ti_simplelink_executable") {
     ]
   }
 
-  if (chip_enable_ota_requestor &&
-      ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-    pw_python_action("${simplelink_target_name}.bin") {
-      public_deps = [ ":${simplelink_target_name}.out.image" ]
+  if (chip_enable_ota_requestor) {
+    if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+      pw_python_action("${simplelink_target_name}.bin") {
+        public_deps = [ ":${simplelink_target_name}.out.image" ]
 
-      script = "${ti_simplelink_sdk_root}//tools/common/oad/oad_image_tool.py"
-      sources = [ "${root_out_dir}/${objcopy_image_name}" ]
-      outputs = [ "${root_out_dir}/${output_base_name}.bin" ]
+        script = "${ti_simplelink_sdk_root}//tools/common/oad/oad_image_tool.py"
+        sources = [ "${root_out_dir}/${objcopy_image_name}" ]
+        outputs = [ "${root_out_dir}/${output_base_name}.bin" ]
 
-      args = [
-        "--verbose",
-        "ccs",
-        rebase_path(root_out_dir, root_build_dir),
-        "7",
-        "-hex1",
-        rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
-        "-o",
-        output_base_name,
-      ]
-
-      if (defined(invoker.pem_file)) {
-        args += [
-          "-k",
-          rebase_path(invoker.pem_file, root_build_dir),
+        args = [
+          "--verbose",
+          "ccs",
+          rebase_path(root_out_dir, root_build_dir),
+          "7",
+          "-hex1",
+          rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
+          "-o",
+          output_base_name,
         ]
-      } else {
-        args += [
-          "-k",
-          rebase_path("${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
+
+        if (defined(invoker.pem_file)) {
+          args += [
+            "-k",
+            rebase_path(invoker.pem_file, root_build_dir),
+          ]
+        } else {
+          args += [
+            "-k",
+            rebase_path(
+                "${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
+                root_build_dir),
+          ]
+        }
+      }
+      action("${simplelink_target_name}-bim.hex") {
+        public_deps = [ ":${simplelink_target_name}.bin" ]
+
+        script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
+        sources = [ "${root_out_dir}/${output_base_name}.bin" ]
+        outputs = [ "${root_out_dir}/${output_base_name}-bim.hex" ]
+
+        if (defined(invoker.bim_hex)) {
+          bim_hex = invoker.bim_hex
+        } else {
+          bim_hex = "${ti_simplelink_sdk_root}/examples/nortos/${ti_simplelink_board}/bim/hexfiles/bim_offchip/Release/bim_offchip.hex"
+        }
+
+        args = [
+          rebase_path("${root_out_dir}/${output_base_name}.bin",
+                      root_build_dir),
+          rebase_path(bim_hex, root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}-bim.hex",
                       root_build_dir),
         ]
       }
-    }
-    pw_python_action("${simplelink_target_name}-bim.hex") {
-      public_deps = [ ":${simplelink_target_name}.bin" ]
+      pw_python_action("${target_name}.ota") {
+        public_deps = [ ":${simplelink_target_name}.bin" ]
 
-      script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
-      sources = [ "${root_out_dir}/${output_base_name}.bin" ]
-      outputs = [ "${root_out_dir}/${output_base_name}-bim.hex" ]
+        script = "${chip_root}/src/app/ota_image_tool.py"
+        sources = [ "${root_out_dir}/${output_base_name}.bin" ]
+        outputs = [ "${root_out_dir}/${output_base_name}.ota" ]
 
-      if (defined(invoker.bim_hex)) {
-        bim_hex = invoker.bim_hex
-      } else {
-        bim_hex = "${ti_simplelink_sdk_root}/examples/nortos/${ti_simplelink_board}/bim/hexfiles/bim_offchip/Release/bim_offchip.hex"
+        args = [
+          "create",
+          rebase_path("${root_out_dir}/${output_base_name}.bin",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.ota",
+                      root_build_dir),
+        ]
+
+        args += [
+          "-v",
+          matter_device_vid,
+          "-p",
+          matter_device_pid,
+          "-vn",
+          matter_software_ver,
+          "-vs",
+          matter_software_ver_str,
+        ]
+        if (defined(invoker.ota_digest)) {
+          args += [
+            "-da",
+            matter_ota_digest,
+          ]
+        } else {
+          args += [
+            "-da",
+            "sha256",
+          ]
+        }
+        if (defined(invoker.ota_args)) {
+          args += invoker.ota_args
+        }
+      }
+    } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+      # add MCUBoot Header to the executable
+      action("${simplelink_target_name}_header.hex") {
+        public_deps = [ ":${simplelink_target_name}.out.image" ]
+
+        script = "${ti_simplelink_sdk_root}/source/third_party/mcuboot/scripts/imgtool.py"
+        sources = [ "${root_out_dir}/${output_base_name}.hex" ]
+        outputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
+
+        args = [
+          "sign",
+          "--header-size",
+          "0x80",
+          "--align",
+          "4",
+          "--slot-size",
+          "0x000F6000",  # must match the flash_map_backend definitions
+          "--version",
+          matter_software_ver_str,
+          "--pad-header",
+          "--pad",
+          "--key",
+          rebase_path(
+              "${ti_simplelink_sdk_root}/source/third_party/mcuboot/root-ec-p256.pem",
+              root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
+          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+                      root_out_dir),
+        ]
+      }
+      action("${simplelink_target_name}_header.bin") {
+        inputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
+        outputs = [ "${root_out_dir}/${output_base_name}_header.bin" ]
+        deps = [ ":${simplelink_target_name}_header.hex" ]
+        args = [
+          objcopy,
+          "-I",
+          "ihex",
+          "-O",
+          "binary",
+          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}_header.bin",
+                      root_build_dir),
+        ]
+        script = "${build_root}/gn_run_binary.py"
       }
 
-      args = [
-        rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
-        rebase_path(bim_hex, root_build_dir),
-        rebase_path("${root_out_dir}/${output_base_name}-bim.hex",
-                    root_build_dir),
-      ]
+      # Generate MCUBoot sysconfig
+      ti_sysconfig("${simplelink_target_name}_mcuboot.syscfg") {
+        sources = [ "${ti_simplelink_sdk_build_root}/mcuboot/mcuboot.syscfg" ]
+        rtos = "nortos"
+        outputs = [
+          "ti_drivers_config.c",
+          "ti_drivers_config.h",
+          "ti_devices_config.c",
+          "ti_devices_config.h",
 
-      args += [ "${root_out_dir}/${output_base_name}-bim.hex" ]
-    }
-    pw_python_action("${target_name}.ota") {
-      public_deps = [ ":${simplelink_target_name}-bim.hex" ]
-
-      script = "${chip_root}/src/app/ota_image_tool.py"
-      sources = [ "${root_out_dir}/${output_base_name}.bin" ]
-      outputs = [ "${root_out_dir}/${output_base_name}.ota" ]
-
-      args = [
-        "create",
-        rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
-        rebase_path("${root_out_dir}/${output_base_name}.ota", root_build_dir),
-      ]
-
-      args += [
-        "-v",
-        matter_device_vid,
-        "-p",
-        matter_device_pid,
-        "-vn",
-        matter_software_ver,
-        "-vs",
-        matter_software_ver_str,
-      ]
-      if (defined(invoker.ota_digest)) {
-        args += [
-          "-da",
-          matter_ota_digest,
-        ]
-      } else {
-        args += [
-          "-da",
-          "sha256",
+          # not traditional source files
+          #"ti_utils_build_linker.cmd.genlibs",
+          #"syscfg_c.rov.xs",
         ]
       }
-      if (defined(invoker.ota_args)) {
-        args += invoker.ota_args
+
+      # build MCUBoot bootloader
+      config("${simplelink_target_name}_mcubootloader_config") {
+        libs = [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x4_cc26x4/driverlib/bin/gcc/driverlib.lib" ]
+      }
+      flashable_executable("${simplelink_target_name}_mcubootloader") {
+        output_name = "${output_base_name}.mcubootloader.out"
+        output_dir = root_out_dir
+        deps = [ ":${simplelink_target_name}_mcuboot.syscfg" ]
+        public_configs = [ ":${simplelink_target_name}_mcubootloader_config" ]
+        ldscript =
+            "${ti_simplelink_sdk_build_root}/mcuboot/mcuboot_cc13x4_cc26x4.lds"
+        objcopy_image_name = "${output_base_name}.mcubootloader.hex"
+        objcopy_image_format = "ihex"
+        inputs = [ ldscript ]
+        sources = [
+          "${ti_simplelink_sdk_build_root}/mcuboot/flash_map_backend.c",
+          "${ti_simplelink_sdk_build_root}/mcuboot/mcuboot_config/mcuboot_config.h",
+          "${ti_simplelink_sdk_build_root}/syscalls_stubs.cpp",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/boot_record.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/bootutil_misc.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/bootutil_public.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/caps.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/encrypted.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/fault_injection_hardening.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/fault_injection_hardening_delay_rng_mbedtls.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ec.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ec256.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ed25519.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_rsa.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_validate.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/loader.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_misc.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_move.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_priv.h",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_scratch.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/tlv.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app/keys.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app/mcuboot_app.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app/security_cnt.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/mbedtls-asn1/src/asn1parse.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/mbedtls-asn1/src/platform_util.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/ti-crypto/sl_crypto.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/debug/led_debug.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/ecc/ECDSACC26X4_driverlib.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/sha2/sha2_driverlib.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/flash/no_rtos/extFlash/bsp_spi_cc13x4_cc26x4.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/flash/no_rtos/extFlash/ext_flash.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/mcuboot/boot_seed/boot_seed_cc13x4_cc26x4.c",
+        ]
+
+        include_dirs = [
+          # === MUST BE BEFORE ===
+          # "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app"
+          # to eclipse the mcuboot config header
+          "${ti_simplelink_sdk_build_root}/mcuboot",
+
+          "${ti_simplelink_sdk_root}/kernel/nortos",
+          "${ti_simplelink_sdk_root}/source",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/include",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/mbedtls-asn1/include",
+          "${ti_simplelink_sdk_root}/source/ti",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/ecc",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/sha2",
+          "${ti_simplelink_sdk_root}/source/ti/common/flash/no_rtos/extFlash",
+        ]
+
+        defines = [
+          "EXCLUDE_TRACE",
+          "BOOT_LOADER",
+        ]
+
+        ldflags = [
+          "-eresetISR",
+          "-L" +
+              rebase_path(ti_simplelink_sdk_root + "/source", root_build_dir),
+          "-L" + rebase_path(ti_simplelink_sdk_root + "/kernel/nortos",
+                             root_build_dir),
+          rebase_path(
+              "${target_gen_dir}/${simplelink_target_name}_mcuboot.syscfg/ti_utils_build_linker.cmd.genlibs",
+              root_build_dir),
+          "-T" + rebase_path(ldscript, root_build_dir),
+        ]
+      }
+
+      action("${simplelink_target_name}-mcuboot.hex") {
+        public_deps = [
+          ":${simplelink_target_name}_header.bin",
+          ":${simplelink_target_name}_mcubootloader.image",
+        ]
+
+        script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
+        sources = [
+          "${root_out_dir}/${output_base_name}.mcubootloader.hex",
+          "${root_out_dir}/${output_base_name}_header.bin",
+        ]
+        outputs = [ "${root_out_dir}/${output_base_name}-mcuboot.hex" ]
+
+        args = [
+          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
+                      root_build_dir),
+        ]
+      }
+      pw_python_action("${target_name}.ota") {
+        # For MCUBoot the image could be truncated to the actual executable
+        # size. The hex file is padded to the slot size.
+        public_deps = [ ":${simplelink_target_name}_header.bin" ]
+
+        script = "${chip_root}/src/app/ota_image_tool.py"
+        sources = [ "${root_out_dir}/${output_base_name}_header.bin" ]
+        outputs = [ "${root_out_dir}/${output_base_name}.ota" ]
+
+        args = [
+          "create",
+          rebase_path("${root_out_dir}/${output_base_name}_header.bin",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.ota",
+                      root_build_dir),
+        ]
+
+        args += [
+          "-v",
+          matter_device_vid,
+          "-p",
+          matter_device_pid,
+          "-vn",
+          matter_software_ver,
+          "-vs",
+          matter_software_ver_str,
+        ]
+        if (defined(invoker.ota_digest)) {
+          args += [
+            "-da",
+            matter_ota_digest,
+          ]
+        } else {
+          args += [
+            "-da",
+            "sha256",
+          ]
+        }
+        if (defined(invoker.ota_args)) {
+          args += invoker.ota_args
+        }
       }
     }
   }
 
   group(simplelink_target_name) {
-    data_deps = [ ":$final_target" ]
+    if (chip_enable_ota_requestor) {
+      # Generating the ota binary image
+      if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+        data_deps = [
+          ":${simplelink_target_name}-bim.hex",
+          ":${simplelink_target_name}.ota",
+          ":${simplelink_target_name}.out",
+        ]
+      } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+        data_deps = [
+          ":${simplelink_target_name}-mcuboot.hex",
+          ":${simplelink_target_name}.ota",
+          ":${simplelink_target_name}.out",
+        ]
+      }
+    } else {
+      # The executable is the final target.
+      data_deps = [ ":${simplelink_target_name}.out" ]
+    }
 
     if (defined(invoker.data_deps)) {
       data_deps += invoker.data_deps

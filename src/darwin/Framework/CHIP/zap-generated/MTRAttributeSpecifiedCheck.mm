@@ -2915,6 +2915,48 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     }
     }
 }
+static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aAttributeId) {
+    case Attributes::Accuracy::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DemandResponseLoadControl;
@@ -6305,6 +6347,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);

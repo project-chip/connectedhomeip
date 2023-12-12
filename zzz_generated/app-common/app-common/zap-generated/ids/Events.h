@@ -407,6 +407,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalEnergyMeasurement {
+namespace Events {
+
+namespace CumulativeEnergyMeasured {
+static constexpr EventId Id = 0x00000000;
+} // namespace CumulativeEnergyMeasured
+
+namespace PeriodicEnergyMeasured {
+static constexpr EventId Id = 0x00000001;
+} // namespace PeriodicEnergyMeasured
+
+} // namespace Events
+} // namespace ElectricalEnergyMeasurement
+
 namespace DemandResponseLoadControl {
 namespace Events {
 
