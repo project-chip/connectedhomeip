@@ -32,19 +32,18 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
     return CHIP_NO_ERROR;
 }
 
-void DefaultCheckInDelegate::OnCheckInComplete(ICDClientInfo & clientInfo, bool needRefreshKey)
+void DefaultCheckInDelegate::OnCheckInComplete(ICDClientInfo & clientInfo)
 {
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
-    if (needRefreshKey)
-    {
-        CheckInMessageHandler handler;
-        uint8_t randomGeneratedSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
-        chip::Crypto::DRBG_get_bytes(randomGeneratedSymmetricKey, sizeof(randomGeneratedSymmetricKey));
-        chip::ByteSpan mNewSymmetricKey(randomGeneratedSymmetricKey);
-        handler.SetNewKey(clientInfo, mNewSymmetricKey);
-    }
+}
+
+void DefaultCheckInDelegate::OnRefreshKey(ByteSpan & keyData)
+{
+    uint8_t randomGeneratedSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    chip::Crypto::DRBG_get_bytes(randomGeneratedSymmetricKey, sizeof(randomGeneratedSymmetricKey));
+    keyData = ByteSpan(randomGeneratedSymmetricKey);
 }
 
 } // namespace app

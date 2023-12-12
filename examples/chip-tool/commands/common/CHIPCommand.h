@@ -162,6 +162,8 @@ protected:
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
+    static chip::app::DefaultCheckInDelegate sCheckInDelegate;
+    static chip::app::CheckInMessageHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

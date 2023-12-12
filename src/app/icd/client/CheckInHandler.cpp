@@ -89,11 +89,17 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
     clientInfo.offset = checkInCounter;
     bool refreshKey   = (checkInCounter > kKeyRefreshLimit);
-    mpCheckInDelegate->OnCheckInComplete(clientInfo, refreshKey);
+    ByteSpan newKeyData;
+    if (refreshKey)
+    {
+        mpCheckInDelegate->OnRefreshKey(newKeyData);
+        RegisterClientWithNewKey(clientInfo, newKeyData);
+    }
+    mpCheckInDelegate->OnCheckInComplete(clientInfo);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckInMessageHandler::SetNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
+CHIP_ERROR CheckInMessageHandler::RegisterClientWithNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
 {
     // TODO - Register the client. On successful registration, update the clientInfo with the new key and store the clientInfo
     return CHIP_NO_ERROR;

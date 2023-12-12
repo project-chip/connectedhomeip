@@ -50,6 +50,8 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
+// chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
+// chip::app::CheckInMessageHandler CHIPCommand::sCheckInHandler;
 
 namespace {
 
@@ -102,13 +104,6 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     ReturnLogErrorOnFailure(mDefaultStorage.Init(nullptr, GetStorageDirectory().ValueOr(nullptr)));
     ReturnLogErrorOnFailure(mOperationalKeystore.Init(&mDefaultStorage));
     ReturnLogErrorOnFailure(mOpCertStore.Init(&mDefaultStorage));
-    ReturnLogErrorOnFailure(mICDClientStorage.Init(&mDefaultStorage, &mSessionKeystore));
-
-    // chip-tool uses a non-persistent keystore.
-    // ICD storage lifetime is currently tied to the chip-tool's lifetime. Since chip-tool interactive mode is currently used for
-    // ICD commissioning and check-in validation, this temporary storage meets the test requirements.
-    // TODO: Implement persistent ICD storage for the chip-tool.
-    ReturnLogErrorOnFailure(sICDClientStorage.Init(&mDefaultStorage, &sSessionKeystore));
 
     chip::Controller::FactoryInitParams factoryInitParams;
 
@@ -140,8 +135,9 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
 
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
-    ReturnLogErrorOnFailure(mCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState().ExchangeMgr(),
-                                                 &mICDClientStorage, &mCheckInDelegate));
+    // ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage));
+    // ReturnLogErrorOnFailure(sCheckInHandler.Init(DeviceControllerFactory::GetInstance().GetSystemState()->ExchangeMgr(),
+    //                                              &sICDClientStorage, &sCheckInDelegate));
 
     CommissionerIdentity nullIdentity{ kIdentityNull, chip::kUndefinedNodeId };
     ReturnLogErrorOnFailure(InitializeCommissioner(nullIdentity, kIdentityNullFabricId));

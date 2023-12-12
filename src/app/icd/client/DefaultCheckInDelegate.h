@@ -29,7 +29,8 @@ class DefaultCheckInDelegate : public CheckInDelegate
 public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage);
-    void OnCheckInComplete(ICDClientInfo & clientInfo, bool needRefreshKey) override;
+    void OnCheckInComplete(ICDClientInfo & clientInfo) override;
+    void OnRefreshKey(ByteSpan & keyData) override;
 
 private:
     ICDClientStorage * mpStorage = nullptr;
