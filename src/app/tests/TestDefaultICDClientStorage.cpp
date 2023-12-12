@@ -57,62 +57,77 @@ void TestClientInfoCount(nlTestSuite * apSuite, void * apContext)
     FabricIndex fabricId = 1;
     NodeId nodeId1       = 6666;
     NodeId nodeId2       = 6667;
-    DefaultICDClientStorage manager;
+    NodeId unknownNodeId = 6668;
     TestPersistentStorageDelegate clientInfoStorage;
     TestSessionKeystoreImpl keystore;
-    err = manager.Init(&clientInfoStorage, &keystore);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.UpdateFabricList(fabricId);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    // Write some ClientInfos and see the counts are correct
-    ICDClientInfo clientInfo1;
-    clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId);
-    ICDClientInfo clientInfo2;
-    clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId);
-    ICDClientInfo clientInfo3;
-    clientInfo3.peer_node = ScopedNodeId(nodeId1, fabricId);
-    err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreEntry(clientInfo1);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = manager.SetKey(clientInfo2, ByteSpan(kKeyBuffer2));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreEntry(clientInfo2);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = manager.StoreEntry(clientInfo3);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    // Make sure iterator counts correctly
-    auto * iterator = manager.IterateICDClientInfo();
-    // same nodeId for clientInfo2 and clientInfo3, so the new one replace old one
-    NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
-
-    ICDClientInfo clientInfo;
-    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
-    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
-    NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
-    NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
-
-    iterator->Release();
-
-    // Delete all and verify iterator counts 0
-    err = manager.DeleteAllEntries(fabricId);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    iterator = manager.IterateICDClientInfo();
-    NL_TEST_ASSERT(apSuite, iterator->Count() == 0);
-
-    // Verify ClientInfos manually count correctly
-    size_t count = 0;
-    while (iterator->Next(clientInfo))
     {
-        count++;
+        DefaultICDClientStorage manager;
+        err = manager.Init(&clientInfoStorage, &keystore);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = manager.UpdateFabricList(fabricId);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        // Write some ClientInfos and see the counts are correct
+        ICDClientInfo clientInfo1;
+        clientInfo1.peer_node = ScopedNodeId(nodeId1, fabricId);
+        ICDClientInfo clientInfo2;
+        clientInfo2.peer_node = ScopedNodeId(nodeId2, fabricId);
+        ICDClientInfo clientInfo3;
+        clientInfo3.peer_node = ScopedNodeId(nodeId1, fabricId);
+        err                   = manager.SetKey(clientInfo1, ByteSpan(kKeyBuffer1));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = manager.StoreEntry(clientInfo1);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = manager.SetKey(clientInfo2, ByteSpan(kKeyBuffer2));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = manager.StoreEntry(clientInfo2);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = manager.SetKey(clientInfo3, ByteSpan(kKeyBuffer3));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = manager.StoreEntry(clientInfo3);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ICDClientInfo clientInfo;
+        manager.GetEntry(clientInfo3.peer_node, clientInfo);
+        NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
+        NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == manager.GetEntry(ScopedNodeId(unknownNodeId, fabricId), clientInfo));
+        // Make sure iterator counts correctly
+        auto * iterator = manager.IterateICDClientInfo();
+        // same nodeId for clientInfo2 and clientInfo3, so the new one replace old one
+        NL_TEST_ASSERT(apSuite, iterator->Count() == 2);
+
+        NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
+        NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId2);
+        NL_TEST_ASSERT(apSuite, iterator->Next(clientInfo));
+        NL_TEST_ASSERT(apSuite, clientInfo.peer_node.GetNodeId() == nodeId1);
+
+        iterator->Release();
+
+        // Delete all and verify iterator counts 0
+        err = manager.DeleteAllEntries(fabricId);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        iterator = manager.IterateICDClientInfo();
+        NL_TEST_ASSERT(apSuite, iterator->Count() == 0);
+
+        // Verify ClientInfos manually count correctly
+        size_t count = 0;
+        while (iterator->Next(clientInfo))
+        {
+            count++;
+        }
+        iterator->Release();
+        NL_TEST_ASSERT(apSuite, count == 0);
     }
-    iterator->Release();
-    NL_TEST_ASSERT(apSuite, count == 0);
+
+    {
+        DefaultICDClientStorage manager;
+        err = manager.Init(&clientInfoStorage, &keystore);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = manager.UpdateFabricList(fabricId);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
 }
 
 void TestClientInfoCountMultipleFabric(nlTestSuite * apSuite, void * apContext)

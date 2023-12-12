@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+// Do not use the DefaultICDClientStorage class in settings where fabric indices are not stable.
+// This class relies on the stability of fabric indices for efficient storage and retrieval of ICD client information.
+// If fabric indices are not stable, the functionality of this class will be compromised and can lead to unexpected behavior.
+
 #pragma once
 
 #include "ICDClientStorage.h"
@@ -52,13 +56,28 @@ public:
 
     ICDClientInfoIterator * IterateICDClientInfo() override;
 
+    /**
+     * When decrypting check-in messages, the system needs to iterate through all keys
+     * from all ICD clientInfos. In DefaultICDClientStorage, ICDClientInfos for the same fabric are stored in
+     * storage using the fabricIndex as the key. To retrieve all relevant ICDClientInfos
+     * from storage, the system needs to know all fabricIndices in advance. The
+     * `UpdateFabricList` function provides a way to inject newly created fabricIndices
+     * into a dedicated table. It is recommended to call this function whenever a controller is created
+     * with a new fabric index.
+     *
+     * @param[in] fabricIndex The newly created fabric index.
+     */
     CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
+    void RemoveKey(ICDClientInfo & clientInfo) override;
+
     CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) override;
 
-    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
+    CHIP_ERROR GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo) override;
+
+    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) override;
 
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
 
@@ -100,7 +119,7 @@ protected:
     {
         // All the fields added together
         return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
+                                           sizeof(uint64_t), sizeof(Crypto::Symmetric128BitsKeyByteArray));
     }
 
     static constexpr size_t MaxICDCounterSize()

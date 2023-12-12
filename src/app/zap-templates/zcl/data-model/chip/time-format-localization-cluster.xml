@@ -20,6 +20,7 @@ limitations under the License.
     <cluster code="0x002c"/>
     <item name="12hr" value="0x00"/>
     <item name="24hr" value="0x01"/>
+    <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
 
   <bitmap name="Feature" type="bitmap32">
@@ -41,6 +42,7 @@ limitations under the License.
     <item name="Korean" value="0x09"/>  
     <item name="Persian" value="0x0A"/>
     <item name="Taiwanese" value="0x0B"/>                   
+    <item name="UseActiveLocale" value="0xFF"/>                   
   </enum>
   <cluster>
     <domain>General</domain>
@@ -54,7 +56,7 @@ limitations under the License.
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" min="0x00" max="0x01" writable="true" optional="false">
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" writable="true" optional="false">
         <description>HourFormat</description>
         <access op="write" role="manage" />
     </attribute>
@@ -62,6 +64,6 @@ limitations under the License.
         <description>ActiveCalendarType</description>
         <access op="write" role="manage" />
     </attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="array" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>

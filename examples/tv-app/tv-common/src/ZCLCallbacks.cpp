@@ -31,6 +31,8 @@
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
 #include "channel/ChannelManager.h"
+#include "content-app-observer/ContentAppObserver.h"
+#include "content-control/ContentController.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "keypad-input/KeypadInputManager.h"
 #include "low-power/LowPowerManager.h"

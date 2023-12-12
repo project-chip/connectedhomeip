@@ -876,6 +876,12 @@ menu "CHIP Device Layer"
                Enabling the above option will enable the esp32 specific tracing functionality and report the
                diagnostic information to the insights cloud.
 
+      config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+           bool "Enable System Stats for insights"
+           depends on ESP_INSIGHTS_ENABLED
+           default n
+           help
+               This option enables the system statistics to be sent to the insights cloud.
     endmenu
 
 
