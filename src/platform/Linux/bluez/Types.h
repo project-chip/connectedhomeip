@@ -55,6 +55,12 @@
 namespace chip {
 
 template <>
+struct GAutoPtrDeleter<BluezAdapter1>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<BluezDevice1>
 {
     using deleter = GObjectDeleter;
