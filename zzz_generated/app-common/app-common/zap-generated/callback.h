@@ -553,6 +553,14 @@ void emberAfBooleanSensorConfigurationClusterInitCallback(chip::EndpointId endpo
  */
 void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Electrical Energy Measurement Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Demand Response Load Control Cluster Init
  *
  * Cluster Init
@@ -5938,6 +5946,82 @@ void emberAfValveConfigurationAndControlClusterServerTickCallback(chip::Endpoint
 void emberAfValveConfigurationAndControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Electrical Energy Measurement Cluster
+//
+
+/** @brief Electrical Energy Measurement Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalEnergyMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalEnergyMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Electrical Energy Measurement Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalEnergyMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrical Energy Measurement Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalEnergyMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrical Energy Measurement Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalEnergyMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalEnergyMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Demand Response Load Control Cluster
 //
 
@@ -10042,12 +10126,6 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
 bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
-/**
- * @brief Valve Configuration and Control Cluster SetLevel Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterSetLevelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::DecodableType & commandData);
 /**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */

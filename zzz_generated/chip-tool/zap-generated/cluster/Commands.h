@@ -99,6 +99,7 @@
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
 | BooleanSensorConfiguration                                          | 0x0080 |
 | ValveConfigurationAndControl                                        | 0x0081 |
+| ElectricalEnergyMeasurement                                         | 0x0091 |
 | DemandResponseLoadControl                                           | 0x0096 |
 | DeviceEnergyManagement                                              | 0x0098 |
 | EnergyEvse                                                          | 0x0099 |
@@ -6436,18 +6437,17 @@ private:
 | Commands:                                                           |        |
 | * Open                                                              |   0x00 |
 | * Close                                                             |   0x01 |
-| * SetLevel                                                          |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OpenDuration                                                      | 0x0000 |
-| * AutoCloseTime                                                     | 0x0001 |
-| * RemainingDuration                                                 | 0x0002 |
-| * CurrentState                                                      | 0x0003 |
-| * TargetState                                                       | 0x0004 |
-| * StartUpState                                                      | 0x0005 |
+| * DefaultOpenDuration                                               | 0x0001 |
+| * AutoCloseTime                                                     | 0x0002 |
+| * RemainingDuration                                                 | 0x0003 |
+| * CurrentState                                                      | 0x0004 |
+| * TargetState                                                       | 0x0005 |
 | * CurrentLevel                                                      | 0x0006 |
 | * TargetLevel                                                       | 0x0007 |
-| * OpenLevel                                                         | 0x0008 |
+| * DefaultOpenLevel                                                  | 0x0008 |
 | * ValveFault                                                        | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -6470,6 +6470,7 @@ public:
     ValveConfigurationAndControlOpen(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("open", credsIssuerConfig)
     {
         AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
+        AddArgument("TargetLevel", 0, UINT8_MAX, &mRequest.targetLevel);
         ClusterCommand::AddArguments();
     }
 
@@ -6534,44 +6535,28 @@ private:
     chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::Type mRequest;
 };
 
-/*
- * Command SetLevel
- */
-class ValveConfigurationAndControlSetLevel : public ClusterCommand
-{
-public:
-    ValveConfigurationAndControlSetLevel(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-level", credsIssuerConfig)
-    {
-        AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
-        AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Type mRequest;
-};
+/*----------------------------------------------------------------------------*\
+| Cluster ElectricalEnergyMeasurement                                 | 0x0091 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Accuracy                                                          | 0x0000 |
+| * CumulativeEnergyImported                                          | 0x0001 |
+| * CumulativeEnergyExported                                          | 0x0002 |
+| * PeriodicEnergyImported                                            | 0x0003 |
+| * PeriodicEnergyExported                                            | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+| * CumulativeEnergyMeasured                                          | 0x0000 |
+| * PeriodicEnergyMeasured                                            | 0x0001 |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster DemandResponseLoadControl                                   | 0x0096 |
@@ -19232,23 +19217,22 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),     //
-        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig),    //
-        make_unique<ValveConfigurationAndControlSetLevel>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),  //
+        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -19258,7 +19242,10 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
-            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "default-open-duration", 0, UINT32_MAX,
+                                                                              Attributes::DefaultOpenDuration::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "auto-close-time", 0, UINT64_MAX,
                                                                               Attributes::AutoCloseTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19271,14 +19258,12 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<
             WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>>(
             Id, "target-state", 0, UINT8_MAX, Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>(
-            Id, "start-up-state", 0, UINT8_MAX, Attributes::StartUpState::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "current-level", 0, UINT8_MAX, Attributes::CurrentLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "target-level", 0, UINT8_MAX, Attributes::TargetLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
-            Id, "open-level", 0, UINT8_MAX, Attributes::OpenLevel::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "default-open-level", 0, UINT8_MAX, Attributes::DefaultOpenLevel::Id,
+                                                   WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>>(
             Id, "valve-fault", 0, UINT16_MAX, Attributes::ValveFault::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -19296,14 +19281,14 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -19320,6 +19305,96 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                       //
         make_unique<SubscribeEvent>(Id, "valve-state-changed", Events::ValveStateChanged::Id, credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "valve-fault", Events::ValveFault::Id, credsIssuerConfig),                //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
+
+    const char * clusterName = "ElectricalEnergyMeasurement";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                       //
+        make_unique<ReadAttribute>(Id, "accuracy", Attributes::Accuracy::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "cumulative-energy-imported", Attributes::CumulativeEnergyImported::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "cumulative-energy-exported", Attributes::CumulativeEnergyExported::Id,
+                                   credsIssuerConfig),                                                                         //
+        make_unique<ReadAttribute>(Id, "periodic-energy-imported", Attributes::PeriodicEnergyImported::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type>>(
+            Id, "accuracy", Attributes::Accuracy::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
+            Id, "cumulative-energy-imported", Attributes::CumulativeEnergyImported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
+            Id, "cumulative-energy-exported", Attributes::CumulativeEnergyExported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
+            Id, "periodic-energy-imported", Attributes::PeriodicEnergyImported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
+            chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
+            Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                       //
+        make_unique<SubscribeAttribute>(Id, "accuracy", Attributes::Accuracy::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "cumulative-energy-imported", Attributes::CumulativeEnergyImported::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "cumulative-energy-exported", Attributes::CumulativeEnergyExported::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "periodic-energy-imported", Attributes::PeriodicEnergyImported::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                          //
+        make_unique<ReadEvent>(Id, "cumulative-energy-measured", Events::CumulativeEnergyMeasured::Id, credsIssuerConfig),      //
+        make_unique<ReadEvent>(Id, "periodic-energy-measured", Events::PeriodicEnergyMeasured::Id, credsIssuerConfig),          //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                     //
+        make_unique<SubscribeEvent>(Id, "cumulative-energy-measured", Events::CumulativeEnergyMeasured::Id, credsIssuerConfig), //
+        make_unique<SubscribeEvent>(Id, "periodic-energy-measured", Events::PeriodicEnergyMeasured::Id, credsIssuerConfig),     //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -25266,6 +25341,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
     registerClusterBooleanSensorConfiguration(commands, credsIssuerConfig);
     registerClusterValveConfigurationAndControl(commands, credsIssuerConfig);
+    registerClusterElectricalEnergyMeasurement(commands, credsIssuerConfig);
     registerClusterDemandResponseLoadControl(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagement(commands, credsIssuerConfig);
     registerClusterEnergyEvse(commands, credsIssuerConfig);

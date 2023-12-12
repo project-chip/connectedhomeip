@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class OperationalStateClusterOperationCompletionEvent(
-  val completionErrorCode: UInt,
+  val completionErrorCode: UByte,
   val totalOperationalTime: Optional<UInt>?,
   val pausedTime: Optional<UInt>?
 ) {
@@ -70,7 +70,7 @@ class OperationalStateClusterOperationCompletionEvent(
       tlvReader: TlvReader
     ): OperationalStateClusterOperationCompletionEvent {
       tlvReader.enterStructure(tlvTag)
-      val completionErrorCode = tlvReader.getUInt(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
+      val completionErrorCode = tlvReader.getUByte(ContextSpecificTag(TAG_COMPLETION_ERROR_CODE))
       val totalOperationalTime =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_TOTAL_OPERATIONAL_TIME))) {

@@ -1882,6 +1882,13 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace OpenDuration
 
+namespace DefaultOpenDuration {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
+} // namespace DefaultOpenDuration
+
 namespace AutoCloseTime {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & value); // epoch_us
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
@@ -1914,12 +1921,6 @@ EmberAfStatus Set(chip::EndpointId endpoint,
                   const chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value);
 } // namespace TargetState
 
-namespace StartUpState {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum * value); // ValveStateEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value);
-} // namespace StartUpState
-
 namespace CurrentLevel {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
@@ -1934,12 +1935,10 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace TargetLevel
 
-namespace OpenLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
+namespace DefaultOpenLevel {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
-} // namespace OpenLevel
+} // namespace DefaultOpenLevel
 
 namespace ValveFault {
 EmberAfStatus Get(chip::EndpointId endpoint,
@@ -1960,6 +1959,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace ValveConfigurationAndControl
+
+namespace ElectricalEnergyMeasurement {
+namespace Attributes {
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalEnergyMeasurement
 
 namespace DemandResponseLoadControl {
 namespace Attributes {

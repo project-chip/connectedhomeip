@@ -2970,17 +2970,22 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
 }
 public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
   public Integer valveState;
+  public Optional<Integer> valveLevel;
   private static final long VALVE_STATE_ID = 0L;
+  private static final long VALVE_LEVEL_ID = 1L;
 
   public ValveConfigurationAndControlClusterValveStateChangedEvent(
-    Integer valveState
+    Integer valveState,
+    Optional<Integer> valveLevel
   ) {
     this.valveState = valveState;
+    this.valveLevel = valveLevel;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(VALVE_STATE_ID, new UIntType(valveState)));
+    values.add(new StructElement(VALVE_LEVEL_ID, valveLevel.<BaseTLVType>map((nonOptionalvalveLevel) -> new UIntType(nonOptionalvalveLevel)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -2990,16 +2995,23 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
       return null;
     }
     Integer valveState = null;
+    Optional<Integer> valveLevel = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == VALVE_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           valveState = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == VALVE_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valveLevel = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ValveConfigurationAndControlClusterValveStateChangedEvent(
-      valveState
+      valveState,
+      valveLevel
     );
   }
 
@@ -3009,6 +3021,9 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
     output.append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n");
     output.append("\tvalveState: ");
     output.append(valveState);
+    output.append("\n");
+    output.append("\tvalveLevel: ");
+    output.append(valveLevel);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -3055,6 +3070,128 @@ public static class ValveConfigurationAndControlClusterValveFaultEvent {
     output.append("ValveConfigurationAndControlClusterValveFaultEvent {\n");
     output.append("\tvalveFault: ");
     output.append(valveFault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
+  private static final long ENERGY_EXPORTED_ID = 1L;
+
+  public ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
+  ) {
+    this.energyImported = energyImported;
+    this.energyExported = energyExported;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+      energyImported,
+      energyExported
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {\n");
+    output.append("\tenergyImported: ");
+    output.append(energyImported);
+    output.append("\n");
+    output.append("\tenergyExported: ");
+    output.append(energyExported);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
+  private static final long ENERGY_EXPORTED_ID = 1L;
+
+  public ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
+  ) {
+    this.energyImported = energyImported;
+    this.energyExported = energyExported;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+      energyImported,
+      energyExported
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {\n");
+    output.append("\tenergyImported: ");
+    output.append(energyImported);
+    output.append("\n");
+    output.append("\tenergyExported: ");
+    output.append(energyExported);
     output.append("\n");
     output.append("}\n");
     return output.toString();

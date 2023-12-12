@@ -4049,9 +4049,14 @@ provisional cluster BooleanSensorConfiguration = 128 {
 provisional cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
   enum ValveStateEnum : enum8 {
-    kOpen = 0;
-    kClosed = 1;
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
   }
 
   bitmap Feature : bitmap32 {
@@ -4063,25 +4068,29 @@ provisional cluster ValveConfigurationAndControl = 129 {
     kGeneralFault = 0x1;
     kBlocked = 0x2;
     kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
   }
 
   info event ValveStateChanged = 0 {
     ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
   }
 
   info event ValveFault = 1 {
     ValveFaultBitmap valveFault = 0;
   }
 
-  attribute access(write: manage) nullable elapsed_s openDuration = 0;
-  readonly attribute optional nullable epoch_us autoCloseTime = 1;
-  readonly attribute optional nullable elapsed_s remainingDuration = 2;
-  readonly attribute nullable ValveStateEnum currentState = 3;
-  readonly attribute nullable ValveStateEnum targetState = 4;
-  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
+  readonly attribute nullable elapsed_s openDuration = 0;
+  readonly attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
   readonly attribute optional nullable percent currentLevel = 6;
   readonly attribute optional nullable percent targetLevel = 7;
-  attribute access(write: manage) optional nullable percent openLevel = 8;
+  attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4091,20 +4100,93 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenRequest {
-    optional elapsed_s openDuration = 0;
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
   }
 
-  request struct SetLevelRequest {
-    percent level = 0;
-    optional elapsed_s openDuration = 1;
-  }
-
-  /** This command is used to set the valve to its fully open position. */
+  /** This command is used to set the valve to its open position. */
   command Open(OpenRequest): DefaultSuccess = 0;
-  /** This command is used to set the valve to its fully closed position. */
+  /** This command is used to set the valve to its closed position. */
   command Close(): DefaultSuccess = 1;
-  /** This command is used to set the valve to a specific level. */
-  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
+}
+
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional cluster ElectricalEnergyMeasurement = 145 {
+  revision 1;
+
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
+  }
+
+  bitmap Feature : bitmap32 {
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
+  }
+
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
+  }
+
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct EnergyMeasurementStruct {
+    int64s energy = 0;
+    optional epoch_s startTimestamp = 1;
+    optional epoch_s endTimestamp = 2;
+    optional systime_ms startSystime = 3;
+    optional systime_ms endSystime = 4;
+  }
+
+  info event CumulativeEnergyMeasured = 0 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  info event PeriodicEnergyMeasured = 1 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  readonly attribute MeasurementAccuracyStruct accuracy = 0;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 1;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** This cluster provides an interface to the functionality of Smart Energy Demand Response and Load Control. */

@@ -8763,6 +8763,17 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlOpenDurationCommandParams
         );
         result.put("readOpenDurationAttribute", readValveConfigurationAndControlOpenDurationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readValveConfigurationAndControlDefaultOpenDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readValveConfigurationAndControlDefaultOpenDurationAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readDefaultOpenDurationAttribute(
+              (ChipClusters.ValveConfigurationAndControlCluster.DefaultOpenDurationAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedValveConfigurationAndControlClusterDefaultOpenDurationAttributeCallback(),
+          readValveConfigurationAndControlDefaultOpenDurationCommandParams
+        );
+        result.put("readDefaultOpenDurationAttribute", readValveConfigurationAndControlDefaultOpenDurationAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlAutoCloseTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlAutoCloseTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8807,17 +8818,6 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlTargetStateCommandParams
         );
         result.put("readTargetStateAttribute", readValveConfigurationAndControlTargetStateAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readValveConfigurationAndControlStartUpStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readValveConfigurationAndControlStartUpStateAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readStartUpStateAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readValveConfigurationAndControlStartUpStateCommandParams
-        );
-        result.put("readStartUpStateAttribute", readValveConfigurationAndControlStartUpStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlCurrentLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlCurrentLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8840,17 +8840,17 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlTargetLevelCommandParams
         );
         result.put("readTargetLevelAttribute", readValveConfigurationAndControlTargetLevelAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readValveConfigurationAndControlOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readValveConfigurationAndControlOpenLevelAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readValveConfigurationAndControlDefaultOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readOpenLevelAttribute(
-              (ChipClusters.ValveConfigurationAndControlCluster.OpenLevelAttributeCallback) callback
+            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readDefaultOpenLevelAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedValveConfigurationAndControlClusterOpenLevelAttributeCallback(),
-          readValveConfigurationAndControlOpenLevelCommandParams
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readValveConfigurationAndControlDefaultOpenLevelCommandParams
         );
-        result.put("readOpenLevelAttribute", readValveConfigurationAndControlOpenLevelAttributeInteractionInfo);
+        result.put("readDefaultOpenLevelAttribute", readValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlValveFaultCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlValveFaultAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8928,6 +8928,76 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlClusterRevisionCommandParams
         );
         result.put("readClusterRevisionAttribute", readValveConfigurationAndControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
+    private static Map<String, InteractionInfo> readElectricalEnergyMeasurementInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalEnergyMeasurementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterGeneratedCommandListAttributeCallback(),
+          readElectricalEnergyMeasurementGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readElectricalEnergyMeasurementGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterAcceptedCommandListAttributeCallback(),
+          readElectricalEnergyMeasurementAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readElectricalEnergyMeasurementAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readEventListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterEventListAttributeCallback(),
+          readElectricalEnergyMeasurementEventListCommandParams
+        );
+        result.put("readEventListAttribute", readElectricalEnergyMeasurementEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.ElectricalEnergyMeasurementCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedElectricalEnergyMeasurementClusterAttributeListAttributeCallback(),
+          readElectricalEnergyMeasurementAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readElectricalEnergyMeasurementAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readElectricalEnergyMeasurementFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readElectricalEnergyMeasurementFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readElectricalEnergyMeasurementClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readElectricalEnergyMeasurementClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ElectricalEnergyMeasurementCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readElectricalEnergyMeasurementClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readElectricalEnergyMeasurementClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -19392,6 +19462,7 @@ public class ClusterReadMapping {
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
             put("booleanSensorConfiguration", readBooleanSensorConfigurationInteractionInfo());
             put("valveConfigurationAndControl", readValveConfigurationAndControlInteractionInfo());
+            put("electricalEnergyMeasurement", readElectricalEnergyMeasurementInteractionInfo());
             put("demandResponseLoadControl", readDemandResponseLoadControlInteractionInfo());
             put("deviceEnergyManagement", readDeviceEnergyManagementInteractionInfo());
             put("energyEvse", readEnergyEvseInteractionInfo());

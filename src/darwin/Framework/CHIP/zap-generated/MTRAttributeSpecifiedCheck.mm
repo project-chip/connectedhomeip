@@ -2865,6 +2865,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::OpenDuration::Id: {
         return YES;
     }
+    case Attributes::DefaultOpenDuration::Id: {
+        return YES;
+    }
     case Attributes::AutoCloseTime::Id: {
         return YES;
     }
@@ -2877,19 +2880,58 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::TargetState::Id: {
         return YES;
     }
-    case Attributes::StartUpState::Id: {
-        return YES;
-    }
     case Attributes::CurrentLevel::Id: {
         return YES;
     }
     case Attributes::TargetLevel::Id: {
         return YES;
     }
-    case Attributes::OpenLevel::Id: {
+    case Attributes::DefaultOpenLevel::Id: {
         return YES;
     }
     case Attributes::ValveFault::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aAttributeId) {
+    case Attributes::Accuracy::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::CumulativeEnergyExported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyImported::Id: {
+        return YES;
+    }
+    case Attributes::PeriodicEnergyExported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6305,6 +6347,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
+    }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return AttributeIsSpecifiedInElectricalEnergyMeasurementCluster(aAttributeId);
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);

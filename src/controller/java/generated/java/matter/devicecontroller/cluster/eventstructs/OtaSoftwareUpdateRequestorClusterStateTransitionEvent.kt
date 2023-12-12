@@ -23,9 +23,9 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
-  val previousState: UInt,
-  val newState: UInt,
-  val reason: UInt,
+  val previousState: UByte,
+  val newState: UByte,
+  val reason: UByte,
   val targetSoftwareVersion: UInt?
 ) {
   override fun toString(): String = buildString {
@@ -63,9 +63,9 @@ class OtaSoftwareUpdateRequestorClusterStateTransitionEvent(
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterStateTransitionEvent {
       tlvReader.enterStructure(tlvTag)
-      val previousState = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_STATE))
-      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
-      val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
+      val previousState = tlvReader.getUByte(ContextSpecificTag(TAG_PREVIOUS_STATE))
+      val newState = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_STATE))
+      val reason = tlvReader.getUByte(ContextSpecificTag(TAG_REASON))
       val targetSoftwareVersion =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_SOFTWARE_VERSION))

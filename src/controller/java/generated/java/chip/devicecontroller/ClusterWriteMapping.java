@@ -1211,73 +1211,31 @@ public class ClusterWriteMapping {
     writeBooleanSensorConfigurationInteractionInfo.put("writeAlarmsEnabledAttribute", writeBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo);
     writeAttributeMap.put("booleanSensorConfiguration", writeBooleanSensorConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeValveConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeValveConfigurationAndControlOpenDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo valveConfigurationAndControlopenDurationCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Long.class, 
-            Long.class 
-        );
-    writeValveConfigurationAndControlOpenDurationCommandParams.put(
-        "value",
-        valveConfigurationAndControlopenDurationCommandParameterInfo
-    );
-    InteractionInfo writeValveConfigurationAndControlOpenDurationAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ValveConfigurationAndControlCluster) cluster).writeOpenDurationAttribute(
-          (DefaultClusterCallback) callback,
-          (Long) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeValveConfigurationAndControlOpenDurationCommandParams
-    );
-    writeValveConfigurationAndControlInteractionInfo.put("writeOpenDurationAttribute", writeValveConfigurationAndControlOpenDurationAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeValveConfigurationAndControlStartUpStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo valveConfigurationAndControlstartUpStateCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeValveConfigurationAndControlDefaultOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo valveConfigurationAndControldefaultOpenLevelCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeValveConfigurationAndControlStartUpStateCommandParams.put(
+    writeValveConfigurationAndControlDefaultOpenLevelCommandParams.put(
         "value",
-        valveConfigurationAndControlstartUpStateCommandParameterInfo
+        valveConfigurationAndControldefaultOpenLevelCommandParameterInfo
     );
-    InteractionInfo writeValveConfigurationAndControlStartUpStateAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ValveConfigurationAndControlCluster) cluster).writeStartUpStateAttribute(
+        ((ChipClusters.ValveConfigurationAndControlCluster) cluster).writeDefaultOpenLevelAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeValveConfigurationAndControlStartUpStateCommandParams
+      writeValveConfigurationAndControlDefaultOpenLevelCommandParams
     );
-    writeValveConfigurationAndControlInteractionInfo.put("writeStartUpStateAttribute", writeValveConfigurationAndControlStartUpStateAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeValveConfigurationAndControlOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo valveConfigurationAndControlopenLevelCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeValveConfigurationAndControlOpenLevelCommandParams.put(
-        "value",
-        valveConfigurationAndControlopenLevelCommandParameterInfo
-    );
-    InteractionInfo writeValveConfigurationAndControlOpenLevelAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ValveConfigurationAndControlCluster) cluster).writeOpenLevelAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeValveConfigurationAndControlOpenLevelCommandParams
-    );
-    writeValveConfigurationAndControlInteractionInfo.put("writeOpenLevelAttribute", writeValveConfigurationAndControlOpenLevelAttributeInteractionInfo);
+    writeValveConfigurationAndControlInteractionInfo.put("writeDefaultOpenLevelAttribute", writeValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo);
     writeAttributeMap.put("valveConfigurationAndControl", writeValveConfigurationAndControlInteractionInfo);
+    Map<String, InteractionInfo> writeElectricalEnergyMeasurementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("electricalEnergyMeasurement", writeElectricalEnergyMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =

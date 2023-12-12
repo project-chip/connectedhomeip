@@ -6221,20 +6221,13 @@ class ChipClusters:
                 "commandName": "Open",
                 "args": {
                     "openDuration": "int",
+                    "targetLevel": "int",
                 },
             },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Close",
                 "args": {
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "SetLevel",
-                "args": {
-                    "level": "int",
-                    "openDuration": "int",
                 },
             },
         },
@@ -6244,38 +6237,36 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000001: {
-                "attributeName": "AutoCloseTime",
+                "attributeName": "DefaultOpenDuration",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "RemainingDuration",
+                "attributeName": "AutoCloseTime",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentState",
+                "attributeName": "RemainingDuration",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "TargetState",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "StartUpState",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000006: {
                 "attributeName": "CurrentLevel",
@@ -6290,7 +6281,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000008: {
-                "attributeName": "OpenLevel",
+                "attributeName": "DefaultOpenLevel",
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
@@ -6300,6 +6291,80 @@ class ChipClusters:
                 "attributeName": "ValveFault",
                 "attributeId": 0x00000009,
                 "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
+    _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO = {
+        "clusterName": "ElectricalEnergyMeasurement",
+        "clusterId": 0x00000091,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Accuracy",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "CumulativeEnergyImported",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "CumulativeEnergyExported",
+                "attributeId": 0x00000002,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "PeriodicEnergyImported",
+                "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "PeriodicEnergyExported",
+                "attributeId": 0x00000004,
+                "type": "",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -13764,6 +13829,7 @@ class ChipClusters:
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
+        0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000098: _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         0x00000099: _ENERGY_EVSE_CLUSTER_INFO,
@@ -13878,6 +13944,7 @@ class ChipClusters:
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "BooleanSensorConfiguration": _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
+        "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "DeviceEnergyManagement": _DEVICE_ENERGY_MANAGEMENT_CLUSTER_INFO,
         "EnergyEvse": _ENERGY_EVSE_CLUSTER_INFO,

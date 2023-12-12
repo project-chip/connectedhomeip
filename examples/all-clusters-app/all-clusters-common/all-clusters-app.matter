@@ -3638,115 +3638,83 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
-/** This cluster is used to configure a boolean sensor. */
-provisional cluster BooleanSensorConfiguration = 128 {
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional cluster ElectricalEnergyMeasurement = 145 {
   revision 1;
 
-  enum SensitivityEnum : enum8 {
-    kHigh = 0;
-    kStandard = 1;
-    kLow = 2;
-  }
-
-  bitmap AlarmModeBitmap : bitmap8 {
-    kVisual = 0x1;
-    kAudible = 0x2;
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
   }
 
   bitmap Feature : bitmap32 {
-    kVisual = 0x1;
-    kAudible = 0x2;
-    kAlarmSuppress = 0x4;
-    kSensitivityLevel = 0x8;
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
   }
 
-  info event AlarmsStateChanged = 0 {
-    AlarmModeBitmap alarmsActive = 0;
-    optional AlarmModeBitmap alarmsSuppressed = 1;
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
   }
 
-  info event SensorFault = 1 {
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
   }
 
-  attribute optional SensitivityEnum sensitivityLevel = 0;
-  readonly attribute optional AlarmModeBitmap alarmsActive = 1;
-  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 2;
-  attribute optional AlarmModeBitmap alarmsEnabled = 3;
+  struct EnergyMeasurementStruct {
+    int64s energy = 0;
+    optional epoch_s startTimestamp = 1;
+    optional epoch_s endTimestamp = 2;
+    optional systime_ms startSystime = 3;
+    optional systime_ms endSystime = 4;
+  }
+
+  info event CumulativeEnergyMeasured = 0 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  info event PeriodicEnergyMeasured = 1 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  readonly attribute MeasurementAccuracyStruct accuracy = 0;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 1;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-
-  request struct SuppressRequestRequest {
-    AlarmModeBitmap alarmsToSuppress = 0;
-  }
-
-  /** This command is used to suppress the specified alarm. */
-  command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
-}
-
-/** This cluster is used to configure a valve. */
-provisional cluster ValveConfigurationAndControl = 129 {
-  revision 1;
-
-  enum ValveStateEnum : enum8 {
-    kOpen = 0;
-    kClosed = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kTimeSync = 0x1;
-    kLevel = 0x2;
-  }
-
-  bitmap ValveFaultBitmap : bitmap16 {
-    kGeneralFault = 0x1;
-    kBlocked = 0x2;
-    kLeaking = 0x4;
-  }
-
-  info event ValveStateChanged = 0 {
-    ValveStateEnum valveState = 0;
-  }
-
-  info event ValveFault = 1 {
-    ValveFaultBitmap valveFault = 0;
-  }
-
-  attribute access(write: manage) nullable elapsed_s openDuration = 0;
-  readonly attribute optional nullable epoch_us autoCloseTime = 1;
-  readonly attribute optional nullable elapsed_s remainingDuration = 2;
-  readonly attribute nullable ValveStateEnum currentState = 3;
-  readonly attribute nullable ValveStateEnum targetState = 4;
-  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
-  readonly attribute optional nullable percent currentLevel = 6;
-  readonly attribute optional nullable percent targetLevel = 7;
-  attribute access(write: manage) optional nullable percent openLevel = 8;
-  readonly attribute optional ValveFaultBitmap valveFault = 9;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct OpenRequest {
-    optional elapsed_s openDuration = 0;
-  }
-
-  request struct SetLevelRequest {
-    percent level = 0;
-    optional elapsed_s openDuration = 1;
-  }
-
-  /** This command is used to set the valve to its fully open position. */
-  command Open(OpenRequest): DefaultSuccess = 0;
-  /** This command is used to set the valve to its fully closed position. */
-  command Close(): DefaultSuccess = 1;
-  /** This command is used to set the valve to a specific level. */
-  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -7157,44 +7125,20 @@ endpoint 1 {
     handle command ResetCondition;
   }
 
-  server cluster BooleanSensorConfiguration {
-    emits event AlarmsStateChanged;
-    emits event SensorFault;
-    ram      attribute sensitivityLevel;
-    ram      attribute alarmsActive;
-    ram      attribute alarmsSuppressed;
-    ram      attribute alarmsEnabled;
+  server cluster ElectricalEnergyMeasurement {
+    emits event CumulativeEnergyMeasured;
+    emits event PeriodicEnergyMeasured;
+    callback attribute accuracy;
+    callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0F;
+    ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
-
-    handle command SuppressRequest;
-  }
-
-  server cluster ValveConfigurationAndControl {
-    emits event ValveStateChanged;
-    emits event ValveFault;
-    persist  attribute openDuration;
-    ram      attribute autoCloseTime;
-    ram      attribute remainingDuration;
-    ram      attribute currentState;
-    ram      attribute targetState;
-    ram      attribute currentLevel;
-    ram      attribute targetLevel;
-    persist  attribute openLevel default = 100;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 1;
-
-    handle command Open;
-    handle command Close;
-    handle command SetLevel;
   }
 
   server cluster WindowCovering {
