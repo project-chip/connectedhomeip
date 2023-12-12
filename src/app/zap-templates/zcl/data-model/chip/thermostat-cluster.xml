@@ -236,11 +236,13 @@ limitations under the License.
     <item fieldId="1" name="NumberOfSchedules" type="int8u" default="0"/>
     <item fieldId="2" name="ScheduleTypeFeatures" type="ScheduleTypeFeaturesBitmap" min="0x0" max="0xF" default="0"/>
   </struct>
-    <struct name="QueuedPresetStruct" apiMaturity="provisional">
+
+  <struct name="QueuedPresetStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
     <item fieldId="1" name="TransitionTimestamp" type="epoch_s" isNullable="true"/>
   </struct>
+
   <struct name="PresetStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="PresetHandle" type="octet_string" length="16" isNullable="true"/>
@@ -250,12 +252,14 @@ limitations under the License.
     <item fieldId="4" name="HeatingSetpoint" type="temperature" optional="true" default="0x07D0"/>
     <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true"/>
   </struct>
+
   <struct name="PresetTypeStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="PresetScenario" type="PresetScenarioEnum" min="0x0" max="0x6"/>
     <item fieldId="1" name="NumberOfPresets" type="int8u" default="0"/>
     <item fieldId="2" name="PresetTypeFeatures" type="PresetTypeFeaturesBitmap" min="0x0" max="0x3" default="0"/>
   </struct>
+
   <struct name="ScheduleStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="ScheduleHandle" type="octet_string" length="16" isNullable="true"/>
@@ -265,6 +269,7 @@ limitations under the License.
     <item fieldId="4" name="Transitions" array="true" type="ScheduleTransitionStruct" minLength="1"/>
     <item fieldId="5" name="BuiltIn" type="boolean" isNullable="true" optional="true"/>
   </struct>
+
   <struct name="ScheduleTransitionStruct" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <item fieldId="0" name="DayOfWeek" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
@@ -284,11 +289,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="6"/>
+
+    <!-- Attributes -->
+
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="temperature" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
     <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="temperature" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="bitmap8" writable="false" default="1" optional="true">Occupancy</attribute>
-    <!-- OCCUPANCY -->
-    
+
     <attribute side="server" code="0x0003" define="ABS_MIN_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="700" optional="true">AbsMinHeatSetpointLimit</attribute>
     <attribute side="server" code="0x0004" define="ABS_MAX_HEAT_SETPOINT_LIMIT" type="temperature" writable="false" default="3000" optional="true">AbsMaxHeatSetpointLimit</attribute>
     <attribute side="server" code="0x0005" define="ABS_MIN_COOL_SETPOINT_LIMIT" type="temperature" writable="false" default="1600" optional="true">AbsMinCoolSetpointLimit</attribute>
@@ -369,7 +376,7 @@ limitations under the License.
     <attribute side="server" code="0x0037" define="UNOCCUPIED_SETBACK" type="int8u" writable="true" optional="true" isNullable="true">
       <description>UnoccupiedSetback</description>
       <access op="write" privilege="manage"/>
-    </attribute>    
+    </attribute>
     <attribute side="server" code="0x0038" define="UNOCCUPIED_SETBACK_MIN" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMin</attribute>
     <attribute side="server" code="0x0039" define="UNOCCUPIED_SETBACK_MAX" type="int8u" writable="false" optional="true" isNullable="true">UnoccupiedSetbackMax</attribute>
     <attribute side="server" code="0x003A" define="EMERGENCY_HEAT_DELTA" type="int8u" writable="true" optional="true" default="0xFF">
@@ -405,26 +412,29 @@ limitations under the License.
       <description>ACCapacityformat</description>
       <access op="write" privilege="manage"/>
     </attribute>
+    <attribute code="0x0048" side="server" type="ARRAY" entryType="PresetTypeStruct" define="PRESET_TYPES" writable="false" optional="true">PresetTypes</attribute>
+    <attribute code="0x0049" side="server" type="ARRAY" entryType="ScheduleTypeStruct" define="SCHEDULE_TYPES" writable="false" optional="true">ScheduleTypes</attribute>
+    <attribute code="0x004A" side="server" type="int8u" define="NUMBER_OF_PRESETS" default="0" writable="false" optional="true">NumberOfPresets</attribute>
+    <attribute code="0x004B" side="server" type="int8u" define="NUMBER_OF_SCHEDULES" default="0" writable="false" optional="true">NumberOfSchedules</attribute>
+    <attribute code="0x004C" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITIONS" default="0" writable="false" optional="true">NumberOfScheduleTransitions</attribute>
+    <attribute code="0x004D" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITION_PER_DAY" isNullable="true" writable="false" optional="true">NumberOfScheduleTransitionPerDay</attribute>
+    <attribute code="0x004E" side="server" type="octet_string" define="ACTIVE_PRESET_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActivePresetHandle</attribute>
+    <attribute code="0x004F" side="server" type="octet_string" define="ACTIVE_SCHEDULE_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActiveScheduleHandle</attribute>
     <attribute code="0x0050" side="server" type="ARRAY" entryType="PresetStruct" define="PRESETS" writable="true" optional="true">
       <description>Presets</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x0053" side="server" type="TemperatureSetpointHoldPolicyBitmap" define="TEMPERATURE_SETPOINT_HOLD_POLICY" default="0" writable="false" optional="true" min="0x0" max="0x3">TemperatureSetpointHoldPolicy</attribute>
-    <attribute code="0x0054" side="server" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" isNullable="true" writable="false" optional="true">SetpointHoldExpiryTimestamp</attribute>
-    <attribute code="0x004D" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITION_PER_DAY" isNullable="true" writable="false" optional="true">NumberOfScheduleTransitionPerDay</attribute>
-    <attribute code="0x004F" side="server" type="octet_string" define="ACTIVE_SCHEDULE_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActiveScheduleHandle</attribute>
-    <attribute code="0x004B" side="server" type="int8u" define="NUMBER_OF_SCHEDULES" default="0" writable="false" optional="true">NumberOfSchedules</attribute>
-    <attribute code="0x0049" side="server" type="ARRAY" entryType="ScheduleTypeStruct" define="SCHEDULE_TYPES" writable="false" optional="true">ScheduleTypes</attribute>
-    <attribute code="0x0052" side="server" type="boolean" define="PRESETS_SCHEDULES_EDITABLE" writable="false" optional="true">PresetsSchedulesEditable</attribute>
-    <attribute code="0x004A" side="server" type="int8u" define="NUMBER_OF_PRESETS" default="0" writable="false" optional="true">NumberOfPresets</attribute>
     <attribute code="0x0051" side="server" type="ARRAY" entryType="ScheduleStruct" define="SCHEDULES" writable="true" optional="true">
       <description>Schedules</description>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute code="0x004C" side="server" type="int8u" define="NUMBER_OF_SCHEDULE_TRANSITIONS" default="0" writable="false" optional="true">NumberOfScheduleTransitions</attribute>
-    <attribute code="0x0048" side="server" type="ARRAY" entryType="PresetTypeStruct" define="PRESET_TYPES" writable="false" optional="true">PresetTypes</attribute>
+    <attribute code="0x0052" side="server" type="boolean" define="PRESETS_SCHEDULES_EDITABLE" writable="false" optional="true">PresetsSchedulesEditable</attribute>
+    <attribute code="0x0053" side="server" type="TemperatureSetpointHoldPolicyBitmap" define="TEMPERATURE_SETPOINT_HOLD_POLICY" default="0" writable="false" optional="true" min="0x0" max="0x3">TemperatureSetpointHoldPolicy</attribute>
+    <attribute code="0x0054" side="server" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" isNullable="true" writable="false" optional="true">SetpointHoldExpiryTimestamp</attribute>
     <attribute code="0x0055" side="server" type="QueuedPresetStruct" define="QUEUED_PRESET" isNullable="true" writable="false" optional="true">QueuedPreset</attribute>
-    <attribute code="0x004E" side="server" type="octet_string" define="ACTIVE_PRESET_HANDLE" isNullable="true" length="16" writable="false" optional="true">ActivePresetHandle</attribute>
+
+    <!-- Client Commands -->
+
     <command source="client" code="0x00" name="SetpointRaiseLower" optional="false">
       <description>
         Command description for SetpointRaiseLower
@@ -452,14 +462,7 @@ limitations under the License.
     <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true" disableDefaultResponse="true">
       <description>This command is used to clear the weekly schedule. The Clear weekly schedule has no payload.</description>
       <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true">
-      <description>This command has the same payload format as the Set Weekly Schedule. Please refer to the payload detail in </description>
-      <arg name="NumberOfTransitionsForSequence" type="int8u"/>
-      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
-      <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
-      <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
-    </command>
+    </command>  
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
       <description>Upon receipt, this SHALL set the thermostat</description>
       <arg name="PresetHandle" type="octet_string" length="16"/>
@@ -490,5 +493,18 @@ limitations under the License.
       <description>Upon receipt, this SHALL attempt to cancel any active editing of the </description>
       <access op="invoke" privilege="manage"/>
     </command>
+
+    <!-- Server Commands/Responses -->
+
+    <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true">
+      <description>
+        The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
+      </description>
+      <arg name="NumberOfTransitionsForSequence" type="int8u"/>
+      <arg name="DayOfWeekForSequence" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
+      <arg name="ModeForSequence" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
+      <arg name="Transitions" type="WeeklyScheduleTransitionStruct" array="true" length="10"/>
+    </command>
+
   </cluster>
 </configurator>
