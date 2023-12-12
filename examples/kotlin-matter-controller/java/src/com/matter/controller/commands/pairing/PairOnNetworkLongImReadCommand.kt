@@ -5,7 +5,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
-import matter.devicecontroller.cluster.clusters.BasicInformationCluster
+import matter.controller.cluster.clusters.BasicInformationCluster
 
 class PairOnNetworkLongImReadCommand(controller: MatterController, credsIssue: CredentialsIssuer?) :
   PairingCommand(
