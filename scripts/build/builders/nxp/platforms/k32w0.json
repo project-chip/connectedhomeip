@@ -1,0 +1,114 @@
+{
+    "name": "k32w0",
+    "base_path": "k32w/k32w0",
+    "apps": [
+        {
+            "name": "lighting-app",
+            "artifact": "chip-k32w0x-light-example"
+        },
+        {
+            "name": "contact-sensor-app",
+            "artifact": "chip-k32w0x-contact-example"
+        }
+    ],
+    "modifiers": [
+        {
+            "name": "OM15082 expansion board attached",
+            "description": "The board offers additional buttons/LEDs for testing reference apps.\nOnly use it when there is an actual expansion board.",
+            "id": "expansion-board",
+            "value": {
+                "chip_with_OM15082": "1"
+            },
+            "except_if": "low-power"
+        },
+        {
+            "name": "Enable pigweed tokenizer",
+            "description": "The application will decrease in size, but the serial output will be encoded.\nPlease use the appropriate detokenizer script (see application readme) for decoding the serial output.",
+            "id": "tokenizer",
+            "value": {
+                "chip_pw_tokenizer_logging": "true"
+            },
+            "except_if": "no-logs"
+        },
+        {
+            "name": "Remove SSBL update region",
+            "description": "It can be used to gain additional space for application, at the cost of not being able to update the SSBL.",
+            "id": "ssbl-reduced",
+            "value": {
+                "chip_reduce_ssbl_size": "true"
+            }
+        },
+        {
+            "name": "Enable OTA update for app/SSBL",
+            "description": "",
+            "id": "ota-fw-proc",
+            "value": {
+                "chip_enable_ota_firmware_processor": "1"
+            },
+            "except_if": "no-ota"
+        },
+        {
+            "name": "Enable OTA update for factory data",
+            "description": "",
+            "id": "ota-fd-proc",
+            "value": {
+                "chip_enable_ota_factory_data_processor": "1"
+            },
+            "except_if": "no-ota"
+        },
+        {
+            "name": "Enable OTA encryption",
+            "description": "A key shall also be specified when compiling using \"chip_with_ota_key\" gn arg.\nThe key should be the same key used to create the OTA image.",
+            "id": "ota-encryption",
+            "value": {
+                "chip_with_ota_encryption": "1"
+            },
+            "except_if": "no-ota"
+        },
+        {
+            "name": "Use NXP Ultrafast P256 crypto library",
+            "description": "",
+            "id": "crypto-ultrafast-p256",
+            "value": {
+                "chip_crypto_flavor": "\"NXP-Ultrafast-P256\""
+            },
+            "except_if": "crypto-tinycrypt"
+        },
+        {
+            "name": "Use TinyCrypt crypto library",
+            "description": "",
+            "id": "crypto-tinycrypt",
+            "value": {
+                "chip_crypto_flavor": "\"tinycrypt\""
+            },
+            "except_if": "crypto-ultrafast-p256"
+        },
+        {
+            "name": "Use FRO32K",
+            "description": "",
+            "id": "fro32k",
+            "value": {
+                "use_fro_32k": "1"
+            }
+        }
+    ],
+    "variable_modifiers": [
+        {
+            "name": "Custom OTA entry address",
+            "description": "Address where the OTA entry will be stored. It is used internally by the multi-image OTA mechanism.",
+            "id": "ota-addr",
+            "value": {
+                "ota_custom_entry_address": ""
+            }
+        },
+        {
+            "name": "OTA encryption key",
+            "description": "Private key used to encrypt/decrypt the OTA image.",
+            "id": "ota-key",
+            "value": {
+                "chip_with_ota_key": ""
+            },
+            "only_if": "ota-encryption"
+        }
+    ]
+}
