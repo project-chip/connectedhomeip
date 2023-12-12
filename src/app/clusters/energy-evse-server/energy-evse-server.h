@@ -93,20 +93,20 @@ public:
     virtual int64_t GetUserMaximumChargeCurrent()                      = 0;
     virtual uint32_t GetRandomizationDelayWindow()                     = 0;
     /* PREF attributes */
-    virtual uint8_t GetNumberOfWeeklyTargets()                          = 0;
-    virtual uint8_t GetNumberOfDailyTargets()                           = 0;
-    virtual DataModel::Nullable<uint32_t> GetNextChargeStartTime()      = 0;
-    virtual DataModel::Nullable<uint32_t> GetNextChargeTargetTime()     = 0;
-    virtual DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy()  = 0;
-    virtual DataModel::Nullable<chip::Percent> GetNextChargeTargetSoC() = 0;
-    virtual DataModel::Nullable<uint16_t> GetApproximateEVEfficiency()  = 0;
+    virtual uint8_t GetNumberOfWeeklyTargets()                         = 0;
+    virtual uint8_t GetNumberOfDailyTargets()                          = 0;
+    virtual DataModel::Nullable<uint32_t> GetNextChargeStartTime()     = 0;
+    virtual DataModel::Nullable<uint32_t> GetNextChargeTargetTime()    = 0;
+    virtual DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() = 0;
+    virtual DataModel::Nullable<Percent> GetNextChargeTargetSoC()      = 0;
+    virtual DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() = 0;
 
     /* SOC attributes */
-    virtual DataModel::Nullable<chip::Percent> GetStateOfCharge() = 0;
-    virtual DataModel::Nullable<int64_t> GetBatteryCapacity()     = 0;
+    virtual DataModel::Nullable<Percent> GetStateOfCharge()   = 0;
+    virtual DataModel::Nullable<int64_t> GetBatteryCapacity() = 0;
 
     /* PNC attributes*/
-    virtual DataModel::Nullable<chip::CharSpan> GetVehicleID() = 0;
+    virtual DataModel::Nullable<CharSpan> GetVehicleID() = 0;
 
     /* Session SESS attributes */
     virtual DataModel::Nullable<uint32_t> GetSessionID()              = 0;
