@@ -1,0 +1,250 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "DeviceEnergyManagementDelegateImpl.h"
+// #include <chrono>
+// #include <string>
+// #include <thread>
+
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
+
+using chip::Optional;
+using namespace chip::app;
+using CostsList = DataModel::List<const Structs::CostStruct::Type>;
+
+Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, const uint32_t duration)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+
+    // TODO: implement
+    mEsaState = ESAStateEnum::kPowerAdjustActive;
+
+    // TODO:  Generate a PowerAdjustStart Event, then begins to adjust its power
+    // When done, raise PowerAdjustEnd & ESAState set to kOnline.
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
+
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+
+    // TODO: implement
+    /* TODO:  If the command is accepted, the ESA SHALL generate an PowerAdjustEnd Event.    */
+    mEsaState = ESAStateEnum::kOnline;
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
+
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+
+    // TODO: implement
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
+
+    if (!forecast.IsNull())
+    {
+        uint32_t duration = forecast.endTime - forecast.startTime; // the current entire forecast duration
+
+        /* Modify start time and end time */
+        forecast.startTime = requestedStartTime;
+        forecast.endTime   = requestedStartTime + duration;
+
+        mDelegate.SetForecast(forecast);
+    }
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t duration)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::ResumeRequest()
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement
+    mEsaState = ESAStateEnum::kOnline;
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
+
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
+    const uint32_t forecastId, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement
+    return status;
+}
+
+Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
+    const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement
+    return status;
+}
+
+// ------------------------------------------------------------------
+// Get attribute methods
+ESATypeEnum DeviceEnergyManagementDelegate::GetESAType()
+{
+    return mEsaType;
+}
+
+bool DeviceEnergyManagementDelegate::GetESACanGenerate()
+{
+    return mEsaCanGenerate;
+}
+
+ESAStateEnum DeviceEnergyManagementDelegate::GetESAState()
+{
+    return mEsaState;
+}
+
+int64_t DeviceEnergyManagementDelegate::GetAbsMinPower()
+{
+    return mAbsMinPower;
+}
+
+int64_t DeviceEnergyManagementDelegate::GetAbsMaxPower()
+{
+    return mAbsMaxPower;
+}
+
+Attributes::PowerAdjustmentCapability::TypeInfo::Type DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
+{
+    return mPowerAdjustmentCapability;
+}
+
+DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegate::GetForecast()
+{
+    return mForecast;
+}
+
+// ------------------------------------------------------------------
+// Set attribute methods
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetESAType(ESATypeEnum newValue)
+{
+    ESATypeEnum oldValue = mEsaState;
+
+    if (newValue >= ESATypeEnum::kUnknownEnumValue)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mEsaType = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mEsaType updated to %d", (int) mEsaType);
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAType::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetESACanGenerate(bool newValue)
+{
+    bool oldValue = mEsaCanGenerate;
+
+    mEsaCanGenerate = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mEsaCanGenerate updated to %d", (int) mEsaCanGenerate);
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESACanGenerate::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetESAState(ESAStateEnum newValue)
+{
+    ESAStateEnum oldValue = mEsaState;
+
+    if (newValue >= ESAStateEnum::kUnknownEnumValue)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    mEsaState = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mEsaState updated to %d", (int) mEsaState);
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMinPower(int64_t newValue)
+{
+    int64_t oldValue = mAbsMinPower;
+
+    mAbsMinPower = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mAbsMinPower updated to %d", (int) mAbsMinPower);
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMinPower::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValue)
+{
+    int64_t oldValue = mAbsMaxPower;
+
+    mAbsMaxPower = newValue;
+    if (oldValue != newValue)
+    {
+        ChipLogDetail(AppServer, "mAbsMaxPower updated to %d", (int) mAbsMaxPower);
+        MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMaxPower::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
+    Attributes::PowerAdjustmentCapability::TypeInfo::Type & powerAdjustmentCapability)
+{
+    // TODO copy the value
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerAdjustmentCapability::Id);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(Structs::ForecastStruct::Type & forecast)
+{
+    mForecast = forecast;
+    mForecast.forecastId++;
+
+    // TODO update the member variable structure
+
+    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
+
+    return CHIP_NO_ERROR;
+}
