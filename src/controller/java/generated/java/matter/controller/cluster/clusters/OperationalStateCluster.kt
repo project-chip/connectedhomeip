@@ -63,8 +63,7 @@ class OperationalStateCluster(
 
   suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -92,7 +91,6 @@ class OperationalStateCluster(
         commandResponseState_decoded =
           OperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -108,8 +106,7 @@ class OperationalStateCluster(
 
   suspend fun stop(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -137,7 +134,6 @@ class OperationalStateCluster(
         commandResponseState_decoded =
           OperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -153,8 +149,7 @@ class OperationalStateCluster(
 
   suspend fun start(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -182,7 +177,6 @@ class OperationalStateCluster(
         commandResponseState_decoded =
           OperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -198,8 +192,7 @@ class OperationalStateCluster(
 
   suspend fun resume(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -227,7 +220,6 @@ class OperationalStateCluster(
         commandResponseState_decoded =
           OperationalStateClusterErrorStateStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }

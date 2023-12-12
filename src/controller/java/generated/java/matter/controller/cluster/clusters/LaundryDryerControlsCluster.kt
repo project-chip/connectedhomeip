@@ -125,8 +125,7 @@ class LaundryDryerControlsCluster(
 
   suspend fun writeSelectedDrynessLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)

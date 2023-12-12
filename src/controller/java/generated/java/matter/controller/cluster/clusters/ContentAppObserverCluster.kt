@@ -53,8 +53,7 @@ class ContentAppObserverCluster(
     timedInvokeTimeoutMs: Int? = null
   ): ContentAppMessageResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -111,7 +110,6 @@ class ContentAppObserverCluster(
       if (tag == ContextSpecificTag(TAG_ENCODING_HINT)) {
         encodingHint_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }

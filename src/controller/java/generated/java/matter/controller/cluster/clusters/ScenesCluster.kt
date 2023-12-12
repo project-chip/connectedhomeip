@@ -96,8 +96,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): AddSceneResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -157,7 +156,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -185,8 +183,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): ViewSceneResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -290,7 +287,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -325,8 +321,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): RemoveSceneResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -373,7 +368,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -400,8 +394,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): RemoveAllScenesResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -438,7 +431,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -462,8 +454,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): StoreSceneResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -510,7 +501,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -539,8 +529,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -573,8 +562,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): GetSceneMembershipResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -652,7 +640,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -684,8 +671,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedAddSceneResponse {
     val commandId: UInt = 64u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -745,7 +731,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -773,8 +758,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): EnhancedViewSceneResponse {
     val commandId: UInt = 65u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -878,7 +862,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -916,8 +899,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): CopySceneResponse {
     val commandId: UInt = 66u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -973,7 +955,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
         sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }

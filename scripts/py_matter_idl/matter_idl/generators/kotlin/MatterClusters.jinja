@@ -210,7 +210,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {% if command.is_timed_invoke -%}
     val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 {%- else -%}
-    val timeoutMs: Duration = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO 
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 {%- endif %}
 
     val tlvWriter = TlvWriter()
@@ -271,7 +271,6 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
       {% endfor %}
 
       else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -361,7 +360,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {% if attribute.requires_timed_write -%}
     val timeoutMs: Duration = Duration.ofMillis(timedWriteTimeoutMs.toLong())
 {%- else -%}
-    val timeoutMs: Duration = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO 
+    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 {%- endif %}    
 
     val tlvWriter = TlvWriter()

@@ -64,8 +64,7 @@ class GeneralCommissioningCluster(
     timedInvokeTimeoutMs: Int? = null
   ): ArmFailSafeResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -105,7 +104,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -130,8 +128,7 @@ class GeneralCommissioningCluster(
     timedInvokeTimeoutMs: Int? = null
   ): SetRegulatoryConfigResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -174,7 +171,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -196,8 +192,7 @@ class GeneralCommissioningCluster(
     timedInvokeTimeoutMs: Int? = null
   ): CommissioningCompleteResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -231,7 +226,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -282,8 +276,7 @@ class GeneralCommissioningCluster(
 
   suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)

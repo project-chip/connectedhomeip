@@ -70,8 +70,7 @@ class OtaSoftwareUpdateProviderCluster(
     timedInvokeTimeoutMs: Int? = null
   ): QueryImageResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -251,7 +250,6 @@ class OtaSoftwareUpdateProviderCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -280,8 +278,7 @@ class OtaSoftwareUpdateProviderCluster(
     timedInvokeTimeoutMs: Int? = null
   ): ApplyUpdateResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -321,7 +318,6 @@ class OtaSoftwareUpdateProviderCluster(
       if (tag == ContextSpecificTag(TAG_DELAYED_ACTION_TIME)) {
         delayedActionTime_decoded = tlvReader.getUInt(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -345,8 +341,7 @@ class OtaSoftwareUpdateProviderCluster(
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

@@ -46,8 +46,7 @@ class KeypadInputCluster(private val controller: MatterController, private val e
 
   suspend fun sendKey(keyCode: UByte, timedInvokeTimeoutMs: Int? = null): SendKeyResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -77,7 +76,6 @@ class KeypadInputCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }

@@ -49,8 +49,7 @@ class SampleMeiCluster(private val controller: MatterController, private val end
 
   suspend fun ping(timedInvokeTimeoutMs: Int? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -73,8 +72,7 @@ class SampleMeiCluster(private val controller: MatterController, private val end
     timedInvokeTimeoutMs: Int? = null
   ): AddArgumentsResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -107,7 +105,6 @@ class SampleMeiCluster(private val controller: MatterController, private val end
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -154,8 +151,7 @@ class SampleMeiCluster(private val controller: MatterController, private val end
 
   suspend fun writeFlipFlopAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)

@@ -56,8 +56,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): AddGroupResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -97,7 +96,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -117,8 +115,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
   suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): ViewGroupResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -162,7 +159,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_NAME)) {
         groupName_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -189,8 +185,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ): GetGroupMembershipResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -249,7 +244,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
             tlvReader.exitContainer()
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -265,8 +259,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
   suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveGroupResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -303,7 +296,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -323,8 +315,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
   suspend fun removeAllGroups(timedInvokeTimeoutMs: Int? = null) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -347,8 +338,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     timedInvokeTimeoutMs: Int? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

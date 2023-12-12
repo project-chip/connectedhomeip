@@ -82,7 +82,6 @@ class AccountLoginCluster(
       if (tag == ContextSpecificTag(TAG_SETUP_P_I_N)) {
         setupPIN_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
