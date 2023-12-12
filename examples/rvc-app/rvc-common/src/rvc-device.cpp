@@ -110,9 +110,10 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
     switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
     case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
-    case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
-    {
-        if (mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeCleaning || mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeMapping) {
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked): {
+        if (mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeCleaning ||
+            mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeMapping)
+        {
             error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
         }
         else
@@ -122,10 +123,11 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
         }
     }
     break;
-    case to_underlying(OperationalState::OperationalStateEnum::kPaused):
-    {
-        if (mPausedState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)) {
-            error = mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused): {
+        if (mPausedState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+        {
+            error = mOperationalStateInstance.SetOperationalState(
+                to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
         }
         else
         {
