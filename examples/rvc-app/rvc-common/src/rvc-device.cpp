@@ -91,9 +91,11 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
 
 void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
+    uint8_t tmpPausedState = mOperationalStateInstance.GetCurrentOperationalState();
     auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
+        mPausedState = tmpPausedState;
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
@@ -104,7 +106,36 @@ void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOp
 
 void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+    auto error = CHIP_NO_ERROR;
+    switch (mOperationalStateInstance.GetCurrentOperationalState())
+    {
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
+    case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked):
+    {
+        if (mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeCleaning || mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeMapping) {
+            error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        }
+        else
+        {
+            err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
+    }
+    break;
+    case to_underlying(OperationalState::OperationalStateEnum::kPaused):
+    {
+        if (mPausedState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger)) {
+            error = mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+        }
+        else
+        {
+            error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+        }
+    }
+    break;
+    }
+
+    // populate the response.
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
