@@ -17,17 +17,6 @@ class PairOnNetworkLongImReadCommand(controller: MatterController, credsIssue: C
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
     runBlocking {
       try {
         val basicInformationCluster =
