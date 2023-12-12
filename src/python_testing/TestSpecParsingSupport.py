@@ -23,9 +23,8 @@ from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 from spec_parsing_support import ClusterParser, XmlCluster
 
-# TODO: I realize this is not a full accounting of all the stuff being parsed yet.
-# I am going to build up the testing support here as I go to make sure we don't regress, but
-# for now, let's start with access support.
+# TODO: improve the test coverage here
+# https://github.com/project-chip/connectedhomeip/issues/30958
 
 CLUSTER_ID = 0x0BEE
 CLUSTER_NAME = "TestCluster"

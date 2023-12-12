@@ -1,6 +1,7 @@
 import logging
 from copy import deepcopy
 from enum import Enum, auto
+from typing import Optional
 
 import chip.clusters as Clusters
 from basic_composition_support import BasicCompositionTests
@@ -17,7 +18,16 @@ class AccessTestType(Enum):
     WRITE = auto()
 
 
-def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, acl_set_to: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> bool:
+def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
+                      acl_set_to: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]) -> bool:
+    ''' Determines if the action is allowed on the device based on the spec_requirements and the current ACL privilege granted.
+
+        The spec parsing uses kUnknownEnumValue to indicate that NO access is allowed for this attribute
+        or command (ex. command with no write access).
+        ACL uses None to indicate that no access has been granted to this controller.
+        In both of these cases, the action is disallowed. In all other cases, access is allowed if the ACL
+        grants a privilege at or above the privilege required in the spec.
+    '''
     if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue or acl_set_to is None:
         return False
     return spec_requires <= acl_set_to
@@ -26,9 +36,10 @@ def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlE
 def checkable_attributes(cluster_id, cluster, xml_cluster) -> list[uint]:
     all_attrs = cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]
 
-    def attr_ok(attribute_id):
+    def known_cluster_attribute(attribute_id) -> bool:
+        ''' Returns true if this is a non-manufacturer specific attribute that has information in the XML and has python codegen data'''
         return attribute_id <= 0xFFFF and attribute_id in xml_cluster.attributes and attribute_id in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
-    return [x for x in all_attrs if attr_ok(x)]
+    return [x for x in all_attrs if known_cluster_attribute(x)]
 
 
 class AccessChecker(MatterBaseTest, BasicCompositionTests):
@@ -55,13 +66,14 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def teardown_test(self):
         await self._cleanup_acl(default_acl=self.default_acl)
 
-    async def _setup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct], privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
-        if privilege is not None:
-            new_acl = deepcopy(default_acl)
-            new_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=privilege, authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase, subjects=[self.TH2_nodeid])
-            new_acl.append(new_entry)
-            await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl(new_acl))])
+    async def _setup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct], privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
+        if privilege is None:
+            return
+        new_acl = deepcopy(default_acl)
+        new_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=privilege, authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase, subjects=[self.TH2_nodeid])
+        new_acl.append(new_entry)
+        await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl(new_acl))])
 
     async def _cleanup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct]):
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
@@ -74,17 +86,18 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             all_clusters |= set(endpoint.keys())
-            for cluster_id, cluster in endpoint.items():
+            for cluster_id, device_cluster_data in endpoint.items():
                 # Find all the attributes for this cluster across all endpoint
                 if cluster_id not in attrs:
                     attrs[cluster_id] = set()
-                attrs[cluster_id].update(set(cluster[GlobalAttributeIds.ATTRIBUTE_LIST_ID]))
+                # discard MEI attributes as we do not have access information for them.
+                attrs[cluster_id].update(
+                    set([id for id in device_cluster_data[GlobalAttributeIds.ATTRIBUTE_LIST_ID] if id <= 0xFFFF]))
 
+        # Remove MEI clusters - we don't have information available to check these.
+        all_clusters = [id for id in all_clusters if id <= 0x7FFF]
         for cluster_id in all_clusters:
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
-            if cluster_id > 0x7FFF:
-                # We cannot check access on MEI clusters
-                continue
             if cluster_id not in self.xml_clusters:
                 # TODO: Upgrade from warning when the spec XML stabilizes
                 self.record_warning(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
@@ -97,9 +110,6 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # check that we have information for all the required attributes
             xml_cluster = self.xml_clusters[cluster_id]
             for attribute_id in attrs[cluster_id]:
-                if attribute_id > 0xFFFF:
-                    # We don't have any understanding of access requirements on MEI attributes, so skip these for now
-                    continue
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 if attribute_id not in xml_cluster.attributes:
                     self.record_warning(test_name="Access Checker", location=location,
@@ -111,9 +121,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     self.success = False
                     continue
 
-    async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
+    async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
-        for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
+        for attribute_id in checkable_attributes(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].read_access
             attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
@@ -146,6 +156,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             if operation_allowed(spec_requires, privilege):
                 # Write the default attribute. We don't care if this fails, as long as it fails with a DIFFERENT error than the access
                 # This is OK because access is required to be checked BEFORE any other thing to avoid leaking device information.
+                # For example, because we don't have any range information, we might be writing an out of range value, but this will
+                # get rejected by the ACL check before the range check.
+                # See section: 8.4.3.2
                 if resp[0].Status == Status.UnsupportedAccess:
                     self.record_error(test_name=test_name, location=location,
                                       problem="Unexpected UnsupportedAccess writing attribute")
@@ -167,15 +180,15 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             logging.info(f"Testing for {privilege}")
             await self._setup_acl(default_acl=self.default_acl, privilege=privilege)
             for endpoint_id, endpoint in self.endpoints_tlv.items():
-                for cluster_id, cluster in endpoint.items():
+                for cluster_id, device_cluster_data in endpoint.items():
                     if cluster_id > 0x7FFF or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                         # These cases have already been recorded by the _record_errors function
                         continue
                     xml_cluster = self.xml_clusters[cluster_id]
                     if test_type == AccessTestType.READ:
-                        await self._run_read_access_test_for_cluster_privilege(endpoint_id, cluster_id, cluster, xml_cluster, privilege)
+                        await self._run_read_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege)
                     elif test_type == AccessTestType.WRITE:
-                        await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, cluster, xml_cluster, privilege, wildcard_read)
+                        await self._run_write_access_test_for_cluster_privilege(endpoint_id, cluster_id, device_cluster_data, xml_cluster, privilege, wildcard_read)
                     else:
                         self.fail_current_test("Unsupported test type")
         if not self.success:

@@ -23,31 +23,28 @@ import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable
+from typing import Callable, Optional
 
 import chip.clusters as Clusters
 from chip.tlv import uint
-from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
-                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, is_disallowed, mandatory, optional, or_operation, parse_callable_from_xml)
+from conformance_support import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
+                                 ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
+                                 parse_callable_from_xml)
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
+_PRIVILEGE_STR = {
+    None: "N/A",
+    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView: "V",
+    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate: "O",
+    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage: "M",
+    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister: "A",
+}
+
 
 def to_access_code(privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
-    enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-    if privilege is None:
-        return "N/A"
-    if privilege == enum.kView:
-        return "V"
-    if privilege == enum.kOperate:
-        return "O"
-    if privilege == enum.kManage:
-        return "M"
-    if privilege == enum.kAdminister:
-        return "A"
-    return ""
+    return _PRIVILEGE_STR.get(privilege, "")
 
 
 @dataclass
@@ -143,13 +140,12 @@ class ClusterParser:
         elif element.tag == 'event':
             location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
         else:
-            print(f'get location from element for element {element}')
             location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
         return location
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
         for sub in element:
-            if sub.tag == OTHERWISE_CONFORM or sub.tag == MANDATORY_CONFORM or sub.tag == OPTIONAL_CONFORM or sub.tag == PROVISIONAL_CONFORM or sub.tag == DEPRECATE_CONFORM or sub.tag == DISALLOW_CONFORM:
+            if sub.tag in TOP_LEVEL_CONFORMANCE_TAGS:
                 return sub
         location = self.get_location_from_element(element)
         self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
@@ -223,9 +219,9 @@ class ClusterParser:
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element, conformance: Callable):
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element, conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
         ''' Returns a tuple of access types for read / write / invoke'''
-        def str_to_access_type(privilege_str: str) -> Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+        def str_to_access_type(privilege_str: str) -> Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum:
             if privilege_str == 'view':
                 return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView
             if privilege_str == 'operate':
@@ -234,6 +230,11 @@ class ClusterParser:
                 return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage
             if privilege_str == 'admin':
                 return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister
+
+            # We don't know what this means, for now, assume no access and mark a warning
+            location = self.get_location_from_element(element_xml)
+            self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                                severity=ProblemSeverity.WARNING, problem=f'Unknown access type {privilege_str}'))
             return Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
 
         if access_xml is None:
