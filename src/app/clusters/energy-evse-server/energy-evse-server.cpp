@@ -244,8 +244,16 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case StartDiagnostics::Id:
-        HandleCommand<StartDiagnostics::DecodableType>(
-            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleStartDiagnostics(ctx, commandData); });
+        if (!SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<StartDiagnostics::DecodableType>(handlerContext, [this](HandlerContext & ctx, const auto & commandData) {
+                HandleStartDiagnostics(ctx, commandData);
+            });
+        }
         return;
     case SetTargets::Id:
         if (!HasFeature(Feature::kChargingPreferences))
