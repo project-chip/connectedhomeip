@@ -37,6 +37,8 @@ CHIP_ERROR PairingCommand::RunCommand()
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
+    mDeviceIsICD = false;
+
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
         CATValues cats = kUndefinedCATs;
@@ -385,6 +387,16 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     }
     else
     {
+        // When ICD device commissioning fails, the ICDClientInfo stored in OnICDRegistrationComplete needs to be removed.
+        if (mDeviceIsICD)
+        {
+            CHIP_ERROR deleteEntryError =
+                CHIPCommand::sICDClientStorage.DeleteEntry(ScopedNodeId(mNodeId, CurrentCommissioner().GetFabricIndex()));
+            if (deleteEntryError != CHIP_NO_ERROR)
+            {
+                ChipLogError(chipTool, "Failed to delete ICD entry: %s", ErrorStr(err));
+            }
+        }
         ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
     }
 
@@ -395,6 +407,7 @@ void PairingCommand::OnICDRegistrationInfoRequired()
 {
     // Since we compute our ICD Registration info up front, we can call ICDRegistrationInfoReady() directly.
     CurrentCommissioner().ICDRegistrationInfoReady();
+    mDeviceIsICD = true;
 }
 
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
@@ -404,8 +417,27 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
     chip::Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
                                sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
 
-    // TODO: Persist symmetric key.
+    app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = ScopedNodeId(nodeId, CurrentCommissioner().GetFabricIndex());
+    clientInfo.monitored_subject = mICDMonitoredSubject.Value();
+    clientInfo.start_icd_counter = icdCounter;
 
+    CHIP_ERROR err = CHIPCommand::sICDClientStorage.SetKey(clientInfo, mICDSymmetricKey.Value());
+    if (err == CHIP_NO_ERROR)
+    {
+        err = CHIPCommand::sICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        CHIPCommand::sICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(chipTool, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+                     err.AsString());
+        SetCommandExitStatus(err);
+        return;
+    }
+
+    ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
     ChipLogProgress(chipTool,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64
                     " / Monitored Subject: " ChipLogFormatX64 " / Symmetric Key: %s",
