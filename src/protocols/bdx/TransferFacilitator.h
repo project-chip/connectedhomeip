@@ -58,8 +58,6 @@ private:
     }
 
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
@@ -73,6 +71,10 @@ private:
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
 protected:
+    // Inherited from ExchangeContext
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
     /**
      * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
      */
