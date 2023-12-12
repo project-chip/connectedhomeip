@@ -356,7 +356,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
                 // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
                 core::CastingPlayer castingPlayer(attributes);
-                for (core::EndpointAttributes endpointAttributes : endpointAttributesList)
+                for (auto & endpointAttributes : endpointAttributesList)
                 {
                     std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(&castingPlayer, endpointAttributes));
                     castingPlayer.RegisterEndpoint(endpoint);
@@ -485,7 +485,7 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
         ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointsContainerTag),
                                                       chip::TLV::kTLVType_Array, endpointsContainerType));
         std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
-        for (memory::Strong<core::Endpoint> endpoint : endpoints)
+        for (auto & endpoint : endpoints)
         {
             chip::TLV::TLVType endpointContainerType = chip::TLV::kTLVType_Structure;
             // Endpoint container starts
