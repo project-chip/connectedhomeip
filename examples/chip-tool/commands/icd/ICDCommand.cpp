@@ -27,8 +27,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
 {
     app::ICDClientInfo info;
     auto iter = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
-    char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
-
+    char icdAesKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | %-75s |\n", "Known ICDs:");
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
@@ -45,9 +44,9 @@ CHIP_ERROR ICDListCommand::RunCommand()
         static_assert(std::is_same<decltype(CHIPCommand::sSessionKeystore), Crypto::RawKeySessionKeystore>::value,
                       "The following BytesToHex can copy/encode the key bytes from sharedKey to hexadecimal format, which only "
                       "works for RawKeySessionKeystore");
-        Encoding::BytesToHex(info.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
-                             icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-        fprintf(stderr, "  | Symmetric Key: %60s |\n", icdSymmetricKeyHex);
+        Encoding::BytesToHex(info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
+                             icdAesKeyHex, sizeof(icdAesKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+        fprintf(stderr, "  | aes key: %60s |\n", icdAesKeyHex);
     }
 
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
