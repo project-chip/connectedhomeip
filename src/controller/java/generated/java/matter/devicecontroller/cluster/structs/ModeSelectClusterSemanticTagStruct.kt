@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ModeSelectClusterSemanticTagStruct(val mfgCode: UShort, val value: UInt) {
+class ModeSelectClusterSemanticTagStruct(val mfgCode: UShort, val value: UShort) {
   override fun toString(): String = buildString {
     append("ModeSelectClusterSemanticTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
@@ -46,7 +46,7 @@ class ModeSelectClusterSemanticTagStruct(val mfgCode: UShort, val value: UInt) {
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ModeSelectClusterSemanticTagStruct {
       tlvReader.enterStructure(tlvTag)
       val mfgCode = tlvReader.getUShort(ContextSpecificTag(TAG_MFG_CODE))
-      val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
+      val value = tlvReader.getUShort(ContextSpecificTag(TAG_VALUE))
 
       tlvReader.exitContainer()
 

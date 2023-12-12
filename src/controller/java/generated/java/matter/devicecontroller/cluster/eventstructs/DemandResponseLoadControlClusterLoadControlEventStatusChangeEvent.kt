@@ -26,9 +26,9 @@ import matter.tlv.TlvWriter
 class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
   val eventID: ByteArray,
   val transitionIndex: UByte?,
-  val status: UInt,
-  val criticality: UInt,
-  val control: UInt,
+  val status: UByte,
+  val criticality: UByte,
+  val control: UShort,
   val temperatureControl:
     Optional<
       matter.devicecontroller.cluster.structs.DemandResponseLoadControlClusterTemperatureControlStruct
@@ -146,9 +146,9 @@ class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent(
           tlvReader.getNull(ContextSpecificTag(TAG_TRANSITION_INDEX))
           null
         }
-      val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
-      val criticality = tlvReader.getUInt(ContextSpecificTag(TAG_CRITICALITY))
-      val control = tlvReader.getUInt(ContextSpecificTag(TAG_CONTROL))
+      val status = tlvReader.getUByte(ContextSpecificTag(TAG_STATUS))
+      val criticality = tlvReader.getUByte(ContextSpecificTag(TAG_CRITICALITY))
+      val control = tlvReader.getUShort(ContextSpecificTag(TAG_CONTROL))
       val temperatureControl =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_TEMPERATURE_CONTROL))) {

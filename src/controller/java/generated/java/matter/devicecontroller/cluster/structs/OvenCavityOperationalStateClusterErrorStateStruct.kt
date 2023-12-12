@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class OvenCavityOperationalStateClusterErrorStateStruct(
-  val errorStateID: UInt,
+  val errorStateID: UByte,
   val errorStateLabel: Optional<String>,
   val errorStateDetails: Optional<String>
 ) {
@@ -62,7 +62,7 @@ class OvenCavityOperationalStateClusterErrorStateStruct(
       tlvReader: TlvReader
     ): OvenCavityOperationalStateClusterErrorStateStruct {
       tlvReader.enterStructure(tlvTag)
-      val errorStateID = tlvReader.getUInt(ContextSpecificTag(TAG_ERROR_STATE_I_D))
+      val errorStateID = tlvReader.getUByte(ContextSpecificTag(TAG_ERROR_STATE_I_D))
       val errorStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_ERROR_STATE_LABEL)))

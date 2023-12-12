@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,19 +18,27 @@
 
 /**
  * @file
- * Linkerscript for Matter executable with space reserved for the TI BIM.
+ * Linkerscript for Matter executable with space reserved for MCUBoot.
  */
 
-STACKSIZE = 0x800;
+STACKSIZE = 0x2000;
 
 MEMORY
 {
-    FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0xFF800
+    MCUBOOT_HDR (RX) : ORIGIN = 0x00006000, LENGTH = 0x00000080
+    FLASH (RX)       : ORIGIN = 0x00006080, LENGTH = 0x000F8780
+    /*
+     * NVS is the last 5 pages of slot, this area is not erased 
+     * during OTA. The slot size for the primary and secondary slots
+     * is therefore 0xF6000 (MCUBoot Header + all the remaining space)
+     */
+    /* FLASH_NVS (RX)   : ORIGIN = 0x000FC000, LENGTH = 0x00002800 */
+    FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
     /*
      * Customer Configuration Area and Bootloader Backdoor configuration in
      * flash
      */
-   /* FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800 */
+    /* FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800 */
     SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00040000
     GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
     /* Explicitly placed off target for the storage of logging data.
@@ -42,6 +51,7 @@ MEMORY
 }
 
 REGION_ALIAS("REGION_TEXT", FLASH);
+REGION_ALIAS("REGION_FACTORY_DATA", FLASH_FACTORY_DATA);
 REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
@@ -51,17 +61,9 @@ REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-    /* BIM header placed at the base of flash by default */
-    PROVIDE (_img_header_base_address =
-        DEFINED(_img_header_base_address) ? _img_header_base_address : 0x0);
- 
-    .oad_image_header (_img_header_base_address) : AT (_img_header_base_address) {
-        KEEP (*(.oad_image_header))
-    } > REGION_TEXT
-
-    /* interrupt vectors shifted to accommodate BIM header */
+    /* interrupt vectors shifted to accommodate MCUBoot header */
     PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x100);
+        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x6080);
 
     .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
         KEEP (*(.resetVecs))
@@ -73,6 +75,14 @@ SECTIONS {
     .vtable (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
     } > REGION_DATA
+
+     /* Define base address for the Factory Data arrays and struct */
+    PROVIDE (_factory_data_base_address =
+        DEFINED(_factory_data_base_address) ? _factory_data_base_address : 0xFE800);
+
+    .factory_data(_factory_data_base_address) : AT (_factory_data_base_address) {
+        KEEP (*(.factory_data_struct))
+    } > REGION_FACTORY_DATA 
 
     /*
      * UDMACC26XX_CONFIG_BASE below must match UDMACC26XX_CONFIG_BASE defined
@@ -221,19 +231,19 @@ SECTIONS {
     /* End of executable code/data, NVS is not part of the OTA image */
     PROVIDE (_flash_end_address = .);
 
-    /* Two pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
-    .nvs (0xFE800) (NOLOAD) : AT (0xFE800) ALIGN(0x2000) {
+    /* 5 pages of NV Memory (0x800 each) at the end of Flash */
+    .nvs (0xFC000) (NOLOAD) : AT (0xFC000) ALIGN(0x800) {
         *(.nvs)
     } > REGION_TEXT
 
-    /* CCFG is supplied by the BIM project */
+    /* CCFG is supplied by the MCUBoot project */
     /*
     .ccfg : {
         KEEP (*(.ccfg))
     } > FLASH_CCFG AT> FLASH_CCFG
     */
 
-    .bss : {
+    .bss (NOLOAD) : {
         __bss_start__ = .;
         *(.shbss)
         *(.bss)
@@ -243,7 +253,7 @@ SECTIONS {
         __bss_end__ = .;
     } > REGION_BSS AT> REGION_BSS
 
-    .heap : {
+    .heap (NOLOAD) : {
         __heap_start__ = .;
         end = __heap_start__;
         _end = end;

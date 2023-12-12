@@ -24,8 +24,8 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class PowerSourceClusterBatChargeFaultChangeType(
-  val current: List<UInt>,
-  val previous: List<UInt>
+  val current: List<UByte>,
+  val previous: List<UByte>
 ) {
   override fun toString(): String = buildString {
     append("PowerSourceClusterBatChargeFaultChangeType {\n")
@@ -58,18 +58,18 @@ class PowerSourceClusterBatChargeFaultChangeType(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeType {
       tlvReader.enterStructure(tlvTag)
       val current =
-        buildList<UInt> {
+        buildList<UByte> {
           tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
+            add(tlvReader.getUByte(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
       val previous =
-        buildList<UInt> {
+        buildList<UByte> {
           tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
           while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUInt(AnonymousTag))
+            add(tlvReader.getUByte(AnonymousTag))
           }
           tlvReader.exitContainer()
         }
