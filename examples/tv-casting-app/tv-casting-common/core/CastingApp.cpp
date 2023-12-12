@@ -20,6 +20,7 @@
 
 #include "support/ChipDeviceEventHandler.h"
 
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -131,6 +132,15 @@ CHIP_ERROR CastingApp::Stop()
     mState = CASTING_APP_NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR CastingApp::ShutdownAllSubscriptions()
+{
+    VerifyOrReturnError(mState == CASTING_APP_RUNNING, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+
+    return CHIP_NO_ERROR;
 }
 
 }; // namespace core
