@@ -204,6 +204,8 @@ class TestXmlParser(unittest.TestCase):
 
         expected_idl = IdlTextToIdl('''
             client cluster DishwasherMode = 89 {
+               revision 2;
+
                bitmap Feature: bitmap32 {
                    kOnOff = 0x1;
                }
