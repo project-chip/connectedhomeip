@@ -19245,7 +19245,7 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
             Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "default-open-duration", 0, UINT32_MAX,
                                                                               Attributes::DefaultOpenDuration::Id,
-                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "auto-close-time", 0, UINT64_MAX,
                                                                               Attributes::AutoCloseTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
