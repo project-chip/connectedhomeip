@@ -1,0 +1,14 @@
+{
+    "name": "k32w1",
+    "base_path": "k32w/k32w1",
+    "apps": [
+        {
+            "name": "lighting-app",
+            "artifact": "chip-k32w1-light-example"
+        },
+        {
+            "name": "contact-sensor-app",
+            "artifact": "chip-k32w1-contact-example"
+        }
+    ]
+}
