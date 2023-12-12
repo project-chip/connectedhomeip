@@ -702,7 +702,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
                 {
                     haveIPv4Conn = true;
                     char addrStr[INET_ADDRSTRLEN];
-                    ip4addr_ntoa_r((const ip4_addr_t *) LwIP_GetIP(&xnetif[0]), addrStr, sizeof(addrStr));
+                    ip4addr_ntoa_r((const ip4_addr_t *) matter_LwIP_GetIP(0), addrStr, sizeof(addrStr));
                     IPAddress::FromString(addrStr, addr);
                 }
 
@@ -749,13 +749,13 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 
 void ConnectivityManagerImpl::OnStationIPv4v6AddressAvailable(void)
 {
-    uint8_t * ip  = LwIP_GetIP(&xnetif[0]);
-    uint8_t * gw  = LwIP_GetGW(&xnetif[0]);
-    uint8_t * msk = LwIP_GetMASK(&xnetif[0]);
+    uint8_t * ip  = matter_LwIP_GetIP(0);
+    uint8_t * gw  = matter_LwIP_GetGW(0);
+    uint8_t * msk = matter_LwIP_GetMASK(0);
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
-    uint8_t * ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
-    uint8_t * ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
+    uint8_t * ipv6_0 = matter_LwIP_GetIPv6_linklocal(0);
+    uint8_t * ipv6_1 = matter_LwIP_GetIPv6_global(0);
 #endif
 #endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 
