@@ -40,7 +40,7 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 namespace chip {
 namespace app {
 
-#define APPDATA_LENGTH 6
+inline constexpr uint8_t kAppDataLength = 6;
 
 CHIP_ERROR
 DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
@@ -471,7 +471,7 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
      *counter to retrieve - 4 bytes
      *appData to retrieve - 2 bytes(activeModeThreshold)
      */
-    uint8_t appDataBuffer[APPDATA_LENGTH];
+    uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();
     while (iterator->Next(clientInfo))
