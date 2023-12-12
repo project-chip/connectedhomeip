@@ -158,6 +158,7 @@ void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallba
 void MatterOperationalStatePluginServerInitCallback() {}
 void MatterRvcOperationalStatePluginServerInitCallback() {}
 void MatterDishwasherAlarmPluginServerInitCallback() {}
+void MatterBooleanSensorConfigurationPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster

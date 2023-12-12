@@ -146,9 +146,7 @@
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINARY_INPUT_BASIC_CLUSTER": [],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_SENSOR_CONFIGURATION_CLUSTER": [
-            "boolean-sensor-configuration-server"
-        ],
+        "BOOLEAN_SENSOR_CONFIGURATION_CLUSTER": [],
         "BOOLEAN_STATE_CLUSTER": [],
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
