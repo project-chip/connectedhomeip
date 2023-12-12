@@ -196,7 +196,7 @@ CHIP_ERROR CommissionerDeclaration::ReadPayload(uint8_t * udcPayload, size_t pay
             ChipLogError(AppServer, "Unexpected non-context TLV tag.");
             return CHIP_ERROR_INVALID_TLV_TAG;
         }
-        uint8_t tagNum              = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
+        uint8_t tagNum = static_cast<uint8_t>(chip::TLV::TagNumFromTag(containerTag));
 
         switch (tagNum)
         {
