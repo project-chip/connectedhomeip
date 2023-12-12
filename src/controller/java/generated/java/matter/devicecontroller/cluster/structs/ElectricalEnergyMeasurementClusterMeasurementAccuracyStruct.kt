@@ -24,7 +24,7 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
-  val measurementType: UInt,
+  val measurementType: UShort,
   val measured: Boolean,
   val minMeasuredValue: Long,
   val maxMeasuredValue: Long,
@@ -68,7 +68,7 @@ class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct(
       tlvReader: TlvReader
     ): ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct {
       tlvReader.enterStructure(tlvTag)
-      val measurementType = tlvReader.getUInt(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
+      val measurementType = tlvReader.getUShort(ContextSpecificTag(TAG_MEASUREMENT_TYPE))
       val measured = tlvReader.getBoolean(ContextSpecificTag(TAG_MEASURED))
       val minMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MIN_MEASURED_VALUE))
       val maxMeasuredValue = tlvReader.getLong(ContextSpecificTag(TAG_MAX_MEASURED_VALUE))
