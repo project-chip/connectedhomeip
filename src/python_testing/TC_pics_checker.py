@@ -1,0 +1,152 @@
+#
+#    Copyright (c) 2023 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+import math
+
+import chip.clusters as Clusters
+from basic_composition_support import BasicCompositionTests
+from global_attribute_ids import GlobalAttributeIds
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
+                                    MatterBaseTest, async_test_body, default_matter_test_main)
+from mobly import asserts
+from spec_parsing_support import build_xml_clusters
+
+
+def attribute_pics(pics_base: str, id: int) -> str:
+    return f'{pics_base}.S.A{id:04X}'
+
+
+def accepted_cmd_pics(pics_base: str, id: int) -> str:
+    return f'{pics_base}.S.C{id:02X}.Rsp'
+
+
+def generated_cmd_pics(pics_base: str, id: int) -> str:
+    return f'{pics_base}.S.C{id:02X}.Tx'
+
+
+def feature_pics(pics_base: str, bit: int) -> str:
+    return f'{pics_base}.S.F{bit:02X}'
+
+
+class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
+    @async_test_body
+    async def setup_class(self):
+        super().setup_class()
+        await self.setup_class_helper(False)
+        self.xml_clusters, self.problems = build_xml_clusters()
+
+    def _check_and_record_errors(self, location, required, pics):
+        if required and not self.check_pics(pics):
+            self.record_error("PICS check", location=location, problem=f"Required PICS {pics} not found in pics list")
+            self.success = False
+        elif not required and self.check_pics(pics):
+            self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
+            self.success = False
+
+    def _add_pics_for_lists(self, cluster_id: int, global_attribute: GlobalAttributeIds) -> None:
+        if global_attribute == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
+            cluster_object = Clusters.ClusterObjects.ALL_ATTRIBUTES
+            pics_function = attribute_pics
+
+        elif global_attribute == GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID:
+            cluster_object = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS
+            pics_function = accepted_cmd_pics
+
+        elif global_attribute == GlobalAttributeIds.GENERATED_COMMAND_LIST_ID:
+            cluster_object = Clusters.ClusterObjects.ALL_GENERATED_COMMANDS
+            pics_function = generated_cmd_pics
+
+        else:
+            asserts.fail("add_pics_for_list function called for non-list attribute")
+
+        # This cluster does not have any of this element type
+        if cluster_id not in cluster_object.keys():
+            return
+
+        for element_id in cluster_object[cluster_id]:
+            if element_id > 0xF000:
+                # No pics for global elements
+                continue
+            pics = pics_function(self.xml_clusters[cluster_id].pics, element_id)
+
+            if cluster_id not in self.endpoint.keys():
+                # This cluster is not on this endpoint
+                required = False
+            elif element_id in self.endpoint[cluster_id][global_attribute]:
+                # Cluster and element are on the endpoint
+                required = True
+            else:
+                # Cluster is on the endpoint but the element is not in the list
+                required = False
+
+            if global_attribute == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
+                location = AttributePathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id, attribute_id=element_id)
+            else:
+                location = CommandPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id, command_id=element_id)
+
+            self._check_and_record_errors(location, required, pics)
+
+    def test_TC_pics_checker(self):
+        self.endpoint_id = self.matter_test_config.endpoint
+        self.endpoint = self.endpoints_tlv[self.endpoint_id]
+        self.success = True
+
+        for cluster_id, cluster in Clusters.ClusterObjects.ALL_CLUSTERS.items():
+            if cluster_id not in self.xml_clusters or self.xml_clusters[cluster_id].pics is None:
+                continue
+
+            # Ensure the PICS.S code is correctly marked
+            pics_cluster = f'{self.xml_clusters[cluster_id].pics}.S'
+            location = ClusterPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id)
+            self._check_and_record_errors(location, cluster_id in self.endpoint, pics_cluster)
+
+            self._add_pics_for_lists(cluster_id, GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+            self._add_pics_for_lists(cluster_id, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)
+            self._add_pics_for_lists(cluster_id, GlobalAttributeIds.GENERATED_COMMAND_LIST_ID)
+
+            try:
+                cluster_features = cluster.Bitmaps.Feature
+            except AttributeError:
+                # cluster has no features
+                continue
+
+            pics_base = self.xml_clusters[cluster_id].pics
+            try:
+                feature_map = self.endpoint[cluster_id][GlobalAttributeIds.FEATURE_MAP_ID]
+            except KeyError:
+                feature_map = 0
+
+            for feature_mask in cluster_features:
+                feature_bit = int(math.log(feature_mask, 2))
+                pics = feature_pics(pics_base, feature_bit)
+                if feature_mask & feature_map:
+                    required = True
+                else:
+                    required = False
+
+                try:
+                    location = FeaturePathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id,
+                                                   feature_code=self.xml_clusters[cluster_id].features[feature_mask].code)
+                except KeyError:
+                    location = ClusterPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id)
+                self._check_and_record_errors(location, required, pics)
+
+        if not self.success:
+            self.fail_current_test("At least one PICS error was found for this endpoint")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
