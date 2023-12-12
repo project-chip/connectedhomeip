@@ -9375,7 +9375,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 namespace Attributes {
 
 namespace CurrentSensitivityLevel {
@@ -9385,7 +9385,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9404,7 +9404,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentSensitivityLevel
@@ -9416,7 +9416,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9435,7 +9435,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SupportedSensitivityLevels
@@ -9447,7 +9447,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9466,20 +9466,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DefaultSensitivityLevel
 
 namespace AlarmsActive {
 
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9488,9 +9487,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9498,20 +9497,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsActive
 
 namespace AlarmsSuppressed {
 
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9520,9 +9518,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9530,20 +9528,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsSuppressed
 
 namespace AlarmsEnabled {
 
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9552,9 +9549,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9562,20 +9559,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsEnabled
 
 namespace AlarmsSupported {
 
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9584,9 +9580,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9594,7 +9590,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace AlarmsSupported
@@ -9602,12 +9598,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 namespace SensorFault {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> * value)
+                  chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9616,10 +9612,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::SensorFaultBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9627,7 +9622,7 @@ EmberAfStatus Set(chip::EndpointId endpoint,
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace SensorFault
@@ -9639,7 +9634,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9658,7 +9653,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -9670,7 +9665,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9689,13 +9684,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::BooleanSensorConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::BooleanStateConfiguration::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 namespace Attributes {

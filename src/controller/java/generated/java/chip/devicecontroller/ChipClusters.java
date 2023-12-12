@@ -27416,7 +27416,7 @@ public class ChipClusters {
     }
   }
 
-  public static class BooleanSensorConfigurationCluster extends BaseChipCluster {
+  public static class BooleanStateConfigurationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 128L;
 
     private static final long CURRENT_SENSITIVITY_LEVEL_ATTRIBUTE_ID = 0L;
@@ -27434,7 +27434,7 @@ public class ChipClusters {
     private static final long FEATURE_MAP_ATTRIBUTE_ID = 65532L;
     private static final long CLUSTER_REVISION_ATTRIBUTE_ID = 65533L;
 
-    public BooleanSensorConfigurationCluster(long devicePtr, int endpointId) {
+    public BooleanStateConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId, CLUSTER_ID);
     }
 

@@ -21483,7 +21483,7 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
 
 @dataclass
-class BooleanSensorConfiguration(Cluster):
+class BooleanStateConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x00000080
 
     @ChipUtility.classproperty

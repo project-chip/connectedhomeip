@@ -7381,9 +7381,9 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBooleanSensorConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
     case Attributes::CurrentSensitivityLevel::Id: {
         using TypeInfo = Attributes::CurrentSensitivityLevel::TypeInfo;
@@ -17936,8 +17936,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeAttributeValueForActivatedCarbonFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return DecodeAttributeValueForBooleanSensorConfigurationCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return DecodeAttributeValueForBooleanStateConfigurationCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return DecodeAttributeValueForValveConfigurationAndControlCluster(aPath.mAttributeId, aReader, aError);

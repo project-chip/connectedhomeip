@@ -14,17 +14,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.devicecontroller.cluster.eventstructs
+package chip.devicecontroller.cluster.eventstructs
 
-import matter.devicecontroller.cluster.*
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanSensorConfigurationClusterSensorFaultEvent(val sensorFault: UShort) {
+class BooleanStateConfigurationClusterSensorFaultEvent(val sensorFault: UInt) {
   override fun toString(): String = buildString {
-    append("BooleanSensorConfigurationClusterSensorFaultEvent {\n")
+    append("BooleanStateConfigurationClusterSensorFaultEvent {\n")
     append("\tsensorFault : $sensorFault\n")
     append("}\n")
   }
@@ -43,13 +43,13 @@ class BooleanSensorConfigurationClusterSensorFaultEvent(val sensorFault: UShort)
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader
-    ): BooleanSensorConfigurationClusterSensorFaultEvent {
+    ): BooleanStateConfigurationClusterSensorFaultEvent {
       tlvReader.enterStructure(tlvTag)
-      val sensorFault = tlvReader.getUShort(ContextSpecificTag(TAG_SENSOR_FAULT))
+      val sensorFault = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_FAULT))
 
       tlvReader.exitContainer()
 
-      return BooleanSensorConfigurationClusterSensorFaultEvent(sensorFault)
+      return BooleanStateConfigurationClusterSensorFaultEvent(sensorFault)
     }
   }
 }

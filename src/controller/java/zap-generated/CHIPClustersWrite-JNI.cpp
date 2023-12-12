@@ -3288,12 +3288,12 @@ JNI_METHOD(void, ActivatedCarbonFilterMonitoringCluster, writeLastChangedTimeAtt
     onFailure.release();
 }
 
-JNI_METHOD(void, BooleanSensorConfigurationCluster, writeCurrentSensitivityLevelAttribute)
+JNI_METHOD(void, BooleanStateConfigurationCluster, writeCurrentSensitivityLevelAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     ListFreer listFreer;
-    using TypeInfo = chip::app::Clusters::BooleanSensorConfiguration::Attributes::CurrentSensitivityLevel::TypeInfo;
+    using TypeInfo = chip::app::Clusters::BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::TypeInfo;
     TypeInfo::Type cppValue;
 
     std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
@@ -3314,8 +3314,8 @@ JNI_METHOD(void, BooleanSensorConfigurationCluster, writeCurrentSensitivityLevel
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    BooleanSensorConfigurationCluster * cppCluster = reinterpret_cast<BooleanSensorConfigurationCluster *>(clusterPtr);
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    BooleanStateConfigurationCluster * cppCluster = reinterpret_cast<BooleanStateConfigurationCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));

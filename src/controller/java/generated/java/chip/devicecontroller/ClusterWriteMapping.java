@@ -1164,30 +1164,30 @@ public class ClusterWriteMapping {
     );
     writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
-    Map<String, InteractionInfo> writeBooleanSensorConfigurationInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo booleanSensorConfigurationcurrentSensitivityLevelCommandParameterInfo =
+    Map<String, InteractionInfo> writeBooleanStateConfigurationInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBooleanStateConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo booleanStateConfigurationcurrentSensitivityLevelCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams.put(
+    writeBooleanStateConfigurationCurrentSensitivityLevelCommandParams.put(
         "value",
-        booleanSensorConfigurationcurrentSensitivityLevelCommandParameterInfo
+        booleanStateConfigurationcurrentSensitivityLevelCommandParameterInfo
     );
-    InteractionInfo writeBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeBooleanStateConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.BooleanSensorConfigurationCluster) cluster).writeCurrentSensitivityLevelAttribute(
+        ((ChipClusters.BooleanStateConfigurationCluster) cluster).writeCurrentSensitivityLevelAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams
+      writeBooleanStateConfigurationCurrentSensitivityLevelCommandParams
     );
-    writeBooleanSensorConfigurationInteractionInfo.put("writeCurrentSensitivityLevelAttribute", writeBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
-    writeAttributeMap.put("booleanSensorConfiguration", writeBooleanSensorConfigurationInteractionInfo);
+    writeBooleanStateConfigurationInteractionInfo.put("writeCurrentSensitivityLevelAttribute", writeBooleanStateConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
+    writeAttributeMap.put("booleanStateConfiguration", writeBooleanStateConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeValveConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeValveConfigurationAndControlOpenDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo valveConfigurationAndControlopenDurationCommandParameterInfo =

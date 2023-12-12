@@ -2819,9 +2819,9 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
-static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
     case Attributes::CurrentSensitivityLevel::Id: {
         return YES;
@@ -6354,8 +6354,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return AttributeIsSpecifiedInBooleanSensorConfigurationCluster(aAttributeId);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return AttributeIsSpecifiedInBooleanStateConfigurationCluster(aAttributeId);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);

@@ -217,8 +217,8 @@ public class ClusterIDMapping {
         if (clusterId == ActivatedCarbonFilterMonitoring.ID) {
             return new ActivatedCarbonFilterMonitoring();
         }
-        if (clusterId == BooleanSensorConfiguration.ID) {
-            return new BooleanSensorConfiguration();
+        if (clusterId == BooleanStateConfiguration.ID) {
+            return new BooleanStateConfiguration();
         }
         if (clusterId == ValveConfigurationAndControl.ID) {
             return new ValveConfigurationAndControl();
@@ -8768,7 +8768,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class BooleanSensorConfiguration implements BaseCluster {
+    public static class BooleanStateConfiguration implements BaseCluster {
         public static final long ID = 128L;
         public long getID() {
             return ID;

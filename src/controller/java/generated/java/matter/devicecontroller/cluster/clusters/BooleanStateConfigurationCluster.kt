@@ -29,7 +29,7 @@ import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanSensorConfigurationCluster(
+class BooleanStateConfigurationCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
@@ -635,7 +635,7 @@ class BooleanSensorConfigurationCluster(
   }
 
   companion object {
-    private val logger = Logger.getLogger(BooleanSensorConfigurationCluster::class.java.name)
+    private val logger = Logger.getLogger(BooleanStateConfigurationCluster::class.java.name)
     const val CLUSTER_ID: UInt = 128u
   }
 }

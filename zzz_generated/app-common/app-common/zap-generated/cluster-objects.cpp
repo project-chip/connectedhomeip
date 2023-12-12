@@ -13649,7 +13649,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ActivatedCarbonFilterMonitoring
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 namespace Commands {
 namespace SuppressAlarm {
@@ -13839,7 +13839,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace SensorFault.
 } // namespace Events
 
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 namespace ValveConfigurationAndControl {
 
 namespace Commands {
@@ -28414,7 +28414,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
+    case Clusters::BooleanStateConfiguration::Id: {
         switch (aCommand)
         {
         default:

@@ -15382,7 +15382,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressAlarmParams
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15396,7 +15396,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSuppressAlarmParams alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterSuppressAlarmParams alloc] init];
 
     other.alarmsToSuppress = self.alarmsToSuppress;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15413,11 +15413,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressAlarmParams (InternalMethods)
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressAlarm::Type encodableStruct;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.alarmsToSuppress = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToSuppress)>>(self.alarmsToSuppress.unsignedCharValue);
@@ -15461,7 +15461,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterEnableDisableAlarmParams
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15475,7 +15475,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterEnableDisableAlarmParams alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterEnableDisableAlarmParams alloc] init];
 
     other.alarmsToEnableDisable = self.alarmsToEnableDisable;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15492,11 +15492,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterEnableDisableAlarmParams (InternalMethods)
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::EnableDisableAlarm::Type encodableStruct;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.alarmsToEnableDisable = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToEnableDisable)>>(self.alarmsToEnableDisable.unsignedCharValue);

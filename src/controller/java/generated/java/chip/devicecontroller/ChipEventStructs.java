@@ -2907,13 +2907,13 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
     return output.toString();
   }
 }
-public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+public static class BooleanStateConfigurationClusterAlarmsStateChangedEvent {
   public Integer alarmsActive;
   public Optional<Integer> alarmsSuppressed;
   private static final long ALARMS_ACTIVE_ID = 0L;
   private static final long ALARMS_SUPPRESSED_ID = 1L;
 
-  public BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+  public BooleanStateConfigurationClusterAlarmsStateChangedEvent(
     Integer alarmsActive,
     Optional<Integer> alarmsSuppressed
   ) {
@@ -2929,7 +2929,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return new StructType(values);
   }
 
-  public static BooleanSensorConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static BooleanStateConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -2948,7 +2948,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
         }
       }
     }
-    return new BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+    return new BooleanStateConfigurationClusterAlarmsStateChangedEvent(
       alarmsActive,
       alarmsSuppressed
     );
@@ -2957,7 +2957,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n");
+    output.append("BooleanStateConfigurationClusterAlarmsStateChangedEvent {\n");
     output.append("\talarmsActive: ");
     output.append(alarmsActive);
     output.append("\n");
@@ -2968,11 +2968,11 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return output.toString();
   }
 }
-public static class BooleanSensorConfigurationClusterSensorFaultEvent {
+public static class BooleanStateConfigurationClusterSensorFaultEvent {
   public Integer sensorFault;
   private static final long SENSOR_FAULT_ID = 0L;
 
-  public BooleanSensorConfigurationClusterSensorFaultEvent(
+  public BooleanStateConfigurationClusterSensorFaultEvent(
     Integer sensorFault
   ) {
     this.sensorFault = sensorFault;
@@ -2985,7 +2985,7 @@ public static class BooleanSensorConfigurationClusterSensorFaultEvent {
     return new StructType(values);
   }
 
-  public static BooleanSensorConfigurationClusterSensorFaultEvent decodeTlv(BaseTLVType tlvValue) {
+  public static BooleanStateConfigurationClusterSensorFaultEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -2998,7 +2998,7 @@ public static class BooleanSensorConfigurationClusterSensorFaultEvent {
         }
       }
     }
-    return new BooleanSensorConfigurationClusterSensorFaultEvent(
+    return new BooleanStateConfigurationClusterSensorFaultEvent(
       sensorFault
     );
   }
@@ -3006,7 +3006,7 @@ public static class BooleanSensorConfigurationClusterSensorFaultEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("BooleanSensorConfigurationClusterSensorFaultEvent {\n");
+    output.append("BooleanStateConfigurationClusterSensorFaultEvent {\n");
     output.append("\tsensorFault: ");
     output.append(sensorFault);
     output.append("\n");

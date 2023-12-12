@@ -4203,7 +4203,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent
+@implementation MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4217,7 +4217,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent alloc] init];
 
     other.alarmsActive = self.alarmsActive;
     other.alarmsSuppressed = self.alarmsSuppressed;
@@ -4233,7 +4233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSensorFaultEvent
+@implementation MTRBooleanStateConfigurationClusterSensorFaultEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4245,7 +4245,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSensorFaultEvent alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterSensorFaultEvent alloc] init];
 
     other.sensorFault = self.sensorFault;
 
