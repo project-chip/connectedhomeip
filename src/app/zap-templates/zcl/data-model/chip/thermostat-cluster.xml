@@ -459,7 +459,7 @@ limitations under the License.
       <arg name="DaysToReturn" type="ScheduleDayOfWeekBitmap" min="0x0" max="0xFF"/>
       <arg name="ModeToReturn" type="ScheduleModeBitmap" min="0x0" max="0x3"/>
     </command>
-    <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true" disableDefaultResponse="true">
+    <command source="client" code="0x03" name="ClearWeeklySchedule" optional="true">
       <description>This command is used to clear the weekly schedule. The Clear weekly schedule has no payload.</description>
       <access op="invoke" privilege="manage"/>
     </command>  
