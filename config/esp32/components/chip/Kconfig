@@ -132,7 +132,7 @@ menu "CHIP Core"
 
         config ENABLE_PERSIST_SUBSCRIPTIONS
             bool "Enable persist subscriptions"
-            default n
+            default y
             help
                 Enable persist subscriptions to make the device resume the subscriptions from the persist
                 subscriptions information after reboot.
