@@ -179,36 +179,41 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
 }
 
 // CommandHandlerInterface
-
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
 {
     using namespace Commands;
 
-    for (auto && id : {
+    for (auto && cmd : {
              Disable::Id,
              EnableCharging::Id,
          })
     {
-        if (callback(id, context) == Loop::Break)
-        {
-            return CHIP_NO_ERROR;
-        }
+        VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
     }
 
     if (HasFeature(Feature::kV2x))
     {
-        callback(EnableDischarging::Id, context);
+        VerifyOrExit(callback(EnableDischarging::Id, context) == Loop::Continue, /**/);
     }
+
     if (HasFeature(Feature::kChargingPreferences))
     {
-        callback(SetTargets::Id, context);
-        callback(GetTargets::Id, context);
-        callback(ClearTargets::Id, context);
+        for (auto && cmd : {
+                 SetTargets::Id,
+                 GetTargets::Id,
+                 ClearTargets::Id,
+             })
+        {
+            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
+        }
     }
+
     if (SupportsOptCmd(OptionalCommands::kSupportsStartDiagnostics))
     {
         callback(StartDiagnostics::Id, context);
     }
+
+exit:
     return CHIP_NO_ERROR;
 }
 
