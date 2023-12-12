@@ -39,7 +39,7 @@ void BufferedReadCallback::OnReportEnd()
     CHIP_ERROR err = DispatchBufferedData(mBufferedPath, StatusIB(), true);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagment, "Fail to dispatch buffered data with error %s in path %s", err.toString(), mBufferedPath.LogPath())
+        ChipLogError(DataManagement, "Fail to dispatch buffered data with error %s in path %s", err.toString(), mBufferedPath.LogPath())
         return;
     }
 
@@ -259,7 +259,7 @@ void BufferedReadCallback::OnAttributeData(const ConcreteDataAttributePath & aPa
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagment, "Fail in OnAttributeData with error %s in path %s", err.toString(), aPath.LogPath())
+        ChipLogError(DataManagement, "Fail in OnAttributeData with error %s in path %s", err.toString(), aPath.LogPath())
     }
 }
 
