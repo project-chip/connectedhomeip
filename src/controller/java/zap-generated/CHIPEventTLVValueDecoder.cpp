@@ -3730,6 +3730,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_sensorFault;
+            std::string value_sensorFaultClassName     = "java/lang/Integer";
+            std::string value_sensorFaultCtorSignature = "(I)V";
+            jint jnivalue_sensorFault                  = static_cast<jint>(cppValue.sensorFault.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_sensorFaultClassName.c_str(),
+                                                                       value_sensorFaultCtorSignature.c_str(), jnivalue_sensorFault,
+                                                                       value_sensorFault);
+
             jclass sensorFaultStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent",
@@ -3739,14 +3747,14 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent");
                 return nullptr;
             }
-            jmethodID sensorFaultStructCtor = env->GetMethodID(sensorFaultStructClass, "<init>", "()V");
+            jmethodID sensorFaultStructCtor = env->GetMethodID(sensorFaultStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (sensorFaultStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(sensorFaultStructClass, sensorFaultStructCtor);
+            jobject value = env->NewObject(sensorFaultStructClass, sensorFaultStructCtor, value_sensorFault);
 
             return value;
         }

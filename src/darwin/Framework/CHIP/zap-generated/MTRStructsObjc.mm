@@ -4237,6 +4237,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _sensorFault = @(0);
     }
     return self;
 }
@@ -4245,12 +4247,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRBooleanSensorConfigurationClusterSensorFaultEvent alloc] init];
 
+    other.sensorFault = self.sensorFault;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sensorFault:%@; >", NSStringFromClass([self class]), _sensorFault];
     return descriptionString;
 }
 

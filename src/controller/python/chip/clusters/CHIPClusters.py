@@ -6141,38 +6141,68 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SuppressRequest",
+                "commandName": "SuppressAlarm",
                 "args": {
                     "alarmsToSuppress": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "EnableDisableAlarm",
+                "args": {
+                    "alarmsToEnableDisable": "int",
                 },
             },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SensitivityLevel",
+                "attributeName": "CurrentSensitivityLevel",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
             0x00000001: {
-                "attributeName": "AlarmsActive",
+                "attributeName": "SupportedSensitivityLevels",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "AlarmsSuppressed",
+                "attributeName": "DefaultSensitivityLevel",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "AlarmsEnabled",
+                "attributeName": "AlarmsActive",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "AlarmsSuppressed",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "AlarmsEnabled",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "AlarmsSupported",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "SensorFault",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

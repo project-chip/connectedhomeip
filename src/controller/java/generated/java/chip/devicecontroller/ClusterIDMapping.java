@@ -8775,10 +8775,14 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SensitivityLevel(0L),
-            AlarmsActive(1L),
-            AlarmsSuppressed(2L),
-            AlarmsEnabled(3L),
+            CurrentSensitivityLevel(0L),
+            SupportedSensitivityLevels(1L),
+            DefaultSensitivityLevel(2L),
+            AlarmsActive(3L),
+            AlarmsSuppressed(4L),
+            AlarmsEnabled(5L),
+            AlarmsSupported(6L),
+            SensorFault(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8827,7 +8831,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SuppressRequest(0L),;
+            SuppressAlarm(0L),
+            EnableDisableAlarm(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8845,17 +8850,34 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SuppressRequestCommandField {AlarmsToSuppress(0),;
+        }public enum SuppressAlarmCommandField {AlarmsToSuppress(0),;
                     private final int id;
-                    SuppressRequestCommandField(int id) {
+                    SuppressAlarmCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static SuppressRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (SuppressRequestCommandField field : SuppressRequestCommandField.values()) {
+                    public static SuppressAlarmCommandField value(int id) throws NoSuchFieldError {
+                        for (SuppressAlarmCommandField field : SuppressAlarmCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum EnableDisableAlarmCommandField {AlarmsToEnableDisable(0),;
+                    private final int id;
+                    EnableDisableAlarmCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static EnableDisableAlarmCommandField value(int id) throws NoSuchFieldError {
+                        for (EnableDisableAlarmCommandField field : EnableDisableAlarmCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

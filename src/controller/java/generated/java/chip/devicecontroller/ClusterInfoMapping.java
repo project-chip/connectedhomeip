@@ -22602,22 +22602,39 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> booleanSensorConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
-    booleanSensorConfigurationsuppressRequestCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo);
-    InteractionInfo booleanSensorConfigurationsuppressRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo booleanSensorConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
+    booleanSensorConfigurationsuppressAlarmCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo);
+    InteractionInfo booleanSensorConfigurationsuppressAlarmInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
-        .suppressRequest((DefaultClusterCallback) callback
+        .suppressAlarm((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("alarmsToSuppress")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        booleanSensorConfigurationsuppressRequestCommandParams
+        booleanSensorConfigurationsuppressAlarmCommandParams
     );
-    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressRequest", booleanSensorConfigurationsuppressRequestInteractionInfo);
+    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressAlarm", booleanSensorConfigurationsuppressAlarmInteractionInfo);
+
+    Map<String, CommandParameterInfo> booleanSensorConfigurationenableDisableAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo booleanSensorConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo = new CommandParameterInfo("alarmsToEnableDisable", Integer.class, Integer.class);
+    booleanSensorConfigurationenableDisableAlarmCommandParams.put("alarmsToEnableDisable",booleanSensorConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo);
+    InteractionInfo booleanSensorConfigurationenableDisableAlarmInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
+        .enableDisableAlarm((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("alarmsToEnableDisable")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        booleanSensorConfigurationenableDisableAlarmCommandParams
+    );
+    booleanSensorConfigurationClusterInteractionInfoMap.put("enableDisableAlarm", booleanSensorConfigurationenableDisableAlarmInteractionInfo);
 
     commandMap.put("booleanSensorConfiguration", booleanSensorConfigurationClusterInteractionInfoMap);
 

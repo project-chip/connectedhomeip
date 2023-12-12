@@ -2823,7 +2823,13 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
 {
     using namespace Clusters::BooleanSensorConfiguration;
     switch (aAttributeId) {
-    case Attributes::SensitivityLevel::Id: {
+    case Attributes::CurrentSensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSensitivityLevels::Id: {
+        return YES;
+    }
+    case Attributes::DefaultSensitivityLevel::Id: {
         return YES;
     }
     case Attributes::AlarmsActive::Id: {
@@ -2833,6 +2839,12 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
         return YES;
     }
     case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSupported::Id: {
+        return YES;
+    }
+    case Attributes::SensorFault::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

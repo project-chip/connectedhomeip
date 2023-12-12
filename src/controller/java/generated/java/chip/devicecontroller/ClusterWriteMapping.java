@@ -1165,50 +1165,28 @@ public class ClusterWriteMapping {
     writeActivatedCarbonFilterMonitoringInteractionInfo.put("writeLastChangedTimeAttribute", writeActivatedCarbonFilterMonitoringLastChangedTimeAttributeInteractionInfo);
     writeAttributeMap.put("activatedCarbonFilterMonitoring", writeActivatedCarbonFilterMonitoringInteractionInfo);
     Map<String, InteractionInfo> writeBooleanSensorConfigurationInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBooleanSensorConfigurationSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo booleanSensorConfigurationsensitivityLevelCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo booleanSensorConfigurationcurrentSensitivityLevelCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeBooleanSensorConfigurationSensitivityLevelCommandParams.put(
+    writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams.put(
         "value",
-        booleanSensorConfigurationsensitivityLevelCommandParameterInfo
+        booleanSensorConfigurationcurrentSensitivityLevelCommandParameterInfo
     );
-    InteractionInfo writeBooleanSensorConfigurationSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.BooleanSensorConfigurationCluster) cluster).writeSensitivityLevelAttribute(
+        ((ChipClusters.BooleanSensorConfigurationCluster) cluster).writeCurrentSensitivityLevelAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeBooleanSensorConfigurationSensitivityLevelCommandParams
+      writeBooleanSensorConfigurationCurrentSensitivityLevelCommandParams
     );
-    writeBooleanSensorConfigurationInteractionInfo.put("writeSensitivityLevelAttribute", writeBooleanSensorConfigurationSensitivityLevelAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeBooleanSensorConfigurationAlarmsEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo booleanSensorConfigurationalarmsEnabledCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeBooleanSensorConfigurationAlarmsEnabledCommandParams.put(
-        "value",
-        booleanSensorConfigurationalarmsEnabledCommandParameterInfo
-    );
-    InteractionInfo writeBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.BooleanSensorConfigurationCluster) cluster).writeAlarmsEnabledAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeBooleanSensorConfigurationAlarmsEnabledCommandParams
-    );
-    writeBooleanSensorConfigurationInteractionInfo.put("writeAlarmsEnabledAttribute", writeBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo);
+    writeBooleanSensorConfigurationInteractionInfo.put("writeCurrentSensitivityLevelAttribute", writeBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
     writeAttributeMap.put("booleanSensorConfiguration", writeBooleanSensorConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeValveConfigurationAndControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeValveConfigurationAndControlOpenDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();

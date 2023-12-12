@@ -2405,6 +2405,12 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
 
         __auto_type * value = [MTRBooleanSensorConfigurationClusterSensorFaultEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.sensorFault.Raw()];
+            value.sensorFault = memberValue;
+        } while (0);
+
         return value;
     }
     default: {

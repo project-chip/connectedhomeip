@@ -2968,6 +2968,52 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return output.toString();
   }
 }
+public static class BooleanSensorConfigurationClusterSensorFaultEvent {
+  public Integer sensorFault;
+  private static final long SENSOR_FAULT_ID = 0L;
+
+  public BooleanSensorConfigurationClusterSensorFaultEvent(
+    Integer sensorFault
+  ) {
+    this.sensorFault = sensorFault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SENSOR_FAULT_ID, new UIntType(sensorFault)));
+
+    return new StructType(values);
+  }
+
+  public static BooleanSensorConfigurationClusterSensorFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sensorFault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SENSOR_FAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensorFault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BooleanSensorConfigurationClusterSensorFaultEvent(
+      sensorFault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanSensorConfigurationClusterSensorFaultEvent {\n");
+    output.append("\tsensorFault: ");
+    output.append(sensorFault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
   public Integer valveState;
   private static final long VALVE_STATE_ID = 0L;

@@ -10109,11 +10109,17 @@ bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
 /**
- * @brief Boolean Sensor Configuration Cluster SuppressRequest Command callback (from client)
+ * @brief Boolean Sensor Configuration Cluster SuppressAlarm Command callback (from client)
  */
-bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
+bool emberAfBooleanSensorConfigurationClusterSuppressAlarmCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData);
+    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressAlarm::DecodableType & commandData);
+/**
+ * @brief Boolean Sensor Configuration Cluster EnableDisableAlarm Command callback (from client)
+ */
+bool emberAfBooleanSensorConfigurationClusterEnableDisableAlarmCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BooleanSensorConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData);
 /**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */
