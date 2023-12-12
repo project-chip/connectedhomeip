@@ -23,6 +23,10 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("system.gni")
 
+if (chip_system_config_use_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
 declare_args() {
   # Extra header to include in CHIPConfig.h for project.
   # TODO - This should probably be in src/core but src/system also uses it.
@@ -175,7 +179,7 @@ source_set("system_config_header") {
 
   if (target_cpu != "esp32") {
     if (chip_system_config_use_lwip) {
-      public_deps += [ "${chip_root}/src/lwip" ]
+      public_deps += [ "${lwip_root}:lwip" ]
     } else {
       if (chip_device_platform == "efr32") {
         public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]

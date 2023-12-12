@@ -18,7 +18,6 @@ import("//build_overrides/lwip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lwip/lwip.gni")
-import("${lwip_root}/lwip.gni")
 
 assert(chip_with_lwip)
 
@@ -100,6 +99,10 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
+} else if (lwip_platform == "silabs") {
+  group("lwip") {
+    public_deps = [ "${lwip_root}:lwip" ]
+  }
 } else if (lwip_platform == "external" || lwip_platform == "mw320") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
@@ -118,6 +121,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
     public_configs += [ "${psoc6_sdk_build_root}:psoc6_sdk_config" ]
   }
 } else if (lwip_platform == "qpg") {
+  import("${lwip_root}/lwip.gni")
+
   config("lwip_config") {
     include_dirs = [ "freertos" ]
   }
@@ -176,6 +181,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
     ]
   }
 } else {
+  import("${lwip_root}/lwip.gni")
+
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
@@ -213,8 +220,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
       sources +=
           [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
-    } else if (lwip_platform == "silabs") {
-      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
