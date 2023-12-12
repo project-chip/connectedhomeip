@@ -110,6 +110,7 @@ chip_data_model("tv-casting-common") {
 
   deps = [
     "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/tracing",
