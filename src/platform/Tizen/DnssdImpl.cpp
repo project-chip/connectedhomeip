@@ -88,7 +88,7 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
 
     if (result != DNSSD_ERROR_NONE)
     {
-        ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, result);
+        ChipLogError(DeviceLayer, "DNSsd %s: Error: %s", __func__, get_error_message(result));
         rCtx->mCallback(rCtx->mCbContext, nullptr, nullptr, TizenToChipError(result));
         // After this point, the context might be no longer valid
         rCtx->mInstance->RemoveContext(rCtx);
@@ -331,10 +331,10 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
     }
 #endif
 
-    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, StringOrNullMarker(ipv4.get()),
-                  StringOrNullMarker(ipv6.get()), ret);
-
-    VerifyOrExit(ret == DNSSD_ERROR_NONE, );
+    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s", __func__, StringOrNullMarker(ipv4.get()),
+                  StringOrNullMarker(ipv6.get()));
+    VerifyOrExit(ret == DNSSD_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "chip::Inet::IPAddress::FromString() failed: %s", get_error_message(ret)));
 
     ret = dnssd_service_get_port(service, &port);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_port() failed: %s", get_error_message(ret)));
@@ -489,7 +489,7 @@ void DnssdTizen::Shutdown()
 {
     int ret = dnssd_deinitialize();
     if (ret != DNSSD_ERROR_NONE)
-        ChipLogError(DeviceLayer, "DNSsd %s: Error: %d", __func__, ret);
+        ChipLogError(DeviceLayer, "dnssd_deinitialize() failed: %s", get_error_message(ret));
 }
 
 CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublishCallback callback, void * context)
