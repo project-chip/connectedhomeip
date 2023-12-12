@@ -34,10 +34,13 @@ public:
      * When needRefreshKey is true,  it indicates that the ICD registration needs to be updated with a new key to avoid counter
      * roll-over problems.
      *
+     * The implementor of this function should generate a new key and send it to CheckInHandler using CHIP_ERROR
+     * CheckInMessageHandler::SetNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
+     *
      * @param[in] clientInfo - ClientInfo object of the peer node
      * @param[in] needRefreshKey - Indicates whether the application should refresh the existing key
      */
-    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey) = 0;
+    virtual void OnCheckInComplete(ICDClientInfo & clientInfo, bool needRefreshKey) = 0;
 };
 
 } // namespace app

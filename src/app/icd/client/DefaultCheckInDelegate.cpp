@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include "CheckInHandler.h"
 #include <app/icd/client/DefaultCheckInDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -30,15 +32,18 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
     return CHIP_NO_ERROR;
 }
 
-void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo, bool needRefreshKey)
+void DefaultCheckInDelegate::OnCheckInComplete(ICDClientInfo & clientInfo, bool needRefreshKey)
 {
-    mpStorage->StoreEntry(clientInfo);
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     if (needRefreshKey)
     {
-        // TODO : Refresh key and re-register client
+        CheckInMessageHandler handler;
+        uint8_t randomGeneratedSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+        chip::Crypto::DRBG_get_bytes(randomGeneratedSymmetricKey, sizeof(randomGeneratedSymmetricKey));
+        chip::ByteSpan mNewSymmetricKey(randomGeneratedSymmetricKey);
+        handler.SetNewKey(clientInfo, mNewSymmetricKey);
     }
 }
 

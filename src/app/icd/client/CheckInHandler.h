@@ -40,6 +40,14 @@ public:
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate);
     void Shutdown();
 
+    /**
+     * @brief Used by the application to set a new key to avoid counter rollover problems.
+     *
+     * @param[in] clientInfo clientInfo object
+     * @param[in] keyData New key data to use to re-register the client with the server
+     */
+    CHIP_ERROR SetNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData);
+
 protected:
     // ExchangeDelegate
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,

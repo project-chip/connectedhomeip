@@ -93,6 +93,11 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CheckInMessageHandler::SetNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
+{
+    // TODO - Register the client. On successful registration, update the clientInfo with the new key and store the clientInfo
+    return CHIP_NO_ERROR;
+}
 void CheckInMessageHandler::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 } // namespace app
