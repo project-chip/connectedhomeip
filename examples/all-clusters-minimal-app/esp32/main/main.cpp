@@ -70,7 +70,7 @@ using namespace ::chip::DeviceManager;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG = "all-clusters-minimal-app";
+extern const char TAG[] = "all-clusters-minimal-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;

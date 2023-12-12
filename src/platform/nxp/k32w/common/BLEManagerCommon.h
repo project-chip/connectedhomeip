@@ -45,9 +45,19 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-typedef void (*ble_generic_cb_fp)(gapGenericEvent_t * pGenericEvent);
-
 using namespace chip::Ble;
+
+/**
+ * A delegate class that can be used by the application to subscribe to BLE events.
+ */
+struct BLECallbackDelegate
+{
+    using GapGenericCallback = void (*)(gapGenericEvent_t * event);
+    using GattServerCallback = void (*)(deviceId_t id, gattServerEvent_t * event);
+
+    GapGenericCallback gapCallback  = nullptr;
+    GattServerCallback gattCallback = nullptr;
+};
 
 /**
  * Base class for different platform implementations (K32W0 and K32W1 for now).
@@ -221,9 +231,13 @@ protected:
     static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
-    virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
-    virtual BLEManagerCommon * GetImplInstance()                   = 0;
+    virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;
+    virtual BLEManagerCommon * GetImplInstance()                                         = 0;
     void DoBleProcessing(void);
+
+    BLECallbackDelegate callbackDelegate;
+    void RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
+                              BLECallbackDelegate::GattServerCallback gattCallback);
 };
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerCommon::_GetCHIPoBLEServiceMode(void)

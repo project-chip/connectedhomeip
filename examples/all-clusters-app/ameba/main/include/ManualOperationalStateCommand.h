@@ -137,7 +137,7 @@ CHIP_ERROR ManualRVCOperationalStateSetStateCommandHandler(int argc, char ** arg
     uint32_t state = atoi(argv[0]);
 
     CHIP_ERROR err;
-    err = GetRVCOperationalStateInstance()->SetOperationalState(state);
+    err = RvcOperationalState::GetRvcOperationalStateInstance()->SetOperationalState(state);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -178,7 +178,7 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
         break;
     }
 
-    GetRVCOperationalStateInstance()->OnOperationalErrorDetected(err);
+    RvcOperationalState::GetRvcOperationalStateInstance()->OnOperationalErrorDetected(err);
 
     return CHIP_NO_ERROR;
 }

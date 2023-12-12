@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UInt) {
+class ThreadNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UByte) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterConnectionStatusEvent {\n")
     append("\tconnectionStatus : $connectionStatus\n")
@@ -45,7 +45,7 @@ class ThreadNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus:
       tlvReader: TlvReader
     ): ThreadNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tlvTag)
-      val connectionStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
+      val connectionStatus = tlvReader.getUByte(ContextSpecificTag(TAG_CONNECTION_STATUS))
 
       tlvReader.exitContainer()
 

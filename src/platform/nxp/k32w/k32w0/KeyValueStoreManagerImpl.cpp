@@ -81,8 +81,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init()
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS keys storage with id: %d. Error: %s", kNvmId_KvsKeys, ErrorStr(err));
     }
-    // Set values storage to max RAM buffer size as a temporary fix for TC-RR-1.1.
-    err = sValuesStorage.Init(kRamBufferMaxAllocSize, true);
+    // Set values storage to a big RAM buffer size as a temporary fix for TC-RR-1.1.
+    err = sValuesStorage.Init(kKVS_RamBufferSize, true);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Cannot init KVS values storage with id: %d. Error: %s", kNvmId_KvsValues, ErrorStr(err));

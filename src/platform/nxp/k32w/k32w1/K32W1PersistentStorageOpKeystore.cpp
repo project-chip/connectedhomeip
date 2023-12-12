@@ -72,7 +72,7 @@ exit:
 
 CHIP_ERROR P256KeypairSSS::ExportBlob(P256SerializedKeypairSSS & output) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
     size_t keyBlobLen = output.Capacity();
     VerifyOrReturnError(sss_sscp_key_store_export_key(&g_keyStore, &mKeyObj, output.Bytes(), &keyBlobLen,
@@ -114,7 +114,7 @@ CHIP_ERROR P256KeypairSSS::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_
     sss_sscp_asymmetric_t asyc;
     size_t signatureSize = kP256_ECDSA_Signature_Length_Raw;
 
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t digest[kSHA256_Hash_Length];
@@ -136,7 +136,7 @@ exit:
 
 CHIP_ERROR P256KeypairSSS::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
     MutableByteSpan csr(out_csr, csr_length);
     CHIP_ERROR err = GenerateCertificateSigningRequest(this, csr);

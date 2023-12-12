@@ -22,8 +22,8 @@ from typing import List, Optional, Set
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                                     ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
-                                         StructQuality, StructTag)
+from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
+                                         StructTag)
 from stringcase import capitalcase
 
 
@@ -65,9 +65,9 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
 
     if isinstance(actual, BasicString):
         if actual.is_binary:
-            return 'OctetString'
+            return 'ByteArray'
         else:
-            return 'CharString'
+            return 'String'
     elif isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
@@ -351,6 +351,11 @@ class EncodableValue:
         self.attrs = attrs
 
     @property
+    def is_basic_type(self):
+        """Returns True if this type is a basic type in Kotlin"""
+        return self.kotlin_type != "Any"
+
+    @property
     def is_nullable(self):
         return EncodableValueAttr.NULLABLE in self.attrs
 
@@ -452,15 +457,23 @@ class EncodableValue:
             else:
                 return "String"
         elif isinstance(t, IdlEnumType):
-            if t.base_type.byte_count >= 3:
-                return "ULong"
-            else:
+            if t.base_type.byte_count <= 1:
+                return "UByte"
+            elif t.base_type.byte_count <= 2:
+                return "UShort"
+            elif t.base_type.byte_count <= 4:
                 return "UInt"
+            else:
+                return "ULong"
         elif isinstance(t, IdlBitmapType):
-            if t.base_type.byte_count >= 3:
-                return "ULong"
-            else:
+            if t.base_type.byte_count <= 1:
+                return "UByte"
+            elif t.base_type.byte_count <= 2:
+                return "UShort"
+            elif t.base_type.byte_count <= 4:
                 return "UInt"
+            else:
+                return "ULong"
         else:
             return "Any"
 
@@ -652,8 +665,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
         Renders .kt files required for kotlin matter support
         """
 
-        clientClusters = [
-            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = self.idl.clusters
 
         self.internal_render_one_output(
             template_path="MatterFiles_gni.jinja",
@@ -679,9 +691,6 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             for struct in cluster.structs:
                 if struct.tag:
                     continue

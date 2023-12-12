@@ -151,6 +151,9 @@ static constexpr ClusterId Id = 0x00000046;
 namespace Timer {
 static constexpr ClusterId Id = 0x00000047;
 } // namespace Timer
+namespace OvenCavityOperationalState {
+static constexpr ClusterId Id = 0x00000048;
+} // namespace OvenCavityOperationalState
 namespace OvenMode {
 static constexpr ClusterId Id = 0x00000049;
 } // namespace OvenMode
@@ -217,9 +220,18 @@ static constexpr ClusterId Id = 0x00000080;
 namespace ValveConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000081;
 } // namespace ValveConfigurationAndControl
+namespace ElectricalEnergyMeasurement {
+static constexpr ClusterId Id = 0x00000091;
+} // namespace ElectricalEnergyMeasurement
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
+namespace DeviceEnergyManagement {
+static constexpr ClusterId Id = 0x00000098;
+} // namespace DeviceEnergyManagement
+namespace EnergyEvse {
+static constexpr ClusterId Id = 0x00000099;
+} // namespace EnergyEvse
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
@@ -331,6 +343,12 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
+namespace ContentControl {
+static constexpr ClusterId Id = 0x0000050F;
+} // namespace ContentControl
+namespace ContentAppObserver {
+static constexpr ClusterId Id = 0x00000510;
+} // namespace ContentAppObserver
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
