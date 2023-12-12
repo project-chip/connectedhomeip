@@ -37,6 +37,7 @@ namespace core {
 class EndpointAttributes
 {
 public:
+    // value of 0 means the attribute could not be read for the corresponding Endpoint
     chip::EndpointId mId = 0;
     uint16_t mVendorId   = 0;
     uint16_t mProductId  = 0;
@@ -45,6 +46,9 @@ public:
 
 class CastingPlayer;
 
+/**
+ * @brief An Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App
+ */
 class Endpoint : public std::enable_shared_from_this<Endpoint>
 {
 
@@ -77,15 +81,27 @@ public:
 
     chip::EndpointId GetId() const { return mAttributes.mId; }
 
+    /**
+     * @return uint16_t - value 0 indicates no ProductId was returned for this Endpoint
+     */
     uint16_t GetProductId() const { return mAttributes.mProductId; }
 
+    /**
+     * @return uint16_t - value 0 indicates no VendorId was returned for this Endpoint
+     */
     uint16_t GetVendorId() const { return mAttributes.mVendorId; }
 
+    /**
+     * @return uint16_t - empty vector indicates no DeviceTypeList was returned for this Endpoint
+     */
     std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> GetDeviceTypeList() const
     {
         return mAttributes.mDeviceTypeList;
     }
 
+    /**
+     * @return uint16_t - empty vector indicates no ServerList was returned for this Endpoint
+     */
     std::vector<chip::ClusterId> GetServerList()
     {
         std::vector<chip::ClusterId> serverList;
@@ -96,6 +112,10 @@ public:
         return serverList;
     }
 
+    /**
+     * @brief Registers a cluster of type T against the passed in clusterId
+     * for this Endpoint
+     */
     template <typename T>
     void RegisterCluster(const chip::ClusterId clusterId)
     {
@@ -104,6 +124,9 @@ public:
         mClusters[clusterId] = std::static_pointer_cast<BaseCluster>(cluster);
     }
 
+    /**
+     * @brief Returns a cluster of type T, if applicable. Returns nullptr otherwise
+     */
     template <typename T>
     memory::Strong<T> GetCluster()
     {

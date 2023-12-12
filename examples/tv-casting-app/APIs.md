@@ -38,8 +38,8 @@ Commissioner. In the context of the
 [Matter Video Player architecture](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc),
 a `CastingPlayer` would map to
 [Casting "Video" Player](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction).
-The `CastingPlayer` is expected to be hosting one or more `Endpoints` (similar
-to
+The `CastingPlayer` is expected to be hosting one or more `Endpoints` (some of
+which can represent
 [Content Apps](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction)
 in the Matter Video Player architecture) that support one or more Matter Media
 `Clusters`.
