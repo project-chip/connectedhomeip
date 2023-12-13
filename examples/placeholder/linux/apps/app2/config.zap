@@ -11877,8 +11877,8 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
+          "name": "Matter Scenes",
+          "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
