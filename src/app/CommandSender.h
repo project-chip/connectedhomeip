@@ -132,9 +132,9 @@ public:
          * receives an OnDone call to destroy and free the object.
          *
          * Note: When implementing batch command feature for Matter 1.3, it was noticed that there was a gap for when IM Status was
-         * not successful for a particular path. OnResponse contract explicitily states that IM Status needed to be success. OnError's
-         * contract specified that it only is supposed to take non-path-specific status response from the server. We were left with this
-         * gap where we needed a callback that could be called for path-specific statuses.
+         * not successful for a particular path. OnResponse contract explicitily states that IM Status needed to be success.
+         * OnError's contract specified that it only is supposed to take non-path-specific status response from the server. We were
+         * left with this gap where we needed a callback that could be called for path-specific statuses.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -143,12 +143,12 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnPathSpecificError(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                         const AdditionalResponseData & aAdditionalResponseData)
+        virtual void OnPathSpecificError(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                         const StatusIB & aStatusIB, const AdditionalResponseData & aAdditionalResponseData)
         {
-            // Legacy code was previously sending these path-specific error status to OnError. To not break compatibility we will continue
-            // to send these error to OnError. Clients that want granularity differentiating between path-specific, and non-path specific
-            // errors can override this method to capture path-specific error.
+            // Legacy code was previously sending these path-specific error status to OnError. To not break compatibility we will
+            // continue to send these error to OnError. Clients that want granularity differentiating between path-specific, and
+            // non-path specific errors can override this method to capture path-specific error.
             OnError(apCommandSender, aStatusIB.ToChipError());
         }
 
@@ -484,10 +484,10 @@ private:
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
     bool mSendPathSpecificErrorToOnResponseCallback = false;
-    bool mSuppressResponse     = false;
-    bool mTimedRequest         = false;
-    bool mBufferAllocated      = false;
-    bool mBatchCommandsEnabled = false;
+    bool mSuppressResponse                          = false;
+    bool mTimedRequest                              = false;
+    bool mBufferAllocated                           = false;
+    bool mBatchCommandsEnabled                      = false;
 };
 
 } // namespace app
