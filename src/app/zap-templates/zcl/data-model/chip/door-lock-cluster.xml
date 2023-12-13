@@ -218,6 +218,56 @@ limitations under the License.
             <!-- Conformance feature [COTA & PIN] - for now optional -->
             <arg name="PINCode" type="octet_string" optional="true" />
         </command>
+        <!-- Command if not USR & PIN feature -->
+        <command source="client" code="5" name="SetPINCode" mustUseTimedInvoke="true" optional="true">
+            <description>Set PIN Code.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+            <arg name="UserType" type="UserTypeEnum" />
+            <arg name="PINCode" type="OCTET_STRING" />
+        </command>
+        <command source="client" code="6" name="GetPINCode" mustUseTimedInvoke="false" optional="true">
+            <description>Get PIN Code.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+        </command>
+        <command source="server" code="6" name="GetPINCodeResponse" mustUseTimedInvoke="false" optional="true">
+            <description>Response to the Get PIN Code command.</description>
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+            <arg name="UserType" type="UserTypeEnum" />
+            <arg name="PINCode" type="OCTET_STRING"/>
+        </command>
+        <command source="client" code="7" name="ClearPINCode" mustUseTimedInvoke="true" optional="true">
+            <description>Clear PIN Code on specific slot.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
+            <arg name="PINSlotIndex" type="INT16U" />
+        </command>
+        <command source="client" code="8" name="ClearAllPINCodes" mustUseTimedInvoke="true" optional="true">
+            <description>Clear all PIN Codes.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
+        </command>
+        <!-- Command if not USR & (PIN | RID | FGP) feature -->
+        <command source="client" code="9" name="SetUserStatus" mustUseTimedInvoke="false" optional="true">
+            <description>Set User status on specific ID.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+        </command>
+        <command source="client" code="10" name="GetUserStatus" mustUseTimedInvoke="false" optional="true">
+            <description>Get User status from specific ID.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+        </command>
+        <command source="server" code="10" name="GetUserStatusResponse" mustUseTimedInvoke="false" optional="true">
+            <description>Response to the Get User status from specific ID.</description>
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+        </command>
         <!-- Conformance feature WDSCH - for now optional -->
         <command source="client" code="11" name="SetWeekDaySchedule" optional="true">
             <description>Set a weekly repeating schedule for a specified user.</description>
@@ -317,6 +367,56 @@ limitations under the License.
             <description>Clears the holiday schedule or all holiday schedules.</description>
             <access op="invoke" role="administer" />
             <arg name="HolidayIndex" type="int8u" />
+        </command>
+        <!-- Command if not USR & (PIN | RID | FGP) feature -->
+        <command source="client" code="20" name="SetUserType" mustUseTimedInvoke="false" optional="true">
+            <description>Set User type on specific ID.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserType" type="UserTypeEnum" />
+        </command>
+        <command source="client" code="21" name="GetUserType" mustUseTimedInvoke="false" optional="true">
+            <description>Get User type from specific ID.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+        </command>
+        <command source="server" code="21" name="GetUserTypeResponse" mustUseTimedInvoke="false" optional="true">
+            <description>Response to the Get User type from specific ID.</description>
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserType" type="UserTypeEnum" />
+        </command>
+        <!-- Command if not USR & RID feature -->
+        <command source="client" code="22" name="SetRFIDCode" mustUseTimedInvoke="true" optional="true">
+            <description>Set RFID Code for specifc User id.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+            <arg name="UserType" type="UserTypeEnum" />
+            <arg name="RFIDCode" type="OCTET_STRING" />
+        </command>
+        <command source="client" code="23" name="GetRFIDCode" mustUseTimedInvoke="false" optional="true">
+            <description>Get RFID Code from specific User id.</description>
+            <access op="invoke" role="administer" />
+            <arg name="UserID" type="INT16U" />
+        </command>
+        <command source="server" code="23" name="GetRFIDCodeResponse" mustUseTimedInvoke="false" optional="true">
+            <description>Response to the Get RFID Code from specific User id.</description>
+            <arg name="UserID" type="INT16U" />
+            <arg name="UserStatus" type="UserStatusEnum" />
+            <arg name="UserType" type="UserTypeEnum" />
+            <arg name="RFIDCode" type="OCTET_STRING" />
+        </command>
+        <command source="client" code="24" name="ClearRFIDCode" mustUseTimedInvoke="true" optional="true">
+            <description>Clear specific RFID codes by the index number.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
+            <arg name="RFIDSlotIndex" type="INT16U" />
+        </command>
+        <command source="client" code="25" name="ClearAllRFIDCodes" mustUseTimedInvoke="true" optional="true">
+            <description>Clear all RFID Codes.</description>
+            <access op="invoke" role="administer" />
+            <arg name="Timeout" type="INT16U" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="26" name="SetUser" mustUseTimedInvoke="true" optional="true">
