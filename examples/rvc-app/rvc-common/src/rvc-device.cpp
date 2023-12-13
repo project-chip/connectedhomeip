@@ -93,7 +93,7 @@ void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOp
 {
     // This method is only called if the device is in a Pause-compatible state, i.e. `Running` or `SeekingCharger`.
     mRusumeState = mOperationalStateInstance.GetCurrentOperationalState();
-    auto error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
+    auto error   = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
