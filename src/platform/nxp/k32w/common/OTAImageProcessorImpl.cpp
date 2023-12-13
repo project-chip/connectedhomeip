@@ -28,7 +28,7 @@
 using namespace chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-#if USE_SMU2_AS_SYSTEM_MEMORY
+#if USE_SMU2_STATIC
 // The attribute specifier should not be changed.
 static chip::OTAImageProcessorImpl gImageProcessor __attribute__((section(".smu2")));
 #else

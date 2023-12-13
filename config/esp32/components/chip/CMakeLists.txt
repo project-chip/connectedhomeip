@@ -493,7 +493,7 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x

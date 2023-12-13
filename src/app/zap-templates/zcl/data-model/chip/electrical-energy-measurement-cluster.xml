@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="Measurement &amp; Sensing"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0091"/>
+    <field name="ImportedEnergy" mask="0x1"/>
+    <field name="ExportedEnergy" mask="0x2"/>
+    <field name="CumulativeEnergy" mask="0x4"/>
+    <field name="PeriodicEnergy" mask="0x8"/>
+  </bitmap>
+
+  <enum name="MeasurementTypeEnum" type="enum16">
+    <cluster code="0x0091"/>
+    <item name="Unspecified" value="0" />
+    <item name="Voltage" value="1" />
+    <item name="ActiveCurrent" value="2" />
+    <item name="ReactiveCurrent" value="3" />
+    <item name="ApparentCurrent" value="4" />
+    <item name="ActivePower" value="5" />
+    <item name="ReactivePower" value="6" />
+    <item name="ApparentPower" value="7" />
+    <item name="RMSVoltage" value="8" />
+    <item name="RMSCurrent" value="9" />
+    <item name="RMSPower" value="10" />
+    <item name="Frequency" value="11" />
+    <item name="PowerFactor" value="12" />
+    <item name="NeutralCurrent" value="13" />
+    <item name="ElectricalEnergy" value="14" />
+  </enum>
+
+  <struct name="EnergyMeasurementStruct">
+    <cluster code="0x0091"/>
+    <!-- TODO: Energy should be energy_mwh once supported -->
+    <item fieldId="0" name="Energy" type="int64s" />
+    <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="2" name="EndTimestamp" type="epoch_s" optional="true"/>
+    <item fieldId="3" name="StartSystime" type="systime_ms" optional="true"/>
+    <item fieldId="4" name="EndSystime" type="systime_ms" optional="true"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyRangeStruct">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="RangeMin" type="int64s" />
+    <item fieldId="1" name="RangeMax" type="int64s" />
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true" />
+    <item fieldId="3" name="PercentMin" type="percent100ths"  optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths"  optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u"  optional="true"/>
+    <item fieldId="6" name="FixedMin" type="int64u"  optional="true"/>
+    <item fieldId="7" name="FixedTypical" type="int64u"  optional="true"/>
+  </struct>
+
+  <struct name="MeasurementAccuracyStruct">
+    <cluster code="0x0091"/>
+    <item fieldId="0" name="MeasurementType" type="MeasurementTypeEnum" />
+    <item fieldId="1" name="Measured" type="boolean" />
+    <item fieldId="2" name="MinMeasuredValue" type="int64s" />
+    <item fieldId="3" name="MaxMeasuredValue" type="int64s" />
+    <item fieldId="4" name="AccuracyRanges" type="MeasurementAccuracyRangeStruct" array="true" />
+  </struct>
+
+  <cluster apiMaturity="provisional">
+    <name>Electrical Energy Measurement</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
+    <code>0x0091</code>
+    <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="1"/> <!-- Revision   -->
+
+    <attribute side="server" code="0x0000" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" optional="false">Accuracy</attribute>
+    <attribute side="server" code="0x0001" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
+    <attribute side="server" code="0x0002" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">CumulativeEnergyExported</attribute>
+    <attribute side="server" code="0x0003" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">PeriodicEnergyImported</attribute>
+    <attribute side="server" code="0x0004" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" writable="false" optional="true" isNullable="true">PeriodicEnergyExported</attribute>
+
+    <event side="server" code="0x00" name="CumulativeEnergyMeasured" priority="info" optional="true">
+      <description>This event SHALL be generated when the server takes a snapshot of the cumulative energy imported by the server, exported from the server of both.</description>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
+    </event>
+
+    <event side="server" code="0x01" name="PeriodicEnergyMeasured" priority="info" optional="true">
+      <description>This event SHALL be generated when the server reaches the end of a reporting period for imported energy, exported energy, or both.</description>
+      <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
+      <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
+    </event>
+
+  </cluster>
+</configurator>

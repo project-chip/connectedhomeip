@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import inspect
 import json
 import logging
 import math
@@ -58,6 +59,13 @@ from chip.tracing import TracingContext
 from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
+
+try:
+    from matter_yamltests.hooks import TestRunnerHooks
+except ImportError:
+    class TestRunnerHooks:
+        pass
+
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -224,6 +232,42 @@ class SimpleEventCallback:
         return self._name
 
 
+class InternalTestRunnerHooks(TestRunnerHooks):
+
+    def start(self, count: int):
+        logging.info(f'Starting test set, running {count} tests')
+
+    def stop(self, duration: int):
+        logging.info(f'Finished test set, ran for {duration}ms')
+
+    def test_start(self, filename: str, name: str, count: int):
+        logging.info(f'Starting test from {filename}: {name} - {count} steps')
+
+    def test_stop(self, exception: Exception, duration: int):
+        logging.info(f'Finished test in {duration}ms')
+
+    def step_skipped(self, name: str, expression: str):
+        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
+        logging.info(f'\t\t**** Skipping: {name}')
+
+    def step_start(self, name: str):
+        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
+        logging.info(f'\t\t***** Test Step {name}')
+
+    def step_success(self, logger, logs, duration: int, request):
+        pass
+
+    def step_failure(self, logger, logs, duration: int, request, received):
+        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
+        logging.info('\t\t***** Test Failure : ')
+
+    def step_unknown(self):
+        """
+        This method is called when the result of running a step is unknown. For example during a dry-run.
+        """
+        pass
+
+
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -237,6 +281,8 @@ class MatterTestConfig:
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
     tests: List[str] = field(default_factory=list)
+    timeout: typing.Union[int, None] = None
+    endpoint: int = 0
 
     commissioning_method: Optional[str] = None
     discriminators: Optional[List[int]] = None
@@ -500,12 +546,100 @@ def hex_from_bytes(b: bytes) -> str:
     return hexlify(b).decode("utf-8")
 
 
+@dataclass
+class TestStep:
+    test_plan_number: typing.Union[int, str]
+    description: str
+    is_commissioning: bool = False
+
+
+@dataclass
+class TestInfo:
+    function: str
+    desc: str
+    steps: list[TestStep]
+    pics: list[str]
+
+
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
 
         # List of accumulated problems across all tests
         self.problems = []
+        self.is_commissioning = False
+
+    def get_test_steps(self, test: str) -> list[TestStep]:
+        ''' Retrieves the test step list for the given test
+
+            Test steps are defined in the function called steps_<functionname>.
+            ex for test test_TC_TEST_1_1, the steps are in a function called
+            steps_TC_TEST_1_1.
+
+            Test that implement a steps_ function should call each step
+            in order using self.step(number), where number is the test_plan_number
+            from each TestStep.
+        '''
+        steps = self._get_defined_test_steps(test)
+        return [TestStep(1, "Run entire test")] if steps is None else steps
+
+    def _get_defined_test_steps(self, test: str) -> list[TestStep]:
+        steps_name = 'steps_' + test[5:]
+        try:
+            fn = getattr(self, steps_name)
+            return fn()
+        except AttributeError:
+            return None
+
+    def get_test_pics(self, test: str) -> list[str]:
+        ''' Retrieves a list of top-level PICS that should be checked before running this test
+
+            An empty list means the test will always be run.
+
+            PICS are defined in a function called pics_<functionname>.
+            ex. for test test_TC_TEST_1_1, the pics are in a function called
+            pics_TC_TEST_1_1.
+        '''
+        pics = self._get_defined_pics(test)
+        return [] if pics is None else pics
+
+    def _get_defined_pics(self, test: str) -> list[TestStep]:
+        steps_name = 'pics_' + test[5:]
+        try:
+            fn = getattr(self, steps_name)
+            return fn()
+        except AttributeError:
+            return None
+
+    def get_test_desc(self, test: str) -> str:
+        ''' Returns a description of this test
+
+            Test description is defined in the function called desc_<functionname>.
+            ex for test test_TC_TEST_1_1, the steps are in a function called
+            desc_TC_TEST_1_1.
+
+            Format:
+            <Test plan reference> [<test plan number>] <test plan name>
+
+            ex:
+            133.1.1. [TC-ACL-1.1] Global attributes
+        '''
+        desc_name = 'desc_' + test[5:]
+        try:
+            fn = getattr(self, desc_name)
+            return fn()
+        except AttributeError:
+            return test
+
+    # Override this if the test requires a different default timeout.
+    # This value will be overridden if a timeout is supplied on the command line.
+    @property
+    def default_timeout(self) -> int:
+        return 90
+
+    @property
+    def runner_hook(self) -> TestRunnerHooks:
+        return unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
@@ -533,6 +667,26 @@ class MatterBaseTest(base_test.BaseTestClass):
         # Mappings of cluster IDs to names and metadata.
         # TODO: Move to using non-generated code and rather use data model description (.matter or .xml)
         self.cluster_mapper = ClusterMapper(self.default_controller._Cluster)
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
+
+    def setup_test(self):
+        self.current_step_index = 0
+        self.step_start_time = datetime.now(timezone.utc)
+        self.step_skipped = False
+        if self.runner_hook and not self.is_commissioning:
+            test_name = self.current_test_info.name
+            steps = self._get_defined_test_steps(test_name)
+            num_steps = 1 if steps is None else len(steps)
+            filename = inspect.getfile(self.__class__)
+            desc = self.get_test_desc(test_name)
+            self.runner_hook.test_start(filename=filename, name=desc, count=num_steps)
+            # If we don't have defined steps, we're going to start the one and only step now
+            # if there are steps defined by the test, rely on the test calling the step() function
+            # to indicates how it is proceeding
+            if steps is None:
+                self.step(1)
 
     def teardown_class(self):
         """Final teardown after all tests: log all problems"""
@@ -561,11 +715,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
@@ -579,11 +735,13 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
@@ -596,12 +754,14 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def send_single_cmd(
             self, cmd: Clusters.ClusterObjects.ClusterCommand,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0,
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
 
         result = await dev_ctrl.SendCommand(nodeid=node_id, endpoint=endpoint, payload=cmd, timedRequestTimeoutMs=timedRequestTimeoutMs)
         return result
@@ -617,6 +777,90 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def record_note(self, test_name: str, location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation, FeaturePathLocation], problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
+
+    def on_fail(self, record):
+        ''' Called by Mobly on test failure
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            exception = record.termination_signal.exception
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            # This isn't QUITE the test duration because the commissioning is handled separately, but it's clsoe enough for now
+            # This is already given in milliseconds
+            test_duration = record.end_time - record.begin_time
+            # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
+            self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
+
+    def on_pass(self, record):
+        ''' Called by Mobly on test pass
+
+            record is of type TestResultRecord
+        '''
+        if self.runner_hook and not self.is_commissioning:
+            # What is request? This seems like an implementation detail for the runner
+            # TODO: As with failure, I have no idea what logger, logs or request are meant to be
+            step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+            test_duration = record.end_time - record.begin_time
+            self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+        # TODO: this check could easily be annoying when doing dev. flag it somehow? Ditto with the in-order check
+        steps = self._get_defined_test_steps(record.test_name)
+        if steps is None:
+            # if we don't have a list of steps, assume they were all run
+            all_steps_run = True
+        else:
+            all_steps_run = len(steps) == self.current_step_index
+
+        if not all_steps_run:
+            # The test is done, but we didn't execute all the steps
+            asserts.fail("Test script error: Not all required steps were run")
+
+        if self.runner_hook and not self.is_commissioning:
+            self.runner_hook.test_stop(exception=None, duration=test_duration)
+
+    def pics_guard(self, pics_condition: bool):
+        if not pics_condition:
+            try:
+                steps = self.get_test_steps()
+                num = steps[self.current_step_index].test_plan_number
+            except KeyError:
+                num = self.current_step_index
+
+            if self.runner_hook:
+                # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
+                # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+                #       as a string? Does it get used by the TH?
+                self.runner_hook.step_skipped(name=str(num), expression="")
+            else:
+                logging.info(f'**** Skipping: {num}')
+            self.step_skipped = True
+
+    def step(self, step: typing.Union[int, str]):
+        test_name = sys._getframe().f_back.f_code.co_name
+        steps = self.get_test_steps(test_name)
+
+        # TODO: this might be annoying during dev. Remove? Flag?
+        if len(steps) <= self.current_step_index or steps[self.current_step_index].test_plan_number != step:
+            asserts.fail(f'Unexpected test step: {step} - steps not called in order, or step does not exist')
+
+        if self.runner_hook:
+            # If we've reached the next step with no assertion and the step wasn't skipped, it passed
+            if not self.step_skipped and self.current_step_index != 0:
+                # TODO: As with failure, I have no idea what loger, logs or request are meant to be
+                step_duration = (datetime.now(timezone.utc) - self.step_start_time) / timedelta(microseconds=1)
+                self.runner_hook.step_success(logger=None, logs=None, duration=step_duration, request=None)
+
+            # TODO: it seems like the step start should take a number and a name
+            name = f'{step} : {steps[self.current_step_index].description}'
+            self.runner_hook.step_start(name=name)
+        else:
+            self.print_step(step, steps[self.current_step_index].description)
+
+        self.step_start_time = datetime.now(tz=timezone.utc)
+        self.current_step_index = self.current_step_index + 1
+        self.step_skipped = False
 
     def get_setup_payload_info(self) -> SetupPayloadInfo:
         if self.matter_test_config.qr_code_content is not None:
@@ -919,6 +1163,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.ble_interface_id = args.ble_interface_id
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
     config.tests = [] if args.tests is None else args.tests
+    config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
+    config.endpoint = 0 if args.endpoint is None else args.endpoint
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -966,10 +1212,12 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              metavar='NODE_ID',
                              default=_DEFAULT_CONTROLLER_NODE_ID,
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
-    basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
+    basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[_DEFAULT_DUT_NODE_ID],
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
+    basic_group.add_argument('--endpoint', type=int, default=0, help="Endpoint under test")
+    basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
@@ -1062,14 +1310,21 @@ def async_test_body(body):
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
     """
-    def async_runner(*args, **kwargs):
-        return asyncio.run(body(*args, **kwargs))
+
+    def async_runner(self: MatterBaseTest, *args, **kwargs):
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+        runner_with_timeout = asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout)
+        return asyncio.run(runner_with_timeout)
 
     return async_runner
 
 
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.is_commissioning = True
 
     def test_run_commissioning(self):
         conf = self.matter_test_config
@@ -1140,6 +1395,7 @@ def default_matter_test_main(argv=None, **kwargs):
     Args:
       argv: A list that is then parsed as command line args. If None, defaults to sys.argv
     """
+
     matter_test_config = parse_matter_test_args(argv)
 
     # Allow override of command line from optional arguments
@@ -1149,6 +1405,38 @@ def default_matter_test_main(argv=None, **kwargs):
     # Find the test class in the test script.
     test_class = _find_test_class()
 
+    # This is required in case we need any testing with maximized certificate chains.
+    # We need *all* issuers from the start, even for default controller, to use
+    # maximized chains, before MatterStackState init, others some stale certs
+    # may not chain properly.
+    if "maximize_cert_chains" in kwargs:
+        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
+
+    hooks = InternalTestRunnerHooks()
+
+    run_tests(test_class, matter_test_config, hooks)
+
+
+def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
+    test_config = generate_mobly_test_config(matter_test_config)
+    base = test_class(test_config)
+
+    if len(matter_test_config.tests) > 0:
+        tests = matter_test_config.tests
+    else:
+        tests = base.get_existing_test_names()
+
+    info = []
+    for t in tests:
+        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
+
+    return info
+
+
+def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig, hooks: TestRunnerHooks) -> None:
+
+    get_test_info(test_class, matter_test_config)
+
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
 
@@ -1156,13 +1444,6 @@ def default_matter_test_main(argv=None, **kwargs):
     tests = None
     if len(matter_test_config.tests) > 0:
         tests = matter_test_config.tests
-
-    # This is required in case we need any testing with maximized certificate chains.
-    # We need *all* issuers from the start, even for default controller, to use
-    # maximized chains, before MatterStackState init, others some stale certs
-    # may not chain properly.
-    if "maximize_cert_chains" in kwargs:
-        matter_test_config.maximize_cert_chains = kwargs["maximize_cert_chains"]
 
     stack = MatterStackState(matter_test_config)
 
@@ -1183,6 +1464,10 @@ def default_matter_test_main(argv=None, **kwargs):
         test_config.user_params["default_controller"] = stash_globally(default_controller)
 
         test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
+        test_config.user_params["hooks"] = stash_globally(hooks)
+
+        # Execute the test class with the config
+        ok = True
 
         test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
 
@@ -1200,14 +1485,28 @@ def default_matter_test_main(argv=None, **kwargs):
             if not matter_test_config.commission_only:
                 runner.add_test_class(test_config, test_class, tests)
 
+            if hooks:
+                # Right now, we only support running a single test class at once,
+                # but it's relatively easy to exapand that to make the test process faster
+                # TODO: support a list of tests
+                hooks.start(count=1)
+                # Mobly gives the test run time in seconds, lets be a bit more precise
+                runner_start_time = datetime.now(timezone.utc)
+
             try:
                 runner.run()
                 ok = runner.results.is_all_pass and ok
+            except TimeoutError:
+                ok = False
             except signals.TestAbortAll:
                 ok = False
             except Exception:
                 logging.exception('Exception when executing %s.', test_config.testbed_name)
                 ok = False
+
+    if hooks:
+        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
+        hooks.stop(duration=duration)
 
     # Shutdown the stack when all done
     stack.Shutdown()

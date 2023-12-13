@@ -122,8 +122,8 @@ public:
     ~ExtensionFieldSetsImpl() override{};
 
     // overrides
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const override;
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader, TLV::Tag structTag) override;
+    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
+    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
     bool IsEmpty() const override { return (mFieldSetsCount == 0); }
     uint8_t GetFieldSetCount() const override { return mFieldSetsCount; };
