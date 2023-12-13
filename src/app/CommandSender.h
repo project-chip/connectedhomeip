@@ -483,11 +483,10 @@ private:
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-    bool mSendPathSpecificErrorToOnResponseCallback = false;
-    bool mSuppressResponse                          = false;
-    bool mTimedRequest                              = false;
-    bool mBufferAllocated                           = false;
-    bool mBatchCommandsEnabled                      = false;
+    bool mSuppressResponse     = false;
+    bool mTimedRequest         = false;
+    bool mBufferAllocated      = false;
+    bool mBatchCommandsEnabled = false;
 };
 
 } // namespace app
