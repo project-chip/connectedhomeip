@@ -2524,7 +2524,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kReadCommissioningInfo: {
         ChipLogProgress(Controller, "Sending read request for commissioning information");
         // Allocate a new ClusterStateCache when starting reading the first batch of attributes.
-        // The attribute cache will be released in:
+        // The cache will be released in:
         // - SendCommissioningReadRequest when failed to send any read requests.
         // - ParseCommissioningInfo when the last ReadCommissioningInfo stage is completed.
         // Currently, we have two ReadCommissioningInfo* stages.
