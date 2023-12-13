@@ -382,7 +382,7 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    if ((mVehicleID.IsNull()) || (strcmp(newValue.data(), mVehicleID.Value().data()) != 0))
+    if (mVehicleID.IsNull() || !newValue.data_equal(mVehicleID.Value()))
     {
         /* create a copy of the string so the callee doesn't have to keep it */
         char * destinationBuffer = new char[kMaxVehicleIDBufSize];
@@ -403,7 +403,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 
         mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
 
-        ChipLogDetail(AppServer, "VehicleID updated to %s", mVehicleID.Value().data());
+        ChipLogDetail(AppServer, "VehicleID updated");
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
     }
 
