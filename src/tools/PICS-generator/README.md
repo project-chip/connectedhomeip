@@ -45,6 +45,11 @@ NOTE: The tool has been verified using V24 PICS (used for Matter 1.2
 certification)
 
 # How to run
+First change the directory to the tool location.
+
+```
+cd src/tools/PICS-generator/
+```
 
 The tool does, as mentioned above, have external dependencies, these are
 provided to the tool using these arguments:
@@ -59,7 +64,7 @@ If the device has not been commissioned this can be done by passing in the
 commissioning information:
 
 ```
-python3 'src/python_testing/PICSGenerator.py' --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>
+python3 PICSGenerator.py --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath> --commissioning-method ble-thread --discriminator <DESCRIMINATOR> --passcode <PASSCODE> --thread-dataset-hex <DATASET_AS_HEX>
 ```
 
 In case the device uses a development PAA, the following parameter should be
@@ -79,5 +84,5 @@ added.
 If a device has already been commissioned, the tool can be executed like this:
 
 ```
-python3 'src/python_testing/PICSGenerator.py' --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
+python3 PICSGenerator.py --cluster-data <pathToClusterJson> --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
 ```
