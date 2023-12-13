@@ -1741,7 +1741,7 @@ endpoint 0 {
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
     ram      attribute userActiveModeTriggerHint default = 0x110D;
-    persist  attribute userActiveModeTriggerInstruction default = "Restart the application";
+    ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1756,5 +1756,3 @@ endpoint 0 {
     handle command StayActiveResponse;
   }
 }
-
-
