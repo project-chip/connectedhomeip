@@ -130,6 +130,7 @@ CHIP_ERROR TLVWriter::Finalize()
 
 CHIP_ERROR TLVWriter::ReserveBuffer(uint32_t aBufferSize)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
 
     if (mBackingStore)
