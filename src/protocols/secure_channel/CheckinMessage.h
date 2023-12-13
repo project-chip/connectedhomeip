@@ -23,6 +23,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
 #include <stdint.h>
 
