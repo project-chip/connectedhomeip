@@ -76,7 +76,7 @@ _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
 # else seems to do it.
-_DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, PyChipError)
+_DeviceAvailableCallbackFunct = CFUNCTYPE(None, py_object, c_void_p, PyChipError)
 
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
@@ -98,6 +98,11 @@ class NOCChain:
     rcacBytes: bytes
     ipkBytes: bytes
     adminSubject: int
+
+
+@_DeviceAvailableCallbackFunct
+def _DeviceAvailableCallback(closure, device, err):
+    closure.deviceAvailable(device, err)
 
 
 @_IssueNOCChainCallbackPythonCallbackFunct
@@ -759,16 +764,6 @@ class ChipDeviceControllerBase():
         returnErr = None
         deviceAvailableCV = threading.Condition()
 
-        @_DeviceAvailableFunct
-        def DeviceAvailableCallback(device, err):
-            nonlocal returnDevice
-            nonlocal returnErr
-            nonlocal deviceAvailableCV
-            with deviceAvailableCV:
-                returnDevice = c_void_p(device)
-                returnErr = err
-                deviceAvailableCV.notify_all()
-
         if allowPASE:
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
@@ -776,8 +771,22 @@ class ChipDeviceControllerBase():
                 print('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice)
 
+        class DeviceAvailableClosure():
+            def deviceAvailable(self, device, err):
+                nonlocal returnDevice
+                nonlocal returnErr
+                nonlocal deviceAvailableCV
+                with deviceAvailableCV:
+                    returnDevice = c_void_p(device)
+                    returnErr = err
+                    deviceAvailableCV.notify_all()
+                ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+
+        closure = DeviceAvailableClosure()
+        ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs).raise_on_error()
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
+            timeoutMs).raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
@@ -889,6 +898,45 @@ class ChipDeviceControllerBase():
                 ClusterId=payload.cluster_id,
                 CommandId=payload.command_id,
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
+        return await future
+
+    async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
+                                timedRequestTimeoutMs: typing.Optional[int] = None,
+                                interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                suppressResponse: typing.Optional[bool] = None):
+        '''
+        Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
+        the responses. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+        the type will be automatically deduced from the metadata received over the wire.
+
+        nodeId: Target's Node ID
+        commands: A list of InvokeRequestInfo containing the commands to invoke.
+        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
+                              right timeout value based on transport characteristics as well as the responsiveness of the target.
+        busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
+        suppressResponse: Do not send a response to this action
+
+        Returns:
+            - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
+                      - A value of `None` indicates success.
+                      - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
+                        contain `interaction_model.Status.UnsupportedCommand`.
+                      - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
+        Raises:
+            - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+
+        ClusterCommand.SendBatchCommands(
+            future, eventLoop, device.deviceProxy, commands,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
         return await future
 
@@ -1568,7 +1616,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
-                c_void_p, c_uint64, _DeviceAvailableFunct]
+                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
 
             self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
