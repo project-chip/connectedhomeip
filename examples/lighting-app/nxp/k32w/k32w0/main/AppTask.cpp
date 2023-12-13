@@ -249,6 +249,14 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    /* SSBL will always be seen as booting from address 0, thanks to the remapping mechanism.
+     * This means the SSBL version will always offset from address 0. */
+    extern uint32_t __MATTER_SSBL_VERSION_START[];
+    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t *) __MATTER_SSBL_VERSION_START),
+             (uint32_t) __MATTER_SSBL_VERSION_START);
+#endif
+
     return err;
 }
 
@@ -897,11 +905,24 @@ void AppTask::PostTurnOnActionRequest(int32_t aActor, LightingManager::Action_t 
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
+    portBASE_TYPE taskToWake = pdFALSE;
     if (sAppEventQueue != NULL)
     {
-        if (!xQueueSend(sAppEventQueue, aEvent, 1))
+        if (__get_IPSR())
         {
-            K32W_LOG("Failed to post event to app task event queue");
+            if (!xQueueSendToFrontFromISR(sAppEventQueue, aEvent, &taskToWake))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
+
+            portYIELD_FROM_ISR(taskToWake);
+        }
+        else
+        {
+            if (!xQueueSend(sAppEventQueue, aEvent, 1))
+            {
+                K32W_LOG("Failed to post event to app task event queue");
+            }
         }
     }
 }

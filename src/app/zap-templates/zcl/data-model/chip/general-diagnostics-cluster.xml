@@ -83,6 +83,7 @@ limitations under the License.
     <code>0x0033</code>
     <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
     <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
     <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
     <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
     <!-- TODO(#30023): Make Uptime conditionally mandatory at rev >= 2 -->

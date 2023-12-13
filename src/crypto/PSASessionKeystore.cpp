@@ -53,7 +53,7 @@ public:
     HmacKeyAttributes()
     {
         psa_set_key_type(&mAttrs, PSA_KEY_TYPE_HMAC);
-        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_ANY_HASH));
+        psa_set_key_algorithm(&mAttrs, PSA_ALG_HMAC(PSA_ALG_SHA_256));
         psa_set_key_usage_flags(&mAttrs, PSA_KEY_USAGE_SIGN_MESSAGE);
         psa_set_key_bits(&mAttrs, CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES * 8);
     }
@@ -68,7 +68,7 @@ private:
 
 } // namespace
 
-CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128BitsKeyHandle & key)
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
@@ -81,7 +81,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128BitsKeyHandle & key)
+CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key)
 {
     // Destroy the old key if already allocated
     psa_destroy_key(key.As<psa_key_id_t>());
@@ -96,7 +96,7 @@ CHIP_ERROR PSASessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & ke
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
-                                         Aes128BitsKeyHandle & key)
+                                         Aes128KeyHandle & key)
 {
     PsaKdf kdf;
     ReturnErrorOnFailure(kdf.Init(PSA_ALG_HKDF(PSA_ALG_SHA_256), secret.Span(), salt, info));
@@ -107,7 +107,7 @@ CHIP_ERROR PSASessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, c
 }
 
 CHIP_ERROR PSASessionKeystore::DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info,
-                                                 Aes128BitsKeyHandle & i2rKey, Aes128BitsKeyHandle & r2iKey,
+                                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                  AttestationChallenge & attestationChallenge)
 {
     PsaKdf kdf;

@@ -30,7 +30,7 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, CounterType counter,
+CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, CounterType counter,
                                                          const ByteSpan & appData, MutableByteSpan & output)
 {
     VerifyOrReturnError(appData.size() <= sMaxAppDataSize, CHIP_ERROR_INVALID_ARGUMENT);
@@ -62,7 +62,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128BitsKeyHa
     return err;
 }
 
-CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128BitsKeyHandle & key, ByteSpan & payload, CounterType & counter,
+CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
                                                       MutableByteSpan & appData)
 {
     VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_ARGUMENT);

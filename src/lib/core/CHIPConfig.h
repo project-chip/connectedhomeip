@@ -1484,16 +1484,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  }
  *
  *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
- *  Empty EFS Scene Max name size: 33bytes
- *  Scene Max name size + OnOff : 51 bytes
- *  Scene Max name size + LevelControl : 60 bytes
- *  Scene Max name size + ColorControl : 126 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 171 bytes
+ *  Empty EFS Scene Max name size: 37 bytes
+ *  Scene Max name size + OnOff : 55 bytes
+ *  Scene Max name size + LevelControl : 64 bytes
+ *  Scene Max name size + ColorControl : 130 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
  *
  *  Cluster Sizes:
- *  OnOff Cluster Max Size: 18 bytes
- *  LevelControl Cluster Max Size: 27 bytes
- *  Color Control Cluster Max Size: 93 bytes
+ *  OnOff Cluster Max Size: 21 bytes
+ *  LevelControl Cluster Max Size: 30 bytes
+ *  Color Control Cluster Max Size: 96 bytes
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
@@ -1687,6 +1687,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ *
+ * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ */
+#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
 #endif
 
 /**

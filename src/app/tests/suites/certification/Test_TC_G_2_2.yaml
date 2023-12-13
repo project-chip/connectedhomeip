@@ -1160,3 +1160,34 @@ tests:
           [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
           [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries
       disabled: true
+
+    - label:
+          "Step 23: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as
+          unicast with the following fields: GroupID as 0x0001, GroupName as
+          Gp123456789123456, Note: GroupName length > 16"
+      PICS: G.S.C00.Rsp && G.S.C00.Tx && G.S.F00
+      verification: |
+          ./chip-tool groups add-group 0x0001 Gp123456789123456 1 0
+
+          Verify the status is CONSTRAINT_ERROR (when GroupName is of length greater than 16) on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1701784321.750191][14898:14900] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0000
+          [1701784321.750198][14898:14900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0000
+          [1701784321.750215][14898:14900] CHIP:TOO:   AddGroupResponse: {
+          [1701784321.750219][14898:14900] CHIP:TOO:     status: 135
+          [1701784321.750222][14898:14900] CHIP:TOO:     groupID: 1
+          [1701784321.750225][14898:14900] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 24: TH reads GroupTable attribute from the GroupKeyManagement
+          cluster from DUT on EP0"
+      PICS: GRPKEY.S.A0001 && G.S.F00
+      verification: |
+          ./chip-tool groupkeymanagement read group-table 1 0
+
+          Verify that there is no entry with GroupId 0x0001 in GroupTable entries  on the TH(Chip-tool)  Log and below is the sample log provided for the raspi platform:
+
+          [1656332191.739327][27032:27037] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003F Attribute 0x0000_0001 DataVersion: 3761602970
+          [1656332191.739391][27032:27037] CHIP:TOO:   GroupTable: 0 entries
+      disabled: true

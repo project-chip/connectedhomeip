@@ -32,7 +32,6 @@ namespace Clusters {
 namespace OperationalState {
 
 Instance * GetOperationalStateInstance();
-Instance * GetRVCOperationalStateInstance();
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class GenericOperationalStateDelegateImpl : public Delegate
@@ -123,6 +122,8 @@ void Shutdown();
 } // namespace OperationalState
 
 namespace RvcOperationalState {
+
+Instance * GetRvcOperationalStateInstance();
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class RvcOperationalStateDelegate : public OperationalState::GenericOperationalStateDelegateImpl
