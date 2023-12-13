@@ -125,22 +125,19 @@ exit:
 
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 {
-    if (mEndpoints.size() != 0)
-    {
-        auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
-            return _endpoint->GetId() == endpoint->GetId();
-        });
+    auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
+        return _endpoint->GetId() == endpoint->GetId();
+    });
 
-        // If existing endpoint, update mEndpoints. If new endpoint, add it to the vector mEndpoints
-        if (it != mEndpoints.end())
-        {
-            unsigned index    = (unsigned int) std::distance(mEndpoints.begin(), it);
-            mEndpoints[index] = endpoint;
-        }
-        else
-        {
-            mEndpoints.push_back(endpoint);
-        }
+    // If existing endpoint, update mEndpoints. If new endpoint, add it to the vector mEndpoints
+    if (it != mEndpoints.end())
+    {
+        unsigned index    = (unsigned int) std::distance(mEndpoints.begin(), it);
+        mEndpoints[index] = endpoint;
+    }
+    else
+    {
+        mEndpoints.push_back(endpoint);
     }
 }
 
