@@ -22,6 +22,9 @@ class PairOnNetworkLongImReadCommand(controller: MatterController, credsIssue: C
         val basicInformationCluster =
           BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
         val vendorName = basicInformationCluster.readVendorNameAttribute()
+
+        // By running command readVendorIDAttribute, we are implicitly requesting CASE to be
+        // established if it's not already present.
         val vendorId = basicInformationCluster.readVendorIDAttribute()
         logger.log(Level.INFO, "Read command succeeded, Verdor Name:${vendorName} (ID:${vendorId})")
       } catch (ex: Exception) {

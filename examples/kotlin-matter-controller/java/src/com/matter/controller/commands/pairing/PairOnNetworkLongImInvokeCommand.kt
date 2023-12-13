@@ -41,6 +41,9 @@ class PairOnNetworkLongImInvokeCommand(
       try {
         val identifyTime: UShort = 1u
         val identifyCluster = IdentifyCluster(controller = currentCommissioner(), endpointId = 0u)
+
+        // By running command identify, we are implicitly requesting CASE to be established if it's
+        // not already present.
         identifyCluster.identify(identifyTime)
         logger.log(Level.INFO, "Invoke command succeeded")
       } catch (ex: Exception) {

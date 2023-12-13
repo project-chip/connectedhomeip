@@ -41,6 +41,9 @@ class PairOnNetworkLongImWriteCommand(
       try {
         val basicInformationCluster =
           BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
+
+        // By running command writeNodeLabelAttribute, we are implicitly requesting CASE to be
+        // established if it's not already present.
         basicInformationCluster.writeNodeLabelAttribute("Test Node Label")
         logger.log(Level.INFO, "Write command succeeded")
 
