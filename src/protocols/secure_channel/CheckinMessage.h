@@ -76,7 +76,8 @@ public:
      *                                    GetAppDataSize(payload) + sizeof(CounterType).
      *                                    appData is used as a work buffer for the decryption process
      *
-     * @return CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
+     * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
+     *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
      *         CHIP_ERROR_INVALID_ARGUMENTS if the provide arguments cannot be used to parse the Check-In message
      */
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
@@ -110,7 +111,7 @@ private:
      *         CHIP_ERROR_INVALID_ARGUMENTS if the provide arguments cannot be used to generate the Check-In message Nonce
      */
     static CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
-                                                  MutableByteSpan & output);
+                                                  Encoding::LittleEndian::BufferWriter & writer);
 };
 
 } // namespace SecureChannel

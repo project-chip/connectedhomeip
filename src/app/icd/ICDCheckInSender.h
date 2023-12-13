@@ -43,6 +43,8 @@ public:
     bool mResolveInProgress = false;
 
 private:
+    static constexpr uint8_t kApplicationDataSize = 2; // ActiveModeThreshold is 2 bytes
+
     CHIP_ERROR SendCheckInMsg(const Transport::PeerAddress & addr);
 
     // This is used when a node address is required.

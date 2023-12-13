@@ -126,12 +126,12 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         // Testing empty output buffer
         MutableByteSpan empty;
         err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, emptyData, empty);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
-        // Test incorrect output buffer size
+        // Test output buffer smaller than the ApplicationData
         userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
         err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
         // Cleanup
         keystore.DestroyKey(aes128KeyHandle);

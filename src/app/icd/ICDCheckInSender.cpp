@@ -59,7 +59,7 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
     // Encoded ActiveModeThreshold in littleEndian for Check-In message application data
-    uint8_t activeModeThresholdBuffer[2] = {};
+    uint8_t activeModeThresholdBuffer[kApplicationDataSize] = { 0 };
     Encoding::LittleEndian::Put16(activeModeThresholdBuffer, ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
     ByteSpan activeModeThresholdByteSpan(activeModeThresholdBuffer);
 

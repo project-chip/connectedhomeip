@@ -37,68 +37,77 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
 {
     VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    uint8_t * appDataStartPtr = output.data() + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES;
-    Encoding::LittleEndian::Put32(appDataStartPtr, counter);
-
     // Generate Nonce from Key and counter value
-    ReturnErrorOnFailure(GenerateCheckInMessageNonce(hmacKeyHandle, counter, output));
+    {
+        MutableByteSpan nonceByteSpan = output.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        Encoding::LittleEndian::BufferWriter writer(nonceByteSpan);
 
-    // In place encryption to save some RAM
-    memcpy(appDataStartPtr + sizeof(CounterType), appData.data(), appData.size());
+        ReturnErrorOnFailure(GenerateCheckInMessageNonce(hmacKeyHandle, counter, writer));
+    }
 
-    uint8_t * micPtr = appDataStartPtr + sizeof(CounterType) + appData.size();
-    ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(appDataStartPtr, sizeof(CounterType) + appData.size(), nullptr, 0, aes128KeyHandle,
-                                                 output.data(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, appDataStartPtr, micPtr,
-                                                 CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    // Encrypt Counter and Application Data
+    {
+        size_t applicationSize          = sizeof(CounterType) + appData.size();
+        MutableByteSpan payloadByteSpan = output.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, applicationSize);
+        Encoding::LittleEndian::BufferWriter payloadWriter(payloadByteSpan);
+
+        payloadWriter.EndianPut(counter, sizeof(counter));
+        payloadWriter.Put(appData.data(), appData.size());
+
+        MutableByteSpan micByteSpan =
+            output.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + applicationSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+
+        ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(payloadWriter.Buffer(), applicationSize, nullptr, 0, aes128KeyHandle,
+                                                     output.data(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, payloadWriter.Buffer(),
+                                                     micByteSpan.data(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+    }
 
     output.reduce_size(appData.size() + sMinPayloadSize);
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
                                                       const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
                                                       CounterType & counter, MutableByteSpan & appData)
 {
-    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t appDataSize = GetAppDataSize(payload);
 
+    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter
     VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ByteSpan nonce         = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
-    ByteSpan encryptedData = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, sizeof(CounterType) + appDataSize);
-    ByteSpan mic =
-        payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + appDataSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    // Decrypt received data
+    {
+        ByteSpan nonce         = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        ByteSpan encryptedData = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, sizeof(CounterType) + appDataSize);
+        ByteSpan mic           = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + appDataSize,
+                                                 CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
-    err = Crypto::AES_CCM_decrypt(encryptedData.data(), encryptedData.size(), nullptr, 0, mic.data(), mic.size(), aes128KeyHandle,
-                                  nonce.data(), nonce.size(), appData.data());
-    ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(Crypto::AES_CCM_decrypt(encryptedData.data(), encryptedData.size(), nullptr, 0, mic.data(), mic.size(),
+                                                     aes128KeyHandle, nonce.data(), nonce.size(), appData.data()));
+    }
 
+    // Read decrypted counter and application data
     counter = Encoding::LittleEndian::Get32(appData.data());
     // Shift to remove the counter from the appData
     memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
-
     appData.reduce_size(appDataSize);
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
-                                                       MutableByteSpan & output)
+                                                       Encoding::LittleEndian::BufferWriter & writer)
 {
-    VerifyOrReturnError(output.size() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(writer.Available() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
+    uint8_t hashWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
 
     chip::Crypto::HMAC_sha shaHandler;
-    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(hmacKeyHandle, (uint8_t *) (&counter), sizeof(CounterType), nonceWorkBuffer,
-                                                CHIP_CRYPTO_HASH_LEN_BYTES));
+    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(hmacKeyHandle, reinterpret_cast<uint8_t *>(&counter), sizeof(CounterType),
+                                                hashWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
 
-    static_assert(sizeof(nonceWorkBuffer) >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, "We're reading off the end of our buffer.");
-    memcpy(output.data(), nonceWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+    writer.Put(hashWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+    VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
 }
