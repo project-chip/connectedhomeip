@@ -57,9 +57,11 @@
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
-#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
+// The role argument should be used to determine whether cluster works as a server or a client.
+// It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
+#define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, ZAP_CLUSTER_MASK(SERVER), NULL, incomingCommands, outgoingCommands    \
+        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
