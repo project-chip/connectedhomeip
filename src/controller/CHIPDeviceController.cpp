@@ -2471,7 +2471,7 @@ void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optio
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = readPathsSize;
 
-    // Shortly hold the ownership of attribute cache, so mAttributeCache can be released when SendRequest fails.
+    // Take ownership of the attribute cache, so it can be released when SendRequest fails.
     auto attributeCache = std::move(mAttributeCache);
     auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
         engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
