@@ -70,7 +70,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 EventNumber number;
                 ReturnErrorOnFailure(reader.Get(number));
-                PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", number);
+                PRETTY_PRINT("\tEventNumber = 0x" ChipLogFormatX64 ",", ChipLogValueX64(number));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -81,7 +81,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 uint64_t value;
                 ReturnErrorOnFailure(reader.Get(value));
-                PRETTY_PRINT("\tPriorityLevel = 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tPriorityLevel = 0x" ChipLogFormatX64 ",", ChipLogValueX64(value));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -92,7 +92,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 uint64_t value;
                 ReturnErrorOnFailure(reader.Get(value));
-                PRETTY_PRINT("\tEpochTimestamp = 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tEpochTimestamp = 0x" ChipLogFormatX64 ",", ChipLogValueX64(value));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -104,7 +104,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 uint64_t value;
                 ReturnErrorOnFailure(reader.Get(value));
-                PRETTY_PRINT("\tSystemTimestamp = 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tSystemTimestamp = 0x" ChipLogFormatX64 ",", ChipLogValueX64(value));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -115,7 +115,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 uint64_t value;
                 ReturnErrorOnFailure(reader.Get(value));
-                PRETTY_PRINT("\tDeltaEpochTimestampstamp= 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tDeltaEpochTimestampstamp= 0x" ChipLogFormatX64 ",", ChipLogValueX64(value));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -126,7 +126,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
             {
                 uint64_t value;
                 ReturnErrorOnFailure(reader.Get(value));
-                PRETTY_PRINT("\tDeltaSystemTimestamp = 0x%" PRIx64 ",", value);
+                PRETTY_PRINT("\tDeltaSystemTimestamp = 0x" ChipLogFormatX64 ",", ChipLogValueX64(value));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;

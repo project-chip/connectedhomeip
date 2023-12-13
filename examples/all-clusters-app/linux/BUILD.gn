@@ -30,6 +30,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
@@ -48,9 +49,6 @@ source_set("chip-all-clusters-common") {
   deps = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/examples/platform/linux:app-main",
-
-    # Issue 29397 for the icd:cluster dep
-    "${chip_root}/src/app/icd:cluster",
     "${chip_root}/src/app/tests/suites/credentials:dac_provider",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",

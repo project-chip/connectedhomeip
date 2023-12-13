@@ -42,6 +42,8 @@ buildconfig_header("ble_buildconfig") {
     defines +=
         [ "BLE_PLATFORM_CONFIG_INCLUDE=${chip_ble_platform_config_include}" ]
   }
+
+  visibility = [ ":ble_config_header" ]
 }
 
 source_set("ble_config_header") {
@@ -49,10 +51,11 @@ source_set("ble_config_header") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  public_deps = [
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+
+  deps = [
     ":ble_buildconfig",
     "${chip_root}/src/platform:platform_buildconfig",
-    "${chip_root}/src/system:system_config_header",
   ]
 }
 
@@ -65,7 +68,6 @@ if (chip_config_network_layer_ble) {
       "BLEEndPoint.h",
       "Ble.h",
       "BleApplicationDelegate.h",
-      "BleConfig.h",
       "BleConnectionDelegate.h",
       "BleError.cpp",
       "BleError.h",

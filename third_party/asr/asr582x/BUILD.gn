@@ -22,6 +22,8 @@ declare_args() {
 
   # Must be "4M" or "2M". For matter, ASR582X use 4M flash default.
   asr_flash_max_size = "4M"
+
+  asr_enable_secureboot = false
 }
 
 assert(asr_target_project != "", "asr_target_project must be specified")
@@ -31,7 +33,6 @@ config("asr_sdk_config") {
   _include_dirs = [
     "${asr_sdk_build_root}/asr_sdk/config",
     "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
-    "${asr_sdk_build_root}/asr_sdk/matter",
     "${asr_sdk_build_root}/asr_sdk/lib/wifi",
     "${asr_sdk_build_root}/asr_sdk/lib/ble",
     "${asr_sdk_build_root}/asr_sdk/lib/sys",
@@ -139,6 +140,10 @@ config("asr_sdk_config") {
     defines += [ "_OTA_CMP_VENDOR_" ]
   } else {
     defines += [ "CFG_DUET_5822T" ]
+  }
+
+  if (asr_enable_secureboot) {
+    defines += [ "_CFG_SECUREBOOT_" ]
   }
 
   cflags_c = [

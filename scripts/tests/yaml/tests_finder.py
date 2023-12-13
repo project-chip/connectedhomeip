@@ -55,6 +55,9 @@ class TestsFinder:
 
         return self.__get_paths(test_names)
 
+    def get_collections(self) -> List[str]:
+        return self.__test_collections
+
     def __get_collections(self, configuration_directory: str, configuration_name: str) -> List[str]:
         if os.path.isfile(configuration_name):
             configuration_filepath = configuration_name

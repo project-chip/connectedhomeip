@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <inet/InetInterface.h>
 #include <lib/core/ClusterEnums.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {

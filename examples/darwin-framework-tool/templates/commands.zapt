@@ -41,6 +41,9 @@ public:
     {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
         {{#zcl_command_arguments}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #if MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
@@ -48,6 +51,9 @@ public:
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #endif // MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
     }
@@ -64,7 +70,13 @@ public:
         __auto_type * params = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
         {{#zcl_command_arguments}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #if MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.parent.name type=type depth=0}}
+        {{#if (isProvisional (asUpperCamelCase parent.parent.name preserveAcronyms=true) command=(asUpperCamelCase parent.name preserveAcronyms=true) commandField=(asStructPropertyName label))}}
+        #endif // MTR_ENABLE_PROVISIONAL
+        {{/if}}
         {{/zcl_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;

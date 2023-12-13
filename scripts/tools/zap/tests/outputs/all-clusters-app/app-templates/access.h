@@ -39,6 +39,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -67,13 +68,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -103,6 +97,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -131,13 +126,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -167,6 +155,7 @@
     /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -195,13 +184,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -231,9 +213,11 @@
     0x00000028, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000028, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000028, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x0000002A, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     0x0000002B, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x0000002C, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x0000002C, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    0x0000002D, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -289,9 +273,11 @@
     0x00000005, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     0x00000006, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0x00000010, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    0x00000000, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     0x00000000, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     0x00000000, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     0x00000001, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    0x00000000, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -347,9 +333,11 @@
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Localization Configuration, Attribute: ActiveLocale, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: HourFormat, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Time Format Localization, Attribute: ActiveCalendarType, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Unit Localization, Attribute: TemperatureUnit, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \

@@ -277,8 +277,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
     }
     else
     {
-        navigateTargetResponse.status =
-            static_cast<app::Clusters::TargetNavigator::TargetNavigatorStatusEnum>(value[statusFieldId].asInt());
+        navigateTargetResponse.status = static_cast<app::Clusters::TargetNavigator::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kData));
         if (!value[dataFieldId].empty())

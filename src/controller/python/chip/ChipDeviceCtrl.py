@@ -53,7 +53,7 @@ from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import UnknownAttribute, UnknownCommand
-from .interaction_model import InteractionModelError
+from .interaction_model import InteractionModelError, SessionParameters, SessionParametersStruct
 from .interaction_model import delegate as im
 from .native import PyChipError
 
@@ -251,6 +251,7 @@ class ChipDeviceControllerBase():
         self.devCtrl = devCtrl
         self.name = name
         self.fabricCheckNodeId = -1
+        self._isActive = False
 
         self._Cluster = ChipClusters(builtins.chipStack)
         self._Cluster.InitLib(self._dmLib)
@@ -375,16 +376,18 @@ class ChipDeviceControllerBase():
         ''' Shuts down this controller and reclaims any used resources, including the bound
             C++ constructor instance in the SDK.
         '''
-        if (self._isActive):
-            if self.devCtrl is not None:
-                self._ChipStack.Call(
-                    lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
-                        self.devCtrl)
-                ).raise_on_error()
-                self.devCtrl = None
+        if not self._isActive:
+            return
 
-            ChipDeviceController.activeList.remove(self)
-            self._isActive = False
+        if self.devCtrl is not None:
+            self._ChipStack.Call(
+                lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
+                    self.devCtrl)
+            ).raise_on_error()
+            self.devCtrl = None
+
+        ChipDeviceController.activeList.remove(self)
+        self._isActive = False
 
     def ShutdownAll():
         ''' Shut down all active controllers and reclaim any used resources.
@@ -806,6 +809,36 @@ class ChipDeviceControllerBase():
             device.deviceProxy, upperLayerProcessingTimeoutMs))
         return res
 
+    def GetRemoteSessionParameters(self, nodeid) -> typing.Optional[SessionParameters]:
+        ''' Returns the SessionParameters of reported by the remote node associated with `nodeid`.
+            If there is some error in getting SessionParameters None is returned.
+
+            This will result in a session being established if one wasn't already established.
+        '''
+
+        # First creating the struct to make building the ByteArray to be sent to CFFI easier.
+        sessionParametersStruct = SessionParametersStruct.parse(b'\x00' * SessionParametersStruct.sizeof())
+        sessionParametersByteArray = SessionParametersStruct.build(sessionParametersStruct)
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
+            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray)))
+
+        # 0 is CHIP_NO_ERROR
+        if res != 0:
+            return None
+
+        sessionParametersStruct = SessionParametersStruct.parse(sessionParametersByteArray)
+        return SessionParameters(
+            sessionIdleInterval=sessionParametersStruct.SessionIdleInterval if sessionParametersStruct.SessionIdleInterval != 0 else None,
+            sessionActiveInterval=sessionParametersStruct.SessionActiveInterval if sessionParametersStruct.SessionActiveInterval != 0 else None,
+            sessionActiveThreshold=sessionParametersStruct.SessionActiveThreshold if sessionParametersStruct.SessionActiveThreshold != 0 else None,
+            dataModelRevision=sessionParametersStruct.DataModelRevision if sessionParametersStruct.DataModelRevision != 0 else None,
+            interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
+            specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
+            maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
+
+        return res
+
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
                                                                    payload: ClusterObjects.ClusterCommand, responseType=None):
         '''
@@ -877,7 +910,7 @@ class ChipDeviceControllerBase():
         return None
 
     async def WriteAttribute(self, nodeid: int,
-                             attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]],
+                             attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]],
                              timedRequestTimeoutMs: typing.Union[None, int] = None,
                              interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
@@ -894,7 +927,7 @@ class ChipDeviceControllerBase():
             to the XYZ attribute on the test cluster to endpoint 1
 
         Returns:
-            - PyChipError
+            - [AttributeStatus] (list - one for each pth)
         '''
         self.CheckIsActive()
 
@@ -1198,10 +1231,10 @@ class ChipDeviceControllerBase():
             - read request: AsyncReadTransation.ReadResponse.attributes.
                             This is of type AttributeCache.attributeCache (Attribute.py),
                             which is a dict mapping endpoints to a list of Cluster (ClusterObjects.py) classes
-                            (dict[int], List[Cluster])
+                            (dict[int, List[Cluster]])
                             Access as ret[endpoint_id][<Cluster class>][<Attribute class>]
-                            Ex. To access the OnTime attribute from the OnOff cluster on EP 0
-                            ret[0][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
+                            Ex. To access the OnTime attribute from the OnOff cluster on EP 1
+                            ret[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnTime]
 
         Raises:
             - InteractionModelError (chip.interaction_model) on error
@@ -1418,10 +1451,10 @@ class ChipDeviceControllerBase():
                 c_char_p, c_char_p]
             self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = PyChipError
 
-            # Currently only supports 1 list item, no name
+            # Currently only supports 1 list item
             self._dmLib.pychip_DeviceController_SetTimeZone.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetTimeZone.argtypes = [
-                c_int32, c_uint64]
+                c_int32, c_uint64, c_char_p]
 
             # Currently only supports 1 list item
             self._dmLib.pychip_DeviceController_SetDSTOffset.restype = PyChipError
@@ -1734,11 +1767,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
         ).raise_on_error()
 
-    def SetTimeZone(self, offset: int, validAt: int):
+    def SetTimeZone(self, offset: int, validAt: int, name: str = ""):
         ''' Set the time zone to set during commissioning. Currently only one time zone entry is supported'''
         self.CheckIsActive()
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt)
+            lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt, name.encode("utf-8"))
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):

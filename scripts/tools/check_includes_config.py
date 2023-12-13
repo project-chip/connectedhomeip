@@ -28,6 +28,7 @@ IGNORE: Set[str] = {
     '/examples/',
     '/java/',
     '/Jni',
+    '/mock/',
     '/pybindings/',
     '/python/',
     '/Test',
@@ -163,5 +164,8 @@ ALLOW: Dict[str, Set[str]] = {
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
     'src/lib/support/jsontlv/TlvToJson.h': {'string'},
-    'src/lib/support/jsontlv/TextFormat.h': {'string'}
+    'src/lib/support/jsontlv/TextFormat.h': {'string'},
+    'src/app/icd/client/DefaultICDClientStorage.cpp': {'vector'},
+    'src/app/icd/client/DefaultICDClientStorage.h': {'vector'},
+    'src/app/icd/client/DefaultICDStorageKey.h': {'vector'}
 }

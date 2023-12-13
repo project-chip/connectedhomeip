@@ -27,9 +27,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManagementServer.h> // nogncheck
-#include <app/icd/ICDManager.h>          // nogncheck
+#include <app/icd/ICDConfigurationData.h> // nogncheck
 #endif
 
 namespace chip {
@@ -73,9 +74,9 @@ Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig()
     // TODO ICD LIT shall not advertise the SII key
     // Increase local MRP retry intervals by ICD polling intervals. That is, intervals for
     // which the device can be at sleep and not be able to receive any messages).
-    config.mIdleRetransTimeout += app::ICDManager::GetSlowPollingInterval();
-    config.mActiveRetransTimeout += app::ICDManager::GetFastPollingInterval();
-    config.mActiveThresholdTime = System::Clock::Milliseconds16(ICDManagementServer::GetInstance().GetActiveModeThresholdMs());
+    config.mIdleRetransTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+    config.mActiveRetransTimeout += ICDConfigurationData::GetInstance().GetFastPollingInterval();
+    config.mActiveThresholdTime = System::Clock::Milliseconds16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
 #endif
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

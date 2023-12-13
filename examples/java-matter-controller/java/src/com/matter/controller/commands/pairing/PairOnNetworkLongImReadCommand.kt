@@ -7,6 +7,7 @@ import chip.devicecontroller.model.AttributeState
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
+import chip.devicecontroller.model.DataVersionFilter
 import chip.devicecontroller.model.EventState
 import chip.devicecontroller.model.NodeState
 import com.matter.controller.commands.common.CredentialsIssuer
@@ -169,6 +170,15 @@ class PairOnNetworkLongImReadCommand(
         )
       )
 
+    val dataVersionFilterList =
+      listOf(
+        DataVersionFilter.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          CLUSTER_ID_BASIC_VERSION,
+        )
+      )
+
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
@@ -184,7 +194,15 @@ class PairOnNetworkLongImReadCommand(
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
     currentCommissioner()
-      .readPath(InternalReportCallback(), devicePointer, attributePathList, eventPathList, false, 0)
+      .readPath(
+        InternalReportCallback(),
+        devicePointer,
+        attributePathList,
+        eventPathList,
+        dataVersionFilterList,
+        false,
+        0
+      )
     waitCompleteMs(getTimeoutMillis())
   }
 
@@ -198,5 +216,6 @@ class PairOnNetworkLongImReadCommand(
     private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
     private const val EVENT_ID_START_UP = 0L
     private const val GLOBAL_ATTRIBUTE_LIST = 65531L
+    private const val CLUSTER_ID_BASIC_VERSION = 0L
   }
 }

@@ -759,6 +759,8 @@ struct DiscoveryCommandResponse
     uint16_t port;
     Optional<uint32_t> mrpRetryIntervalIdle;
     Optional<uint32_t> mrpRetryIntervalActive;
+    Optional<uint16_t> mrpRetryActiveThreshold;
+    Optional<bool> isICDOperatingAsLIT;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
@@ -782,6 +784,8 @@ struct DiscoveryCommandResponse
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(15), port));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(16), mrpRetryIntervalIdle));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(17), mrpRetryIntervalActive));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(18), mrpRetryActiveThreshold));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(19), isICDOperatingAsLIT));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -851,6 +855,12 @@ struct DiscoveryCommandResponse
                 break;
             case 17:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryIntervalActive));
+                break;
+            case 18:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryActiveThreshold));
+                break;
+            case 19:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, isICDOperatingAsLIT));
                 break;
             default:
                 break;

@@ -73,7 +73,7 @@ public:
                   const ReliableMessageProtocolConfig & config) :
         mTable(table),
         mState(State::kEstablishing), mSecureSessionType(secureSessionType), mLocalNodeId(localNodeId), mPeerNodeId(peerNodeId),
-        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mRemoteMRPConfig(config)
+        mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mRemoteSessionParams(config)
     {
         MoveToState(State::kActive);
         Retain(); // Put the test session in Active state. This ref is released inside MarkForEviction
@@ -102,7 +102,7 @@ public:
      *   discovered during session establishment.
      */
     void Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs, uint16_t peerSessionId,
-                  const ReliableMessageProtocolConfig & config);
+                  const SessionParameters & sessionParameters);
 
     ~SecureSession() override
     {
@@ -156,15 +156,19 @@ public:
 
     Access::SubjectDescriptor GetSubjectDescriptor() const override;
 
-    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+    bool AllowsMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    bool AllowsLargePayload() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kTcp; }
 
     System::Clock::Milliseconds32 GetAckTimeout() const override
     {
         switch (mPeerAddress.GetTransportType())
         {
-        case Transport::Type::kUdp:
-            return GetRetransmissionTimeout(mRemoteMRPConfig.mActiveRetransTimeout, mRemoteMRPConfig.mIdleRetransTimeout,
-                                            GetLastPeerActivityTime(), mRemoteMRPConfig.mActiveThresholdTime);
+        case Transport::Type::kUdp: {
+            const ReliableMessageProtocolConfig & remoteMRPConfig = mRemoteSessionParams.GetMRPConfig();
+            return GetRetransmissionTimeout(remoteMRPConfig.mActiveRetransTimeout, remoteMRPConfig.mIdleRetransTimeout,
+                                            GetLastPeerActivityTime(), remoteMRPConfig.mActiveThresholdTime);
+        }
         case Transport::Type::kTcp:
             return System::Clock::Seconds16(30);
         case Transport::Type::kBle:
@@ -186,9 +190,9 @@ public:
 
     const CATValues & GetPeerCATs() const { return mPeerCATs; }
 
-    void SetRemoteMRPConfig(const ReliableMessageProtocolConfig & config) { mRemoteMRPConfig = config; }
+    void SetRemoteSessionParameters(const SessionParameters & sessionParams) { mRemoteSessionParams = sessionParams; }
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const override { return mRemoteMRPConfig; }
+    const SessionParameters & GetRemoteSessionParameters() const override { return mRemoteSessionParams; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
@@ -312,7 +316,7 @@ private:
     /// Timestamp of last rx. @see ActiveTimestamp in the spec
     System::Clock::Timestamp mLastPeerActivityTime = System::SystemClock().GetMonotonicTimestamp();
 
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
+    SessionParameters mRemoteSessionParams;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
 };
