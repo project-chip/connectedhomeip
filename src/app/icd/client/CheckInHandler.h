@@ -56,6 +56,14 @@ protected:
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return CheckInExchangeDispatch::Instance(); }
 
 private:
+    /**
+     * @brief Used by the application to set a new key to avoid counter rollover problems.
+     *
+     * @param[in] clientInfo clientInfo object
+     * @param[in] keyData New key data to use to re-register the client with the server
+     */
+    CHIP_ERROR RegisterClientWithNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData);
+
     class CheckInExchangeDispatch : public Messaging::ExchangeMessageDispatch
     {
     public:
@@ -75,14 +83,6 @@ private:
         }
         bool IsEncryptionRequired() const override { return false; }
     };
-
-    /**
-     * @brief Used by the application to set a new key to avoid counter rollover problems.
-     *
-     * @param[in] clientInfo clientInfo object
-     * @param[in] keyData New key data to use to re-register the client with the server
-     */
-    CHIP_ERROR RegisterClientWithNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData);
 
     Messaging::ExchangeManager * mpExchangeManager = nullptr;
     CheckInDelegate * mpCheckInDelegate            = nullptr;

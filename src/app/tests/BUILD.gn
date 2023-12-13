@@ -181,6 +181,7 @@ chip_test_suite_using_nltest("tests") {
     test_sources += [ "TestEventLogging.cpp" ]
 
     #Not sure why TestDefaultICDClientStorage fails on openiotsdk
+    #Created https://github.com/project-chip/connectedhomeip/issues/30974 to analyze further
     test_sources += [ "TestDefaultICDClientStorage.cpp" ]
   }
 

@@ -87,10 +87,10 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     // If the CheckIn message processing fails, return CHIP_NO_ERROR and exit.
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_NO_ERROR);
-    CounterType checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-    VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
-    clientInfo.offset = checkInCounter;
-    bool refreshKey   = (checkInCounter > kKeyRefreshLimit);
+    CounterType receivedCheckInCouterOffset = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
+    VerifyOrReturnError(receivedCheckInCouterOffset > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
+    clientInfo.offset = receivedCheckInCouterOffset;
+    bool refreshKey   = (receivedCheckInCouterOffset > kKeyRefreshLimit);
     ByteSpan newKeyData;
     if (refreshKey)
     {
