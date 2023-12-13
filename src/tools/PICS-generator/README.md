@@ -45,6 +45,7 @@ NOTE: The tool has been verified using V24 PICS (used for Matter 1.2
 certification)
 
 # How to run
+
 First change the directory to the tool location.
 
 ```
