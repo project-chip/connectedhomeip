@@ -11527,10 +11527,10 @@
           ]
         },
         {
-          "name": "Boolean Sensor Configuration",
+          "name": "Boolean State Configuration",
           "code": 128,
           "mfgCode": null,
-          "define": "BOOLEAN_SENSOR_CONFIGURATION_CLUSTER",
+          "define": "BOOLEAN_STATE_CONFIGURATION_CLUSTER",
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",

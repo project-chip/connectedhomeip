@@ -16,12 +16,12 @@
  */
 
 /**
- * @file API declarations for boolean sensor configuration cluster.
+ * @file API declarations for boolean state configuration cluster.
  */
 
 #pragma once
 
-#include "boolean-sensor-configuration-delegate.h"
+#include "boolean-state-configuration-delegate.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -31,14 +31,14 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 Delegate * GetDefaultDelegate(EndpointId endpoint);
 
 CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms);
 CHIP_ERROR ClearAllAlarms(EndpointId ep);
-CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarms);
+CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms);
 CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level);
 CHIP_ERROR EmitSensorFault(EndpointId ep);
 
@@ -49,7 +49,7 @@ inline bool HasFeature(EndpointId ep, Feature feature)
     return success ? (map & to_underlying(feature)) : false;
 }
 
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app
 } // namespace chip

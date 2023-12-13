@@ -16,7 +16,7 @@
  *
  */
 
-#include "boolean-sensor-configuration-server.h"
+#include "boolean-state-configuration-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -35,24 +35,24 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::BooleanSensorConfiguration::Attributes;
-using chip::app::Clusters::BooleanSensorConfiguration::Delegate;
+using namespace chip::app::Clusters::BooleanStateConfiguration::Attributes;
+using chip::app::Clusters::BooleanStateConfiguration::Delegate;
 using chip::Protocols::InteractionModel::Status;
 
-static constexpr size_t kBooleanSensorConfigurationDelegateTableSize =
-    EMBER_AF_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
+    EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-static_assert(kBooleanSensorConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
-              "BooleanSensorConfiguration Delegate table size error");
+static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
+              "BooleanStateConfiguration Delegate table size error");
 
 namespace {
-Delegate * gDelegateTable[kBooleanSensorConfigurationDelegateTableSize] = { nullptr };
+Delegate * gDelegateTable[kBooleanStateConfigurationDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanSensorConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kBooleanSensorConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
+                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kBooleanStateConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -67,20 +67,20 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 
 static bool emitAlarmsStateChangedEvent(EndpointId ep)
 {
-    if (!HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible) &&
-        !HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual))
+    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kAudible) &&
+        !HasFeature(ep, BooleanStateConfiguration::Feature::kVisual))
     {
         return false;
     }
 
-    BooleanSensorConfiguration::Events::AlarmsStateChanged::Type event;
-    BitMask<BooleanSensorConfiguration::AlarmModeBitmap> active;
+    BooleanStateConfiguration::Events::AlarmsStateChanged::Type event;
+    BitMask<BooleanStateConfiguration::AlarmModeBitmap> active;
     VerifyOrReturnValue(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &active), false);
     event.alarmsActive = active;
 
-    if (HasFeature(ep, BooleanSensorConfiguration::Feature::kAlarmSuppress))
+    if (HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress))
     {
-        BitMask<BooleanSensorConfiguration::AlarmModeBitmap> suppressed;
+        BitMask<BooleanStateConfiguration::AlarmModeBitmap> suppressed;
         VerifyOrReturnValue(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &suppressed), false);
         event.alarmsSuppressed.SetValue(suppressed);
     }
@@ -101,7 +101,7 @@ static bool emitAlarmsStateChangedEvent(EndpointId ep)
 
 static CHIP_ERROR emitSensorFaultEvent(EndpointId ep)
 {
-    BooleanSensorConfiguration::Events::SensorFault::Type event;
+    BooleanStateConfiguration::Events::SensorFault::Type event;
     EventNumber eventNumber;
 
     CHIP_ERROR error = LogEvent(event, ep, eventNumber);
@@ -119,14 +119,14 @@ static CHIP_ERROR emitSensorFaultEvent(EndpointId ep)
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanSensorConfiguration::Id,
-                                                       EMBER_AF_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, BooleanStateConfiguration::Id,
+                                                       EMBER_AF_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep < kBooleanSensorConfigurationDelegateTableSize)
+    if (ep < kBooleanStateConfigurationDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }
@@ -137,12 +137,11 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
     return GetDelegate(endpoint);
 }
 
-CHIP_ERROR SetAlarmsActive(EndpointId ep, BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarms)
+CHIP_ERROR SetAlarmsActive(EndpointId ep, BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms)
 {
-    if (HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual) ||
-        HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible))
+    if (HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) || HasFeature(ep, BooleanStateConfiguration::Feature::kAudible))
     {
-        BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsEnabled;
+        BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsEnabled;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         if (!alarmsEnabled.Has(alarms))
@@ -159,7 +158,7 @@ CHIP_ERROR SetAlarmsActive(EndpointId ep, BitMask<BooleanSensorConfiguration::Al
 
 CHIP_ERROR ClearAllAlarms(EndpointId ep)
 {
-    BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
+    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed),
@@ -178,19 +177,18 @@ CHIP_ERROR ClearAllAlarms(EndpointId ep)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarm)
+CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarm)
 {
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
-    if (!HasFeature(ep, BooleanSensorConfiguration::Feature::kAlarmSuppress))
+    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress))
     {
         return CHIP_IM_GLOBAL_STATUS(UnsupportedCommand);
     }
 
-    BitMask<BooleanSensorConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
+    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
 
-    if (HasFeature(ep, BooleanSensorConfiguration::Feature::kVisual) ||
-        HasFeature(ep, BooleanSensorConfiguration::Feature::kAudible))
+    if (HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) || HasFeature(ep, BooleanStateConfiguration::Feature::kAudible))
     {
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive), attribute_error);
         if (!alarmsActive.Has(alarm))
@@ -234,17 +232,17 @@ CHIP_ERROR EmitSensorFault(EndpointId ep)
     return CHIP_NO_ERROR;
 }
 
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
-bool emberAfBooleanSensorConfigurationClusterSuppressAlarmCallback(
+bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const BooleanSensorConfiguration::Commands::SuppressAlarm::DecodableType & commandData)
+    const BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData)
 {
     const auto & alarm = commandData.alarmsToSuppress;
-    CHIP_ERROR err     = BooleanSensorConfiguration::SuppressAlarms(commandPath.mEndpointId, alarm);
+    CHIP_ERROR err     = BooleanStateConfiguration::SuppressAlarms(commandPath.mEndpointId, alarm);
     if (err == CHIP_NO_ERROR)
     {
         commandObj->AddStatus(commandPath, Status::Success);
@@ -265,11 +263,11 @@ bool emberAfBooleanSensorConfigurationClusterSuppressAlarmCallback(
     return true;
 }
 
-bool emberAfBooleanSensorConfigurationClusterEnableDisableAlarmCallback(
+bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const BooleanSensorConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData)
+    const BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData)
 {
     return true;
 }
 
-void MatterBooleanSensorConfigurationPluginServerInitCallback() {}
+void MatterBooleanStateConfigurationPluginServerInitCallback() {}

@@ -24,22 +24,22 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 /** @brief
- *    Defines methods for implementing application-specific logic for the Boolean Sensor Configuration Cluster.
+ *    Defines methods for implementing application-specific logic for the Boolean State Configuration Cluster.
  */
 class Delegate
 {
 public:
     Delegate(){};
 
-    virtual CHIP_ERROR HandleSuppressAlarm(BooleanSensorConfiguration::AlarmModeBitmap alarmToSuppress) = 0;
+    virtual CHIP_ERROR HandleSuppressAlarm(BooleanStateConfiguration::AlarmModeBitmap alarmToSuppress) = 0;
 
     virtual ~Delegate() = default;
 };
 
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 } // namespace Clusters
 } // namespace app
 } // namespace chip
