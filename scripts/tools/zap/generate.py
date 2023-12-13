@@ -30,8 +30,10 @@ from typing import Optional
 
 from zap_execution import ZapTool
 
+
 def isWindows():
     return platform.system() == "Windows"
+
 
 # fcntl is not supported on Windows platform due to lack of necessity of I/O control on file descriptor
 if not isWindows():
