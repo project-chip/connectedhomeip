@@ -54,7 +54,7 @@ Status EnergyEvseDelegate::Disable()
         break;
 
     default:
-        ChipLogError(AppServer, "Unexpected EVSE hardware state\n");
+        ChipLogError(AppServer, "Unexpected EVSE hardware state");
         SetState(StateEnum::kFault);
         break;
     }
@@ -128,10 +128,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
     switch (mHwState)
     {
     case StateEnum::kNotPluggedIn:
+        // TODO handle errors here
         SetState(StateEnum::kNotPluggedIn);
         break;
 
     case StateEnum::kPluggedInNoDemand:
+        // TODO handle errors here
+        //  TODO REFACTOR per Andrei's comment in PR30857 - can we collapse this switch statement?
         SetState(StateEnum::kPluggedInNoDemand);
         break;
 
@@ -141,12 +144,12 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         break;
 
     default:
-        ChipLogError(AppServer, "Unexpected EVSE hardware state\n");
+        ChipLogError(AppServer, "Unexpected EVSE hardware state");
         SetState(StateEnum::kFault);
         break;
     }
 
-    /* update SupplyState */
+    /* update SupplyState to say that charging is now enabled */
     SetSupplyState(SupplyStateEnum::kChargingEnabled);
 
     /* If it looks ok, store the min & max charging current */
@@ -198,7 +201,6 @@ Status EnergyEvseDelegate::StartDiagnostics()
  * FUNCTIONS BELOW:
  *    - EVSE Hardware interface
  *
- *  RegisterEvseHardwareCallback( callbackType, callbackFnc )
  *  SetMaxHardwareCurrentLimit( currentmA )
  *  SetCircuitCapacity( currentmA )
  *  SetCableAssemblyLimit( currentmA )
@@ -208,24 +210,12 @@ Status EnergyEvseDelegate::StartDiagnostics()
  */
 
 /**
- * @brief    Called by EVSE Hardware to register a callback
- *
- * @param    Callback function
- */
-#if 0
-Status EnergyEvseDelegate::HwRegisterEvseHardwareCallback(int Callback) // TODO
-{
-    // TODO
-    return CHIP_NO_ERROR;
-}
-#endif
-/**
  * @brief    Called by EVSE Hardware to notify the delegate of the maximum
  *           current limit supported by the hardware.
  *
  *           This is normally called at start-up.
  *
- * @param    currentmA
+ * @param    currentmA - Maximum current limit supported by the hardware
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
@@ -247,7 +237,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  *           This is normally called at start-up when reading from DIP-switch
  *           settings.
  *
- * @param    currentmA
+ * @param    currentmA - Maximum current limit specified by electrician
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
@@ -272,7 +262,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  *           using different resistors, which results in different voltages
  *           measured by the EVSE.
  *
- * @param    currentmA
+ * @param    currentmA - Maximum current limit detected from Cable assembly
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
@@ -288,17 +278,17 @@ Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 }
 
 /**
- * @brief    Called by EVSE Hardware to indicate a fault
+ * @brief    Called by EVSE Hardware to indicate if EV is detected
  *
- * @param    StateEnum
+ * The only allowed states that the EVSE hardware can set are:
+ *  kNotPluggedIn
+ *  kPluggedInNoDemand
+ *  kPluggedInDemand
+ *
+ * @param    StateEnum - the state of the EV being plugged in and asking for demand etc
  */
 Status EnergyEvseDelegate::HwSetState(StateEnum state)
 {
-    /* the only allowed states that the EVSE hardware can set are:
-     *  kNotPluggedIn
-     *  kPluggedInNoDemand
-     *  kPluggedInDemand
-     */
     switch (state)
     {
     case StateEnum::kNotPluggedIn:
@@ -326,7 +316,7 @@ Status EnergyEvseDelegate::HwSetState(StateEnum state)
 /**
  * @brief    Called by EVSE Hardware to indicate a fault
  *
- * @param    FaultStateEnum
+ * @param    FaultStateEnum - the fault condition detected
  */
 Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
 {
@@ -372,6 +362,7 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 
     return Status::Success;
 }
+
 /**
  * @brief    Called by EVSE Hardware to share the VehicleID
  *
@@ -382,30 +373,32 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    if (mVehicleID.IsNull() || !newValue.data_equal(mVehicleID.Value()))
+    if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
     {
-        /* create a copy of the string so the callee doesn't have to keep it */
-        char * destinationBuffer = new char[kMaxVehicleIDBufSize];
-
-        MutableCharSpan destinationString(destinationBuffer, kMaxVehicleIDBufSize);
-        CHIP_ERROR err = CopyCharSpanToMutableCharSpan(newValue, destinationString);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "HwSetVehicleID - could not copy vehicleID");
-            delete[] destinationBuffer;
-            return Status::Failure;
-        }
-
-        if (!mVehicleID.IsNull())
-        {
-            delete[] mVehicleID.Value().data();
-        }
-
-        mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
-
-        ChipLogDetail(AppServer, "VehicleID updated");
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+        return Status::Success;
     }
+
+    /* create a copy of the string so the callee doesn't have to keep it */
+    char * destinationBuffer = new char[kMaxVehicleIDBufSize];
+
+    MutableCharSpan destinationString(destinationBuffer, kMaxVehicleIDBufSize);
+    CHIP_ERROR err = CopyCharSpanToMutableCharSpan(newValue, destinationString);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "HwSetVehicleID - could not copy vehicleID");
+        delete[] destinationBuffer;
+        return Status::Failure;
+    }
+
+    if (!mVehicleID.IsNull())
+    {
+        delete[] mVehicleID.Value().data();
+    }
+
+    mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
+
+    ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;
 }
@@ -457,6 +450,7 @@ StateEnum EnergyEvseDelegate::GetState()
 {
     return mState;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetState(StateEnum newValue)
 {
     StateEnum oldValue = mState;
@@ -468,7 +462,7 @@ CHIP_ERROR EnergyEvseDelegate::SetState(StateEnum newValue)
     mState = newValue;
     if (oldValue != mState)
     {
-        ChipLogDetail(AppServer, "State updated to %d", (int) mState);
+        ChipLogDetail(AppServer, "State updated to %d", static_cast<int>(mState));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, State::Id);
     }
 
@@ -480,6 +474,7 @@ SupplyStateEnum EnergyEvseDelegate::GetSupplyState()
 {
     return mSupplyState;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetSupplyState(SupplyStateEnum newValue)
 {
     SupplyStateEnum oldValue = mSupplyState;
@@ -492,7 +487,7 @@ CHIP_ERROR EnergyEvseDelegate::SetSupplyState(SupplyStateEnum newValue)
     mSupplyState = newValue;
     if (oldValue != mSupplyState)
     {
-        ChipLogDetail(AppServer, "SupplyState updated to %d", (int) mSupplyState);
+        ChipLogDetail(AppServer, "SupplyState updated to %d", static_cast<int>(mSupplyState));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SupplyState::Id);
     }
     return CHIP_NO_ERROR;
@@ -503,6 +498,7 @@ FaultStateEnum EnergyEvseDelegate::GetFaultState()
 {
     return mFaultState;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetFaultState(FaultStateEnum newValue)
 {
     FaultStateEnum oldValue = mFaultState;
@@ -515,7 +511,7 @@ CHIP_ERROR EnergyEvseDelegate::SetFaultState(FaultStateEnum newValue)
     mFaultState = newValue;
     if (oldValue != mFaultState)
     {
-        ChipLogDetail(AppServer, "FaultState updated to %d", (int) mFaultState);
+        ChipLogDetail(AppServer, "FaultState updated to %d", static_cast<int>(mFaultState));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, FaultState::Id);
     }
     return CHIP_NO_ERROR;
@@ -526,6 +522,7 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetChargingEnabledUntil()
 {
     return mChargingEnabledUntil;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(uint32_t newValue)
 {
     DataModel::Nullable<uint32_t> oldValue = mChargingEnabledUntil;
@@ -539,11 +536,13 @@ CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(uint32_t newValue)
     }
     return CHIP_NO_ERROR;
 }
+
 /* DischargingEnabledUntil */
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetDischargingEnabledUntil()
 {
     return mDischargingEnabledUntil;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(uint32_t newValue)
 {
     DataModel::Nullable<uint32_t> oldValue = mDischargingEnabledUntil;
@@ -557,11 +556,13 @@ CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(uint32_t newValue)
     }
     return CHIP_NO_ERROR;
 }
+
 /* CircuitCapacity */
 int64_t EnergyEvseDelegate::GetCircuitCapacity()
 {
     return mCircuitCapacity;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetCircuitCapacity(int64_t newValue)
 {
     int64_t oldValue = mCircuitCapacity;
@@ -579,11 +580,13 @@ CHIP_ERROR EnergyEvseDelegate::SetCircuitCapacity(int64_t newValue)
     }
     return CHIP_NO_ERROR;
 }
+
 /* MinimumChargeCurrent */
 int64_t EnergyEvseDelegate::GetMinimumChargeCurrent()
 {
     return mMinimumChargeCurrent;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetMinimumChargeCurrent(int64_t newValue)
 {
     int64_t oldValue = mMinimumChargeCurrent;
@@ -607,6 +610,7 @@ int64_t EnergyEvseDelegate::GetMaximumChargeCurrent()
 {
     return mMaximumChargeCurrent;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetMaximumChargeCurrent(int64_t newValue)
 {
     int64_t oldValue = mMaximumChargeCurrent;
@@ -624,11 +628,13 @@ CHIP_ERROR EnergyEvseDelegate::SetMaximumChargeCurrent(int64_t newValue)
     }
     return CHIP_NO_ERROR;
 }
+
 /* MaximumDischargeCurrent */
 int64_t EnergyEvseDelegate::GetMaximumDischargeCurrent()
 {
     return mMaximumDischargeCurrent;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetMaximumDischargeCurrent(int64_t newValue)
 {
     int64_t oldValue = mMaximumDischargeCurrent;
@@ -646,11 +652,13 @@ CHIP_ERROR EnergyEvseDelegate::SetMaximumDischargeCurrent(int64_t newValue)
     }
     return CHIP_NO_ERROR;
 }
+
 /* UserMaximumChargeCurrent */
 int64_t EnergyEvseDelegate::GetUserMaximumChargeCurrent()
 {
     return mUserMaximumChargeCurrent;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
 {
     if ((newValue < 0) || (newValue > kMaximumChargeCurrent))
@@ -668,11 +676,13 @@ CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
 
     return CHIP_NO_ERROR;
 }
+
 /* RandomizationDelayWindow */
 uint32_t EnergyEvseDelegate::GetRandomizationDelayWindow()
 {
     return mRandomizationDelayWindow;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
 {
     uint32_t oldValue = mRandomizationDelayWindow;
@@ -722,6 +732,7 @@ DataModel::Nullable<uint16_t> EnergyEvseDelegate::GetApproximateEVEfficiency()
 {
     return mApproximateEVEfficiency;
 }
+
 CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(uint16_t newValue)
 {
     DataModel::Nullable<uint16_t> oldValue = mApproximateEVEfficiency;
