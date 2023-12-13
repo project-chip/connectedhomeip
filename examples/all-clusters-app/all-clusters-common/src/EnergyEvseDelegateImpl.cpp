@@ -375,15 +375,34 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 /**
  * @brief    Called by EVSE Hardware to share the VehicleID
  *
- * @param    C
+ * This routine will make a copy of the string so the callee doesn't
+ * have to hold onto it forever.
+ *
+ * @param    CharSpan containing up to 32 chars.
  */
-Status EnergyEvseDelegate::HwSetVehicleID(CharSpan newValue)
+Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    DataModel::Nullable<CharSpan> oldValue = mVehicleID;
-
-    mVehicleID = MakeNullable(newValue);
-    if ((oldValue.IsNull()) || (strcmp(mVehicleID.Value().data(), oldValue.Value().data()) != 0))
+    if ((mVehicleID.IsNull()) || (strcmp(newValue.data(), mVehicleID.Value().data()) != 0))
     {
+        /* create a copy of the string so the callee doesn't have to keep it */
+        char * destinationBuffer = new char[kMaxVehicleIDBufSize];
+
+        MutableCharSpan destinationString(destinationBuffer, kMaxVehicleIDBufSize);
+        CHIP_ERROR err = CopyCharSpanToMutableCharSpan(newValue, destinationString);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "HwSetVehicleID - could not copy vehicleID");
+            delete[] destinationBuffer;
+            return Status::Failure;
+        }
+
+        if (!mVehicleID.IsNull())
+        {
+            delete[] mVehicleID.Value().data();
+        }
+
+        mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
+
         ChipLogDetail(AppServer, "VehicleID updated to %s", mVehicleID.Value().data());
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
     }
