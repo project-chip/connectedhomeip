@@ -257,7 +257,7 @@ void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * i
     uint32_t smallSize             = 5;
     uint32_t smallerSizeToReserver = smallSize - 1;
 
-    auto buffer = PacketBufferHandle::New(smallSize, /* reservedSize = */ 0);
+    auto buffer = PacketBufferHandle::New(smallSize, /* aReservedSize = */ 0);
 
     PacketBufferTLVWriter writer;
     writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
