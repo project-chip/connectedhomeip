@@ -1727,6 +1727,48 @@ cluster DoorLock = 257 {
     optional octet_string PINCode = 1;
   }
 
+  request struct SetPINCodeRequest {
+    INT16U timeout = 0;
+    INT16U userID = 1;
+    UserStatusEnum userStatus = 2;
+    UserTypeEnum userType = 3;
+    OCTET_STRING PINCode = 4;
+  }
+
+  request struct GetPINCodeRequest {
+    INT16U userID = 0;
+  }
+
+  response struct GetPINCodeResponse = 6 {
+    INT16U userID = 0;
+    UserStatusEnum userStatus = 1;
+    UserTypeEnum userType = 2;
+    OCTET_STRING PINCode = 3;
+  }
+
+  request struct ClearPINCodeRequest {
+    INT16U timeout = 0;
+    INT16U PINSlotIndex = 1;
+  }
+
+  request struct ClearAllPINCodesRequest {
+    INT16U timeout = 0;
+  }
+
+  request struct SetUserStatusRequest {
+    INT16U userID = 0;
+    UserStatusEnum userStatus = 1;
+  }
+
+  request struct GetUserStatusRequest {
+    INT16U userID = 0;
+  }
+
+  response struct GetUserStatusResponse = 10 {
+    INT16U userID = 0;
+    UserStatusEnum userStatus = 1;
+  }
+
   request struct SetWeekDayScheduleRequest {
     int8u weekDayIndex = 0;
     int16u userIndex = 1;
@@ -1806,6 +1848,48 @@ cluster DoorLock = 257 {
     int8u holidayIndex = 0;
   }
 
+  request struct SetUserTypeRequest {
+    INT16U userID = 0;
+    UserTypeEnum userType = 1;
+  }
+
+  request struct GetUserTypeRequest {
+    INT16U userID = 0;
+  }
+
+  response struct GetUserTypeResponse = 21 {
+    INT16U userID = 0;
+    UserTypeEnum userType = 1;
+  }
+
+  request struct SetRFIDCodeRequest {
+    INT16U timeout = 0;
+    INT16U userID = 1;
+    UserStatusEnum userStatus = 2;
+    UserTypeEnum userType = 3;
+    OCTET_STRING RFIDCode = 4;
+  }
+
+  request struct GetRFIDCodeRequest {
+    INT16U userID = 0;
+  }
+
+  response struct GetRFIDCodeResponse = 23 {
+    INT16U userID = 0;
+    UserStatusEnum userStatus = 1;
+    UserTypeEnum userType = 2;
+    OCTET_STRING RFIDCode = 3;
+  }
+
+  request struct ClearRFIDCodeRequest {
+    INT16U timeout = 0;
+    INT16U RFIDSlotIndex = 1;
+  }
+
+  request struct ClearAllRFIDCodesRequest {
+    INT16U timeout = 0;
+  }
+
   request struct SetUserRequest {
     DataOperationTypeEnum operationType = 0;
     int16u userIndex = 1;
@@ -1878,6 +1962,18 @@ cluster DoorLock = 257 {
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
   /** This command causes the lock device to unlock the door with a timeout parameter. */
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  /** Set PIN Code. */
+  timed command access(invoke: administer) SetPINCode(SetPINCodeRequest): DefaultSuccess = 5;
+  /** Get PIN Code. */
+  command access(invoke: administer) GetPINCode(GetPINCodeRequest): DefaultSuccess = 6;
+  /** Clear PIN Code on specific slot. */
+  timed command access(invoke: administer) ClearPINCode(ClearPINCodeRequest): DefaultSuccess = 7;
+  /** Clear all PIN Codes. */
+  timed command access(invoke: administer) ClearAllPINCodes(ClearAllPINCodesRequest): DefaultSuccess = 8;
+  /** Set User status on specific ID. */
+  command access(invoke: administer) SetUserStatus(SetUserStatusRequest): DefaultSuccess = 9;
+  /** Get User status from specific ID. */
+  command access(invoke: administer) GetUserStatus(GetUserStatusRequest): DefaultSuccess = 10;
   /** Set a weekly repeating schedule for a specified user. */
   command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
   /** Retrieve the specific weekly schedule for the specific user. */
@@ -1896,6 +1992,18 @@ cluster DoorLock = 257 {
   command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
   /** Clears the holiday schedule or all holiday schedules. */
   command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
+  /** Set User type on specific ID. */
+  command access(invoke: administer) SetUserType(SetUserTypeRequest): DefaultSuccess = 20;
+  /** Get User type from specific ID. */
+  command access(invoke: administer) GetUserType(GetUserTypeRequest): DefaultSuccess = 21;
+  /** Set RFID Code for specifc User id. */
+  timed command access(invoke: administer) SetRFIDCode(SetRFIDCodeRequest): DefaultSuccess = 22;
+  /** Get RFID Code from specific User id. */
+  command access(invoke: administer) GetRFIDCode(GetRFIDCodeRequest): DefaultSuccess = 23;
+  /** Clear specific RFID codes by the index number. */
+  timed command access(invoke: administer) ClearRFIDCode(ClearRFIDCodeRequest): DefaultSuccess = 24;
+  /** Clear all RFID Codes. */
+  timed command access(invoke: administer) ClearAllRFIDCodes(ClearAllRFIDCodesRequest): DefaultSuccess = 25;
   /** Set User into the lock. */
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
   /** Retrieve User. */

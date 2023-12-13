@@ -6951,6 +6951,54 @@ class ChipClusters:
                     "PINCode": "bytes",
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "SetPINCode",
+                "args": {
+                    "timeout": "int",
+                    "userID": "int",
+                    "userStatus": "int",
+                    "userType": "int",
+                    "PINCode": "bytes",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "GetPINCode",
+                "args": {
+                    "userID": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "ClearPINCode",
+                "args": {
+                    "timeout": "int",
+                    "PINSlotIndex": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "ClearAllPINCodes",
+                "args": {
+                    "timeout": "int",
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "SetUserStatus",
+                "args": {
+                    "userID": "int",
+                    "userStatus": "int",
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "GetUserStatus",
+                "args": {
+                    "userID": "int",
+                },
+            },
             0x0000000B: {
                 "commandId": 0x0000000B,
                 "commandName": "SetWeekDaySchedule",
@@ -7028,6 +7076,54 @@ class ChipClusters:
                 "commandName": "ClearHolidaySchedule",
                 "args": {
                     "holidayIndex": "int",
+                },
+            },
+            0x00000014: {
+                "commandId": 0x00000014,
+                "commandName": "SetUserType",
+                "args": {
+                    "userID": "int",
+                    "userType": "int",
+                },
+            },
+            0x00000015: {
+                "commandId": 0x00000015,
+                "commandName": "GetUserType",
+                "args": {
+                    "userID": "int",
+                },
+            },
+            0x00000016: {
+                "commandId": 0x00000016,
+                "commandName": "SetRFIDCode",
+                "args": {
+                    "timeout": "int",
+                    "userID": "int",
+                    "userStatus": "int",
+                    "userType": "int",
+                    "RFIDCode": "bytes",
+                },
+            },
+            0x00000017: {
+                "commandId": 0x00000017,
+                "commandName": "GetRFIDCode",
+                "args": {
+                    "userID": "int",
+                },
+            },
+            0x00000018: {
+                "commandId": 0x00000018,
+                "commandName": "ClearRFIDCode",
+                "args": {
+                    "timeout": "int",
+                    "RFIDSlotIndex": "int",
+                },
+            },
+            0x00000019: {
+                "commandId": 0x00000019,
+                "commandName": "ClearAllRFIDCodes",
+                "args": {
+                    "timeout": "int",
                 },
             },
             0x0000001A: {
