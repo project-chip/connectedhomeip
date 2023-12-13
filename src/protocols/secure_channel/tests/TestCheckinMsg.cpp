@@ -94,7 +94,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         uint8_t data[]                   = { "This is some user Data. It should be encrypted" };
         userData                         = chip::ByteSpan(data);
         const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
-        uint8_t gargantuaBuffer[2048]    = { 0 };
+        uint8_t veryLargeBuffer[2048]    = { 0 };
 
         // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
         Symmetric128BitsKeyByteArray aesKeyMaterial;
@@ -129,7 +129,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
         // Test output buffer smaller than the ApplicationData
-        userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
+        userData = chip::ByteSpan(veryLargeBuffer, sizeof(veryLargeBuffer));
         err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
