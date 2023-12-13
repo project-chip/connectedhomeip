@@ -48,9 +48,8 @@ class BarrierControlCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun barrierControlGoToPercent(percentOpen: UByte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun barrierControlGoToPercent(percentOpen: UByte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -63,16 +62,15 @@ class BarrierControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun barrierControlStop(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun barrierControlStop(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -82,7 +80,7 @@ class BarrierControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -218,9 +216,8 @@ class BarrierControlCluster(
     return decodedValue
   }
 
-  suspend fun writeBarrierOpenEventsAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierOpenEventsAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -235,7 +232,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -295,9 +292,8 @@ class BarrierControlCluster(
     return decodedValue
   }
 
-  suspend fun writeBarrierCloseEventsAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierCloseEventsAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -312,7 +308,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -374,10 +370,9 @@ class BarrierControlCluster(
 
   suspend fun writeBarrierCommandOpenEventsAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -392,7 +387,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -454,10 +449,9 @@ class BarrierControlCluster(
 
   suspend fun writeBarrierCommandCloseEventsAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 7u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -472,7 +466,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -532,9 +526,8 @@ class BarrierControlCluster(
     return decodedValue
   }
 
-  suspend fun writeBarrierOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierOpenPeriodAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -549,7 +542,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -609,9 +602,8 @@ class BarrierControlCluster(
     return decodedValue
   }
 
-  suspend fun writeBarrierClosePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBarrierClosePeriodAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 9u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -626,7 +618,7 @@ class BarrierControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

@@ -41,9 +41,8 @@ class LowPowerCluster(private val controller: MatterController, private val endp
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun sleep(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun sleep(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -53,7 +52,7 @@ class LowPowerCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

@@ -67,10 +67,9 @@ class OtaSoftwareUpdateProviderCluster(
     location: String?,
     requestorCanConsent: Boolean?,
     metadataForProvider: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): QueryImageResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -114,7 +113,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -275,10 +274,9 @@ class OtaSoftwareUpdateProviderCluster(
   suspend fun applyUpdateRequest(
     updateToken: ByteArray,
     newVersion: UInt,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ApplyUpdateResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -294,7 +292,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -338,10 +336,9 @@ class OtaSoftwareUpdateProviderCluster(
   suspend fun notifyUpdateApplied(
     updateToken: ByteArray,
     softwareVersion: UInt,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -357,7 +354,7 @@ class OtaSoftwareUpdateProviderCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

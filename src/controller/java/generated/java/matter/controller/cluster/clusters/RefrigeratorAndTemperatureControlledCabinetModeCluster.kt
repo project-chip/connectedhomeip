@@ -60,10 +60,9 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
 
   suspend fun changeToMode(
     newMode: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ChangeToModeResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -76,7 +75,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -238,9 +237,8 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
     return StartUpModeAttribute(decodedValue)
   }
 
-  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -255,7 +253,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -320,9 +318,8 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
     return OnModeAttribute(decodedValue)
   }
 
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 3u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -337,7 +334,7 @@ class RefrigeratorAndTemperatureControlledCabinetModeCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

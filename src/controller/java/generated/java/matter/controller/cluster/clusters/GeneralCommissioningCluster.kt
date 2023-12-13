@@ -61,10 +61,9 @@ class GeneralCommissioningCluster(
   suspend fun armFailSafe(
     expiryLengthSeconds: UShort,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ArmFailSafeResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -80,7 +79,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -125,10 +124,9 @@ class GeneralCommissioningCluster(
     newRegulatoryConfig: UByte,
     countryCode: String,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): SetRegulatoryConfigResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -147,7 +145,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -189,10 +187,9 @@ class GeneralCommissioningCluster(
   }
 
   suspend fun commissioningComplete(
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): CommissioningCompleteResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -202,7 +199,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -274,9 +271,8 @@ class GeneralCommissioningCluster(
     return decodedValue
   }
 
-  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -291,7 +287,7 @@ class GeneralCommissioningCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

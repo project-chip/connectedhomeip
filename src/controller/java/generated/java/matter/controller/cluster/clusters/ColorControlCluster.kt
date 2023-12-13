@@ -76,10 +76,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -104,7 +103,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -116,10 +115,9 @@ class ColorControlCluster(
     rate: UByte,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -141,7 +139,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -154,10 +152,9 @@ class ColorControlCluster(
     transitionTime: UByte,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -182,7 +179,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -194,10 +191,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -219,7 +215,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -231,10 +227,9 @@ class ColorControlCluster(
     rate: UByte,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -256,7 +251,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -269,10 +264,9 @@ class ColorControlCluster(
     transitionTime: UByte,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -297,7 +291,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -310,10 +304,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 6u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -338,7 +331,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -351,10 +344,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 7u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -379,7 +371,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -391,10 +383,9 @@ class ColorControlCluster(
     rateY: Short,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 8u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -416,7 +407,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -429,10 +420,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 9u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -457,7 +447,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -469,10 +459,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 10u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -494,7 +483,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -507,10 +496,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 64u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -535,7 +523,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -547,10 +535,9 @@ class ColorControlCluster(
     rate: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 65u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -572,7 +559,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -585,10 +572,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 66u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -613,7 +599,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -626,10 +612,9 @@ class ColorControlCluster(
     transitionTime: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 67u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -654,7 +639,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -669,10 +654,9 @@ class ColorControlCluster(
     startHue: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 68u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -703,7 +687,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -713,10 +697,9 @@ class ColorControlCluster(
   suspend fun stopMoveStep(
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 71u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -732,7 +715,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -746,10 +729,9 @@ class ColorControlCluster(
     colorTemperatureMaximumMireds: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 75u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -783,7 +765,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -798,10 +780,9 @@ class ColorControlCluster(
     colorTemperatureMaximumMireds: UShort,
     optionsMask: UByte,
     optionsOverride: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 76u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -838,7 +819,7 @@ class ColorControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1195,9 +1176,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeOptionsAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOptionsAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 15u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1212,7 +1192,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1987,9 +1967,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeWhitePointXAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWhitePointXAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 48u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2004,7 +1983,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2064,9 +2043,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeWhitePointYAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWhitePointYAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 49u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2081,7 +2059,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2141,9 +2119,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointRXAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointRXAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 50u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2158,7 +2135,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2218,9 +2195,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointRYAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointRYAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 51u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2235,7 +2211,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2300,9 +2276,11 @@ class ColorControlCluster(
     return ColorPointRIntensityAttribute(decodedValue)
   }
 
-  suspend fun writeColorPointRIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointRIntensityAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 52u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2317,7 +2295,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2377,9 +2355,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointGXAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointGXAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 54u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2394,7 +2371,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2454,9 +2431,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointGYAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointGYAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 55u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2471,7 +2447,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2536,9 +2512,11 @@ class ColorControlCluster(
     return ColorPointGIntensityAttribute(decodedValue)
   }
 
-  suspend fun writeColorPointGIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointGIntensityAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 56u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2553,7 +2531,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2613,9 +2591,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointBXAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointBXAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 58u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2630,7 +2607,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2690,9 +2667,8 @@ class ColorControlCluster(
     return decodedValue
   }
 
-  suspend fun writeColorPointBYAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointBYAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 59u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2707,7 +2683,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2772,9 +2748,11 @@ class ColorControlCluster(
     return ColorPointBIntensityAttribute(decodedValue)
   }
 
-  suspend fun writeColorPointBIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeColorPointBIntensityAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 60u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2789,7 +2767,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3246,10 +3224,9 @@ class ColorControlCluster(
 
   suspend fun writeStartUpColorTemperatureMiredsAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16400u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3264,7 +3241,7 @@ class ColorControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

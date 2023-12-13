@@ -58,10 +58,9 @@ class GroupKeyManagementCluster(
 
   suspend fun keySetWrite(
     groupKeySet: GroupKeyManagementClusterGroupKeySetStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -74,7 +73,7 @@ class GroupKeyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -83,10 +82,9 @@ class GroupKeyManagementCluster(
 
   suspend fun keySetRead(
     groupKeySetID: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): KeySetReadResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -99,7 +97,7 @@ class GroupKeyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -129,9 +127,8 @@ class GroupKeyManagementCluster(
     return KeySetReadResponse(groupKeySet_decoded)
   }
 
-  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -144,7 +141,7 @@ class GroupKeyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -152,10 +149,9 @@ class GroupKeyManagementCluster(
   }
 
   suspend fun keySetReadAllIndices(
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): KeySetReadAllIndicesResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -165,7 +161,7 @@ class GroupKeyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -242,10 +238,9 @@ class GroupKeyManagementCluster(
 
   suspend fun writeGroupKeyMapAttribute(
     value: List<GroupKeyManagementClusterGroupKeyMapStruct>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -264,7 +259,7 @@ class GroupKeyManagementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

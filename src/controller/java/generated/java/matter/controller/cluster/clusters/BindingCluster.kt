@@ -83,10 +83,9 @@ class BindingCluster(private val controller: MatterController, private val endpo
 
   suspend fun writeBindingAttribute(
     value: List<BindingClusterTargetStruct>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -105,7 +104,7 @@ class BindingCluster(private val controller: MatterController, private val endpo
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

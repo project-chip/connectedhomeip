@@ -51,9 +51,12 @@ class DeviceEnergyManagementCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun powerAdjustRequest(power: Long, duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun powerAdjustRequest(
+    power: Long,
+    duration: UInt,
+    timedInvokeTimeout: Duration? = null
+  ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -69,16 +72,15 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun cancelPowerAdjustRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun cancelPowerAdjustRequest(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -88,16 +90,18 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun startTimeAdjustRequest(requestedStartTime: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun startTimeAdjustRequest(
+    requestedStartTime: UInt,
+    timedInvokeTimeout: Duration? = null
+  ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -110,16 +114,15 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun pauseRequest(duration: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun pauseRequest(duration: UInt, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -132,16 +135,15 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun resumeRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun resumeRequest(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -151,7 +153,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -161,10 +163,9 @@ class DeviceEnergyManagementCluster(
   suspend fun modifyForecastRequest(
     forecastId: UInt,
     slotAdjustments: List<DeviceEnergyManagementClusterSlotAdjustmentStruct>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -184,7 +185,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -193,10 +194,9 @@ class DeviceEnergyManagementCluster(
 
   suspend fun requestConstraintBasedForecast(
     constraints: List<DeviceEnergyManagementClusterConstraintsStruct>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 6u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -213,7 +213,7 @@ class DeviceEnergyManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

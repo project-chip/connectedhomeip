@@ -74,9 +74,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun setpointRaiseLower(mode: UByte, amount: Byte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun setpointRaiseLower(mode: UByte, amount: Byte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -92,7 +91,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -104,10 +103,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
     dayOfWeekForSequence: UByte,
     modeForSequence: UByte,
     transitions: List<ThermostatClusterWeeklyScheduleTransitionStruct>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -136,7 +134,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -146,10 +144,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
   suspend fun getWeeklySchedule(
     daysToReturn: UByte,
     modeToReturn: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetWeeklyScheduleResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -165,7 +162,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -240,9 +237,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     )
   }
 
-  suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun clearWeeklySchedule(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -252,7 +248,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -627,10 +623,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeHVACSystemTypeConfigurationAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 9u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -645,7 +640,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -707,10 +702,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeLocalTemperatureCalibrationAttribute(
     value: Byte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -725,7 +719,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -787,10 +781,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeOccupiedCoolingSetpointAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 17u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -805,7 +798,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -867,10 +860,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeOccupiedHeatingSetpointAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 18u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -885,7 +877,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -947,10 +939,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeUnoccupiedCoolingSetpointAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 19u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -965,7 +956,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1027,10 +1018,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeUnoccupiedHeatingSetpointAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 20u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1045,7 +1035,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1105,9 +1095,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeMinHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMinHeatSetpointLimitAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 21u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1122,7 +1114,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1182,9 +1174,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMaxHeatSetpointLimitAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 22u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1199,7 +1193,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1259,9 +1253,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeMinCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMinCoolSetpointLimitAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 23u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1276,7 +1272,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1336,9 +1332,11 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMaxCoolSetpointLimitAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 24u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1353,7 +1351,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1413,9 +1411,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeMinSetpointDeadBandAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMinSetpointDeadBandAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 25u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1430,7 +1427,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1490,9 +1487,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeRemoteSensingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRemoteSensingAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 26u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1507,7 +1503,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1564,10 +1560,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeControlSequenceOfOperationAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 27u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1582,7 +1577,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1637,9 +1632,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeSystemModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSystemModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 28u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1654,7 +1648,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1860,10 +1854,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeTemperatureSetpointHoldAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 35u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1878,7 +1871,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1948,10 +1941,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeTemperatureSetpointHoldDurationAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 36u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1966,7 +1958,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2030,10 +2022,9 @@ class ThermostatCluster(private val controller: MatterController, private val en
 
   suspend fun writeThermostatProgrammingOperationModeAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 37u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2048,7 +2039,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2264,9 +2255,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return OccupiedSetbackAttribute(decodedValue)
   }
 
-  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 52u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2281,7 +2271,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2428,9 +2418,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return UnoccupiedSetbackAttribute(decodedValue)
   }
 
-  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 55u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2445,7 +2434,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2587,9 +2576,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 58u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2604,7 +2592,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2664,9 +2652,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACTypeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 64u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2681,7 +2668,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2741,9 +2728,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACCapacityAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACCapacityAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 65u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2758,7 +2744,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2818,9 +2804,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACRefrigerantTypeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACRefrigerantTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 66u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2835,7 +2820,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2895,9 +2880,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACCompressorTypeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACCompressorTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 67u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2912,7 +2896,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2972,9 +2956,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACErrorCodeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACErrorCodeAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 68u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2989,7 +2972,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3049,9 +3032,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACLouverPositionAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACLouverPositionAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 69u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3066,7 +3048,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3167,9 +3149,8 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACCapacityformatAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeACCapacityformatAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 71u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3184,7 +3165,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

@@ -60,10 +60,9 @@ class DemandResponseLoadControlCluster(
 
   suspend fun registerLoadControlProgramRequest(
     loadControlProgram: DemandResponseLoadControlClusterLoadControlProgramStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -76,7 +75,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -85,10 +84,9 @@ class DemandResponseLoadControlCluster(
 
   suspend fun unregisterLoadControlProgramRequest(
     loadControlProgramID: ByteArray,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -101,7 +99,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -110,10 +108,9 @@ class DemandResponseLoadControlCluster(
 
   suspend fun addLoadControlEventRequest(
     event: DemandResponseLoadControlClusterLoadControlEventStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -126,7 +123,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -136,10 +133,9 @@ class DemandResponseLoadControlCluster(
   suspend fun removeLoadControlEventRequest(
     eventID: ByteArray,
     cancelControl: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -155,16 +151,15 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun clearLoadControlEventsRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun clearLoadControlEventsRequest(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -174,7 +169,7 @@ class DemandResponseLoadControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -428,9 +423,8 @@ class DemandResponseLoadControlCluster(
     return decodedValue
   }
 
-  suspend fun writeDefaultRandomStartAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDefaultRandomStartAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -445,7 +439,7 @@ class DemandResponseLoadControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -500,9 +494,11 @@ class DemandResponseLoadControlCluster(
     return decodedValue
   }
 
-  suspend fun writeDefaultRandomDurationAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDefaultRandomDurationAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 7u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -517,7 +513,7 @@ class DemandResponseLoadControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

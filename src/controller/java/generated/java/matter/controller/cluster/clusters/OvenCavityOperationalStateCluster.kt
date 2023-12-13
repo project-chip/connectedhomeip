@@ -61,9 +61,8 @@ class OvenCavityOperationalStateCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun pause(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun pause(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -73,7 +72,7 @@ class OvenCavityOperationalStateCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -104,9 +103,8 @@ class OvenCavityOperationalStateCluster(
     return OperationalCommandResponse(commandResponseState_decoded)
   }
 
-  suspend fun stop(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun stop(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -116,7 +114,7 @@ class OvenCavityOperationalStateCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -147,9 +145,8 @@ class OvenCavityOperationalStateCluster(
     return OperationalCommandResponse(commandResponseState_decoded)
   }
 
-  suspend fun start(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun start(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -159,7 +156,7 @@ class OvenCavityOperationalStateCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -190,9 +187,8 @@ class OvenCavityOperationalStateCluster(
     return OperationalCommandResponse(commandResponseState_decoded)
   }
 
-  suspend fun resume(timedInvokeTimeoutMs: Int? = null): OperationalCommandResponse {
+  suspend fun resume(timedInvokeTimeout: Duration? = null): OperationalCommandResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -202,7 +198,7 @@ class OvenCavityOperationalStateCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

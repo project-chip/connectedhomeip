@@ -75,9 +75,11 @@ class ThermostatUserInterfaceConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeTemperatureDisplayModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeTemperatureDisplayModeAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -92,7 +94,7 @@ class ThermostatUserInterfaceConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -147,9 +149,8 @@ class ThermostatUserInterfaceConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeKeypadLockoutAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeKeypadLockoutAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -164,7 +165,7 @@ class ThermostatUserInterfaceConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -228,10 +229,9 @@ class ThermostatUserInterfaceConfigurationCluster(
 
   suspend fun writeScheduleProgrammingVisibilityAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -246,7 +246,7 @@ class ThermostatUserInterfaceConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

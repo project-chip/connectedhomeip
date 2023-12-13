@@ -83,10 +83,9 @@ class UserLabelCluster(private val controller: MatterController, private val end
 
   suspend fun writeLabelListAttribute(
     value: List<UserLabelClusterLabelStruct>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -105,7 +104,7 @@ class UserLabelCluster(private val controller: MatterController, private val end
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

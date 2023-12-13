@@ -48,9 +48,8 @@ class ElectricalMeasurementCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun getProfileInfoCommand(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -60,7 +59,7 @@ class ElectricalMeasurementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -71,10 +70,9 @@ class ElectricalMeasurementCluster(
     attributeId: UShort,
     startTime: UInt,
     numberOfIntervals: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -93,7 +91,7 @@ class ElectricalMeasurementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -2242,10 +2240,9 @@ class ElectricalMeasurementCluster(
 
   suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 1297u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2260,7 +2257,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2324,10 +2321,9 @@ class ElectricalMeasurementCluster(
 
   suspend fun writeAverageRmsUnderVoltageCounterAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 1299u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2342,7 +2338,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2404,10 +2400,9 @@ class ElectricalMeasurementCluster(
 
   suspend fun writeRmsExtremeOverVoltagePeriodAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 1300u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2422,7 +2417,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2484,10 +2479,9 @@ class ElectricalMeasurementCluster(
 
   suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 1301u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2502,7 +2496,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2562,9 +2556,11 @@ class ElectricalMeasurementCluster(
     return decodedValue
   }
 
-  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRmsVoltageSagPeriodAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 1302u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2579,7 +2575,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2639,9 +2635,11 @@ class ElectricalMeasurementCluster(
     return decodedValue
   }
 
-  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRmsVoltageSwellPeriodAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 1303u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2656,7 +2654,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2932,9 +2930,8 @@ class ElectricalMeasurementCluster(
     return decodedValue
   }
 
-  suspend fun writeOverloadAlarmsMaskAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOverloadAlarmsMaskAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1792u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2949,7 +2946,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3081,9 +3078,11 @@ class ElectricalMeasurementCluster(
     return decodedValue
   }
 
-  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeAcOverloadAlarmsMaskAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 2048u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3098,7 +3097,7 @@ class ElectricalMeasurementCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

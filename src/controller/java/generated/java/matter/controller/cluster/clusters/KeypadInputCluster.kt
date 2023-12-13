@@ -44,9 +44,8 @@ class KeypadInputCluster(private val controller: MatterController, private val e
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun sendKey(keyCode: UByte, timedInvokeTimeoutMs: Int? = null): SendKeyResponse {
+  suspend fun sendKey(keyCode: UByte, timedInvokeTimeout: Duration? = null): SendKeyResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -59,7 +58,7 @@ class KeypadInputCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

@@ -47,9 +47,8 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun off(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun off(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -59,16 +58,15 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun on(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun on(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -78,16 +76,15 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun toggle(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun toggle(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -97,7 +94,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -107,10 +104,9 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
   suspend fun offWithEffect(
     effectIdentifier: UByte,
     effectVariant: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 64u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -126,16 +122,15 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun onWithRecallGlobalScene(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun onWithRecallGlobalScene(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 65u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -145,7 +140,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -156,10 +151,9 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     onOffControl: UByte,
     onTime: UShort,
     offWaitTime: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 66u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -178,7 +172,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -288,9 +282,8 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     return decodedValue
   }
 
-  suspend fun writeOnTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOnTimeAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16385u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -305,7 +298,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -365,9 +358,8 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     return decodedValue
   }
 
-  suspend fun writeOffWaitTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOffWaitTimeAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16386u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -382,7 +374,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -447,9 +439,8 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
     return StartUpOnOffAttribute(decodedValue)
   }
 
-  suspend fun writeStartUpOnOffAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeStartUpOnOffAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16387u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -464,7 +455,7 @@ class OnOffCluster(private val controller: MatterController, private val endpoin
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

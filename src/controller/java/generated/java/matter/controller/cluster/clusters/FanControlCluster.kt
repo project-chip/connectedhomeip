@@ -53,10 +53,9 @@ class FanControlCluster(private val controller: MatterController, private val en
     direction: UByte,
     wrap: Boolean?,
     lowestOff: Boolean?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration? = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -75,7 +74,7 @@ class FanControlCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -113,9 +112,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeFanModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeFanModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -130,7 +128,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -222,9 +220,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return PercentSettingAttribute(decodedValue)
   }
 
-  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -239,7 +236,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -371,9 +368,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return SpeedSettingAttribute(decodedValue)
   }
 
-  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -388,7 +384,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -520,9 +516,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeRockSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRockSettingAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -537,7 +532,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -633,9 +628,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeWindSettingAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWindSettingAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 10u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -650,7 +644,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -710,9 +704,8 @@ class FanControlCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeAirflowDirectionAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeAirflowDirectionAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 11u
-    val timeoutMs: Duration? = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) }
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -727,7 +720,7 @@ class FanControlCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
