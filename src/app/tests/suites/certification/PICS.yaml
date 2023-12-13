@@ -8912,7 +8912,7 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: DRYERCTRL.S.A0001
 
-   
+
 
     # RVC Clean Mode Cluster
 
