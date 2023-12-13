@@ -24,40 +24,42 @@ repo:
 ############################################################
 examples:
     - any:
-        - 'examples/*'
-        - 'examples/**/*'
+        - examples/*
+        - examples/**/*
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
     - any:
-        - 'docs/*'
-        - 'docs/**/*'
-        - '"*.md"'
+        - docs/*
+        - docs/**/*
+        - "*.md"
 
 ############################################################
 #  Tools + Development Items
 ############################################################
 scripts:
     -any:
-        - 'scripts/*'
-        - 'scripts/**/*'
+        - scripts/*
+        - scripts/**/*
 
 integrations:
     - any:
-    - 'integrations/*'
-    - 'integrations/**/*'
+        - integrations/*
+        - integrations/**/*
 
 docker:
-    - integrations/docker/*
-    - integrations/docker/**/*
+    - any:
+        - integrations/docker/*
+        - integrations/docker/**/*
 
 vscode:
-    - .vscode/*
-    - .vscode/**/*
-    - .devcontainer/*
-    - .devcontainer/**/*
+    - any:
+        - .vscode/*
+        - .vscode/**/*
+        - .devcontainer/*
+        - .devcontainer/**/*
 
 gn:
     - build/*
@@ -207,37 +209,46 @@ silabs:
     - src/platform/silabs/**/*
 
 esp32:
-    - src/platform/ESP32/*
-    - src/platform/ESP32/**/*
+    - any:
+        - src/platform/ESP32/*
+        - src/platform/ESP32/**/*
 
 freeRTOS:
-    - src/platform/FreeRTOS/*
-    - src/platform/FreeRTOS/**/*
+    - any:
+        - src/platform/FreeRTOS/*
+        - src/platform/FreeRTOS/**/*
 
 k32w:
-    - src/platform/K32W/*
-    - src/platform/K32W/**/*
+    - any:
+        - src/platform/K32W/*
+        - src/platform/K32W/**/*
 
 linux:
-    - src/platform/Linux/*
-    - src/platform/Linux/**/*
+    - any:
+        - src/platform/Linux/*
+        - src/platform/Linux/**/*
 
 nrf connect:
-    - src/platform/nrfconnect/*
-    - src/platform/nrfconnect/**/*
+    - any:
+        - src/platform/nrfconnect/*
+        - src/platform/nrfconnect/**/*
 
 openthread:
-    - src/platform/openthread/*
-    - src/platform/openthread/**/*
+    - any:
+        - src/platform/openthread/*
+        - src/platform/openthread/**/*
 
 zephyr:
-    - src/platform/Zephyr/*
-    - src/platform/Zephyr/**/*
+    - any:
+        - src/platform/Zephyr/*
+        - src/platform/Zephyr/**/*
 
 telink:
-    - src/platform/telink/*
-    - src/platform/telink/**/*
+    - any:
+        - src/platform/telink/*
+        - src/platform/telink/**/*
 
 tizen:
-    - src/platform/Tizen/*
-    - src/platform/Tizen/**/*
+    - any:
+        - src/platform/Tizen/*
+        - src/platform/Tizen/**/*
