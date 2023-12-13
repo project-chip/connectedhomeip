@@ -30,57 +30,57 @@ namespace Clusters {
 
 namespace OvenMode {
 
-const uint8_t ModeBake              = 0;
-const uint8_t ModeConvection        = 1;
-const uint8_t ModeGrill             = 2;
-const uint8_t ModeRoast             = 3;
-const uint8_t ModeClean             = 4;
-const uint8_t ModeConvectionBake    = 5;
-const uint8_t ModeConvectionRoast   = 6;
-const uint8_t ModeWarming           = 7;
-const uint8_t ModeProofing          = 8;
+const uint8_t ModeBake            = 0;
+const uint8_t ModeConvection      = 1;
+const uint8_t ModeGrill           = 2;
+const uint8_t ModeRoast           = 3;
+const uint8_t ModeClean           = 4;
+const uint8_t ModeConvectionBake  = 5;
+const uint8_t ModeConvectionRoast = 6;
+const uint8_t ModeWarming         = 7;
+const uint8_t ModeProofing        = 8;
 
 /// This is an application level delegate to handle Oven commands according to the specific business logic.
 class OvenModeDelegate : public ModeBase::Delegate
 {
 private:
-    using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType ModeTagsBake[1]           = { { .value = to_underlying(ModeTag::kBake) } };
-    ModeTagStructType ModeTagsConvection[1]     = { { .value = to_underlying(ModeTag::kConvection) } };
-    ModeTagStructType ModeTagsGrill[1]          = { { .value = to_underlying(ModeTag::kGrill) } };
-    ModeTagStructType ModeTagsRoast[1]          = { { .value = to_underlying(ModeTag::kRoast) } };
-    ModeTagStructType ModeTagsClean[1]          = { { .value = to_underlying(ModeTag::kClean) } };
-    ModeTagStructType ModeTagsConvectionBake[1] = { { .value = to_underlying(ModeTag::kConvectionBake) } };
-    ModeTagStructType ModeTagsConvectionRoast[1]= { { .value = to_underlying(ModeTag::kConvectionRoast) } };
-    ModeTagStructType ModeTagsWarming[1]        = { { .value = to_underlying(ModeTag::kWarming) } };
-    ModeTagStructType ModeTagsProofing[1]       = { { .value = to_underlying(ModeTag::kProofing) } };
+    using ModeTagStructType                      = detail::Structs::ModeTagStruct::Type;
+    ModeTagStructType ModeTagsBake[1]            = { { .value = to_underlying(ModeTag::kBake) } };
+    ModeTagStructType ModeTagsConvection[1]      = { { .value = to_underlying(ModeTag::kConvection) } };
+    ModeTagStructType ModeTagsGrill[1]           = { { .value = to_underlying(ModeTag::kGrill) } };
+    ModeTagStructType ModeTagsRoast[1]           = { { .value = to_underlying(ModeTag::kRoast) } };
+    ModeTagStructType ModeTagsClean[1]           = { { .value = to_underlying(ModeTag::kClean) } };
+    ModeTagStructType ModeTagsConvectionBake[1]  = { { .value = to_underlying(ModeTag::kConvectionBake) } };
+    ModeTagStructType ModeTagsConvectionRoast[1] = { { .value = to_underlying(ModeTag::kConvectionRoast) } };
+    ModeTagStructType ModeTagsWarming[1]         = { { .value = to_underlying(ModeTag::kWarming) } };
+    ModeTagStructType ModeTagsProofing[1]        = { { .value = to_underlying(ModeTag::kProofing) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[9] = {
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Bake"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Bake"),
                                                  .mode     = ModeBake,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsBake) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection"),
                                                  .mode     = ModeConvection,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvection) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Grill"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Grill"),
                                                  .mode     = ModeGrill,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsGrill) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Roast"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Roast"),
                                                  .mode     = ModeRoast,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsRoast) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Clean"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Clean"),
                                                  .mode     = ModeClean,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsClean) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Bake"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Bake"),
                                                  .mode     = ModeConvectionBake,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvectionBake) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Roast"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Convection Roast"),
                                                  .mode     = ModeConvectionRoast,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsConvectionRoast) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Warming"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Warming"),
                                                  .mode     = ModeWarming,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsWarming) },
-         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Proofing"),
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Proofing"),
                                                  .mode     = ModeProofing,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsProofing) },
     };
@@ -101,9 +101,6 @@ ModeBase::Instance * Instance();
 void Shutdown();
 
 } // namespace OvenMode
-
-
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip

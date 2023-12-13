@@ -27,7 +27,7 @@ using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::T
 
 // RVC Run
 
-static OvenModeDelegate * gOvenModeDelegate = nullptr;
+static OvenModeDelegate * gOvenModeDelegate   = nullptr;
 static ModeBase::Instance * gOvenModeInstance = nullptr;
 
 CHIP_ERROR OvenModeDelegate::Init()
@@ -95,6 +95,7 @@ void OvenMode::Shutdown()
         gOvenModeDelegate = nullptr;
     }
 }
+void emberAfOvenModeClusterServerInitCallback(chip::EndpointId endpointId) {}
 
 void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {

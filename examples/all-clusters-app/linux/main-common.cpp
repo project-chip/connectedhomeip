@@ -26,6 +26,8 @@
 #include "laundry-washer-mode.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
+#include "oven-modes.h"
+#include "oven-operational-state-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
