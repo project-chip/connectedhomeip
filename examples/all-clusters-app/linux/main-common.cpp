@@ -27,7 +27,6 @@
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
-#include "oven-operational-state-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
@@ -239,6 +238,7 @@ void ApplicationShutdown()
     Clusters::AirQuality::Shutdown();
     Clusters::OperationalState::Shutdown();
     Clusters::RvcOperationalState::Shutdown();
+    Clusters::OvenMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
