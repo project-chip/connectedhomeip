@@ -1897,6 +1897,7 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2025,7 +2026,7 @@ limitations under the License.
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Laundry Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Laundry Dryer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
@@ -2077,6 +2078,8 @@ limitations under the License.
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Oven Cavity Operational State" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>

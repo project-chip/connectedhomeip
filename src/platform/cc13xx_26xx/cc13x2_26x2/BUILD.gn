@@ -65,8 +65,7 @@ static_library("cc13x2_26x2") {
       # this needs to be in the final link to place the data correctly
       # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
       #"oad_image_header.c",
-      "../OTAImageProcessorImpl.cpp",
-      "../OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
     ]
   }
 

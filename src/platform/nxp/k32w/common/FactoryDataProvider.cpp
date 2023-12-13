@@ -40,8 +40,8 @@ static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
 static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
-uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
-uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
+uint32_t FactoryDataProvider::kFactoryDataStart        = (uint32_t) __MATTER_FACTORY_DATA_START;
+uint32_t FactoryDataProvider::kFactoryDataSize         = (uint32_t) __MATTER_FACTORY_DATA_SIZE;
 uint32_t FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(FactoryDataProvider::Header);
 
 FactoryDataProvider::FactoryDataProvider()
@@ -123,11 +123,17 @@ CHIP_ERROR FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf
 
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+#if CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+    constexpr uint8_t kCdForAllExamples[] = CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION;
+
+    return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, outBuffer);
+#else
     uint16_t declarationSize = 0;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kCertDeclarationId, outBuffer.data(), outBuffer.size(), declarationSize));
     outBuffer.reduce_size(declarationSize);
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)

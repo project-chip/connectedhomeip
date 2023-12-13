@@ -53,7 +53,7 @@ from .clusters import Objects as GeneratedObjects
 from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import UnknownAttribute, UnknownCommand
-from .interaction_model import InteractionModelError
+from .interaction_model import InteractionModelError, SessionParameters, SessionParametersStruct
 from .interaction_model import delegate as im
 from .native import PyChipError
 
@@ -76,7 +76,7 @@ _DevicePairingDelegate_OnFabricCheckFunct = CFUNCTYPE(
 #
 # CHIP_ERROR is actually signed, so using c_uint32 is weird, but everything
 # else seems to do it.
-_DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, PyChipError)
+_DeviceAvailableCallbackFunct = CFUNCTYPE(None, py_object, c_void_p, PyChipError)
 
 _IssueNOCChainCallbackPythonCallbackFunct = CFUNCTYPE(
     None, py_object, PyChipError, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_void_p, c_size_t, c_uint64)
@@ -98,6 +98,11 @@ class NOCChain:
     rcacBytes: bytes
     ipkBytes: bytes
     adminSubject: int
+
+
+@_DeviceAvailableCallbackFunct
+def _DeviceAvailableCallback(closure, device, err):
+    closure.deviceAvailable(device, err)
 
 
 @_IssueNOCChainCallbackPythonCallbackFunct
@@ -759,16 +764,6 @@ class ChipDeviceControllerBase():
         returnErr = None
         deviceAvailableCV = threading.Condition()
 
-        @_DeviceAvailableFunct
-        def DeviceAvailableCallback(device, err):
-            nonlocal returnDevice
-            nonlocal returnErr
-            nonlocal deviceAvailableCV
-            with deviceAvailableCV:
-                returnDevice = c_void_p(device)
-                returnErr = err
-                deviceAvailableCV.notify_all()
-
         if allowPASE:
             res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
                 self.devCtrl, nodeid, byref(returnDevice)), timeoutMs)
@@ -776,8 +771,22 @@ class ChipDeviceControllerBase():
                 print('Using PASE connection')
                 return DeviceProxyWrapper(returnDevice)
 
+        class DeviceAvailableClosure():
+            def deviceAvailable(self, device, err):
+                nonlocal returnDevice
+                nonlocal returnErr
+                nonlocal deviceAvailableCV
+                with deviceAvailableCV:
+                    returnDevice = c_void_p(device)
+                    returnErr = err
+                    deviceAvailableCV.notify_all()
+                ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+
+        closure = DeviceAvailableClosure()
+        ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
         self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
-            self.devCtrl, nodeid, DeviceAvailableCallback), timeoutMs).raise_on_error()
+            self.devCtrl, nodeid, ctypes.py_object(closure), _DeviceAvailableCallback),
+            timeoutMs).raise_on_error()
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
@@ -807,6 +816,36 @@ class ChipDeviceControllerBase():
         device = self.GetConnectedDeviceSync(nodeid)
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_ComputeRoundTripTimeout(
             device.deviceProxy, upperLayerProcessingTimeoutMs))
+        return res
+
+    def GetRemoteSessionParameters(self, nodeid) -> typing.Optional[SessionParameters]:
+        ''' Returns the SessionParameters of reported by the remote node associated with `nodeid`.
+            If there is some error in getting SessionParameters None is returned.
+
+            This will result in a session being established if one wasn't already established.
+        '''
+
+        # First creating the struct to make building the ByteArray to be sent to CFFI easier.
+        sessionParametersStruct = SessionParametersStruct.parse(b'\x00' * SessionParametersStruct.sizeof())
+        sessionParametersByteArray = SessionParametersStruct.build(sessionParametersStruct)
+        device = self.GetConnectedDeviceSync(nodeid)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_DeviceProxy_GetRemoteSessionParameters(
+            device.deviceProxy, ctypes.c_char_p(sessionParametersByteArray)))
+
+        # 0 is CHIP_NO_ERROR
+        if res != 0:
+            return None
+
+        sessionParametersStruct = SessionParametersStruct.parse(sessionParametersByteArray)
+        return SessionParameters(
+            sessionIdleInterval=sessionParametersStruct.SessionIdleInterval if sessionParametersStruct.SessionIdleInterval != 0 else None,
+            sessionActiveInterval=sessionParametersStruct.SessionActiveInterval if sessionParametersStruct.SessionActiveInterval != 0 else None,
+            sessionActiveThreshold=sessionParametersStruct.SessionActiveThreshold if sessionParametersStruct.SessionActiveThreshold != 0 else None,
+            dataModelRevision=sessionParametersStruct.DataModelRevision if sessionParametersStruct.DataModelRevision != 0 else None,
+            interactionModelRevision=sessionParametersStruct.InteractionModelRevision if sessionParametersStruct.InteractionModelRevision != 0 else None,
+            specficiationVersion=sessionParametersStruct.SpecificationVersion if sessionParametersStruct.SpecificationVersion != 0 else None,
+            maxPathsPerInvoke=sessionParametersStruct.MaxPathsPerInvoke)
+
         return res
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
@@ -1538,7 +1577,7 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetFabricCheckCallback.restype = PyChipError
 
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
-                c_void_p, c_uint64, _DeviceAvailableFunct]
+                c_void_p, c_uint64, py_object, _DeviceAvailableCallbackFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = PyChipError
 
             self._dmLib.pychip_FreeOperationalDeviceProxy.argtypes = [
