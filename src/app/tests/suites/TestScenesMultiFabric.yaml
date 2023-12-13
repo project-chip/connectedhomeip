@@ -26,7 +26,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Matter Scenes"
     endpoint: 1
     payload:
         type: char_string
