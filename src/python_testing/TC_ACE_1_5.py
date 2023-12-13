@@ -18,13 +18,13 @@
 import logging
 import time
 
-import chip.clusters as Clusters
 import chip.clusters.enum
-from chip.interaction_model import Status
+import chip.clusters as Clusters
+from mobly import asserts
 from chip import ChipDeviceCtrl
+from chip.interaction_model import Status
 from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 class TC_ACE_1_5(MatterBaseTest):
 
@@ -45,20 +45,33 @@ class TC_ACE_1_5(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    async def write_acl(self, acl):
+    async def write_acl(self, acl, th):
         # This returns an attribute status
-        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
+        result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
     async def read_descriptor_expect_success(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+        result = await self.read_single_attribute_check_success(
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+
+    async def read_basic_expect_success(self, th):
+        cluster = Clusters.Objects.BasicInformation
+        attribute = Clusters.BasicInformation.Attributes.VendorID
+        result = await self.read_single_attribute_check_success(
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def read_basic_expect_unsupported_access(self, th):
         cluster = Clusters.Objects.BasicInformation
         attribute = Clusters.BasicInformation.Attributes.VendorID
-        await self.read_single_attribute_expect_error(
+        result = await self.read_single_attribute_expect_error(
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
+
+    async def read_descriptor_expect_unsupported_access(self, th):
+        cluster = Clusters.Objects.Descriptor
+        attribute = Clusters.Descriptor.Attributes.DeviceTypeList
+        result = await self.read_single_attribute_expect_error(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     @async_test_body
@@ -94,7 +107,6 @@ class TC_ACE_1_5(MatterBaseTest):
         
         self.print_step(4, "TH2 Reads CurrentFabricIndex ")
         th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
-        print("th2FabricIndex: %d" % (th2FabricIndex))
 
         self.print_step(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -108,7 +120,7 @@ class TC_ACE_1_5(MatterBaseTest):
             subjects=[],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.Descriptor.id)])
         acl = [admin_acl, descriptor_view]
-        await self.write_acl(acl)
+        await self.write_acl(acl, self.th1)
 
         self.print_step(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -124,7 +136,7 @@ class TC_ACE_1_5(MatterBaseTest):
             subjects=[],
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.BasicInformation.id)])
         acl = [admin_acl, descriptor_view]
-        await self.write_acl(acl)
+        await self.write_acl(acl, self.th2)
 
         self.print_step(7, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
         await self.read_descriptor_expect_success(self.th1)
@@ -132,6 +144,25 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(8, "TH1 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
         await self.read_basic_expect_unsupported_access(self.th1)
 
+        self.print_step(9, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
+        await self.read_descriptor_expect_unsupported_access(self.th2)
+
+        self.print_step(10, "TH2 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
+        await self.read_basic_expect_success(self.th2)
+
+        self.print_step(11, "TH1 resets the ACLs to default value by writing DUT EP0")
+        full_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[TH1_nodeid],
+            targets=[])
+
+        acl = [full_acl]
+        await self.write_acl(acl, self.th1)
+
+        self.print_step(12, "TH1 removes the TH2 fabric by sending the RemoveFabric command to the DUT with the FabricIndex set to th2FabricIndex")
+        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2FabricIndex)
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 if __name__ == "__main__":
     default_matter_test_main()
