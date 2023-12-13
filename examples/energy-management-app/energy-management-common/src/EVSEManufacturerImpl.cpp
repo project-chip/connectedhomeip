@@ -43,7 +43,11 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
     dg->HwSetCableAssemblyLimit(63000);
 
     /* For now let's pretend the vehicle ID is set */
-    dg->HwSetVehicleID(CharSpan("TEST_VEHICLE_123456789", 22));
+    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
+    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_9876543210"));
+
+    /* This next one will fail because it is too long */
+    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_9876543210TOOOOOOOOOOOOOOOOOOO"));
 
     /* For now let's pretend the RFID sensor was triggered - send an event */
     uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };

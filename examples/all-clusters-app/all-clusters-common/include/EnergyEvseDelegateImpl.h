@@ -75,7 +75,7 @@ public:
     Status HwSetState(StateEnum state);
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
-    Status HwSetVehicleID(CharSpan vehID);
+    Status HwSetVehicleID(const CharSpan & vehID);
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -139,6 +139,7 @@ private:
     static constexpr int DEFAULT_MIN_CHARGE_CURRENT          = 6000;                  /* 6A */
     static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT = kMaximumChargeCurrent; /* 80A */
     static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW  = 600;                   /* 600s */
+    static constexpr int kMaxVehicleIDBufSize                = 32;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
