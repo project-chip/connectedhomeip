@@ -384,14 +384,15 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
         if (mpCallback != nullptr)
         {
+            ConcreteCommandPath concreteCommandPath(endpointId, clusterId, commandId);
             if (statusIB.IsSuccess())
             {
-                mpCallback->OnResponseWithAdditionalData(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
+               mpCallback->OnResponseWithAdditionalData(this, concreteCommandPath, statusIB,
                                                          hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
             }
             else
             {
-                mpCallback->OnError(this, statusIB.ToChipError());
+                mpCallback->OnPathSpecificError(this, concreteCommandPath, statusIB, additionalResponseData);
             }
         }
     }
