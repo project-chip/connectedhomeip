@@ -72,7 +72,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
-    debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
+    debugStr.reset(g_variant_print(serviceData, TRUE));
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
     bluez_leadvertisement1_set_type_(adv, (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
@@ -117,7 +117,7 @@ gboolean BluezAdvertisement::BluezLEAdvertisement1Release(BluezLEAdvertisement1 
 {
     ChipLogDetail(DeviceLayer, "Release BLE adv object in %s", __func__);
     g_dbus_object_manager_server_unexport(mEndpoint.GetGattApplicationObjectManager(), mpAdvPath);
-    mpAdv          = nullptr;
+    mpAdv.reset();
     mIsAdvertising = false;
     return TRUE;
 }
@@ -128,7 +128,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
-    mpAdv = GAutoPtr<BluezLEAdvertisement1>(CreateLEAdvertisement());
+    mpAdv.reset(CreateLEAdvertisement());
     return CHIP_NO_ERROR;
 }
 
@@ -182,10 +182,8 @@ void BluezAdvertisement::Shutdown()
     // attached to the advertising object that may run on the glib thread.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) {
-            if (self->mpAdv.get() != nullptr)
-            {
-                self->mpAdv = nullptr;
-            }
+            self->mpAdv.reset();
+
             return CHIP_NO_ERROR;
         },
         this);

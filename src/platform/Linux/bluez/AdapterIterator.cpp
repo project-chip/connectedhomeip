@@ -43,7 +43,7 @@ CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GAutoPtr<GError> error;
 
-    self->mManager = GAutoPtr<GDBusObjectManager>(g_dbus_object_manager_client_new_for_bus_sync(
+    self->mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
         nullptr /*destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(error).Get()));
@@ -92,14 +92,12 @@ bool AdapterIterator::Advance()
             index = 0;
         }
 
-        mCurrent.adapter = nullptr;
-
         mCurrent.index   = index;
         mCurrent.address = bluez_adapter1_get_address(adapter);
         mCurrent.alias   = bluez_adapter1_get_alias(adapter);
         mCurrent.name    = bluez_adapter1_get_name(adapter);
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
-        mCurrent.adapter = GAutoPtr<BluezAdapter1>(adapter);
+        mCurrent.adapter.reset(adapter);
 
         mCurrentListItem = mCurrentListItem->next;
 

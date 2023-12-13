@@ -441,14 +441,14 @@ void BluezEndpoint::SetupAdapter()
                 {
                     if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
                     {
-                        mpAdapter = GAutoPtr<BluezAdapter1>(g_object_ref(adapter));
+                        mpAdapter.reset(g_object_ref(adapter));
                     }
                 }
                 else
                 {
                     if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
                     {
-                        mpAdapter = GAutoPtr<BluezAdapter1>(g_object_ref(adapter));
+                        mpAdapter.reset(g_object_ref(adapter));
                     }
                 }
             }
@@ -534,7 +534,7 @@ void BluezEndpoint::SetupGattService()
     static const char * const c3_flags[] = { "read", nullptr };
 #endif
 
-    mpService = GAutoPtr<BluezGattService1>(CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING));
+    mpService.reset(CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING));
 
     // C1 characteristic
     mpC1 =
@@ -604,7 +604,7 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
     VerifyOrReturn(!mIsCentral);
 
     mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
-    mpRoot     = GAutoPtr<GDBusObjectManagerServer>(g_dbus_object_manager_server_new(mpRootPath));
+    mpRoot.reset(g_dbus_object_manager_server_new(mpRootPath));
 
     SetupGattService();
 
@@ -628,7 +628,7 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 
     SetupGattServer(conn.get());
 
-    mpObjMgr = GAutoPtr<GDBusObjectManager>(g_dbus_object_manager_client_new_sync(
+    mpObjMgr.reset(g_dbus_object_manager_client_new_sync(
         conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
         nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
         &MakeUniquePointerReceiver(err).Get()));
@@ -682,7 +682,7 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
     }
     else
     {
-        mpConnectCancellable = GAutoPtr<GCancellable>(g_cancellable_new());
+        mpConnectCancellable.reset(g_cancellable_new());
     }
 
     err =
@@ -699,15 +699,24 @@ void BluezEndpoint::Shutdown()
 {
     VerifyOrReturn(mIsInitialized);
 
-    mpObjMgr             = nullptr;
-    mpAdapter            = nullptr;
-    mpDevice             = nullptr;
-    mpRoot               = nullptr;
-    mpService            = nullptr;
-    mpC1                 = nullptr;
-    mpC2                 = nullptr;
-    mpC3                 = nullptr;
-    mpConnectCancellable = nullptr;
+    // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
+    // cleanup function releases the D-Bus manager client object, which handles D-Bus
+    // signals. Otherwise, we will face race condition when the D-Bus signal is in
+    // the middle of being processed when the cleanup function is called.
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) {
+            mpObjMgr.reset();
+            mpAdapter.reset();
+            mpDevice.reset();
+            mpRoot.reset();
+            mpService.reset();
+            mpC1.reset();
+            mpC2.reset();
+            mpC3.reset();
+            mpConnectCancellable.reset();
+            return CHIP_NO_ERROR;
+        },
+        this);
 
     g_free(mpOwningName);
     g_free(mpAdapterName);

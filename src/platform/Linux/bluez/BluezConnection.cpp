@@ -86,9 +86,9 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
 
     if (!aEndpoint.mIsCentral)
     {
-        mpService = GAutoPtr<BluezGattService1>(BLUEZ_GATT_SERVICE1(g_object_ref(aEndpoint.mpService.get())));
-        mpC1      = GAutoPtr<BluezGattCharacteristic1>(BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC1.get())));
-        mpC2      = GAutoPtr<BluezGattCharacteristic1>(BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC2.get())));
+        mpService.reset(BLUEZ_GATT_SERVICE1(g_object_ref(aEndpoint.mpService.get())));
+        mpC1.reset(BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC1.get())));
+        mpC2.reset(BLUEZ_GATT_CHARACTERISTIC1(g_object_ref(aEndpoint.mpC2.get())));
     }
     else
     {
@@ -104,7 +104,7 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
                 if ((BluezIsServiceOnDevice(service, mpDevice.get())) == TRUE &&
                     (strcmp(bluez_gatt_service1_get_uuid(service), CHIP_BLE_UUID_SERVICE_STRING) == 0))
                 {
-                    mpService = GAutoPtr<BluezGattService1>(service);
+                    mpService.reset(service);
                     break;
                 }
                 g_object_unref(service);
@@ -123,18 +123,18 @@ CHIP_ERROR BluezConnection::Init(const BluezEndpoint & aEndpoint)
                 if ((BluezIsCharOnService(char1, mpService.get()) == TRUE) &&
                     (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C1_STRING) == 0))
                 {
-                    mpC1 = GAutoPtr<BluezGattCharacteristic1>(char1);
+                    mpC1.reset(char1);
                 }
                 else if ((BluezIsCharOnService(char1, mpService.get()) == TRUE) &&
                          (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C2_STRING) == 0))
                 {
-                    mpC2 = GAutoPtr<BluezGattCharacteristic1>(char1);
+                    mpC2.reset(char1);
                 }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
                 else if ((BluezIsCharOnService(char1, mpService.get()) == TRUE) &&
                          (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
                 {
-                    mpC3 = GAutoPtr<BluezGattCharacteristic1>(char1);
+                    mpC3.reset(char1);
                 }
 #endif
                 else

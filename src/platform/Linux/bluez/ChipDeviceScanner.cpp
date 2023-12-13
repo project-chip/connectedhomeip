@@ -58,8 +58,8 @@ CHIP_ERROR ChipDeviceScanner::Init(ChipDeviceScannerDelegate * delegate)
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    mCancellable = GAutoPtr<GCancellable>(g_cancellable_new());
-    mDelegate    = delegate;
+    mCancellable.reset(g_cancellable_new());
+    mDelegate = delegate;
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
@@ -78,7 +78,15 @@ void ChipDeviceScanner::Shutdown()
         chip::DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, this);
     }
 
-    mCancellable = nullptr;
+    // Release resources on the glib thread. This is necessary because the D-Bus manager client
+    // object handles D-Bus signals. Otherwise, we might face a race when the manager object is
+    // released during a D-Bus signal being processed.
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](ChipDeviceScanner * self) {
+            mCancellable.reset();
+            return CHIP_NO_ERROR;
+        },
+        this);
 
     mIsInitialized = false;
 }
