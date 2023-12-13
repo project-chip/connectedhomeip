@@ -16429,7 +16429,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            PingCountEvent(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;

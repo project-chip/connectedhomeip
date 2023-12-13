@@ -22,7 +22,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
-import matter.devicecontroller.cluster.clusters.IdentifyCluster
+import matter.controller.cluster.clusters.IdentifyCluster
 
 class PairOnNetworkLongImInvokeCommand(
   controller: MatterController,
