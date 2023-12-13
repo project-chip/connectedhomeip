@@ -57,6 +57,7 @@ CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeMana
 
 void CheckInMessageHandler::Shutdown()
 {
+    mpICDClientStorage = nullptr;
     if (mpExchangeManager)
     {
         mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
@@ -77,14 +78,15 @@ CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHead
 CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                     System::PacketBufferHandle && payload)
 {
-    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn),
-                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    // If the message type is not ICD_CheckIn, return CHIP_NO_ERROR and exit
+    VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_NO_ERROR);
 
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
     CounterType counter = 0;
+    // If the CheckIn message processing fails, return CHIP_NO_ERROR and exit.
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
-                        CHIP_ERROR_INCORRECT_STATE);
+                        CHIP_NO_ERROR);
     CounterType checkInCounter = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
     VerifyOrReturnError(checkInCounter > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
     clientInfo.offset = checkInCounter;
