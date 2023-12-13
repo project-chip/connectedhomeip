@@ -51,7 +51,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     thermostatUserInterfaceConfigurationCluster = "Thermostat User Interface Configuration Cluster"
     wakeOnLANCluster = "Wake On LAN Cluster"
     lowPowerCluster = "Low Power Cluster"
-    laundryModeCluster = "Laundry Mode Cluster"
 
     if otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
         clusterName = "OTA Software Update"
