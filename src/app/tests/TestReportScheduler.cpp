@@ -27,37 +27,7 @@
 
 namespace {
 
-class TestContext : public chip::Test::AppContext
-{
-public:
-    static int Initialize(void * context)
-    {
-        if (AppContext::Initialize(context) != SUCCESS)
-            return FAILURE;
-
-        auto * ctx = static_cast<TestContext *>(context);
-
-        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
-        {
-            return FAILURE;
-        }
-
-        return SUCCESS;
-    }
-
-    static int Finalize(void * context)
-    {
-        chip::app::EventManagement::DestroyEventManagement();
-
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-
-        return SUCCESS;
-    }
-
-private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
-};
+using TestContext = chip::Test::AppContext;
 
 class NullReadHandlerCallback : public chip::app::ReadHandler::ManagementCallback
 {
@@ -844,7 +814,14 @@ static nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
-nlTestSuite sSuite = { "TestReportScheduler", &sTests[0], TestContext::Initialize, TestContext::Finalize };
+nlTestSuite sSuite = {
+    "TestReportScheduler",
+    &sTests[0],
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
+};
 
 } // namespace
 

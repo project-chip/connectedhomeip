@@ -457,6 +457,10 @@ SSBL demo application can be imported from the `Quickstart panel`:
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
+### Features
+
+#### Multi image
+
 To support multi-image OTA feature, the SSBL project must be compiled using the
 following defines:
 
@@ -473,6 +477,24 @@ Optionally, add the following defines:
 -   `EXTERNAL_FLASH_DATA_OTA=1` - to support external read only data.
 
 ![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
+
+#### Simple hash verification
+
+When secure boot is not used, a simple hash can be appended at the end of the
+image for integrity check. Applications should be built with
+`chip_simple_hash_verification=1`.
+
+To support simple hash verification feature, the SSBL project must be compiled
+with:
+
+-   `gSimpleHashVerification=1`
+
+and update the post-build command to use simple hash verification instead of the
+default options. Go to
+`Project -> Properties -> C/C++ Build -> Settings -> Build steps` and press
+`Edit` under `Post-build steps` subsection. The command should look similar to:
+
+![SSBL_SIMPLE_HASH_VERIFICATION](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_simple_hash.JPG)
 
 Once compiled, the required SSBL file is called `k32w061dk6_ssbl.bin`.
 

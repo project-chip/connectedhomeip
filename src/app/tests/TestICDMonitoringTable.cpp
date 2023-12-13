@@ -155,11 +155,16 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 
     // Retrieve first entry
     err = loading.Get(0, entry);
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve second entry
     err = loading.Get(1, entry);
@@ -168,6 +173,10 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // No more entries
     err = loading.Get(2, entry);
@@ -176,6 +185,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 
     // Remove first entry
     saving.Remove(0);
+
     ICDMonitoringEntry entry4(&keystore);
     entry4.checkInNodeID    = kClientNodeId13;
     entry4.monitoredSubject = kClientNodeId11;
@@ -190,6 +200,10 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve second entry
     err = loading.Get(1, entry);
@@ -198,6 +212,10 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry4.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 }
 
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
@@ -296,14 +314,22 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
-    // Retrieve fabric2, second entry
+    // Retrieve fabric1, second entry
     err = table1.Get(1, entry);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -312,6 +338,10 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 }
 
 void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
@@ -358,6 +388,10 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve second entry (not modified)
     err = table1.Get(1, entry);
@@ -366,6 +400,10 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove (existing)
     err = table1.Remove(0);
@@ -381,6 +419,10 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -389,6 +431,10 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove all (fabric 1)
     err = table1.RemoveAll();
@@ -404,6 +450,10 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove all (fabric 2)
     err = table2.RemoveAll();

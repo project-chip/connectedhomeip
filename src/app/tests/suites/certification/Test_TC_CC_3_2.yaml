@@ -95,14 +95,29 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #Tolerance to be computed from the range
+    #Start value 200, expected value 250, 200 - 250 = -50, 50 % 15 = 8 , So 250+/-8 We need two range here as 254 is the max value
+    #242...254...0...4
+    #Multiple range not supported in YAML: https://github.com/project-chip/connectedhomeip/issues/23197
     - label: "Step 2c: TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 215
-              maxValue: 255
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          After 10 seconds, Verify that CurrentHue attribute  value is 250 On TH(chip-tool)  Logs and below is the sample log provided for the raspi platform
+
+          [1649662328.012887][8447:8452] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087279986
+          [1649662328.012957][8447:8452] CHIP:TOO:   Current hue: 250
+          [1649662328.013055][8447:8452] CHIP:EM: Sending Standalone Ack for MessageCounter:8634142 on exchange 13871i
+          (Value can vary)
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 10s"
       PICS: CC.S.F00

@@ -122,7 +122,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance = new Instance(gOperationalStateDelegate, operationalStateEndpoint, Clusters::OperationalState::Id);
+    gOperationalStateInstance           = new Instance(gOperationalStateDelegate, operationalStateEndpoint);
 
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
