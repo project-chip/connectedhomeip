@@ -70,11 +70,11 @@ tests:
                         GroupKeySetID: 1,
                         GroupKeySecurityPolicy: 0,
                         EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime0: 2220000,
+                        EpochStartTime0: 1,
                         EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime1: 2220001,
+                        EpochStartTime1: 18446744073709551613,
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
-                        EpochStartTime2: 2220002,
+                        EpochStartTime2: 18446744073709551614,
                     }
 
     - label:

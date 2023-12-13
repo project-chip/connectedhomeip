@@ -726,6 +726,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
     Map<String, InteractionInfo> writeTimerInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("timer", writeTimerInteractionInfo);
+    Map<String, InteractionInfo> writeOvenCavityOperationalStateInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("ovenCavityOperationalState", writeOvenCavityOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeOvenModeInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeOvenModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo ovenModestartUpModeCommandParameterInfo =
@@ -1322,6 +1324,8 @@ public class ClusterWriteMapping {
     );
     writeDemandResponseLoadControlInteractionInfo.put("writeDefaultRandomDurationAttribute", writeDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo);
     writeAttributeMap.put("demandResponseLoadControl", writeDemandResponseLoadControlInteractionInfo);
+    Map<String, InteractionInfo> writeDeviceEnergyManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("deviceEnergyManagement", writeDeviceEnergyManagementInteractionInfo);
     Map<String, InteractionInfo> writeEnergyEvseInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeEnergyEvseUserMaximumChargeCurrentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo energyEvseuserMaximumChargeCurrentCommandParameterInfo =
@@ -3598,6 +3602,10 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("applicationBasic", writeApplicationBasicInteractionInfo);
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
+    Map<String, InteractionInfo> writeContentControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("contentControl", writeContentControlInteractionInfo);
+    Map<String, InteractionInfo> writeContentAppObserverInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("contentAppObserver", writeContentAppObserverInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =

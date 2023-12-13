@@ -28,9 +28,9 @@
 
 #pragma once
 
-inline constexpr const char kIdentityAlpha[] = "alpha";
-inline constexpr const char kIdentityBeta[] = "beta";
-inline constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr char kIdentityAlpha[] = "alpha";
+inline constexpr char kIdentityBeta[] = "beta";
+inline constexpr char kIdentityGamma[] = "gamma";
 
 class CHIPCommandBridge : public Command {
 public:

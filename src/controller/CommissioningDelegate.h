@@ -52,6 +52,9 @@ enum CommissioningStage : uint8_t
     kSendTrustedRootCert,        ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
     kSendNOC,                    ///< Send AddNOC (0x3E:6) command to the device
     kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
+    kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
+    kICDRegistration,            ///< Register for ICD management
+    kICDSendStayActive,          ///< Send Keep Alive to ICD
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
@@ -517,6 +520,27 @@ public:
         return *this;
     }
 
+    Optional<NodeId> GetICDCheckInNodeId() const { return mICDCheckInNodeId; }
+    CommissioningParameters & SetICDCheckInNodeId(NodeId icdCheckInNodeId)
+    {
+        mICDCheckInNodeId = MakeOptional(icdCheckInNodeId);
+        return *this;
+    }
+
+    Optional<uint64_t> GetICDMonitoredSubject() const { return mICDMonitoredSubject; }
+    CommissioningParameters & SetICDMonitoredSubject(uint64_t icdMonitoredSubject)
+    {
+        mICDMonitoredSubject = MakeOptional(icdMonitoredSubject);
+        return *this;
+    }
+
+    Optional<ByteSpan> GetICDSymmetricKey() const { return mICDSymmetricKey; }
+    CommissioningParameters & SetICDSymmetricKey(ByteSpan icdSymmetricKey)
+    {
+        mICDSymmetricKey = MakeOptional(icdSymmetricKey);
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -538,6 +562,7 @@ public:
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
         mDefaultNTP.ClearValue();
+        mICDSymmetricKey.ClearValue();
     }
 
 private:
@@ -578,6 +603,11 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
+
+    Optional<NodeId> mICDCheckInNodeId;
+    Optional<uint64_t> mICDMonitoredSubject;
+    Optional<ByteSpan> mICDSymmetricKey;
+
     ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };

@@ -38,7 +38,9 @@ AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate
 
 void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                     const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                    const CharSpan & data)
+                                                    const CharSpan & data,
+                                                    const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                    bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());

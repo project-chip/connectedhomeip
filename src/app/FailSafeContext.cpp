@@ -19,14 +19,15 @@
  *    @file
  *          Provides the implementation of the FailSafeContext object.
  */
-
-#include <app/icd/ICDNotifier.h>
+#include "FailSafeContext.h"
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include "FailSafeContext.h"
 
 using namespace chip::DeviceLayer;
 

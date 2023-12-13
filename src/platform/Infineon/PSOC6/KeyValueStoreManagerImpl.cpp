@@ -52,7 +52,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     if (!init_success)
     {
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
     }
 
     // Get the value size
@@ -152,7 +152,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 {
     if (!init_success)
     {
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
     }
 
     cy_rslt_t result;
@@ -179,7 +179,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
     if (!init_success)
     {
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
     }
 
     // Matter KVStore requires that a delete called on a key that doesn't exist return an error
@@ -223,7 +223,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::Erase(void)
 {
     if (!init_success)
     {
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
     }
 
     cy_rslt_t result = mtb_kvstore_reset(&kvstore_obj);

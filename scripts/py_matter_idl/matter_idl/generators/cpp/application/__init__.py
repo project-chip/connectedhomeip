@@ -13,14 +13,10 @@
 # limitations under the License.
 
 import os
-from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
-
-
-def serverClustersOnly(clusters: List[Cluster]) -> List[Cluster]:
-    return [c for c in clusters if c.side == ClusterSide.SERVER]
+from matter_idl.generators.cluster_selection import server_side_clusters
+from matter_idl.matter_idl_types import Idl
 
 
 class CppApplicationGenerator(CodeGenerator):
@@ -35,8 +31,6 @@ class CppApplicationGenerator(CodeGenerator):
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
-        self.jinja_env.filters['serverClustersOnly'] = serverClustersOnly
-
     def internal_render_all(self):
         """
         Renders the cpp and header files required for applications
@@ -47,7 +41,7 @@ class CppApplicationGenerator(CodeGenerator):
             template_path="PluginApplicationCallbacksHeader.jinja",
             output_file_name="app/PluginApplicationCallbacks.h",
             vars={
-                'clusters': self.idl.clusters,
+                'clusters': server_side_clusters(self.idl)
             }
         )
 
@@ -57,6 +51,6 @@ class CppApplicationGenerator(CodeGenerator):
             template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
             vars={
-                'clusters': self.idl.clusters,
+                'clusters': server_side_clusters(self.idl)
             }
         )

@@ -24,7 +24,7 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="ARRAY" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">OutputList</attribute>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST"           type="array" entryType="OutputInfoStruct" length="254"          writable="false"  optional="false">OutputList</attribute>
     <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="int8u" default="0x00"               min="0x00" max="0xFF" writable="false"  optional="false">CurrentOutput</attribute>
 
     <command source="client" code="0x00" name="SelectOutput" optional="false">
