@@ -22,9 +22,15 @@
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
-
+#if OTA_ENCRYPTION_ENABLE
+#include "OtaUtils.h"
+#include "rom_aes.h"
+#endif
 namespace chip {
 
+#if OTA_ENCRYPTION_ENABLE
+constexpr uint8_t au8Iv[] = { 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x00, 0x00, 0x00, 0x00 };
+#endif
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
     CHIP_ERROR status     = CHIP_NO_ERROR;
@@ -57,6 +63,9 @@ void OTATlvProcessor::ClearInternal()
     mLength          = 0;
     mProcessedLength = 0;
     mWasSelected     = false;
+#if OTA_ENCRYPTION_ENABLE
+    mIVOffset = 0;
+#endif
 }
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)
@@ -93,4 +102,75 @@ CHIP_ERROR OTADataAccumulator::Accumulate(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
+#if OTA_ENCRYPTION_ENABLE
+CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & block)
+{
+    uint8_t iv[16];
+    uint8_t key[16];
+    uint8_t dataOut[16] = { 0 };
+    uint32_t u32IVCount;
+    uint32_t Offset = 0;
+    uint8_t data;
+    tsReg128 sKey;
+    aesContext_t Context;
+
+    memcpy(iv, au8Iv, sizeof(au8Iv));
+
+    u32IVCount = (((uint32_t) iv[12]) << 24) | (((uint32_t) iv[13]) << 16) | (((uint32_t) iv[14]) << 8) | (iv[15]);
+    u32IVCount += (mIVOffset >> 4);
+
+    iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
+    iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
+    iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
+    iv[15] = (uint8_t) (u32IVCount & 0xff);
+
+    size_t len = strlen(OTA_ENCRYPTION_KEY);
+
+    if (len != 32)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char hex[3] = { OTA_ENCRYPTION_KEY[i], OTA_ENCRYPTION_KEY[i + 1], '\0' };
+        key[i / 2]  = (uint8_t) strtol(hex, NULL, 16);
+    }
+    ByteSpan KEY = ByteSpan(key);
+    Encoding::LittleEndian::Reader reader_key(KEY.data(), KEY.size());
+    ReturnErrorOnFailure(reader_key.Read32(&sKey.u32register0)
+                             .Read32(&sKey.u32register1)
+                             .Read32(&sKey.u32register2)
+                             .Read32(&sKey.u32register3)
+                             .StatusCode());
+
+    while (Offset + 16 <= block.size())
+    {
+        /*Encrypt the IV*/
+        Context.mode         = AES_MODE_ECB_ENCRYPT;
+        Context.pSoftwareKey = (uint32_t *) &sKey;
+        AES_128_ProcessBlocks(&Context, (uint32_t *) &iv[0], (uint32_t *) &dataOut[0], 1);
+
+        /* Decrypt a block of the buffer */
+        for (uint8_t i = 0; i < 16; i++)
+        {
+            data = block[Offset + i] ^ dataOut[i];
+            memcpy(&block[Offset + i], &data, sizeof(uint8_t));
+        }
+
+        /* increment the IV for the next block  */
+        u32IVCount++;
+
+        iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
+        iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
+        iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
+        iv[15] = (uint8_t) (u32IVCount & 0xff);
+
+        Offset += 16; /* increment the buffer offset */
+        mIVOffset += 16;
+    }
+
+    return CHIP_NO_ERROR;
+}
+#endif
 } // namespace chip

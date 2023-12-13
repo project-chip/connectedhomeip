@@ -4310,6 +4310,192 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rangeMin = @(0);
+
+        _rangeMax = @(0);
+
+        _percentMax = nil;
+
+        _percentMin = nil;
+
+        _percentTypical = nil;
+
+        _fixedMax = nil;
+
+        _fixedMin = nil;
+
+        _fixedTypical = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct alloc] init];
+
+    other.rangeMin = self.rangeMin;
+    other.rangeMax = self.rangeMax;
+    other.percentMax = self.percentMax;
+    other.percentMin = self.percentMin;
+    other.percentTypical = self.percentTypical;
+    other.fixedMax = self.fixedMax;
+    other.fixedMin = self.fixedMin;
+    other.fixedTypical = self.fixedTypical;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rangeMin:%@; rangeMax:%@; percentMax:%@; percentMin:%@; percentTypical:%@; fixedMax:%@; fixedMin:%@; fixedTypical:%@; >", NSStringFromClass([self class]), _rangeMin, _rangeMax, _percentMax, _percentMin, _percentTypical, _fixedMax, _fixedMin, _fixedTypical];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _measurementType = @(0);
+
+        _measured = @(0);
+
+        _minMeasuredValue = @(0);
+
+        _maxMeasuredValue = @(0);
+
+        _accuracyRanges = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct alloc] init];
+
+    other.measurementType = self.measurementType;
+    other.measured = self.measured;
+    other.minMeasuredValue = self.minMeasuredValue;
+    other.maxMeasuredValue = self.maxMeasuredValue;
+    other.accuracyRanges = self.accuracyRanges;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: measurementType:%@; measured:%@; minMeasuredValue:%@; maxMeasuredValue:%@; accuracyRanges:%@; >", NSStringFromClass([self class]), _measurementType, _measured, _minMeasuredValue, _maxMeasuredValue, _accuracyRanges];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _energy = @(0);
+
+        _startTimestamp = nil;
+
+        _endTimestamp = nil;
+
+        _startSystime = nil;
+
+        _endSystime = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct alloc] init];
+
+    other.energy = self.energy;
+    other.startTimestamp = self.startTimestamp;
+    other.endTimestamp = self.endTimestamp;
+    other.startSystime = self.startSystime;
+    other.endSystime = self.endSystime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energy:%@; startTimestamp:%@; endTimestamp:%@; startSystime:%@; endSystime:%@; >", NSStringFromClass([self class]), _energy, _startTimestamp, _endTimestamp, _startSystime, _endSystime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _energyImported = nil;
+
+        _energyExported = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent alloc] init];
+
+    other.energyImported = self.energyImported;
+    other.energyExported = self.energyExported;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energyImported:%@; energyExported:%@; >", NSStringFromClass([self class]), _energyImported, _energyExported];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _energyImported = nil;
+
+        _energyExported = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent alloc] init];
+
+    other.energyImported = self.energyImported;
+    other.energyExported = self.energyExported;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: energyImported:%@; energyExported:%@; >", NSStringFromClass([self class]), _energyImported, _energyExported];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDemandResponseLoadControlClusterHeatingSourceControlStruct
 - (instancetype)init
 {
@@ -5855,7 +6041,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRThermostatClusterThermostatScheduleTransition
+@implementation MTRThermostatClusterWeeklyScheduleTransitionStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -5871,7 +6057,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRThermostatClusterThermostatScheduleTransition alloc] init];
+    auto other = [[MTRThermostatClusterWeeklyScheduleTransitionStruct alloc] init];
 
     other.transitionTime = self.transitionTime;
     other.heatSetpoint = self.heatSetpoint;
@@ -5886,6 +6072,12 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
+@dynamic transitionTime;
+@dynamic heatSetpoint;
+@dynamic coolSetpoint;
 @end
 
 @implementation MTRChannelClusterProgramCastStruct
@@ -7507,6 +7699,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @dynamic fabricIndex;
+@end
+
+@implementation MTRSampleMEIClusterPingCountEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _count = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSampleMEIClusterPingCountEventEvent alloc] init];
+
+    other.count = self.count;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: count:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _count, _fabricIndex];
+    return descriptionString;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -20941,8 +20941,8 @@ NS_ASSUME_NONNULL_BEGIN
             auto iter_0 = decodableStruct.transitions.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
-                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
+                MTRThermostatClusterWeeklyScheduleTransitionStruct * newElement_0;
+                newElement_0 = [MTRThermostatClusterWeeklyScheduleTransitionStruct new];
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 if (entry_0.heatSetpoint.IsNull()) {
                     newElement_0.heatSetpoint = nil;
@@ -21034,11 +21034,11 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.transitions.count; ++i_0) {
-                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransition class]]) {
+                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterWeeklyScheduleTransitionStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRThermostatClusterThermostatScheduleTransition *) self.transitions[i_0];
+                    auto element_0 = (MTRThermostatClusterWeeklyScheduleTransitionStruct *) self.transitions[i_0];
                     listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
                     if (element_0.heatSetpoint == nil) {
                         listHolder_0->mList[i_0].heatSetpoint.SetNull();

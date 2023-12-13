@@ -33,7 +33,7 @@ using SymmetricKeystore = SessionKeystore;
 
 namespace chip {
 
-inline constexpr size_t kICDMonitoringBufferSize = 40;
+inline constexpr size_t kICDMonitoringBufferSize = 60;
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
@@ -104,7 +104,8 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;
     uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle key                   = Crypto::Aes128KeyHandle();
+    Crypto::Aes128KeyHandle aesKeyHandle          = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmacKeyHandle        = Crypto::Hmac128KeyHandle();
     bool keyHandleValid                           = false;
     uint16_t index                                = 0;
     Crypto::SymmetricKeystore * symmetricKeystore = nullptr;

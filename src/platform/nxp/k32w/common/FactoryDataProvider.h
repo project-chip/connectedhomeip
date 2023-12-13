@@ -26,8 +26,8 @@
 #include "CHIPPlatformConfig.h"
 
 /* Grab symbol for the base address from the linker file. */
-extern uint32_t __FACTORY_DATA_START[];
-extern uint32_t __FACTORY_DATA_SIZE[];
+extern uint32_t __MATTER_FACTORY_DATA_START[];
+extern uint32_t __MATTER_FACTORY_DATA_SIZE[];
 
 namespace chip {
 namespace DeviceLayer {

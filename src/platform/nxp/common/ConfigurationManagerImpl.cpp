@@ -27,7 +27,6 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "NXPConfig.h"
-#include <app/server/Server.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
@@ -148,12 +147,7 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    PlatformMgr().ScheduleWork([](intptr_t) {
-        // Emit ShutDown event and delete all fabrics.
-        PlatformMgr().HandleServerShuttingDown();
-        Server::GetInstance().GetFabricTable().DeleteAllFabrics();
-        DoFactoryReset(0);
-    });
+    PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,

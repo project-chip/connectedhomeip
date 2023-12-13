@@ -25,6 +25,7 @@
 #include "Command.h"
 
 #include <TracingCommandLineArgument.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -155,9 +156,10 @@ protected:
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+    static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
