@@ -16,33 +16,38 @@
 #  Top Level Labels
 ############################################################
 repo:
-    - ./*
+    - any:
+        - './*'
 
 ############################################################
 #  Examples
 ############################################################
 examples:
-    - examples/*
-    - examples/**/*
+    - any:
+        - 'examples/*'
+        - 'examples/**/*'
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
-    - docs/*
-    - docs/**/*
-    - "*.md"
+    - any:
+        - 'docs/*'
+        - 'docs/**/*'
+        - '"*.md"'
 
 ############################################################
 #  Tools + Development Items
 ############################################################
 scripts:
-    - scripts/*
-    - scripts/**/*
+    -any:
+        - 'scripts/*'
+        - 'scripts/**/*'
 
 integrations:
-    - integrations/*
-    - integrations/**/*
+    - any:
+    - 'integrations/*'
+    - 'integrations/**/*'
 
 docker:
     - integrations/docker/*
