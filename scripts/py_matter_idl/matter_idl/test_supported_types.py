@@ -72,7 +72,7 @@ class TestSupportedTypes(unittest.TestCase):
                     # handled as a non-integer type
                     "boolean", "single", "double",
                     # handled as specific bitmaps
-                    "bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64",
+                    "bitmap8", "bitmap16", "bitmap32", "bitmap64",
                     # handled as specific enums. Note that spec defines enumerations only for 8 and 16
                     "enum8", "enum16",
 
