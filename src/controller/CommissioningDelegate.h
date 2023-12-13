@@ -691,7 +691,7 @@ struct ReadCommissioningInfo
     uint8_t maxTimeZoneSize           = 1;
     uint8_t maxDSTSize                = 1;
     NodeId remoteNodeId               = kUndefinedNodeId;
-    bool isLit                        = false;
+    bool isLIT                        = false;
     bool checkInProtocolSupport       = false;
     bool supportsConcurrentConnection = true;
 };

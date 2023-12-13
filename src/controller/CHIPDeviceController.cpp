@@ -2271,14 +2271,14 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
-        info.isLit                  = true;
+        info.isLIT                  = true;
         info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         // This key is optional so not an error
         err        = CHIP_NO_ERROR;
-        info.isLit = false;
+        info.isLIT = false;
         err        = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
@@ -2290,7 +2290,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         {
             if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
             {
-                info.isLit = false;
+                info.isLIT = false;
             }
             else
             {

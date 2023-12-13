@@ -759,7 +759,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
-                if (commissioningInfo.isLit && commissioningInfo.checkInProtocolSupport)
+                if (commissioningInfo.isLIT && commissioningInfo.checkInProtocolSupport)
                 {
                     mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
