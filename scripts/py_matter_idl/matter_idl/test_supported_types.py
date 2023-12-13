@@ -74,7 +74,7 @@ class TestSupportedTypes(unittest.TestCase):
                     # handled as specific bitmaps
                     "bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64",
                     # handled as specific enums. Note that spec defines enumerations only for 8 and 16
-                    "enum8", "enum16"
+                    "enum8", "enum16",
 
                     # TODO: these may be bugs to fix
                     "unknown"
