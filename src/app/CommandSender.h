@@ -136,8 +136,8 @@ public:
          * IM Status was not successful. OnResponse contract explicitily states that IM Status needed to be success. OnError's contract
          * specified that it only is supposed to take non-path-specific status response from the server. We were left with this gap
          * where we needed a callback that could be called for path-specific statuses that contained an error. Ideally it would have
-         * been nice to change OnResponse's contract to no force IM status to be a success, but doing so would break a lot of code,
-         * hence the addition of OnPathSpecificError.
+         * been nice to change OnResponse's contract to not force IM status to be a success, but doing so would cause regression as
+         * code outside SDK may rely on the existing callback behavior; hence the addition of OnPathSpecificError.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -163,8 +163,8 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific status response
          *     from the server. In that case, StatusIB::InitFromChipError can be used to extract
          *     the status.
-         *       Note: If client does not override OnPathSpecificError they will also get path-specific status response
-         *             from server this way. This is done for backwards compatibility.
+         *       Note: If client does not override OnPathSpecificError they will also get path-specific error status
+         *             response(s) from server this way. This is done for backwards compatibility.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
