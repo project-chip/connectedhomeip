@@ -110,109 +110,130 @@ test driver:
 #  Source Code
 ############################################################
 qr code:
-    - src/qrcode/*
-    - src/qrcode/**/*
-    - src/qrcodetool/*
-    - src/qrcodetool/**/*
+    - any:
+        - src/qrcode/*
+        - src/qrcode/**/*
+        - src/qrcodetool/*
+        - src/qrcodetool/**/*
 
 lwip:
-    - src/lwip/*
-    - src/lwip/**/*
+    - any:
+        - src/lwip/*
+        - src/lwip/**/*
 
 inet:
-    - src/inet/*
-    - src/inet/**/*
+    - any:
+        - src/inet/*
+        - src/inet/**/*
 
 config:
-    - config/*
-    - config/**/*
+    - any:
+        - config/*
+        - config/**/*
 
 lib:
-    - src/lib/*
-    - src/lib/**/*
+    - any:
+        - src/lib/*
+        - src/lib/**/*
 
 core:
-    - src/lib/core/*
-    - src/lib/core/**/*
+    - any:
+        - src/lib/core/*
+        - src/lib/core/**/*
 
 protocols:
-    - src/lib/protocols/*
-    - src/lib/protocols/**/*
-    - src/protocols/*
-    - src/protocols/**/*
+    - any:
+        - src/lib/protocols/*
+        - src/lib/protocols/**/*
+        - src/protocols/*
+        - src/protocols/**/*
 
 messaging:
-    - src/messaging/*
-    - src/messaging/**/*
+    - any:
+        - src/messaging/*
+        - src/messaging/**/*
 
 shell:
-    - src/lib/shell/*
-    - src/lib/shell/**/*
+    - any:
+        - src/lib/shell/*
+        - src/lib/shell/**/*
 
 support:
-    - src/lib/support/*
-    - src/lib/support/**/*
+    - any:
+        - src/lib/support/*
+        - src/lib/support/**/*
 
 crypto:
-    - src/crypto/*
-    - src/crypto/**/*
+    - any:
+        - src/crypto/*
+        - src/crypto/**/*
 
 controller:
-    - src/controller/*
-    - src/controller/**/*
+    - any:
+        - src/controller/*
+        - src/controller/**/*
 
 ble:
-    - src/ble/*
-    - src/ble/**/*
+    - any:
+        - src/ble/*
+        - src/ble/**/*
 
 app:
-    - src/app/*
-    - src/app/**/*
+    - any:
+        - src/app/*
+        - src/app/**/*
 
 icd:
-    - src/app/icd/*
-    - src/app/icd/**/*
+    - any:
+        - src/app/icd/*
+        - src/app/icd/**/*
 
 transport:
-    - src/transport/*
-    - src/transport/**/*
+    - any:
+        - src/transport/*
+        - src/transport/**/*
 
 system:
-    - src/system/*
-    - src/system/**/*
+    - any:
+        - src/system/*
+        - src/system/**/*
 
 setup payload:
-    - src/setup_payload/*
-    - src/setup_payload/**/*
+    - any:
+        - src/setup_payload/*
+        - src/setup_payload/**/*
 
 ############################################################
 #  Platforms
 ############################################################
 platform:
-    - src/platform/*
-    - src/platform/**/*
-    - config/tizen/chip-gn/platform/*
-    - config/tizen/chip-gn/platform/**/*
-    - examples/platform/*
-    - examples/platform/**/*
-    - scripts/tools/memory/platform/*
-    - scripts/tools/memory/platform/**/*
-    - src/include/platform/*
-    - src/include/platform/**/*
-    - src/lib/dnssd/platform/*
-    - src/lib/dnssd/platform/**/*
+    - any:
+        - src/platform/*
+        - src/platform/**/*
+        - config/tizen/chip-gn/platform/*
+        - config/tizen/chip-gn/platform/**/*
+        - examples/platform/*
+        - examples/platform/**/*
+        - scripts/tools/memory/platform/*
+        - scripts/tools/memory/platform/**/*
+        - src/include/platform/*
+        - src/include/platform/**/*
+        - src/lib/dnssd/platform/*
+        - src/lib/dnssd/platform/**/*
 
 darwin:
-    - src/platform/Darwin/*
-    - src/platform/Darwin/**/*
-    - src/darwin/*
-    - src/darwin/**/*
-    - examples/darwin-framework-tool/*
-    - examples/darwin-framework-tool/**/*
+    - any:
+        - src/platform/Darwin/*
+        - src/platform/Darwin/**/*
+        - src/darwin/*
+        - src/darwin/**/*
+        - examples/darwin-framework-tool/*
+        - examples/darwin-framework-tool/**/*
 
 silabs:
-    - src/platform/silabs/*
-    - src/platform/silabs/**/*
+    - any:
+        - src/platform/silabs/*
+        - src/platform/silabs/**/*
 
 esp32:
     - any:
