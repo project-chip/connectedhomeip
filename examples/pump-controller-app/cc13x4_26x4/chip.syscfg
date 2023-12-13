@@ -83,7 +83,8 @@ for(var setting in ccfgSettings)
     CCFG[setting] = ccfgSettings[setting];
 }
 
-CCFG.enableCodeGeneration = true;
+/* disable CCFG for OTA-able application */
+CCFG.enableCodeGeneration = false;
 
 
 /* NVS */
