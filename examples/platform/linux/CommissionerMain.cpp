@@ -131,12 +131,6 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
-    // #if !CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    //     ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - setting factoryParams.enableServerInteractions to true.");
-    //     factoryParams.enableServerInteractions = true;
-    // #else
-    //     ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - NOT setting factoryParams.enableServerInteractions to true.");
-    // #endif
 
     gGroupDataProvider.SetStorageDelegate(&gServerStorage);
     gGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
@@ -187,13 +181,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerICAC     = icacSpan;
     params.controllerNOC      = nocSpan;
 
-    params.defaultCommissioner = &gAutoCommissioner;
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - setting params.enableServerInteractions to true.");
+    params.defaultCommissioner      = &gAutoCommissioner;
     params.enableServerInteractions = true;
-#else
-    ChipLogError(AppServer, "----  DEBUG -- InitCommissioner - NOT setting params.enableServerInteractions to true.");
-#endif
 
     // assign prefered feature settings
     CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
