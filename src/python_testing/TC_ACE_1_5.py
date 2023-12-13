@@ -18,13 +18,13 @@
 import logging
 import time
 
-import chip.clusters.enum
 import chip.clusters as Clusters
 from mobly import asserts
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.ChipDeviceCtrl import CommissioningParameters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+
 
 class TC_ACE_1_5(MatterBaseTest):
 
@@ -53,25 +53,25 @@ class TC_ACE_1_5(MatterBaseTest):
     async def read_descriptor_expect_success(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        result = await self.read_single_attribute_check_success(
+        await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def read_basic_expect_success(self, th):
         cluster = Clusters.Objects.BasicInformation
         attribute = Clusters.BasicInformation.Attributes.VendorID
-        result = await self.read_single_attribute_check_success(
+        await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     async def read_basic_expect_unsupported_access(self, th):
         cluster = Clusters.Objects.BasicInformation
         attribute = Clusters.BasicInformation.Attributes.VendorID
-        result = await self.read_single_attribute_expect_error(
+        await self.read_single_attribute_expect_error(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     async def read_descriptor_expect_unsupported_access(self, th):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        result = await self.read_single_attribute_expect_error(
+        await self.read_single_attribute_expect_error(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     @async_test_body
@@ -83,14 +83,13 @@ class TC_ACE_1_5(MatterBaseTest):
         params = self.OpenCommissioningWindow()
 
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 
         TH1_nodeid = self.matter_test_config.controller_node_id
         TH2_nodeid = self.matter_test_config.controller_node_id + 2
 
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
-                                         paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+                                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
         errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
@@ -103,10 +102,10 @@ class TC_ACE_1_5(MatterBaseTest):
 
         self.print_step(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects = [TH1_nodeid],
-            targets = [Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[TH1_nodeid],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
         descriptor_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
@@ -117,13 +116,13 @@ class TC_ACE_1_5(MatterBaseTest):
 
         self.print_step(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex = th2FabricIndex,
-            privilege = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects = [TH2_nodeid],
-            targets = [Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
+            fabricIndex=th2FabricIndex,
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[TH2_nodeid],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])
         descriptor_view = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            fabricIndex = th2FabricIndex,
+            fabricIndex=th2FabricIndex,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             subjects=[],
@@ -156,6 +155,7 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(12, "TH1 removes the TH2 fabric by sending the RemoveFabric command to the DUT with the FabricIndex set to th2FabricIndex")
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2FabricIndex)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
