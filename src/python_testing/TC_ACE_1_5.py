@@ -19,11 +19,11 @@ import logging
 import time
 
 import chip.clusters as Clusters
-from mobly import asserts
 from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
 from chip.ChipDeviceCtrl import CommissioningParameters
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TC_ACE_1_5(MatterBaseTest):
@@ -100,7 +100,8 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")
         th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
 
-        self.print_step(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
+        self.print_step(
+            5, "TH1 writes DUT Endpoint 0 ACL cluster ACL attribute, value is list of ACLEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
@@ -114,7 +115,8 @@ class TC_ACE_1_5(MatterBaseTest):
         acl = [admin_acl, descriptor_view]
         await self.write_acl(acl, self.th1)
 
-        self.print_step(6, "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
+        self.print_step(
+            6, "TH2 writes DUT Endpoint 0 ACL cluster ACL attribute, value is list of ACLEntryStruct containing 2 elements")
         admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             fabricIndex=th2FabricIndex,
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
@@ -152,7 +154,8 @@ class TC_ACE_1_5(MatterBaseTest):
         acl = [full_acl]
         await self.write_acl(acl, self.th1)
 
-        self.print_step(12, "TH1 removes the TH2 fabric by sending the RemoveFabric command to the DUT with the FabricIndex set to th2FabricIndex")
+        self.print_step(
+            12, "TH1 removes the TH2 fabric by sending the RemoveFabric command to the DUT with the FabricIndex set to th2FabricIndex")
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2FabricIndex)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
