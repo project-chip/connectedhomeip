@@ -70,9 +70,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif wakeOnLANCluster == clusterName or lowPowerCluster == clusterName:
         clusterName = "Media Cluster"
 
-    elif laundryModeCluster == clusterName:
-        clusterName = "Laundry Washer Mode Cluster"
-
     elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
         clusterName = clusterName.replace("Cluster", "").strip()
 
