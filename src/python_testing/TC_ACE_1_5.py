@@ -77,7 +77,7 @@ class TC_ACE_1_5(MatterBaseTest):
     @async_test_body
     async def test_TC_ACE_1_5(self):
         self.print_step(1, "Comissioning, already done ")
-        self.th1 = self.default_controller       
+        self.th1 = self.default_controller
 
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
         params = self.OpenCommissioningWindow()
@@ -96,7 +96,7 @@ class TC_ACE_1_5(MatterBaseTest):
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
-        
+
         self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")
         th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
 
