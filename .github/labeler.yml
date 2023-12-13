@@ -62,43 +62,49 @@ vscode:
         - .devcontainer/**/*
 
 gn:
-    - build/*
-    - build/**/*
-    - build_overrides/*
-    - build_overrides/**/*
-    - .gn
-    - "*.gn"
-    - "*.gni"
+    - any:
+        - build/*
+        - build/**/*
+        - build_overrides/*
+        - build_overrides/**/*
+        - .gn
+        - "*.gn"
+        - "*.gni"
 
 github:
-    - .github
-    - .github/*
-    - .github/**/*
+    - any:
+        - .github
+        - .github/*
+        - .github/**/*
 
 workflows:
-    - .github/workflows/*
-    - .github/workflows/**/*
+    - any:
+        - .github/workflows/*
+        - .github/workflows/**/*
 
 tools:
-    - src/tools/*
-    - src/tools/**/*
-    - tools/*
-    - tools/**/*
-    - examples/chip-tool/*
-    - examples/chip-tool/**/*
+    - any:
+        - src/tools/*
+        - src/tools/**/*
+        - tools/*
+        - tools/**/*
+        - examples/chip-tool/*
+        - examples/chip-tool/**/*
 
 ############################################################
 #  Tests
 ############################################################
 tests:
-    - src/python_testing/*
-    - src/python_testing/**/*
-    - src/app/tests/*
-    - src/app/tests/**/*
+    - any:
+        - src/python_testing/*
+        - src/python_testing/**/*
+        - src/app/tests/*
+        - src/app/tests/**/*
 
 test driver:
-    - src/test_driver/*
-    - src/test_driver/**/*
+    - any:
+        - src/test_driver/*
+        - src/test_driver/**/*
 
 ############################################################
 #  Source Code
