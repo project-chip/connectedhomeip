@@ -79,15 +79,8 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(1, "Comissioning, already done ")
         self.th1 = self.default_controller       
 
-        #new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        #new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
-        #TH2 = new_fabric_admin.NewController(nodeId = 112233)
-
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
         params = self.OpenCommissioningWindow()
-        #dev_ctrl = self.default_controller
-        #params = dev_ctrl.OpenComissioningWindow(nodeid=self.dut_node_id, timeout=900, iteration=1000, discriminator=1234, option=1)
-
 
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
@@ -105,7 +98,7 @@ class TC_ACE_1_5(MatterBaseTest):
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
         
-        self.print_step(4, "TH2 Reads CurrentFabricIndex ")
+        self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")
         th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
 
         self.print_step(5, "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 2 elements")
