@@ -463,35 +463,35 @@ limitations under the License.
       <description>This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload.</description>
       <access op="invoke" privilege="manage"/>
     </command>  
+    <command source="client" code="0x05" name="SetActiveScheduleRequest" optional="true">
+      <description>This command is used to set the active schedule.</description>
+      <arg name="ScheduleHandle" type="octet_string" length="16"/>
+    </command>
     <command source="client" code="0x06" name="SetActivePresetRequest" optional="true">
-      <description>Upon receipt, this SHALL set the thermostat</description>
+      <description>This command is used to set the active preset.</description>
       <arg name="PresetHandle" type="octet_string" length="16"/>
       <arg name="DelayMinutes" type="int16u" optional="true" default="0"/>
     </command>
-    <command source="client" code="0x09" name="CommitPresetsSchedulesRequest" optional="true">
-      <description>Upon receipt, this SHALL attempt to commit any pending changes to the </description>
-      <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="client" code="0x05" name="SetActiveScheduleRequest" optional="true">
-      <description>Upon receipt, if the </description>
-      <arg name="ScheduleHandle" type="octet_string" length="16"/>
-    </command>
-    <command source="client" code="0x0A" name="CancelSetActivePresetRequest" optional="true">
-      <description>This command is sent to cancel a queued preset specified by </description>
-      <access op="invoke" privilege="manage"/>
-    </command>
-    <command source="client" code="0x0B" name="SetTemperatureSetpointHoldPolicy" optional="true">
-      <description>This command is sent to set the </description>
-      <arg name="TemperatureSetpointHoldPolicy" type="TemperatureSetpointHoldPolicyBitmap" min="0x0" max="0x3"/>
-    </command>
     <command source="client" code="0x07" name="StartPresetsSchedulesEditRequest" optional="true">
-      <description>Upon receipt, this SHALL attempt to enable editing of the </description>
+      <description>This command is used to start editing the presets and schedules.</description>
       <access op="invoke" privilege="manage"/>
       <arg name="TimeoutSeconds" type="int16u" max="120"/>
     </command>
     <command source="client" code="0x08" name="CancelPresetsSchedulesEditRequest" optional="true">
-      <description>Upon receipt, this SHALL attempt to cancel any active editing of the </description>
+      <description>This command is used to cancel editing presets and schedules.</description>
       <access op="invoke" privilege="manage"/>
+    </command>
+    <command source="client" code="0x09" name="CommitPresetsSchedulesRequest" optional="true">
+      <description>This command is used to notify the server that all edits are done and should be committed.</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+    <command source="client" code="0x0A" name="CancelSetActivePresetRequest" optional="true">
+      <description>This command is sent to cancel a queued preset.</description>
+      <access op="invoke" privilege="manage"/>
+    </command>
+    <command source="client" code="0x0B" name="SetTemperatureSetpointHoldPolicy" optional="true">
+      <description>This command sets the set point hold policy.</description>
+      <arg name="TemperatureSetpointHoldPolicy" type="TemperatureSetpointHoldPolicyBitmap" min="0x0" max="0x3"/>
     </command>
 
     <!-- Server Commands/Responses -->

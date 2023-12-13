@@ -1483,21 +1483,21 @@ cluster Thermostat = 513 {
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** This command is used to clear the weekly schedule. The Clear weekly schedule has no payload. */
+  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
-  /** Upon receipt, if the */
+  /** This command is used to set the active schedule. */
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
-  /** Upon receipt, this SHALL set the thermostat */
+  /** This command is used to set the active preset. */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
-  /** Upon receipt, this SHALL attempt to enable editing of the */
+  /** This command is used to start editing the presets and schedules. */
   command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
-  /** Upon receipt, this SHALL attempt to cancel any active editing of the */
+  /** This command is used to cancel editing presets and schedules. */
   command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
-  /** Upon receipt, this SHALL attempt to commit any pending changes to the */
+  /** This command is used to notify the server that all edits are done and should be committed. */
   command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
-  /** This command is sent to cancel a queued preset specified by */
+  /** This command is sent to cancel a queued preset. */
   command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
-  /** This command is sent to set the */
+  /** This command sets the set point hold policy. */
   command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 

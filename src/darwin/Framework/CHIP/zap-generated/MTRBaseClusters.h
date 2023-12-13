@@ -8937,7 +8937,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command ClearWeeklySchedule
  *
- * This command is used to clear the weekly schedule. The Clear weekly schedule has no payload.
+ * This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload.
  */
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)clearWeeklyScheduleWithCompletion:(MTRStatusCompletion)completion
@@ -8945,25 +8945,25 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetActiveScheduleRequest
  *
- * Upon receipt, if the
+ * This command is used to set the active schedule.
  */
 - (void)setActiveScheduleRequestWithParams:(MTRThermostatClusterSetActiveScheduleRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command SetActivePresetRequest
  *
- * Upon receipt, this SHALL set the thermostat
+ * This command is used to set the active preset.
  */
 - (void)setActivePresetRequestWithParams:(MTRThermostatClusterSetActivePresetRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command StartPresetsSchedulesEditRequest
  *
- * Upon receipt, this SHALL attempt to enable editing of the
+ * This command is used to start editing the presets and schedules.
  */
 - (void)startPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterStartPresetsSchedulesEditRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command CancelPresetsSchedulesEditRequest
  *
- * Upon receipt, this SHALL attempt to cancel any active editing of the
+ * This command is used to cancel editing presets and schedules.
  */
 - (void)cancelPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterCancelPresetsSchedulesEditRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)cancelPresetsSchedulesEditRequestWithCompletion:(MTRStatusCompletion)completion
@@ -8971,7 +8971,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command CommitPresetsSchedulesRequest
  *
- * Upon receipt, this SHALL attempt to commit any pending changes to the
+ * This command is used to notify the server that all edits are done and should be committed.
  */
 - (void)commitPresetsSchedulesRequestWithParams:(MTRThermostatClusterCommitPresetsSchedulesRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)commitPresetsSchedulesRequestWithCompletion:(MTRStatusCompletion)completion
@@ -8979,7 +8979,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command CancelSetActivePresetRequest
  *
- * This command is sent to cancel a queued preset specified by
+ * This command is sent to cancel a queued preset.
  */
 - (void)cancelSetActivePresetRequestWithParams:(MTRThermostatClusterCancelSetActivePresetRequestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)cancelSetActivePresetRequestWithCompletion:(MTRStatusCompletion)completion
@@ -8987,7 +8987,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetTemperatureSetpointHoldPolicy
  *
- * This command is sent to set the
+ * This command sets the set point hold policy.
  */
 - (void)setTemperatureSetpointHoldPolicyWithParams:(MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
