@@ -228,6 +228,8 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
     sender.release();
     callback.release();
 
+    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
+    // own method/primitive.
     if (busyWaitMs)
     {
         usleep(busyWaitMs * 1000);
@@ -254,6 +256,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
 
+    // TODO(#30986): Move away from passing these command through variadic arguments.
     va_list args;
     va_start(args, n);
 
@@ -304,6 +307,8 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     sender.release();
     callback.release();
 
+    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
+    // own method/primitive.
     if (busyWaitMs)
     {
         usleep(busyWaitMs * 1000);
@@ -353,6 +358,8 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     sender.release();
     callback.release();
 
+    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
+    // own method/primitive.
     if (busyWaitMs)
     {
         usleep(busyWaitMs * 1000);
@@ -398,6 +405,8 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
         SuccessOrExit(err = sender->SendGroupCommandRequest(chip::SessionHandle(session)));
     }
 
+    // TODO(#30985): Reconsider the purpose of busyWait and if it can be broken out into it's
+    // own method/primitive.
     if (busyWaitMs)
     {
         usleep(busyWaitMs * 1000);
