@@ -42,7 +42,15 @@ tests:
               - name: "nodeId"
                 saveAs: commissionerNodeId
 
-    - label: "Step 1: TH adds ACL Operate privileges for Group 0x0103"
+    - label:
+          "Step 1: TH writes the ACL attribute in the Access Control cluster to
+          add Manage privileges for group 0x0103 and maintain the current
+          administrative privileges for the TH. The following access control
+          list shall be used : List item 1 (TH admin): a)Privilege: Administer
+          (5) b)AuthMode: CASE (2) c)Subjects: TH node id ([N1]) d)Targets: all
+          (null) List item 2 (group operate access): a)Privilege: Manage (4)
+          b)AuthMode: Group (3) c)Subjects: group 0x0103 ([0x0103]) d)Targets:
+          all (null) "
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"
@@ -65,7 +73,14 @@ tests:
                   },
               ]
 
-    - label: "Step 2: TH sends KeySetWrite command with TH key"
+    - label:
+          "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows : a)GroupKeySetID: 0x01a3
+          b)GroupKeySecurityPolicy: TrustFirst (0) c)EpochStartTime0:1
+          d)EpochKey1:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf e)EpochStartTime1:
+          18446744073709551613 f)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          g)EpochStartTime2: 18446744073709551614 "
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -83,7 +98,12 @@ tests:
                         EpochStartTime2: 18446744073709551614,
                     }
 
-    - label: "Step 3: TH binds GroupId to GroupKeySet"
+    - label:
+          "Step 3: TH binds GroupId 0x0103 and 0x0101 with GroupKeySetID 0x01a3
+          in the GroupKeyMap attribute list on GroupKeyManagement cluster by
+          writing the GroupKeyMap attribute with 2 entries as follows : List
+          item 1 :  a)GroupId: 0x0103  b)GroupKeySetId: 0x01a3   List item 2:
+          a)GroupId: 0x0101  b)GroupKeySetId: 0x01a3"
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -95,12 +115,15 @@ tests:
               ]
 
     - label:
-          "Step 4: TH sends RemoveAllGroups command to the DUT on
-          PIXIT.G.ENDPOINT"
+          "Step 4: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT"
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
-    - label: "Step 5: TH sends AddGroup command to the DUT on PIXIT.G.ENDPOINT"
+    - label:
+          "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
+          the following settings 1)GroupID: 0x0103 2)GroupName: 'Test Group
+          0103'"
       endpoint: Groups.Endpoint
       command: "AddGroup"
       arguments:
@@ -117,8 +140,9 @@ tests:
                 value: 0x0103
 
     - label:
-          "Step 6: TH sends AddGroup command again but using group messaging
-          (0x0103)"
+          "Step 6: TH sends a AddGroup Command to the Groups cluster with the
+          GroupID field set to 0x0101 and the GroupName set to an 'Test Group
+          0101'. The command is sent as a group command using GroupID 0x0103"
       groupId: 0x0103
       command: "AddGroup"
       arguments:
@@ -149,7 +173,10 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 7: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+    - label:
+          "Step 7: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
+          confirm that the AddGroup command from step 6 was successful "
       PICS: G.S.F00
       endpoint: Groups.Endpoint
       command: "ViewGroup"
@@ -166,7 +193,10 @@ tests:
               - name: GroupName
                 value: "Test Group 0101"
 
-    - label: "Step 8: TH sends ViewGroup command on Endpoint PIXIT.G.ENDPOINT "
+    - label:
+          "Step 8: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
+          confirm that the AddGroup command from step 6 was successful "
       PICS: "!(G.S.F00)"
       endpoint: Groups.Endpoint
       command: "ViewGroup"
@@ -183,7 +213,10 @@ tests:
               - name: GroupName
                 value: ""
 
-    - label: "Step 9: TH removes the GroupKeySet"
+    - label:
+          "Step 9: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a3"
       cluster: "Group Key Management"
       command: "KeySetRemove"
       arguments:
@@ -192,12 +225,18 @@ tests:
                 value: 0x01a3
 
     - label:
-          "Step 10: TH cleans up groups using RemoveAllGroups command to the DUT
-          on PIXIT.G.ENDPOINT"
+          "Step 10: TH cleans up the groups by sending the RemoveAllGroups
+          command to the DUT on PIXIT.G.ENDPOINT"
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
-    - label: "Step 11: TH removes ACL Operate privileges for Group 0x0103"
+    - label:
+          "Step 11: TH writes the ACL attribute in the Access Control cluster to
+          remove Manage privileges for group 0x0103 and maintain the current
+          administrative privileges for the TH. The following access control
+          list shall be used : List item 1 (TH admin): a)Privilege: Administer
+          (5)  b)AuthMode: CASE (2)  c)Subjects: TH node id ([N1])  d)Targets:
+          all (null)"
       cluster: "Access Control"
       command: "writeAttribute"
       attribute: "ACL"

@@ -68,13 +68,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -133,13 +126,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -198,13 +184,6 @@
     /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
     /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxHeatSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MaxCoolSetpointLimit, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
-    /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
     /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \

@@ -4947,24 +4947,24 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
                                                                        jninewElement_0_coolSetpoint, newElement_0_coolSetpoint);
         }
 
-        jclass thermostatScheduleTransitionStructClass_1;
+        jclass weeklyScheduleTransitionStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ThermostatClusterThermostatScheduleTransition",
-            thermostatScheduleTransitionStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct",
+            weeklyScheduleTransitionStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterThermostatScheduleTransition");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct");
             return;
         }
-        jmethodID thermostatScheduleTransitionStructCtor_1 = env->GetMethodID(
-            thermostatScheduleTransitionStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (thermostatScheduleTransitionStructCtor_1 == nullptr)
+        jmethodID weeklyScheduleTransitionStructStructCtor_1 = env->GetMethodID(
+            weeklyScheduleTransitionStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        if (weeklyScheduleTransitionStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterThermostatScheduleTransition constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(thermostatScheduleTransitionStructClass_1, thermostatScheduleTransitionStructCtor_1,
+        newElement_0 = env->NewObject(weeklyScheduleTransitionStructStructClass_1, weeklyScheduleTransitionStructStructCtor_1,
                                       newElement_0_transitionTime, newElement_0_heatSetpoint, newElement_0_coolSetpoint);
         chip::JniReferences::GetInstance().AddToList(Transitions, newElement_0);
     }

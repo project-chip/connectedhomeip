@@ -51,6 +51,11 @@ jobs:
               run: |
                 apt-get update
                 DEBIAN_FRONTEND=noninteractive apt-get install -fy --fix-missing openjdk-17-jre
+            # Clean out java generated files: since java codegen will generate one file per
+            # structure/cluster, if clusters and structures are ever changed (for in progress work)
+            # this may leave obsolete files. Ensure we always check for clean regen.
+            - name: Ensure clean java
+              run: rm -rf src/controller/java/generated/
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Generate script-maintained items (ERROR_CODES.md)
