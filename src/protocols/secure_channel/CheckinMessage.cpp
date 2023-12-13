@@ -35,7 +35,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
                                                          const CounterType & counter, const ByteSpan & appData,
                                                          MutableByteSpan & output)
 {
-    VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     CHIP_ERROR err            = CHIP_NO_ERROR;
     uint8_t * appDataStartPtr = output.data() + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES;
@@ -61,13 +61,13 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
                                                       const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
                                                       CounterType & counter, MutableByteSpan & appData)
 {
-    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t appDataSize = GetAppDataSize(payload);
 
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter
-    VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     ByteSpan nonce         = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
     ByteSpan encryptedData = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, sizeof(CounterType) + appDataSize);
@@ -89,7 +89,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
 CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
                                                        MutableByteSpan & output)
 {
-    VerifyOrReturnError(output.size() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output.size() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
 
