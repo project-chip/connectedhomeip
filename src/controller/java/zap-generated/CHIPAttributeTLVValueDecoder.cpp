@@ -18781,8 +18781,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::BooleanSensorConfiguration::Id: {
-        using namespace app::Clusters::BooleanSensorConfiguration;
+    case app::Clusters::BooleanStateConfiguration::Id: {
+        using namespace app::Clusters::BooleanStateConfiguration;
         switch (aPath.mAttributeId)
         {
         case Attributes::CurrentSensitivityLevel::Id: {

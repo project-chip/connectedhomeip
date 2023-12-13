@@ -994,13 +994,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterSuppressAlarmParams (InternalMethods)
+@interface MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterEnableDisableAlarmParams (InternalMethods)
+@interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

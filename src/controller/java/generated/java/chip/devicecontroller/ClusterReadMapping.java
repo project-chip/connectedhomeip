@@ -8637,161 +8637,161 @@ public class ClusterReadMapping {
      
        return result;
     }
-    private static Map<String, InteractionInfo> readBooleanSensorConfigurationInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readBooleanSensorConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+    private static Map<String, InteractionInfo> readBooleanStateConfigurationInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readBooleanStateConfigurationCurrentSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationCurrentSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readCurrentSensitivityLevelAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readCurrentSensitivityLevelAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationCurrentSensitivityLevelCommandParams
+          readBooleanStateConfigurationCurrentSensitivityLevelCommandParams
         );
-        result.put("readCurrentSensitivityLevelAttribute", readBooleanSensorConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationSupportedSensitivityLevelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationSupportedSensitivityLevelsAttributeInteractionInfo = new InteractionInfo(
+        result.put("readCurrentSensitivityLevelAttribute", readBooleanStateConfigurationCurrentSensitivityLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationSupportedSensitivityLevelsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationSupportedSensitivityLevelsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readSupportedSensitivityLevelsAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readSupportedSensitivityLevelsAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationSupportedSensitivityLevelsCommandParams
+          readBooleanStateConfigurationSupportedSensitivityLevelsCommandParams
         );
-        result.put("readSupportedSensitivityLevelsAttribute", readBooleanSensorConfigurationSupportedSensitivityLevelsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationDefaultSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationDefaultSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
+        result.put("readSupportedSensitivityLevelsAttribute", readBooleanStateConfigurationSupportedSensitivityLevelsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationDefaultSensitivityLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationDefaultSensitivityLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readDefaultSensitivityLevelAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readDefaultSensitivityLevelAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationDefaultSensitivityLevelCommandParams
+          readBooleanStateConfigurationDefaultSensitivityLevelCommandParams
         );
-        result.put("readDefaultSensitivityLevelAttribute", readBooleanSensorConfigurationDefaultSensitivityLevelAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsActiveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAlarmsActiveAttributeInteractionInfo = new InteractionInfo(
+        result.put("readDefaultSensitivityLevelAttribute", readBooleanStateConfigurationDefaultSensitivityLevelAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAlarmsActiveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAlarmsActiveAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAlarmsActiveAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAlarmsActiveAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationAlarmsActiveCommandParams
+          readBooleanStateConfigurationAlarmsActiveCommandParams
         );
-        result.put("readAlarmsActiveAttribute", readBooleanSensorConfigurationAlarmsActiveAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsSuppressedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAlarmsSuppressedAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAlarmsActiveAttribute", readBooleanStateConfigurationAlarmsActiveAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAlarmsSuppressedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAlarmsSuppressedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAlarmsSuppressedAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAlarmsSuppressedAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationAlarmsSuppressedCommandParams
+          readBooleanStateConfigurationAlarmsSuppressedCommandParams
         );
-        result.put("readAlarmsSuppressedAttribute", readBooleanSensorConfigurationAlarmsSuppressedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAlarmsSuppressedAttribute", readBooleanStateConfigurationAlarmsSuppressedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAlarmsEnabledCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAlarmsEnabledAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAlarmsEnabledAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAlarmsEnabledAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationAlarmsEnabledCommandParams
+          readBooleanStateConfigurationAlarmsEnabledCommandParams
         );
-        result.put("readAlarmsEnabledAttribute", readBooleanSensorConfigurationAlarmsEnabledAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAlarmsSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAlarmsSupportedAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAlarmsEnabledAttribute", readBooleanStateConfigurationAlarmsEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAlarmsSupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAlarmsSupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAlarmsSupportedAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAlarmsSupportedAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationAlarmsSupportedCommandParams
+          readBooleanStateConfigurationAlarmsSupportedCommandParams
         );
-        result.put("readAlarmsSupportedAttribute", readBooleanSensorConfigurationAlarmsSupportedAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationSensorFaultCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationSensorFaultAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAlarmsSupportedAttribute", readBooleanStateConfigurationAlarmsSupportedAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationSensorFaultCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationSensorFaultAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readSensorFaultAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readSensorFaultAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationSensorFaultCommandParams
+          readBooleanStateConfigurationSensorFaultCommandParams
         );
-        result.put("readSensorFaultAttribute", readBooleanSensorConfigurationSensorFaultAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readSensorFaultAttribute", readBooleanStateConfigurationSensorFaultAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readGeneratedCommandListAttribute(
-              (ChipClusters.BooleanSensorConfigurationCluster.GeneratedCommandListAttributeCallback) callback
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.BooleanStateConfigurationCluster.GeneratedCommandListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedBooleanSensorConfigurationClusterGeneratedCommandListAttributeCallback(),
-          readBooleanSensorConfigurationGeneratedCommandListCommandParams
+          () -> new ClusterInfoMapping.DelegatedBooleanStateConfigurationClusterGeneratedCommandListAttributeCallback(),
+          readBooleanStateConfigurationGeneratedCommandListCommandParams
         );
-        result.put("readGeneratedCommandListAttribute", readBooleanSensorConfigurationGeneratedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readGeneratedCommandListAttribute", readBooleanStateConfigurationGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAcceptedCommandListAttribute(
-              (ChipClusters.BooleanSensorConfigurationCluster.AcceptedCommandListAttributeCallback) callback
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.BooleanStateConfigurationCluster.AcceptedCommandListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedBooleanSensorConfigurationClusterAcceptedCommandListAttributeCallback(),
-          readBooleanSensorConfigurationAcceptedCommandListCommandParams
+          () -> new ClusterInfoMapping.DelegatedBooleanStateConfigurationClusterAcceptedCommandListAttributeCallback(),
+          readBooleanStateConfigurationAcceptedCommandListCommandParams
         );
-        result.put("readAcceptedCommandListAttribute", readBooleanSensorConfigurationAcceptedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationEventListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAcceptedCommandListAttribute", readBooleanStateConfigurationAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationEventListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readEventListAttribute(
-              (ChipClusters.BooleanSensorConfigurationCluster.EventListAttributeCallback) callback
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readEventListAttribute(
+              (ChipClusters.BooleanStateConfigurationCluster.EventListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedBooleanSensorConfigurationClusterEventListAttributeCallback(),
-          readBooleanSensorConfigurationEventListCommandParams
+          () -> new ClusterInfoMapping.DelegatedBooleanStateConfigurationClusterEventListAttributeCallback(),
+          readBooleanStateConfigurationEventListCommandParams
         );
-        result.put("readEventListAttribute", readBooleanSensorConfigurationEventListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationAttributeListAttributeInteractionInfo = new InteractionInfo(
+        result.put("readEventListAttribute", readBooleanStateConfigurationEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationAttributeListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readAttributeListAttribute(
-              (ChipClusters.BooleanSensorConfigurationCluster.AttributeListAttributeCallback) callback
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.BooleanStateConfigurationCluster.AttributeListAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedBooleanSensorConfigurationClusterAttributeListAttributeCallback(),
-          readBooleanSensorConfigurationAttributeListCommandParams
+          () -> new ClusterInfoMapping.DelegatedBooleanStateConfigurationClusterAttributeListAttributeCallback(),
+          readBooleanStateConfigurationAttributeListCommandParams
         );
-        result.put("readAttributeListAttribute", readBooleanSensorConfigurationAttributeListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationFeatureMapAttributeInteractionInfo = new InteractionInfo(
+        result.put("readAttributeListAttribute", readBooleanStateConfigurationAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationFeatureMapAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readFeatureMapAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readFeatureMapAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readBooleanSensorConfigurationFeatureMapCommandParams
+          readBooleanStateConfigurationFeatureMapCommandParams
         );
-        result.put("readFeatureMapAttribute", readBooleanSensorConfigurationFeatureMapAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readBooleanSensorConfigurationClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readBooleanSensorConfigurationClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+        result.put("readFeatureMapAttribute", readBooleanStateConfigurationFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readBooleanStateConfigurationClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readBooleanStateConfigurationClusterRevisionAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.BooleanSensorConfigurationCluster) cluster).readClusterRevisionAttribute(
+            ((ChipClusters.BooleanStateConfigurationCluster) cluster).readClusterRevisionAttribute(
               (ChipClusters.IntegerAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readBooleanSensorConfigurationClusterRevisionCommandParams
+          readBooleanStateConfigurationClusterRevisionCommandParams
         );
-        result.put("readClusterRevisionAttribute", readBooleanSensorConfigurationClusterRevisionAttributeInteractionInfo);
+        result.put("readClusterRevisionAttribute", readBooleanStateConfigurationClusterRevisionAttributeInteractionInfo);
      
        return result;
     }
@@ -19504,7 +19504,7 @@ public class ClusterReadMapping {
             put("rvcOperationalState", readRvcOperationalStateInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
             put("activatedCarbonFilterMonitoring", readActivatedCarbonFilterMonitoringInteractionInfo());
-            put("booleanSensorConfiguration", readBooleanSensorConfigurationInteractionInfo());
+            put("booleanStateConfiguration", readBooleanStateConfigurationInteractionInfo());
             put("valveConfigurationAndControl", readValveConfigurationAndControlInteractionInfo());
             put("electricalEnergyMeasurement", readElectricalEnergyMeasurementInteractionInfo());
             put("demandResponseLoadControl", readDemandResponseLoadControlInteractionInfo());

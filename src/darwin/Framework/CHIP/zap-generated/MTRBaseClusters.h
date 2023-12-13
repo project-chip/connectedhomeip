@@ -6985,25 +6985,25 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 /**
- * Cluster Boolean Sensor Configuration
+ * Cluster Boolean State Configuration
  *
  * This cluster is used to configure a boolean sensor.
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterBooleanSensorConfiguration : MTRGenericBaseCluster
+@interface MTRBaseClusterBooleanStateConfiguration : MTRGenericBaseCluster
 
 /**
  * Command SuppressAlarm
  *
  * This command is used to suppress the specified alarm mode.
  */
-- (void)suppressAlarmWithParams:(MTRBooleanSensorConfigurationClusterSuppressAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)suppressAlarmWithParams:(MTRBooleanStateConfigurationClusterSuppressAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EnableDisableAlarm
  *
  * This command is used to enable or disable the specified alarm mode.
  */
-- (void)enableDisableAlarmWithParams:(MTRBooleanSensorConfigurationClusterEnableDisableAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)enableDisableAlarmWithParams:(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeCurrentSensitivityLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeCurrentSensitivityLevelWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -7096,7 +7096,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-@interface MTRBaseClusterBooleanSensorConfiguration (Availability)
+@interface MTRBaseClusterBooleanStateConfiguration (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -16839,20 +16839,20 @@ typedef NS_OPTIONS(uint32_t, MTRActivatedCarbonFilterMonitoringFeature) {
     MTRActivatedCarbonFilterMonitoringFeatureReplacementProductList MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRBooleanSensorConfigurationAlarmModeBitmap) {
-    MTRBooleanSensorConfigurationAlarmModeBitmapVisual MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRBooleanSensorConfigurationAlarmModeBitmapAudible MTR_PROVISIONALLY_AVAILABLE = 0x2,
+typedef NS_OPTIONS(uint8_t, MTRBooleanStateConfigurationAlarmModeBitmap) {
+    MTRBooleanStateConfigurationAlarmModeBitmapVisual MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRBooleanStateConfigurationAlarmModeBitmapAudible MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRBooleanSensorConfigurationFeature) {
-    MTRBooleanSensorConfigurationFeatureVisual MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRBooleanSensorConfigurationFeatureAudible MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRBooleanSensorConfigurationFeatureAlarmSuppress MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRBooleanSensorConfigurationFeatureSensitivityLevel MTR_PROVISIONALLY_AVAILABLE = 0x8,
+typedef NS_OPTIONS(uint32_t, MTRBooleanStateConfigurationFeature) {
+    MTRBooleanStateConfigurationFeatureVisual MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRBooleanStateConfigurationFeatureAudible MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRBooleanStateConfigurationFeatureAlarmSuppress MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRBooleanStateConfigurationFeatureSensitivityLevel MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint16_t, MTRBooleanSensorConfigurationSensorFaultBitmap) {
-    MTRBooleanSensorConfigurationSensorFaultBitmapGneralFault MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint16_t, MTRBooleanStateConfigurationSensorFaultBitmap) {
+    MTRBooleanStateConfigurationSensorFaultBitmapGneralFault MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRValveConfigurationAndControlValveState) {

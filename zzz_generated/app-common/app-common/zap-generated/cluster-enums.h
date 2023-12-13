@@ -2125,7 +2125,7 @@ enum class Feature : uint32_t
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 // Bitmap for AlarmModeBitmap
 enum class AlarmModeBitmap : uint8_t
@@ -2148,7 +2148,7 @@ enum class SensorFaultBitmap : uint16_t
 {
     kGneralFault = 0x1,
 };
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 
