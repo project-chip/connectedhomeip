@@ -56,17 +56,24 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Symmetric128BitsKeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
+        // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
+        Symmetric128BitsKeyByteArray aesKeyMaterial;
+        memcpy(aesKeyMaterial, test.key, test.key_len);
 
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+        Symmetric128BitsKeyByteArray hmacKeyMaterial;
+        memcpy(hmacKeyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle aes128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(aesKeyMaterial, aes128KeyHandle));
+
+        Hmac128KeyHandle hmac128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
         // Validate that counter change, indeed changes the output buffer content
         counter = 0;
         for (uint8_t j = 0; j < 5; j++)
         {
-            err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
+            err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
             NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
             // Verifiy that the output buffer changed
@@ -77,21 +84,30 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
             counter += chip::Crypto::GetRandU32() + 1;
             outputBuffer = MutableByteSpan(a);
         }
-        keystore.DestroyKey(keyHandle);
+
+        keystore.DestroyKey(aes128KeyHandle);
+        keystore.DestroyKey(hmac128KeyHandle);
     }
 
     // Parameter check
     {
-        uint8_t data[]                                               = { "This is some user Data. It should be encrypted" };
-        userData                                                     = chip::ByteSpan(data);
-        const ccm_128_test_vector & test                             = *ccm_128_test_vectors[0];
-        uint8_t gargantuaBuffer[2 * CheckinMessage::sMaxAppDataSize] = { 0 };
+        uint8_t data[]                   = { "This is some user Data. It should be encrypted" };
+        userData                         = chip::ByteSpan(data);
+        const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
+        uint8_t veryLargeBuffer[2048]    = { 0 };
 
-        Symmetric128BitsKeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
+        // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
+        Symmetric128BitsKeyByteArray aesKeyMaterial;
+        memcpy(aesKeyMaterial, test.key, test.key_len);
 
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+        Symmetric128BitsKeyByteArray hmacKeyMaterial;
+        memcpy(hmacKeyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle aes128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(aesKeyMaterial, aes128KeyHandle));
+
+        Hmac128KeyHandle hmac128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
         // As of now passing an empty key handle while using PSA crypto will result in a failure.
         // However when using OpenSSL this same test result in a success.
@@ -102,20 +118,24 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
         // ChipLogError(Inet, "%s", err.AsString());
         // NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
+        // Testing empty application data
         ByteSpan emptyData;
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, outputBuffer);
+        err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, emptyData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
+        // Testing empty output buffer
         MutableByteSpan empty;
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, emptyData, empty);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+        err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, emptyData, empty);
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
-        userData = chip::ByteSpan(gargantuaBuffer, sizeof(gargantuaBuffer));
-        err      = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
-        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_INVALID_ARGUMENT == err));
+        // Test output buffer smaller than the ApplicationData
+        userData = chip::ByteSpan(veryLargeBuffer, sizeof(veryLargeBuffer));
+        err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
+        NL_TEST_ASSERT(inSuite, (CHIP_ERROR_BUFFER_TOO_SMALL == err));
 
         // Cleanup
-        keystore.DestroyKey(keyHandle);
+        keystore.DestroyKey(aes128KeyHandle);
+        keystore.DestroyKey(hmac128KeyHandle);
     }
 }
 
@@ -137,27 +157,38 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
     userData                         = chip::ByteSpan(data);
     const ccm_128_test_vector & test = *ccm_128_test_vectors[0];
 
-    Symmetric128BitsKeyByteArray keyMaterial;
-    memcpy(keyMaterial, test.key, test.key_len);
+    // Two distinct key material buffers to ensure crypto-hardware-assist with single-usage keys create two different handles.
+    Symmetric128BitsKeyByteArray aesKeyMaterial;
+    memcpy(aesKeyMaterial, test.key, test.key_len);
 
-    Aes128KeyHandle keyHandle;
-    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, test.key, test.key_len);
+
+    Aes128KeyHandle aes128KeyHandle;
+    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(aesKeyMaterial, aes128KeyHandle));
+
+    Hmac128KeyHandle hmac128KeyHandle;
+    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
     //=================Encrypt=======================
 
-    err              = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
+    err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
     ByteSpan payload = chip::ByteSpan(outputBuffer.data(), outputBuffer.size());
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
     //=================Decrypt=======================
 
     MutableByteSpan empty;
-    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, empty);
+    err = CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, empty);
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
 
     ByteSpan emptyPayload;
-    err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, emptyPayload, decryptedCounter, buffer);
+    err = CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, emptyPayload, decryptedCounter, buffer);
     NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR != err));
+
+    // Cleanup
+    keystore.DestroyKey(aes128KeyHandle);
+    keystore.DestroyKey(hmac128KeyHandle);
 }
 
 void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
@@ -180,22 +211,29 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Symmetric128BitsKeyByteArray keyMaterial;
-        memcpy(keyMaterial, test.key, test.key_len);
+        // Two disctint key material to force the PSA unit tests to create two different Key IDs
+        Symmetric128BitsKeyByteArray aesKeyMaterial;
+        memcpy(aesKeyMaterial, test.key, test.key_len);
 
-        Aes128KeyHandle keyHandle;
-        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+        Symmetric128BitsKeyByteArray hmacKeyMaterial;
+        memcpy(hmacKeyMaterial, test.key, test.key_len);
+
+        Aes128KeyHandle aes128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(aesKeyMaterial, aes128KeyHandle));
+
+        Hmac128KeyHandle hmac128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
         //=================Encrypt=======================
 
-        err = CheckinMessage::GenerateCheckinMessagePayload(keyHandle, counter, userData, outputBuffer);
+        err = CheckinMessage::GenerateCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, counter, userData, outputBuffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         //=================Decrypt=======================
         uint32_t decryptedCounter = 0;
         ByteSpan payload          = chip::ByteSpan(outputBuffer.data(), outputBuffer.size());
 
-        err = CheckinMessage::ParseCheckinMessagePayload(keyHandle, payload, decryptedCounter, buffer);
+        err = CheckinMessage::ParseCheckinMessagePayload(aes128KeyHandle, hmac128KeyHandle, payload, decryptedCounter, buffer);
         NL_TEST_ASSERT(inSuite, (CHIP_NO_ERROR == err));
 
         NL_TEST_ASSERT(inSuite, (memcmp(data, buffer.data(), sizeof(data)) == 0));
@@ -208,7 +246,10 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
         buffer       = MutableByteSpan(b);
 
         counter += chip::Crypto::GetRandU32() + 1;
-        keystore.DestroyKey(keyHandle);
+
+        // Cleanup
+        keystore.DestroyKey(aes128KeyHandle);
+        keystore.DestroyKey(hmac128KeyHandle);
     }
 }
 
