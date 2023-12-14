@@ -248,7 +248,15 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
     auto remoteSessionParameters = device->GetSecureSession().Value()->GetRemoteSessionParameters();
     CommandSender::ConfigParameters config;
+
     config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
+
+    // TODO(#30986): Need to create a separate pychip_CommandSender_TestOnlySendBatchCommands so that we perform
+    // operations that is very clear at callsite that violating certain aspects like setting this MaxPathsPerInvoke
+    // to a number other than what is reported by the remote node is allowed. Right now the only user of this
+    // function is cert test script. To implement pychip_CommandSender_TestOnlySendBatchCommands in a clean way
+    // we need to move away from the variadic arguments.
+    config.SetRemoteMaxPathsPerInvoke(std::numeric_limits<uint16_t>::max());
 
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
