@@ -46,6 +46,12 @@ IMWriteStatus = Struct(
     "AttributeId" / Int32ul,
 )
 
+CommandPathIBStruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "CommandId" / Int32ul,
+)
+
 # AttributePath should not contain padding
 AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
