@@ -58,6 +58,12 @@ extern "C" {
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <string.h>
 
+#ifdef SIWX_917
+extern "C" {
+#include "sl_si91x_trng.h"
+}
+#endif
+
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -78,15 +84,26 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
-    uint8_t randomAddrBLE[6] = { 0 };
+    uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
+#if SIWX_917
+    sl_status_t sl_status;
+    //! Get Random number of desired length
+    sl_status = sl_si91x_trng_get_random_num((uint32_t *)randomAddrBLE, RSI_BLE_ADDR_LENGTH);
+    if (sl_status != SL_STATUS_OK) {
+        ChipLogError(DeviceLayer," TRNG Random number generation Failed ");
+        return ;
+    }
+#else
     uint64_t randomAddr      = chip::Crypto::GetRandU64();
+    memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
+#endif
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
                                    NULL, NULL, NULL);
 
     // registering the GATT call back functions
-    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL, NULL,
+    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL, rsi_ble_on_read_req_event,
                                     rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                     rsi_ble_on_event_indication_confirmation, NULL);
 
@@ -96,7 +113,6 @@ void sl_ble_init()
 
     //  initializing the application events map
     rsi_ble_app_init_events();
-    memcpy(randomAddrBLE, &randomAddr, 6);
     rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
@@ -147,6 +163,16 @@ void sl_ble_event_handling_task(void)
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
         }
         break;
+        case RSI_BLE_EVENT_GATT_RD: {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+        if (event_msg.rsi_ble_read_req->type == 0) {
+             BLEMgrImpl().HandleC3ReadRequest(event_msg.rsi_ble_read_req);
+        }
+#endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_EVENT_GATT_RD);
+        }
+        break;
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
             BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
@@ -161,6 +187,12 @@ void sl_ble_event_handling_task(void)
         break;
         default:
             break;
+        }
+
+        if (chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected()) {
+            // Once DUT is connected adding a 500ms delay
+            // TODO: Fix this with a better event handling
+            vTaskDelay(pdMS_TO_TICKS(500));
         }
     }
 }
@@ -984,8 +1016,18 @@ exit:
     return err;
 }
 
-// TODO:: Need to do the correct implementation
-void BLEManagerImpl::HandleC3ReadRequest(void) {}
+void BLEManagerImpl::HandleC3ReadRequest(rsi_ble_read_req_t * rsi_ble_read_req) {
+  sl_status_t ret = rsi_ble_gatt_read_response(rsi_ble_read_req->dev_addr,
+                                    GATT_READ_RESP,
+                                    rsi_ble_read_req->handle,
+                                    GATT_READ_ZERO_OFFSET,
+                                    sInstance.c3AdditionalDataBufferHandle->DataLength(),
+                                    sInstance.c3AdditionalDataBufferHandle->Start());
+  if (ret != SL_STATUS_OK)
+  {
+    ChipLogDetail(DeviceLayer, "Failed to send read response, err:%ld", ret);
+  }
+}
 
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 

@@ -206,9 +206,14 @@ template("efr32_sdk") {
 
     if (use_SiWx917) {
       _include_dirs += [
-        "${wifi_sdk_root}/components/si91x/inc",
         "${wifi_sdk_root}/components/si91x/memory",
-        "${wifi_sdk_root}/components/si91x/sl_net/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/inc",
+        "${wifi_sdk_root}/components/common/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -237,7 +242,7 @@ template("efr32_sdk") {
       if (use_rs9116) {
         _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
       } else {
-        _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
+        _include_dirs += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc" ]
       }
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
@@ -331,6 +336,7 @@ template("efr32_sdk") {
         defines += [
           "EXP_BOARD=1",
           "CHIP_917",
+          "SLI_SI917=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
         ]
@@ -776,13 +782,13 @@ template("efr32_sdk") {
         ]
       } else {
         sources += [
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
-          "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gap_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_ble_gatt_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_ble.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_bt_common_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
         ]
       }
     } else {

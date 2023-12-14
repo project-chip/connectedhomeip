@@ -38,7 +38,6 @@
 #include "spidrv.h"
 
 #include "sl_device_init_clocks.h"
-#include "sl_device_init_dpll.h"
 #include "sl_device_init_hfxo.h"
 #include "sl_spidrv_instances.h"
 #include "sl_status.h"
@@ -48,27 +47,15 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+#define DEFAULT_SPI_TRASFER_MODE 0
+// Macro to drive semaphore block minimun timer in milli seconds
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
 
-#ifdef CHIP_9117
-#include "cmsis_os2.h"
-#include "sl_board_configuration.h"
-#include "sl_net.h"
-#include "sl_si91x_driver.h"
-#include "sl_si91x_types.h"
-#include "sl_wifi_callback_framework.h"
-#include "sl_wifi_constants.h"
-#include "sl_wifi_types.h"
-
-// macro to drive semaphore block minimum timer in milli seconds
-// ported from rsi_hal.h (rs911x)
-#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
-#else
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
-#endif // CHIP_9117
 
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
@@ -109,6 +96,16 @@ static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
+
+#if defined(EFR32MG12)
+#include "sl_spidrv_exp_config.h"
+extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#elif defined(EFR32MG24)
+#include "spi_multiplex.h"
+#else
+#error "Unknown platform"
+#endif
 
 // variable to identify spi configured for expansion header
 // EUSART configuration available on the SPIDRV
@@ -174,6 +171,11 @@ void sl_wfx_host_reset_chip(void)
     vTaskDelay(pdMS_TO_TICKS(3));
 }
 
+void gpio_interrupt(uint8_t interrupt_number)
+{
+  UNUSED_PARAMETER(interrupt_number);
+}
+
 /*****************************************************************
  * @fn   void rsi_hal_board_init(void)
  * @brief
@@ -200,13 +202,6 @@ void rsi_hal_board_init(void)
 
     /* Reset of Wifi chip */
     sl_wfx_host_reset_chip();
-}
-
-// wifi-sdk
-sl_status_t sl_si91x_host_bus_init(void)
-{
-    rsi_hal_board_init();
-    return SL_STATUS_OK;
 }
 
 void sl_si91x_host_enable_high_speed_bus()
@@ -461,20 +456,3 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
 #endif // SL_SPICTRL_MUX
     return rsiError;
 }
-
-#ifdef CHIP_9117
-/*********************************************************************
- * @fn   int16_t sl_si91x_host_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen)
- * @param[in]  uint8_t *tx_buff, pointer to the buffer with the data to be transferred
- * @param[in]  uint8_t *rx_buff, pointer to the buffer to store the data received
- * @param[in]  uint16_t transfer_length, Number of bytes to send and receive
- * @param[out] None
- * @return     0, 0=success
- * @section description
- * This API is used to transfer/receive data to the Wi-Fi module through the SPI interface.
- **************************************************************************/
-sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint16_t xlen)
-{
-    return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, RSI_MODE_8BIT));
-}
-#endif // CHIP_9117
