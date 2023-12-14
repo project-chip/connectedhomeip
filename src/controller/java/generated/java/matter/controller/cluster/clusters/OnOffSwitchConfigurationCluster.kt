@@ -106,10 +106,8 @@ class OnOffSwitchConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeSwitchActionsAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSwitchActionsAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -124,7 +122,7 @@ class OnOffSwitchConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

@@ -1274,6 +1274,18 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace IcdManagement {
 namespace Attributes {
 
+namespace UserActiveModeTriggerHint {
+EmberAfStatus
+Get(chip::EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> * value); // UserActiveModeTriggerBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> value);
+} // namespace UserActiveModeTriggerHint
+
+namespace UserActiveModeTriggerInstruction {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace UserActiveModeTriggerInstruction
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);

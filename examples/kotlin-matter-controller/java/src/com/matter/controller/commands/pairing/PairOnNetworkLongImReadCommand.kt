@@ -17,22 +17,14 @@ class PairOnNetworkLongImReadCommand(controller: MatterController, credsIssue: C
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
     runBlocking {
       try {
         val basicInformationCluster =
           BasicInformationCluster(controller = currentCommissioner(), endpointId = DEFAULT_ENDPOINT)
         val vendorName = basicInformationCluster.readVendorNameAttribute()
+
+        // By running command readVendorIDAttribute, we are implicitly requesting CASE to be
+        // established if it's not already present.
         val vendorId = basicInformationCluster.readVendorIDAttribute()
         logger.log(Level.INFO, "Read command succeeded, Verdor Name:${vendorName} (ID:${vendorId})")
       } catch (ex: Exception) {
