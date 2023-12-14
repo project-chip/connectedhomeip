@@ -77,10 +77,8 @@ class TimeFormatLocalizationCluster(
     return decodedValue
   }
 
-  suspend fun writeHourFormatAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeHourFormatAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -95,7 +93,7 @@ class TimeFormatLocalizationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -155,10 +153,8 @@ class TimeFormatLocalizationCluster(
     return decodedValue
   }
 
-  suspend fun writeActiveCalendarTypeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeActiveCalendarTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -173,7 +169,7 @@ class TimeFormatLocalizationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

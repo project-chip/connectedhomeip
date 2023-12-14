@@ -55,10 +55,9 @@ class AdministratorCommissioningCluster(
     discriminator: UShort,
     iterations: UInt,
     salt: ByteArray,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -83,7 +82,7 @@ class AdministratorCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -92,10 +91,9 @@ class AdministratorCommissioningCluster(
 
   suspend fun openBasicCommissioningWindow(
     commissioningTimeout: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -108,16 +106,15 @@ class AdministratorCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun revokeCommissioning(timedInvokeTimeoutMs: Int) {
+  suspend fun revokeCommissioning(timedInvokeTimeout: Duration) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -127,7 +124,7 @@ class AdministratorCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
