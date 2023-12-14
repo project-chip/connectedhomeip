@@ -28,6 +28,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
     app::ICDClientInfo info;
     auto iter = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
     char icdAesKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
+    char icdHmacKeyHex[Crypto::kHMAC_CCM128_Key_Length * 2 + 1];
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | %-75s |\n", "Known ICDs:");
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
@@ -47,6 +48,9 @@ CHIP_ERROR ICDListCommand::RunCommand()
         Encoding::BytesToHex(info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kAES_CCM128_Key_Length,
                              icdAesKeyHex, sizeof(icdAesKeyHex), chip::Encoding::HexFlags::kNullTerminate);
         fprintf(stderr, "  | aes key: %60s |\n", icdAesKeyHex);
+        Encoding::BytesToHex(info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kHMAC_CCM128_Key_Length,
+                             icdHmacKeyHex, sizeof(icdHmacKeyHex), chip::Encoding::HexFlags::kNullTerminate);
+        fprintf(stderr, "  | aes key: %60s |\n", icdHmacKeyHex);
     }
 
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");

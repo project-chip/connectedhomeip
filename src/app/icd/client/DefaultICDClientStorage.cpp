@@ -295,7 +295,12 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     ReturnErrorOnFailure(mpKeyStore->CreateKey(keyMaterial, clientInfo.aes_key_handle));
-    return mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
+    CHIP_ERROR err = mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+    }
+    return err;
 }
 
 void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
