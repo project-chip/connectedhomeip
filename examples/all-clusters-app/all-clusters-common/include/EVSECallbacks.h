@@ -18,6 +18,10 @@
 
 #pragma once
 
+namespace chip {
+namespace app {
+namespace Clusters {
+
 using namespace chip::app::Clusters::EnergyEvse;
 
 /* This callbacks mechanism is intended to allow different delegates to callback
@@ -72,3 +76,7 @@ struct EVSECallbackWrapper
     EVSECallbackFunc handler;
     intptr_t arg;
 };
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip
