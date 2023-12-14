@@ -3629,6 +3629,56 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalEnergyMeasurement {
+namespace Attributes {
+
+namespace Accuracy {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Accuracy
+
+namespace CumulativeEnergyImported {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CumulativeEnergyImported
+
+namespace CumulativeEnergyExported {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CumulativeEnergyExported
+
+namespace PeriodicEnergyImported {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace PeriodicEnergyImported
+
+namespace PeriodicEnergyExported {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace PeriodicEnergyExported
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalEnergyMeasurement
+
 namespace DemandResponseLoadControl {
 namespace Attributes {
 

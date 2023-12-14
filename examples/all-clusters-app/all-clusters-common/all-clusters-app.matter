@@ -3638,32 +3638,77 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
-/** This cluster provides an interface to specify preferences for how devices should consume energy. */
-cluster EnergyPreference = 155 {
-  revision 1; // NOTE: Default/not specifically set
+/** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
+provisional cluster ElectricalEnergyMeasurement = 145 {
+  revision 1;
 
-  enum EnergyPriorityEnum : enum8 {
-    kComfort = 0;
-    kSpeed = 1;
-    kEfficiency = 2;
-    kWaterConsumption = 3;
+  enum MeasurementTypeEnum : enum16 {
+    kUnspecified = 0;
+    kVoltage = 1;
+    kActiveCurrent = 2;
+    kReactiveCurrent = 3;
+    kApparentCurrent = 4;
+    kActivePower = 5;
+    kReactivePower = 6;
+    kApparentPower = 7;
+    kRMSVoltage = 8;
+    kRMSCurrent = 9;
+    kRMSPower = 10;
+    kFrequency = 11;
+    kPowerFactor = 12;
+    kNeutralCurrent = 13;
+    kElectricalEnergy = 14;
   }
 
   bitmap Feature : bitmap32 {
-    kEnergyBalance = 0x1;
-    kLowPowerModeSensitivity = 0x2;
+    kImportedEnergy = 0x1;
+    kExportedEnergy = 0x2;
+    kCumulativeEnergy = 0x4;
+    kPeriodicEnergy = 0x8;
   }
 
-  struct BalanceStruct {
-    percent step = 0;
-    optional char_string<64> label = 1;
+  struct MeasurementAccuracyRangeStruct {
+    int64s rangeMin = 0;
+    int64s rangeMax = 1;
+    optional percent100ths percentMax = 2;
+    optional percent100ths percentMin = 3;
+    optional percent100ths percentTypical = 4;
+    optional int64u fixedMax = 5;
+    optional int64u fixedMin = 6;
+    optional int64u fixedTypical = 7;
   }
 
-  readonly attribute optional BalanceStruct energyBalances[] = 0;
-  attribute optional int8u currentEnergyBalance = 1;
-  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
-  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
-  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  struct MeasurementAccuracyStruct {
+    MeasurementTypeEnum measurementType = 0;
+    boolean measured = 1;
+    int64s minMeasuredValue = 2;
+    int64s maxMeasuredValue = 3;
+    MeasurementAccuracyRangeStruct accuracyRanges[] = 4;
+  }
+
+  struct EnergyMeasurementStruct {
+    int64s energy = 0;
+    optional epoch_s startTimestamp = 1;
+    optional epoch_s endTimestamp = 2;
+    optional systime_ms startSystime = 3;
+    optional systime_ms endSystime = 4;
+  }
+
+  info event CumulativeEnergyMeasured = 0 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  info event PeriodicEnergyMeasured = 1 {
+    optional EnergyMeasurementStruct energyImported = 0;
+    optional EnergyMeasurementStruct energyExported = 1;
+  }
+
+  readonly attribute MeasurementAccuracyStruct accuracy = 0;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyImported = 1;
+  readonly attribute optional nullable EnergyMeasurementStruct cumulativeEnergyExported = 2;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyImported = 3;
+  readonly attribute optional nullable EnergyMeasurementStruct periodicEnergyExported = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -7080,17 +7125,19 @@ endpoint 1 {
     handle command ResetCondition;
   }
 
-  server cluster EnergyPreference {
-    callback attribute energyBalances;
-    ram      attribute currentEnergyBalance;
-    callback attribute energyPriorities;
-    callback attribute lowPowerModeSensitivities;
-    ram      attribute currentLowPowerModeSensitivity;
+  server cluster ElectricalEnergyMeasurement {
+    emits event CumulativeEnergyMeasured;
+    emits event PeriodicEnergyMeasured;
+    callback attribute accuracy;
+    callback attribute cumulativeEnergyImported;
+    callback attribute cumulativeEnergyExported;
+    callback attribute periodicEnergyImported;
+    callback attribute periodicEnergyExported;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
   }
 

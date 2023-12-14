@@ -41,7 +41,7 @@
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS
 #include <tracing/esp32_trace/insights_sys_stats.h>
-#define START_TIMEOUT_MS 600000
+#define START_TIMEOUT_MS 60000
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER

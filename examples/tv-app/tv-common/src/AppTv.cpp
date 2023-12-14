@@ -393,21 +393,22 @@ constexpr CommandId channelOutgoingCommands[] = {
 };
 // Declare Cluster List for Content App endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(contentAppClusters)
-DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, keypadInputIncomingCommands,
+DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, ZAP_CLUSTER_MASK(SERVER), keypadInputIncomingCommands,
                             keypadInputOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, applicationLauncherIncomingCommands,
-                            applicationLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, accountLoginIncomingCommands,
-                            accountLoginOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, contentLauncherIncomingCommands,
-                            contentLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
-                            mediaPlaybackOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, targetNavigatorIncomingCommands,
-                            targetNavigatorOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, channelIncomingCommands, channelOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            applicationLauncherIncomingCommands, applicationLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            accountLoginIncomingCommands, accountLoginOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            contentLauncherIncomingCommands, contentLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            mediaPlaybackIncomingCommands, mediaPlaybackOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            targetNavigatorIncomingCommands, targetNavigatorOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, ZAP_CLUSTER_MASK(SERVER), channelIncomingCommands,
+                            channelOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Content App endpoint
