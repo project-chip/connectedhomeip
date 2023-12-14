@@ -23,6 +23,7 @@ CommandHandlerInterfaceOnlyClusters:
     - RVC Clean Mode
     - Dishwasher Mode
     - Laundry Washer Mode
+    - Oven Mode
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Operational State
     - Activated Carbon Filter Monitoring
@@ -49,6 +50,7 @@ ClustersWithInitFunctions:
     - Mode Select
     - Sample MEI
     - Scenes
+    - Oven Mode
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
