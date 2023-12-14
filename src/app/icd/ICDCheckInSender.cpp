@@ -59,12 +59,20 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
     // Encoded ActiveModeThreshold in littleEndian for Check-In message application data
-    uint8_t activeModeThresholdBuffer[kApplicationDataSize] = { 0 };
-    Encoding::LittleEndian::Put16(activeModeThresholdBuffer, ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
-    ByteSpan activeModeThresholdByteSpan(activeModeThresholdBuffer);
+    {
+        uint8_t activeModeThresholdBuffer[kApplicationDataSize] = { 0 };
+        size_t writtenBytes                                     = 0;
+        Encoding::LittleEndian::BufferWriter writer(activeModeThresholdBuffer, kApplicationDataSize);
 
-    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mAes128KeyHandle, mHmac128KeyHandle, mICDCounter,
-                                                                       activeModeThresholdByteSpan, output));
+        writer.Put16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+        VerifyOrReturnError(writer.Fit(writtenBytes), CHIP_ERROR_INTERNAL);
+
+        ByteSpan activeModeThresholdByteSpan(writer.Buffer(), writtenBytes);
+
+        ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mAes128KeyHandle, mHmac128KeyHandle, mICDCounter,
+                                                                           activeModeThresholdByteSpan, output));
+    }
+
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
 
     VerifyOrReturnError(mExchangeManager->GetSessionManager() != nullptr, CHIP_ERROR_INTERNAL);
