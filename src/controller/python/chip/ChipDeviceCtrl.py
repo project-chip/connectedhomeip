@@ -1893,7 +1893,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return PyChipError(CHIP_ERROR_TIMEOUT)
         return self._ChipStack.commissioningEventRes
 
-    def CommissionWithCode(self, setupPayload: str, nodeid: int, network_only: bool = False) -> PyChipError:
+    def CommissionWithCode(self, setupPayload: str, nodeid: int, networkOnly: bool = False) -> PyChipError:
         ''' Commission with the given nodeid from the setupPayload.
             setupPayload may be a QR or manual code.
         '''
@@ -1909,7 +1909,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                self.devCtrl, setupPayload, nodeid, network_only)
+                self.devCtrl, setupPayload, nodeid, networkOnly)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
             # Error 50 is a timeout
