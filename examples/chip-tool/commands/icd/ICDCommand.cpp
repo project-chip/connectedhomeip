@@ -50,7 +50,7 @@ CHIP_ERROR ICDListCommand::RunCommand()
         fprintf(stderr, "  | aes key: %60s |\n", icdAesKeyHex);
         Encoding::BytesToHex(info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), Crypto::kHMAC_CCM128_Key_Length,
                              icdHmacKeyHex, sizeof(icdHmacKeyHex), chip::Encoding::HexFlags::kNullTerminate);
-        fprintf(stderr, "  | aes key: %60s |\n", icdHmacKeyHex);
+        fprintf(stderr, "  | hmac key: %60s |\n", icdHmacKeyHex);
     }
 
     fprintf(stderr, "  +-----------------------------------------------------------------------------+\n");
