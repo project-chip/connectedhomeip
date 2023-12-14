@@ -84,11 +84,9 @@ class NetworkCommissioningCluster(
   suspend fun scanNetworks(
     ssid: ByteArray?,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ScanNetworksResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -104,7 +102,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -197,7 +195,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -223,11 +220,9 @@ class NetworkCommissioningCluster(
     networkIdentity: ByteArray?,
     clientIdentifier: ByteArray?,
     possessionNonce: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NetworkConfigResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -261,7 +256,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -346,7 +341,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -369,11 +363,9 @@ class NetworkCommissioningCluster(
   suspend fun addOrUpdateThreadNetwork(
     operationalDataset: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NetworkConfigResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -389,7 +381,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -474,7 +466,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -497,11 +488,9 @@ class NetworkCommissioningCluster(
   suspend fun removeNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NetworkConfigResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -517,7 +506,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -602,7 +591,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -625,11 +613,9 @@ class NetworkCommissioningCluster(
   suspend fun connectNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ConnectNetworkResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -645,7 +631,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -697,7 +683,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -715,11 +700,9 @@ class NetworkCommissioningCluster(
     networkID: ByteArray,
     networkIndex: UByte,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NetworkConfigResponse {
     val commandId: UInt = 8u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -738,7 +721,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -823,7 +806,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -846,11 +828,9 @@ class NetworkCommissioningCluster(
   suspend fun queryIdentity(
     keyIdentifier: ByteArray,
     possessionNonce: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): QueryIdentityResponse {
     val commandId: UInt = 9u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -868,7 +848,7 @@ class NetworkCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -902,7 +882,6 @@ class NetworkCommissioningCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1088,10 +1067,8 @@ class NetworkCommissioningCluster(
     return decodedValue
   }
 
-  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1106,7 +1083,7 @@ class NetworkCommissioningCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

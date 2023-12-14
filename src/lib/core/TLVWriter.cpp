@@ -128,6 +128,20 @@ CHIP_ERROR TLVWriter::Finalize()
     return err;
 }
 
+CHIP_ERROR TLVWriter::ReserveBuffer(uint32_t aBufferSize)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+
+    if (mBackingStore)
+    {
+        VerifyOrReturnError(mBackingStore->GetNewBufferWillAlwaysFail(), CHIP_ERROR_INCORRECT_STATE);
+    }
+    mReservedSize += aBufferSize;
+    mRemainingLen -= aBufferSize;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVWriter::PutBoolean(Tag tag, bool v)
 {
     return WriteElementHead((v) ? TLVElementType::BooleanTrue : TLVElementType::BooleanFalse, tag, 0);

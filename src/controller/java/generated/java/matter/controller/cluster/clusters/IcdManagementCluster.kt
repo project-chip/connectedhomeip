@@ -58,11 +58,9 @@ class IcdManagementCluster(
     monitoredSubject: ULong,
     key: ByteArray,
     verificationKey: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): RegisterClientResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -86,7 +84,7 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -103,7 +101,6 @@ class IcdManagementCluster(
       if (tag == ContextSpecificTag(TAG_I_C_D_COUNTER)) {
         ICDCounter_decoded = tlvReader.getUInt(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -120,11 +117,9 @@ class IcdManagementCluster(
   suspend fun unregisterClient(
     checkInNodeID: ULong,
     verificationKey: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -142,17 +137,15 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int? = null): StayActiveResponse {
+  suspend fun stayActiveRequest(timedInvokeTimeout: Duration? = null): StayActiveResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -162,7 +155,7 @@ class IcdManagementCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -179,7 +172,6 @@ class IcdManagementCluster(
       if (tag == ContextSpecificTag(TAG_PROMISED_ACTIVE_DURATION)) {
         promisedActiveDuration_decoded = tlvReader.getUInt(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
