@@ -123,172 +123,202 @@ test driver:
 #  Source Code
 ############################################################
 qr code:
-    - any:
-        - src/qrcode/*
-        - src/qrcode/**/*
-        - src/qrcodetool/*
-        - src/qrcodetool/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/qrcode/*
+      - src/qrcode/**/*
+      - src/qrcodetool/*
+      - src/qrcodetool/**/*
 
 lwip:
-    - any:
-        - src/lwip/*
-        - src/lwip/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lwip/*
+      - src/lwip/**/*
 
 inet:
-    - any:
-        - src/inet/*
-        - src/inet/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/inet/*
+      - src/inet/**/*
 
 config:
-    - any:
-        - config/*
-        - config/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - config/*
+      - config/**/*
 
 lib:
-    - any:
-        - src/lib/*
-        - src/lib/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/*
+      - src/lib/**/*
 
 core:
-    - any:
-        - src/lib/core/*
-        - src/lib/core/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/core/*
+      - src/lib/core/**/*
 
 protocols:
-    - any:
-        - src/lib/protocols/*
-        - src/lib/protocols/**/*
-        - src/protocols/*
-        - src/protocols/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/protocols/*
+      - src/lib/protocols/**/*
+      - src/protocols/*
+      - src/protocols/**/*
 
 messaging:
-    - any:
-        - src/messaging/*
-        - src/messaging/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/messaging/*
+      - src/messaging/**/*
 
 shell:
-    - any:
-        - src/lib/shell/*
-        - src/lib/shell/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/shell/*
+      - src/lib/shell/**/*
 
 support:
-    - any:
-        - src/lib/support/*
-        - src/lib/support/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/lib/support/*
+      - src/lib/support/**/*
 
 crypto:
-    - any:
-        - src/crypto/*
-        - src/crypto/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/crypto/*
+      - src/crypto/**/*
 
 controller:
-    - any:
-        - src/controller/*
-        - src/controller/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/controller/*
+      - src/controller/**/*
 
 ble:
-    - any:
-        - src/ble/*
-        - src/ble/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/ble/*
+      - src/ble/**/*
 
 app:
-    - any:
-        - src/app/*
-        - src/app/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/app/*
+      - src/app/**/*
 
 icd:
-    - any:
-        - src/app/icd/*
-        - src/app/icd/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/app/icd/*
+      - src/app/icd/**/*
 
 transport:
-    - any:
-        - src/transport/*
-        - src/transport/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/transport/*
+      - src/transport/**/*
 
 system:
-    - any:
-        - src/system/*
-        - src/system/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/system/*
+      - src/system/**/*
 
 setup payload:
-    - any:
-        - src/setup_payload/*
-        - src/setup_payload/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/setup_payload/*
+      - src/setup_payload/**/*
 
 ############################################################
 #  Platforms
 ############################################################
 platform:
-    - any:
-        - src/platform/*
-        - src/platform/**/*
-        - config/tizen/chip-gn/platform/*
-        - config/tizen/chip-gn/platform/**/*
-        - examples/platform/*
-        - examples/platform/**/*
-        - scripts/tools/memory/platform/*
-        - scripts/tools/memory/platform/**/*
-        - src/include/platform/*
-        - src/include/platform/**/*
-        - src/lib/dnssd/platform/*
-        - src/lib/dnssd/platform/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/*
+      - src/platform/**/*
+      - config/tizen/chip-gn/platform/*
+      - config/tizen/chip-gn/platform/**/*
+      - examples/platform/*
+      - examples/platform/**/*
+      - scripts/tools/memory/platform/*
+      - scripts/tools/memory/platform/**/*
+      - src/include/platform/*
+      - src/include/platform/**/*
+      - src/lib/dnssd/platform/*
+      - src/lib/dnssd/platform/**/*
 
 darwin:
-    - any:
-        - src/platform/Darwin/*
-        - src/platform/Darwin/**/*
-        - src/darwin/*
-        - src/darwin/**/*
-        - examples/darwin-framework-tool/*
-        - examples/darwin-framework-tool/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Darwin/*
+      - src/platform/Darwin/**/*
+      - src/darwin/*
+      - src/darwin/**/*
+      - examples/darwin-framework-tool/*
+      - examples/darwin-framework-tool/**/*
 
 silabs:
-    - any:
-        - src/platform/silabs/*
-        - src/platform/silabs/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/silabs/*
+      - src/platform/silabs/**/*
 
 esp32:
-    - any:
-        - src/platform/ESP32/*
-        - src/platform/ESP32/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/ESP32/*
+      - src/platform/ESP32/**/*
 
 freeRTOS:
-    - any:
-        - src/platform/FreeRTOS/*
-        - src/platform/FreeRTOS/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/FreeRTOS/*
+      - src/platform/FreeRTOS/**/*
 
 k32w:
-    - any:
-        - src/platform/K32W/*
-        - src/platform/K32W/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/K32W/*
+      - src/platform/K32W/**/*
 
 linux:
-    - any:
-        - src/platform/Linux/*
-        - src/platform/Linux/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Linux/*
+      - src/platform/Linux/**/*
 
 nrf connect:
-    - any:
-        - src/platform/nrfconnect/*
-        - src/platform/nrfconnect/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/nrfconnect/*
+      - src/platform/nrfconnect/**/*
 
 openthread:
-    - any:
-        - src/platform/openthread/*
-        - src/platform/openthread/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/openthread/*
+      - src/platform/openthread/**/*
 
 zephyr:
-    - any:
-        - src/platform/Zephyr/*
-        - src/platform/Zephyr/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Zephyr/*
+      - src/platform/Zephyr/**/*
 
 telink:
-    - any:
-        - src/platform/telink/*
-        - src/platform/telink/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/telink/*
+      - src/platform/telink/**/*
 
 tizen:
-    - any:
-        - src/platform/Tizen/*
-        - src/platform/Tizen/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/platform/Tizen/*
+      - src/platform/Tizen/**/*
