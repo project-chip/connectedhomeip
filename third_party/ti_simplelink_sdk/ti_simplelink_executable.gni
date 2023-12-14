@@ -122,8 +122,8 @@ template("ti_simplelink_executable") {
     ]
   }
 
-  #if (chip_enable_ota_requestor)
-    if(ti_simplelink_device_family == "cc13x2x7_26x2x7") {
+  if (chip_enable_ota_requestor) {
+    if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       if (custom_factory_data) {
         pw_python_action("${simplelink_target_name}-without-factory-data.hex") {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
@@ -134,7 +134,8 @@ template("ti_simplelink_executable") {
               [ "${root_out_dir}/${output_base_name}-without-factory-data.hex" ]
 
           args = [
-            rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
+            rebase_path("${root_out_dir}/${output_base_name}.hex",
+                        root_out_dir),
             rebase_path("${root_out_dir}/${output_base_name}.out.map",
                         root_out_dir),
             rebase_path(
@@ -146,7 +147,8 @@ template("ti_simplelink_executable") {
       }
       pw_python_action("${simplelink_target_name}.bin") {
         if (custom_factory_data) {
-          public_deps = [ ":${simplelink_target_name}-without-factory-data.hex" ]
+          public_deps =
+              [ ":${simplelink_target_name}-without-factory-data.hex" ]
         } else {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
         }
@@ -245,8 +247,7 @@ template("ti_simplelink_executable") {
         if (custom_factory_data) {
           public_deps += [ ":${simplelink_target_name}-factory-data.hex" ]
 
-          script =
-              "${ti_simplelink_sdk_build_root}/oad_and_factory_data_merge_tool.py"
+          script = "${ti_simplelink_sdk_build_root}/oad_and_factory_data_merge_tool.py"
           sources = [
             "${root_out_dir}/${output_base_name}-factory-data.hex",
             "${root_out_dir}/${output_base_name}.bin",
@@ -295,8 +296,10 @@ template("ti_simplelink_executable") {
 
         args = [
           "create",
-          rebase_path("${root_out_dir}/${output_base_name}.bin", root_build_dir),
-          rebase_path("${root_out_dir}/${output_base_name}.ota", root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.bin",
+                      root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}.ota",
+                      root_build_dir),
         ]
 
         args += [
@@ -340,11 +343,9 @@ template("ti_simplelink_executable") {
             args += invoker.ota_args
           }
         }
-      } 
-    }
-
-    else if (ti_simplelink_device_family == "cc13x4_26x4") {
-      if(custom_factory_data){
+      }
+    } else if (ti_simplelink_device_family == "cc13x4_26x4") {
+      if (custom_factory_data) {
         pw_python_action("${simplelink_target_name}-without-factory-data.hex") {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
 
@@ -354,7 +355,8 @@ template("ti_simplelink_executable") {
               [ "${root_out_dir}/${output_base_name}-without-factory-data.hex" ]
 
           args = [
-            rebase_path("${root_out_dir}/${output_base_name}.hex", root_out_dir),
+            rebase_path("${root_out_dir}/${output_base_name}.hex",
+                        root_out_dir),
             rebase_path("${root_out_dir}/${output_base_name}.out.map",
                         root_out_dir),
             rebase_path(
@@ -386,25 +388,25 @@ template("ti_simplelink_executable") {
           ]
         }
       }
+
       # add MCUBoot Header to the executable
       action("${simplelink_target_name}_header.hex") {
-        if(custom_factory_data){
-          public_deps = [ ":${simplelink_target_name}-without-factory-data.hex" ]
-        }
-        else{
+        if (custom_factory_data) {
+          public_deps =
+              [ ":${simplelink_target_name}-without-factory-data.hex" ]
+        } else {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
         }
-        
+
         script = "${ti_simplelink_sdk_root}/source/third_party/mcuboot/scripts/imgtool.py"
-        if(custom_factory_data){
+        if (custom_factory_data) {
           sources =
               [ "${root_out_dir}/${output_base_name}-without-factory-data.hex" ]
           input_path =
               "${root_out_dir}/${output_base_name}-without-factory-data.hex"
-        }
-        else{
+        } else {
           sources = [ "${root_out_dir}/${output_base_name}.hex" ]
-          input_path = "${root_out_dir}/${output_base_name}.hex" 
+          input_path = "${root_out_dir}/${output_base_name}.hex"
         }
         outputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
 
@@ -559,44 +561,41 @@ template("ti_simplelink_executable") {
         if (custom_factory_data) {
           public_deps += [ ":${simplelink_target_name}-factory-data.hex" ]
 
-          script =
-              "${ti_simplelink_sdk_build_root}/oad_and_factory_data_merge_tool.py"
+          script = "${ti_simplelink_sdk_build_root}/oad_and_factory_data_merge_tool.py"
           sources = [
             "${root_out_dir}/${output_base_name}-factory-data.hex",
             "${root_out_dir}/${output_base_name}.bin",
           ]
-        } else{
-            script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
-            sources = [
-              "${root_out_dir}/${output_base_name}.mcubootloader.hex",
-              "${root_out_dir}/${output_base_name}_header.bin",
-            ]
+        } else {
+          script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
+          sources = [
+            "${root_out_dir}/${output_base_name}.mcubootloader.hex",
+            "${root_out_dir}/${output_base_name}_header.bin",
+          ]
         }
 
-       
         outputs = [ "${root_out_dir}/${output_base_name}-mcuboot.hex" ]
 
-        if(custom_factory_data){
+        if (custom_factory_data) {
           args = [
-          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
-                      root_build_dir),
-          rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
-                      root_build_dir),
-
-          rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
-                      root_build_dir),
-          ]
-
-        } else{
-          args = [
-          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
-                      root_build_dir),
-          rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
-                      root_build_dir),
-          rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
+            rebase_path("${root_out_dir}/${output_base_name}_header.hex",
                         root_build_dir),
-          rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
-                      root_build_dir),
+            rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
+                        root_build_dir),
+
+            rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
+                        root_build_dir),
+          ]
+        } else {
+          args = [
+            rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+                        root_build_dir),
+            rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
+                        root_build_dir),
+            rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
+                        root_build_dir),
+            rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
+                        root_build_dir),
           ]
         }
       }
@@ -643,9 +642,8 @@ template("ti_simplelink_executable") {
         }
       }
     }
-  }
-
-  if (ti_simplelink_device_family == "cc13x4_26x4" && custom_factory_data) {
+  } else if (ti_simplelink_device_family == "cc13x4_26x4" &&
+             custom_factory_data) {
     pw_python_action("${simplelink_target_name}-without-factory-data.hex") {
       public_deps = [ ":${simplelink_target_name}.out.image" ]
 
