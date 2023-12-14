@@ -103,9 +103,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+  suspend fun lockDoor(PINCode: ByteArray?, timedInvokeTimeout: Duration) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -118,16 +117,15 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+  suspend fun unlockDoor(PINCode: ByteArray?, timedInvokeTimeout: Duration) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -140,16 +138,19 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun unlockWithTimeout(timeout: UShort, PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+  suspend fun unlockWithTimeout(
+    timeout: UShort,
+    PINCode: ByteArray?,
+    timedInvokeTimeout: Duration
+  ) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -165,7 +166,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -180,11 +181,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     startMinute: UByte,
     endHour: UByte,
     endMinute: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 11u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -215,7 +214,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -225,11 +224,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun getWeekDaySchedule(
     weekDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetWeekDayScheduleResponse {
     val commandId: UInt = 12u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -245,7 +242,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -361,7 +358,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -395,11 +391,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun clearWeekDaySchedule(
     weekDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 13u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -415,7 +409,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -427,11 +421,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userIndex: UShort,
     localStartTime: UInt,
     localEndTime: UInt,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 14u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -453,7 +445,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -463,11 +455,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun getYearDaySchedule(
     yearDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetYearDayScheduleResponse {
     val commandId: UInt = 15u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -483,7 +473,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -548,7 +538,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -579,11 +568,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
   suspend fun clearYearDaySchedule(
     yearDayIndex: UByte,
     userIndex: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 16u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -599,7 +586,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -611,11 +598,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     localStartTime: UInt,
     localEndTime: UInt,
     operatingMode: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 17u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -637,7 +622,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -646,11 +631,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun getHolidaySchedule(
     holidayIndex: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetHolidayScheduleResponse {
     val commandId: UInt = 18u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -663,7 +646,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -738,7 +721,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -762,10 +744,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     )
   }
 
-  suspend fun clearHolidaySchedule(holidayIndex: UByte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun clearHolidaySchedule(holidayIndex: UByte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 19u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -778,7 +758,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -793,10 +773,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userStatus: UByte?,
     userType: UByte?,
     credentialRule: UByte?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 26u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -829,17 +808,15 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun getUser(userIndex: UShort, timedInvokeTimeoutMs: Int? = null): GetUserResponse {
+  suspend fun getUser(userIndex: UShort, timedInvokeTimeout: Duration? = null): GetUserResponse {
     val commandId: UInt = 27u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -852,7 +829,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1037,7 +1014,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1062,9 +1038,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     )
   }
 
-  suspend fun clearUser(userIndex: UShort, timedInvokeTimeoutMs: Int) {
+  suspend fun clearUser(userIndex: UShort, timedInvokeTimeout: Duration) {
     val commandId: UInt = 29u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1077,7 +1052,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1091,10 +1066,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     userIndex: UShort?,
     userStatus: UByte?,
     userType: UByte?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ): SetCredentialResponse {
     val commandId: UInt = 34u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1122,7 +1096,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1175,7 +1149,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1191,11 +1164,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun getCredentialStatus(
     credential: DoorLockClusterCredentialStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetCredentialStatusResponse {
     val commandId: UInt = 36u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1208,7 +1179,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1297,7 +1268,6 @@ class DoorLockCluster(private val controller: MatterController, private val endp
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1319,10 +1289,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun clearCredential(
     credential: DoorLockClusterCredentialStruct?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 38u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1335,16 +1304,15 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeoutMs: Int) {
+  suspend fun unboltDoor(PINCode: ByteArray?, timedInvokeTimeout: Duration) {
     val commandId: UInt = 39u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1357,7 +1325,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1540,10 +1508,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeDoorOpenEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDoorOpenEventsAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1558,7 +1524,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1618,10 +1584,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeDoorClosedEventsAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDoorClosedEventsAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1636,7 +1600,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1696,10 +1660,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeOpenPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOpenPeriodAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1714,7 +1676,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2214,10 +2176,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeLanguageAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLanguageAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 33u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2232,7 +2192,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2292,10 +2252,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeLEDSettingsAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLEDSettingsAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 34u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2310,7 +2268,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2365,10 +2323,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeAutoRelockTimeAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeAutoRelockTimeAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 35u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2383,7 +2339,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2443,10 +2399,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeSoundVolumeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSoundVolumeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 36u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2461,7 +2415,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2516,10 +2470,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeOperatingModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOperatingModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 37u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2534,7 +2486,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2663,11 +2615,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableLocalProgrammingAttribute(
     value: Boolean,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 40u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2682,7 +2632,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2744,11 +2694,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableOneTouchLockingAttribute(
     value: Boolean,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 41u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2763,7 +2711,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2825,11 +2773,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnableInsideStatusLEDAttribute(
     value: Boolean,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 42u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2844,7 +2790,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2906,11 +2852,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeEnablePrivacyModeButtonAttribute(
     value: Boolean,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 43u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2925,7 +2869,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2987,11 +2931,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeLocalProgrammingFeaturesAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 44u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3006,7 +2948,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3066,10 +3008,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeWrongCodeEntryLimitAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWrongCodeEntryLimitAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 48u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3084,7 +3024,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3146,11 +3086,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeUserCodeTemporaryDisableTimeAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 49u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3165,7 +3103,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3225,10 +3163,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeSendPINOverTheAirAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSendPINOverTheAirAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 50u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3243,7 +3179,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3305,11 +3241,9 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
   suspend fun writeRequirePINforRemoteOperationAttribute(
     value: Boolean,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 51u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3324,7 +3258,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3384,10 +3318,11 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeExpiringUserTimeoutAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeExpiringUserTimeoutAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 53u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3402,7 +3337,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

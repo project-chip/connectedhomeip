@@ -192,10 +192,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun test(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun test(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -205,17 +203,15 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testNotHandled(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testNotHandled(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -225,17 +221,15 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testSpecific(timedInvokeTimeoutMs: Int? = null): TestSpecificResponse {
+  suspend fun testSpecific(timedInvokeTimeout: Duration? = null): TestSpecificResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -245,7 +239,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -262,7 +256,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -276,10 +269,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return TestSpecificResponse(returnValue_decoded)
   }
 
-  suspend fun testUnknownCommand(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testUnknownCommand(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -289,7 +280,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -299,11 +290,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testAddArguments(
     arg1: UByte,
     arg2: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestAddArgumentsResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -319,7 +308,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -336,7 +325,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -352,11 +340,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testSimpleArgumentRequest(
     arg1: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestSimpleArgumentResponse {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -369,7 +355,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -386,7 +372,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -407,11 +392,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg4: List<Boolean>,
     arg5: UByte,
     arg6: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestStructArrayArgumentResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -455,7 +438,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -535,7 +518,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG6)) {
         arg6_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -578,11 +560,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testStructArgumentRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 7u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -595,7 +575,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -612,7 +592,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -628,11 +607,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructArgumentRequest(
     arg1: UnitTestingClusterNestedStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 8u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -645,7 +622,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -662,7 +639,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -678,11 +654,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListStructArgumentRequest(
     arg1: List<UnitTestingClusterSimpleStruct>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 9u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -699,7 +673,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -716,7 +690,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -732,11 +705,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UArgumentRequest(
     arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 10u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -753,7 +724,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -770,7 +741,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -786,11 +756,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructListArgumentRequest(
     arg1: UnitTestingClusterNestedStructList,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 11u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -803,7 +771,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -820,7 +788,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -836,11 +803,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListNestedStructListArgumentRequest(
     arg1: List<UnitTestingClusterNestedStructList>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 12u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -857,7 +822,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -874,7 +839,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -890,11 +854,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UReverseRequest(
     arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestListInt8UReverseResponse {
     val commandId: UInt = 13u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -911,7 +873,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -935,7 +897,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             tlvReader.exitContainer()
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -952,11 +913,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testEnumsRequest(
     arg1: UShort,
     arg2: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEnumsResponse {
     val commandId: UInt = 14u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -972,7 +931,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -996,7 +955,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1016,11 +974,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNullableOptionalRequest(
     arg1: UByte?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestNullableOptionalResponse {
     val commandId: UInt = 15u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1033,7 +989,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1106,7 +1062,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1138,11 +1093,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     nullableList: List<UByte>?,
     optionalList: List<UByte>?,
     nullableOptionalList: List<UByte>?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestComplexNullableOptionalResponse {
     val commandId: UInt = 16u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1220,7 +1173,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1604,7 +1557,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1693,11 +1645,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun simpleStructEchoRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): SimpleStructResponse {
     val commandId: UInt = 17u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1710,7 +1660,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1727,7 +1677,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1741,9 +1690,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return SimpleStructResponse(arg1_decoded)
   }
 
-  suspend fun timedInvokeRequest(timedInvokeTimeoutMs: Int) {
+  suspend fun timedInvokeRequest(timedInvokeTimeout: Duration) {
     val commandId: UInt = 18u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1753,17 +1701,18 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testSimpleOptionalArgumentRequest(arg1: Boolean?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testSimpleOptionalArgumentRequest(
+    arg1: Boolean?,
+    timedInvokeTimeout: Duration? = null
+  ) {
     val commandId: UInt = 19u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1776,7 +1725,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1787,11 +1736,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg1: UByte,
     arg2: UByte,
     arg3: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEmitTestEventResponse {
     val commandId: UInt = 20u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1810,7 +1757,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1827,7 +1774,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getULong(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1843,11 +1789,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testEmitTestFabricScopedEventRequest(
     arg1: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEmitTestFabricScopedEventResponse {
     val commandId: UInt = 21u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1860,7 +1804,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1877,7 +1821,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getULong(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1922,10 +1865,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBooleanAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1940,7 +1881,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1995,10 +1936,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2013,7 +1952,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2068,10 +2007,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2086,7 +2023,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2141,10 +2078,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap32Attribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap32Attribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 3u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2159,7 +2094,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2214,10 +2149,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap64Attribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2232,7 +2165,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2287,10 +2220,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2305,7 +2236,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2360,10 +2291,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt16uAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2378,7 +2307,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2433,10 +2362,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt24uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 7u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2451,7 +2378,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2506,10 +2433,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt32uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2524,7 +2449,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2579,10 +2504,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt40uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 9u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2597,7 +2520,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2652,10 +2575,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt48uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 10u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2670,7 +2591,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2725,10 +2646,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt56uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 11u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2743,7 +2662,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2798,10 +2717,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt64uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 12u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2816,7 +2733,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2871,10 +2788,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 13u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2889,7 +2804,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2944,10 +2859,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt16sAttribute(value: Short, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 14u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2962,7 +2875,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3017,10 +2930,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt24sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt24sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 15u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3035,7 +2946,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3090,10 +3001,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt32sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt32sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3108,7 +3017,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3163,10 +3072,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt40sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt40sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 17u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3181,7 +3088,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3236,10 +3143,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt48sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt48sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 18u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3254,7 +3159,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3309,10 +3214,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt56sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt56sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 19u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3327,7 +3230,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3382,10 +3285,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt64sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt64sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 20u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3400,7 +3301,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3455,10 +3356,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnum8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnum8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 21u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3473,7 +3372,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3528,10 +3427,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnum16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnum16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 22u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3546,7 +3443,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3601,10 +3498,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeFloatSingleAttribute(value: Float, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 23u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3619,7 +3514,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3674,10 +3569,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeFloatDoubleAttribute(value: Double, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 24u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3692,7 +3585,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3747,10 +3640,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOctetStringAttribute(value: ByteArray, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 25u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3765,7 +3656,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3827,10 +3718,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return ListInt8uAttribute(decodedValue)
   }
 
-  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 26u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -3849,7 +3738,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3913,11 +3802,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 27u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -3936,7 +3823,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4000,11 +3887,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListStructOctetStringAttribute(
     value: List<UnitTestingClusterTestListStructOctet>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 28u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -4023,7 +3908,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4078,10 +3963,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeLongOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLongOctetStringAttribute(value: ByteArray, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 29u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4096,7 +3979,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4151,10 +4034,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 30u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4169,7 +4050,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4224,10 +4105,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeLongCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLongCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 31u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4242,7 +4121,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4297,10 +4176,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEpochUsAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEpochUsAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 32u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4315,7 +4192,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4370,10 +4247,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEpochSAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEpochSAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 33u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4388,7 +4263,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4443,10 +4318,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeVendorIdAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeVendorIdAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 34u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4461,7 +4334,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4528,11 +4401,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListNullablesAndOptionalsStructAttribute(
     value: List<UnitTestingClusterNullablesAndOptionalsStruct>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 35u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -4551,7 +4422,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4606,10 +4477,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnumAttrAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnumAttrAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 36u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4624,7 +4493,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4682,11 +4551,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeStructAttrAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 37u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     value.toTlv(AnonymousTag, tlvWriter)
@@ -4701,7 +4568,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4756,10 +4623,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt8uAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 38u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4774,7 +4642,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4829,10 +4697,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 39u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4847,7 +4713,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4902,10 +4768,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt16uAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 40u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4920,7 +4787,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4975,10 +4842,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt16sAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 41u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4993,7 +4861,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5057,11 +4925,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListLongOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 42u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -5080,7 +4946,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5144,11 +5010,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListFabricScopedAttribute(
     value: List<UnitTestingClusterTestFabricScoped>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 43u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -5167,7 +5031,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5222,9 +5086,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeTimedWriteBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeTimedWriteBooleanAttribute(value: Boolean, timedWriteTimeout: Duration) {
     val ATTRIBUTE_ID: UInt = 48u
-    val timeoutMs: Duration = Duration.ofMillis(timedWriteTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5239,7 +5102,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5294,10 +5157,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeGeneralErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeGeneralErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 49u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5312,7 +5176,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5367,10 +5231,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeClusterErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeClusterErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 50u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5385,7 +5250,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5445,10 +5310,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeUnsupportedAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeUnsupportedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 255u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5463,7 +5326,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5524,10 +5387,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBooleanAttribute(decodedValue)
   }
 
-  suspend fun writeNullableBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBooleanAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16384u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5542,7 +5403,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5603,10 +5464,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap8Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16385u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5621,7 +5480,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5682,10 +5541,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap16Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16386u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5700,7 +5557,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5761,10 +5618,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap32Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap32Attribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap32Attribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16387u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5779,7 +5634,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5840,10 +5695,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap64Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap64Attribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16388u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5858,7 +5711,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5919,10 +5772,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt8uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16389u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5937,7 +5788,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5998,10 +5849,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt16uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt16uAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16390u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6016,7 +5865,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6077,10 +5926,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt24uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt24uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16391u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6095,7 +5942,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6156,10 +6003,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt32uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt32uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16392u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6174,7 +6019,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6235,10 +6080,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt40uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt40uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16393u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6253,7 +6096,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6314,10 +6157,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt48uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt48uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16394u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6332,7 +6173,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6393,10 +6234,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt56uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt56uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16395u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6411,7 +6250,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6472,10 +6311,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt64uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt64uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16396u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6490,7 +6327,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6551,10 +6388,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt8sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16397u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6569,7 +6404,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6630,10 +6465,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt16sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt16sAttribute(value: Short, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16398u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6648,7 +6481,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6709,10 +6542,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt24sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt24sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt24sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16399u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6727,7 +6558,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6788,10 +6619,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt32sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt32sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt32sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16400u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6806,7 +6635,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6867,10 +6696,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt40sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt40sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt40sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16401u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6885,7 +6712,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6946,10 +6773,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt48sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt48sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt48sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16402u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6964,7 +6789,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7025,10 +6850,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt56sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt56sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt56sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16403u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7043,7 +6866,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7104,10 +6927,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt64sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt64sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt64sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16404u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7122,7 +6943,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7183,10 +7004,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnum8Attribute(decodedValue)
   }
 
-  suspend fun writeNullableEnum8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnum8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16405u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7201,7 +7020,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7262,10 +7081,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnum16Attribute(decodedValue)
   }
 
-  suspend fun writeNullableEnum16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnum16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16406u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7280,7 +7097,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7341,10 +7158,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableFloatSingleAttribute(decodedValue)
   }
 
-  suspend fun writeNullableFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableFloatSingleAttribute(value: Float, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16407u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7359,7 +7174,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7420,10 +7235,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableFloatDoubleAttribute(decodedValue)
   }
 
-  suspend fun writeNullableFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableFloatDoubleAttribute(
+    value: Double,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 16408u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7438,7 +7254,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7501,11 +7317,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableOctetStringAttribute(
     value: ByteArray,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16409u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7520,7 +7334,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7581,10 +7395,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableCharStringAttribute(decodedValue)
   }
 
-  suspend fun writeNullableCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16414u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7599,7 +7411,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7660,10 +7472,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnumAttrAttribute(decodedValue)
   }
 
-  suspend fun writeNullableEnumAttrAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnumAttrAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16420u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7678,7 +7488,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7741,11 +7551,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableStructAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16421u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     value.toTlv(AnonymousTag, tlvWriter)
@@ -7760,7 +7568,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7823,11 +7631,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8uAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16422u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7842,7 +7648,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7905,11 +7711,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8sAttribute(
     value: Byte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16423u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7924,7 +7728,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7989,11 +7793,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16uAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16424u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8008,7 +7810,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8073,11 +7875,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16sAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16425u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8092,7 +7892,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8152,10 +7952,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeWriteOnlyInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWriteOnlyInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16426u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8170,7 +7968,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

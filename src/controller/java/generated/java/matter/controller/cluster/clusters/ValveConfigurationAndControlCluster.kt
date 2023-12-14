@@ -64,10 +64,8 @@ class ValveConfigurationAndControlCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun open(openDuration: UInt?, targetLevel: UByte?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun open(openDuration: UInt?, targetLevel: UByte?, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -83,17 +81,15 @@ class ValveConfigurationAndControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun close(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun close(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -103,7 +99,7 @@ class ValveConfigurationAndControlCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -184,10 +180,8 @@ class ValveConfigurationAndControlCluster(
     return DefaultOpenDurationAttribute(decodedValue)
   }
 
-  suspend fun writeDefaultOpenDurationAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDefaultOpenDurationAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -202,7 +196,7 @@ class ValveConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -496,10 +490,8 @@ class ValveConfigurationAndControlCluster(
     return decodedValue
   }
 
-  suspend fun writeDefaultOpenLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDefaultOpenLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -514,7 +506,7 @@ class ValveConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
