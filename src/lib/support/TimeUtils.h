@@ -124,9 +124,9 @@ bool CalendarDateToDaysSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayO
 bool DaysSinceUnixEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
 bool AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays);
 bool CalendarTimeToSecondsSinceUnixEpoch(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute,
-                                                uint8_t second, uint32_t & secondsSinceEpoch);
+                                         uint8_t second, uint32_t & secondsSinceEpoch);
 void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth,
-                                                uint8_t & hour, uint8_t & minute, uint8_t & second);
+                                         uint8_t & hour, uint8_t & minute, uint8_t & second);
 
 /**
  *  @brief Convert a calendar date and time to the number of seconds since CHIP Epoch (2000-01-01 00:00:00 UTC).
@@ -146,7 +146,7 @@ void SecondsSinceUnixEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & 
  *            representable range.
  */
 bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint8_t hour, uint8_t minute, uint8_t second,
-                                    uint32_t & chipEpochTime);
+                             uint32_t & chipEpochTime);
 
 /**
  *  @brief Convert the number of seconds since CHIP Epoch (2000-01-01 00:00:00 UTC) to a calendar date and time.
@@ -163,7 +163,7 @@ bool CalendarToChipEpochTime(uint16_t year, uint8_t month, uint8_t dayOfMonth, u
  *  @param second         Second (0-59).
  */
 void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
-                                    uint8_t & minute, uint8_t & second);
+                             uint8_t & minute, uint8_t & second);
 
 /**
  *  @brief Convert the number of seconds since Unix Epoch (1970-01-01 00:00:00 GMT TAI) to

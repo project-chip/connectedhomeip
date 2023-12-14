@@ -31,24 +31,24 @@
 
 #include <nlunit-test.h>
 
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 
-#define TestAssert(cond, message) \
-do \
-{ \
-    if (!(cond))  \
-    { \
-        ChipLogError(NotSpecified, "%s", (message)); \
-    } \
-    NL_TEST_ASSERT(inSuite, (cond)); \
-\
-    if (!(cond)) return; \
-} while (0)
-
+#define TestAssert(cond, message)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(cond))                                                                                                               \
+        {                                                                                                                          \
+            ChipLogError(NotSpecified, "%s", (message));                                                                           \
+        }                                                                                                                          \
+        NL_TEST_ASSERT(inSuite, (cond));                                                                                           \
+                                                                                                                                   \
+        if (!(cond))                                                                                                               \
+            return;                                                                                                                \
+    } while (0)
 
 struct OrdinalDateTestValue
 {
