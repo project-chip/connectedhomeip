@@ -45,6 +45,6 @@ factory_data_hex = intelhex.IntelHex()
 factory_data_hex.fromfile(factory_data, format='hex')
 
 ota_image.merge(bim_hex, overlap='error')
-ota_image.merge(factory_data_hex, overlap='error')
+ota_image.merge(factory_data_hex, overlap='replace')
 
 ota_image.tofile(combined_hex, format='hex')

@@ -38,13 +38,6 @@ assert(matter_software_ver_str != "",
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
 
-  if (chip_enable_ota_requestor) {
-    # Generating the ota binary image
-    final_target = "${target_name}.ota"
-  } else {
-    # The executable is the final target.
-    final_target = "${simplelink_target_name}.out"
-  }
   output_base_name = get_path_info(invoker.output_name, "name")
 
   #used for OTA image creator for the cc13xx
@@ -144,6 +137,28 @@ template("ti_simplelink_executable") {
             "cc13x2_26x2",
           ]
         }
+        pw_python_action("${simplelink_target_name}-factory-data.hex") {
+          script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
+          sources = [
+            "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema",
+            "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json",
+          ]
+          outputs = [ "${root_out_dir}/${output_base_name}-factory-data.hex" ]
+
+          args = [
+            "-factory_data",
+            rebase_path(
+                "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
+            "-schema",
+            rebase_path(
+                "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema"),
+            "-o",
+            rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
+                        root_out_dir),
+            "-device",
+            "cc13x2_26x2",
+          ]
+        }
       }
       pw_python_action("${simplelink_target_name}.bin") {
         if (custom_factory_data) {
@@ -195,51 +210,6 @@ template("ti_simplelink_executable") {
                   root_build_dir),
             ]
           }
-        }
-        action("${simplelink_target_name}-bim.hex") {
-          public_deps = [ ":${simplelink_target_name}.bin" ]
-
-          script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
-          sources = [ "${root_out_dir}/${output_base_name}.bin" ]
-          outputs = [ "${root_out_dir}/${output_base_name}-bim.hex" ]
-
-          if (defined(invoker.bim_hex)) {
-            bim_hex = invoker.bim_hex
-          } else {
-            bim_hex = "${ti_simplelink_sdk_root}/examples/nortos/${ti_simplelink_board}/bim/hexfiles/bim_offchip/Release/bim_offchip.hex"
-          }
-
-          args = [
-            rebase_path("${root_out_dir}/${output_base_name}.bin",
-                        root_build_dir),
-            rebase_path(bim_hex, root_build_dir),
-            rebase_path("${root_out_dir}/${output_base_name}-bim.hex",
-                        root_build_dir),
-          ]
-        }
-      }
-      if (custom_factory_data) {
-        pw_python_action("${simplelink_target_name}-factory-data.hex") {
-          script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
-          sources = [
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema",
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json",
-          ]
-          outputs = [ "${root_out_dir}/${output_base_name}-factory-data.hex" ]
-
-          args = [
-            "-factory_data",
-            rebase_path(
-                "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
-            "-schema",
-            rebase_path(
-                "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema"),
-            "-o",
-            rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
-                        root_out_dir),
-            "-device",
-            "cc13x2_26x2",
-          ]
         }
       }
       pw_python_action("${simplelink_target_name}-bim.hex") {
@@ -564,7 +534,8 @@ template("ti_simplelink_executable") {
           script = "${ti_simplelink_sdk_build_root}/oad_and_factory_data_merge_tool.py"
           sources = [
             "${root_out_dir}/${output_base_name}-factory-data.hex",
-            "${root_out_dir}/${output_base_name}.bin",
+            "${root_out_dir}/${output_base_name}.mcubootloader.hex",
+            "${root_out_dir}/${output_base_name}_header.bin",
           ]
         } else {
           script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
@@ -582,7 +553,8 @@ template("ti_simplelink_executable") {
                         root_build_dir),
             rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
                         root_build_dir),
-
+            rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
+                        root_build_dir),
             rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
                         root_build_dir),
           ]
@@ -591,8 +563,6 @@ template("ti_simplelink_executable") {
             rebase_path("${root_out_dir}/${output_base_name}_header.hex",
                         root_build_dir),
             rebase_path("${root_out_dir}/${output_base_name}.mcubootloader.hex",
-                        root_build_dir),
-            rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
                         root_build_dir),
             rebase_path("${root_out_dir}/${output_base_name}-mcuboot.hex",
                         root_build_dir),
