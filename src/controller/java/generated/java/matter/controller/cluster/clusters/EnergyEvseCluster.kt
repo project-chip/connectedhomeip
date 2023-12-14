@@ -80,9 +80,8 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun disable(timedInvokeTimeoutMs: Int) {
+  suspend fun disable(timedInvokeTimeout: Duration) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -92,7 +91,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -103,10 +102,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     chargingEnabledUntil: UInt?,
     minimumChargeCurrent: Long,
     maximumChargeCurrent: Long,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -127,7 +125,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -137,10 +135,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
   suspend fun enableDischarging(
     dischargingEnabledUntil: UInt?,
     maximumDischargeCurrent: Long,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -158,16 +155,15 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun startDiagnostics(timedInvokeTimeoutMs: Int) {
+  suspend fun startDiagnostics(timedInvokeTimeout: Duration) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -177,7 +173,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -187,10 +183,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
   suspend fun setTargets(
     dayOfWeekforSequence: UByte,
     chargingTargets: List<EnergyEvseClusterChargingTargetStruct>,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -210,16 +205,15 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun getTargets(daysToReturn: UByte, timedInvokeTimeoutMs: Int): GetTargetsResponse {
+  suspend fun getTargets(daysToReturn: UByte, timedInvokeTimeout: Duration): GetTargetsResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -232,7 +226,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -263,7 +257,6 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
             tlvReader.exitContainer()
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -281,9 +274,8 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
     return GetTargetsResponse(dayOfWeekforSequence_decoded, chargingTargets_decoded)
   }
 
-  suspend fun clearTargets(timedInvokeTimeoutMs: Int) {
+  suspend fun clearTargets(timedInvokeTimeout: Duration) {
     val commandId: UInt = 7u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -293,7 +285,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -644,11 +636,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeUserMaximumChargeCurrentAttribute(
     value: Long,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 9u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -663,7 +653,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -725,11 +715,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeRandomizationDelayWindowAttribute(
     value: UInt,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 10u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -744,7 +732,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1047,11 +1035,9 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
 
   suspend fun writeApproximateEVEfficiencyAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 39u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1066,7 +1052,7 @@ class EnergyEvseCluster(private val controller: MatterController, private val en
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
