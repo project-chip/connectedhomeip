@@ -154,7 +154,7 @@ private:
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
-    Status NotifyApplicationStateChange(void);
+    Status NotifyApplicationStateChange();
 
     /**
      * @brief Helper function to work out the charge limit based on conditions and settings

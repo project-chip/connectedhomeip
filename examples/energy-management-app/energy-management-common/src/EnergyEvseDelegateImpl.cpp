@@ -491,7 +491,7 @@ Status EnergyEvseDelegate::NotifyApplicationCurrentLimitChange(int64_t maximumCh
     return Status::Success;
 }
 
-Status EnergyEvseDelegate::NotifyApplicationStateChange(void)
+Status EnergyEvseDelegate::NotifyApplicationStateChange()
 {
     EVSECbInfo cbInfo;
 
