@@ -16,223 +16,266 @@
 #  Top Level Labels
 ############################################################
 repo:
-    - ./*
+    - any:
+        - './*'
 
 ############################################################
 #  Examples
 ############################################################
 examples:
-    - examples/*
-    - examples/**/*
+    - any:
+        - examples/*
+        - examples/**/*
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
-    - docs/*
-    - docs/**/*
-    - "*.md"
+    - any:
+        - docs/*
+        - docs/**/*
+        - "*.md"
 
 ############################################################
 #  Tools + Development Items
 ############################################################
 scripts:
-    - scripts/*
-    - scripts/**/*
+    -any:
+        - scripts/*
+        - scripts/**/*
 
 integrations:
-    - integrations/*
-    - integrations/**/*
+    - any:
+        - integrations/*
+        - integrations/**/*
 
 docker:
-    - integrations/docker/*
-    - integrations/docker/**/*
+    - any:
+        - integrations/docker/*
+        - integrations/docker/**/*
 
 vscode:
-    - .vscode/*
-    - .vscode/**/*
-    - .devcontainer/*
-    - .devcontainer/**/*
+    - any:
+        - .vscode/*
+        - .vscode/**/*
+        - .devcontainer/*
+        - .devcontainer/**/*
 
 gn:
-    - build/*
-    - build/**/*
-    - build_overrides/*
-    - build_overrides/**/*
-    - .gn
-    - "*.gn"
-    - "*.gni"
+    - any:
+        - build/*
+        - build/**/*
+        - build_overrides/*
+        - build_overrides/**/*
+        - .gn
+        - "*.gn"
+        - "*.gni"
 
 github:
-    - .github
-    - .github/*
-    - .github/**/*
+    - any:
+        - .github
+        - .github/*
+        - .github/**/*
 
 workflows:
-    - .github/workflows/*
-    - .github/workflows/**/*
+    - any:
+        - .github/workflows/*
+        - .github/workflows/**/*
 
 tools:
-    - src/tools/*
-    - src/tools/**/*
-    - tools/*
-    - tools/**/*
-    - examples/chip-tool/*
-    - examples/chip-tool/**/*
+    - any:
+        - src/tools/*
+        - src/tools/**/*
+        - tools/*
+        - tools/**/*
+        - examples/chip-tool/*
+        - examples/chip-tool/**/*
 
 ############################################################
 #  Tests
 ############################################################
 tests:
-    - src/python_testing/*
-    - src/python_testing/**/*
-    - src/app/tests/*
-    - src/app/tests/**/*
+    - any:
+        - src/python_testing/*
+        - src/python_testing/**/*
+        - src/app/tests/*
+        - src/app/tests/**/*
 
 test driver:
-    - src/test_driver/*
-    - src/test_driver/**/*
+    - any:
+        - src/test_driver/*
+        - src/test_driver/**/*
 
 ############################################################
 #  Source Code
 ############################################################
 qr code:
-    - src/qrcode/*
-    - src/qrcode/**/*
-    - src/qrcodetool/*
-    - src/qrcodetool/**/*
+    - any:
+        - src/qrcode/*
+        - src/qrcode/**/*
+        - src/qrcodetool/*
+        - src/qrcodetool/**/*
 
 lwip:
-    - src/lwip/*
-    - src/lwip/**/*
+    - any:
+        - src/lwip/*
+        - src/lwip/**/*
 
 inet:
-    - src/inet/*
-    - src/inet/**/*
+    - any:
+        - src/inet/*
+        - src/inet/**/*
 
 config:
-    - config/*
-    - config/**/*
+    - any:
+        - config/*
+        - config/**/*
 
 lib:
-    - src/lib/*
-    - src/lib/**/*
+    - any:
+        - src/lib/*
+        - src/lib/**/*
 
 core:
-    - src/lib/core/*
-    - src/lib/core/**/*
+    - any:
+        - src/lib/core/*
+        - src/lib/core/**/*
 
 protocols:
-    - src/lib/protocols/*
-    - src/lib/protocols/**/*
-    - src/protocols/*
-    - src/protocols/**/*
+    - any:
+        - src/lib/protocols/*
+        - src/lib/protocols/**/*
+        - src/protocols/*
+        - src/protocols/**/*
 
 messaging:
-    - src/messaging/*
-    - src/messaging/**/*
+    - any:
+        - src/messaging/*
+        - src/messaging/**/*
 
 shell:
-    - src/lib/shell/*
-    - src/lib/shell/**/*
+    - any:
+        - src/lib/shell/*
+        - src/lib/shell/**/*
 
 support:
-    - src/lib/support/*
-    - src/lib/support/**/*
+    - any:
+        - src/lib/support/*
+        - src/lib/support/**/*
 
 crypto:
-    - src/crypto/*
-    - src/crypto/**/*
+    - any:
+        - src/crypto/*
+        - src/crypto/**/*
 
 controller:
-    - src/controller/*
-    - src/controller/**/*
+    - any:
+        - src/controller/*
+        - src/controller/**/*
 
 ble:
-    - src/ble/*
-    - src/ble/**/*
+    - any:
+        - src/ble/*
+        - src/ble/**/*
 
 app:
-    - src/app/*
-    - src/app/**/*
+    - any:
+        - src/app/*
+        - src/app/**/*
 
 icd:
-    - src/app/icd/*
-    - src/app/icd/**/*
+    - any:
+        - src/app/icd/*
+        - src/app/icd/**/*
 
 transport:
-    - src/transport/*
-    - src/transport/**/*
+    - any:
+        - src/transport/*
+        - src/transport/**/*
 
 system:
-    - src/system/*
-    - src/system/**/*
+    - any:
+        - src/system/*
+        - src/system/**/*
 
 setup payload:
-    - src/setup_payload/*
-    - src/setup_payload/**/*
+    - any:
+        - src/setup_payload/*
+        - src/setup_payload/**/*
 
 ############################################################
 #  Platforms
 ############################################################
 platform:
-    - src/platform/*
-    - src/platform/**/*
-    - config/tizen/chip-gn/platform/*
-    - config/tizen/chip-gn/platform/**/*
-    - examples/platform/*
-    - examples/platform/**/*
-    - scripts/tools/memory/platform/*
-    - scripts/tools/memory/platform/**/*
-    - src/include/platform/*
-    - src/include/platform/**/*
-    - src/lib/dnssd/platform/*
-    - src/lib/dnssd/platform/**/*
+    - any:
+        - src/platform/*
+        - src/platform/**/*
+        - config/tizen/chip-gn/platform/*
+        - config/tizen/chip-gn/platform/**/*
+        - examples/platform/*
+        - examples/platform/**/*
+        - scripts/tools/memory/platform/*
+        - scripts/tools/memory/platform/**/*
+        - src/include/platform/*
+        - src/include/platform/**/*
+        - src/lib/dnssd/platform/*
+        - src/lib/dnssd/platform/**/*
 
 darwin:
-    - src/platform/Darwin/*
-    - src/platform/Darwin/**/*
-    - src/darwin/*
-    - src/darwin/**/*
-    - examples/darwin-framework-tool/*
-    - examples/darwin-framework-tool/**/*
+    - any:
+        - src/platform/Darwin/*
+        - src/platform/Darwin/**/*
+        - src/darwin/*
+        - src/darwin/**/*
+        - examples/darwin-framework-tool/*
+        - examples/darwin-framework-tool/**/*
 
 silabs:
-    - src/platform/silabs/*
-    - src/platform/silabs/**/*
+    - any:
+        - src/platform/silabs/*
+        - src/platform/silabs/**/*
 
 esp32:
-    - src/platform/ESP32/*
-    - src/platform/ESP32/**/*
+    - any:
+        - src/platform/ESP32/*
+        - src/platform/ESP32/**/*
 
 freeRTOS:
-    - src/platform/FreeRTOS/*
-    - src/platform/FreeRTOS/**/*
+    - any:
+        - src/platform/FreeRTOS/*
+        - src/platform/FreeRTOS/**/*
 
 k32w:
-    - src/platform/K32W/*
-    - src/platform/K32W/**/*
+    - any:
+        - src/platform/K32W/*
+        - src/platform/K32W/**/*
 
 linux:
-    - src/platform/Linux/*
-    - src/platform/Linux/**/*
+    - any:
+        - src/platform/Linux/*
+        - src/platform/Linux/**/*
 
 nrf connect:
-    - src/platform/nrfconnect/*
-    - src/platform/nrfconnect/**/*
+    - any:
+        - src/platform/nrfconnect/*
+        - src/platform/nrfconnect/**/*
 
 openthread:
-    - src/platform/openthread/*
-    - src/platform/openthread/**/*
+    - any:
+        - src/platform/openthread/*
+        - src/platform/openthread/**/*
 
 zephyr:
-    - src/platform/Zephyr/*
-    - src/platform/Zephyr/**/*
+    - any:
+        - src/platform/Zephyr/*
+        - src/platform/Zephyr/**/*
 
 telink:
-    - src/platform/telink/*
-    - src/platform/telink/**/*
+    - any:
+        - src/platform/telink/*
+        - src/platform/telink/**/*
 
 tizen:
-    - src/platform/Tizen/*
-    - src/platform/Tizen/**/*
+    - any:
+        - src/platform/Tizen/*
+        - src/platform/Tizen/**/*

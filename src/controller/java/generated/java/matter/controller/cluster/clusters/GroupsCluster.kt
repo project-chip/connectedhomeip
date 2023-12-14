@@ -53,11 +53,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
   suspend fun addGroup(
     groupID: UShort,
     groupName: String,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): AddGroupResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -73,7 +71,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -97,7 +95,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -115,10 +112,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     return AddGroupResponse(status_decoded, groupID_decoded)
   }
 
-  suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): ViewGroupResponse {
+  suspend fun viewGroup(groupID: UShort, timedInvokeTimeout: Duration? = null): ViewGroupResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -131,7 +126,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -162,7 +157,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_NAME)) {
         groupName_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -186,11 +180,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
 
   suspend fun getGroupMembership(
     groupList: List<UShort>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetGroupMembershipResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -207,7 +199,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -249,7 +241,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
             tlvReader.exitContainer()
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -263,10 +254,11 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     return GetGroupMembershipResponse(capacity_decoded, groupList_decoded)
   }
 
-  suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int? = null): RemoveGroupResponse {
+  suspend fun removeGroup(
+    groupID: UShort,
+    timedInvokeTimeout: Duration? = null
+  ): RemoveGroupResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -279,7 +271,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -303,7 +295,6 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -321,10 +312,8 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
     return RemoveGroupResponse(status_decoded, groupID_decoded)
   }
 
-  suspend fun removeAllGroups(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun removeAllGroups(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -334,7 +323,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -344,11 +333,9 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
   suspend fun addGroupIfIdentifying(
     groupID: UShort,
     groupName: String,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -364,7 +351,7 @@ class GroupsCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
