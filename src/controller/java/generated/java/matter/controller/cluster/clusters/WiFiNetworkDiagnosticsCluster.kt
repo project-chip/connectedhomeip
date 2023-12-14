@@ -70,10 +70,8 @@ class WiFiNetworkDiagnosticsCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun resetCounts(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -83,7 +81,7 @@ class WiFiNetworkDiagnosticsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
