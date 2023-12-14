@@ -84,7 +84,12 @@ class AsyncCommandTransaction:
         self._expect_type = expectType
 
     def _handleResponse(self, path: CommandPath, status: Status, response: bytes):
-        if (len(response) == 0):
+        if status.IMStatus != chip.interaction_model.Status.Success:
+            # Contract for CommandSender OnResponse changed in Matter 1.3. The expectation
+            # for legacy clients is to get the path specific error through the _handleError
+            # to not break downstream users we continue to do so here.
+            self._handleError(status, 0, None)
+        elif (len(response) == 0):
             self._future.set_result(None)
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
@@ -149,8 +154,14 @@ class AsyncBatchCommandsTransaction:
             self._handleError(status, 0, IndexError(f"CommandSenderCallback has given us an unexpected index value {index}"))
             return
 
-        if (len(response) == 0):
-            self._responses[index] = None
+        if status.IMStatus != chip.interaction_model.Status.Success:
+            try:
+                self._responses[index] = chip.interaction_model.InteractionModelError(
+                    chip.interaction_model.Status(status.IMStatus), status.ClusterStatus)
+            except AttributeError as ex:
+                self._handleError(status, 0, ex)
+        elif (len(response) == 0):
+            ef_epne[ne]= None
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
             if (self._expect_types[index] is None):
@@ -173,9 +184,7 @@ class AsyncBatchCommandsTransaction:
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
         if self._future.done():
-            # TODO Right now this even callback happens if there was a real IM Status error on one command.
-            # We need to update OnError to allow providing a CommandRef that we can try associating with it.
-            logger.exception(f"Recieved another error, but we have sent error. imError:{imError}, chipError {chipError}")
+            logger.exception(f"Recieved another error unexpectedly. imError:{imError}, chipError {chipError}")
             return
         if exception:
             self._future.set_exception(exception)

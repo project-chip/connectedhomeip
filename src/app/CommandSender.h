@@ -69,22 +69,15 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponseWithAdditionalData will be called when a successful response from the server has been received and processed.
+         * OnResponse will be called when an InvokeResponse from the server has been received and processed.
          * Specifically:
-         *  - When a status code is received and it is IM::Success, aData will be nullptr.
-         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *  - When a CommandStatusIB response is received, aData will be nullptr. The command specific status itself can be an error such as
+         *    UnsupportedCluster.
+         *  - When a CommandDataIB response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
-         *
-         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
-         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
-         * future to provide additional response data by only making changes to `AdditionalResponseData`, and not all the potential
-         * callees.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
-         *
-         * It is advised that subclass should only override this or `OnResponse`. But, it shouldn't actually matter if both are
-         * overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -95,35 +88,10 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                                                  const AdditionalResponseData & aAdditionalResponseData)
-        {
-            OnResponse(apCommandSender, aPath, aStatusIB, apData);
-        }
+        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                const AdditionalResponseData & aAdditionalResponseData) {}
 
-        /**
-         * OnResponse will be called when a successful response from server has been received and processed. Specifically:
-         *  - When a status code is received and it is IM::Success, aData will be nullptr.
-         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
-         *    that contains the data payload (callee will still need to open and process the container).
-         *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy the object.
-         *
-         * It is advised that subclasses should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
-         * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
-         *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aPath           The command path field in invoke command response.
-         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
-         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
-         *                            be a generic SUCCESS status with no-cluster specific information.
-         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
-         */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                TLV::TLVReader * apData)
-        {}
 
         /**
          * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following

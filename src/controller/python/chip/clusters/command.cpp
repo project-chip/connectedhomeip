@@ -82,9 +82,9 @@ public:
         mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
     {}
 
-    void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                      const app::StatusIB & aStatus, TLV::TLVReader * aData,
-                                      const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                    const app::StatusIB & aStatus, TLV::TLVReader * aData,
+                    const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];

@@ -59,7 +59,7 @@ public:
 
 private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
-                    const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
+                    const app::StatusIB & aStatus, TLV::TLVReader * aReader, const app::CommandSender::AdditionalResponseData & aAdditionalResponseData) override;
 
     void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
@@ -102,8 +102,15 @@ private:
 template <typename CommandResponseObjectT>
 void TypedCommandCallback<CommandResponseObjectT>::OnResponse(app::CommandSender * apCommandSender,
                                                               const app::ConcreteCommandPath & aCommandPath,
-                                                              const app::StatusIB & aStatus, TLV::TLVReader * aReader)
+                                                              const app::StatusIB & aStatus, TLV::TLVReader * aReader,
+                                                              const app::CommandSender::AdditionalResponseData & aAdditionalResponseData)
 {
+    if (!aStatus.IsSuccess())
+    {
+        OnError(apCommandSender, aStatus.ToChipError());
+        return;
+    }
+
     if (mCalledCallback)
     {
         return;
@@ -148,8 +155,16 @@ template <>
 inline void TypedCommandCallback<app::DataModel::NullObjectType>::OnResponse(app::CommandSender * apCommandSender,
                                                                              const app::ConcreteCommandPath & aCommandPath,
                                                                              const app::StatusIB & aStatus,
-                                                                             TLV::TLVReader * aReader)
+                                                                             TLV::TLVReader * aReader,
+                                                                             const app::CommandSender::AdditionalResponseData & aAdditionalResponseData
+                                                                             )
 {
+    if (!aStatus.IsSuccess())
+    {
+        OnError(apCommandSender, aStatus.ToChipError());
+        return;
+    }
+
     if (mCalledCallback)
     {
         return;
