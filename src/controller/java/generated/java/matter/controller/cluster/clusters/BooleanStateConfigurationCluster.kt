@@ -48,10 +48,8 @@ class BooleanStateConfigurationCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun suppressAlarm(alarmsToSuppress: UByte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun suppressAlarm(alarmsToSuppress: UByte, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -64,17 +62,18 @@ class BooleanStateConfigurationCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun enableDisableAlarm(alarmsToEnableDisable: UByte, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun enableDisableAlarm(
+    alarmsToEnableDisable: UByte,
+    timedInvokeTimeout: Duration? = null
+  ) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -87,7 +86,7 @@ class BooleanStateConfigurationCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -132,11 +131,9 @@ class BooleanStateConfigurationCluster(
 
   suspend fun writeCurrentSensitivityLevelAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -151,7 +148,7 @@ class BooleanStateConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

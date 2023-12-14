@@ -80,10 +80,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writeActiveTextAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeActiveTextAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -98,7 +96,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -158,10 +156,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writeDescriptionAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeDescriptionAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 28u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -176,7 +172,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -236,10 +232,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writeInactiveTextAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInactiveTextAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 46u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -254,7 +248,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -309,10 +303,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writeOutOfServiceAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOutOfServiceAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 81u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -327,7 +319,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -418,10 +410,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writePresentValueAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writePresentValueAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 85u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -436,7 +426,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -496,10 +486,8 @@ class BinaryInputBasicCluster(
     return decodedValue
   }
 
-  suspend fun writeReliabilityAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeReliabilityAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 103u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -514,7 +502,7 @@ class BinaryInputBasicCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

@@ -45,6 +45,8 @@ static_library("telink") {
     "ConnectivityManagerImpl.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
+    "NFCManagerImpl.cpp",
+    "NFCManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
   ]
