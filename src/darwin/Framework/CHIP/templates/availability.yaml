@@ -8193,7 +8193,7 @@
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - DemandResponseLoadControl
-          - BooleanSensorConfiguration
+          - BooleanStateConfiguration
           - ValveConfigurationAndControl
           - Timer
           - OvenMode
