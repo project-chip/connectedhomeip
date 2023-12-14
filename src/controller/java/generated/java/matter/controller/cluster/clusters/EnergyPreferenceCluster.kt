@@ -128,10 +128,11 @@ class EnergyPreferenceCluster(
     return decodedValue
   }
 
-  suspend fun writeCurrentEnergyBalanceAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeCurrentEnergyBalanceAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -146,7 +147,7 @@ class EnergyPreferenceCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -294,11 +295,9 @@ class EnergyPreferenceCluster(
 
   suspend fun writeCurrentLowPowerModeSensitivityAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -313,7 +312,7 @@ class EnergyPreferenceCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
