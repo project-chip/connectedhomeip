@@ -57,6 +57,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000041, DeviceTypeClass::Simple, "Matter Water Freeze Detector" },
     { 0x00000042, DeviceTypeClass::Simple, "Matter Valve" },
     { 0x00000043, DeviceTypeClass::Simple, "Matter Water Leak Detector" },
+    { 0x00000044, DeviceTypeClass::Simple, "Matter Rain Sensor" },
     { 0x00000070, DeviceTypeClass::Simple, "Matter Refrigerator" },
     { 0x00000071, DeviceTypeClass::Simple, "Matter Temperature Controlled Cabinet" },
     { 0x00000072, DeviceTypeClass::Simple, "Matter Room Air Conditioner" },

@@ -4013,7 +4013,7 @@ provisional cluster BooleanStateConfiguration = 128 {
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
-    kGneralFault = 0x1;
+    kGeneralFault = 0x1;
   }
 
   info event AlarmsStateChanged = 0 {

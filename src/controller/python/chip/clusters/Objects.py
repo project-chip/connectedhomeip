@@ -21533,7 +21533,7 @@ class BooleanStateConfiguration(Cluster):
             kSensitivityLevel = 0x8
 
         class SensorFaultBitmap(IntFlag):
-            kGneralFault = 0x1
+            kGeneralFault = 0x1
 
     class Commands:
         @dataclass

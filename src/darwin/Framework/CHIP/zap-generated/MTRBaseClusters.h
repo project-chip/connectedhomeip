@@ -16852,7 +16852,7 @@ typedef NS_OPTIONS(uint32_t, MTRBooleanStateConfigurationFeature) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint16_t, MTRBooleanStateConfigurationSensorFaultBitmap) {
-    MTRBooleanStateConfigurationSensorFaultBitmapGneralFault MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRBooleanStateConfigurationSensorFaultBitmapGeneralFault MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRValveConfigurationAndControlValveState) {
