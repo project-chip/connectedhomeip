@@ -56,7 +56,6 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner() = delete;
     ChipDeviceScanner(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;

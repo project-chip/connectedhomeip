@@ -38,7 +38,6 @@ class BluezEndpoint;
 class BluezAdvertisement
 {
 public:
-    BluezAdvertisement() = delete;
     BluezAdvertisement(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ~BluezAdvertisement() { Shutdown(); }
 
@@ -69,7 +68,6 @@ private:
     void StopDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR StopImpl();
 
-    // Objects (interfaces) used by LE advertisement
     const BluezEndpoint & mEndpoint;
     GAutoPtr<BluezLEAdvertisement1> mpAdv;
 

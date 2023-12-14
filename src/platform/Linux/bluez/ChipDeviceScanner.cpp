@@ -83,7 +83,7 @@ void ChipDeviceScanner::Shutdown()
     // released during a D-Bus signal being processed.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
-            mCancellable.reset();
+            self->mCancellable.reset();
             return CHIP_NO_ERROR;
         },
         this);

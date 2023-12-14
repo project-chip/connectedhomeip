@@ -154,7 +154,8 @@ CHIP_ERROR BluezAdvertisement::Init(ChipAdvType aAdvType, const char * aAdvUUID,
     mDeviceIdInfo.SetAdditionalDataFlag(true);
 #endif
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule BLE advertisement Init() on CHIPoBluez thread"));
 
@@ -252,8 +253,8 @@ CHIP_ERROR BluezAdvertisement::Start()
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err =
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->StartImpl(); }, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezAdvertisement * self) { return self->StartImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule BLE advertisement Start() on CHIPoBluez thread"));
     return err;
@@ -314,8 +315,8 @@ CHIP_ERROR BluezAdvertisement::Stop()
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err =
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezAdvertisement * self) { return self->StopImpl(); }, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezAdvertisement * self) { return self->StopImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule BLE advertisement Stop() on CHIPoBluez thread"));
     return err;

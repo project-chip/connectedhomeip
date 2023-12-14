@@ -395,7 +395,7 @@ void BluezEndpoint::BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBu
 void BluezEndpoint::BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject)
 {
     // TODO: for Device1, lookup connection, and call otPlatTobleHandleDisconnected
-    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mpAdapter.get().
+    // for Adapter1: unclear, crash if this pertains to our adapter? at least null out the self->mpAdapter.
     // for Characteristic1, or GattService -- handle here via calling otPlatTobleHandleDisconnected, or ignore.
 }
 
@@ -685,8 +685,8 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
         mpConnectCancellable.reset(g_cancellable_new());
     }
 
-    err =
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
     ChipLogDetail(DeviceLayer, "BlueZ integration init success");
@@ -705,15 +705,15 @@ void BluezEndpoint::Shutdown()
     // the middle of being processed when the cleanup function is called.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
-            mpObjMgr.reset();
-            mpAdapter.reset();
-            mpDevice.reset();
-            mpRoot.reset();
-            mpService.reset();
-            mpC1.reset();
-            mpC2.reset();
-            mpC3.reset();
-            mpConnectCancellable.reset();
+            self->mpObjMgr.reset();
+            self->mpAdapter.reset();
+            self->mpDevice.reset();
+            self->mpRoot.reset();
+            self->mpService.reset();
+            self->mpC1.reset();
+            self->mpC2.reset();
+            self->mpC3.reset();
+            self->mpConnectCancellable.reset();
             return CHIP_NO_ERROR;
         },
         this);
