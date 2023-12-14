@@ -25,6 +25,13 @@ namespace Clusters {
 namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
+
+{{#zcl_enums}}
+{{#if has_more_than_one_cluster}}
+using {{asUpperCamelCase name}} = Clusters::detail::Enums::{{asUpperCamelCase name}};
+{{/if}}
+{{/zcl_enums}}
+
 {{#zcl_structs}}
 {{#if has_more_than_one_cluster}}
 {{> cluster_objects_struct header=true}}
@@ -48,6 +55,11 @@ namespace {{asUpperCamelCase label}} {
 
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
+{{#zcl_enums}}
+{{#if has_more_than_one_cluster}}
+using {{asUpperCamelCase name}} = Clusters::detail::Enums::{{asUpperCamelCase name}};
+{{/if}}
+{{/zcl_enums}}
 {{#zcl_structs}}
 {{#first}}
 namespace Structs {
