@@ -164,13 +164,10 @@ class IdlType:
 # Data types, held by ZAP in chip-types.xml and generally by the spec.
 __CHIP_SIZED_TYPES__ = {
     "bitmap16": BasicInteger(idl_name="bitmap16", byte_count=2, is_signed=False),
-    "bitmap24": BasicInteger(idl_name="bitmap24", byte_count=3, is_signed=False),
     "bitmap32": BasicInteger(idl_name="bitmap32", byte_count=4, is_signed=False),
     "bitmap64": BasicInteger(idl_name="bitmap64", byte_count=8, is_signed=False),
     "bitmap8": BasicInteger(idl_name="bitmap8", byte_count=1, is_signed=False),
     "enum16": BasicInteger(idl_name="enum16", byte_count=2, is_signed=False),
-    "enum24": BasicInteger(idl_name="enum24", byte_count=3, is_signed=False),
-    "enum32": BasicInteger(idl_name="enum32", byte_count=4, is_signed=False),
     "enum8": BasicInteger(idl_name="enum8", byte_count=1, is_signed=False),
     "int16s": BasicInteger(idl_name="int16s", byte_count=2, is_signed=True),
     "int16u": BasicInteger(idl_name="int16u", byte_count=2, is_signed=False),
@@ -336,7 +333,7 @@ class TypeLookupContext:
         Handles both standard names (like enum8) as well as enumerations defined
         within the current lookup context.
         """
-        if name.lower() in ["enum8", "enum16", "enum24", "enum32"]:
+        if name.lower() in ["enum8", "enum16"]:
             return True
         return any(map(lambda e: e.name == name, self.all_enums))
 
@@ -348,7 +345,7 @@ class TypeLookupContext:
 
     def is_untyped_bitmap_type(self, name: str):
         """Determine if the given type is a untyped bitmap (just an interger size)."""
-        return name.lower() in {"bitmap8", "bitmap16", "bitmap24", "bitmap32", "bitmap64"}
+        return name.lower() in {"bitmap8", "bitmap16", "bitmap32", "bitmap64"}
 
     def is_bitmap_type(self, name: str):
         """
@@ -386,9 +383,9 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
         return BasicString(idl_name=lowercase_name, is_binary=False, max_length=data_type.max_length)
     elif lowercase_name in ['octet_string', 'long_octet_string']:
         return BasicString(idl_name=lowercase_name, is_binary=True, max_length=data_type.max_length)
-    elif lowercase_name in ['enum8', 'enum16', 'enum24', 'enum32']:
+    elif lowercase_name in ['enum8', 'enum16']:
         return IdlEnumType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
-    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap24', 'bitmap32', 'bitmap64']:
+    elif lowercase_name in ['bitmap8', 'bitmap16', 'bitmap32', 'bitmap64']:
         return IdlBitmapType(idl_name=lowercase_name, base_type=__CHIP_SIZED_TYPES__[lowercase_name])
 
     int_type = __CHIP_SIZED_TYPES__.get(lowercase_name, None)

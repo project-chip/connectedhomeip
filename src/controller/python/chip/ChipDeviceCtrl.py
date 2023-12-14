@@ -901,6 +901,45 @@ class ChipDeviceControllerBase():
             interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
         return await future
 
+    async def SendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
+                                timedRequestTimeoutMs: typing.Optional[int] = None,
+                                interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                suppressResponse: typing.Optional[bool] = None):
+        '''
+        Send a batch of cluster-object encapsulated commands to a node and get returned a future that can be awaited upon to receive
+        the responses. If a valid responseType is passed in, that will be used to deserialize the object. If not,
+        the type will be automatically deduced from the metadata received over the wire.
+
+        nodeId: Target's Node ID
+        commands: A list of InvokeRequestInfo containing the commands to invoke.
+        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
+        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
+                              right timeout value based on transport characteristics as well as the responsiveness of the target.
+        busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
+        suppressResponse: Do not send a response to this action
+
+        Returns:
+            - List of command responses in the same order as what was given in `commands`. The type of the response is defined by the command.
+                      - A value of `None` indicates success.
+                      - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
+                        contain `interaction_model.Status.UnsupportedCommand`.
+                      - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
+        Raises:
+            - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+
+        ClusterCommand.SendBatchCommands(
+            future, eventLoop, device.deviceProxy, commands,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse).raise_on_error()
+        return await future
+
     def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future

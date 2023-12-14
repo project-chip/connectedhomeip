@@ -18,40 +18,37 @@
 
 #pragma once
 
-#include "core/CastingApp.h"
-#include "support/AppParameters.h"
+#include "Endpoint.h"
+#include "Types.h"
 
-#include <cstdint>
-#include <memory>
+#include "lib/support/logging/CHIPLogging.h"
 
 namespace matter {
 namespace casting {
-
-namespace memory {
-
-template <typename T>
-using Weak = std::weak_ptr<T>;
-
-template <typename T>
-using Strong = std::shared_ptr<T>;
-
-} // namespace memory
-
 namespace core {
 
-class CastingApp;
+class Endpoint;
+
+// Base cluster class
+class BaseCluster
+{
+private:
+protected:
+    memory::Weak<Endpoint> mEndpoint;
+
+public:
+    BaseCluster(memory::Weak<Endpoint> endpoint) { this->mEndpoint = endpoint; }
+
+    virtual ~BaseCluster() {}
+
+    BaseCluster()                       = delete;
+    BaseCluster(BaseCluster & other)    = delete;
+    void operator=(const BaseCluster &) = delete;
+
+protected:
+    memory::Weak<Endpoint> GetEndpoint() const { return mEndpoint.lock(); }
+};
 
 }; // namespace core
-
-namespace support {
-
-class AppParameters;
-class ByteSpanDataProvider;
-class ServerInitParamsProvider;
-
-class EndpointListLoader;
-
-} // namespace support
-
 }; // namespace casting
 }; // namespace matter
