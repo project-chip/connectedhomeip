@@ -188,7 +188,7 @@ static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, S
             }
 
             // Check the off requirements (check 9)
-            if (schedule.systemMode == ThermostatSystemModeEnum::kOff)
+            if (schedule.systemMode == SystemModeEnum::kOff)
             {
                 const bool offSupported = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff);
                 VerifyOrReturnError(offSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
@@ -214,7 +214,7 @@ static EmberAfStatus CheckNumberOfTransitions(ThermostatMatterScheduleManager & 
     VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
     VerifyOrExit(schedule.transitions.size() <= numberOfScheduleTransitions, status = EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED);
 
-    status = NumberOfScheduleTransitionsPerDay::Get(mgr.mEndpoint, numberOfScheduleTransitionsPerDay);
+    status = NumberOfScheduleTransitionPerDay::Get(mgr.mEndpoint, numberOfScheduleTransitionsPerDay);
     VerifyOrDie(status == EMBER_ZCL_STATUS_SUCCESS);
 
     if (numberOfScheduleTransitionsPerDay.IsNull() == false)
@@ -223,13 +223,13 @@ static EmberAfStatus CheckNumberOfTransitions(ThermostatMatterScheduleManager & 
 
         for (auto const &transition : schedule.transitions)
         {
-            weekDayTransitionCounts[0] += transition.dayOfWeek.Has(DayOfWeek::kSunday) ? 1 : 0;
-            weekDayTransitionCounts[1] += transition.dayOfWeek.Has(DayOfWeek::kMonday) ? 1 : 0;
-            weekDayTransitionCounts[2] += transition.dayOfWeek.Has(DayOfWeek::kTuesday) ? 1 : 0;
-            weekDayTransitionCounts[3] += transition.dayOfWeek.Has(DayOfWeek::kWednesday) ? 1 : 0;
-            weekDayTransitionCounts[4] += transition.dayOfWeek.Has(DayOfWeek::kThursday) ? 1 : 0;
-            weekDayTransitionCounts[5] += transition.dayOfWeek.Has(DayOfWeek::kFriday) ? 1 : 0;
-            weekDayTransitionCounts[6] += transition.dayOfWeek.Has(DayOfWeek::kSaturday) ? 1 : 0;
+            weekDayTransitionCounts[0] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kSunday) ? 1 : 0;
+            weekDayTransitionCounts[1] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kMonday) ? 1 : 0;
+            weekDayTransitionCounts[2] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kTuesday) ? 1 : 0;
+            weekDayTransitionCounts[3] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kWednesday) ? 1 : 0;
+            weekDayTransitionCounts[4] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kThursday) ? 1 : 0;
+            weekDayTransitionCounts[5] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kFriday) ? 1 : 0;
+            weekDayTransitionCounts[6] += transition.dayOfWeek.Has(ScheduleDayOfWeekBitmap::kSaturday) ? 1 : 0;
         }
 
         for (int weekDayIndex = 0; weekDayIndex < 7; weekDayIndex++)
@@ -258,19 +258,23 @@ EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Sp
     // For all exisiting schedules -- Walk the old list
     for (auto & old_schedule : oldlist)
     {
+        VerifyOrDie(old_schedule.scheduleHandle.IsNull() == false);
+
         // Check 1. -- for each existing built in schedule, make sure it's still in the new list
-        if (old_schedule.builtIn.HasValue() && old_schedule.builtIn.Value())
+        if ((old_schedule.builtIn.HasValue() == true) && (old_schedule.builtIn.Value() == true))
         {
-            status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
+            status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
             VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-            VerifyOrExit(querySchedule.builtIn == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(querySchedule.builtIn.HasValue() == false, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(querySchedule.builtIn.Value() == true, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         }
 
         // Check 2 -- If the schedule is currently being referenced but would be deleted.
         // if its a builtin schedule we don't need to search again, we know it's there from the above check.
-        if (old_schedule.builtIn == false && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle))
+        if ((old_schedule.builtIn.HasValue() == false || old_schedule.builtIn.Value() == false) && IsScheduleHandleReferenced(*this, old_schedule.scheduleHandle.Value()))
         {
-            status = FindScheduleByHandle(old_schedule.scheduleHandle, newlist, querySchedule);
+            VerifyOrDie(old_schedule.scheduleHandle.IsNull() == false);
+            status = FindScheduleByHandle(old_schedule.scheduleHandle.Value(), newlist, querySchedule);
             VerifyOrExit(status == EMBER_ZCL_STATUS_SUCCESS, status = EMBER_ZCL_STATUS_INVALID_IN_STATE);
         }
     }
@@ -278,26 +282,27 @@ EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Sp
     // Walk the new list
     for (auto & new_schedule : newlist)
     {
-        if (new_schedule.scheduleHandle.empty() == false)
+        if (new_schedule.scheduleHandle.IsNull() == false)
         {
             // Existing schedule checks
 
             // Make sure it's unique to the list
-            status = CheckScheduleHandleUnique(new_schedule.scheduleHandle, newlist);
+            status = CheckScheduleHandleUnique(new_schedule.scheduleHandle.Value(), newlist);
             SuccessOrExit(status);
 
             // Look for it in the old list
             ScheduleStruct::Type existingSchedule;
-            status = FindScheduleByHandle(new_schedule.scheduleHandle, oldlist, existingSchedule);
+            status = FindScheduleByHandle(new_schedule.scheduleHandle.Value(), oldlist, existingSchedule);
             SuccessOrExit(status);
 
             // Check BuiltIn
-            VerifyOrExit(new_schedule.builtIn == existingSchedule.builtIn, status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(new_schedule.builtIn.HasValue() == existingSchedule.builtIn.HasValue(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
+            VerifyOrExit(new_schedule.builtIn.Value() == existingSchedule.builtIn.Value(), status = EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS);
         }
         else
         {
             // new schedule checks
-            VerifyOrExit(new_schedule.builtIn == false, status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+            VerifyOrExit((new_schedule.builtIn.HasValue() == false) || (new_schedule.builtIn.Value() == false), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
 
         // Check for system mode in Schedule Types

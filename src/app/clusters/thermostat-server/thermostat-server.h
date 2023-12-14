@@ -25,19 +25,13 @@
 
 struct ThermostatMatterScheduleManager
 {
-    enum editType
-    {
-        Presets,
-        Schedules
-    };
-
     /**
      * Callbacks are not thread safe. To access the ThermostatMatterScheduleManager struct please
      * consider using the LockChipStack / UnlockChipStack functions of the PlatformMgr.
      */
-    using onEditStartCb  = void (*)(ThermostatMatterScheduleManager *, editType aType);
+    using onEditStartCb  = void (*)(ThermostatMatterScheduleManager *);
     using onEditCancelCb = onEditStartCb;
-    using onEditCommitCb = EmberAfStatus (*)(ThermostatMatterScheduleManager *, editType);
+    using onEditCommitCb = EmberAfStatus (*)(ThermostatMatterScheduleManager *);
 
     using getPresetTypeAtIndexCB = CHIP_ERROR (*)(ThermostatMatterScheduleManager *, size_t index,
                                                   chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type & presetType);
