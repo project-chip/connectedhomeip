@@ -58,6 +58,7 @@ public:
      *
      * @return CHIP_ERROR_BUFFER_TOO_SMALL if output buffer is too small
      *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to generate the Check-In message
+     *         CHIP_ERROR_INTERNAL if an error occurs during the generation of the Check-In message
      */
     static CHIP_ERROR GenerateCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
                                                     const Crypto::Hmac128KeyHandle & hmacKeyHandle, const CounterType & counter,
@@ -66,17 +67,16 @@ public:
     /**
      * @brief Parse Check-in Message payload
      *
-     * @note Function requires two key handles to generate the Check-In message.
-     *       Due to PSA requirements, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
+     * @note Function requires two key handles to parse the Check-In message.
+     *       Due to the way some key stores work, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
      *
-     * @param[in]       aes128KeyHandle   Key handle with which to encrypt the check-in payload with the AEAD
-     * @param[in]       hmac128KeyHandle  Key handle with which to generate the nonce for the check-in payload with the HMAC
+     * @param[in]       aes128KeyHandle   Key handle with which to decrypt the received check-in payload (using AEAD).
+     * @param[in]       hmac128KeyHandle  Key handle with which to verify the received nonce in the check-in payload (using HMAC).
      * @param[in]       payload           The received payload to decrypt and parse
      * @param[out]      counter           The counter value retrieved from the payload
-     * @param[in,out]   appData           The optional application data decrypted. The input size of appData must be at least the size of
-     *                                    GetAppDataSize(payload) + sizeof(CounterType), because
-     *                                    appData is used as a work buffer for the decryption process.  The output size
-     *                                    on success will be GetAppDataSize(payload).
+     * @param[in,out]   appData           The optional application data decrypted. The input size of appData must be at least the
+     * size of GetAppDataSize(payload) + sizeof(CounterType), because appData is used as a work buffer for the decryption process.
+     * The output size on success will be GetAppDataSize(payload).
      *
      * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
@@ -86,7 +86,7 @@ public:
                                                  const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
                                                  CounterType & counter, MutableByteSpan & appData);
 
-    static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + sMinPayloadSize; }
+    static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + kMinPayloadSize; }
 
     /**
      * @brief Get the App Data Size
@@ -96,7 +96,7 @@ public:
      */
     static size_t GetAppDataSize(ByteSpan & payload);
 
-    static constexpr uint16_t sMinPayloadSize =
+    static constexpr uint16_t kMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
 private:

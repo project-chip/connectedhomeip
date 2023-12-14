@@ -53,7 +53,7 @@ void ICDCheckInSender::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP
 
 CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
 {
-    System::PacketBufferHandle buffer = MessagePacketBuffer::New(CheckinMessage::sMinPayloadSize);
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(CheckinMessage::kMinPayloadSize);
 
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };

@@ -35,7 +35,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
                                                          const CounterType & counter, const ByteSpan & appData,
                                                          MutableByteSpan & output)
 {
-    VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(output.size() >= (appData.size() + kMinPayloadSize), CHIP_ERROR_BUFFER_TOO_SMALL);
     size_t cursorIndex = 0;
 
     // Generate Nonce from Key and counter value
@@ -61,15 +61,17 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
         MutableByteSpan mic = output.SubSpan(cursorIndex, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
         cursorIndex += mic.size();
 
-        // Validate that cursorIndex is within the available output space
+        // Validate that the cursorIndex is within the available output space
         VerifyOrReturnError(cursorIndex <= output.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        // Validate that the cursorIndex matchs the message length
+        VerifyOrReturnError(cursorIndex == appData.size() + kMinPayloadSize, CHIP_ERROR_INTERNAL);
 
         ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(payloadByteSpan.data(), payloadByteSpan.size(), nullptr, 0, aes128KeyHandle,
                                                      output.data(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, payloadByteSpan.data(),
                                                      mic.data(), mic.size()));
     }
 
-    output.reduce_size(appData.size() + sMinPayloadSize);
+    output.reduce_size(appData.size() + kMinPayloadSize);
     return CHIP_NO_ERROR;
 }
 
@@ -79,7 +81,7 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
 {
     size_t appDataSize = GetAppDataSize(payload);
 
-    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(payload.size() >= kMinPayloadSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter
     VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -105,6 +107,9 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
 
     // Read decrypted counter and application data
     counter = Encoding::LittleEndian::Get32(appData.data());
+
+    // TODO : Validate received nonce by calculating it with the hmacKeyHandle and received Counter value
+
     // Shift to remove the counter from the appData
     memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
     appData.reduce_size(appDataSize);
@@ -136,7 +141,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
 
 size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
 {
-    return (payload.size() <= sMinPayloadSize) ? 0 : payload.size() - sMinPayloadSize;
+    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
 }
 
 } // namespace SecureChannel
