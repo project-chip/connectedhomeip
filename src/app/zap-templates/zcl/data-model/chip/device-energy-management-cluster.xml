@@ -32,7 +32,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA).</description>
     
-    <globalAttribute side="server" code="0xFFFD" value="2" />
+    <globalAttribute side="either" code="0xFFFD" value="2" />
 
     <!--Attributes-->
     <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" writable="false" optional="false">ESAType</attribute>
