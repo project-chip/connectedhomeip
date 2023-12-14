@@ -25,7 +25,7 @@
 from . import Attribute, CHIPClusters, Command
 from .Objects import (AccessControl, AccountLogin, Actions, ActivatedCarbonFilterMonitoring, AdministratorCommissioning, AirQuality,
                       ApplicationBasic, ApplicationLauncher, AudioOutput, BallastConfiguration, BarrierControl, BasicInformation,
-                      BinaryInputBasic, Binding, BooleanStateConfiguration, BooleanState, BridgedDeviceBasicInformation,
+                      BinaryInputBasic, Binding, BooleanState, BooleanStateConfiguration, BridgedDeviceBasicInformation,
                       CarbonDioxideConcentrationMeasurement, CarbonMonoxideConcentrationMeasurement, Channel, ColorControl,
                       ContentLauncher, Descriptor, DeviceEnergyManagement, DiagnosticLogs, DishwasherAlarm, DishwasherMode,
                       DoorLock, ElectricalMeasurement, EnergyEvse, EthernetNetworkDiagnostics, FanControl, FaultInjection,
