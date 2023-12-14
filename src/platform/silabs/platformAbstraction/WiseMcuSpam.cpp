@@ -30,6 +30,8 @@ extern "C" {
 #include "rsi_board.h"
 #include "sl_event_handler.h"
 #include "sl_system_init.h"
+#include "sl_si91x_led_config.h"
+#include "sl_si91x_led.h"
 void soc_pll_config(void);
 }
 
@@ -73,7 +75,7 @@ void SilabsPlatform::InitLed(void)
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     // TODO add range check
-    RSI_Board_LED_Set(led, state);
+    (state) ? sl_si91x_led_set(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN) : sl_si91x_led_clear(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
     return CHIP_NO_ERROR;
 }
 
@@ -86,7 +88,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     // TODO add range check
-    RSI_Board_LED_Toggle(led);
+    sl_si91x_led_toggle(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS

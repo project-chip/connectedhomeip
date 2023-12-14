@@ -169,7 +169,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING);
     temp_reset = (wfx_wifi_scan_ext_t *) malloc(sizeof(wfx_wifi_scan_ext_t));
     memset(temp_reset, 0, sizeof(wfx_wifi_scan_ext_t));
-    if (CHECK_IF_EVENT_FAILED(event))
+    if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         SILABS_LOG("F: Join Event received with %u bytes payload\n", result_length);
         callback_status = *(sl_status_t *) result;
@@ -237,7 +237,7 @@ int32_t wfx_wifi_rsi_init(void)
 {
     SILABS_LOG("wfx_wifi_rsi_init started");
     sl_status_t status;
-    status = sl_wifi_init(&config, default_wifi_event_handler);
+    status = sl_wifi_init(&config, NULL, sl_wifi_default_event_handler);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("wfx_wifi_rsi_init failed %x", status);
@@ -257,7 +257,7 @@ static sl_status_t wfx_rsi_init(void)
 {
     sl_status_t status;
 
-#ifndef RSI_M4_INTERFACE
+#ifndef SLI_SI91X_MCU_INTERFACE
     status = wfx_wifi_rsi_init();
     if (status != SL_STATUS_OK)
     {
@@ -302,7 +302,7 @@ void wfx_show_err(char * msg)
 
 sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * scan_result, uint32_t result_length, void * arg)
 {
-    if (CHECK_IF_EVENT_FAILED(event))
+    if (SL_WIFI_CHECK_IF_EVENT_FAILED(event))
     {
         callback_status       = *(sl_status_t *) scan_result;
         scan_results_complete = true;
@@ -351,7 +351,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
 }
 sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 {
-    ARGS_CHECK_NULL_POINTER(scan_result);
+    SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
     int x;
     wfx_wifi_scan_result_t ap;
     for (x = 0; x < (int) scan_result->scan_count; x++)
@@ -492,7 +492,7 @@ static sl_status_t wfx_rsi_do_join(void)
          * And check there is a success
          */
         sl_wifi_credential_t cred = { 0 };
-        cred.type                 = SL_WIFI_CRED_PSK;
+        cred.type                 = SL_WIFI_PSK_CREDENTIAL;
         memcpy(cred.psk.value, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
         sl_wifi_credential_id_t id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
         status = sl_net_set_credential(id, SL_NET_WIFI_PSK, &wfx_rsi.sec.passkey[0], strlen(wfx_rsi.sec.passkey));
