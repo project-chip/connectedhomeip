@@ -123,10 +123,11 @@ class LaundryDryerControlsCluster(
     return SelectedDrynessLevelAttribute(decodedValue)
   }
 
-  suspend fun writeSelectedDrynessLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSelectedDrynessLevelAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -141,7 +142,7 @@ class LaundryDryerControlsCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

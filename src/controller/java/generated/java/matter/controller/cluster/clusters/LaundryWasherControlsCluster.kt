@@ -133,10 +133,8 @@ class LaundryWasherControlsCluster(
     return SpinSpeedCurrentAttribute(decodedValue)
   }
 
-  suspend fun writeSpinSpeedCurrentAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSpinSpeedCurrentAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -151,7 +149,7 @@ class LaundryWasherControlsCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -211,10 +209,8 @@ class LaundryWasherControlsCluster(
     return decodedValue
   }
 
-  suspend fun writeNumberOfRinsesAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNumberOfRinsesAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -229,7 +225,7 @@ class LaundryWasherControlsCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
