@@ -23,14 +23,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <zephyr/kernel.h>
-#include <zephyr/nfc/nfc_tag.h>
 #include <zephyr/nfc/ndef/uri_msg.h>
+#include <zephyr/nfc/nfc_tag.h>
 
-
-void nfc_callback(const struct device *dev,
-                         enum nfc_tag_event event,
-                         const uint8_t *data,
-                         size_t data_len)
+void nfc_callback(const struct device * dev, enum nfc_tag_event event, const uint8_t * data, size_t data_len)
 {
     ARG_UNUSED(dev);
     ARG_UNUSED(data);
@@ -56,26 +52,30 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
     int err;
 
     err = nfc_tag_init(dev, nfc_callback);
-    if (err != 0) {
+    if (err != 0)
+    {
         ChipLogError(DeviceLayer, "Cannot setup NFC subsys!");
         return CHIP_ERROR_INTERNAL;
     }
 
     /* Set up Tag mode */
     err = nfc_tag_set_type(dev, NFC_TAG_TYPE_T5T);
-    if (err != 0) {
+    if (err != 0)
+    {
         ChipLogError(DeviceLayer, "Cannot setup NFC Tag mode!");
         return CHIP_ERROR_INTERNAL;
     }
 
-    err = nfc_ndef_uri_msg_encode(NFC_URI_NONE, (const uint8_t*)payload, payloadLength, ndef_msg_buf, &len);
-    if (err != 0) {
+    err = nfc_ndef_uri_msg_encode(NFC_URI_NONE, (const uint8_t *) payload, payloadLength, ndef_msg_buf, &len);
+    if (err != 0)
+    {
         ChipLogError(DeviceLayer, "Cannot encode message!");
         return CHIP_ERROR_INTERNAL;
     }
 
     err = nfc_tag_set_ndef(dev, ndef_msg_buf, len);
-    if (err != 0) {
+    if (err != 0)
+    {
         ChipLogError(DeviceLayer, "Cannot set payload!");
         return CHIP_ERROR_INTERNAL;
     }

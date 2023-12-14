@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-
 #pragma once
 
 namespace chip {
@@ -24,7 +23,7 @@ namespace DeviceLayer {
 namespace {
 #define NFC_DEV st25dvxxkc
 #define DEV_PTR DEVICE_DT_GET(DT_NODELABEL(NFC_DEV))
-#define NDEF_MSG_BUF_SIZE    128
+#define NDEF_MSG_BUF_SIZE 128
 } // namespace
 
 class NFCManagerImpl final : public NFCManager
@@ -41,7 +40,7 @@ private:
 
     // ===== Members for internal use by this class.
     bool mIsStarted;
-    const struct device *dev = DEV_PTR;
+    const struct device * dev = DEV_PTR;
     // ===== Members for internal use by the following friends.
 
     friend NFCManager & NFCMgr();
