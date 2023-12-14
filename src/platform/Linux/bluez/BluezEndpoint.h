@@ -72,6 +72,7 @@ public:
     CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName);
     void Shutdown();
 
+    void SetAdapter(BluezAdapter1 * apAdapter) { mpAdapter.reset(apAdapter); };
     BluezAdapter1 * GetAdapter() const { return mpAdapter.get(); }
     const char * GetAdapterName() const { return mpAdapterName; }
 
