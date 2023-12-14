@@ -24,7 +24,7 @@ private:
     bool mDocked   = false;
     bool mCharging = false;
 
-    uint8_t mPausedState = 0;
+    uint8_t mStateBeforePause = 0;
 
 public:
     /**

@@ -92,31 +92,22 @@ void RvcDevice::HandleRvcCleanChangeToMode(uint8_t newMode, ModeBase::Commands::
 void RvcDevice::HandleOpStatePauseCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
     // This method is only called if the device is in a Pause-compatible state, i.e. `Running` or `SeekingCharger`.
-    mPausedState = mOperationalStateInstance.GetCurrentOperationalState();
+    mStateBeforePause = mOperationalStateInstance.GetCurrentOperationalState();
     auto error   = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                           : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
 }
 
 void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err)
 {
-    auto error = CHIP_NO_ERROR;
+    uint8_t targetState = to_underlying(OperationalState::OperationalStateEnum::kRunning);
+
     switch (mOperationalStateInstance.GetCurrentOperationalState())
     {
     case to_underlying(RvcOperationalState::OperationalStateEnum::kCharging):
     case to_underlying(RvcOperationalState::OperationalStateEnum::kDocked): {
-        if (mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeCleaning ||
-            mRunModeInstance.GetCurrentMode() == RvcRunMode::ModeMapping)
-        {
-            error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-        }
-        else
+        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeCleaning &&
+            mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeMapping)
         {
             err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
             return;
@@ -124,14 +115,9 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
     }
     break;
     case to_underlying(OperationalState::OperationalStateEnum::kPaused): {
-        if (mPausedState == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
+        if (mStateBeforePause == to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
         {
-            error = mOperationalStateInstance.SetOperationalState(
-                to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
-        }
-        else
-        {
-            error = mOperationalStateInstance.SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
+            targetState = to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger);
         }
     }
     break;
@@ -142,14 +128,10 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
         return;
     }
 
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
+    auto error = mOperationalStateInstance.SetOperationalState(targetState);
+
+    err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                     : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
 }
 
 void RvcDevice::HandleChargedMessage()
