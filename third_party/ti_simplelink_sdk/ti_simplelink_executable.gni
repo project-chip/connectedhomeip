@@ -86,8 +86,6 @@ template("ti_simplelink_executable") {
       }
     } else if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (chip_enable_ota_requestor) {
-        print("custom factory data: ")
-        print(custom_factory_data)
         sources +=
             [ "${chip_root}/src/platform/cc13xx_26xx/oad_image_header.c" ]
         if (custom_factory_data) {
