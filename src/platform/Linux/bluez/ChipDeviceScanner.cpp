@@ -142,13 +142,13 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 
     if (mObjectAddedSignal)
     {
-        g_signal_handler_disconnect(mEndpoint.GetObjectManager(), mObjectAddedSignal);
+        g_signal_handler_disconnect(mEndpoint.GetBluezObjectManager(), mObjectAddedSignal);
         mObjectAddedSignal = 0;
     }
 
     if (mInterfaceChangedSignal)
     {
-        g_signal_handler_disconnect(mEndpoint.GetObjectManager(), mInterfaceChangedSignal);
+        g_signal_handler_disconnect(mEndpoint.GetBluezObjectManager(), mInterfaceChangedSignal);
         mInterfaceChangedSignal = 0;
     }
 
@@ -245,12 +245,12 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     GAutoPtr<GError> error;
 
     self->mObjectAddedSignal =
-        g_signal_connect(self->mEndpoint.GetObjectManager(), "object-added", G_CALLBACK(SignalObjectAdded), self);
-    self->mInterfaceChangedSignal = g_signal_connect(self->mEndpoint.GetObjectManager(), "interface-proxy-properties-changed",
+        g_signal_connect(self->mEndpoint.GetBluezObjectManager(), "object-added", G_CALLBACK(SignalObjectAdded), self);
+    self->mInterfaceChangedSignal = g_signal_connect(self->mEndpoint.GetBluezObjectManager(), "interface-proxy-properties-changed",
                                                      G_CALLBACK(SignalInterfaceChanged), self);
 
     ChipLogProgress(Ble, "BLE removing known devices.");
-    for (BluezObject & object : BluezObjectList(self->mEndpoint.GetObjectManager()))
+    for (BluezObject & object : BluezObjectList(self->mEndpoint.GetBluezObjectManager()))
     {
         GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
         if (device.get() != nullptr)

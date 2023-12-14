@@ -161,7 +161,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    isAdditionalAdvertising = (aChar == mpC3);
+    isAdditionalAdvertising = (aChar == mpC3.get());
 #endif
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
@@ -441,14 +441,14 @@ void BluezEndpoint::SetupAdapter()
                 {
                     if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
                     {
-                        mpAdapter.reset(g_object_ref(adapter));
+                        mpAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                     }
                 }
                 else
                 {
                     if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
                     {
-                        mpAdapter.reset(g_object_ref(adapter));
+                        mpAdapter.reset(static_cast<BluezAdapter1 *>(g_object_ref(adapter)));
                     }
                 }
             }
@@ -537,8 +537,7 @@ void BluezEndpoint::SetupGattService()
     mpService.reset(CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING));
 
     // C1 characteristic
-    mpC1 =
-        GAutoPtr<BluezGattCharacteristic1>(CreateGattCharacteristic(mpService.get(), "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags));
+    mpC1.reset(CreateGattCharacteristic(mpService.get(), "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags));
     g_signal_connect(mpC1.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -551,8 +550,7 @@ void BluezEndpoint::SetupGattService()
     g_signal_connect(mpC1.get(), "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
 
     // C2 characteristic
-    mpC2 =
-        GAutoPtr<BluezGattCharacteristic1>(CreateGattCharacteristic(mpService.get(), "c2", CHIP_PLAT_BLE_UUID_C2_STRING, c2_flags));
+    mpC2.reset(CreateGattCharacteristic(mpService.get(), "c2", CHIP_PLAT_BLE_UUID_C2_STRING, c2_flags));
     g_signal_connect(mpC2.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -574,8 +572,7 @@ void BluezEndpoint::SetupGattService()
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
     // Additional data characteristics
-    mpC3 =
-        GAutoPtr<BluezGattCharacteristic1>(CreateGattCharacteristic(mpService.get(), "c3", CHIP_PLAT_BLE_UUID_C3_STRING, c3_flags));
+    mpC3.reset(CreateGattCharacteristic(mpService.get(), "c3", CHIP_PLAT_BLE_UUID_C3_STRING, c3_flags));
     g_signal_connect(mpC3.get(), "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -685,8 +682,8 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
         mpConnectCancellable.reset(g_cancellable_new());
     }
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
+    err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
     ChipLogDetail(DeviceLayer, "BlueZ integration init success");
