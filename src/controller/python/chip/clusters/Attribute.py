@@ -796,7 +796,7 @@ class AsyncReadTransaction:
                     attribute_path = TypedAttributePath(Path=change)
                 except KeyError as err:
                     # path could not be resolved into a TypedAttributePath
-                    logging.getLogger(__name__).exception(err)
+                    logging.getLogger(__name__).warning(err)
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
 
