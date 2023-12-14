@@ -29,6 +29,12 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
 
     /* Register callbacks */
     EnergyEvseDelegate * dg = aInstance->GetDelegate();
+    if (dg == nullptr)
+    {
+        ChipLogError(AppServer, "Delegate is not initialized");
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
     // TODO EnergyEvseManager::GetInstance()->GetDelegate()->RegisterCallbacks();
 
     /* Set the EVSE Hardware Maximum current limit */
