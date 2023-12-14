@@ -6751,8 +6751,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("systemTimeUs", indent + 1, value.systemTimeUs));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("UTCTimeUs", indent + 1, value.UTCTimeUs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("systemTimeMs", indent + 1, value.systemTimeMs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("posixTimeMs", indent + 1, value.posixTimeMs));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
