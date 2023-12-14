@@ -114,7 +114,6 @@ source_set("chip-all-clusters-common") {
   if (chip_build_libshell) {
     defines = [ "ENABLE_CHIP_SHELL" ]
   }
-
 }
 
 source_set("chip-lock-app-common") {
