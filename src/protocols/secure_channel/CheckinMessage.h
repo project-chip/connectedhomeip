@@ -47,17 +47,17 @@ public:
      * @brief Generate Check-in Message payload
      *
      * @note Function requires two key handles to generate the Check-In message.
-     *       Due to PSA requirements, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
+     *       Due to the way some key stores work, the same key handle cannot be used for AES-CCM and HMAC-SHA-256 operations.
      *
-     * @param[in]  aes128KeyHandle   Key handle with which to encrypt the check-in payload with the AEAD
-     * @param[in]  hmac128KeyHandle  Key handle with which to generate the nonce the check-in payload with the HMAC
+     * @param[in]  aes128KeyHandle   Key handle with which to encrypt the check-in payload (using AEAD).
+     * @param[in]  hmac128KeyHandle  Key handle with which to generate the nonce for the check-in payload (using HMAC).
      * @param[in]  counter           Check-in counter
      * @param[in]  appData           Application Data to incorporate within the Check-in message. Allowed to be empty.
      * @param[out] output            Buffer in Which to store the generated payload. SUFFICIENT SPACE MUST BE ALLOCATED by the
      *                               caller Required Buffer Size is : GetCheckinPayloadSize(appData.size())
      *
      * @return CHIP_ERROR_BUFFER_TOO_SMALL if output buffer is too small
-     *         CHIP_ERROR_INVALID_ARGUMENTS if the provide arguments cannot be used to generate the Check-In message
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to generate the Check-In message
      */
     static CHIP_ERROR GenerateCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
                                                     const Crypto::Hmac128KeyHandle & hmacKeyHandle, const CounterType & counter,
@@ -73,13 +73,14 @@ public:
      * @param[in]       hmac128KeyHandle  Key handle with which to generate the nonce for the check-in payload with the HMAC
      * @param[in]       payload           The received payload to decrypt and parse
      * @param[out]      counter           The counter value retrieved from the payload
-     * @param[in,out]   appData           The optional application data decrypted. The size of appData must be at least the size of
-     *                                    GetAppDataSize(payload) + sizeof(CounterType).
-     *                                    appData is used as a work buffer for the decryption process
+     * @param[in,out]   appData           The optional application data decrypted. The input size of appData must be at least the size of
+     *                                    GetAppDataSize(payload) + sizeof(CounterType), because
+     *                                    appData is used as a work buffer for the decryption process.  The output size
+     *                                    on success will be GetAppDataSize(payload).
      *
      * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
-     *         CHIP_ERROR_INVALID_ARGUMENTS if the provide arguments cannot be used to parse the Check-In message
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to parse the Check-In message
      */
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
                                                  const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
@@ -109,7 +110,7 @@ private:
      *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES
      *
      * @return CHIP_ERROR_BUFFER_TOO_SMALL if output buffer is too small
-     *         CHIP_ERROR_INVALID_ARGUMENTS if the provide arguments cannot be used to generate the Check-In message Nonce
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to generate the Check-In message Nonce
      */
     static CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
                                                   Encoding::LittleEndian::BufferWriter & writer);
