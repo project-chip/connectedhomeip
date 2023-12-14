@@ -19,128 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRScenesClusterAttributeValuePair
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeID = @(0);
-
-        _attributeValue = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterAttributeValuePair alloc] init];
-
-    other.attributeID = self.attributeID;
-    other.attributeValue = self.attributeValue;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
-    return descriptionString;
-}
-
-- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
-{
-    self.attributeID = attributeId;
-}
-
-- (NSNumber * _Nonnull)attributeId
-{
-    return self.attributeID;
-}
-
-@end
-
-@implementation MTRScenesClusterExtensionFieldSet
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clusterID = @(0);
-
-        _attributeValueList = [NSArray array];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterExtensionFieldSet alloc] init];
-
-    other.clusterID = self.clusterID;
-    other.attributeValueList = self.attributeValueList;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
-    return descriptionString;
-}
-
-- (void)setClusterId:(NSNumber * _Nonnull)clusterId
-{
-    self.clusterID = clusterId;
-}
-
-- (NSNumber * _Nonnull)clusterId
-{
-    return self.clusterID;
-}
-
-@end
-
-@implementation MTRScenesClusterSceneInfoStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _sceneCount = @(0);
-
-        _currentScene = @(0);
-
-        _currentGroup = @(0);
-
-        _sceneValid = @(0);
-
-        _remainingCapacity = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterSceneInfoStruct alloc] init];
-
-    other.sceneCount = self.sceneCount;
-    other.currentScene = self.currentScene;
-    other.currentGroup = self.currentGroup;
-    other.sceneValid = self.sceneValid;
-    other.remainingCapacity = self.remainingCapacity;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -4164,6 +4042,129 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
+@end
+
+@implementation MTRMatterScenesClusterAttributeValuePair
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _attributeValue = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMatterScenesClusterAttributeValuePair alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.attributeValue = self.attributeValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesClusterAttributeValuePair : MTRMatterScenesClusterAttributeValuePair
+@dynamic attributeID;
+@dynamic attributeId;
+@dynamic attributeValue;
+@end
+
+@implementation MTRMatterScenesClusterExtensionFieldSet
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clusterID = @(0);
+
+        _attributeValueList = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMatterScenesClusterExtensionFieldSet alloc] init];
+
+    other.clusterID = self.clusterID;
+    other.attributeValueList = self.attributeValueList;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesClusterExtensionFieldSet : MTRMatterScenesClusterExtensionFieldSet
+@dynamic clusterID;
+@dynamic clusterId;
+@dynamic attributeValueList;
+@end
+
+@implementation MTRMatterScenesClusterSceneInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sceneCount = @(0);
+
+        _currentScene = @(0);
+
+        _currentGroup = @(0);
+
+        _sceneValid = @(0);
+
+        _remainingCapacity = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMatterScenesClusterSceneInfoStruct alloc] init];
+
+    other.sceneCount = self.sceneCount;
+    other.currentScene = self.currentScene;
+    other.currentGroup = self.currentGroup;
+    other.sceneValid = self.sceneValid;
+    other.remainingCapacity = self.remainingCapacity;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesClusterSceneInfoStruct : MTRMatterScenesClusterSceneInfoStruct
+@dynamic sceneCount;
+@dynamic currentScene;
+@dynamic currentGroup;
+@dynamic sceneValid;
+@dynamic remainingCapacity;
+@dynamic fabricIndex;
 @end
 
 @implementation MTRHEPAFilterMonitoringClusterReplacementProductStruct

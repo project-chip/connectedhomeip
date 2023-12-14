@@ -86,30 +86,6 @@ enum class NameSupportBitmap : uint8_t
 };
 } // namespace Groups
 
-namespace Scenes {
-
-// Bitmap for CopyModeBitmap
-enum class CopyModeBitmap : uint8_t
-{
-    kCopyAllScenes = 0x1,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kSceneNames   = 0x1,
-    kExplicit     = 0x2,
-    kTableSize    = 0x4,
-    kFabricScenes = 0x8,
-};
-
-// Bitmap for NameSupportBitmap
-enum class NameSupportBitmap : uint8_t
-{
-    kSceneNames = 0x80,
-};
-} // namespace Scenes
-
 namespace OnOff {
 
 // Enum for DelayedAllOffEffectVariantEnum
@@ -2035,6 +2011,30 @@ enum class OperationalStateEnum : uint8_t
     // src/app/common/templates/config-data.yaml.
 };
 } // namespace RvcOperationalState
+
+namespace MatterScenes {
+
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kSceneNames   = 0x1,
+    kExplicit     = 0x2,
+    kTableSize    = 0x4,
+    kFabricScenes = 0x8,
+};
+
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
+{
+    kSceneNames = 0x80,
+};
+} // namespace MatterScenes
 
 namespace HepaFilterMonitoring {
 

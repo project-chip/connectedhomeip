@@ -43,12 +43,10 @@ void emberAfIdentifyClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
 
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
-
-/**
+/** @brief On/Off Cluster Init
+ *
+ * Cluster Init
+ *
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
@@ -338,7 +336,18 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpoint);
 
-/**
+/** @brief Matter Scenes Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMatterScenesClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief HEPA Filter Monitoring Cluster Init
+ *
+ * Cluster Init
+ *
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
@@ -677,45 +686,6 @@ MatterGroupsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAt
  * @param endpoint  Endpoint that is being served
  */
 void emberAfGroupsClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
-// Scenes Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfScenesClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterScenesClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfScenesClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterScenesClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterScenesClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // On/Off Cluster
@@ -2954,6 +2924,84 @@ chip::Protocols::InteractionModel::Status MatterRvcOperationalStateClusterServer
  * @param endpoint  Endpoint that is being served
  */
 void emberAfRvcOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Matter Scenes Cluster
+//
+
+/** @brief Matter Scenes Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMatterScenesClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Matter Scenes Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMatterScenesClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Matter Scenes Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfMatterScenesClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Matter Scenes Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterMatterScenesClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Matter Scenes Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterMatterScenesClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Matter Scenes Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterMatterScenesClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Matter Scenes Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfMatterScenesClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Matter Scenes Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfMatterScenesClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster

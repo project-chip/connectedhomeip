@@ -8477,6 +8477,8 @@
                   - TextTracks
                   - AudioTracks
   renames:
+      clusters:
+        MatterScenes: Scenes 
       structs:
           Thermostat:
               WeeklyScheduleTransitionStruct: ThermostatScheduleTransition
