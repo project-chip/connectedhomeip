@@ -7172,7 +7172,7 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -7326,7 +7326,7 @@ cluster ContentLauncher = 1290 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
