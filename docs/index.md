@@ -17,6 +17,7 @@ examples/index
 tools/index
 BUG_REPORT
 code_generation
+clusters
 ERROR_CODES
 ```
 

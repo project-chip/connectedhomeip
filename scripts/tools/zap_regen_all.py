@@ -438,6 +438,11 @@ def getCodegenTemplates():
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="src/controller/java/generated"))
 
+    targets.append(JinjaCodegenTarget(
+        generator="summary-markdown",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="docs"))
+
     return targets
 
 

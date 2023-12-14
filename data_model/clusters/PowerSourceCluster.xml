@@ -69,24 +69,24 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
-      <mandatoryConform>
+      <optionalConform>
         <feature name="BAT"/>
-      </mandatoryConform>
+      </optionalConform>
     </feature>
     <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
-      <mandatoryConform>
+      <optionalConform>
         <feature name="BAT"/>
-      </mandatoryConform>
+      </optionalConform>
     </feature>
     <feature bit="4" code="CHGM" name="ChargeManagement" summary="A battery with charging management">
-      <mandatoryConform>
+      <optionalConform>
         <feature name="BAT"/>
-      </mandatoryConform>
+      </optionalConform>
     </feature>
     <feature bit="5" code="DCHGM" name="DischargeManagement" summary="A battery with discharging management">
-      <mandatoryConform>
+      <optionalConform>
         <feature name="BAT"/>
-      </mandatoryConform>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>

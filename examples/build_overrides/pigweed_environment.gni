@@ -18,4 +18,3 @@
 _bootstrap_root = "//third_party/connectedhomeip"
 
 import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
-

@@ -29,7 +29,7 @@
 
 using namespace chip;
 
-static const char * TAG = "app-task";
+static const char TAG[] = "app-task";
 
 Button AppButton;
 

@@ -53,10 +53,54 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    // CommandSender::Callback::OnResponse is public SDK API, so we cannot break source
+    // compatibility for it. To allow for additional values to be added at a future time
+    // without constantly changing the function's declaration parameter list, we are
+    // defining the struct AdditionalResponseData and adding that to the parameter list
+    // to allow for future extendability.
+    struct AdditionalResponseData
+    {
+        Optional<uint16_t> mCommandRef;
+    };
+
     class Callback
     {
     public:
         virtual ~Callback() = default;
+
+        /**
+         * OnResponseWithAdditionalData will be called when a successful response from the server has been received and processed.
+         * Specifically:
+         *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
+         *    that contains the data payload (callee will still need to open and process the container).
+         *
+         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
+         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
+         * future to provide additional response data by only making changes to `AdditionalResponseData`, and not all the potential
+         * callees.
+         *
+         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * It is advised that subclass should only override this or `OnResponse`. But, it shouldn't actually matter if both are
+         * overridden, just that `OnResponse` will never be called by CommandSender directly.
+         *
+         * @param[in] apCommandSender The command sender object that initiated the command transaction.
+         * @param[in] aPath           The command path field in invoke command response.
+         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
+         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
+         *                            be a generic SUCCESS status with no-cluster specific information.
+         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
+         * @param[in] aAdditionalResponseData
+         *                            Additional response data that comes within the InvokeResponseMessage.
+         */
+        virtual void OnResponseWithAdditionalData(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                                                  const StatusIB & aStatusIB, TLV::TLVReader * apData,
+                                                  const AdditionalResponseData & aAdditionalResponseData)
+        {
+            OnResponse(apCommandSender, aPath, aStatusIB, apData);
+        }
 
         /**
          * OnResponse will be called when a successful response from server has been received and processed. Specifically:
@@ -66,6 +110,9 @@ public:
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
+         *
+         * It is advised that subclasses should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
+         * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -114,6 +161,48 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
+    // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
+    // for it. By having parameters to that API use this struct instead of individual
+    // function arguments, we centralize required changes to one file when adding new
+    // funtionality.
+    struct ConfigParameters
+    {
+        ConfigParameters & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
+        {
+            mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
+            return *this;
+        }
+
+        // If mRemoteMaxPathsPerInvoke is 1, this will allow the CommandSender client to contain only one command and
+        // doesn't enforce other batch commands requirements.
+        uint16_t mRemoteMaxPathsPerInvoke = 1;
+    };
+
+    // PrepareCommand and FinishCommand are public SDK APIs, so we cannot break source
+    // compatibility for them. By having parameters to those APIs use this struct instead
+    // of individual function arguments, we centralize required changes to one file
+    // when adding new functionality.
+    struct AdditionalCommandParameters
+    {
+        // gcc bug requires us to have the constructor below
+        // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96645
+        AdditionalCommandParameters() {}
+
+        AdditionalCommandParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
+        {
+            mStartOrEndDataStruct = aStartOrEndDataStruct;
+            return *this;
+        }
+
+        // From the perspective of `PrepareCommand`, this is an out parameter. This value will be
+        // set by `PrepareCommand` and is expected to be unchanged by caller until it is provided
+        // to `FinishCommand`.
+        Optional<uint16_t> mCommandRef;
+        // For both `PrepareCommand` and `FinishCommand` this is an in parameter. It must have
+        // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.
+        bool mStartOrEndDataStruct = false;
+    };
+
     /*
      * Constructor.
      *
@@ -124,9 +213,49 @@ public:
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
     ~CommandSender();
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
-    CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
+
+    /**
+     * Enables additional features of CommandSender, for example sending batch commands.
+     *
+     * In the case of enabling batch commands, once set it ensures that commands contain all
+     * required data elements while building the InvokeRequestMessage. This must be called
+     * before PrepareCommand.
+     *
+     * @param [in] aConfigParams contains information to configure CommandSender behavior,
+     *                      such as such as allowing a max number of paths per invoke greater than one,
+     *                      based on how many paths the remote peer claims to support.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE
+     *                      If device has previously called `PrepareCommand`.
+     * @return CHIP_ERROR_INVALID_ARGUMENT
+     *                      Invalid argument value.
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+     *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
+     */
+    CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
+
+    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs);
+
+    [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR
+    PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true)
+    {
+        AdditionalCommandParameters optionalArgs;
+        optionalArgs.SetStartOrEndDataStruct(aStartDataStruct);
+        return PrepareCommand(aCommandPathParams, optionalArgs);
+    }
+
+    CHIP_ERROR FinishCommand(const AdditionalCommandParameters & aOptionalArgs);
+
+    [[deprecated("FinishCommand should migrate to calling FinishCommand with AdditionalCommandParameters")]] CHIP_ERROR
+    FinishCommand(bool aEndDataStruct = true)
+    {
+        AdditionalCommandParameters optionalArgs;
+        optionalArgs.SetStartOrEndDataStruct(aEndDataStruct);
+        return FinishCommand(optionalArgs);
+    }
+
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
     /**
      * API for adding a data request.  The template parameter T is generally
      * expected to be a ClusterName::Commands::CommandName::Type struct, but any
@@ -137,9 +266,16 @@ public:
      * @param [in] aData         The data for the request.
      */
     template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              AdditionalCommandParameters & aOptionalArgs)
+    {
+        return AddRequestData(aCommandPath, aData, NullOptional, aOptionalArgs);
+    }
+    template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
     {
-        return AddRequestData(aCommandPath, aData, NullOptional);
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestData(aCommandPath, aData, optionalArgs);
     }
 
     /**
@@ -149,14 +285,29 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                              const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
+        VerifyOrReturnError(aOptionalArgs.mStartOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
 
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+    }
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestData(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
     }
 
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs, const AdditionalCommandParameters & aOptionalArgs);
+
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        AdditionalCommandParameters optionalArgs;
+        return FinishCommand(aTimedInvokeTimeoutMs, optionalArgs);
+    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
@@ -166,9 +317,18 @@ public:
      */
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs,
+                                          AdditionalCommandParameters & aOptionalArgs)
+    {
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
+    }
+
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
                                           const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
-        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+        AdditionalCommandParameters optionalArgs;
+        return AddRequestDataNoTimedCheck(aCommandPath, aData, aTimedInvokeTimeoutMs, optionalArgs);
     }
 
     /**
@@ -183,13 +343,13 @@ public:
 private:
     template <typename CommandDataT>
     CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
-                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
     {
-        ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
+        ReturnErrorOnFailure(PrepareCommand(aCommandPath, aOptionalArgs));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
-        return FinishCommand(aTimedInvokeTimeoutMs);
+        return FinishCommand(aTimedInvokeTimeoutMs, aOptionalArgs);
     }
 
 public:
@@ -288,12 +448,16 @@ private:
     // invoke.
     Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
-    bool mSuppressResponse                 = false;
-    bool mTimedRequest                     = false;
 
     State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    bool mBufferAllocated = false;
+    uint16_t mFinishedCommandCount    = 0;
+    uint16_t mRemoteMaxPathsPerInvoke = 1;
+
+    bool mSuppressResponse     = false;
+    bool mTimedRequest         = false;
+    bool mBufferAllocated      = false;
+    bool mBatchCommandsEnabled = false;
 };
 
 } // namespace app

@@ -31,6 +31,7 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/handlers.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/parsing.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cluster_selection.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/__init__.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/tlvmeta/__init__.py",

@@ -53,10 +53,17 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = Test::LoopbackMessagingContext;
-
 namespace chip {
 namespace {
+
+class TestContext : public Test::LoopbackMessagingContext
+{
+public:
+    // Performs shared setup for all tests in the test suite
+    CHIP_ERROR SetUpTestSuite() override;
+    // Performs shared teardown for all tests in the test suite
+    void TearDownTestSuite() override;
+};
 
 void ServiceEvents(TestContext & ctx)
 {
@@ -155,6 +162,11 @@ public:
         mSingleFabricIndex = fabricIndex;
         mKeypair           = std::move(keypair);
     }
+    void Shutdown()
+    {
+        mSingleFabricIndex = kUndefinedFabricIndex;
+        mKeypair           = nullptr;
+    }
 
     bool HasPendingOpKeypair() const override { return false; }
     bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override { return mSingleFabricIndex != kUndefinedFabricIndex; }
@@ -214,6 +226,8 @@ Crypto::DefaultSessionKeystore gDeviceSessionKeystore;
 
 Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
 Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
+
+CASEServer gPairingServer;
 
 NodeId Node01_01 = 0xDEDEDEDE00010001;
 NodeId Node01_02 = 0xDEDEDEDE00010002;
@@ -310,6 +324,37 @@ CHIP_ERROR InitCredentialSets()
     ReturnErrorOnFailure(InitTestIpk(gDeviceGroupDataProvider, *newFabric, /* numIpks= */ 1));
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestContext::SetUpTestSuite()
+{
+    ConfigInitializeNodes(false);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit((err = LoopbackMessagingContext::SetUpTestSuite()) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "SetUpTestSuite lo messaging context failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit((err = chip::DeviceLayer::PlatformMgr().InitChipStack()) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "Init CHIP stack failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit((err = InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
+                                        &gCommissionerOpCertStore)) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "InitFabricTable failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrExit((err = InitCredentialSets()) == CHIP_NO_ERROR,
+                 ChipLogError(AppServer, "InitCredentialSets failed: %" CHIP_ERROR_FORMAT, err.Format()));
+    chip::DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
+exit:
+    return err;
+}
+
+void TestContext::TearDownTestSuite()
+{
+    chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
+    gDeviceOperationalKeystore.Shutdown();
+    gPairingServer.Shutdown();
+    gCommissionerStorageDelegate.ClearStorage();
+    gDeviceStorageDelegate.ClearStorage();
+    gCommissionerFabrics.DeleteAllFabrics();
+    gDeviceFabrics.DeleteAllFabrics();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+    LoopbackMessagingContext::TearDownTestSuite();
 }
 
 } // anonymous namespace
@@ -491,8 +536,6 @@ void TestCASESession::SecurePairingHandshakeTest(nlTestSuite * inSuite, void * i
     pairingCommissioner.SetGroupDataProvider(&gCommissionerGroupDataProvider);
     SecurePairingHandshakeTestCommon(inSuite, inContext, sessionManager, pairingCommissioner, delegateCommissioner);
 }
-
-CASEServer gPairingServer;
 
 void TestCASESession::SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -1193,75 +1236,17 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int CASE_TestSecurePairing_Setup(void * inContext);
-int CASE_TestSecurePairing_Teardown(void * inContext);
-
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-CASE",
     &sTests[0],
-    CASE_TestSecurePairing_Setup,
-    CASE_TestSecurePairing_Teardown,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
-
-namespace {
-/*
- *  Set up the test suite.
- */
-CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.ConfigInitializeNodes(false);
-    ReturnErrorOnFailure(ctx.Init());
-
-    ReturnErrorOnFailure(InitFabricTable(gCommissionerFabrics, &gCommissionerStorageDelegate, /* opKeyStore = */ nullptr,
-                                         &gCommissionerOpCertStore));
-
-    return InitCredentialSets();
-}
-} // anonymous namespace
-
-/**
- *  Set up the test suite.
- */
-int CASE_TestSecurePairing_Setup(void * inContext)
-{
-    chip::Platform::MemoryInit();
-
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
-
-    CHIP_ERROR err = CASETestSecurePairingSetup(inContext);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Support, "Failed to init tests %" CHIP_ERROR_FORMAT, err.Format());
-        return FAILURE;
-    }
-
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    chip::DeviceLayer::SetSystemLayerForTesting(&ctx.GetSystemLayer());
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int CASE_TestSecurePairing_Teardown(void * inContext)
-{
-    chip::DeviceLayer::SetSystemLayerForTesting(nullptr);
-
-    gPairingServer.Shutdown();
-    gCommissionerStorageDelegate.ClearStorage();
-    gDeviceStorageDelegate.ClearStorage();
-    gCommissionerFabrics.DeleteAllFabrics();
-    gDeviceFabrics.DeleteAllFabrics();
-    static_cast<TestContext *>(inContext)->Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
-    return SUCCESS;
-}
 
 /**
  *  Main

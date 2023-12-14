@@ -75,6 +75,14 @@ CHIP_ERROR CommandStatusIB::Parser::PrettyPrint() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
+        case to_underlying(Tag::kRef):
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            {
+                uint16_t reference;
+                ReturnErrorOnFailure(reader.Get(reference));
+                PRETTY_PRINT("\tRef = 0x%x,", reference);
+            }
+            break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
             break;
@@ -108,6 +116,11 @@ CHIP_ERROR CommandStatusIB::Parser::GetErrorStatus(StatusIB::Parser * const apEr
     return apErrorStatus->Init(reader);
 }
 
+CHIP_ERROR CommandStatusIB::Parser::GetRef(uint16_t * const apRef) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kRef), apRef);
+}
+
 CommandPathIB::Builder & CommandStatusIB::Builder::CreatePath()
 {
     if (mError == CHIP_NO_ERROR)
@@ -124,6 +137,11 @@ StatusIB::Builder & CommandStatusIB::Builder::CreateErrorStatus()
         mError = mErrorStatus.Init(mpWriter, to_underlying(Tag::kErrorStatus));
     }
     return mErrorStatus;
+}
+
+CHIP_ERROR CommandStatusIB::Builder::Ref(const uint16_t aRef)
+{
+    return mpWriter->Put(TLV::ContextTag(Tag::kRef), aRef);
 }
 
 CHIP_ERROR CommandStatusIB::Builder::EndOfCommandStatusIB()

@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class BasicInformationClusterStartUpEvent (
-    val softwareVersion: ULong) {
-  override fun toString(): String  = buildString {
+class BasicInformationClusterStartUpEvent(val softwareVersion: ULong) {
+  override fun toString(): String = buildString {
     append("BasicInformationClusterStartUpEvent {\n")
     append("\tsoftwareVersion : $softwareVersion\n")
     append("}\n")
@@ -45,10 +40,10 @@ class BasicInformationClusterStartUpEvent (
   companion object {
     private const val TAG_SOFTWARE_VERSION = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BasicInformationClusterStartUpEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterStartUpEvent {
       tlvReader.enterStructure(tlvTag)
       val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      
+
       tlvReader.exitContainer()
 
       return BasicInformationClusterStartUpEvent(softwareVersion)

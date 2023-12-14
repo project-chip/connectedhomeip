@@ -707,8 +707,8 @@ SWTCH.C.F01=1
 SWTCH.C.F02=1
 SWTCH.C.F03=1
 SWTCH.C.F04=1
-SWTCH.C.M.RA=1
-SWTCH.C.M.EV=1
+SWTCH.C.M.SwitchStatePolling=1
+SWTCH.C.M.SwitchStateEventing=1
 SWTCH.C.AM-READ=0
 SWTCH.C.AM-WRITE=0
 SWTCH.C.AO-READ=0
@@ -771,6 +771,8 @@ LTIME.C.Afffc=1
 LTIME.C.Afffd=1
 LTIME.C.A0000.12HR=1
 LTIME.C.A0000.24HR=1
+
+LTIME.S.F00=1
 
 # Unit Localization Cluster
 LUNIT.S=1
@@ -1202,7 +1204,7 @@ ACT.C.C0b.Tx=0
 # Boolean State Cluster
 BOOL.S=1
 BOOL.S.A0000=1
-BOOL.M.ManuallyControlled=1
+BOOL.S.M.ManuallyControlled=1
 BOOL.S.E00=0
 
 BOOL.C=1
@@ -2599,9 +2601,9 @@ TCTL.S.A0003=0
 TCTL.S.A0004=1
 TCTL.S.A0005=1
 TCC.M.ManuallyControlledTemperature=1
-TCTL.S.M.SupportsInvalidInMode=1
-TCTL.S.C00.Rsp=1
-TCTL.C.C00.Tx=1
+TCTL.S.M.SupportsInvalidInMode=0
+TCTL.S.C00.Rsp=0
+TCTL.C.C00.Tx=0
 
 #Washer Controls
 WASHERCTRL.S=1

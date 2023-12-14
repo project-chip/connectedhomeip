@@ -30,6 +30,12 @@ struct EventHeader
     EventNumber mEventNumber     = 0;
     PriorityLevel mPriorityLevel = PriorityLevel::Invalid;
     Timestamp mTimestamp;
+
+    void LogPath() const
+    {
+        ChipLogProgress(DataManagement, "Concrete Event Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mPath.mEndpointId,
+                        ChipLogValueMEI(mPath.mClusterId), ChipLogValueMEI(mPath.mEventId));
+    }
 };
 } // namespace app
 } // namespace chip

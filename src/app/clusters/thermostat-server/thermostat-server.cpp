@@ -206,7 +206,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case RemoteSensing::Id:
         if (localTemperatureNotExposedSupported)
         {
-            chip::BitMask<RemoteSensingBitmap> valueRemoteSensing;
+            BitMask<RemoteSensingBitmap> valueRemoteSensing;
             EmberAfStatus status = RemoteSensing::Get(aPath.mEndpointId, &valueRemoteSensing);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
@@ -459,7 +459,10 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
         }
     }
     break;
-
+    case QueuedPreset::Id: {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    break;
     default: // return CHIP_NO_ERROR and just write to the attribute store in default
         break;
     }
@@ -715,37 +718,37 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     case ControlSequenceOfOperation::Id: {
         uint8_t requestedCSO;
         requestedCSO = *value;
-        if (requestedCSO > to_underlying(ThermostatControlSequence::kCoolingAndHeatingWithReheat))
+        if (requestedCSO > to_underlying(ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat))
             return imcode::InvalidValue;
         return imcode::Success;
     }
 
     case SystemMode::Id: {
-        ThermostatControlSequence ControlSequenceOfOperation;
+        ControlSequenceOfOperationEnum ControlSequenceOfOperation;
         EmberAfStatus status = ControlSequenceOfOperation::Get(endpoint, &ControlSequenceOfOperation);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             return imcode::InvalidValue;
         }
-        auto RequestedSystemMode = static_cast<ThermostatSystemModeEnum>(*value);
-        if (ControlSequenceOfOperation > ThermostatControlSequence::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > ThermostatSystemModeEnum::kFanOnly)
+        auto RequestedSystemMode = static_cast<SystemModeEnum>(*value);
+        if (ControlSequenceOfOperation > ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat ||
+            RequestedSystemMode > SystemModeEnum::kFanOnly)
         {
             return imcode::InvalidValue;
         }
 
         switch (ControlSequenceOfOperation)
         {
-        case ThermostatControlSequence::kCoolingOnly:
-        case ThermostatControlSequence::kCoolingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kHeat || RequestedSystemMode == ThermostatSystemModeEnum::kEmergencyHeat)
+        case ControlSequenceOfOperationEnum::kCoolingOnly:
+        case ControlSequenceOfOperationEnum::kCoolingWithReheat:
+            if (RequestedSystemMode == SystemModeEnum::kHeat || RequestedSystemMode == SystemModeEnum::kEmergencyHeat)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
 
-        case ThermostatControlSequence::kHeatingOnly:
-        case ThermostatControlSequence::kHeatingWithReheat:
-            if (RequestedSystemMode == ThermostatSystemModeEnum::kCool || RequestedSystemMode == ThermostatSystemModeEnum::kPrecooling)
+        case ControlSequenceOfOperationEnum::kHeatingOnly:
+        case ControlSequenceOfOperationEnum::kHeatingWithReheat:
+            if (RequestedSystemMode == SystemModeEnum::kCool || RequestedSystemMode == SystemModeEnum::kPrecooling)
                 return imcode::InvalidValue;
             else
                 return imcode::Success;
@@ -965,7 +968,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
     switch (mode)
     {
-    case SetpointAdjustMode::kBoth:
+    case SetpointRaiseLowerModeEnum::kBoth:
         if (HeatSupported && CoolSupported)
         {
             int16_t DesiredCoolingSetpoint, CoolLimit, DesiredHeatingSetpoint, HeatLimit;
@@ -1045,7 +1048,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_SUCCESS;
         break;
 
-    case SetpointAdjustMode::kCool:
+    case SetpointRaiseLowerModeEnum::kCool:
         if (CoolSupported)
         {
             if (OccupiedCoolingSetpoint::Get(aEndpointId, &CoolingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
@@ -1098,7 +1101,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
             status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
 
-    case SetpointAdjustMode::kHeat:
+    case SetpointRaiseLowerModeEnum::kHeat:
         if (HeatSupported)
         {
             if (OccupiedHeatingSetpoint::Get(aEndpointId, &HeatingSetpoint) == EMBER_ZCL_STATUS_SUCCESS)
@@ -1158,14 +1161,6 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
     return true;
-}
-
-bool emberAfThermostatClusterGetRelayStatusLogCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::DecodableType & commandData)
-{
-    // TODO
-    return false;
 }
 
 // Timer Callbacks

@@ -57,10 +57,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
-    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
-    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
-    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
   ]
 
   visibility = [ ":app_config" ]
@@ -248,7 +245,7 @@ static_library("app") {
     ":app_config",
     ":revision_info",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:notifier",
+    "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
@@ -259,7 +256,10 @@ static_library("app") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:manager" ]
+    public_deps += [
+      "${chip_root}/src/app/icd:manager",
+      "${chip_root}/src/app/icd:notifier",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

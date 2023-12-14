@@ -111,8 +111,8 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="TIME_SOURCE" type="TimeSourceEnum" default="0x00" optional="true">TimeSource</attribute>
     <attribute side="server" code="0x0003" define="TRUSTED_TIME_SOURCE" type="TrustedTimeSourceStruct" isNullable="true" optional="true">TrustedTimeSource</attribute>
     <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="char_string" length="128" isNullable="true" optional="true">DefaultNTP</attribute>
-    <attribute side="server" code="0x0005" define="TIME_ZONE" type="ARRAY" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
-    <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
+    <attribute side="server" code="0x0005" define="TIME_ZONE" type="array" entryType="TimeZoneStruct" optional="true">TimeZone</attribute>
+    <attribute side="server" code="0x0006" define="DST_OFFSET" type="array" entryType="DSTOffsetStruct" optional="true">DSTOffset</attribute>
     <attribute side="server" code="0x0007" define="LOCAL_TIME" type="epoch_us" default="0xFFFFFFFFFFFFFFFF" isNullable="true" optional="true">LocalTime</attribute>
     <attribute side="server" code="0x0008" define="TIME_ZONE_DATABASE" type="TimeZoneDatabaseEnum" default="2" optional="true">TimeZoneDatabase</attribute>
     <attribute side="server" code="0x0009" define="NTP_SERVER_AVAILABLE" type="boolean" default="false" optional="true">NTPServerAvailable</attribute>

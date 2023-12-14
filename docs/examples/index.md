@@ -294,15 +294,6 @@ tv-casting-app/APIs.md
 window-app/**/README
 ```
 
-## Resource monitoring example
-
-```{toctree}
-:glob:
-:maxdepth: 1
-
-resource-monitoring-app/**/README
-```
-
 ## RVC example
 
 ```{toctree}
@@ -319,4 +310,22 @@ rvc-app/README
 :maxdepth: 1
 
 air-purifier-app/**/README
+```
+
+## Network Infrastructure Manager example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+network-manager-app/README
+```
+
+## Lit ICD example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lit-icd-app/**/README
 ```

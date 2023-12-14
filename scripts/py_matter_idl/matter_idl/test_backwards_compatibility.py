@@ -125,13 +125,6 @@ class TestCompatibilityChecks(unittest.TestCase):
             "server cluster A = 16 { enum X : ENUM8 {}}",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
-    def test_basic_clusters_side(self):
-        self.ValidateUpdate(
-            "Detects side switch for clusters",
-            "client cluster A = 1 {}",
-            "server cluster A = 1 {}",
-            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
-
     def test_bitmaps_delete(self):
         self.ValidateUpdate(
             "Deleting a bitmap is not ok",
