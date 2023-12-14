@@ -582,7 +582,7 @@ class SubscriptionTransaction:
             self._onErrorCb = callback
 
     @property
-    def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
+    def OnAttributeChangeCb(self) -> Callable[[Union[TypedAttributePath, AttributePath], SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
 
     @property
@@ -791,12 +791,12 @@ class AsyncReadTransaction:
 
         if (self._subscription_handler is not None):
             for change in self._changedPathSet:
+                attribute_path = change
                 try:
                     attribute_path = TypedAttributePath(Path=change)
-                except (KeyError, ValueError) as err:
+                except KeyError as err:
                     # path could not be resolved into a TypedAttributePath
                     logging.getLogger(__name__).exception(err)
-                    continue
                 self._subscription_handler.OnAttributeChangeCb(
                     attribute_path, self._subscription_handler)
 
