@@ -16,95 +16,108 @@
 #  Top Level Labels
 ############################################################
 repo:
-    - any:
-        - './*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - './*'
 
 ############################################################
 #  Examples
 ############################################################
 examples:
-    - any:
-        - examples/*
-        - examples/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - examples/*
+      - examples/**/*
 
 ############################################################
 #  Documentation
 ############################################################
 documentation:
-    - any:
-        - docs/*
-        - docs/**/*
-        - "*.md"
+  - changed-files:
+    - any-glob-to-any-file:
+      - docs/*
+      - docs/**/*
+      - "*.md"
 
 ############################################################
 #  Tools + Development Items
 ############################################################
 scripts:
-    -any:
-        - scripts/*
-        - scripts/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - scripts/*
+      - scripts/**/*
 
 integrations:
-    - any:
-        - integrations/*
-        - integrations/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - integrations/*
+      - integrations/**/*
 
 docker:
-    - any:
-        - integrations/docker/*
-        - integrations/docker/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - integrations/docker/*
+      - integrations/docker/**/*
 
 vscode:
-    - any:
-        - .vscode/*
-        - .vscode/**/*
-        - .devcontainer/*
-        - .devcontainer/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .vscode/*
+      - .vscode/**/*
+      - .devcontainer/*
+      - .devcontainer/**/*
 
 gn:
-    - any:
-        - build/*
-        - build/**/*
-        - build_overrides/*
-        - build_overrides/**/*
-        - .gn
-        - "*.gn"
-        - "*.gni"
+  - changed-files:
+    - any-glob-to-any-file:
+      - build/*
+      - build/**/*
+      - build_overrides/*
+      - build_overrides/**/*
+      - .gn
+      - "*.gn"
+      - "*.gni"
 
 github:
-    - any:
-        - .github
-        - .github/*
-        - .github/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github
+      - .github/*
+      - .github/**/*
 
 workflows:
-    - any:
-        - .github/workflows/*
-        - .github/workflows/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/workflows/*
+      - .github/workflows/**/*
 
 tools:
-    - any:
-        - src/tools/*
-        - src/tools/**/*
-        - tools/*
-        - tools/**/*
-        - examples/chip-tool/*
-        - examples/chip-tool/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/tools/*
+      - src/tools/**/*
+      - tools/*
+      - tools/**/*
+      - examples/chip-tool/*
+      - examples/chip-tool/**/*
 
 ############################################################
 #  Tests
 ############################################################
 tests:
-    - any:
-        - src/python_testing/*
-        - src/python_testing/**/*
-        - src/app/tests/*
-        - src/app/tests/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/python_testing/*
+      - src/python_testing/**/*
+      - src/app/tests/*
+      - src/app/tests/**/*
 
 test driver:
-    - any:
-        - src/test_driver/*
-        - src/test_driver/**/*
+  - changed-files:
+    - any-glob-to-any-file:
+      - src/test_driver/*
+      - src/test_driver/**/*
 
 ############################################################
 #  Source Code
