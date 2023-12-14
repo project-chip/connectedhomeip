@@ -80,9 +80,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (pApInfo->auth_mode < (uint8_t)(SecurityTypeEnum::kUnknownEnumValue))
+    if (pApInfo->auth_mode < (uint8_t) (SecurityTypeEnum::kUnknownEnumValue))
     {
-        securityType = (SecurityTypeEnum)(pApInfo->auth_mode);
+        securityType = (SecurityTypeEnum) (pApInfo->auth_mode);
     }
     else
     {

@@ -141,7 +141,6 @@ template("_chip_build_time_zapgen") {
     #       out links of template files and zap files and such
     _extra_dependencies = [
       "${_partials_dir}/header.zapt",
-      "${_partials_dir}/im_command_handler_cluster_commands.zapt",
 
       # Application templates, actually generating files
       "${_template_dir}/access.zapt",

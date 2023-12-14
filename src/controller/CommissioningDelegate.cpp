@@ -37,8 +37,8 @@ const char * StageToString(CommissioningStage stage)
         return "ReadCommissioningInfo";
         break;
 
-    case kCheckForMatchingFabric:
-        return "CheckForMatchingFabric";
+    case kReadCommissioningInfo2:
+        return "ReadCommissioningInfo2";
         break;
 
     case kArmFailsafe:
@@ -107,6 +107,18 @@ const char * StageToString(CommissioningStage stage)
 
     case kConfigureTrustedTimeSource:
         return "ConfigureTrustedTimeSource";
+        break;
+
+    case kICDGetRegistrationInfo:
+        return "ICDGetRegistrationInfo";
+        break;
+
+    case kICDRegistration:
+        return "ICDRegistration";
+        break;
+
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
         break;
 
     case kWiFiNetworkSetup:

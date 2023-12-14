@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 import("common_flags.gni")
 import("icd/icd.gni")
@@ -56,15 +57,24 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
-    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
+  ]
+
+  visibility = [ ":app_config" ]
+}
+
+source_set("revision_info") {
+  sources = [
+    "DataModelRevision.h",
+    "InteractionModelRevision.h",
+    "SpecificationVersion.h",
   ]
 }
 
 source_set("app_config") {
   sources = [ "AppConfig.h" ]
 
-  public_deps = [ ":app_buildconfig" ]
+  deps = [ ":app_buildconfig" ]
 }
 
 static_library("app") {
@@ -98,7 +108,6 @@ static_library("app") {
     "FailSafeContext.h",
     "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
-    "InteractionModelRevision.h",
     "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
@@ -234,8 +243,10 @@ static_library("app") {
 
   public_deps = [
     ":app_config",
+    ":revision_info",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:observer-srcs",
+    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -245,7 +256,10 @@ static_library("app") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+    public_deps += [
+      "${chip_root}/src/app/icd:manager",
+      "${chip_root}/src/app/icd:notifier",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

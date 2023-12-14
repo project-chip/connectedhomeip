@@ -80,7 +80,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mFlags.SetRaw(0);
 
     // Set callback functions from chip_porting
-    chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
+    chip_connmgr_set_callback_func((chip_connmgr_callback) (conn_callback_dispatcher), this);
 
     // Register WiFi event handlers
     wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);

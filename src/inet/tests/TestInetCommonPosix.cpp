@@ -47,8 +47,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>

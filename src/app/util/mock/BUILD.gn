@@ -19,7 +19,10 @@ config("mock_include") {
 }
 
 source_set("mock_ember") {
-  sources = [ "attribute-storage.cpp" ]
+  sources = [
+    "MockNodeConfig.cpp",
+    "attribute-storage.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/src/app",

@@ -457,11 +457,11 @@ tests:
                 value: "y"
 
     - label:
-          "Step 10:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 10:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
-      command: "writeAttribute"
+      command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {
@@ -639,11 +639,11 @@ tests:
                 value: "y"
 
     - label:
-          "Step 16:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 16:TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute"
       PICS: ACL.S.A0000
-      command: "writeAttribute"
+      command: "readAttribute"
       attribute: "ACL"
-      arguments:
+      response:
           value:
               [
                   {

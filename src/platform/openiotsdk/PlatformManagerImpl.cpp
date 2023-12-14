@@ -42,7 +42,7 @@ namespace DeviceLayer {
 struct ScopedLock
 {
     ScopedLock(osMutexId_t & lockable) : _lockable(lockable) { osMutexAcquire(_lockable, osWaitForever); }
-    ScopedLock(const ScopedLock &) = delete;
+    ScopedLock(const ScopedLock &)             = delete;
     ScopedLock & operator=(const ScopedLock &) = delete;
     ~ScopedLock() { osMutexRelease(_lockable); }
 

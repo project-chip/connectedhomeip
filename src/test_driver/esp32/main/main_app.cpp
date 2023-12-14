@@ -29,14 +29,14 @@
 #include <stdio.h>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-const char * TAG = "CHIP-tests";
+const char TAG[] = "CHIP-tests";
 
 static void tester_task(void * pvParameters)
 {

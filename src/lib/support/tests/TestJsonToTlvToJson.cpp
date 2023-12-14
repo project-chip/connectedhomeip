@@ -20,6 +20,7 @@
 #include <app/data-model/Encode.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
+#include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 
@@ -388,9 +389,9 @@ void TestConverter_Float_1third(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"100:FLOAT\" : 0.33333334\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"100:FLOAT\" : 0.33333334\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"100:FLOAT\" : 0.3333333432674408\n"
                                "}\n";
@@ -414,9 +415,9 @@ void TestConverter_Float_17_9(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"101:FLOAT\" : 17.9\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"101:FLOAT\" : 17.9\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"101:FLOAT\" : 17.899999618530273\n"
                                "}\n";
@@ -677,9 +678,9 @@ void TestConverter_Array_Empty_ImplicitProfileTag2(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"emptyarray:10000:ARRAY-?\" : []\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"emptyarray:10000:ARRAY-?\" : []\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"10000:ARRAY-?\" : []\n"
                                "}\n";
@@ -867,18 +868,18 @@ void TestConverter_Array_IntsMinMax(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"0:ARRAY-INT\" : [\n"
-                             "      -128,\n"
-                             "      127,\n"
-                             "      -32768,\n"
-                             "      32767,\n"
-                             "      -2147483648,\n"
-                             "      2147483647,\n"
-                             "      -9223372036854775808,\n"
-                             "      9223372036854775807\n"
-                             "   ]\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"0:ARRAY-INT\" : [\n"
+                                 "      -128,\n"
+                                 "      127,\n"
+                                 "      -32768,\n"
+                                 "      32767,\n"
+                                 "      -2147483648,\n"
+                                 "      2147483647,\n"
+                                 "      -9223372036854775808,\n"
+                                 "      9223372036854775807\n"
+                                 "   ]\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"0:ARRAY-INT\" : [\n"
                                  "      -128,\n"
@@ -950,14 +951,14 @@ void TestConverter_Array_UIntsMax(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"0:ARRAY-UINT\" : [\n"
-                             "      255,\n"
-                             "      65535,\n"
-                             "      4294967295,\n"
-                             "      18446744073709551615\n"
-                             "   ]\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"0:ARRAY-UINT\" : [\n"
+                                 "      255,\n"
+                                 "      65535,\n"
+                                 "      4294967295,\n"
+                                 "      18446744073709551615\n"
+                                 "   ]\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"0:ARRAY-UINT\" : [\n"
                                  "      255,\n"
@@ -991,13 +992,13 @@ void TestConverter_Array_Doubles(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"0:ARRAY-DOUBLE\" : [\n"
-                             "      1.1,\n"
-                             "      134.2763,\n"
-                             "      -12345.87\n"
-                             "   ]\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"0:ARRAY-DOUBLE\" : [\n"
+                                 "      1.1,\n"
+                                 "      134.2763,\n"
+                                 "      -12345.87\n"
+                                 "   ]\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"0:ARRAY-DOUBLE\" : [\n"
                                  "      1.1000000000000001,\n"
@@ -1034,13 +1035,13 @@ void TestConverter_Array_Floats(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"1000:ARRAY-FLOAT\" : [\n"
-                             "      1.1,\n"
-                             "      134.2763,\n"
-                             "      -12345.87\n"
-                             "   ]\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"1000:ARRAY-FLOAT\" : [\n"
+                                 "      1.1,\n"
+                                 "      134.2763,\n"
+                                 "      -12345.87\n"
+                                 "   ]\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"1000:ARRAY-FLOAT\" : [\n"
                                  "      1.1000000238418579,\n"
@@ -1169,11 +1170,11 @@ void TestConverter_Struct_UInt(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"value:0:STRUCT\" : {\n"
-                             "      \"name:255:UINT\" : 42\n"
-                             "   }\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"value:0:STRUCT\" : {\n"
+                               "      \"name:255:UINT\" : 42\n"
+                               "   }\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"0:STRUCT\" : {\n"
                                "      \"255:UINT\" : 42\n"
@@ -1253,18 +1254,18 @@ void TestConverter_Struct_MixedElements(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"c:0:STRUCT\" : {\n"
-                             "      \"z:0:INT\" : 20,\n"
-                             "      \"b:1:BOOL\" : true,\n"
-                             "      \"2:UINT\" : 0,\n"
-                             "      \"abc:3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVl\",\n"
-                             "      \"cc:4:STRING\" : \"hello\",\n"
-                             "      \"tt:5:INT\" : -500000,\n"
-                             "      \"AA:6:DOUBLE\" : 17.9,\n"
-                             "      \"B:7:FLOAT\" : 17.9\n"
-                             "   }\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"c:0:STRUCT\" : {\n"
+                                 "      \"z:0:INT\" : 20,\n"
+                                 "      \"b:1:BOOL\" : true,\n"
+                                 "      \"2:UINT\" : 0,\n"
+                                 "      \"abc:3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVl\",\n"
+                                 "      \"cc:4:STRING\" : \"hello\",\n"
+                                 "      \"tt:5:INT\" : -500000,\n"
+                                 "      \"AA:6:DOUBLE\" : 17.9,\n"
+                                 "      \"B:7:FLOAT\" : 17.9\n"
+                                 "   }\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"0:STRUCT\" : {\n"
                                  "      \"0:INT\" : 20,\n"
@@ -1332,30 +1333,30 @@ void TestConverter_Array_Structures(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"1000:ARRAY-STRUCT\": [\n"
-                             "      {\n"
-                             "         \"0:INT\" : 20,\n"
-                             "         \"1:BOOL\" : true,\n"
-                             "         \"2:UINT\" : 0,\n"
-                             "         \"3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVlIDE=\",\n"
-                             "         \"4:STRING\" : \"hello1\",\n"
-                             "         \"5:INT\" : -500000,\n"
-                             "         \"6:DOUBLE\" : 17.9,\n"
-                             "         \"7:FLOAT\" : 17.9\n"
-                             "      },\n"
-                             "      {\n"
-                             "         \"0:INT\" : -10,\n"
-                             "         \"1:BOOL\" : false,\n"
-                             "         \"2:UINT\" : 128,\n"
-                             "         \"3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVlIDI=\",\n"
-                             "         \"4:STRING\" : \"hello2\",\n"
-                             "         \"5:INT\" : \"40000000000\",\n"
-                             "         \"6:DOUBLE\" : -1754.923,\n"
-                             "         \"7:FLOAT\" : 97.945\n"
-                             "      }\n"
-                             "   ]\n"
-                             "}\n";
+    std::string jsonString     = "{\n"
+                                 "   \"1000:ARRAY-STRUCT\": [\n"
+                                 "      {\n"
+                                 "         \"0:INT\" : 20,\n"
+                                 "         \"1:BOOL\" : true,\n"
+                                 "         \"2:UINT\" : 0,\n"
+                                 "         \"3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVlIDE=\",\n"
+                                 "         \"4:STRING\" : \"hello1\",\n"
+                                 "         \"5:INT\" : -500000,\n"
+                                 "         \"6:DOUBLE\" : 17.9,\n"
+                                 "         \"7:FLOAT\" : 17.9\n"
+                                 "      },\n"
+                                 "      {\n"
+                                 "         \"0:INT\" : -10,\n"
+                                 "         \"1:BOOL\" : false,\n"
+                                 "         \"2:UINT\" : 128,\n"
+                                 "         \"3:BYTES\" : \"VGVzdCBCeXRlU3RyaW5nIFZhbHVlIDI=\",\n"
+                                 "         \"4:STRING\" : \"hello2\",\n"
+                                 "         \"5:INT\" : \"40000000000\",\n"
+                                 "         \"6:DOUBLE\" : -1754.923,\n"
+                                 "         \"7:FLOAT\" : 97.945\n"
+                                 "      }\n"
+                                 "   ]\n"
+                                 "}\n";
     std::string expectedString = "{\n"
                                  "   \"1000:ARRAY-STRUCT\": [\n"
                                  "      {\n"
@@ -1432,35 +1433,35 @@ void TestConverter_TopLevel_MixedElements(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.Finalize());
 
-    std::string jsonString = "{\n"
-                             "   \"value:0:INT\": 42,\n"
-                             "   \"value:1:BYTES\": \"VGVzdCBhcnJheSBtZW1iZXIgMA==\",\n"
-                             "   \"value:2:DOUBLE\": 156.398,\n"
-                             "   \"value:3:UINT\": \"73709551615\",\n"
-                             "   \"value:4:BOOL\": true,\n"
-                             "   \"value:5:NULL\": null,\n"
-                             "   \"value:6:STRUCT\": {\n"
-                             "      \"name:1:STRING\": \"John\",\n"
-                             "      \"age:2:UINT\": 34,\n"
-                             "      \"approved:3:BOOL\": true,\n"
-                             "      \"kids:4:ARRAY-INT\": [\n"
-                             "         5,\n"
-                             "         9,\n"
-                             "         10\n"
-                             "      ],\n"
-                             "      \"names:5:ARRAY-STRING\": [\n"
-                             "         \"Ammy\",\n"
-                             "         \"David\",\n"
-                             "         \"Larry\"\n"
-                             "      ],\n"
-                             "      \"6:ARRAY-BOOL\": [\n"
-                             "         true,\n"
-                             "         false,\n"
-                             "         true\n"
-                             "      ]\n"
-                             "   },\n"
-                             "   \"value:7:FLOAT\": 0.0\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"value:0:INT\": 42,\n"
+                               "   \"value:1:BYTES\": \"VGVzdCBhcnJheSBtZW1iZXIgMA==\",\n"
+                               "   \"value:2:DOUBLE\": 156.398,\n"
+                               "   \"value:3:UINT\": \"73709551615\",\n"
+                               "   \"value:4:BOOL\": true,\n"
+                               "   \"value:5:NULL\": null,\n"
+                               "   \"value:6:STRUCT\": {\n"
+                               "      \"name:1:STRING\": \"John\",\n"
+                               "      \"age:2:UINT\": 34,\n"
+                               "      \"approved:3:BOOL\": true,\n"
+                               "      \"kids:4:ARRAY-INT\": [\n"
+                               "         5,\n"
+                               "         9,\n"
+                               "         10\n"
+                               "      ],\n"
+                               "      \"names:5:ARRAY-STRING\": [\n"
+                               "         \"Ammy\",\n"
+                               "         \"David\",\n"
+                               "         \"Larry\"\n"
+                               "      ],\n"
+                               "      \"6:ARRAY-BOOL\": [\n"
+                               "         true,\n"
+                               "         false,\n"
+                               "         true\n"
+                               "      ]\n"
+                               "   },\n"
+                               "   \"value:7:FLOAT\": 0.0\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"0:INT\": 42,\n"
                                "   \"1:BYTES\": \"VGVzdCBhcnJheSBtZW1iZXIgMA==\",\n"
@@ -1559,49 +1560,49 @@ void TestConverter_Structure_FromReadme(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType2));
     NL_TEST_ASSERT(gSuite, CHIP_NO_ERROR == writer.EndContainer(containerType));
 
-    std::string jsonString = "{\n"
-                             "   \"0:ARRAY-STRUCT\" : [\n"
-                             "      {\n"
-                             "         \"0:INT\" : 8,\n"
-                             "         \"1:BOOL\" : true\n"
-                             "      }\n"
-                             "   ],\n"
-                             "   \"1:STRUCT\" : {\n"
-                             "       \"0:INT\" : 12,\n"
-                             "       \"1:BOOL\" : false,\n"
-                             "       \"2:STRING\" : \"example\"\n"
-                             "   },\n"
-                             "   \"2:INT\" : \"40000000000\",\n"
-                             "   \"isQualified:3:BOOL\" : true,\n"
-                             "   \"4:ARRAY-?\" : [],\n"
-                             "   \"5:ARRAY-DOUBLE\" : [\n"
-                             "      1.1000000000000001,\n"
-                             "      134.27629999999999,\n"
-                             "      -12345.870000000001,\n"
-                             "      \"Infinity\",\n"
-                             "      62534.0,\n"
-                             "      -62534.0\n"
-                             "   ],\n"
-                             "   \"6:ARRAY-BYTES\" : [\n"
-                             "      \"AAECAwQ=\",\n"
-                             "      \"/w==\",\n"
-                             "      \"Su+I\"\n"
-                             "   ],\n"
-                             "   \"7:BYTES\" : \"VGVzdCBCeXRlcw==\",\n"
-                             "   \"8:DOUBLE\" : 17.899999999999999,\n"
-                             "   \"9:FLOAT\" : 17.899999618530273,\n"
-                             "   \"10:FLOAT\" : \"-Infinity\",\n"
-                             "   \"contact:11:STRUCT\" : {\n"
-                             "      \"name:1:STRING\" : \"John\",\n"
-                             "      \"age:2:UINT\" : 34,\n"
-                             "      \"approved:3:BOOL\" : true,\n"
-                             "      \"kids:4:ARRAY-INT\" : [\n"
-                             "         5,\n"
-                             "         9,\n"
-                             "         10\n"
-                             "      ]\n"
-                             "   }\n"
-                             "}\n";
+    std::string jsonString   = "{\n"
+                               "   \"0:ARRAY-STRUCT\" : [\n"
+                               "      {\n"
+                               "         \"0:INT\" : 8,\n"
+                               "         \"1:BOOL\" : true\n"
+                               "      }\n"
+                               "   ],\n"
+                               "   \"1:STRUCT\" : {\n"
+                               "       \"0:INT\" : 12,\n"
+                               "       \"1:BOOL\" : false,\n"
+                               "       \"2:STRING\" : \"example\"\n"
+                               "   },\n"
+                               "   \"2:INT\" : \"40000000000\",\n"
+                               "   \"isQualified:3:BOOL\" : true,\n"
+                               "   \"4:ARRAY-?\" : [],\n"
+                               "   \"5:ARRAY-DOUBLE\" : [\n"
+                               "      1.1000000000000001,\n"
+                               "      134.27629999999999,\n"
+                               "      -12345.870000000001,\n"
+                               "      \"Infinity\",\n"
+                               "      62534.0,\n"
+                               "      -62534.0\n"
+                               "   ],\n"
+                               "   \"6:ARRAY-BYTES\" : [\n"
+                               "      \"AAECAwQ=\",\n"
+                               "      \"/w==\",\n"
+                               "      \"Su+I\"\n"
+                               "   ],\n"
+                               "   \"7:BYTES\" : \"VGVzdCBCeXRlcw==\",\n"
+                               "   \"8:DOUBLE\" : 17.899999999999999,\n"
+                               "   \"9:FLOAT\" : 17.899999618530273,\n"
+                               "   \"10:FLOAT\" : \"-Infinity\",\n"
+                               "   \"contact:11:STRUCT\" : {\n"
+                               "      \"name:1:STRING\" : \"John\",\n"
+                               "      \"age:2:UINT\" : 34,\n"
+                               "      \"approved:3:BOOL\" : true,\n"
+                               "      \"kids:4:ARRAY-INT\" : [\n"
+                               "         5,\n"
+                               "         9,\n"
+                               "         10\n"
+                               "      ]\n"
+                               "   }\n"
+                               "}\n";
     std::string jsonExpected = "{\n"
                                "   \"0:ARRAY-STRUCT\" : [\n"
                                "      {\n"

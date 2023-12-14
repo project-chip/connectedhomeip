@@ -29,7 +29,7 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
@@ -317,6 +317,43 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
     }
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+{
+    bool isActive = false;
+    mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            return Loop::Continue;
+        }
+
+        Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
+        if (subject.fabricIndex != aFabricIndex)
+        {
+            return Loop::Continue;
+        }
+
+        if (subject.authMode == Access::AuthMode::kCase)
+        {
+            if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
+            {
+                isActive = handler->IsActiveSubscription();
+
+                // Exit loop only if isActive is set to true
+                // Otherwise keep looking for another subscription that could
+                // match the subject
+                if (isActive)
+                {
+                    return Loop::Break;
+                }
+            }
+        }
+
+        return Loop::Continue;
+    });
+
+    return isActive;
+}
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
@@ -643,7 +680,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 auto subjectDescriptor = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetSubjectDescriptor();
                 err                    = ParseAttributePaths(subjectDescriptor, attributePathListParser, hasValidAttributePath,
-                                          requestedAttributePathCount);
+                                                             requestedAttributePathCount);
                 if (err != CHIP_NO_ERROR)
                 {
                     return Status::InvalidAction;

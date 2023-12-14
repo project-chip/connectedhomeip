@@ -104,4 +104,4 @@ streamer_t * streamer_get(void)
 } // namespace Shell
 } // namespace chip
 
-#endif //#ifdef MW320_SHELL_STREAMER
+#endif // #ifdef MW320_SHELL_STREAMER

@@ -27,8 +27,8 @@
 // Include module header
 #include <system/SystemError.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ErrorStr.h>
 
 #include <lib/core/CHIPConfig.h>
 

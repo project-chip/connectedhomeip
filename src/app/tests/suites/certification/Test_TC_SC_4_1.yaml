@@ -752,7 +752,10 @@ tests:
       verification: |
           Run the below open-commissioning-window in TH Terminal
 
-          ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
+          The user needs to change this command to match the longDiscriminator override.
+          use the same discriminator as the longDiscriminator of the DUT.
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 2000 <discriminator>
 
           verify success on TH (Chip-tool) logs:
 
@@ -1062,7 +1065,9 @@ tests:
           DUT should start to send Commissionable Node Discovery DNS-SD
           advertisements"
       verification: |
-          If the device supports Discovery for an extended period of time, the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
+          If the device supports Extended Discovery, pass the PROMPT before the extended time period expires.
+
+          the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
 
           Reference Raspberrypi device is not supporting extended discovery.
       cluster: "LogCommands"

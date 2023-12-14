@@ -436,7 +436,7 @@ extern "C" {
 #endif /* CFG_FULL_LOW_POWER */
 
 /* FOR DEBUGGING ONLY ! */
-//#define CFG_LPM_SUPPORTED   1
+// #define CFG_LPM_SUPPORTED   1
 
 /******************************************************************************
  * Timer Server

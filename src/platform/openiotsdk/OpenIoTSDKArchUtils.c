@@ -51,14 +51,14 @@ uint32_t sec2tick(uint32_t sec)
 
 uint32_t ms2tick(uint32_t ms)
 {
-    return (uint32_t)(((uint64_t) ms * (uint64_t) osKernelGetTickFreq()) / 1000U);
+    return (uint32_t) (((uint64_t) ms * (uint64_t) osKernelGetTickFreq()) / 1000U);
 }
 
 uint32_t us2tick(uint32_t usec)
 {
     // round division up because our tick is so long this might become 0
     // we need the timer to sleep at least one tick as it otherwise breaks expectations
-    return (uint32_t)(((uint64_t) usec * osKernelGetTickFreq() + (1000000 - 1)) / 1000000);
+    return (uint32_t) (((uint64_t) usec * osKernelGetTickFreq() + (1000000 - 1)) / 1000000);
 }
 
 /* Kernel ticks to time */
@@ -110,7 +110,7 @@ void usleep(uint32_t usec)
 
 time_t time(time_t * __timer)
 {
-    time_t seconds = (time_t)(tick2sec(GetTick()));
+    time_t seconds = (time_t) (tick2sec(GetTick()));
     if (__timer)
     {
         *__timer = seconds;

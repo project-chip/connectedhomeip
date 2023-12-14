@@ -125,7 +125,7 @@ const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_UniqueId = {
 
 /* Internal for the KVS interface. */
 const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_KVS_key   = { { .systemID = kCC13XX_26XXMatter_SysID,
-                                                                         .itemID   = kCC13XX_26XXMatter_ItemID_ChipKVS_key } };
+                                                                           .itemID   = kCC13XX_26XXMatter_ItemID_ChipKVS_key } };
 const CC13XX_26XXConfig::Key CC13XX_26XXConfig::kConfigKey_KVS_value = { { .systemID = kCC13XX_26XXMatter_SysID,
                                                                            .itemID   = kCC13XX_26XXMatter_ItemID_ChipKVS_value } };
 

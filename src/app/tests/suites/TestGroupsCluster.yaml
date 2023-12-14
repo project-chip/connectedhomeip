@@ -65,7 +65,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0x7e
+                value: 0x7e # UNSUPPORTED_ACCESS
               - name: "GroupID"
                 value: 0x0101
 
@@ -100,6 +100,21 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
               ]
 
+    - label: "Add First Group (name too long)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "12345678901234567"
+      response:
+          values:
+              - name: "Status"
+                value: 0x87 # CONSTRAINT_ERROR
+              - name: "GroupID"
+                value: 0x0101
+
     - label: "Add First Group (new)"
       command: "AddGroup"
       arguments:
@@ -107,7 +122,7 @@ tests:
               - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
-                value: "Group #1"
+                value: "Group #101234567" # Maximal-length name, to check that this works
       response:
           values:
               - name: "Status"
@@ -128,7 +143,7 @@ tests:
               - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
-                value: "Group #1"
+                value: "Group #101234567"
 
     - label: "View Second Group (not found)"
       command: "ViewGroup"
@@ -229,7 +244,7 @@ tests:
               - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
-                value: "Group #1"
+                value: "Group #101234567"
 
     - label: "View Second Group (existing)"
       command: "ViewGroup"
@@ -328,7 +343,7 @@ tests:
               - name: "GroupID"
                 value: 0x0101
               - name: "GroupName"
-                value: "Group #1"
+                value: "Group #101234567"
 
     - label: "View Second Group (removed)"
       command: "ViewGroup"

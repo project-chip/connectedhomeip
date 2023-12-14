@@ -251,6 +251,13 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 @end
 
+@implementation MTRDeviceControllerAbstractParameters
+- (instancetype)_initInternal
+{
+    return [super init];
+}
+@end
+
 @implementation MTRDeviceControllerParameters
 - (instancetype)initWithStorageDelegate:(id<MTRDeviceControllerStorageDelegate>)storageDelegate
                    storageDelegateQueue:(dispatch_queue_t)storageDelegateQueue
@@ -262,7 +269,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
                 intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                         rootCertificate:(MTRCertificateDERBytes)rootCertificate
 {
-    if (!(self = [super init])) {
+    if (!(self = [super _initInternal])) {
         return nil;
     }
 
@@ -503,7 +510,9 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (usingExistingNOC == YES
         && ((oldIntermediateCert == nil) != (self.intermediateCertificate == nil)
             || ((oldIntermediateCert != nil) &&
-                [MTRCertificates isCertificate:oldIntermediateCert equalTo:self.intermediateCertificate] == NO))) {
+                [MTRCertificates isCertificate:oldIntermediateCert
+                                       equalTo:self.intermediateCertificate]
+                    == NO))) {
         self.operationalCertificate = nil;
     }
 

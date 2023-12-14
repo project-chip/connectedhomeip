@@ -35,9 +35,6 @@
 
 #include "sl_board_control.h"
 
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-#include "spi_multiplex.h"
-#endif
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
 #define QR_CODE_MODULE_SIZE 3
@@ -195,11 +192,11 @@ void SilabsLCD::WriteStatus()
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     sprintf(str, "Advertising : %c", mStatus.advertising ? 'Y' : 'N');
     GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    GLIB_drawStringOnLine(&glibContext, "Is ICD : Y", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#else
-    GLIB_drawStringOnLine(&glibContext, "Is ICD : N", lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
-#endif
+    if (mStatus.icdMode != NotICD)
+    {
+        sprintf(str, "ICD : %s", mStatus.icdMode == SIT ? "SIT" : "LIT");
+        GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    }
 
     updateDisplay();
 }

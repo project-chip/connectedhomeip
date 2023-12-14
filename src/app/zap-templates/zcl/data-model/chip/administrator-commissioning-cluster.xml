@@ -17,14 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="General"/>
 
-  <enum name="StatusCode" type="ENUM8">
+  <enum name="StatusCode" type="enum8">
     <cluster code="0x003c"/>
      <item name="Busy" value="0x02"/>
      <item name="PAKEParameterError" value="0x03"/>
      <item name="WindowNotOpen" value="0x04"/>
   </enum>
 
-  <enum name="CommissioningWindowStatusEnum" type="ENUM8">
+  <enum name="CommissioningWindowStatusEnum" type="enum8">
     <cluster code="0x003c"/>
      <item name="WindowNotOpen" value="0x00"/>
      <item name="EnhancedWindowOpen" value="0x01"/>
@@ -40,21 +40,21 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="CommissioningWindowStatusEnum" writable="false" optional="false">WindowStatus</attribute>
     <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" isNullable="true" optional="false">AdminFabricIndex</attribute>
-    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="vendor_id" writable="false" isNullable="true" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" mustUseTimedInvoke="true" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>
-      <arg name="CommissioningTimeout" type="INT16U"/>
-      <arg name="PAKEPasscodeVerifier" type="OCTET_STRING"/>
-      <arg name="Discriminator" type="INT16U"/>
-      <arg name="Iterations" type="INT32U"/>
-      <arg name="Salt" type="OCTET_STRING"/>
+      <arg name="CommissioningTimeout" type="int16u"/>
+      <arg name="PAKEPasscodeVerifier" type="octet_string"/>
+      <arg name="Discriminator" type="int16u"/>
+      <arg name="Iterations" type="int32u"/>
+      <arg name="Salt" type="octet_string" length="32"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
     <command source="client" code="0x01" name="OpenBasicCommissioningWindow" mustUseTimedInvoke="true" optional="true">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it.</description>
-      <arg name="CommissioningTimeout" type="INT16U"/>
+      <arg name="CommissioningTimeout" type="int16u"/>
       <access op="invoke" privilege="administer"/>
     </command>
 
@@ -64,4 +64,9 @@ limitations under the License.
     </command>
 
   </cluster>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x003c" />
+    <field name="Basic" mask="0x01" />
+  </bitmap>
 </configurator>

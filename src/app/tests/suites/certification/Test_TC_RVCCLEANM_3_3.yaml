@@ -18,7 +18,9 @@ name:
     as Server
 
 PICS:
-    - RVCCLEANM.S
+    - RVCCLEANM.S.A0002
+    - RVCCLEANM.S.A0003
+    - RVCCLEANM.S.F00
 
 config:
     nodeId: 0x12344321

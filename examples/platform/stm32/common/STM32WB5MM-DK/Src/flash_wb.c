@@ -104,7 +104,7 @@ NVM_StatusTypeDef NM_Dump(void)
     err = FD_EraseSectors((NVM_MATTER_ADDR_INIT_SECURE - FLASH_START) / (NVM_SIZE_FLASH / NB_SECTOR), NB_SECTOR);
     if (err == 0)
     {
-        err = FD_WriteData(NVM_MATTER_ADDR_INIT_SECURE, (uint64_t *) ram_nvm, (uint32_t)(NVM_SIZE_FLASH / sizeof(uint64_t)));
+        err = FD_WriteData(NVM_MATTER_ADDR_INIT_SECURE, (uint64_t *) ram_nvm, (uint32_t) (NVM_SIZE_FLASH / sizeof(uint64_t)));
         if (err != 0)
         {
             err = NVM_WRITE_FAILED;

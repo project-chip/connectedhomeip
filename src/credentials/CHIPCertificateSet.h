@@ -246,14 +246,7 @@ public:
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
                              const ChipCertificateData ** certData);
 
-    /**
-     * @brief Verify CHIP certificate signature.
-     *
-     * @param cert    Pointer to the CHIP certificate which signature should be validated.
-     * @param caCert  Pointer to the CA certificate of the verified certificate.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
+    // Deprecated, use the equivalent free function VerifyCertSignature()
     static CHIP_ERROR VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert);
 
 private:

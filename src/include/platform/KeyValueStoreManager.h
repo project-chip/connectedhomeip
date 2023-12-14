@@ -30,7 +30,7 @@
 #include <type_traits>
 
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -69,7 +69,7 @@ public:
      *         CHIP_ERROR_BUFFER_TOO_SMALL the buffer could not fit the entire
      *                                     value, but as many bytes as possible
      *                                     were written to it
-     *         CHIP_ERROR_WELL_UNINITIALIZED the KVS is not initialized
+     *         CHIP_ERROR_UNINITIALIZED the KVS is not initialized
      *         CHIP_ERROR_INVALID_ARGUMENT key is empty or too long or value is
      *                                     too large
      */
@@ -93,7 +93,7 @@ public:
      *         CHIP_ERROR_BUFFER_TOO_SMALL the buffer could not fit the entire
      *                                     value, but as many bytes as possible
      *                                     were written to it
-     *         CHIP_ERROR_WELL_UNINITIALIZED the KVS is not initialized
+     *         CHIP_ERROR_UNINITIALIZED the KVS is not initialized
      *         CHIP_ERROR_INVALID_ARGUMENT key is empty or too long or value is
      *                                     too large
      */
@@ -120,7 +120,7 @@ public:
      *         CHIP_ERROR_INTEGRITY_CHECK_FAILED checksum validation failed after
      *                                           writing the data
      *         CHIP_ERROR_PERSISTED_STORAGE_FAILED failed to write the value.
-     *         CHIP_ERROR_WELL_UNINITIALIZED the KVS is not initialized
+     *         CHIP_ERROR_UNINITIALIZED the KVS is not initialized
      *         CHIP_ERROR_INVALID_ARGUMENT key is empty or too long or value is
      *                                     too large
      */
@@ -139,7 +139,7 @@ public:
      *         CHIP_ERROR_INTEGRITY_CHECK_FAILED checksum validation failed after
      *                                           writing the data
      *         CHIP_ERROR_PERSISTED_STORAGE_FAILED failed to write the value.
-     *         CHIP_ERROR_WELL_UNINITIALIZED the KVS is not initialized
+     *         CHIP_ERROR_UNINITIALIZED the KVS is not initialized
      *         CHIP_ERROR_INVALID_ARGUMENT key is empty or too long or value is
      *                                     too large
      */
@@ -165,7 +165,7 @@ public:
      *         CHIP_ERROR_INTEGRITY_CHECK_FAILED checksum validation failed after
      *                                           erasing data
      *         CHIP_ERROR_PERSISTED_STORAGE_FAILED failed to erase the value.
-     *         CHIP_ERROR_WELL_UNINITIALIZED the KVS is not initialized
+     *         CHIP_ERROR_UNINITIALIZED the KVS is not initialized
      *         CHIP_ERROR_INVALID_ARGUMENT key is empty or too long
      */
     CHIP_ERROR Delete(const char * key);
@@ -179,8 +179,8 @@ protected:
     ~KeyValueStoreManager() = default;
 
     // No copy, move or assignment.
-    KeyValueStoreManager(const KeyValueStoreManager &)  = delete;
-    KeyValueStoreManager(const KeyValueStoreManager &&) = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &)             = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &&)            = delete;
     KeyValueStoreManager & operator=(const KeyValueStoreManager &) = delete;
 };
 

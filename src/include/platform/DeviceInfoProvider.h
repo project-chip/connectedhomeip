@@ -79,7 +79,7 @@ public:
     virtual ~DeviceInfoProvider() = default;
 
     // Not copyable
-    DeviceInfoProvider(const DeviceInfoProvider &) = delete;
+    DeviceInfoProvider(const DeviceInfoProvider &)             = delete;
     DeviceInfoProvider & operator=(const DeviceInfoProvider &) = delete;
 
     /**

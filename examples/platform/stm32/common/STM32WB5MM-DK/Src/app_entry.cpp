@@ -336,7 +336,7 @@ static void APPE_SysUserEvtRx(void * pPayload)
         break;
 
     case SHCI_SUB_EVT_ERROR_NOTIF:
-        APPE_SysEvtError((SCHI_SystemErrCode_t)(p_sys_event->payload[0]));
+        APPE_SysEvtError((SCHI_SystemErrCode_t) (p_sys_event->payload[0]));
         break;
 
     default:

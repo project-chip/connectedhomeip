@@ -60,7 +60,7 @@ static_library("helpers") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libInetLayerTests"
 
   public_configs = [ ":tests_config" ]

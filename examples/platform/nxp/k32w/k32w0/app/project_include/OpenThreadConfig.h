@@ -106,7 +106,7 @@
 #define UART_USE_SERIAL_MGR 1
 #define UART_USE_SERIAL_MGR_LOG 1
 
-//#define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
+// #define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
 
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.

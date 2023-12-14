@@ -62,10 +62,10 @@ public:
     ~Instance() override;
 
     // Not copyable or movable
-    Instance(const Instance &) = delete;
+    Instance(const Instance &)             = delete;
     Instance & operator=(const Instance &) = delete;
     Instance(Instance &&)                  = delete;
-    Instance & operator=(Instance &&) = delete;
+    Instance & operator=(Instance &&)      = delete;
 
     /**
      * Initialise the Resource Monitoring cluster.

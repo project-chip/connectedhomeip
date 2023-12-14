@@ -53,7 +53,7 @@
 #define configCPU_CLOCK_HZ ((unsigned long) (48000000))
 /* FreeRTOS heap size is 0 because currently "bget" heap is the
  only heap available, for both FreeRTOS and application */
-#define configTOTAL_HEAP_SIZE ((size_t)(0))
+#define configTOTAL_HEAP_SIZE ((size_t) (0))
 #define configCHECK_FOR_STACK_OVERFLOW 2
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2

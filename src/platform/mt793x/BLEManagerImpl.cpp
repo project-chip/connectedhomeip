@@ -123,7 +123,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     bt_create_task();
 
     bt_callback_manager_register_callback(bt_callback_type_app_event,
-                                          (uint32_t)(MODULE_MASK_GAP | MODULE_MASK_GATT | MODULE_MASK_SYSTEM),
+                                          (uint32_t) (MODULE_MASK_GAP | MODULE_MASK_GATT | MODULE_MASK_SYSTEM),
                                           (void *) BleMatterAppEventCallback);
 #ifdef BT_ENABLE_HCI_SNOOP_LOG
     bt_driver_btsnoop_ctrl(1);

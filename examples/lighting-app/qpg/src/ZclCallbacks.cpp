@@ -106,7 +106,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
             {
                 // We only support 8-bit hue. Assuming hue is linear, normalize 16-bit to 8-bit.
-                hsv.h = (uint8_t)((*reinterpret_cast<uint16_t *>(value)) >> 8);
+                hsv.h = (uint8_t) ((*reinterpret_cast<uint16_t *>(value)) >> 8);
                 // get saturation from cluster value storage
                 EmberAfStatus status = ColorControl::Attributes::CurrentSaturation::Get(endpoint, &hsv.s);
                 assert(status == EMBER_ZCL_STATUS_SUCCESS);

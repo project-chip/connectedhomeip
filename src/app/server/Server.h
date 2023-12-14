@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
+#include <app/icd/ICDConfig.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
@@ -45,6 +46,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/KvsPersistentStorageDelegate.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -68,8 +70,7 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDEventManager.h> // nogncheck
-#include <app/icd/ICDManager.h>      // nogncheck
+#include <app/icd/ICDManager.h> // nogncheck
 #endif
 
 namespace chip {
@@ -91,12 +92,21 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+using UdcTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                     ,
+                                     Transport::UDP /* IPv4 */
+#endif
+                                     >;
+#endif
+
 struct ServerInitParams
 {
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -178,7 +188,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -349,6 +359,10 @@ public:
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     app::reporting::ReportScheduler * GetReportScheduler() { return mReportScheduler; }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::ICDManager & GetICDManager() { return mICDManager; }
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     /**
      * This function causes the ShutDown event to be generated async on the
@@ -588,7 +602,11 @@ private:
     FabricTable mFabrics;
     secure_channel::MessageCounterManager mMessageCounterManager;
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
+    chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * gUDCClient = nullptr;
+    // mUdcTransportMgr is for insecure communication (ex. user directed commissioning)
+    // specifically, the commissioner declaration message (sent by commissioner to commissionee)
+    UdcTransportMgr * mUdcTransportMgr = nullptr;
+    uint16_t mCdcListenPort            = CHIP_UDC_COMMISSIONEE_PORT;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     CommissioningWindowManager mCommissioningWindowManager;
 
@@ -619,7 +637,6 @@ private:
 
     System::Clock::Microseconds64 mInitTimestamp;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDEventManager mICDEventManager;
     app::ICDManager mICDManager;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 };

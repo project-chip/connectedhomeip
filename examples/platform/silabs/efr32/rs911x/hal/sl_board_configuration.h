@@ -25,7 +25,10 @@ typedef struct
 } sl_pin_t;
 
 #define PIN(port_id, pin_id)                                                                                                       \
-    (sl_pin_t) { .port = gpioPort##port_id, .pin = pin_id }
+    (sl_pin_t)                                                                                                                     \
+    {                                                                                                                              \
+        .port = gpioPort##port_id, .pin = pin_id                                                                                   \
+    }
 
 #define PACKET_PENDING_INT_PRI 3
 #if defined(EFR32MG12_BRD4161A) || defined(BRD4161A) || defined(EFR32MG12_BRD4162A) || defined(BRD4162A) ||                        \

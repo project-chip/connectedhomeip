@@ -20,17 +20,12 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
-#import "NSDataSpanConversion.h"
 #import "zap-generated/MTRBaseClusters.h"
-#import "zap-generated/MTRCommandPayloads_Internal.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/NullObject.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/Session.h>
-
-#include <type_traits>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -152,39 +147,12 @@ using MTRActionBlockT = CHIP_ERROR (^)(chip::Messaging::ExchangeManager & exchan
 template <typename SuccessCallback>
 using MTRLocalActionBlockT = CHIP_ERROR (^)(SuccessCallback successCb, MTRErrorCallback failureCb);
 
-class NoAttestationChallenge {
-};
-
-class HaveAttestationChallenge {
-protected:
-    NSData * mAttestationChallenge;
-};
-
-namespace detail {
-using AttestationResponseCallback
-    = void (*)(void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
-} // namespace detail
-
 template <class T>
-class MTRCallbackBridge : public MTRCallbackBridgeBase,
-                          protected std::conditional<std::is_same_v<T, detail::AttestationResponseCallback>,
-                              HaveAttestationChallenge, NoAttestationChallenge>::type {
+class MTRCallbackBridge : public MTRCallbackBridgeBase {
 public:
     using MTRActionBlock = MTRActionBlockT<T>;
     using MTRLocalActionBlock = MTRLocalActionBlockT<T>;
     using SuccessCallbackType = T;
-
-    /**
-     * Construct a callback bridge, which can then have DispatcLocalAction() called
-     * on it.
-     */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn)
-        : MTRCallbackBridgeBase(queue)
-        , mHandler(handler)
-        , mSuccess(OnSuccessFn)
-        , mFailure(OnFailureFn)
-    {
-    }
 
     /**
      * Construct a callback bridge, which can then have DispatchAction() called
@@ -197,41 +165,6 @@ public:
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
-    }
-
-    /**
-     * Try to run the given MTRLocalActionBlock on the Matter thread, if we have
-     * a device and it's attached to a running controller, then handle
-     * converting the value produced by the success callback to the right type
-     * so it can be passed to a callback of the type we're templated over.
-     *
-     * Does not attempt to establish any sessions to devices.  Must not be used
-     * with any action blocks that need a session.
-     */
-    void DispatchLocalAction(MTRBaseDevice * _Nullable device, MTRLocalActionBlock _Nonnull action)
-    {
-        if (!device) {
-            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
-            return;
-        }
-
-        LogRequestStart();
-
-        [device.deviceController
-            asyncDispatchToMatterQueue:^() {
-                CHIP_ERROR err = action(mSuccess, mFailure);
-                if (err != CHIP_NO_ERROR) {
-                    ChipLogError(Controller, "Failure performing action. C++-mangled success callback type: '%s', error: %s",
-                        typeid(T).name(), chip::ErrorStr(err));
-
-                    // Take the normal async error-reporting codepath.  This will also
-                    // handle cleaning us up properly.
-                    OnFailureFn(this, err);
-                }
-            }
-            errorHandler:^(NSError * error) {
-                DispatchFailure(this, error);
-            }];
     }
 
     void LogRequestStart() override
@@ -251,10 +184,6 @@ public:
         if (error != nil) {
             DispatchFailure(this, error);
             return;
-        }
-
-        if constexpr (HaveAttestationChallenge()) {
-            this->mAttestationChallenge = AsData(session.Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
         }
 
         CHIP_ERROR err = action(*exchangeManager, session.Value(), mSuccess, mFailure, this);
@@ -277,17 +206,7 @@ protected:
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
-    template <typename ResponseType> static void SetAttestationChallengeIfNeeded(void * context, ResponseType * _Nonnull response)
-    {
-        if constexpr (HaveAttestationChallenge()) {
-            auto * self = static_cast<MTRCallbackBridge *>(context);
-            response.attestationChallenge = self->mAttestationChallenge;
-        }
-    }
-
 private:
-    static constexpr bool HaveAttestationChallenge() { return std::is_same_v<T, detail::AttestationResponseCallback>; }
-
     static void DispatchCallbackResult(void * context, NSError * _Nullable error, id _Nullable value)
     {
         MTRCallbackBridge * callbackBridge = static_cast<MTRCallbackBridge *>(context);

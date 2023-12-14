@@ -24,41 +24,32 @@
 
 #pragma once
 
-#if defined(EFR32MG24)
+#ifndef SL_LCDCTRL_MUX
+#define SL_LCDCTRL_MUX (EFR32MG24 && SL_WIFI && DISPLAY_ENABLED)
+#endif // SL_LCDCTRL_MUX
+
+#ifndef SL_UARTCTRL_MUX
+#define SL_UARTCTRL_MUX (EFR32MG24 && WF200_WIFI && ENABLE_CHIP_SHELL)
+#endif // SL_UARTCTRL_MUX
+
+#ifndef SL_MX25CTRL_MUX
+#define SL_MX25CTRL_MUX (EFR32MG24 && SL_WIFI && CONFIG_USE_EXTERNAL_FLASH)
+#endif // SL_MX25CTRL_MUX
+
+#ifndef SL_BTLCTRL_MUX
+#define SL_BTLCTRL_MUX (EFR32MG24 && SL_WIFI && CONFIG_USE_EXTERNAL_FLASH)
+#endif // SL_BTLCTRL_MUX
+
+#ifndef SL_SPICTRL_MUX
+#define SL_SPICTRL_MUX (EFR32MG24 && SL_WIFI && (SL_LCDCTRL_MUX || SL_UARTCTRL_MUX || SL_MX25CTRL_MUX || SL_BTLCTRL_MUX))
+#endif // SL_SPICTRL_MUX
+
+#if SL_SPICTRL_MUX
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "FreeRTOS.h"
-#include "em_eusart.h"
-#include "semphr.h"
-#include "sl_memlcd_display.h"
-#include "sl_mx25_flash_shutdown_usart_config.h"
-#include "sl_spidrv_instances.h"
-#include "spidrv.h"
 
-#define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
-#define SL_SPIDRV_MX25_FLASH_BITRATE 16000000
-
-#ifdef RS911X_WIFI
-#include "sl_spidrv_eusart_exp_config.h"
-
-#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
-#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-
-#elif WF200_WIFI
-#include "sl_spidrv_exp_config.h"
-#include "sl_wfx_host_api.h"
-
-// TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
-// REF: sl_spidrv_exp_config.h
-#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_USART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#endif /* RS911X_WIFI || WF200_WIFI */
-
+#if SL_SPICTRL_MUX
 /****************************************************************************
  * @fn  void SPIDRV_SetBaudrate()
  * @brief
@@ -87,7 +78,9 @@ sl_status_t sl_wfx_host_spi_cs_assert(void);
  *****************************************************************************/
 sl_status_t sl_wfx_host_spi_cs_deassert(void);
 #endif /* RS911X_WIFI */
+#endif // SL_SPICTRL_MUX
 
+#if SL_MUX25CTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_spiflash_cs_assert()
  * @brief
@@ -105,7 +98,9 @@ sl_status_t sl_wfx_host_spiflash_cs_assert(void);
  * @return returns SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
+#endif // SL_MUX25CTRL_MUX
 
+#if SL_BTLCTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_bootloader_spi_transfer()
  * @brief
@@ -123,7 +118,9 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void);
+#endif // SL_BTLCTRL_MUX
 
+#if SL_LCDCTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_lcd_spi_transfer()
  * @brief
@@ -141,8 +138,9 @@ sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_lcd_spi_transfer(void);
+#endif // SL_LCDCTRL_MUX
 
-#if defined(WF200_WIFI)
+#if SL_UARTCTRL_MUX
 /****************************************************************************
  * @fn  sl_status_t sl_wfx_host_pre_uart_transfer()
  * @brief
@@ -160,9 +158,9 @@ sl_status_t sl_wfx_host_pre_uart_transfer(void);
  * @return SL_STATUS_OK
  *****************************************************************************/
 sl_status_t sl_wfx_host_post_uart_transfer(void);
-#endif /* WF200_WIFI */
+#endif // SL_UARTCTRL_MUX
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* EFR32MG24 */
+#endif // SL_SPICTRL_MUX

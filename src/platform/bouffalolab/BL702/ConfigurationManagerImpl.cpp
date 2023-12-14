@@ -22,9 +22,7 @@
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
-extern "C" {
-#include <eth_bd.h>
-}
+#include "EthernetInterface.h"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 namespace chip {
@@ -45,7 +43,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    eth_get_mac(buf.data());
+    memcpy(buf.data(), deviceInterface_getNetif()->hwaddr, ConfigurationManager::kPrimaryMACAddressLength);
 
     return CHIP_NO_ERROR;
 }

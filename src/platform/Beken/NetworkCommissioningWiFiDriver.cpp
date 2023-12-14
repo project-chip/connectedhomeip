@@ -185,7 +185,7 @@ void BekenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)

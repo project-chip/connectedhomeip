@@ -56,7 +56,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65530, 65531, 65531, 65533]
+              contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
     - label: "Step 3a: Read the global attribute: AttributeList"
       PICS: "!PICS_EVENT_LIST_ENABLED"
@@ -65,7 +65,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [65528, 65529, 65531, 65531, 65533]
+              contains: [65528, 65529, 65531, 65532, 65533]
 
     - label: "Step 3b: Read the optional attribute(MACAddress) in AttributeList"
       PICS: WAKEONLAN.S.A0000

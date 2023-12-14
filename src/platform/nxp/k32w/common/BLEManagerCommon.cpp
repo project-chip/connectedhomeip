@@ -172,10 +172,10 @@ CHIP_ERROR BLEManagerCommon::_Init()
         xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
     VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
+    sImplInstance = GetImplInstance();
+
     /* BLE platform code initialization */
     SuccessOrExit(err = InitHostController(&blekw_generic_cb));
-
-    sImplInstance = GetImplInstance();
 
     /* Register the GATT server callback */
     VerifyOrExit(GattServer_RegisterCallback(blekw_gatt_server_cb) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
@@ -183,6 +183,18 @@ CHIP_ERROR BLEManagerCommon::_Init()
     /* Wait until BLE Stack is ready */
     eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
     VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, err = CHIP_ERROR_INCORRECT_STATE);
+
+#if BLE_HIGH_TX_POWER
+    /* Set Adv Power */
+    Gap_SetTxPowerLevel(gAdvertisingPowerLeveldBm_c, gTxPowerAdvChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, err = CHIP_ERROR_INCORRECT_STATE);
+
+    /* Set Connect Power */
+    Gap_SetTxPowerLevel(gConnectPowerLeveldBm_c, gTxPowerConnChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, err = CHIP_ERROR_INCORRECT_STATE);
+#endif
 
 #if defined(CPU_JN518X) && defined(chip_with_low_power) && (chip_with_low_power == 1)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
@@ -665,14 +677,14 @@ CHIP_ERROR BLEManagerCommon::ConfigureAdvertisingData(void)
     {
         advInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
-    advInterval = (uint16_t)(advInterval * 0.625F);
+    advInterval = (uint16_t) (advInterval * 0.625F);
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
     adv_params.ownAddressType                       = gBleAddrTypeRandom_c;
     adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
-    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
+    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
 
     err = blekw_start_advertising(&adv_params, &adv, &scanRsp);
@@ -902,6 +914,13 @@ void BLEManagerCommon::DoBleProcessing(void)
     }
 }
 
+void BLEManagerCommon::RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
+                                            BLECallbackDelegate::GattServerCallback gattCallback)
+{
+    callbackDelegate.gapCallback  = gapCallback;
+    callbackDelegate.gattCallback = gattCallback;
+}
+
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
@@ -1066,6 +1085,11 @@ void BLEManagerCommon::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
     /* Call BLE Conn Manager */
     BleConnManager_GenericEvent(pGenericEvent);
 
+    if (sImplInstance->callbackDelegate.gapCallback)
+    {
+        sImplInstance->callbackDelegate.gapCallback(pGenericEvent);
+    }
+
     switch (pGenericEvent->eventType)
     {
     case gInternalError_c:
@@ -1150,6 +1174,9 @@ void BLEManagerCommon::blekw_gap_connection_cb(deviceId_t deviceId, gapConnectio
 
     if (pConnectionEvent->eventType == gConnEvtConnected_c)
     {
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
+        PWR_DisallowDeviceToSleep();
+#endif
 #if CHIP_DEVICE_CONFIG_BLE_SET_PHY_2M_REQ
         ChipLogProgress(DeviceLayer, "BLE K32W: Trying to set the PHY to 2M");
 
@@ -1208,6 +1235,11 @@ void BLEManagerCommon::blekw_stop_connection_timeout(void)
 
 void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent)
 {
+    if (sImplInstance->callbackDelegate.gattCallback)
+    {
+        sImplInstance->callbackDelegate.gattCallback(deviceId, pServerEvent);
+    }
+
     switch (pServerEvent->eventType)
     {
     case gEvtMtuChanged_c: {

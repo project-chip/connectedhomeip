@@ -89,7 +89,9 @@ def load_config() -> None:
         config["ameba"]["MATTER_SDK"] = None
         config["ameba"]["MODEL"] = 'D'
         config["ameba"]["TTY"] = None
-        config["telink"]["ZEPHYR_BASE"] = os.environ.get('ZEPHYR_BASE')
+        config["telink"]["ZEPHYR_BASE"] = os.environ.get('TELINK_ZEPHYR_BASE')
+        config["telink"]["ZEPHYR_SDK_INSTALL_DIR"] = os.environ.get(
+            'TELINK_ZEPHYR_SDK_DIR')
         config["telink"]["TTY"] = None
 
         flush_print(yaml.dump(config))
@@ -542,7 +544,13 @@ def main() -> int:
             flush_print(
                 'Path for Telink SDK was not found. Make sure Telink_SDK is set on your config.yaml file')
             exit(1)
+        if config['telink']['ZEPHYR_SDK_INSTALL_DIR'] is None:
+            flush_print(
+                'Path for Telink toolchain was not found. Make sure Telink toolchain is set on your config.yaml file')
+            exit(1)
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=zephyr")
+        shell.run_cmd(
+            f"export ZEPHYR_SDK_INSTALL_DIR={config['telink']['ZEPHYR_SDK_INSTALL_DIR']}")
         shell.run_cmd(
             f"export ZEPHYR_BASE={config['telink']['ZEPHYR_BASE']}")
         shell.run_cmd(
@@ -675,7 +683,7 @@ def main() -> int:
 
         shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
 
-        if options.build_target in "esp32 nrfconnect ameba telink".split():
+        if options.build_target in "esp32 ameba telink".split():
             with open("project_include.cmake", "w") as f:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
@@ -705,8 +713,20 @@ def main() -> int:
             nrf_build_cmds = ["west build -b nrf52840dk_nrf52840"]
             if options.do_clean:
                 nrf_build_cmds.append("-p always")
+            nrf_build_cmds.append("--")
             if options.do_rpc:
-                nrf_build_cmds.append("-- -DOVERLAY_CONFIG=rpc.overlay")
+                nrf_build_cmds.append("-DOVERLAY_CONFIG=rpc.overlay")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_VENDOR_ID={options.vid}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_PRODUCT_ID={options.pid}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_PRODUCT_NAME='\"{options.pname}\"'")
+            nrf_build_cmds.append(
+                f"-DSAMPLE_NAME={options.sample_device_type_name}")
+            nrf_build_cmds.append(
+                f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
+
             shell.run_cmd(" ".join(nrf_build_cmds))
 
         elif options.build_target == "silabs-thread":
@@ -763,7 +783,7 @@ def main() -> int:
                 shell.run_cmd("make is")
         elif options.build_target == "telink":
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/telink")
-            telink_build_cmds = ["west build"]
+            telink_build_cmds = ["west build -b tlsr9518adk80d"]
             if options.do_clean:
                 telink_build_cmds.append("-p always")
             if options.do_rpc:
@@ -782,6 +802,11 @@ def main() -> int:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
+                'chip_device_project_config_include = "<CHIPProjectAppConfig.h>"',
+                'chip_project_config_include = "<CHIPProjectAppConfig.h>"',
+                'chip_system_project_config_include = "<SystemProjectConfig.h>"',
+                'chip_project_config_include_dirs = [ "${chip_root}/examples/chef/linux/include" ]',
+                'chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]',
                 (f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", '
                  f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
                  f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '

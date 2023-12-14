@@ -16,6 +16,10 @@
  *    limitations under the License.
  */
 
+#include "simple-app-helper.h"
+
+#include "core/CastingPlayer.h"
+#include "core/CastingPlayerDiscovery.h"
 #include "core/Types.h"
 
 #include <LinuxCommissionableDataProvider.h>
@@ -28,6 +32,12 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+
+#if defined(ENABLE_CHIP_SHELL)
+#include <lib/shell/Engine.h> // nogncheck
+#include <thread>
+using chip::Shell::Engine;
+#endif
 
 using namespace matter::casting::core;
 using namespace matter::casting::support;
@@ -147,6 +157,21 @@ int main(int argc, char * argv[])
     err = CastingApp::GetInstance()->Start();
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingApp::Start failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+#if defined(ENABLE_CHIP_SHELL)
+    chip::Shell::Engine::Root().Init();
+    std::thread shellThread([]() { chip::Shell::Engine::Root().RunMainLoop(); });
+    RegisterCommands();
+#endif
+
+    CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // Discover CastingPlayers
+    err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
+                        ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

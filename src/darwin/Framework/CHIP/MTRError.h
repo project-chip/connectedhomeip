@@ -78,6 +78,15 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * TLV-level failures.
      */
     MTRErrorCodeTLVDecodeFailed MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
+
+    /**
+     * MTRErrorCodeDNSSDUnauthorized means that the application is not
+     * authorized to perform DNS_SD lookups.  This typically means missing
+     * entries for "_matter._tcp" (for operational lookup) and "_matterc._udp"
+     * (for commissionable lookup) under the NSBonjourServices key in the
+     * application's Info.plist.
+     */
+    MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
 };
 // clang-format on
 

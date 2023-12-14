@@ -253,93 +253,63 @@ NFC.
 Before building the example, check out the Matter repository and sync submodules
 using the following command:
 
-        $ git submodule update --init
+        $ python3 scripts/checkout_submodules.py --shallow --platform nrfconnect
 
-The example requires a specific revision of the nRF Connect SDK. You can either
-install it along with the related tools directly on your system or use a Docker
-image that has the tools pre-installed.
+> **Note**:
+>
+> For Linux operating system install
+> [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/#J-LinkSoftwareAndDocumentationPack).
 
-If you are a macOS user, you won't be able to use the Docker container to flash
-the application onto a Nordic development kit due to
-[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell-for-setup) for building instead.
+### Install Command Line Tools
 
-### Using Docker container for setup
+With admin permissions enabled, download and install the
+[nRF Command Line Tools](https://www.nordicsemi.com/Products/Development-tools/nrf-command-line-tools).
 
-To use the Docker container for setup, complete the following steps:
+### Install Toolchain Manager
 
-1.  If you do not have the nRF Connect SDK installed yet, create a directory for
-    it by running the following command:
+Toolchain Manager is available from
+[nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop),
+a cross-platform tool that provides different applications that simplify
+installing the nRF Connect SDK. Both the tool and the application are available
+for Windows, Linux, and macOS.
 
-        $ mkdir ~/nrfconnect
+To install the Toolchain Manager app, complete the following steps:
 
-2.  Download the latest version of the nRF Connect SDK Docker image by running
-    the following command:
+1.  [Download nRF Connect for Desktop](https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop/download#infotabs)
+    for your operating system.
 
-        $ docker pull nordicsemi/nrfconnect-chip
+2.  Install and run the tool on your machine.
 
-3.  Start Docker with the downloaded image by running the following command,
-    customized to your needs as described below:
+3.  In the **APPS** section, click **Install** button on the Toolchain Manager
+    tab.
 
-         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
-             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+### Install nRF Connect SDK
 
-    In this command:
+Complete the following steps to install the nRF Connect SDK:
 
-    -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
-        SDK source directory.
-    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
-        source directory.
-    -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
-        parameters can be omitted if you are not planning to flash the example
-        onto hardware. These parameters give the container access to USB devices
-        connected to your computer such as the nRF52840 DK.
-    -   _--rm_ can be omitted if you do not want the container to be
-        auto-removed when you exit the container shell session.
-    -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
-        current user instead of root.
+1.  Open Toolchain Manager in nRF Connect for Desktop.
 
-4.  Update the nRF Connect SDK to the most recent supported revision, by running
-    the following command:
+2.  Click the **Install** button next to the
+    [recommended](../../../config/nrfconnect/.nrfconnect-recommended-revision)
+    version of the nRF Connect SDK.
 
-         $ cd /var/chip
+3.  A pop-up window will inform you about the current installation directory. If
+    you want to change the directory, click the **Change directory** button.
+    Otherwise, click the **Continue installation** button.
+
+4.  When the nRF Connect SDK is installed on your machine, the **Install**
+    button changes to the **Open VS Code** button.
+
+5.  Click the dropdown menu next to the **Open VS Code** button for the
+    installed nRF Connect SDK version, and select **Open terminal**.
+
+6.  Make sure that the nRF Connect SDK version is compatible with the Matter SDK
+    version:
+
+    ```
+         $ cd {connectedhomeip directory}
          $ python3 scripts/setup/nrfconnect/update_ncs.py --update
-
-Now you can proceed with the [Building](#building) instruction.
-
-### Using native shell for setup
-
-To use the native shell for setup, complete the following steps:
-
-1.  Download and install the following additional software:
-
-    -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
-    -   [GN meta-build system](https://gn.googlesource.com/gn/)
-
-2.  If you do not have the nRF Connect SDK installed, follow the
-    [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-    in the nRF Connect SDK documentation to install the latest stable nRF
-    Connect SDK version. Since command-line tools will be used for building the
-    example, installing SEGGER Embedded Studio is not required.
-
-    If you have the SDK already installed, continue to the next step and update
-    the nRF Connect SDK after initializing environment variables.
-
-3.  Initialize environment variables referred to by the CHIP and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
-
-         $ source nrfconnect-dir/zephyr/zephyr-env.sh
-         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-         $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
-
-4.  Update the nRF Connect SDK to the most recent supported revision by running
-    the following command (replace _matter-dir_ with the path to Matter
-    repository directory):
-
-         $ cd matter-dir
-         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
+    ```
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -347,8 +317,7 @@ Now you can proceed with the [Building](#building) instruction.
 
 ## Building
 
-Complete the following steps, regardless of the method used for setting up the
-environment:
+Complete the following steps to build the sample:
 
 1.  Navigate to the example's directory:
 

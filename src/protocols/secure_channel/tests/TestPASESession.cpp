@@ -35,6 +35,10 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <stdarg.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 // This test suite pushes multiple PASESession objects onto the stack for the
 // purposes of testing device-to-device communication.  However, in the real
 // world, these won't live in a single device's memory.  Hence, disable stack
@@ -59,7 +63,7 @@ constexpr uint32_t sTestPaseMessageCount = 5;
 constexpr uint32_t sTestSpake2p01_PinCode        = 20202021;
 constexpr uint32_t sTestSpake2p01_IterationCount = 1000;
 constexpr uint8_t sTestSpake2p01_Salt[]          = { 0x53, 0x50, 0x41, 0x4B, 0x45, 0x32, 0x50, 0x20,
-                                            0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
+                                                     0x4B, 0x65, 0x79, 0x20, 0x53, 0x61, 0x6C, 0x74 };
 constexpr Spake2pVerifier sTestSpake2p01_PASEVerifier = { .mW0 = {
     0xB9, 0x61, 0x70, 0xAA, 0xE8, 0x03, 0x34, 0x68, 0x84, 0x72, 0x4F, 0xE9, 0xA3, 0xB2, 0x87, 0xC3,
     0x03, 0x30, 0xC2, 0xA6, 0x60, 0x37, 0x5D, 0x17, 0xBB, 0x20, 0x5A, 0x8C, 0xF1, 0xAE, 0xCB, 0x35,
@@ -79,14 +83,23 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
     0xB7, 0xC0, 0x7F, 0xCC, 0x06, 0x27, 0xA1, 0xB8, 0x57, 0x3A, 0x14, 0x9F, 0xCD, 0x1F, 0xA4, 0x66, 0xCF
 };
 
+class TestContext : public chip::Test::LoopbackMessagingContext
+{
+public:
+    // Performs shared setup for all tests in the test suite
+    CHIP_ERROR SetUpTestSuite() override
+    {
+        ConfigInitializeNodes(false);
+        return chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+    }
+};
+
 class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
 {
 public:
     void OnMessageDropped() override { mMessageDropped = true; }
     bool mMessageDropped = false;
 };
-
-using TestContext = chip::Test::LoopbackMessagingContext;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -256,10 +269,21 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
-            64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-            64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-        });
+        // Adding an if-else to avoid affecting non-ICD tests
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // Increase local MRP retry intervals to take into account the increase response delay from an ICD
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                1000_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#else  // CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(
+            ReliableMessageProtocolConfig({
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+                64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+            }));
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 
     NL_TEST_ASSERT(inSuite,
@@ -279,8 +303,15 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
 
     while (delegate.mMessageDropped)
     {
+        auto waitTimeout = 100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+        // If running as an ICD, increase waitTimeout to account for the polling interval
+        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
+#endif
+
         // Wait some time so the dropped message will be retransmitted when we drain the IO.
-        chip::test_utils::SleepMillis((100_ms + CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST).count());
+        chip::test_utils::SleepMillis(waitTimeout.count());
         delegate.mMessageDropped = false;
         ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
         ctx.DrainAndServiceIO();
@@ -439,10 +470,10 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
+    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -487,61 +518,30 @@ void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
 
 // Test Suite
 
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
+static const nlTest sTests[] = {
+    NL_TEST_DEF("WaitInit", SecurePairingWaitTest),
+    NL_TEST_DEF("Start", SecurePairingStartTest),
+    NL_TEST_DEF("Handshake", SecurePairingHandshakeTest),
     NL_TEST_DEF("Handshake with Commissioner MRP Parameters", SecurePairingHandshakeWithCommissionerMRPTest),
     NL_TEST_DEF("Handshake with Device MRP Parameters", SecurePairingHandshakeWithDeviceMRPTest),
     NL_TEST_DEF("Handshake with Both MRP Parameters", SecurePairingHandshakeWithAllMRPTest),
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
     NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("PASE Verifier Serialize", PASEVerifierSerializeTest),
-
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
-
-int TestSecurePairing_Setup(void * inContext);
-int TestSecurePairing_Teardown(void * inContext);
 
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
-    TestSecurePairing_Setup,
-    TestSecurePairing_Teardown,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
-
-// clang-format on
-//
-/**
- *  Set up the test suite.
- */
-int TestSecurePairing_Setup(void * inContext)
-{
-    auto & ctx = *static_cast<TestContext *>(inContext);
-
-    // Initialize System memory and resources
-    ctx.ConfigInitializeNodes(false);
-    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestSecurePairing_Teardown(void * inContext)
-{
-    return TestContext::Finalize(inContext);
-}
 
 } // anonymous namespace
 

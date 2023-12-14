@@ -39,7 +39,7 @@
 #include <ChipShellCollection.h>
 #endif
 
-#ifdef CONFIG_ENABLE_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
 
@@ -57,7 +57,7 @@ int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef CONFIG_ENABLE_PW_RPC
+#ifdef CONFIG_CHIP_PW_RPC
     rpc::Init();
 #endif
 

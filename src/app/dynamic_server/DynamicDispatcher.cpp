@@ -350,8 +350,8 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index)
 
 namespace {
 const CommandId acceptedCommands[]  = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Id,
-                                       Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
-                                       Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id, kInvalidCommandId };
+                                        Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Id,
+                                        Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Id, kInvalidCommandId };
 const CommandId generatedCommands[] = { Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Id,
                                         Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::Id, kInvalidCommandId };
 const EmberAfCluster otaProviderCluster{

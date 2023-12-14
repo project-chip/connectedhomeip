@@ -102,7 +102,7 @@ static void serial_irq_cb(void * p_instance, mdh_serial_irq_type_t event);
 struct CriticalSection
 {
     CriticalSection() { core_util_critical_section_enter(); }
-    CriticalSection(const CriticalSection &) = delete;
+    CriticalSection(const CriticalSection &)             = delete;
     CriticalSection & operator=(const CriticalSection &) = delete;
     ~CriticalSection() { core_util_critical_section_exit(); }
 };

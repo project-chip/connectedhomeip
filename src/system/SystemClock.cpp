@@ -73,7 +73,7 @@ ClockBase * gClockBase = &gClockImpl;
 
 #if HAVE_CLOCK_GETTIME
 
-#if HAVE_DECL_CLOCK_BOOTTIME
+#if defined(HAVE_DECL_CLOCK_BOOTTIME) && HAVE_DECL_CLOCK_BOOTTIME
 // CLOCK_BOOTTIME is a Linux-specific option to clock_gettime for a clock which compensates for system sleep.
 #define MONOTONIC_CLOCK_ID CLOCK_BOOTTIME
 #define MONOTONIC_RAW_CLOCK_ID CLOCK_MONOTONIC_RAW

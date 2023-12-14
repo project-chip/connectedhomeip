@@ -15,8 +15,12 @@
  *    limitations under the License.
  */
 
-#include <app/reporting/reporting.h>
+#include <app/icd/ICDConfig.h>
 #include <app/server/CommissioningWindowManager.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
+#include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <lib/dnssd/Advertiser.h>
@@ -63,7 +67,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         Cleanup();
         mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
-#if CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // If in NonConcurrentConnection, this will already have been completed
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
     }
@@ -81,6 +86,13 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         app::DnssdServer::Instance().AdvertiseOperational();
         ChipLogProgress(AppServer, "Operational advertising enabled");
     }
+#if CONFIG_NETWORK_LAYER_BLE
+    else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
+    {
+        ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+    }
+#endif
 }
 
 void CommissioningWindowManager::Shutdown()
@@ -543,13 +555,14 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
-        event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
-        CHIP_ERROR err                       = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (err != CHIP_NO_ERROR)
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlag::kCommissioningWindowOpen;
+        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
         {
-            ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+        }
+        else
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }

@@ -47,22 +47,22 @@ public:
     using IntegerType = StorageType;
 
     constexpr BitFlags() : mValue(0) {}
-    BitFlags(const BitFlags & other) = default;
+    BitFlags(const BitFlags & other)       = default;
     BitFlags & operator=(const BitFlags &) = default;
 
-    explicit BitFlags(FlagsEnum value) : mValue(static_cast<IntegerType>(value)) {}
-    explicit BitFlags(IntegerType value) : mValue(value) {}
+    explicit constexpr BitFlags(FlagsEnum value) : mValue(static_cast<IntegerType>(value)) {}
+    explicit constexpr BitFlags(IntegerType value) : mValue(value) {}
 
     template <typename... Args>
-    BitFlags(FlagsEnum flag, Args &&... args) : mValue(Or(flag, std::forward<Args>(args)...))
+    constexpr BitFlags(FlagsEnum flag, Args &&... args) : mValue(Or(flag, std::forward<Args>(args)...))
     {}
 
     template <typename... Args>
-    BitFlags(const BitFlags<FlagsEnum> & flags, Args &&... args) : mValue(Or(flags, std::forward<Args>(args)...))
+    constexpr BitFlags(const BitFlags<FlagsEnum> & flags, Args &&... args) : mValue(Or(flags, std::forward<Args>(args)...))
     {}
 
     template <typename... Args>
-    BitFlags(IntegerType value, Args &&... args) : mValue(value | Or(std::forward<Args>(args)...))
+    constexpr BitFlags(IntegerType value, Args &&... args) : mValue(value | Or(std::forward<Args>(args)...))
     {}
 
     /**
@@ -102,7 +102,7 @@ public:
      */
     BitFlags & Clear(const BitFlags & other)
     {
-        mValue &= ~other.mValue;
+        mValue &= static_cast<IntegerType>(~static_cast<IntegerType>(other.mValue));
         return *this;
     }
 
@@ -221,7 +221,7 @@ public:
      *
      * @note            This is intended to be used only to store flags into a raw binary record.
      */
-    IntegerType Raw() const { return mValue; }
+    constexpr IntegerType Raw() const { return mValue; }
 
     /**
      * Get the address of the flags as a pointer to the underlying integer type.

@@ -17,7 +17,6 @@
 
 #include "ConnectivityUtils.h"
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -74,7 +73,7 @@ uint8_t ConnectivityUtils::MapFrequencyToChannel(const uint16_t frequency)
 
 InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    InterfaceTypeEnum ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+    InterfaceTypeEnum ret = InterfaceTypeEnum::kUnspecified;
     int sock              = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -89,7 +88,7 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+        ret = InterfaceTypeEnum::kWiFi;
     }
     else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
@@ -100,7 +99,7 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
         Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+            ret = InterfaceTypeEnum::kEthernet;
     }
 
     close(sock);
@@ -239,7 +238,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
     struct ifaddrs * ifa = nullptr;
     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
+        if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kWiFi)
         {
             Platform::CopyString(ifname, bufSize, ifa->ifa_name);
             err = CHIP_NO_ERROR;
@@ -405,7 +404,7 @@ CHIP_ERROR ConnectivityUtils::GetEthInterfaceName(char * ifname, size_t bufSize)
     struct ifaddrs * ifa = nullptr;
     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET)
+        if (GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::kEthernet)
         {
             Platform::CopyString(ifname, bufSize, ifa->ifa_name);
             err = CHIP_NO_ERROR;
@@ -447,34 +446,34 @@ CHIP_ERROR ConnectivityUtils::GetEthPHYRate(const char * ifname, PHYRateEnum & p
     switch (speed)
     {
     case 10:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_M;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
         break;
     case 100:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE100_M;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate100M;
         break;
     case 1000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE1_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate1G;
         break;
     case 25000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate25g;
         break;
     case 5000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE5_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate5G;
         break;
     case 10000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE10_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate10G;
         break;
     case 40000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE40_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate40G;
         break;
     case 100000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE100_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate100G;
         break;
     case 200000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE200_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate200G;
         break;
     case 400000:
-        pHYRate = EmberAfPHYRateEnum::EMBER_ZCL_PHY_RATE_ENUM_RATE400_G;
+        pHYRate = app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum::kRate400G;
         break;
     default:
         ChipLogError(DeviceLayer, "Undefined speed! (%d)\n", speed);

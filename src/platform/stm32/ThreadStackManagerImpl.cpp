@@ -40,7 +40,7 @@
 #include <openthread/heap.h>
 #include <openthread/message.h>
 
-//#include <transport/raw/MessageHeader.h>
+// #include <transport/raw/MessageHeader.h>
 
 #include <openthread/error.h>
 #include <openthread/icmp6.h>

@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
+      disabled: true
+
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)"

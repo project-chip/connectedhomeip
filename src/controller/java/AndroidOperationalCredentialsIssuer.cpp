@@ -35,8 +35,8 @@
 
 namespace chip {
 namespace Controller {
-constexpr const char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
-constexpr const char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
+constexpr char kOperationalCredentialsIssuerKeypairStorage[]   = "AndroidDeviceControllerKey";
+constexpr char kOperationalCredentialsRootCertificateStorage[] = "AndroidCARootCert";
 
 using namespace Credentials;
 using namespace Crypto;
@@ -186,8 +186,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::CallbackGenerateNOCChain(const B
         ReturnErrorOnFailure(reader.Next());
     }
 
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
@@ -307,7 +306,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onOpCSRGenerationComplete", "([B)V", &method);
+                                                             "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());
@@ -335,8 +334,7 @@ CHIP_ERROR AndroidOperationalCredentialsIssuer::LocalGenerateNOCChain(const Byte
         ReturnErrorOnFailure(reader.Next());
     }
 
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));

@@ -21,6 +21,7 @@
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
@@ -29,14 +30,8 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
-namespace chip {
-namespace TestCerts {
-extern const Span<const ByteSpan> kTestAttestationTrustStoreRoots;
-} // namespace TestCerts
-} // namespace chip
-
 using namespace chip::Crypto;
-using chip::TestCerts::kTestAttestationTrustStoreRoots;
+using chip::TestCerts::GetTestPaaRootStore;
 
 namespace chip {
 namespace Credentials {
@@ -274,9 +269,7 @@ constexpr std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
 
 struct TestAttestationTrustStore final : public ArrayAttestationTrustStore
 {
-    TestAttestationTrustStore() :
-        ArrayAttestationTrustStore(kTestAttestationTrustStoreRoots.data(), kTestAttestationTrustStoreRoots.size())
-    {}
+    TestAttestationTrustStore() : ArrayAttestationTrustStore(GetTestPaaRootStore().data(), GetTestPaaRootStore().size()) {}
 };
 Global<TestAttestationTrustStore> gTestAttestationTrustStore;
 

@@ -26,10 +26,10 @@ except ModuleNotFoundError:
 
 import unittest
 
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
-                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
-                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
+                                         AttributeStorage, Bitmap, Cluster, Command, CommandInstantiation, CommandQuality,
+                                         ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality,
+                                         Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
 def parseText(txt, skip_meta=True):
@@ -51,71 +51,6 @@ class TestParser(unittest.TestCase):
 
         self.assertEqual(actual, expected)
 
-    def test_global_enum(self):
-        actual = parseText("""
-            enum GlobalEnum : ENUM8 {
-               kValue1 = 1;
-               kOther = 0x12; /* hex numbers tested sporadically */
-            }
-        """)
-
-        expected = Idl(enums=[
-            Enum(name='GlobalEnum', base_type='ENUM8',
-                 entries=[
-                     ConstantEntry(name="kValue1", code=1),
-                     ConstantEntry(name="kOther", code=0x12),
-                 ])]
-        )
-        self.assertEqual(actual, expected)
-
-    def test_global_struct(self):
-        actual = parseText("""
-            struct Something {
-                CHAR_STRING astring = 1;
-                optional CLUSTER_ID idlist[] = 2;
-                nullable int valueThatIsNullable = 0x123;
-                char_string<123> sized_string = 222;
-            }
-        """)
-
-        expected = Idl(structs=[
-            Struct(name='Something',
-                   fields=[
-                        Field(
-                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
-                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist",
-                              is_list=True, qualities=FieldQuality.OPTIONAL),
-                        Field(data_type=DataType(name="int"), code=0x123,
-                              name="valueThatIsNullable", qualities=FieldQuality.NULLABLE),
-                        Field(data_type=DataType(name="char_string", max_length=123),
-                              code=222, name="sized_string"),
-                   ])]
-        )
-        self.assertEqual(actual, expected)
-
-    def test_fabric_scoped_struct(self):
-        actual = parseText("""
-            fabric_scoped struct FabricStruct {
-                CHAR_STRING astring = 1;
-                optional CLUSTER_ID idlist[] = 2;
-                nullable fabric_sensitive int nullablesensitive = 0x123;
-            }
-        """)
-
-        expected = Idl(structs=[
-            Struct(name='FabricStruct',
-                   qualities=StructQuality.FABRIC_SCOPED,
-                   fields=[
-                        Field(
-                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
-                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist",
-                              is_list=True, qualities=FieldQuality.OPTIONAL),
-                        Field(data_type=DataType(name="int"), code=0x123, name="nullablesensitive",
-                              qualities=FieldQuality.NULLABLE | FieldQuality.FABRIC_SENSITIVE),
-                   ])]
-        )
-        self.assertEqual(actual, expected)
-
     def test_cluster_attribute(self):
         actual = parseText("""
             server cluster MyCluster = 0x321 {
@@ -127,8 +62,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=0x321,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE, definition=Field(
@@ -150,7 +84,7 @@ class TestParser(unittest.TestCase):
             }
 
             /** Documentation for MyCluster #2 */
-            client cluster MyCluster = 0x321 {
+            client cluster MyCluster2 = 0x322 {
                 /* NOT a doc comment */
                 command WithoutArg(): DefaultSuccess = 123;
 
@@ -179,8 +113,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -202,8 +135,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -230,8 +162,7 @@ class TestParser(unittest.TestCase):
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="MyCluster",
+            Cluster(name="MyCluster",
                     code=1,
                     attributes=[
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
@@ -276,8 +207,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="WithCommands",
+            Cluster(name="WithCommands",
                     code=1,
                     structs=[
                         Struct(name="FreeStruct", fields=[]),
@@ -316,8 +246,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER,
-                    name="WithCommands",
+            Cluster(name="WithCommands",
                     code=1,
                     structs=[
                         Struct(name="InParam", fields=[],
@@ -351,8 +280,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="WithEnums",
+            Cluster(name="WithEnums",
                     code=0xab,
                     enums=[
                         Enum(name="TestEnum", base_type="ENUM16",
@@ -360,6 +288,227 @@ class TestParser(unittest.TestCase):
                                  ConstantEntry(name="A", code=0x123),
                                  ConstantEntry(name="B", code=0x234),
                              ])],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_event_field_api_maturity(self):
+        actual = parseText("""
+            server cluster MaturityTest = 1 {
+                critical event TestEvent = 123 {
+                  nullable int16u someStableMember = 0;
+                  provisional nullable int16u someProvisionalMember = 1;
+                  internal nullable int16u someInternalMember = 2;
+                }
+           }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="MaturityTest",
+                    code=1,
+                    events=[
+                        Event(priority=EventPriority.CRITICAL, name="TestEvent", code=123, fields=[
+                            Field(name="someStableMember", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                            Field(name="someProvisionalMember", code=1, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.PROVISIONAL),
+                            Field(name="someInternalMember", code=2, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.INTERNAL),
+
+                        ]),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_enum_constant_maturity(self):
+        actual = parseText("""
+            client cluster WithEnums = 0xab {
+                enum TestEnum : ENUM16 {
+                    kStable = 0x123;
+                    provisional kProvisional = 0x234;
+                    internal kInternal = 0x345;
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="WithEnums",
+                    code=0xab,
+                    enums=[
+                        Enum(name="TestEnum", base_type="ENUM16",
+                             entries=[
+                                 ConstantEntry(name="kStable", code=0x123),
+                                 ConstantEntry(
+                                     name="kProvisional", code=0x234, api_maturity=ApiMaturity.PROVISIONAL),
+                                 ConstantEntry(
+                                     name="kInternal", code=0x345, api_maturity=ApiMaturity.INTERNAL),
+                             ])],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_bitmap_constant_maturity(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                bitmap TestBitmap : BITMAP32 {
+                    kStable = 0x1;
+                    internal kInternal = 0x2;
+                    provisional kProvisional = 0x4;
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="Test",
+                    code=0xab,
+                    bitmaps=[
+                        Bitmap(name="TestBitmap", base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(name="kStable", code=0x1),
+                                   ConstantEntry(
+                                       name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
+                                   ConstantEntry(
+                                       name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL),
+                               ])],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_struct_field_api_maturity(self):
+        actual = parseText("""
+            server cluster MaturityTest = 1 {
+                struct TestStruct {
+                  nullable int16u someStableMember = 0;
+                  provisional nullable int16u someProvisionalMember = 1;
+                  internal nullable int16u someInternalMember = 2;
+                }
+           }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="MaturityTest",
+                    code=1,
+                    structs=[
+                        Struct(name="TestStruct", fields=[
+                            Field(name="someStableMember", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                            Field(name="someProvisionalMember", code=1, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.PROVISIONAL),
+                            Field(name="someInternalMember", code=2, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.INTERNAL),
+
+                        ]),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_entry_maturity(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                enum StableEnum : ENUM16 {}
+                provisional enum ProvisionalEnum : ENUM16 {}
+                internal enum InternalEnum : ENUM16 {}
+                deprecated enum DeprecatedEnum : ENUM16 {}
+
+                bitmap StableBitmap : BITMAP32 {}
+                provisional bitmap ProvisionalBitmap : BITMAP32 {}
+                internal bitmap InternalBitmap : BITMAP32 {}
+
+                struct StableStruct {}
+                provisional struct ProvisionalStruct {}
+                internal struct InternalStruct {}
+
+                info event StableEvent = 1 {}
+                provisional info event ProvisionalEvent = 2 {}
+                internal info event InternalEvent = 3 {}
+
+                request struct StableCommandRequest {}
+                response struct StableCommandResponse = 200 {}
+
+                provisional request struct ProvisionalCommandRequest {}
+                provisional response struct ProvisionalCommandResponse = 201 {}
+
+                internal request struct InternalCommandRequest {}
+                internal response struct InternalCommandResponse = 202 {}
+
+                command StableCommand(StableCommandRequest): StableCommandResponse = 100;
+                provisional command ProvisionalCommand(ProvisionalCommandRequest): ProvisionalCommandResponse = 101;
+                internal command InternalCommand(InternalCommandRequest): InternalCommandResponse = 102;
+
+                readonly attribute int8u roStable = 1;
+                attribute int32u rwStable[] = 2;
+                provisional readonly attribute int8u roProvisional = 11;
+                provisional attribute int32u rwProvisional[] = 12;
+                internal readonly attribute int8u roInternal = 21;
+                internal attribute int32u rwInternal[] = 22;
+                stable attribute int32u rwForcedStable[] = 31;
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(name="Test",
+                    code=0xab,
+                    enums=[
+                        Enum(name="StableEnum", base_type="ENUM16", entries=[]),
+                        Enum(name="ProvisionalEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Enum(name="InternalEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.INTERNAL),
+                        Enum(name="DeprecatedEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.DEPRECATED),
+                    ],
+                    bitmaps=[
+                        Bitmap(name="StableBitmap",
+                               base_type="BITMAP32", entries=[]),
+                        Bitmap(name="ProvisionalBitmap", base_type="BITMAP32",
+                               entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Bitmap(name="InternalBitmap", base_type="BITMAP32",
+                               entries=[], api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    structs=[
+                        Struct(name="StableStruct", fields=[]),
+                        Struct(name="ProvisionalStruct", fields=[],
+                               api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="InternalStruct", fields=[],
+                               api_maturity=ApiMaturity.INTERNAL),
+
+                        Struct(name="StableCommandRequest",
+                               fields=[], tag=StructTag.REQUEST),
+                        Struct(name="StableCommandResponse", fields=[],
+                               tag=StructTag.RESPONSE, code=200),
+                        Struct(name="ProvisionalCommandRequest", fields=[
+                        ], tag=StructTag.REQUEST, api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="ProvisionalCommandResponse", fields=[
+                        ], tag=StructTag.RESPONSE, code=201, api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="InternalCommandRequest", fields=[
+                        ], tag=StructTag.REQUEST, api_maturity=ApiMaturity.INTERNAL),
+                        Struct(name="InternalCommandResponse", fields=[
+                        ], tag=StructTag.RESPONSE, code=202, api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    events=[
+                        Event(priority=EventPriority.INFO,
+                              name="StableEvent", code=1, fields=[]),
+                        Event(priority=EventPriority.INFO, name="ProvisionalEvent",
+                              code=2, fields=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Event(priority=EventPriority.INFO, name="InternalEvent",
+                              code=3, fields=[], api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    commands=[
+                        Command(name="StableCommand", code=100, input_param="StableCommandRequest",
+                                output_param="StableCommandResponse"),
+                        Command(name="ProvisionalCommand", code=101, input_param="ProvisionalCommandRequest",
+                                output_param="ProvisionalCommandResponse", api_maturity=ApiMaturity.PROVISIONAL),
+                        Command(name="InternalCommand", code=102, input_param="InternalCommandRequest",
+                                output_param="InternalCommandResponse", api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=1, name="roStable")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="rwStable", is_list=True)),
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=11, name="roProvisional"), api_maturity=ApiMaturity.PROVISIONAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=12, name="rwProvisional", is_list=True), api_maturity=ApiMaturity.PROVISIONAL),
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=21, name="roInternal"), api_maturity=ApiMaturity.INTERNAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=22, name="rwInternal", is_list=True), api_maturity=ApiMaturity.INTERNAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=31, name="rwForcedStable", is_list=True), api_maturity=ApiMaturity.STABLE),
+                    ]
                     )])
         self.assertEqual(actual, expected)
 
@@ -373,8 +522,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="Test",
+            Cluster(name="Test",
                     code=0xab,
                     bitmaps=[
                         Bitmap(name="TestBitmap", base_type="BITMAP32",
@@ -396,8 +544,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, fields=[
@@ -420,8 +567,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
@@ -442,8 +588,7 @@ class TestParser(unittest.TestCase):
             }
         """)
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.CLIENT,
-                    name="EventTester",
+            Cluster(name="EventTester",
                     code=0x123,
                     events=[
                         Event(priority=EventPriority.INFO, readacl=AccessPrivilege.VIEW,
@@ -465,9 +610,9 @@ server cluster A = 1 { /* Test comment */ }
 
         expected = Idl(clusters=[
             Cluster(parse_meta=ParseMetaData(line=2, column=1, start_pos=1),
-                    side=ClusterSide.SERVER, name="A", code=1),
+                    name="A", code=1),
             Cluster(parse_meta=ParseMetaData(line=5, column=4, start_pos=87),
-                    side=ClusterSide.CLIENT, name="B", code=2),
+                    name="B", code=2),
         ])
         self.assertEqual(actual, expected)
 
@@ -479,9 +624,9 @@ server cluster A = 1 { /* Test comment */ }
         """)
 
         expected = Idl(clusters=[
-            Cluster(side=ClusterSide.SERVER, name="A", code=1),
-            Cluster(side=ClusterSide.CLIENT, name="B", code=2),
-            Cluster(side=ClusterSide.CLIENT, name="C", code=3),
+            Cluster(name="A", code=1),
+            Cluster(name="B", code=2),
+            Cluster(name="C", code=3),
         ])
         self.assertEqual(actual, expected)
 
@@ -566,6 +711,20 @@ server cluster A = 1 { /* Test comment */ }
         ])
         self.assertEqual(actual, expected)
 
+    def test_cluster_api_maturity(self):
+        actual = parseText("""
+            provisional server cluster A = 1 { /* Test comment */ }
+            internal client cluster B = 2 { }
+            client cluster C = 3 { }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="A", code=1, api_maturity=ApiMaturity.PROVISIONAL),
+            Cluster(name="B", code=2, api_maturity=ApiMaturity.INTERNAL),
+            Cluster(name="C", code=3),
+        ])
+        self.assertEqual(actual, expected)
+
     def test_emits_events(self):
         actual = parseText("""
             endpoint 1 {
@@ -591,6 +750,54 @@ server cluster A = 1 { /* Test comment */ }
                                            "FooBar", "SomeNewEvent"}),
                 ServerClusterInstantiation(name="AnotherExample", events_emitted={
                     "StartUp", "ShutDown"}),
+            ])
+        ])
+
+        self.assertEqual(actual, expected)
+
+    def test_revision(self):
+        actual = parseText("""
+            server cluster A = 1 { } // revision 1 implied
+            client cluster B = 2 { revision 1; }
+            client cluster C = 3 { revision 2; }
+            client cluster D = 4 { revision 123; }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="A", code=1, revision=1),
+            Cluster(name="B", code=2, revision=1),
+            Cluster(name="C", code=3, revision=2),
+            Cluster(name="D", code=4, revision=123),
+        ])
+        self.assertEqual(actual, expected)
+
+    def test_handle_commands(self):
+        actual = parseText("""
+            endpoint 1 {
+                server cluster Example {}
+            }
+            endpoint 2 {
+              server cluster Example {
+                handle command TestCommand;
+                handle command AnotherOne;
+              }
+              server cluster AnotherExample {
+                handle command Xyz;
+              }
+            }
+        """)
+
+        expected = Idl(endpoints=[
+            Endpoint(number=1, server_clusters=[
+                     ServerClusterInstantiation(name="Example")]),
+            Endpoint(number=2, server_clusters=[
+                ServerClusterInstantiation(name="Example", commands=[
+                    CommandInstantiation(name="TestCommand"),
+                    CommandInstantiation(name="AnotherOne"),
+                ]),
+                ServerClusterInstantiation(name="AnotherExample", commands=[
+                    CommandInstantiation(name="Xyz"),
+                ]),
             ])
         ])
 

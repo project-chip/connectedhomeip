@@ -1,0 +1,20 @@
+CodeQL:
+    No space left on device:
+        short: Ran out of space
+        detail: Exception with signature "No space left on device"
+    Check that the disk containing the database directory has ample free space.:
+        short: Ran out of space
+        detail:
+            Fatal internal error with message indicating that disk space most
+            likely ran out
+Build example:
+    Could not find a version that satisfies the requirement:
+        short: Requirements issue
+        detail: Unable to install a requirements in Python requirements.txt
+    No module named:
+        short: Missing module
+        detail: Expected module was missing
+Full builds:
+    No space left on device:
+        short: Ran out of space
+        detail: Exception with signature "No space left on device

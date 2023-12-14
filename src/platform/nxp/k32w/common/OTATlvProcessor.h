@@ -39,7 +39,8 @@ namespace chip {
 #define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0A)
 #define CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x0B)
 #define CHIP_OTA_PROCESSOR_EEPROM_OFFSET CHIP_ERROR_TLV_PROCESSOR(0x0C)
-#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_OTA_PROCESSOR_EXTERNAL_STORAGE CHIP_ERROR_TLV_PROCESSOR(0x0D)
+#define CHIP_OTA_PROCESSOR_START_IMAGE CHIP_ERROR_TLV_PROCESSOR(0x0E)
 
 // Descriptor constants
 inline constexpr size_t kVersionStringSize = 64;
@@ -89,6 +90,9 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
+#if OTA_ENCRYPTION_ENABLE
+    CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
+#endif
 
 protected:
     /**
@@ -120,6 +124,10 @@ protected:
 
     bool IsError(CHIP_ERROR & status);
 
+#if OTA_ENCRYPTION_ENABLE
+    /*ota decryption*/
+    uint32_t mIVOffset = 0;
+#endif
     uint32_t mLength                             = 0;
     uint32_t mProcessedLength                    = 0;
     bool mWasSelected                            = false;
@@ -139,6 +147,7 @@ public:
     CHIP_ERROR Accumulate(ByteSpan & block);
 
     inline uint8_t * data() { return mBuffer.Get(); }
+    inline uint32_t GetThreshold() { return mThreshold; }
 
 private:
     uint32_t mThreshold;

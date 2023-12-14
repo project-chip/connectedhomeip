@@ -18,6 +18,8 @@
 
 #include <controller/AutoCommissioner.h>
 
+#include <cstring>
+
 #include <app/InteractionModelTimeout.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/CHIPCert.h>
@@ -27,6 +29,8 @@ namespace chip {
 namespace Controller {
 
 using namespace chip::app::Clusters;
+using chip::app::DataModel::MakeNullable;
+using chip::app::DataModel::NullNullable;
 
 AutoCommissioner::AutoCommissioner()
 {
@@ -63,6 +67,32 @@ static bool IsUnsafeSpan(const Optional<SpanType> & maybeUnsafeSpan, const Optio
     return maybeUnsafeSpan.Value().data() != knownSafeSpan.Value().data();
 }
 
+CHIP_ERROR AutoCommissioner::VerifyICDRegistrationInfo(const CommissioningParameters & params)
+{
+    ChipLogProgress(Controller, "Checking ICD registration parameters");
+    if (!params.GetICDSymmetricKey().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD symmetric key!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (params.GetICDSymmetricKey().Value().size() != sizeof(mICDSymmetricKey))
+    {
+        ChipLogError(Controller, "Invalid ICD symmetric key length!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (!params.GetICDCheckInNodeId().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD check-in node id!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (!params.GetICDMonitoredSubject().HasValue())
+    {
+        ChipLogError(Controller, "Missing ICD monitored subject!");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     // Make sure any members that point to buffers that we are not pointing to
@@ -85,7 +115,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetIcac(), mParams.GetIcac()) || IsUnsafeSpan(params.GetIpk(), mParams.GetIpk()) ||
          IsUnsafeSpan(params.GetAttestationElements(), mParams.GetAttestationElements()) ||
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
-         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()));
+         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
+         IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()) ||
+         IsUnsafeSpan(params.GetICDSymmetricKey(), mParams.GetICDSymmetricKey()) ||
+         (params.GetDefaultNTP().HasValue() && !params.GetDefaultNTP().Value().IsNull() &&
+          params.GetDefaultNTP().Value().Value().data() != mDefaultNtp));
 
     mParams = params;
 
@@ -174,6 +209,66 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
+    if (params.GetDSTOffsets().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting DST offsets from parameters");
+        size_t size = std::min(params.GetDSTOffsets().Value().size(), kMaxSupportedDstStructs);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mDstOffsetsBuf[i] = params.GetDSTOffsets().Value()[i];
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDstOffsetsBuf, size);
+        mParams.SetDSTOffsets(list);
+    }
+    if (params.GetTimeZone().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Time Zone from parameters");
+        size_t size = std::min(params.GetTimeZone().Value().size(), kMaxSupportedTimeZones);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
+            if (params.GetTimeZone().Value()[i].name.HasValue() &&
+                params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
+            {
+                auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
+                // The buffer backing "span" is statically allocated and is of size kMaxSupportedTimeZones, so this should never
+                // fail.
+                CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
+                mTimeZoneBuf[i].name.SetValue(span);
+            }
+            else
+            {
+                mTimeZoneBuf[i].name.ClearValue();
+            }
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
+    }
+    if (params.GetDefaultNTP().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Default NTP from parameters");
+        // This parameter is an optional nullable, so we need to go two levels deep here.
+        if (!params.GetDefaultNTP().Value().IsNull() && params.GetDefaultNTP().Value().Value().size() <= kMaxDefaultNtpSize)
+        {
+            // The buffer backing "span" is statically allocated and is of size kMaxDefaultNtpSize.
+            auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
+            CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
+            auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, params.GetDefaultNTP().Value().Value().size()));
+            mParams.SetDefaultNTP(default_ntp);
+        }
+    }
+
+    if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore && params.GetICDSymmetricKey().HasValue())
+    {
+        ReturnErrorOnFailure(VerifyICDRegistrationInfo(params));
+
+        // The values must be valid now.
+        memcpy(mICDSymmetricKey, params.GetICDSymmetricKey().Value().data(), params.GetICDSymmetricKey().Value().size());
+        mParams.SetICDSymmetricKey(ByteSpan(mICDSymmetricKey));
+        mParams.SetICDCheckInNodeId(params.GetICDCheckInNodeId().Value());
+        mParams.SetICDMonitoredSubject(params.GetICDMonitoredSubject().Value());
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -242,12 +337,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        if (mParams.GetCheckForMatchingFabric())
-        {
-            return CommissioningStage::kCheckForMatchingFabric;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kCheckForMatchingFabric:
+        return CommissioningStage::kReadCommissioningInfo2;
+    case CommissioningStage::kReadCommissioningInfo2:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -316,6 +407,17 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             return GetNextCommissioningStageInternal(CommissioningStage::kConfigureTrustedTimeSource, lastErr);
         }
     case CommissioningStage::kConfigureTrustedTimeSource:
+        if (mNeedIcdRegistration)
+        {
+            return CommissioningStage::kICDGetRegistrationInfo;
+        }
+        return GetNextCommissioningStageInternal(CommissioningStage::kICDSendStayActive, lastErr);
+    case CommissioningStage::kICDGetRegistrationInfo:
+        return CommissioningStage::kICDRegistration;
+    case CommissioningStage::kICDRegistration:
+        // TODO(#24259): StayActiveRequest is not supported by server. We may want to SendStayActive after OpDiscovery.
+        return CommissioningStage::kICDSendStayActive;
+    case CommissioningStage::kICDSendStayActive:
         // TODO(cecille): device attestation casues operational cert provisioning to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -635,11 +737,34 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
-        case CommissioningStage::kCheckForMatchingFabric: {
-            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
-            if (nodeId != kUndefinedNodeId)
+        case CommissioningStage::kReadCommissioningInfo2: {
+
+            if (!report.Is<ReadCommissioningInfo2>())
             {
-                mParams.SetRemoteNodeId(nodeId);
+                ChipLogError(
+                    Controller,
+                    "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+            }
+
+            ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+            mParams.SetSupportsConcurrentConnection(commissioningInfo.supportsConcurrentConnection);
+
+            if (mParams.GetCheckForMatchingFabric())
+            {
+                chip::NodeId nodeId = commissioningInfo.nodeId;
+                if (nodeId != kUndefinedNodeId)
+                {
+                    mParams.SetRemoteNodeId(nodeId);
+                }
+            }
+
+            if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+            {
+                if (commissioningInfo.isIcd && commissioningInfo.checkInProtocolSupport)
+                {
+                    mNeedIcdRegistration = true;
+                    ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");
+                }
             }
             break;
         }
@@ -702,6 +827,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // storing the returned certs, so just return here without triggering the next stage.
             return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac,
                                      report.Get<NocChain>().ipk, report.Get<NocChain>().adminSubject);
+        case CommissioningStage::kICDGetRegistrationInfo:
+            // Noting to do. The ICD registation info is handled elsewhere.
+            break;
+        case CommissioningStage::kICDRegistration:
+            // Noting to do. DevicePairingDelegate will handle this.
+            break;
+        case CommissioningStage::kICDSendStayActive:
+            // Nothing to do.
+            break;
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;

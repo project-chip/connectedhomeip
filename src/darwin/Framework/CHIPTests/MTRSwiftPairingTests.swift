@@ -3,7 +3,7 @@ import XCTest
 
 // This more or less parallels the "no delegate" case in MTRPairingTests
 
-struct Constants {
+struct PairingConstants {
     static let localPort = 5541
     static let vendorID = 0xFFF1
     static let onboardingPayload = "MT:Y.K90SO527JA0648G00"
@@ -15,6 +15,7 @@ struct Constants {
 // as only being available starting with macOS 13.3, we need to flag our
 // code with the same availabiluty annotation.
 @available(macOS, introduced: 13.3)
+@available(iOS, introduced: 16.4)
 class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
     let expectation: XCTestExpectation
 
@@ -30,7 +31,7 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
         XCTAssertNil(error)
 
         do {
-            try controller.commissionNode(withID: Constants.deviceID as NSNumber, commissioningParams: MTRCommissioningParameters())
+            try controller.commissionNode(withID: PairingConstants.deviceID as NSNumber, commissioningParams: MTRCommissioningParameters())
         } catch {
             XCTFail("Could not start commissioning of node: \(error)")
         }
@@ -40,7 +41,7 @@ class MTRSwiftPairingTestControllerDelegate : NSObject, MTRDeviceControllerDeleg
 
     func controller(_ controller: MTRDeviceController, commissioningComplete error: Error?, nodeID: NSNumber?) {
         XCTAssertNil(error)
-        XCTAssertEqual(nodeID, Constants.deviceID as NSNumber)
+        XCTAssertEqual(nodeID, PairingConstants.deviceID as NSNumber)
         expectation.fulfill()
     }
 }
@@ -50,12 +51,13 @@ class MTRSwiftPairingTests : XCTestCase {
     // as only being available starting with macOS 13.3, we need to flag our
     // code with the same availabiluty annotation.
     @available(macOS, introduced: 13.3)
+    @available(iOS, introduced: 16.4)
     func test001_BasicPairing() {
         let factory = MTRDeviceControllerFactory.sharedInstance()
 
         let storage = MTRTestStorage()
         let factoryParams = MTRDeviceControllerFactoryParams(storage: storage)
-        factoryParams.port = Constants.localPort as NSNumber
+        factoryParams.port = PairingConstants.localPort as NSNumber
 
         do {
             try factory.start(factoryParams)
@@ -68,7 +70,7 @@ class MTRSwiftPairingTests : XCTestCase {
         let testKeys = MTRTestKeys()
 
         let params = MTRDeviceControllerStartupParams(ipk: testKeys.ipk, fabricID: 1, nocSigner: testKeys)
-        params.vendorID = Constants.vendorID as NSNumber
+        params.vendorID = PairingConstants.vendorID as NSNumber
 
         let controller: MTRDeviceController
         do {
@@ -88,22 +90,22 @@ class MTRSwiftPairingTests : XCTestCase {
 
         let payload : MTRSetupPayload
         do {
-            payload = try MTRSetupPayload(onboardingPayload: Constants.onboardingPayload)
+            payload = try MTRSetupPayload(onboardingPayload: PairingConstants.onboardingPayload)
         } catch {
             XCTFail("Could not parse setup payload: \(error)")
             return
         }
 
         do {
-            try controller.setupCommissioningSession(with: payload, newNodeID: Constants.deviceID as NSNumber)
+            try controller.setupCommissioningSession(with: payload, newNodeID: PairingConstants.deviceID as NSNumber)
         } catch {
             XCTFail("Could not start setting up PASE session: \(error)")
             return
         }
 
-        wait(for: [expectation], timeout: TimeInterval(Constants.timeoutInSeconds))
+        wait(for: [expectation], timeout: TimeInterval(PairingConstants.timeoutInSeconds))
 
-        ResetCommissionee(MTRBaseDevice(nodeID: Constants.deviceID as NSNumber, controller: controller), DispatchQueue.main, self, Constants.timeoutInSeconds)
+        ResetCommissionee(MTRBaseDevice(nodeID: PairingConstants.deviceID as NSNumber, controller: controller), DispatchQueue.main, self, PairingConstants.timeoutInSeconds)
 
         controller.shutdown()
         XCTAssertFalse(controller.isRunning)

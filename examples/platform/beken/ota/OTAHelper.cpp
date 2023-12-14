@@ -92,11 +92,11 @@ extern "C" void BkQueryImageCmdHandler(char * pcWriteBuffer, int xWriteBufferLen
     {
         cmd0   = argv[1][0] - 0x30;
         cmd1   = argv[1][1] - 0x30;
-        nodeId = (uint32_t)(cmd0 * 10 + cmd1);
+        nodeId = (uint32_t) (cmd0 * 10 + cmd1);
 
         cmd0     = argv[2][0] - 0x30;
         cmd1     = argv[2][1] - 0x30;
-        fabricId = (uint32_t)(cmd0 * 10 + cmd1);
+        fabricId = (uint32_t) (cmd0 * 10 + cmd1);
         ChipLogProgress(DeviceLayer, "nodeId %lu,fabricId %lu\r\n", nodeId, fabricId);
     }
     else
@@ -132,7 +132,7 @@ extern "C" void BkNotifyUpdateApplied(char * pcWriteBuffer, int xWriteBufferLen,
     {
         cmd0    = argv[1][0] - 0x30;
         cmd1    = argv[1][1] - 0x30;
-        version = (uint32_t)(cmd0 * 10 + cmd1);
+        version = (uint32_t) (cmd0 * 10 + cmd1);
 
         ChipLogProgress(DeviceLayer, "version %lu \r\n", version);
     }

@@ -16,8 +16,8 @@ class AirQualitySensorManager
 {
 public:
     // Delete copy constructor and assignment operator.
-    AirQualitySensorManager(const AirQualitySensorManager &)  = delete;
-    AirQualitySensorManager(const AirQualitySensorManager &&) = delete;
+    AirQualitySensorManager(const AirQualitySensorManager &)             = delete;
+    AirQualitySensorManager(const AirQualitySensorManager &&)            = delete;
     AirQualitySensorManager & operator=(const AirQualitySensorManager &) = delete;
 
     static void InitInstance(EndpointId aEndpointId = 1)

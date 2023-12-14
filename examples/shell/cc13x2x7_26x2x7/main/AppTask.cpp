@@ -19,7 +19,7 @@
 
 #include "AppTask.h"
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 #include "FreeRTOS.h"
 

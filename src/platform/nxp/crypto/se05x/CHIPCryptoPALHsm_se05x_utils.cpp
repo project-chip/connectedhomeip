@@ -73,7 +73,7 @@ static Mutex sSEObjMutex;
 #define UNLOCK_SECURE_ELEMENT()
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-#endif //#if ENABLE_REENTRANCY
+#endif // #if ENABLE_REENTRANCY
 
 /* Open session to se05x */
 CHIP_ERROR se05x_sessionOpen(void)
@@ -378,4 +378,4 @@ void se05x_setCryptoObjID(SE05x_CryptoObjectID_t objId, uint8_t status)
     UNLOCK_SECURE_ELEMENT();
 }
 
-#endif //#if ENABLE_REENTRANCY
+#endif // #if ENABLE_REENTRANCY

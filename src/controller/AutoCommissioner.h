@@ -74,6 +74,8 @@ private:
     EndpointId GetEndpoint(const CommissioningStage & stage) const;
     CommissioningStage GetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
+    CHIP_ERROR VerifyICDRegistrationInfo(const CommissioningParameters & params);
+
     // Helper function to determine whether next stage should be kWiFiNetworkSetup,
     // kThreadNetworkSetup or kCleanup, depending whether network information has
     // been provided that matches the thread/wifi endpoint of the target.
@@ -102,9 +104,25 @@ private:
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
+    // Time zone is statically allocated because it is max 2 and not trivially destructible
+    static constexpr size_t kMaxSupportedTimeZones = 2;
+    app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type mTimeZoneBuf[kMaxSupportedTimeZones];
+    static constexpr size_t kMaxTimeZoneNameLen = 64;
+    char mTimeZoneNames[kMaxTimeZoneNameLen][kMaxSupportedTimeZones];
+
+    // DSTOffsetStructs are similarly not trivially destructible. They don't have a defined size, but we're
+    // going to do static allocation of the buffers anyway until we replace chip::Optional with std::optional.
+    static constexpr size_t kMaxSupportedDstStructs = 10;
+    app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
+
+    static constexpr size_t kMaxDefaultNtpSize = 128;
+    char mDefaultNtp[kMaxDefaultNtpSize];
+
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
     bool mNeedsDST = false;
+
+    bool mNeedIcdRegistration = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
@@ -120,6 +138,8 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
+
+    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
 };
 } // namespace Controller
 } // namespace chip

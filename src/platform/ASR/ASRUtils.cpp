@@ -20,8 +20,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ASR/ASRConfig.h>
 #include <platform/ASR/ASRUtils.h>
@@ -39,7 +39,10 @@ using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
 namespace {
+constexpr uint8_t kWiFiMaxNetworks = 15;
+uint8_t NumAP                      = 0;
 lega_wlan_wifi_conf wifi_conf;
+lega_wlan_scan_ap_record_t scan_result[kWiFiMaxNetworks];
 } // namespace
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 CHIP_ERROR ASRUtils::IsAPEnabled(bool & apEnabled)
@@ -299,4 +302,53 @@ CHIP_ERROR ASRUtils::asr_wifi_connect(void)
     }
 
     return err;
+}
+
+void ASRUtils::lega_wifi_scan_ind(lega_wlan_scan_result_t * result)
+{
+    NumAP = 0;
+    for (int i = 0; i < result->ap_num; i++)
+    {
+        if (i < kWiFiMaxNetworks)
+        {
+            memcpy(&scan_result[i], &result->ap_list[i], sizeof(lega_wlan_scan_ap_record_t));
+            NumAP++;
+        }
+    }
+    NetworkCommissioning::ASRWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+}
+
+CHIP_ERROR ASRUtils::StartScanWiFiNetworks(ByteSpan ssid)
+{
+    if (Internal::ASRUtils::EnableStationMode() != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks Failed");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    NumAP = 0;
+    memset(scan_result, 0, sizeof(scan_result));
+    lega_wlan_scan_compeleted_cb_register(Internal::ASRUtils::lega_wifi_scan_ind);
+
+    if (!ssid.empty()) // ssid is given, only scan this network
+    {
+        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
+        memcpy(cSsid, ssid.data(), ssid.size());
+        lega_wlan_start_scan_active(cSsid, 0);
+    }
+    else // scan all networks
+    {
+        lega_wlan_start_scan();
+    }
+    return CHIP_NO_ERROR;
+}
+
+lega_wlan_scan_ap_record_t * ASRUtils::GetScanResults(void)
+{
+    return scan_result;
+}
+
+uint8_t ASRUtils::GetScanApNum(void)
+{
+    return NumAP;
 }

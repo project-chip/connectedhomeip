@@ -33,8 +33,8 @@ class SilabsDeviceDataProvider : public CommissionableDataProvider,
 {
 public:
     SilabsDeviceDataProvider() :
-        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(
-                                          ConfigurationManagerImpl::GetDefaultInstance())
+        CommissionableDataProvider(),
+        Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
 // TODO Remove once Commander supports (doesn't erase) NVM3 for 917

@@ -25,6 +25,7 @@
 #pragma once
 
 #include <functional>
+#include <platform/CHIPDeviceError.h>
 
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
@@ -176,6 +177,7 @@ public:
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
@@ -183,6 +185,7 @@ public:
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);

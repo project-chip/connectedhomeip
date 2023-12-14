@@ -242,7 +242,7 @@ static void LpTimerStart(uint32_t time_to_sleep)
     {
         /* The result always fits in uint32_t and is always less than 0xFFFF0000 */
         time = time_to_sleep * 1000000000000ULL;
-        time = (uint64_t)(time / (CFG_TS_TICK_VAL_PS * configTICK_RATE_HZ));
+        time = (uint64_t) (time / (CFG_TS_TICK_VAL_PS * configTICK_RATE_HZ));
     }
 
     HW_TS_Start(LpTimerContext.LpTimerFreeRTOS_Id, (uint32_t) time);
@@ -289,7 +289,7 @@ static uint32_t LpGetElapsedTime(void)
 
     LpTimeLeftOnExit = HW_TS_RTC_ReadLeftTicksToCount();
     /* This cannot overflow. Max result is ~ 1.6e13 */
-    time_ps = (uint64_t)((CFG_TS_TICK_VAL_PS) * (uint64_t)(LpTimerContext.LpTimeLeftOnEntry - LpTimeLeftOnExit));
+    time_ps = (uint64_t) ((CFG_TS_TICK_VAL_PS) * (uint64_t) (LpTimerContext.LpTimeLeftOnEntry - LpTimeLeftOnExit));
 
     /* time_ps can be less than 1 RTOS tick in following situations
      * a) MCU didn't go to STOP2 due to wake-up unrelated to Timer Server or woke up from STOP2 very shortly after.
@@ -305,8 +305,8 @@ static uint32_t LpGetElapsedTime(void)
     else
     {
         /* Convert pS time into OS ticks */
-        val_ticks = time_ps * configTICK_RATE_HZ;   /* This cannot overflow. Max result is ~ 1.6e16 */
-        val_ticks = (uint64_t)(val_ticks / (1e12)); /* The result always fits in uint32_t */
+        val_ticks = time_ps * configTICK_RATE_HZ;    /* This cannot overflow. Max result is ~ 1.6e16 */
+        val_ticks = (uint64_t) (val_ticks / (1e12)); /* The result always fits in uint32_t */
     }
 
     /**

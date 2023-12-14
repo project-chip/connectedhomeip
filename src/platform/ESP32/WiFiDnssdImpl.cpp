@@ -469,7 +469,7 @@ static CHIP_ERROR OnResolveDone(ResolveContext * ctx)
 exit:
     if (error != CHIP_NO_ERROR)
     {
-        ctx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), error);
+        ctx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), error);
     }
     else
     {
@@ -530,7 +530,7 @@ static void MdnsQueryDone(intptr_t context)
 #endif
             if (!result)
             {
-                resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), CHIP_ERROR_INVALID_ARGUMENT);
+                resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INVALID_ARGUMENT);
                 RemoveMdnsQuery(ctx);
                 return;
             }
@@ -549,10 +549,10 @@ static void MdnsQueryDone(intptr_t context)
                     mdns_query_async_delete(resolveCtx->mSrvQueryHandle);
                     resolveCtx->mAddrQueryResult = nullptr;
                     resolveCtx->mSrvQueryHandle  = mdns_query_async_new(result->hostname, NULL, NULL, MDNS_TYPE_AAAA, kTimeoutMilli,
-                                                                       kMaxResults, MdnsQueryNotifier);
+                                                                        kMaxResults, MdnsQueryNotifier);
                     if (!resolveCtx->mSrvQueryHandle)
                     {
-                        resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), CHIP_ERROR_NO_MEMORY);
+                        resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_NO_MEMORY);
                         RemoveMdnsQuery(ctx);
                         return;
                     }
@@ -565,7 +565,7 @@ static void MdnsQueryDone(intptr_t context)
             }
             else
             {
-                resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(nullptr, 0), CHIP_ERROR_INCORRECT_STATE);
+                resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INCORRECT_STATE);
                 RemoveMdnsQuery(ctx);
                 return;
             }

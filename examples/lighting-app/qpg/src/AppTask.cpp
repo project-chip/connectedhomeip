@@ -257,15 +257,23 @@ void AppTask::InitServer(intptr_t arg)
     // Open commissioning after boot if no fabric was available
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
     {
-        PlatformMgr().ScheduleWork(OpenCommissioning, 0);
+        ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
+        AppTask::OpenCommissioning((intptr_t) 0);
     }
 }
 
 void AppTask::OpenCommissioning(intptr_t arg)
 {
     // Enable BLE advertisements
-    chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
-    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+
+    SystemLayer().ScheduleLambda([] {
+        CHIP_ERROR err;
+        err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow();
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+        }
+    });
 }
 
 CHIP_ERROR AppTask::Init()
@@ -486,10 +494,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             else
             {
                 // Enable BLE advertisements and pairing window
-                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
-                {
-                    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
-                }
+                AppTask::OpenCommissioning((intptr_t) 0);
+                ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
             }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)

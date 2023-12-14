@@ -54,7 +54,7 @@ class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
 
 public:
     ExchangeManager();
-    ExchangeManager(const ExchangeManager &) = delete;
+    ExchangeManager(const ExchangeManager &)           = delete;
     ExchangeManager operator=(const ExchangeManager &) = delete;
 
     /**

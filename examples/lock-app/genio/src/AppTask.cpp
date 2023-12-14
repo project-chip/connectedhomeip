@@ -50,7 +50,7 @@
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
-//#define EXAMPLE_VENDOR_ID                   0xcafe
+// #define EXAMPLE_VENDOR_ID                   0xcafe
 
 #ifdef portYIELD_FROM_ISR
 #define OS_YIELD_FROM_ISR(yield) portYIELD_FROM_ISR(yield)

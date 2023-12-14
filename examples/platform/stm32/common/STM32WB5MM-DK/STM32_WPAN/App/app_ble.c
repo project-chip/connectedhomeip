@@ -206,9 +206,9 @@ const osThreadAttr_t HciUserEvtProcess_attr = { .name       = CFG_HCI_USER_EVT_P
 PLACE_IN_SECTION("MB_MEM1") ALIGN(4) static TL_CmdPacket_t BleCmdBuffer;
 
 static const uint8_t M_bd_addr[BD_ADDR_SIZE_LOCAL] = {
-    (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000000000FF)),       (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8),
-    (uint8_t)((CFG_ADV_BD_ADDRESS & 0x000000FF0000) >> 16), (uint8_t)((CFG_ADV_BD_ADDRESS & 0x0000FF000000) >> 24),
-    (uint8_t)((CFG_ADV_BD_ADDRESS & 0x00FF00000000) >> 32), (uint8_t)((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
+    (uint8_t) ((CFG_ADV_BD_ADDRESS & 0x0000000000FF)),       (uint8_t) ((CFG_ADV_BD_ADDRESS & 0x00000000FF00) >> 8),
+    (uint8_t) ((CFG_ADV_BD_ADDRESS & 0x000000FF0000) >> 16), (uint8_t) ((CFG_ADV_BD_ADDRESS & 0x0000FF000000) >> 24),
+    (uint8_t) ((CFG_ADV_BD_ADDRESS & 0x00FF00000000) >> 32), (uint8_t) ((CFG_ADV_BD_ADDRESS & 0xFF0000000000) >> 40)
 };
 static uint8_t bd_addr_udn[BD_ADDR_SIZE_LOCAL];
 
@@ -750,13 +750,13 @@ const uint8_t * BleGetBdAddress(void)
          * Note: In order to use the Public Address in a final product, a dedicated
          * 24bits company ID (OUI) shall be bought.
          */
-        bd_addr_udn[0] = (uint8_t)(udn & 0x000000FF);
-        bd_addr_udn[1] = (uint8_t)((udn & 0x0000FF00) >> 8);
+        bd_addr_udn[0] = (uint8_t) (udn & 0x000000FF);
+        bd_addr_udn[1] = (uint8_t) ((udn & 0x0000FF00) >> 8);
         bd_addr_udn[2] = (uint8_t) device_id;
-        bd_addr_udn[3] = (uint8_t)(company_id & 0x000000FF);
+        bd_addr_udn[3] = (uint8_t) (company_id & 0x000000FF);
         ;
-        bd_addr_udn[4] = (uint8_t)((company_id & 0x0000FF00) >> 8);
-        bd_addr_udn[5] = (uint8_t)((company_id & 0x00FF0000) >> 16);
+        bd_addr_udn[4] = (uint8_t) ((company_id & 0x0000FF00) >> 8);
+        bd_addr_udn[5] = (uint8_t) ((company_id & 0x00FF0000) >> 16);
 
         bd_addr = (const uint8_t *) bd_addr_udn;
     }

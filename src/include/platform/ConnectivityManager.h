@@ -25,9 +25,9 @@
 #include <memory>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/icd/ICDConfig.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
@@ -260,8 +260,8 @@ protected:
     ~ConnectivityManager() = default;
 
     // No copy, move or assignment.
-    ConnectivityManager(const ConnectivityManager &)  = delete;
-    ConnectivityManager(const ConnectivityManager &&) = delete;
+    ConnectivityManager(const ConnectivityManager &)             = delete;
+    ConnectivityManager(const ConnectivityManager &&)            = delete;
     ConnectivityManager & operator=(const ConnectivityManager &) = delete;
 };
 

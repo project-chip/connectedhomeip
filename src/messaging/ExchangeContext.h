@@ -214,6 +214,14 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
+    /**
+     * Tracks whether we have received at least one application level message
+     * during the life-time of this exchange
+     *
+     * @return Returns 'true' if we have received at least one message, else 'false'
+     */
+    inline bool HasReceivedAtLeastOneMessage() { return mFlags.Has(Flags::kFlagReceivedAtLeastOneMessage); }
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     SessionHolder & GetSessionHolder() { return mSession; }
 
@@ -292,42 +300,19 @@ private:
      */
     void MessageHandled();
 
-    /**
-     * Updates Sleepy End Device intervals mode in the following way:
-     * - does nothing for exchanges over Bluetooth LE
-     * - requests active mode if there are more messages,
-     *   including MRP acknowledgements, expected to be sent or received on
-     *   this exchange.
-     * - withdraws the request for active mode, otherwise.
-     */
-    void UpdateSEDIntervalMode();
-
-    /**
-     * Requests or withdraws the request for Sleepy End Device active mode
-     * based on the argument value.
-     *
-     * Note that the device switches to the idle mode if no
-     * exchange nor other component requests the active mode.
-     */
-    void UpdateSEDIntervalMode(bool activeMode);
-
     static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 
     // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
     // evict it when the exchange is done with all its work (including any MRP traffic).
-    inline void SetIgnoreSessionRelease(bool ignore);
-    inline bool ShouldIgnoreSessionRelease();
+    inline void SetIgnoreSessionRelease(bool ignore) { mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore); }
+
+    inline bool ShouldIgnoreSessionRelease() { return mFlags.Has(Flags::kFlagIgnoreSessionRelease); }
+
+    inline void SetHasReceivedAtLeastOneMessage(bool hasReceivedMessage)
+    {
+        mFlags.Set(Flags::kFlagReceivedAtLeastOneMessage, hasReceivedMessage);
+    }
 };
-
-inline void ExchangeContext::SetIgnoreSessionRelease(bool ignore)
-{
-    mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore);
-}
-
-inline bool ExchangeContext::ShouldIgnoreSessionRelease()
-{
-    return mFlags.Has(Flags::kFlagIgnoreSessionRelease);
-}
 
 } // namespace Messaging
 } // namespace chip

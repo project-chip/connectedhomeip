@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <inet/InetInterface.h>
 #include <lib/core/ClusterEnums.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
@@ -241,8 +241,8 @@ private:
     WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
-    DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;
-    DiagnosticDataProvider(const DiagnosticDataProvider &&) = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &)             = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &&)            = delete;
     DiagnosticDataProvider & operator=(const DiagnosticDataProvider &) = delete;
 };
 

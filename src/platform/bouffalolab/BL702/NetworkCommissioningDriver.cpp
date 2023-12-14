@@ -191,7 +191,7 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
                     networkId.data());
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 
 exit:
@@ -270,9 +270,9 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
         }
 
         p->security.SetRaw(pmsg->records[i].auth_mode);
-        p->ssidLen = strlen((char *) pmsg->records[i].ssid) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-            ? strlen((char *) pmsg->records[i].ssid)
-            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        p->ssidLen  = strlen((char *) pmsg->records[i].ssid) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+             ? strlen((char *) pmsg->records[i].ssid)
+             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
         p->channel  = pmsg->records[i].channel;
         p->wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         p->rssi     = pmsg->records[i].rssi;

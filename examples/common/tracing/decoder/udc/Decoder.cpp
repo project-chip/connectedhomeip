@@ -21,10 +21,10 @@
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 namespace {
-constexpr const char * kProtocolName = "User Directed Commissioning";
+constexpr char kProtocolName[] = "User Directed Commissioning";
 
-constexpr const char * kUnknown                   = "Unknown";
-constexpr const char * kIdentificationDeclaration = "Identification Declaration";
+constexpr char kUnknown[]                   = "Unknown";
+constexpr char kIdentificationDeclaration[] = "Identification Declaration";
 } // namespace
 
 using MessageType = chip::Protocols::UserDirectedCommissioning::MsgType;

@@ -50,6 +50,7 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include "InetInterfaceImpl.h"
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -514,7 +515,7 @@ InterfaceIterator::~InterfaceIterator()
 {
     if (mIntfArray != nullptr)
     {
-        if_freenameindex(mIntfArray);
+        if_freenameindexImpl(mIntfArray);
         mIntfArray = nullptr;
     }
 }
@@ -528,7 +529,7 @@ bool InterfaceIterator::Next()
 {
     if (mIntfArray == nullptr)
     {
-        mIntfArray = if_nameindex();
+        mIntfArray = if_nameindexImpl();
     }
     else if (mIntfArray[mCurIntf].if_index != 0)
     {

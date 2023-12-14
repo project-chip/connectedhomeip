@@ -108,15 +108,15 @@ static uint32_t ReadRtcSsrValue(void)
     uint32_t first_read;
     uint32_t second_read;
 
-    first_read = (uint32_t)(READ_BIT(RTC->SSR, RTC_SSR_SS));
+    first_read = (uint32_t) (READ_BIT(RTC->SSR, RTC_SSR_SS));
 
-    second_read = (uint32_t)(READ_BIT(RTC->SSR, RTC_SSR_SS));
+    second_read = (uint32_t) (READ_BIT(RTC->SSR, RTC_SSR_SS));
 
     while (first_read != second_read)
     {
         first_read = second_read;
 
-        second_read = (uint32_t)(READ_BIT(RTC->SSR, RTC_SSR_SS));
+        second_read = (uint32_t) (READ_BIT(RTC->SSR, RTC_SSR_SS));
     }
 
     return second_read;
@@ -605,11 +605,12 @@ void HW_TS_Init(HW_TS_InitMode_t TimerInitMode, RTC_HandleTypeDef * hrtc)
     /**
      * Readout the user config
      */
-    WakeupTimerDivider = (4 - ((uint32_t)(READ_BIT(RTC->CR, RTC_CR_WUCKSEL))));
+    WakeupTimerDivider = (4 - ((uint32_t) (READ_BIT(RTC->CR, RTC_CR_WUCKSEL))));
 
-    AsynchPrescalerUserConfig = (uint8_t)(READ_BIT(RTC->PRER, RTC_PRER_PREDIV_A) >> (uint32_t) POSITION_VAL(RTC_PRER_PREDIV_A)) + 1;
+    AsynchPrescalerUserConfig =
+        (uint8_t) (READ_BIT(RTC->PRER, RTC_PRER_PREDIV_A) >> (uint32_t) POSITION_VAL(RTC_PRER_PREDIV_A)) + 1;
 
-    SynchPrescalerUserConfig = (uint16_t)(READ_BIT(RTC->PRER, RTC_PRER_PREDIV_S)) + 1;
+    SynchPrescalerUserConfig = (uint16_t) (READ_BIT(RTC->PRER, RTC_PRER_PREDIV_S)) + 1;
 
     /**
      *  Margin is taken to avoid wrong calculation when the wrap around is there and some
@@ -868,7 +869,7 @@ uint16_t HW_TS_RTC_ReadLeftTicksToCount(void)
 
     if ((READ_BIT(RTC->CR, RTC_CR_WUTE) == (RTC_CR_WUTE)) == SET)
     {
-        auro_reload_value = (uint32_t)(READ_BIT(RTC->WUTR, RTC_WUTR_WUT));
+        auro_reload_value = (uint32_t) (READ_BIT(RTC->WUTR, RTC_WUTR_WUT));
 
         elapsed_time_value = ReturnTimeElapsed();
 

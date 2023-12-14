@@ -94,9 +94,7 @@ source_set("app-main") {
     ]
   }
 
-  if (chip_enable_smoke_co_trigger) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=1" ]
-  }
+  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}" ]
 
   public_configs = [ ":app-main-config" ]
 }

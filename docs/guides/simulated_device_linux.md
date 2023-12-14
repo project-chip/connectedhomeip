@@ -38,7 +38,7 @@ need to be specifically built.
     ./scripts/examples/gn_build_example.sh examples/placeholder/linux out/debug/simulated/ chip_tests_zap_config=\"app1\"
     ```
 
-## Build the App with gn and ninja
+## Build the App with gn and ninja (alternative)
 
 In order to utilize the app against a commissioner or controller, the app will
 need to be specifically built.
@@ -57,7 +57,7 @@ Now that the building is completed there is a `chip-app1` binary created. This
 binary can be executed on a linux os.
 
 ```
-./out/simulated/chip-app1
+./out/debug/simulated/chip-app1
 ```
 
 ## Running the app with test parameter
@@ -66,7 +66,7 @@ Now that the building is completed there is a `chip-app1` binary created. This
 binary can be executed on a linux os with test commands.
 
 ```
-./out/simulated/chip-app1 --command [TEST NAME]
+./out/debug/simulated/chip-app1 --command [TEST NAME]
 ```
 
 ## Interacting with the simulated app

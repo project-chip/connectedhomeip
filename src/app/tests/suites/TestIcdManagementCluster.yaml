@@ -20,6 +20,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Read the commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -28,29 +36,38 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read IdleModeInterval"
+    - label: "Read Feature Map"
       command: "readAttribute"
-      attribute: "IdleModeInterval"
+      attribute: "FeatureMap"
       response:
-          value: 2
+          value: 0x07
 
-    - label: "Read ActiveModeInterval"
+    - label: "Read IdleModeDuration"
       command: "readAttribute"
-      attribute: "ActiveModeInterval"
+      attribute: "IdleModeDuration"
       response:
-          value: 300
+          value: 3600
+
+    - label: "Read ActiveModeDuration"
+      command: "readAttribute"
+      attribute: "ActiveModeDuration"
+      response:
+          value: 10000
 
     - label: "Read ActiveModeThreshold"
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
       response:
-          value: 300
+          value: 1000
 
     - label: "Read ICDCounter"
       command: "readAttribute"
       attribute: "ICDCounter"
       response:
-          value: 0
+          constraints:
+              type: int32u
+              minValue: 0x0
+              maxValue: 0xFFFFFFFF
 
     - label: "Read ClientsSupportedPerFabric"
       command: "readAttribute"
@@ -85,11 +102,25 @@ tests:
       response:
           error: NOT_FOUND
 
-    - label: "Read RegisteredClients"
+    # chip-tool will register itself with the ICD during the tests.
+    - label: "Read RegisteredClients For Registration During Commissioning"
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value: []
+          value:
+              [
+                  {
+                      CheckInNodeID: commissionerNodeId,
+                      MonitoredSubject: commissionerNodeId,
+                  },
+              ]
+
+    - label: "Unregister Client Registered During Commissioning"
+      command: "UnregisterClient"
+      arguments:
+          values:
+              - name: "CheckInNodeID"
+                value: commissionerNodeId
 
     - label: "Register 1.0 (key too short)"
       command: "RegisterClient"
@@ -130,7 +161,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 2.1"
       command: "RegisterClient"
@@ -146,7 +180,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Register 3.1"
       command: "RegisterClient"
@@ -167,20 +204,11 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1001,
-                      Key: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2001,
-                      Key:
-                          "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1001 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
               ]
 
-    - label: "Register 1.1"
+    - label: "Register 1.1 (update)"
       command: "RegisterClient"
       arguments:
           values:
@@ -193,7 +221,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"
@@ -201,17 +232,8 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1002,
-                      Key: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2001,
-                      Key:
-                          "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
               ]
 
     - label: "Register 2.2 (wrong verification key)"
@@ -230,7 +252,10 @@ tests:
       response:
           values:
               - name: "ICDCounter"
-                value: 0
+                constraints:
+                    type: int32u
+                    minValue: 0x0
+                    maxValue: 0xFFFFFFFF
 
     - label: "Read RegisteredClients"
       command: "readAttribute"
@@ -238,16 +263,8 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1002,
-                      Key: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2002,
-                      Key: "\x02\x12\x22\x32\x42\x52\x62\x72\x82\x92\xa2\xb2\xc2\xd2\xe2\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2002 },
               ]
 
     - label: "Unregister 1.1 (wrong key)"
@@ -263,14 +280,7 @@ tests:
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value:
-              [
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2002,
-                      Key: "\x02\x12\x22\x32\x42\x52\x62\x72\x82\x92\xa2\xb2\xc2\xd2\xe2\x2f",
-                  },
-              ]
+          value: [{ CheckInNodeID: 201, MonitoredSubject: 2002 }]
 
     - label: "Unregister 2.1"
       command: "UnregisterClient"

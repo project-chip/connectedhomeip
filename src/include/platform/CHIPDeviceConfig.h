@@ -303,6 +303,19 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
+ * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+#ifndef WIFI_START_CHECK_TIME_USEC
+#define WIFI_START_CHECK_TIME_USEC 100000 // 100ms
+#endif
+#ifndef WIFI_START_CHECK_ATTEMPTS
+#define WIFI_START_CHECK_ATTEMPTS 5
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -344,6 +357,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+ *
+ * Enable support for WiFi Per-Device Credentials
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 0
 #endif
 
 /**
@@ -852,6 +874,16 @@
 #define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+ *
+ * Enable Thread Border Router service.
+ * Users should ensure OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE is set accordingly within their thread stack
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+#define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
 /**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *
@@ -1419,3 +1451,11 @@
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
 #endif
+
+/**
+ * CHIP_DEVICE_ENABLE_PORT_PARAMS enables command-line parameters to set the
+ * port to use for POSIX example applications.
+ */
+#ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
+#endif // CHIP_DEVICE_ENABLE_PORT_PARAMS

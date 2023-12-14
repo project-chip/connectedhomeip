@@ -24,7 +24,7 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBuilder
+from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
@@ -111,6 +111,8 @@ def BuildHostTarget():
         TargetPart('thermostat', app=HostApp.THERMOSTAT),
         TargetPart('java-matter-controller',
                    app=HostApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('kotlin-matter-controller',
+                   app=HostApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('minmdns', app=HostApp.MIN_MDNS),
         TargetPart('light', app=HostApp.LIGHT),
         TargetPart('lock', app=HostApp.LOCK),
@@ -133,6 +135,10 @@ def BuildHostTarget():
         TargetPart('dishwasher', app=HostApp.DISHWASHER),
         TargetPart('refrigerator', app=HostApp.REFRIGERATOR),
         TargetPart('rvc', app=HostApp.RVC),
+        TargetPart('air-purifier', app=HostApp.AIR_PURIFIER),
+        TargetPart('lit-icd', app=HostApp.LIT_ICD),
+        TargetPart('air-quality-sensor', app=HostApp.AIR_QUALITY_SENSOR),
+        TargetPart('network-manager', app=HostApp.NETWORK_MANAGER),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -206,6 +212,7 @@ def BuildEsp32Target():
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
+    target.AppendModifier('tracing', enable_insights_trace=True).OnlyIfRe("light")
 
     return target
 
@@ -331,6 +338,8 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller',
                    app=AndroidApp.JAVA_MATTER_CONTROLLER),
+        TargetPart('kotlin-matter-controller',
+                   app=AndroidApp.KOTLIN_MATTER_CONTROLLER),
         TargetPart('virtual-device-app',
                    app=AndroidApp.VIRTUAL_DEVICE_APP),
     ])
@@ -454,12 +463,18 @@ def BuildASRTarget():
 def BuildK32WTarget():
     target = BuildTarget('k32w', K32WBuilder)
 
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('k32w0', board=K32WBoard.K32W0),
+        TargetPart('k32w1', board=K32WBoard.K32W1)
+    ])
+
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=K32WApp.LIGHT, release=True),
         TargetPart('shell', app=K32WApp.SHELL, release=True),
         TargetPart('lock', app=K32WApp.LOCK, release=True),
-        TargetPart('contact', app=K32WApp.CONTACT, release=True),
+        TargetPart('contact', app=K32WApp.CONTACT, release=True)
     ])
 
     target.AppendModifier(name="se05x", se05x=True)
@@ -470,6 +485,7 @@ def BuildK32WTarget():
     target.AppendModifier(name="crypto-platform", crypto_platform=True)
     target.AppendModifier(
         name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
+    target.AppendModifier(name="openthread-ftd", openthread_ftd=True)
 
     return target
 
@@ -522,6 +538,7 @@ def Buildcc32xxTarget():
     # apps
     target.AppendFixedTargets([
         TargetPart('lock', app=cc32xxApp.LOCK),
+        TargetPart('air-purifier', app=cc32xxApp.AIR_PURIFIER),
 
     ])
 
@@ -561,6 +578,8 @@ def BuildQorvoTarget():
         TargetPart('shell', app=QpgApp.SHELL),
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
     ])
+
+    target.AppendModifier('updateimage', update_image=True)
 
     return target
 
@@ -603,6 +622,7 @@ def BuildTizenTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("asan", use_asan=True)
     target.AppendModifier("ubsan", use_ubsan=True)
+    target.AppendModifier('with-ui', with_ui=True)
 
     return target
 
@@ -643,6 +663,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('fp', enable_frame_ptr=True)
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('mot', use_matter_openthread=True)
 
     return target
 
@@ -684,9 +705,11 @@ def BuildTelinkTarget():
     target.AppendFixedTargets([
         TargetPart('tlsr9518adk80d', board=TelinkBoard.TLSR9518ADK80D),
         TargetPart('tlsr9528a', board=TelinkBoard.TLSR9528A),
+        TargetPart('tlsr9528a_retention', board=TelinkBoard.TLSR9528A_RETENTION),
     ])
 
     target.AppendFixedTargets([
+        TargetPart('air-quality-sensor', app=TelinkApp.AIR_QUALITY_SENSOR),
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('bridge', app=TelinkApp.BRIDGE),
@@ -697,7 +720,6 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
-        TargetPart('resource-monitoring', app=TelinkApp.RESOURCE_MONITORING),
         TargetPart('shell', app=TelinkApp.SHELL),
         TargetPart('smoke-co-alarm', app=TelinkApp.SMOKE_CO_ALARM),
         TargetPart('temperature-measurement',
@@ -706,9 +728,13 @@ def BuildTelinkTarget():
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
+    target.AppendModifier('ota', enable_ota=True)
+    target.AppendModifier('dfu', enable_dfu=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)
+    target.AppendModifier('4mb', enable_4mb_flash=True)
+    target.AppendModifier('mars', mars_board_config=True)
 
     return target
 

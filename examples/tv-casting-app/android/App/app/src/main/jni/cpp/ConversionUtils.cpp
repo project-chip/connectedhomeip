@@ -21,6 +21,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <string.h>
+#include <system/SystemClock.h>
 
 CHIP_ERROR convertJAppParametersToCppAppParams(jobject appParameters, AppParams & outAppParams)
 {
@@ -155,8 +157,37 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
     jstring jHostName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getHostNameField));
     const char * hostName     = env->GetStringUTFChars(jHostName, 0);
 
+    jfieldID jPort = env->GetFieldID(jVideoPlayerClass, "port", "I");
+    uint16_t port  = static_cast<uint16_t>(env->GetIntField(videoPlayer, jPort));
+
+    jfieldID getInstanceNameField = env->GetFieldID(jVideoPlayerClass, "instanceName", "Ljava/lang/String;");
+    jstring jInstanceName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getInstanceNameField));
+    const char * instanceName     = {};
+    if (jInstanceName != nullptr)
+    {
+        instanceName = env->GetStringUTFChars(jInstanceName, 0);
+    }
+
+    jfieldID jLastDiscoveredMs = env->GetFieldID(jVideoPlayerClass, "lastDiscoveredMs", "J");
+    long lastDiscoveredMs      = static_cast<long>(env->GetLongField(videoPlayer, jLastDiscoveredMs));
+
+    jfieldID getMACAddressField = env->GetFieldID(jVideoPlayerClass, "MACAddress", "Ljava/lang/String;");
+    jstring jMACAddress         = static_cast<jstring>(env->GetObjectField(videoPlayer, getMACAddressField));
+    const char * MACAddress     = jMACAddress == nullptr ? nullptr : env->GetStringUTFChars(jMACAddress, 0);
+
+    jfieldID jIsAsleep = env->GetFieldID(jVideoPlayerClass, "isAsleep", "Z");
+    bool isAsleep      = static_cast<bool>(env->GetBooleanField(videoPlayer, jIsAsleep));
+
     outTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType, deviceName,
-                                        hostName);
+                                        hostName, 0, nullptr, port, instanceName, chip::System::Clock::Timestamp(lastDiscoveredMs));
+
+    if (MACAddress != nullptr)
+    {
+        chip::CharSpan MACAddressSpan(MACAddress, 2 * 2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength);
+        outTargetVideoPlayerInfo.SetMACAddress(MACAddressSpan);
+    }
+
+    outTargetVideoPlayerInfo.SetIsAsleep(isAsleep);
 
     jfieldID jContentAppsField = env->GetFieldID(jVideoPlayerClass, "contentApps", "Ljava/util/List;");
     jobject jContentApps       = env->GetObjectField(videoPlayer, jContentAppsField);
@@ -196,8 +227,9 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
         jclass jVideoPlayerClass;
         ReturnErrorOnFailure(
             chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
-        jmethodID jVideoPlayerConstructor = env->GetMethodID(
-            jVideoPlayerClass, "<init>", "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/String;Z)V");
+        jmethodID jVideoPlayerConstructor = env->GetMethodID(jVideoPlayerClass, "<init>",
+                                                             "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/"
+                                                             "String;Ljava/lang/String;IJLjava/lang/String;ZZ)V");
 
         jobject jContentAppList        = nullptr;
         TargetEndpointInfo * endpoints = targetVideoPlayerInfo->GetEndpoints();
@@ -217,6 +249,20 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
 
         jstring hostName =
             targetVideoPlayerInfo->GetHostName() == nullptr ? nullptr : env->NewStringUTF(targetVideoPlayerInfo->GetHostName());
+
+        jstring instanceName = targetVideoPlayerInfo->GetInstanceName() == nullptr
+            ? nullptr
+            : env->NewStringUTF(targetVideoPlayerInfo->GetInstanceName());
+
+        jstring MACAddress = nullptr;
+        if (targetVideoPlayerInfo->GetMACAddress() != nullptr && targetVideoPlayerInfo->GetMACAddress()->data() != nullptr)
+        {
+            char MACAddressWithNil[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength + 1];
+            memcpy(MACAddressWithNil, targetVideoPlayerInfo->GetMACAddress()->data(),
+                   targetVideoPlayerInfo->GetMACAddress()->size());
+            MACAddressWithNil[targetVideoPlayerInfo->GetMACAddress()->size()] = '\0';
+            MACAddress                                                        = env->NewStringUTF(MACAddressWithNil);
+        }
 
         jobject jIPAddressList                    = nullptr;
         const chip::Inet::IPAddress * ipAddresses = targetVideoPlayerInfo->GetIpAddresses();
@@ -240,11 +286,12 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
             }
         }
 
-        outVideoPlayer = env->NewObject(jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(),
-                                        targetVideoPlayerInfo->GetFabricIndex(), deviceName, targetVideoPlayerInfo->GetVendorId(),
-                                        targetVideoPlayerInfo->GetProductId(), targetVideoPlayerInfo->GetDeviceType(),
-                                        jContentAppList, targetVideoPlayerInfo->GetNumIPs(), jIPAddressList, hostName,
-                                        targetVideoPlayerInfo->GetOperationalDeviceProxy() != nullptr);
+        outVideoPlayer = env->NewObject(
+            jVideoPlayerClass, jVideoPlayerConstructor, targetVideoPlayerInfo->GetNodeId(), targetVideoPlayerInfo->GetFabricIndex(),
+            deviceName, targetVideoPlayerInfo->GetVendorId(), targetVideoPlayerInfo->GetProductId(),
+            targetVideoPlayerInfo->GetDeviceType(), jContentAppList, targetVideoPlayerInfo->GetNumIPs(), jIPAddressList, hostName,
+            instanceName, targetVideoPlayerInfo->GetPort(), targetVideoPlayerInfo->GetLastDiscovered().count(), MACAddress,
+            targetVideoPlayerInfo->IsAsleep(), targetVideoPlayerInfo->GetOperationalDeviceProxy() != nullptr);
     }
     return CHIP_NO_ERROR;
 }

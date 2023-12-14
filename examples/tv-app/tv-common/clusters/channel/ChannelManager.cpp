@@ -131,18 +131,18 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     // Error: Found multiple matches
     if (matchedChannels.size() > 1)
     {
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kMultipleMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
         helper.Success(response);
     }
     else if (matchedChannels.size() == 0)
     {
         // Error: Found no match
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kNoMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
         helper.Success(response);
     }
     else
     {
-        response.status      = chip::app::Clusters::Channel::ChannelStatusEnum::kSuccess;
+        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;
@@ -188,6 +188,40 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+    return true;
+}
+
+void ChannelManager::HandleGetProgramGuide(
+    CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
+    const chip::Optional<uint32_t> & endTime,
+    const chip::Optional<chip::app::DataModel::DecodableList<ChannelInfoType>> & channelList,
+    const chip::Optional<PageTokenType> & pageToken, const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,
+    const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+    const chip::Optional<chip::ByteSpan> & data)
+{
+
+    // 1. Decode received parameters
+    // 2. Perform search
+    // 3. Return results
+    ProgramGuideResponseType response;
+    // response.channelPagingStruct;
+    // response.programList;
+    helper.Success(response);
+}
+
+bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
+                                         const DataModel::DecodableList<AdditionalInfo> & externalIdList,
+                                         const chip::ByteSpan & data)
+{
+    // Start recording
+    return true;
+}
+
+bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
+                                               const DataModel::DecodableList<AdditionalInfo> & externalIdList,
+                                               const chip::ByteSpan & data)
+{
+    // Cancel recording
     return true;
 }
 

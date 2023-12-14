@@ -106,27 +106,6 @@ tests:
           [1692617790.900428][31584:31586] CHIP:TOO:       Revision: 1
           [1692617790.900430][31584:31586] CHIP:TOO:      }
 
-          ./chip-tool descriptor read device-type-list 1 1
-
-          On TH (Chip-tool) log, Verify that
-          - If PartsLists count is 0 then, DeviceTypeList count is at least one.
-          - DeviceTypeList should contains exactly one Application Device Type [In below log 256(In hex 0x100) is a   Application Device Type(On/OffLight)] or set of Application Device Types which are a subset of each other.
-          -  DeviceTypeList may contain one or more Utility Device Types, but not Root Node Device Type.[In below log DeviceType: 17(In hex 0x0011) is a Utility DeviceType ]
-          -  Revision value  is not less than 1 and it should match the Revision of the DeviceType and below is the sample log provided for the raspi platform
-
-          [1674552599.264189][21135:21137] CHIP:DMG: }
-          [1692617790.900384][31584:31586] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 2832593371
-          [1692617790.900398][31584:31586] CHIP:TOO:   DeviceTypeList: 2 entries
-          [1692617790.900410][31584:31586] CHIP:TOO:     [1]: {
-          [1692617790.900413][31584:31586] CHIP:TOO:       DeviceType: 256
-          [1692617790.900416][31584:31586] CHIP:TOO:       Revision: 1
-          [1692617790.900419][31584:31586] CHIP:TOO:      }
-          [1692617790.900423][31584:31586] CHIP:TOO:     [2]: {
-          [1692617790.900425][31584:31586] CHIP:TOO:       DeviceType: 17
-          [1692617790.900428][31584:31586] CHIP:TOO:       Revision: 1
-          [1692617790.900430][31584:31586] CHIP:TOO:      }
-
-
           ./chip-tool descriptor read  parts-list 1 2
 
           Verify parts-list response contains 0 entries on the TH (Chip-tool) and below is the sample log provided for the raspi platform:
@@ -235,6 +214,20 @@ tests:
           [1693218196.393772][13451:13453] CHIP:TOO:     [68]: 1294
           [1693218196.393783][13451:13453] CHIP:TOO:     [69]: 2820
           [1693218196.393794][13451:13453] CHIP:TOO:     [70]: 4294048773
+
+          ./chip-tool descriptor read server-list 1 2
+
+          Verify ServerList entries on TH (Chip-tool) Log and below is the sample log provided for the raspi platform, Here ServerList entries are 7.
+
+          [1692618559.962829][31688:31690] CHIP:TOO: Endpoint: 2 Cluster: 0x0000_001D Attribute 0x0000_0001 DataVersion: 1103199808
+          [1692618559.962884][31688:31690] CHIP:TOO:   ServerList: 7 entries
+          [1692618559.962910][31688:31690] CHIP:TOO:     [1]: 3
+          [1692618559.962922][31688:31690] CHIP:TOO:     [2]: 4
+          [1692618559.962933][31688:31690] CHIP:TOO:     [3]: 5
+          [1692618559.962945][31688:31690] CHIP:TOO:     [4]: 6
+          [1692618559.962955][31688:31690] CHIP:TOO:     [5]: 29
+          [1692618559.962966][31688:31690] CHIP:TOO:     [6]: 47
+          [1692618559.962978][31688:31690] CHIP:TOO:     [7]: 1030
       disabled: true
 
     - label: "Step 3: TH reads 'ClientList' attribute"

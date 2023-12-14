@@ -36,7 +36,7 @@ public:
     virtual ~CommissionableDataProvider() = default;
 
     // Not copyable
-    CommissionableDataProvider(const CommissionableDataProvider &) = delete;
+    CommissionableDataProvider(const CommissionableDataProvider &)             = delete;
     CommissionableDataProvider & operator=(const CommissionableDataProvider &) = delete;
 
     /**

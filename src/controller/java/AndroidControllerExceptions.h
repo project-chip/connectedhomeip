@@ -24,8 +24,8 @@ namespace chip {
 class AndroidControllerExceptions
 {
 public:
-    AndroidControllerExceptions(const AndroidControllerExceptions &)  = delete;
-    AndroidControllerExceptions(const AndroidControllerExceptions &&) = delete;
+    AndroidControllerExceptions(const AndroidControllerExceptions &)             = delete;
+    AndroidControllerExceptions(const AndroidControllerExceptions &&)            = delete;
     AndroidControllerExceptions & operator=(const AndroidControllerExceptions &) = delete;
 
     static AndroidControllerExceptions & GetInstance()

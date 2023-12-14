@@ -17,10 +17,6 @@
         {
             "name": "header",
             "path": "partials/header.zapt"
-        },
-        {
-            "name": "im_command_handler_cluster_commands",
-            "path": "partials/im_command_handler_cluster_commands.zapt"
         }
     ],
     "templates": [

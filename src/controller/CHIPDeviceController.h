@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/ClusterStateCache.h>
@@ -186,6 +186,16 @@ public:
         if (mSystemState)
         {
             return mSystemState->SessionMgr();
+        }
+
+        return nullptr;
+    }
+
+    Messaging::ExchangeManager * ExchangeMgr()
+    {
+        if (mSystemState != nullptr)
+        {
+            return mSystemState->ExchangeMgr();
         }
 
         return nullptr;
@@ -602,6 +612,22 @@ public:
 
     /**
      * @brief
+     *   This function is called by the DevicePairingDelegate to indicate that ICD registration info (ICDSymmetricKey,
+     * ICDCheckInNodeId and ICDMonitoredSubject) have been set on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(). As a result, commissioning can advance to the next stage.
+     *
+     * The DevicePairingDelegate may call this method from the OnICDRegistrationInfoRequired callback, or it may call this
+     * method after obtaining required parameters for ICD registration using asyncronous methods (like RPC call etc).
+     *
+     * When the ICD Registration completes, OnICDRegistrationComplete will be called.
+     *
+     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state
+     * (kICDGetRegistrationInfo).
+     */
+    CHIP_ERROR ICDRegistrationInfoReady();
+
+    /**
+     * @brief
      *  This function returns the current CommissioningStage for this commissioner.
      */
     CommissioningStage GetCommissioningStage() { return mCommissioningStage; }
@@ -860,6 +886,9 @@ private:
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
 
+    static void OnICDManagementRegisterClientResponse(
+        void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -925,7 +954,10 @@ private:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Parsers for the two different read clients
     void ParseCommissioningInfo();
-    void ParseFabrics();
+    void ParseCommissioningInfo2();
+    // Called by ParseCommissioningInfo2
+    CHIP_ERROR ParseFabrics(ReadCommissioningInfo2 & info);
+    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo2 & info);
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT

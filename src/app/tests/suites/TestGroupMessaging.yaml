@@ -22,6 +22,10 @@ config:
     nodeId: 0x12344321
     cluster: "Basic Information"
     endpoint: 0
+    # Test that a group id can be a variable.
+    groupIdVariable:
+        type: int16u
+        defaultValue: 0x0101
     nodeId2:
         type: node_id
         defaultValue: 0x43211234
@@ -215,7 +219,7 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: 0x0101
+      groupId: groupIdVariable # 0x0101
 
     # Give the group invoke time to actually happen; unicast delivery can outrace
     # multicast if the unicast packet is sent immediately after the multicast one.

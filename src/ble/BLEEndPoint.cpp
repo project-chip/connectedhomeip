@@ -1375,10 +1375,10 @@ CHIP_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
 #endif
             // If we have a message received callback, and end point is not closing...
             if (mBleTransport != nullptr && mState != kState_Closing)
-        {
-            // Pass received message up the stack.
-            mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
-        }
+            {
+                // Pass received message up the stack.
+                mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
+            }
     }
 
 exit:

@@ -34,6 +34,7 @@
 
 #include <system/SystemError.h>
 #include <system/SystemLayer.h>
+#include <system/SystemStats.h>
 
 #include <zephyr/sys/reboot.h>
 
@@ -122,7 +123,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-#if CONFIG_REBOOT
+#ifdef CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
 #else
     // NB: When this is implemented, |mInitialized| can be removed.
@@ -138,6 +139,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_PostEvent(const ChipDe
         ChipLogError(DeviceLayer, "Failed to post event to CHIP Platform event queue");
         return System::MapErrorZephyr(status);
     }
+
+    SYSTEM_STATS_INCREMENT(System::Stats::kPlatformMgr_NumEvents);
 
     // Wake CHIP thread to process the event. If the function is called from ISR, such as a Zephyr
     // timer handler, do not signal the thread directly because that involves taking a mutex, which
@@ -159,7 +162,10 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::ProcessDeviceEvents()
     ChipDeviceEvent event;
 
     while (k_msgq_get(&mChipEventQueue, &event, K_NO_WAIT) == 0)
+    {
+        SYSTEM_STATS_DECREMENT(System::Stats::kPlatformMgr_NumEvents);
         Impl()->DispatchEvent(&event);
+    }
 }
 
 template <class ImplClass>
@@ -203,7 +209,7 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(void)
 {
     if (!mChipThreadStack)
-        return CHIP_ERROR_WELL_UNINITIALIZED;
+        return CHIP_ERROR_UNINITIALIZED;
 
     const auto tid = k_thread_create(&mChipThread, mChipThreadStack, CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE, EventLoopTaskMain,
                                      this, nullptr, nullptr, CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY, 0, K_NO_WAIT);

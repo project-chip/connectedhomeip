@@ -19,6 +19,8 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <unistd.h>
+
 #include <zephyr/logging/log.h>
 #include <zephyr/settings/settings.h>
 
@@ -27,7 +29,7 @@ using namespace ::chip::DeviceLayer;
 
 LOG_MODULE_REGISTER(runner, CONFIG_MATTER_LOG_LEVEL);
 
-extern "C" void main(void)
+extern "C" int main(void)
 {
     VerifyOrDie(settings_subsys_init() == 0);
 
@@ -35,5 +37,5 @@ extern "C" void main(void)
     int status = RunRegisteredUnitTests();
     LOG_INF("CHIP test status: %d", status);
 
-    exit(status);
+    _exit(status);
 }

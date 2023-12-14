@@ -79,8 +79,8 @@ protected:
     ~NFCManager() = default;
 
     // No copy, move or assignment.
-    NFCManager(const NFCManager &) = delete;
-    NFCManager(NFCManager &&)      = delete;
+    NFCManager(const NFCManager &)     = delete;
+    NFCManager(NFCManager &&)          = delete;
     void operator=(const NFCManager &) = delete;
 
     // NFCManager implementation getters.

@@ -171,7 +171,7 @@ standard names. */
 
 /* USER CODE BEGIN Defines */
 /* Section where parameter definitions can be added (for instance, to override default ones in FreeRTOS.h) */
-//#define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1  /* required only for Keil but does not hurt otherwise */
+// #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1  /* required only for Keil but does not hurt otherwise */
 #define configGENERATE_RUN_TIME_STATS 1
 
 #if (configGENERATE_RUN_TIME_STATS == 1)

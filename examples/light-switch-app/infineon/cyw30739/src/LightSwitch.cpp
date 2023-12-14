@@ -82,7 +82,7 @@ void LightSwitch::DimmerChangeBrightness(uint16_t kValue)
         // add to brightness vluse to change brightness after call dimmer change.
         sBrightness = kValue;
         data->Value =
-            (uint8_t)(sBrightness > CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM ? CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM : sBrightness);
+            (uint8_t) (sBrightness > CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM ? CHIP_DEVICE_CONFIG_BRIGHTNESS_MAXIMUM : sBrightness);
         data->IsGroup = BindingHandler::GetInstance().IsGroupBound();
         DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
     }

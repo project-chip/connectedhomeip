@@ -17,15 +17,15 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
-
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <openthread/platform/entropy.h>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
+
+#include <openthread/platform/entropy.h>
 
 #include <mbedtls/platform.h>
 
@@ -51,7 +51,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();
     SuccessOrExit(err);
-    err = GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>::DoInit(otInstanceInitSingle());
+    err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(otInst);
     SuccessOrExit(err);
 
     mbedtls_platform_set_calloc_free(pvPortCalloc, vPortFree);
@@ -143,7 +143,7 @@ extern "C" ot_system_event_t otrGetNotifyEvent(void)
 extern "C" void otrNotifyEvent(ot_system_event_t sevent)
 {
     uint32_t tag        = otrEnterCrit();
-    ot_system_event_var = (ot_system_event_t)(ot_system_event_var | sevent);
+    ot_system_event_var = (ot_system_event_t) (ot_system_event_var | sevent);
     otrExitCrit(tag);
 
     otSysEventSignalPending();

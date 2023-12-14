@@ -15,8 +15,6 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-set(BOARD tlsr9518adk80d)
-
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -38,13 +36,21 @@ else()
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
+else()
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
+  message(STATUS "Flash memory size is set to: 2mb")
+endif()
+
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
 set(CONF_FILE prj.conf)
@@ -68,8 +74,10 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
                            ${CHEF}/shell_common/include
+                           ${CHEF}/telink/include
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
+                           ${TELINK_COMMON}/app/include
 )
 
 if (CONFIG_CHIP_LIB_SHELL)
@@ -89,7 +97,12 @@ add_definitions(
 )
 
 target_sources(app PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    src/AppTask.cpp
+    ${TELINK_COMMON}/common/src/mainCommon.cpp
+    ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
+    ${TELINK_COMMON}/util/src/PWMDevice.cpp
+    ${TELINK_COMMON}/util/src/ButtonManager.cpp
+    ${TELINK_COMMON}/util/src/ThreadUtil.cpp
     ${CHEF}/common/stubs.cpp
 )
 
@@ -99,11 +112,6 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
-           
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()
 
 if (CONFIG_CHIP_PW_RPC)
 

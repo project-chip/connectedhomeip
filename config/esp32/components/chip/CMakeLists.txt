@@ -38,12 +38,9 @@ if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
 endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
-    if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
+    if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
         set(is_debug TRUE)
     else()
-        if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-            message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
-        endif()
         set(is_debug FALSE)
     endif()
 endif()
@@ -261,11 +258,24 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    chip_gn_arg_append("matter_enable_esp_insights_trace"                    "true")
+  chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
+     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+   target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_MATTER_EVENT_LIST)
+    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -318,7 +328,11 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
 if(CONFIG_ENABLE_PW_RPC)
-    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
 
 # When using the pregenerated files, there is a edge case where an error appears for
@@ -370,10 +384,6 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}"
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
-endif()
 
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 
@@ -483,7 +493,7 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x

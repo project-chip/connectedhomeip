@@ -45,7 +45,7 @@ public:
         kCommand,
         kEvent,
     };
-    PayloadEntry(const PayloadEntry &) = default;
+    PayloadEntry(const PayloadEntry &)             = default;
     PayloadEntry & operator=(const PayloadEntry &) = default;
 
     PayloadEntry() : mType(IMPayloadType::kNone), mName(""), mValue("") {}

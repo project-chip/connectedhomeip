@@ -40,7 +40,7 @@ struct pbkdf2_test_vector
 };
 
 static const uint8_t chiptest_key1[]                          = { 0xf2, 0xe3, 0x4b, 0xd9, 0x50, 0xe9, 0x1c, 0xf3, 0x7d, 0x22,
-                                         0xe1, 0x13, 0x5a, 0x39, 0x9b, 0x02, 0xa1, 0x7c, 0xb1, 0x93 };
+                                                                  0xe1, 0x13, 0x5a, 0x39, 0x9b, 0x02, 0xa1, 0x7c, 0xb1, 0x93 };
 static const struct pbkdf2_test_vector chiptest_test_vector_1 = { .password = chip::Uint8::from_const_char("password"),
                                                                   .plen     = 8,
                                                                   .salt     = chip::Uint8::from_const_char("saltSALTsaltSALT"),
@@ -52,7 +52,7 @@ static const struct pbkdf2_test_vector chiptest_test_vector_1 = { .password = ch
                                                                   .result   = CHIP_NO_ERROR };
 
 static const uint8_t chiptest_key2[]                          = { 0x2b, 0x77, 0x27, 0x5c, 0xc3, 0x12, 0x0b, 0x15, 0x13, 0xf6,
-                                         0xf3, 0xe0, 0x36, 0x49, 0xfd, 0x49, 0x33, 0x76, 0x52, 0x60 };
+                                                                  0xf3, 0xe0, 0x36, 0x49, 0xfd, 0x49, 0x33, 0x76, 0x52, 0x60 };
 static const struct pbkdf2_test_vector chiptest_test_vector_2 = { .password = chip::Uint8::from_const_char("password"),
                                                                   .plen     = 8,
                                                                   .salt     = chip::Uint8::from_const_char("saltSALTsaltSALT"),
@@ -64,7 +64,7 @@ static const struct pbkdf2_test_vector chiptest_test_vector_2 = { .password = ch
                                                                   .result   = CHIP_NO_ERROR };
 
 static const uint8_t chiptest_key3[]                          = { 0x82, 0xff, 0xaa, 0xfc, 0x0b, 0x04, 0x91, 0x80, 0xee, 0xa7,
-                                         0x9a, 0x04, 0x10, 0x31, 0x58, 0x87, 0xb6, 0x60, 0xac, 0x7e };
+                                                                  0x9a, 0x04, 0x10, 0x31, 0x58, 0x87, 0xb6, 0x60, 0xac, 0x7e };
 static const struct pbkdf2_test_vector chiptest_test_vector_3 = { .password = chip::Uint8::from_const_char("password"),
                                                                   .plen     = 8,
                                                                   .salt     = chip::Uint8::from_const_char("saltSALTsaltSALT"),
@@ -76,7 +76,7 @@ static const struct pbkdf2_test_vector chiptest_test_vector_3 = { .password = ch
                                                                   .result   = CHIP_NO_ERROR };
 
 static const uint8_t chiptest_key4[]                          = { 0xf8, 0x8a, 0xfb, 0xb7, 0x9d, 0xda, 0x3f, 0x28, 0x2e, 0x21,
-                                         0xad, 0xf2, 0x53, 0xd0, 0xe9, 0xf1, 0x70, 0x82, 0x3a, 0x9f };
+                                                                  0xad, 0xf2, 0x53, 0xd0, 0xe9, 0xf1, 0x70, 0x82, 0x3a, 0x9f };
 static const struct pbkdf2_test_vector chiptest_test_vector_4 = { .password = chip::Uint8::from_const_char("password"),
                                                                   .plen     = 8,
                                                                   .salt     = chip::Uint8::from_const_char("saltSALTsaltSALT"),

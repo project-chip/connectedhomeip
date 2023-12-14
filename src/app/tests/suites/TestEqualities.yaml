@@ -19,10 +19,10 @@ config:
     cluster: "EqualityCommands"
     endpoint: 1
     expectedValue:
-        type: INT16U
+        type: int16u
         defaultValue: 20003
     unexpectedValue:
-        type: INT16U
+        type: int16u
         defaultValue: 20004
 
 tests:

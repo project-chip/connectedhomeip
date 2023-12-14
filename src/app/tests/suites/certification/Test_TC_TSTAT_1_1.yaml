@@ -553,8 +553,16 @@ tests:
               type: list
               contains: [30]
 
+    - label: "Step 5a: Read the mandatory commands in AcceptedCommandList"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
     - label:
-          "Step 5a: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 5b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
           AcceptedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -562,9 +570,11 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3]
+              contains: [1, 2, 3]
 
-    - label: "Step 5b: Read the optional attribute: AcceptedCommandList"
+    - label:
+          "Step 5c: Read the optional (GetRelayStatusLog) command in
+          AcceptedCommandList"
       PICS: TSTAT.S.C04.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"

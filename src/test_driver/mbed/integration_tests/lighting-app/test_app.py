@@ -146,77 +146,79 @@ def test_light_ctrl(device, network):
 
 
 def test_device_info_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
-    status, payload = pw_client.rpcs.chip.rpc.Device.GetDeviceInfo()
-    assert status.ok() is True
-    assert payload.vendor_id is not None and payload.product_id is not None and payload.serial_number is not None
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
+        status, payload = pw_client.rpcs.chip.rpc.Device.GetDeviceInfo()
+        assert status.ok() is True
+        assert payload.vendor_id is not None and payload.product_id is not None and payload.serial_number is not None
 
-    device_details = get_device_details(device)
-    assert device_details is not None and len(device_details) != 0
+        device_details = get_device_details(device)
+        assert device_details is not None and len(device_details) != 0
 
-    assert int(device_details["VendorID"]) == payload.vendor_id
-    assert int(device_details["ProductID"]) == payload.product_id
-    assert int(device_details["Discriminator"]
-               ) == payload.pairing_info.discriminator
-    assert int(device_details["SetUpPINCode"]) == payload.pairing_info.code
+        assert int(device_details["VendorID"]) == payload.vendor_id
+        assert int(device_details["ProductID"]) == payload.product_id
+        assert int(device_details["Discriminator"]
+                   ) == payload.pairing_info.discriminator
+        assert int(device_details["SetUpPINCode"]) == payload.pairing_info.code
 
 
 def test_device_factory_reset_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
-    status, payload = pw_client.rpcs.chip.rpc.Device.FactoryReset()
-    assert status.ok() is True
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
+        status, payload = pw_client.rpcs.chip.rpc.Device.FactoryReset()
+        assert status.ok() is True
 
 
 def test_device_reboot_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
-    status, payload = pw_client.rpcs.chip.rpc.Device.Reboot()
-    assert status == Status.UNIMPLEMENTED
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
+        status, payload = pw_client.rpcs.chip.rpc.Device.Reboot()
+        assert status == Status.UNIMPLEMENTED
 
 
 def test_device_ota_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
-    status, payload = pw_client.rpcs.chip.rpc.Device.TriggerOta()
-    assert status == Status.UNIMPLEMENTED
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
+        status, payload = pw_client.rpcs.chip.rpc.Device.TriggerOta()
+        assert status == Status.UNIMPLEMENTED
 
 
 def test_ligth_ctrl_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
 
-    # Check light on
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Set(on=True)
-    assert status.ok() is True
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
-    assert status.ok() is True
-    assert payload.on is True
+        # Check light on
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Set(on=True)
+        assert status.ok() is True
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
+        assert status.ok() is True
+        assert payload.on is True
 
-    # Check light off
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Set(on=False)
-    assert status.ok() is True
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
-    assert status.ok() is True
-    assert payload.on is False
+        # Check light off
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Set(on=False)
+        assert status.ok() is True
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
+        assert status.ok() is True
+        assert payload.on is False
 
 
 def test_button_ctrl_rpc(device):
-    pw_client = PigweedClient(device, RPC_PROTOS)
+    with PigweedClient(device, RPC_PROTOS) as pw_client:
 
-    # Check button 0 (lighting)
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
-    assert status.ok() is True
-    initial_state = bool(payload.on)
+        # Check button 0 (lighting)
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
+        assert status.ok() is True
+        initial_state = bool(payload.on)
 
-    compare_state = not initial_state
-    status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0, pushed=True)
-    assert status.ok() is True
-    sleep(2)
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
-    assert status.ok() is True
-    assert payload.on == compare_state
+        compare_state = not initial_state
+        status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0,
+                                                               pushed=True)
+        assert status.ok() is True
+        sleep(2)
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
+        assert status.ok() is True
+        assert payload.on == compare_state
 
-    compare_state = initial_state
-    status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0, pushed=True)
-    assert status.ok() is True
-    sleep(2)
-    status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
-    assert status.ok() is True
-    assert payload.on == compare_state
+        compare_state = initial_state
+        status, payload = pw_client.rpcs.chip.rpc.Button.Event(idx=0,
+                                                               pushed=True)
+        assert status.ok() is True
+        sleep(2)
+        status, payload = pw_client.rpcs.chip.rpc.Lighting.Get()
+        assert status.ok() is True
+        assert payload.on == compare_state

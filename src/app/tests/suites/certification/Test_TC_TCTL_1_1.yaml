@@ -75,7 +75,7 @@ tests:
           be 1 if and only if TCTL.S.F02(A_STEP) & TCTL.S.F00(TN)"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: TCTL.S.F02 && !TCTL.S.F00
+      PICS: TCTL.S.F02 && TCTL.S.F00
       response:
           constraints:
               type: bitmap32

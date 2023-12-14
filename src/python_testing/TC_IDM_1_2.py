@@ -85,7 +85,8 @@ class TC_IDM_1_2(MatterBaseTest):
         for i in endpoints:
             dut_ep_cluster_ids = wildcard_descriptor[i][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
             unsupported_clusters[i] = list(set(all_cluster_ids) - set(dut_ep_cluster_ids))
-            supported_clusters[i] = set(dut_ep_cluster_ids)
+            # We only want to consider the set of standard clusters as "supported clusters", so use the intersection
+            supported_clusters[i] = set(dut_ep_cluster_ids).intersection(set(all_cluster_ids))
 
         # This is really unlikely to happen on any real product, so we're going to assert here if we can't find anything
         # since it's likely a test error

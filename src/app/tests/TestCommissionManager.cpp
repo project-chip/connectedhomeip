@@ -137,7 +137,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                                CommissioningWindowAdvertisement::kDnssdOnly);
+                                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,

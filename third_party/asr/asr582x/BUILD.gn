@@ -19,6 +19,11 @@ import("${chip_root}/src/platform/ASR/args.gni")
 declare_args() {
   # Build target to use for asr SDK. Use this to set global SDK defines.
   asr_target_project = ""
+
+  # Must be "4M" or "2M". For matter, ASR582X use 4M flash default.
+  asr_flash_max_size = "4M"
+
+  asr_enable_secureboot = false
 }
 
 assert(asr_target_project != "", "asr_target_project must be specified")
@@ -28,7 +33,6 @@ config("asr_sdk_config") {
   _include_dirs = [
     "${asr_sdk_build_root}/asr_sdk/config",
     "${asr_sdk_build_root}/asr_sdk/config/lwip_if",
-    "${asr_sdk_build_root}/asr_sdk/matter",
     "${asr_sdk_build_root}/asr_sdk/lib/wifi",
     "${asr_sdk_build_root}/asr_sdk/lib/ble",
     "${asr_sdk_build_root}/asr_sdk/lib/sys",
@@ -121,7 +125,6 @@ config("asr_sdk_config") {
     "CONFIG_IEEE80211W",
     "WFA_CERTIFICATE_N",
     "CFG_DUET_5822S",
-    "CFG_DUET_5822T",
     "MBEDTLS_HW",
     "MBEDTLS_HW_RSA",
     "MBEDTLS_HW_ECC",
@@ -132,6 +135,16 @@ config("asr_sdk_config") {
     "CFG_EASY_LOG_ENABLE=1",
     "CFG_EASY_LOG_MODULE_EN=1",
   ]
+
+  if (asr_flash_max_size == "2M") {
+    defines += [ "_OTA_CMP_VENDOR_" ]
+  } else {
+    defines += [ "CFG_DUET_5822T" ]
+  }
+
+  if (asr_enable_secureboot) {
+    defines += [ "_CFG_SECUREBOOT_" ]
+  }
 
   cflags_c = [
     "-mcpu=cortex-m4",

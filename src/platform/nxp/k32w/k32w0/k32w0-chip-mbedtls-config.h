@@ -104,7 +104,7 @@
  * RSA-2048 still requires the FREESCALE_PKHA_LONG_OPERANDS_ENABLE macro to be defined,
  * otherwise it fails at runtime.
  */
-//#define FREESCALE_PKHA_LONG_OPERANDS_ENABLE
+// #define FREESCALE_PKHA_LONG_OPERANDS_ENABLE
 #endif
 
 /* Enable AES use in library if there is AES on chip. */

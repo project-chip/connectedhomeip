@@ -65,9 +65,6 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-#include <app/server/Server.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -209,15 +206,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
-        {
-            // Refresh Multicast listening
-            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-            Server::GetInstance().RejoinExistingMulticastGroups();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_DETAIL_LOGGING
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
@@ -499,9 +487,13 @@ ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<I
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    if (otLinkGetCslPeriod(mOTInst) != 0)
+#else
     if (otLinkCslGetPeriod(mOTInst) != 0)
+#endif // OPENTHREAD_API_VERSION
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
-#endif
+#endif // CHIP_DEVICE_CONFIG_THREAD_SSED
 
     ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 
@@ -1710,7 +1702,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.
-#if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
+#if defined(OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE) && OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
     otIp6SetSlaacEnabled(otInst, true);
 #endif
 
@@ -1765,8 +1757,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
 // * poll period for SED devices that poll the parent for data
 // * CSL period for SSED devices that listen for messages in scheduled time slots.
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    // Get CSL period in units of us and divide by 1000 to get milliseconds.
+    uint32_t curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
     // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
     uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
@@ -1774,9 +1771,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
     if (pollingInterval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+        // Set CSL period in units of us and divide by 1000 to get milliseconds.
+        otErr         = otLinkSetCslPeriod(mOTInst, pollingInterval.count() * 1000);
+        curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
         otErr         = otLinkCslSetPeriod(mOTInst, pollingInterval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
         curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
         otErr         = otLinkSetPollPeriod(mOTInst, pollingInterval.count());
         curIntervalMS = otLinkGetPollPeriod(mOTInst);
@@ -2075,7 +2078,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2175,7 +2178,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2224,7 +2227,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2249,7 +2252,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 

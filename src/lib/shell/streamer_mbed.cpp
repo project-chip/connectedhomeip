@@ -56,7 +56,7 @@ streamer_t * streamer_get()
     return &streamer_stdio;
 }
 
-#endif //#ifndef SHELL_STREAMER_APP_SPECIFIC
+#endif // #ifndef SHELL_STREAMER_APP_SPECIFIC
 
 } // namespace Shell
 } // namespace chip

@@ -26,7 +26,7 @@
 
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

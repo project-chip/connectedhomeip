@@ -101,9 +101,6 @@ template("asr_sdk_sources") {
       "demo/matter_demo/app/ble_demo/duet_hl_matter/app.c",
       "demo/matter_demo/app/ble_demo/duet_hl_matter/user_platform.c",
 
-      #matter
-      "matter/asr_factory_config.c",
-
       #elog
       "common/duet/easylogger/elog_async.c",
       "common/duet/easylogger/elog_buf.c",

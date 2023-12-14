@@ -12,7 +12,7 @@ using DeviceScannedCallback
     = void (*)(PyObject * context, const char * address, uint16_t discriminator, uint16_t vendorId, uint16_t productId);
 using ScanCompleteCallback = void (*)(PyObject * context);
 using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
-}
+} // namespace
 
 @interface ChipDeviceBleScanner : NSObject <CBCentralManagerDelegate>
 

@@ -376,7 +376,7 @@ CHIP_TLV_CERT_ERROR_TEST_CASES = [
         "is_get_cert_type_expected_to_fail": False,
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong "
+        "description": "Certificate Key Usage extension digitalSignature field is wrong "
         "(not present for NOC and present for ICAC/RCAC)",
         "test_name": 'Ext-KeyUsage-DigSig-Wrong',
         "error_flag": 'ext-key-usage-dig-sig',

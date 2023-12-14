@@ -33,6 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/PlatformManager.h>
 
 namespace chip {
@@ -40,8 +41,8 @@ namespace DeviceLayer {
 namespace Internal {
 
 // CHIPoBLE UUID strings
-const char * chip_service_uuid       = "0000FFF6-0000-1000-8000-00805F9B34FB";
-const char * chip_service_uuid_short = "FFF6";
+const char chip_service_uuid[]       = "0000FFF6-0000-1000-8000-00805F9B34FB";
+const char chip_service_uuid_short[] = "FFF6";
 
 ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
 
@@ -145,25 +146,22 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
 
 CHIP_ERROR ChipDeviceScanner::TriggerScan(ChipDeviceScanner * self)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    GSource * idleSource;
+    GAutoPtr<GSource> idleSource;
     int ret;
 
     // Trigger LE Scan
     ret = bt_adapter_le_start_scan(LeScanResultCb, self);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret));
-                 err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnValue(ret == BT_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret)));
     self->mIsScanning = true;
 
     // Setup timer for scan timeout
-    idleSource = g_timeout_source_new(self->mScanTimeoutMs);
-    g_source_set_callback(idleSource, TimerExpiredCb, self, nullptr);
-    g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
-    g_source_attach(idleSource, g_main_context_get_thread_default());
-    g_source_unref(idleSource);
+    idleSource = GAutoPtr<GSource>(g_timeout_source_new(self->mScanTimeoutMs));
+    g_source_set_callback(idleSource.get(), TimerExpiredCb, self, nullptr);
+    g_source_set_priority(idleSource.get(), G_PRIORITY_HIGH_IDLE);
+    g_source_attach(idleSource.get(), g_main_context_get_thread_default());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 static bool __IsScanFilterSupported()

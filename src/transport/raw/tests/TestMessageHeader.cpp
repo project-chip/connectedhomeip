@@ -23,9 +23,9 @@
  *
  */
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
 #include <transport/raw/MessageHeader.h>
@@ -432,7 +432,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test MX ==================
     {
@@ -441,7 +441,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=none, MX=1, SX=0
@@ -449,7 +449,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x04\x00\x00\x20\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=none, DST=1, MX=1, SX=0
@@ -457,7 +457,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + DST_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x01\x00\x00\x20\xCC\xCC\xCC\xCC\xDD\xDD\xDD\xDD\xDD\xDD\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=0
@@ -474,7 +474,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + GID_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x02\x00\x00\x21\xCC\xCC\xCC\xCC\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     {
         // SRC=1, DST=group, MX=1, SX=0
@@ -482,7 +482,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN,
         .msgLength        = HDR_LEN + MX_LEN + SRC_LEN + GID_LEN + PRO_LEN + APP_LEN,
         .msg              = "\x06\x00\x00\x21\xCC\xCC\xCC\xCC\x11\x11\x11\x11\x11\x11\x11\x11\xDD\xDD\x04\x00\xE4\xE3\xE2\xE1"
-               "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
+                            "\x01\xCC\xEE\xEE\x66\x66\xBB\xBB",
     },
     // ================== Test SX ==================
     {
@@ -491,7 +491,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN + SX_LEN,
         .msgLength        = HDR_LEN + PRO_LEN + SX_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x00\xCC\xCC\xCC\xCC"
-               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+                            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=none, DST=none, MX=1, SX=1
@@ -499,7 +499,7 @@ struct TestVectorMsgExtensions theTestVectorMsgExtensions[] = {
         .appPayloadOffset = PRO_LEN + SX_LEN,
         .msgLength        = HDR_LEN + MX_LEN + PRO_LEN + SX_LEN + APP_LEN,
         .msg              = "\x00\x00\x00\x20\xCC\xCC\xCC\xCC\x04\x00\xE4\xE3\xE2\xE1"
-               "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
+                            "\x08\xCC\xEE\xEE\x66\x66\x04\x00\xE4\xE3\xE2\xE1\xBB\xBB",
     },
     {
         // SRC=1, DST=1, MX=1, SX=1

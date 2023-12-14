@@ -100,6 +100,9 @@ public:
         mClusterStateCache = std::move(aClusterStateCache);
     }
 
+    // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
+    void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
+
 protected:
     // Report an error, which may be due to issues in our own internal state or
     // due to the OnError callback happening.
@@ -119,10 +122,12 @@ private:
 
     // OnEventData and OnAttributeData must be implemented by subclasses.
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB * apStatus) override = 0;
+        const chip::app::StatusIB * apStatus) override
+        = 0;
 
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB & aStatus) override = 0;
+        const chip::app::StatusIB & aStatus) override
+        = 0;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -176,6 +181,10 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
+
+    // Copied from ReadClient and customized for
+    uint32_t ComputeTimeTillNextSubscription();
+    uint32_t mResubscriptionNumRetries = 0;
 };
 
 NS_ASSUME_NONNULL_END

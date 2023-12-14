@@ -19,8 +19,8 @@
 #include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <transport/TracingStructs.h>
@@ -375,6 +375,8 @@ void JsonBackend::LogNodeDiscovered(NodeDiscoveredInfo & info)
         result["mrp"]["idle_retransmit_timeout_ms"]   = info.result->mrpRemoteConfig.mIdleRetransTimeout.count();
         result["mrp"]["active_retransmit_timeout_ms"] = info.result->mrpRemoteConfig.mActiveRetransTimeout.count();
         result["mrp"]["active_threshold_time_ms"]     = info.result->mrpRemoteConfig.mActiveThresholdTime.count();
+
+        result["isICDOperatingAsLIT"] = info.result->isICDOperatingAsLIT;
 
         value["result"] = result;
     }

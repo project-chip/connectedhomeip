@@ -29,18 +29,41 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="2"/>
 
-    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="ENUM8" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
+    <attribute side="server" code="0x0000" define="TEMPERATURE_DISPLAY_MODE" type="TemperatureDisplayModeEnum" min="0x00" max="0x01" writable="true" default="0x00" optional="false">TemperatureDisplayMode</attribute>
 
-    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="ENUM8" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
+    <attribute side="server" code="0x0001" define="KEYPAD_LOCKOUT" type="KeypadLockoutEnum" min="0x00" max="0x05" writable="true" default="0x00" optional="false">
       <description>KeypadLockout</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ENUM8" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
+    <attribute side="server" code="0x0002" define="SCHEDULE_PROGRAMMING_VISIBILITY" type="ScheduleProgrammingVisibilityEnum" min="0x00" max="0x01" writable="true" optional="true" introducedIn="ha-1.2-05-3520-29">
       <description>ScheduleProgrammingVisibility</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
   </cluster>
+
+  <enum name="KeypadLockoutEnum" type="enum8">
+    <cluster code="0x0204"/>
+    <item name="NoLockout" value="0x00"/>
+    <item name="Lockout1" value="0x01"/>
+    <item name="Lockout2" value="0x02"/>
+    <item name="Lockout3" value="0x03"/>
+    <item name="Lockout4" value="0x04"/>
+    <item name="Lockout5" value="0x05"/>
+  </enum>
+
+  <enum name="ScheduleProgrammingVisibilityEnum" type="enum8">
+    <cluster code="0x0204"/>
+    <item name="ScheduleProgrammingPermitted" value="0x00"/>
+    <item name="ScheduleProgrammingDenied" value="0x01"/>
+  </enum>
+
+  <enum name="TemperatureDisplayModeEnum" type="enum8">
+    <cluster code="0x0204"/>
+    <item name="Celsius" value="0x00"/>
+    <item name="Fahrenheit" value="0x01"/>
+  </enum>
+
 </configurator>

@@ -36,8 +36,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
-import chip.onboardingpayload.OnboardingPayloadParser
-import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.databinding.BarcodeFragmentBinding
@@ -50,6 +48,8 @@ import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import matter.onboardingpayload.OnboardingPayloadParser
+import matter.onboardingpayload.UnrecognizedQrCodeException
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment() {

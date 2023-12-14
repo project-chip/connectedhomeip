@@ -34,8 +34,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
         mResult = attestationResult;
 
         id<MTRDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
-        if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:
-                                                                              opaqueDeviceHandle:attestationDeviceInfo:error:)]
+        if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]
             || [strongDelegate respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
@@ -51,8 +50,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                 NSError * error = (attestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
                     ? nil
                     : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                if ([strongDelegate respondsToSelector:@selector
-                                    (deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
+                if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
                     [strongDelegate deviceAttestationCompletedForController:mDeviceController
                                                          opaqueDeviceHandle:device
                                                       attestationDeviceInfo:deviceInfo

@@ -49,7 +49,7 @@ void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
             spake_objects_created--;
         }
     }
-#endif //#if ENABLE_REENTRANCY
+#endif // #if ENABLE_REENTRANCY
     return;
 }
 
@@ -204,7 +204,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
         se05x_init_cryptoObj_mutex();
         alreadyInitialised = true;
     }
-#endif //#if ENABLE_REENTRANCY
+#endif // #if ENABLE_REENTRANCY
 
     if (context_len > 0)
     {
@@ -441,4 +441,4 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 } // namespace Crypto
 } // namespace chip
 
-#endif //#if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
+#endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
