@@ -216,4 +216,10 @@ inline uint64_t SecondsToMilliseconds(uint32_t seconds)
     return (seconds * kMillisecondsPerSecond);
 }
 
+// For backwards-compatibility of public API.
+[[deprecated("Use SecondsToMilliseconds")]] inline uint64_t secondsToMilliseconds(uint32_t seconds)
+{
+    return SecondsToMilliseconds(seconds);
+}
+
 } // namespace chip
