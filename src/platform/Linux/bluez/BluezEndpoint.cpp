@@ -682,8 +682,8 @@ CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char 
         mpConnectCancellable.reset(g_cancellable_new());
     }
 
-    err =
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
     ChipLogDetail(DeviceLayer, "BlueZ integration init success");
