@@ -539,7 +539,7 @@ OnOff
 OperationalCredentials
 PumpConfigurationAndControl
 RelativeHumidityMeasurement
-Scenes
+MatterScenes
 SoftwareDiagnostics
 Switch
 Channel
