@@ -31,6 +31,16 @@ using namespace chip::app::Clusters::EnergyEvse::Attributes;
 using chip::app::LogEvent;
 using chip::Protocols::InteractionModel::Status;
 
+EnergyEvseDelegate::~EnergyEvseDelegate()
+{
+    // TODO Fix this as part of issue #30993 refactoring
+    if (!mVehicleID.IsNull())
+    {
+        ChipLogDetail(AppServer, "Freeing VehicleID");
+        delete[] mVehicleID.Value().data();
+    }
+}
+
 /**
  * @brief   Called when EVSE cluster receives Disable command
  */
@@ -395,6 +405,7 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
+    // TODO this code to be refactored - See Issue #30993
     if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
     {
         return Status::Success;
