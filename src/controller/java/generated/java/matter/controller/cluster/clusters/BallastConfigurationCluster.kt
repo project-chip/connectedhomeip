@@ -183,10 +183,8 @@ class BallastConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeMinLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMinLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -201,7 +199,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -256,10 +254,8 @@ class BallastConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeMaxLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeMaxLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 17u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -274,7 +270,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -339,10 +335,11 @@ class BallastConfigurationCluster(
     return IntrinsicBallastFactorAttribute(decodedValue)
   }
 
-  suspend fun writeIntrinsicBallastFactorAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeIntrinsicBallastFactorAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 20u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -357,7 +354,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -424,11 +421,9 @@ class BallastConfigurationCluster(
 
   suspend fun writeBallastFactorAdjustmentAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 21u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -443,7 +438,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -534,10 +529,8 @@ class BallastConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeLampTypeAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampTypeAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 48u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -552,7 +545,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -612,10 +605,8 @@ class BallastConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeLampManufacturerAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampManufacturerAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 49u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -630,7 +621,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -695,10 +686,8 @@ class BallastConfigurationCluster(
     return LampRatedHoursAttribute(decodedValue)
   }
 
-  suspend fun writeLampRatedHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampRatedHoursAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 50u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -713,7 +702,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -778,10 +767,8 @@ class BallastConfigurationCluster(
     return LampBurnHoursAttribute(decodedValue)
   }
 
-  suspend fun writeLampBurnHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampBurnHoursAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 51u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -796,7 +783,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -856,10 +843,8 @@ class BallastConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeLampAlarmModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampAlarmModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 52u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -874,7 +859,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -939,10 +924,11 @@ class BallastConfigurationCluster(
     return LampBurnHoursTripPointAttribute(decodedValue)
   }
 
-  suspend fun writeLampBurnHoursTripPointAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLampBurnHoursTripPointAttribute(
+    value: UInt,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 53u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -957,7 +943,7 @@ class BallastConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

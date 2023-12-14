@@ -192,10 +192,8 @@ class BridgedDeviceBasicInformationCluster(
     return decodedValue
   }
 
-  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -210,7 +208,7 @@ class BridgedDeviceBasicInformationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

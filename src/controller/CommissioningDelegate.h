@@ -684,18 +684,14 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
-    bool requiresUTC               = false;
-    bool requiresTimeZone          = false;
-    bool requiresDefaultNTP        = false;
-    bool requiresTrustedTimeSource = false;
-    uint8_t maxTimeZoneSize        = 1;
-    uint8_t maxDSTSize             = 1;
-};
-
-struct ReadCommissioningInfo2
-{
-    NodeId nodeId                     = kUndefinedNodeId;
-    bool isIcd                        = false;
+    bool requiresUTC                  = false;
+    bool requiresTimeZone             = false;
+    bool requiresDefaultNTP           = false;
+    bool requiresTrustedTimeSource    = false;
+    uint8_t maxTimeZoneSize           = 1;
+    uint8_t maxDSTSize                = 1;
+    NodeId remoteNodeId               = kUndefinedNodeId;
+    bool isLIT                        = false;
     bool checkInProtocolSupport       = false;
     bool supportsConcurrentConnection = true;
 };
@@ -730,8 +726,8 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo: ReadCommissioningInfo
-     * kReadCommissioningInfo2: ReadCommissioningInfo2
+     * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
+     * kReadCommissioningInfo2: ReadCommissioningInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
@@ -755,9 +751,9 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: none
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, ReadCommissioningInfo2, AttestationErrorInfo,
-                                         CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

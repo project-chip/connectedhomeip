@@ -51,10 +51,8 @@ class BasicInformationCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun mfgSpecificPing(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun mfgSpecificPing(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -64,7 +62,7 @@ class BasicInformationCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -257,10 +255,8 @@ class BasicInformationCluster(
     return decodedValue
   }
 
-  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNodeLabelAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -275,7 +271,7 @@ class BasicInformationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -330,10 +326,8 @@ class BasicInformationCluster(
     return decodedValue
   }
 
-  suspend fun writeLocationAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLocationAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -348,7 +342,7 @@ class BasicInformationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -712,10 +706,11 @@ class BasicInformationCluster(
     return decodedValue
   }
 
-  suspend fun writeLocalConfigDisabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLocalConfigDisabledAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -730,7 +725,7 @@ class BasicInformationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
