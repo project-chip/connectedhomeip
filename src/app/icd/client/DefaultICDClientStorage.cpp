@@ -294,6 +294,7 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
+    // TODO : Update key lifetime once creaKey method supports it.
     ReturnErrorOnFailure(mpKeyStore->CreateKey(keyMaterial, clientInfo.aes_key_handle));
     CHIP_ERROR err = mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
     if (err != CHIP_NO_ERROR)
