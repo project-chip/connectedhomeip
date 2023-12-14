@@ -40,8 +40,6 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 namespace chip {
 namespace app {
 
-inline constexpr uint8_t kAppDataLength = 6;
-
 CHIP_ERROR
 DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
