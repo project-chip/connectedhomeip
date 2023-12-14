@@ -17,6 +17,8 @@
  */
 
 #include "CastingPlayer.h"
+#include "Endpoint.h"
+
 #include "support/CastingStore.h"
 
 #include <app/server/Server.h>
@@ -27,7 +29,8 @@ namespace core {
 
 CastingPlayer * CastingPlayer::mTargetCastingPlayer = nullptr;
 
-void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, unsigned long long int commissioningWindowTimeoutSec)
+void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, unsigned long long int commissioningWindowTimeoutSec,
+                                                EndpointFilter desiredEndpointFilter)
 {
     ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection called");
 
@@ -46,40 +49,49 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
     mCommissioningWindowTimeoutSec = commissioningWindowTimeoutSec;
     mTargetCastingPlayer           = this;
 
-    // If this CastingPlayer is the cache of CastingPlayers the app previously connected to (and has nodeId and fabricIndex of),
-    // simply Find or Re-establish the CASE session and return early
+    // If *this* CastingPlayer was previously connected to, its nodeId, fabricIndex and other attributes should be present
+    // in the CastingStore cache. If that is the case, AND, the cached data contains the endpoint desired by the client, if any,
+    // as per desiredEndpointFilter, simply Find or Re-establish the CASE session and return early
     if (cachedCastingPlayers.size() != 0)
     {
         it = std::find_if(cachedCastingPlayers.begin(), cachedCastingPlayers.end(),
                           [this](const core::CastingPlayer & castingPlayerParam) { return castingPlayerParam == *this; });
 
+        // found the CastingPlayer in cache
         if (it != cachedCastingPlayers.end())
         {
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
-            *this          = cachedCastingPlayers[index];
+            if (ContainsDesiredEndpoint(&cachedCastingPlayers[index], desiredEndpointFilter))
+            {
+                *this = cachedCastingPlayers[index];
 
-            FindOrEstablishSession(
-                nullptr,
-                [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
-                    ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer successful");
-                    CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
-                    support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
-                    VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
-                    CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
-                },
-                [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
-                    ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer failed");
-                    CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                    support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
-                    VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
-                    CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
-                    mTargetCastingPlayer = nullptr;
-                });
-            return; // FindOrEstablishSession called. Return early.
+                FindOrEstablishSession(
+                    nullptr,
+                    [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
+                        ChipLogProgress(AppServer,
+                                        "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer successful");
+                        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+
+                        // this async call will Load all the endpoints with their respective attributes into the TargetCastingPlayer
+                        // persist the TargetCastingPlayer information into the CastingStore and call mOnCompleted()
+                        support::EndpointListLoader::GetInstance()->Initialize(&exchangeMgr, &sessionHandle);
+                        support::EndpointListLoader::GetInstance()->Load();
+                    },
+                    [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
+                        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer failed");
+                        CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                        support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                        VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
+                        CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
+                        mTargetCastingPlayer = nullptr;
+                    });
+                return; // FindOrEstablishSession called. Return early.
+            }
         }
     }
 
-    // this CastingPlayer is not in the list of cached CastingPlayers previously connected to. This VerifyOrEstablishConnection call
+    // this CastingPlayer is not in the list of cached CastingPlayers previously connected to or the cached data
+    // does not contain the endpoint the client desires to interact with. So, this VerifyOrEstablishConnection call
     // will require User Directed Commissioning.
     if (chip::Server::GetInstance().GetFailSafeContext().IsFailSafeArmed())
     {
@@ -101,13 +113,31 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection failed with %" CHIP_ERROR_FORMAT, err.Format());
         support::ChipDeviceEventHandler::SetUdcStatus(false);
         mConnectionState               = CASTING_PLAYER_NOT_CONNECTED;
         mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
-        mOnCompleted                   = nullptr;
         mTargetCastingPlayer           = nullptr;
-        ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection failed with %" CHIP_ERROR_FORMAT, err.Format());
         mOnCompleted(err, nullptr);
+        mOnCompleted = nullptr;
+    }
+}
+
+void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
+{
+    auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
+        return _endpoint->GetId() == endpoint->GetId();
+    });
+
+    // If existing endpoint, update mEndpoints. If new endpoint, add it to the vector mEndpoints
+    if (it != mEndpoints.end())
+    {
+        unsigned index    = (unsigned int) std::distance(mEndpoints.begin(), it);
+        mEndpoints[index] = endpoint;
+    }
+    else
+    {
+        mEndpoints.push_back(endpoint);
     }
 }
 
@@ -163,6 +193,24 @@ void CastingPlayer::FindOrEstablishSession(void * clientContext, chip::OnDeviceC
     chip::Server::GetInstance().GetCASESessionManager()->FindOrEstablishSession(
         chip::ScopedNodeId(mAttributes.nodeId, mAttributes.fabricIndex), connectionContext->mOnConnectedCallback,
         connectionContext->mOnConnectionFailureCallback);
+}
+
+bool CastingPlayer::ContainsDesiredEndpoint(core::CastingPlayer * cachedCastingPlayer, EndpointFilter desiredEndpointFilter)
+{
+    std::vector<memory::Strong<Endpoint>> cachedEndpoints = cachedCastingPlayer->GetEndpoints();
+    for (const auto & cachedEndpoint : cachedEndpoints)
+    {
+        bool match = true;
+        match = match && (desiredEndpointFilter.vendorId == 0 || cachedEndpoint->GetVendorId() == desiredEndpointFilter.vendorId);
+        match =
+            match && (desiredEndpointFilter.productId == 0 || cachedEndpoint->GetProductId() == desiredEndpointFilter.productId);
+        // TODO: check deviceTypeList
+        if (match)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void CastingPlayer::LogDetail() const

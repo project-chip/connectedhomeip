@@ -4083,7 +4083,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
   }
 
   readonly attribute nullable elapsed_s openDuration = 0;
-  readonly attribute nullable elapsed_s defaultOpenDuration = 1;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
   readonly attribute optional nullable epoch_us autoCloseTime = 2;
   readonly attribute nullable elapsed_s remainingDuration = 3;
   readonly attribute nullable ValveStateEnum currentState = 4;
@@ -8805,6 +8805,11 @@ internal cluster FaultInjection = 4294048774 {
 /** The Sample MEI cluster showcases a cluster manufacturer extensions */
 cluster SampleMei = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
+
+  fabric_sensitive info event PingCountEvent = 0 {
+    int32u count = 1;
+    fabric_idx fabricIndex = 254;
+  }
 
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
