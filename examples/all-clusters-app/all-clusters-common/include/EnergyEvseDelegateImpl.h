@@ -37,6 +37,8 @@ namespace EnergyEvse {
 class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
+    ~EnergyEvseDelegate();
+
     /**
      * @brief   Called when EVSE cluster receives Disable command
      */
