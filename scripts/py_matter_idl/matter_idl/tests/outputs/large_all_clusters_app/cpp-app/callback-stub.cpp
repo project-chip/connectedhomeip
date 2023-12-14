@@ -154,7 +154,7 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::RelativeHumidityMeasurement::Id:
         emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
         break;
-    case app::Clusters::Scenes::Id:
+    case app::Clusters::MatterScenes::Id:
         emberAfScenesClusterInitCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:

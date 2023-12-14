@@ -38,7 +38,7 @@
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
 {{/if}}
-{{else if (is_str_equal name "Scenes")}}
+{{else if (is_str_equal name "Matter Scenes")}}
 {{#if (is_server side)}}
 // User options for {{side}} plugin {{name}}
 {{/if}}
