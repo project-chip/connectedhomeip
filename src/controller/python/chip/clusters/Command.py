@@ -149,7 +149,13 @@ class AsyncBatchCommandsTransaction:
             self._handleError(status, 0, IndexError(f"CommandSenderCallback has given us an unexpected index value {index}"))
             return
 
-        if (len(response) == 0):
+        if status.IMStatus != chip.interaction_model.Status.Success:
+            try:
+                self._responses[index] = chip.interaction_model.InteractionModelError(
+                    chip.interaction_model.Status(status.IMStatus), status.ClusterStatus)
+            except AttributeError as ex:
+                self._handleError(status, 0, ex)
+        elif (len(response) == 0):
             self._responses[index] = None
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
@@ -173,9 +179,7 @@ class AsyncBatchCommandsTransaction:
 
     def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
         if self._future.done():
-            # TODO Right now this even callback happens if there was a real IM Status error on one command.
-            # We need to update OnError to allow providing a CommandRef that we can try associating with it.
-            logger.exception(f"Recieved another error, but we have sent error. imError:{imError}, chipError {chipError}")
+            logger.exception(f"Recieved another error, but we been have sent error. imError:{imError}, chipError {chipError}")
             return
         if exception:
             self._future.set_exception(exception)

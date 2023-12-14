@@ -120,10 +120,26 @@ public:
             return;
         }
 
-        gOnCommandSenderResponseCallback(
-            mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId, index, to_underlying(aStatus.mStatus),
-            aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
-            size);
+        gOnCommandSenderResponseCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId, index,
+                                         to_underlying(aStatus.mStatus),
+                                         aStatus.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus), buffer, size);
+    }
+
+    void OnPathSpecificError(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
+                             const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    {
+        // For legacy specific reasons when we are not processing a batch command we simply forward this to the OnError callback
+        // for more information on why see https://github.com/project-chip/connectedhomeip/issues/30991.
+        if (!mIsBatchedCommands)
+        {
+            OnError(apCommandSender, aStatusIB.ToChipError());
+            return;
+        }
+
+        // While the API contract for OnResponseWithAdditionalData states that it should only be called when aStatusIB indicates
+        // success, for chip-repl the callback for batch commands is written in manner that supports accepting both success and
+        // error StatusIB for batch commands, as such we just call that.
+        OnResponseWithAdditionalData(apCommandSender, aPath, aStatusIB, nullptr, aAdditionalResponseData);
     }
 
     void OnError(const CommandSender * apCommandSender, CHIP_ERROR aProtocolError) override
