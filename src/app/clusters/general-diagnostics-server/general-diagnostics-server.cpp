@@ -16,6 +16,11 @@
  */
 
 #include "general-diagnostics-server.h"
+
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#include "app/clusters/time-synchronization-server/time-synchronization-server.h"
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+
 #include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -192,7 +197,8 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         return ReadIfSupported(&DiagnosticDataProvider::GetRebootCount, aEncoder);
     }
     case UpTime::Id: {
-        return ReadIfSupported(&DiagnosticDataProvider::GetUpTime, aEncoder);
+        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
+        return aEncoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case TotalOperationalHours::Id: {
         return ReadIfSupported(&DiagnosticDataProvider::GetTotalOperationalHours, aEncoder);
@@ -385,9 +391,35 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
 bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
                                                           Commands::TimeSnapshot::DecodableType const & commandData)
 {
-    // TODO(#30096): Command needs to be implemented.
-    ChipLogError(Zcl, "TimeSnapshot not yet supported!");
-    commandObj->AddStatus(commandPath, Status::InvalidCommand);
+    ChipLogError(Zcl, "Received TimeSnapshot command!");
+
+    Commands::TimeSnapshotResponse::Type response;
+
+    System::Clock::Microseconds64 posix_time_us{0};
+
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+    bool time_is_synced = false;
+    using Clusters::TimeSynchronization::GranularityEnum;
+    GranularityEnum granularity = Clusters::TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity();
+    time_is_synced = (granularity == GranularityEnum::kSecondsGranularity) || (granularity == GranularityEnum::kMillisecondsGranularity) || (granularity == GranularityEnum::kMicrosecondsGranularity);
+
+    if (time_is_synced)
+    {
+        CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
+        if (posix_time_err != CHIP_NO_ERROR) {
+            ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
+            posix_time_us = System::Clock::Microseconds64{0};
+        }
+    }
+#endif // TIME_SYNCHRONIZATION_CLUSTER
+    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+
+    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    if (posix_time_us.count() != 0)
+    {
+        response.posixTimeMs.SetNonNull(static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
+    }
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
