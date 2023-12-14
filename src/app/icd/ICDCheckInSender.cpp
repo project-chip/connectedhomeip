@@ -62,7 +62,7 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     {
         uint8_t activeModeThresholdBuffer[kApplicationDataSize] = { 0 };
         size_t writtenBytes                                     = 0;
-        Encoding::LittleEndian::BufferWriter writer(activeModeThresholdBuffer, kApplicationDataSize);
+        Encoding::LittleEndian::BufferWriter writer(activeModeThresholdBuffer, sizeof(activeModeThresholdBuffer));
 
         writer.Put16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
         VerifyOrReturnError(writer.Fit(writtenBytes), CHIP_ERROR_INTERNAL);
