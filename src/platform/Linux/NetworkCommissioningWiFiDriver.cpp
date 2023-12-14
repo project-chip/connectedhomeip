@@ -25,7 +25,6 @@
 #include <vector>
 
 using namespace chip;
-using namespace chip::Thread;
 
 namespace chip {
 namespace DeviceLayer {
@@ -99,26 +98,16 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
     return CHIP_NO_ERROR;
 }
 
-bool LinuxWiFiDriver::NetworkMatch(const WiFiNetwork & network, ByteSpan networkId)
-{
-    return networkId.size() == network.ssidLen && memcmp(networkId.data(), network.ssid, network.ssidLen) == 0;
-}
-
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                                            uint8_t & outNetworkIndex)
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    VerifyOrReturnError(mStagingNetwork.ssidLen == 0 || NetworkMatch(mStagingNetwork, ssid), Status::kBoundsExceeded);
-
-    static_assert(sizeof(WiFiNetwork::ssid) <= std::numeric_limits<decltype(WiFiNetwork::ssidLen)>::max(),
-                  "Max length of WiFi ssid exceeds the limit of ssidLen field");
-    static_assert(sizeof(WiFiNetwork::credentials) <= std::numeric_limits<decltype(WiFiNetwork::credentialsLen)>::max(),
-                  "Max length of WiFi credentials exceeds the limit of credentialsLen field");
+    VerifyOrReturnError(mStagingNetwork.Empty() || mStagingNetwork.Match(ssid), Status::kBoundsExceeded);
 
     // Do the check before setting the values, so the data is not updated on error.
     VerifyOrReturnError(credentials.size() <= sizeof(mStagingNetwork.credentials), Status::kOutOfRange);
-    VerifyOrReturnError(ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
+    VerifyOrReturnError(!ssid.empty() && ssid.size() <= sizeof(mStagingNetwork.ssid), Status::kOutOfRange);
 
     memcpy(mStagingNetwork.credentials, credentials.data(), credentials.size());
     mStagingNetwork.credentialsLen = static_cast<decltype(mStagingNetwork.credentialsLen)>(credentials.size());
@@ -133,7 +122,7 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 {
     outDebugText.reduce_size(0);
     outNetworkIndex = 0;
-    VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
+    VerifyOrReturnError(mStagingNetwork.Match(networkId), Status::kNetworkIDNotFound);
 
     // Use empty ssid for representing invalid network
     mStagingNetwork.ssidLen = 0;
@@ -143,9 +132,9 @@ Status LinuxWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outD
 Status LinuxWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
-    VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
+    VerifyOrReturnError(mStagingNetwork.Match(networkId), Status::kNetworkIDNotFound);
+    VerifyOrReturnError(index == 0, Status::kOutOfRange);
     // We only support one network, so reorder is actually no-op.
-
     return Status::kSuccess;
 }
 
@@ -154,9 +143,9 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
+    VerifyOrExit(mStagingNetwork.Match(networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: SSID: %.*s", static_cast<int>(networkId.size()),
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", static_cast<int>(networkId.size()),
                     StringOrNullMarker((char *) networkId.data()));
 
     err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
@@ -170,7 +159,7 @@ exit:
 
     if (networkingStatus != Status::kSuccess)
     {
-        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
         callback->OnResult(networkingStatus, CharSpan(), 0);
     }
 }
@@ -186,12 +175,12 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
 
 size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
 {
-    return driver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
+    return driver->mStagingNetwork.Empty() ? 0 : 1;
 }
 
 bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    if (exhausted || driver->mStagingNetwork.ssidLen == 0)
+    if (exhausted || driver->mStagingNetwork.Empty())
     {
         return false;
     }

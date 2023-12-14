@@ -122,8 +122,8 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
-public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+public:
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {
@@ -132,7 +132,6 @@ public:
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
     void PostNetworkConnect();
-    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
@@ -144,8 +143,12 @@ public:
     CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
+
+private:
+    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
 #endif
 
+public:
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

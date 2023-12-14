@@ -69,14 +69,6 @@ public:
         bool exhausted = false;
     };
 
-    struct WiFiNetwork
-    {
-        uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen = 0;
-        uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
-        uint8_t credentialsLen = 0;
-    };
-
     void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
 
     // BaseDriver
@@ -112,7 +104,19 @@ public:
     }
 
 private:
-    bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
+    struct WiFiNetwork
+    {
+        bool Empty() const { return ssidLen == 0; }
+        bool Match(ByteSpan aSsid) const { return !Empty() && ByteSpan(ssid, ssidLen).data_equal(aSsid); }
+
+        uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+        uint8_t ssidLen = 0;
+        static_assert(std::numeric_limits<decltype(ssidLen)>::max() >= sizeof(ssid));
+
+        uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
+        uint8_t credentialsLen = 0;
+        static_assert(std::numeric_limits<decltype(credentialsLen)>::max() >= sizeof(credentials));
+    };
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
