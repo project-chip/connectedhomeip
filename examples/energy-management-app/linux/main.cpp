@@ -41,37 +41,75 @@ static EVSEManufacturer * gEvseManufacturer = nullptr;
 
 void ApplicationInit()
 {
-    if ((gDelegate == nullptr) && (gInstance == nullptr))
+    CHIP_ERROR err;
+
+    if ((gDelegate != nullptr) || (gInstance != nullptr) || (gEvseManufacturer != nullptr))
     {
-        gDelegate = new EnergyEvseDelegate();
-        if (gDelegate != nullptr)
-        {
-            /* Manufacturer may optionally not support all features, commands & attributes */
-            gInstance = new EnergyEvseManager(
-                EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
-                BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences,
-                                                       EnergyEvse::Feature::kPlugAndCharge, EnergyEvse::Feature::kRfid,
-                                                       EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
-                BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                      OptionalAttributes::kSupportsRandomizationWindow,
-                                                      OptionalAttributes::kSupportsApproximateEvEfficiency),
-                BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
-            gInstance->Init(); /* Register Attribute & Command handlers */
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "EVSE Instance or Delegate already exist.")
+        ChipLogError(AppServer, "EVSE Instance or Delegate, EvseManufacturer already exist.");
+        return;
     }
 
+    gDelegate = new EnergyEvseDelegate();
+    if (gDelegate == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");
+        return;
+    }
+
+    /* Manufacturer may optionally not support all features, commands & attributes */
+    gInstance =
+        new EnergyEvseManager(EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
+                              BitMask<EnergyEvse::Feature, uint32_t>(
+                                  EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
+                                  EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
+                              BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                                    OptionalAttributes::kSupportsRandomizationWindow,
+                                                                    OptionalAttributes::kSupportsApproximateEvEfficiency),
+                              BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
+
+    if (gInstance == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseManager");
+        delete gDelegate;
+        gDelegate = nullptr;
+        return;
+    }
+
+    err = gInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init failed on gInstance");
+        delete gInstance;
+        delete gDelegate;
+        gInstance = nullptr;
+        gDelegate = nullptr;
+        return;
+    }
+
+    /* Now create EVSEManufacturer*/
+    gEvseManufacturer = new EVSEManufacturer();
     if (gEvseManufacturer == nullptr)
     {
-        gEvseManufacturer = new EVSEManufacturer();
-        gEvseManufacturer->Init(gInstance);
+        ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
+        delete gInstance;
+        delete gDelegate;
+        gInstance = nullptr;
+        gDelegate = nullptr;
+        return;
     }
-    else
+
+    /* Call Manufacturer specific init */
+    err = gEvseManufacturer->Init(gInstance);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "EVSEManufacturer already exists.")
+        ChipLogError(AppServer, "Init failed on gEvseManufacturer");
+        delete gEvseManufacturer;
+        delete gInstance;
+        delete gDelegate;
+        gEvseManufacturer = nullptr;
+        gInstance         = nullptr;
+        gDelegate         = nullptr;
+        return;
     }
 }
 
