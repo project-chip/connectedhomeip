@@ -35,7 +35,7 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    // TODO EnergyEvseManager::GetInstance()->GetDelegate()->RegisterCallbacks();
+    dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(nullptr));
 
     /* Set the EVSE Hardware Maximum current limit */
     // For Manufacturer to specify the hardware capability in mA
@@ -66,4 +66,28 @@ CHIP_ERROR EVSEManufacturer::Shutdown(EnergyEvseManager * aInstance)
 {
 
     return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief    Main Callback handler - to be implemented by Manufacturer
+ *
+ * @param    EVSECbInfo describes the type of call back, and a union of structs
+ *           which contain relevant info for the specific callback type
+ *
+ * @param    arg - optional pointer to some context information (see register function)
+ */
+void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg)
+{
+    switch (cb->type)
+    {
+    case EVSECallbackType::StateChanged:
+        ChipLogProgress(AppServer, "EVSE callback - state changed");
+        break;
+    case EVSECallbackType::ChargeCurrentChanged:
+        ChipLogProgress(AppServer, "EVSE callback - maxChargeCurrent changed to %ld",
+                        static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
+        break;
+    default:
+        ChipLogError(AppServer, "Unhandler EVSE Callback type %d", static_cast<int>(cb->type));
+    }
 }
