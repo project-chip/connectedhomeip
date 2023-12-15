@@ -92,6 +92,7 @@ inline constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 inline constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
 inline constexpr size_t kAES_CCM128_Nonce_Length = 13;
 inline constexpr size_t kAES_CCM128_Tag_Length   = 16;
+inline constexpr size_t kHMAC_CCM128_Key_Length  = 128u / 8u;
 
 inline constexpr size_t CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = kAES_CCM128_Nonce_Length;
 

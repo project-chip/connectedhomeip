@@ -3215,13 +3215,15 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ChargingTargetStruct.targetTime", "targetTime", value.isMember("targetTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetStruct.targetTimeMinutesPastMidnight",
+                                                                  "targetTimeMinutesPastMidnight",
+                                                                  value.isMember("targetTimeMinutesPastMidnight")));
 
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targetTime");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targetTime, value["targetTime"]));
-    valueCopy.removeMember("targetTime");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "targetTimeMinutesPastMidnight");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.targetTimeMinutesPastMidnight,
+                                                      value["targetTimeMinutesPastMidnight"]));
+    valueCopy.removeMember("targetTimeMinutesPastMidnight");
 
     if (value.isMember("targetSoC"))
     {
@@ -3242,7 +3244,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.targetTime);
+    ComplexArgumentParser::Finalize(request.targetTimeMinutesPastMidnight);
     ComplexArgumentParser::Finalize(request.targetSoC);
     ComplexArgumentParser::Finalize(request.addedEnergy);
 }

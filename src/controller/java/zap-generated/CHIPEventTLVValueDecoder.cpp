@@ -5248,11 +5248,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_sessionID;
-            std::string value_sessionIDClassName     = "java/lang/Long";
-            std::string value_sessionIDCtorSignature = "(J)V";
-            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            if (cppValue.sessionID.IsNull())
+            {
+                value_sessionID = nullptr;
+            }
+            else
+            {
+                std::string value_sessionIDClassName     = "java/lang/Long";
+                std::string value_sessionIDCtorSignature = "(J)V";
+                jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            }
 
             jobject value_state;
             std::string value_stateClassName     = "java/lang/Integer";
@@ -7275,6 +7282,48 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::SampleMei;
         switch (aPath.mEventId)
         {
+        case Events::PingCountEvent::Id: {
+            Events::PingCountEvent::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_count;
+            std::string value_countClassName     = "java/lang/Long";
+            std::string value_countCtorSignature = "(J)V";
+            jlong jnivalue_count                 = static_cast<jlong>(cppValue.count);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                value_countClassName.c_str(), value_countCtorSignature.c_str(), jnivalue_count, value_count);
+
+            jobject value_fabricIndex;
+            std::string value_fabricIndexClassName     = "java/lang/Integer";
+            std::string value_fabricIndexCtorSignature = "(I)V";
+            jint jnivalue_fabricIndex                  = static_cast<jint>(cppValue.fabricIndex);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_fabricIndexClassName.c_str(),
+                                                                       value_fabricIndexCtorSignature.c_str(), jnivalue_fabricIndex,
+                                                                       value_fabricIndex);
+
+            jclass pingCountEventStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$SampleMeiClusterPingCountEventEvent", pingCountEventStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$SampleMeiClusterPingCountEventEvent");
+                return nullptr;
+            }
+            jmethodID pingCountEventStructCtor =
+                env->GetMethodID(pingCountEventStructClass, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
+            if (pingCountEventStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$SampleMeiClusterPingCountEventEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(pingCountEventStructClass, pingCountEventStructCtor, value_count, value_fabricIndex);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

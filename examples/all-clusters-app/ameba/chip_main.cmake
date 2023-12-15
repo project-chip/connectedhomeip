@@ -156,6 +156,9 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseDelegateImpl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseManager.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp

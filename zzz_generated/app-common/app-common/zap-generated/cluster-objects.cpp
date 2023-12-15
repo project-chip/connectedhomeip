@@ -6685,8 +6685,8 @@ namespace TimeSnapshotResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kSystemTimeUs), systemTimeUs);
-    encoder.Encode(to_underlying(Fields::kUTCTimeUs), UTCTimeUs);
+    encoder.Encode(to_underlying(Fields::kSystemTimeMs), systemTimeMs);
+    encoder.Encode(to_underlying(Fields::kPosixTimeMs), posixTimeMs);
     return encoder.Finalize();
 }
 
@@ -6704,13 +6704,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kSystemTimeUs))
+        if (__context_tag == to_underlying(Fields::kSystemTimeMs))
         {
-            err = DataModel::Decode(reader, systemTimeUs);
+            err = DataModel::Decode(reader, systemTimeMs);
         }
-        else if (__context_tag == to_underlying(Fields::kUTCTimeUs))
+        else if (__context_tag == to_underlying(Fields::kPosixTimeMs))
         {
-            err = DataModel::Decode(reader, UTCTimeUs);
+            err = DataModel::Decode(reader, posixTimeMs);
         }
         else
         {
@@ -15763,7 +15763,7 @@ namespace ChargingTargetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTargetTime), targetTime);
+    encoder.Encode(to_underlying(Fields::kTargetTimeMinutesPastMidnight), targetTimeMinutesPastMidnight);
     encoder.Encode(to_underlying(Fields::kTargetSoC), targetSoC);
     encoder.Encode(to_underlying(Fields::kAddedEnergy), addedEnergy);
     return encoder.Finalize();
@@ -15783,9 +15783,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kTargetTime))
+        if (__context_tag == to_underlying(Fields::kTargetTimeMinutesPastMidnight))
         {
-            err = DataModel::Decode(reader, targetTime);
+            err = DataModel::Decode(reader, targetTimeMinutesPastMidnight);
         }
         else if (__context_tag == to_underlying(Fields::kTargetSoC))
         {
@@ -27946,7 +27946,48 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace PingCountEvent {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCount), count));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFabricIndex), fabricIndex));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kCount))
+        {
+            err = DataModel::Decode(reader, count);
+        }
+        else if (__context_tag == to_underlying(Fields::kFabricIndex))
+        {
+            err = DataModel::Decode(reader, fabricIndex);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace PingCountEvent.
+} // namespace Events
 
 } // namespace SampleMei
 

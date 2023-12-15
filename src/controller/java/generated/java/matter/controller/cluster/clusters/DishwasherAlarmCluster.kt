@@ -45,10 +45,8 @@ class DishwasherAlarmCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun reset(alarms: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun reset(alarms: UInt, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -61,17 +59,15 @@ class DishwasherAlarmCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun modifyEnabledAlarms(mask: UInt, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun modifyEnabledAlarms(mask: UInt, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -84,7 +80,7 @@ class DishwasherAlarmCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
