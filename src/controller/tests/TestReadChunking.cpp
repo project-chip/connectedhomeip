@@ -780,7 +780,7 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
     }
 
-    chip::test_utils::SleepMillis(secondsToMilliseconds(2));
+    chip::test_utils::SleepMillis(SecondsToMilliseconds(2));
 
     // Destroying the read client will terminate the subscription transaction.
     ctx.DrainAndServiceIO();
@@ -1045,7 +1045,7 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
         }
     }
 
-    chip::test_utils::SleepMillis(secondsToMilliseconds(3));
+    chip::test_utils::SleepMillis(SecondsToMilliseconds(3));
 
     // Destroying the read client will terminate the subscription transaction.
     ctx.DrainAndServiceIO();
