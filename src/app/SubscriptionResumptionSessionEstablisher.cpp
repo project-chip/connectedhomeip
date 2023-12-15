@@ -24,21 +24,13 @@ namespace app {
 class AutoDeleteEstablisher
 {
 public:
-    AutoDeleteEstablisher(SubscriptionResumptionSessionEstablisher * sessionEstablisher) : mSessionEstablisher(sessionEstablisher) {}
-    ~AutoDeleteEstablisher()
-    {
-        chip::Platform::Delete(mSessionEstablisher);
-    }
+    AutoDeleteEstablisher(SubscriptionResumptionSessionEstablisher * sessionEstablisher) : mSessionEstablisher(sessionEstablisher)
+    {}
+    ~AutoDeleteEstablisher() { chip::Platform::Delete(mSessionEstablisher); }
 
-    SubscriptionResumptionSessionEstablisher * operator->() const
-    {
-        return mSessionEstablisher;
-    }
+    SubscriptionResumptionSessionEstablisher * operator->() const { return mSessionEstablisher; }
 
-    SubscriptionResumptionSessionEstablisher & operator*() const
-    {
-        return *mSessionEstablisher;
-    }
+    SubscriptionResumptionSessionEstablisher & operator*() const { return *mSessionEstablisher; }
 
 private:
     SubscriptionResumptionSessionEstablisher * mSessionEstablisher;
