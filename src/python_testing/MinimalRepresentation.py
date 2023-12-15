@@ -26,12 +26,10 @@ from TC_DeviceConformance import DeviceConformanceTests
 
 @dataclass
 class ClusterMinimalElements:
-    # masks
-    features: list[uint] = field(default_factory=list)
-    # IDs
-    attributes: list[uint] = field(default_factory=list)
+    feature_masks: list[uint] = field(default_factory=list)
+    attribute_ids: list[uint] = field(default_factory=list)
     # Only received commands are necessary - generated events are ALWAYS determined from accepted
-    commands: list[uint] = field(default_factory=list)
+    command_ids: list[uint] = field(default_factory=list)
     # TODO: need event support
 
 
@@ -70,31 +68,31 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
                     xml_feature = self.xml_clusters[cluster_id].features[f]
                     conformance_decision = xml_feature.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.OPTIONAL:
-                        minimal.features.append(f)
+                        minimal.feature_masks.append(f)
 
                 # All optional attributes
                 for attribute_id, attribute in cluster.items():
                     if attribute_id not in self.xml_clusters[cluster_id].attributes.keys():
                         if attribute_id > 0xFFFF:
                             # MEI
-                            minimal.attributes.append(attribute_id)
+                            minimal.attribute_ids.append(attribute_id)
                         continue
                     xml_attribute = self.xml_clusters[cluster_id].attributes[attribute_id]
                     conformance_decision = xml_attribute.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.OPTIONAL:
-                        minimal.attributes.append(attribute_id)
+                        minimal.attribute_ids.append(attribute_id)
 
                 # All optional commands
                 for command_id in accepted_command_list:
                     if command_id not in self.xml_clusters[cluster_id].accepted_commands:
                         if command_id > 0xFFFF:
                             # MEI
-                            minimal.attributes.append(command_id)
+                            minimal.attribute_ids.append(command_id)
                         continue
                     xml_command = self.xml_clusters[cluster_id].accepted_commands[command_id]
                     conformance_decision = xml_command.conformance(feature_map, attribute_list, all_command_list)
                     if conformance_decision == ConformanceDecision.OPTIONAL:
-                        minimal.commands.append(command_id)
+                        minimal.command_ids.append(command_id)
 
                 representation[endpoint_id][cluster_id] = minimal
 
@@ -107,15 +105,15 @@ class MinimalRepresentationChecker(DeviceConformanceTests):
                 name = self.xml_clusters[cluster_id].name
                 print(f'  Cluster {cluster_id:04x} - {name}')
                 print('    Features:')
-                for feature in minimals.features:
+                for feature in minimals.feature_masks:
                     code = self.xml_clusters[cluster_id].features[feature].code
                     print(f'      {feature:02x}: {code}')
                 print('    Attributes:')
-                for attribute in minimals.attributes:
+                for attribute in minimals.attribute_ids:
                     name = self.xml_clusters[cluster_id].attributes[attribute].name
                     print(f'      {attribute:02x}: {name}')
                 print('    Commands:')
-                for command in minimals.commands:
+                for command in minimals.command_ids:
                     name = self.xml_clusters[cluster_id].accepted_commands[command].name
                     print(f'      {command:02x}: {name}')
 
