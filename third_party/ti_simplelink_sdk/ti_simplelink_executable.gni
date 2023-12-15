@@ -196,20 +196,13 @@ template("ti_simplelink_executable") {
             "-k",
             rebase_path(invoker.pem_file, root_build_dir),
           ]
-
-          if (defined(invoker.pem_file)) {
-            args += [
-              "-k",
-              rebase_path(invoker.pem_file, root_build_dir),
-            ]
-          } else {
-            args += [
-              "-k",
-              rebase_path(
-                  "${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
-                  root_build_dir),
-            ]
-          }
+        } else {
+          args += [
+            "-k",
+            rebase_path(
+                "${ti_simplelink_sdk_root}/tools/common/oad/private.pem",
+                root_build_dir),
+          ]
         }
       }
       pw_python_action("${simplelink_target_name}-bim.hex") {
