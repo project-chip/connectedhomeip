@@ -1,17 +1,17 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#        http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 cmake_minimum_required(VERSION 3.13.1)
 
@@ -64,40 +64,40 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_compile_options(app PRIVATE -fpermissive)
 
 target_include_directories(app PRIVATE
-                           include
-                           ${ALL_CLUSTERS_COMMON_DIR}/include
-                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                            
-                           ${GEN_DIR}/app-common
-                           ${GEN_DIR}/all-clusters-app
-                           ${TELINK_COMMON}/common/include
-                           ${TELINK_COMMON}/util/include)
+  include
+  ${ALL_CLUSTERS_COMMON_DIR}/include
+  ${ENERGY_MANAGEMENT_COMMON_DIR}/include
+  ${GEN_DIR}/app-common
+  ${GEN_DIR}/all-clusters-app
+  ${TELINK_COMMON}/common/include
+  ${TELINK_COMMON}/util/include)
 
 add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
+  "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
 )
 
 target_sources(app PRIVATE
-               src/AppTask.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
-               ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
-               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
-               ${TELINK_COMMON}/common/src/mainCommon.cpp
-               ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
-               ${TELINK_COMMON}/util/src/LEDWidget.cpp
-               ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp)
+  src/AppTask.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/EnergyEvseManager.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
+  ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+  ${TELINK_COMMON}/common/src/mainCommon.cpp
+  ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
+  ${TELINK_COMMON}/util/src/LEDWidget.cpp
+  ${TELINK_COMMON}/util/src/ButtonManager.cpp
+  ${TELINK_COMMON}/util/src/ThreadUtil.cpp
+  ${TELINK_COMMON}/util/src/PWMDevice.cpp)
 
 chip_configure_data_model(app
-    INCLUDE_SERVER
-    ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
+  INCLUDE_SERVER
+  ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )

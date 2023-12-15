@@ -97,7 +97,8 @@ void OvenMode::Shutdown()
 }
 void emberAfOvenModeClusterServerInitCallback(chip::EndpointId endpointId)
 {
-    (void) endpointId; // #error "Compiling the function: emberAfOvenModeClusterServerInitCallback"
+    (void) endpointId;
+    // #error "Compiling the function: emberAfOvenModeClusterServerInitCallback"
 }
 
 void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
