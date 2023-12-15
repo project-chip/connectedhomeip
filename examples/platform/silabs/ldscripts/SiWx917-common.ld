@@ -39,8 +39,8 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-     	KEEP(*(.reset_handler))
-		*(EXCLUDE_FILE(*sl_si91x_bus.o *sl_si91x_driver.o *sli_si91x_multithreaded.o *rsi_hal_mcu_m4_ram.o ) .text*)
+        KEEP(*(.reset_handler))
+		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *heap_*.c.o) .text*)
 		
     /* .ctors */
     *crtbegin.o(.ctors)
@@ -127,10 +127,24 @@ SECTIONS
 		*(.rodata*)
 		*(vtable)
 		*(.data*)
-		*sl_si91x_bus.o(.text*)
-		*sl_si91x_driver.o(.text*)
-		*sli_si91x_multithreaded.o(.text*)
-		*rsi_hal_mcu_m4_ram.o(.text*)
+		*sl_si91x_bus.c.o(.text*)
+		*sl_si91x_driver.c.o(.text*)
+		*sli_si91x_multithreaded.c.o(.text*)
+		*rsi_hal_mcu_m4_ram.c.o(.text*)
+  	    	*rsi_deepsleep_soc.c.o(.text*)
+		*croutine.c.o(.text*)
+		*event_groups.c.o(.text*)
+		*list.c.o(.text*)
+		*queue.c.o(.text*)
+		*cmsis_os2.c.o(.text*)
+		*stream_buffer.c.o(.text*)
+		*tasks.c.o(.text*)
+		*timers.c.o(.text*)
+		*freertos_umm_malloc_host.c.o(.text*)
+		*malloc_buffers.c.o(.text*)
+		*sl_rsi_utility.c.o(.text*)
+		*port.c.o(.text*)
+		*heap_*.c.o(.text*)
 
     . = ALIGN(4);
     /* preinit data */
@@ -224,7 +238,8 @@ SECTIONS
     KEEP(*(.simee*))
   } > rom
 
-  linker_nvm_end = __main_flash_end__;
+  /* Last page of flash is reserved for the manufacturing token space */
+  linker_nvm_end = __main_flash_end__ - 4096;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
   linker_storage_end = linker_nvm_begin;
