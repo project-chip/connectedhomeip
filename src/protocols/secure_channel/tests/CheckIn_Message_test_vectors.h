@@ -43,7 +43,7 @@ typedef struct CheckIn_Message_test_vector
 } CheckIn_Message_test_vector;
 
 /**
- * Test 3 Inputs
+ * vector 1
  */
 
 const uint8_t kKey1[] = { 0xd9, 0x0e, 0x13, 0x18, 0x0d, 0x00, 0xba, 0xad, 0xd2, 0x0c, 0xf5, 0xed, 0x49, 0x13, 0xd3, 0xff };
@@ -74,7 +74,7 @@ const CheckIn_Message_test_vector vector1 = { .key                  = kKey1,
                                               .payload_len          = sizeof(kPayload1) };
 
 /**
- * Test 3 Inputs
+ * vector 2
  */
 
 const uint8_t kKey2[] = { 0x18, 0xfd, 0xbc, 0xea, 0xef, 0x01, 0x95, 0x5b, 0x0e, 0xc8, 0x75, 0xed, 0xa3, 0xae, 0x6e, 0xe8 };
@@ -106,7 +106,7 @@ const CheckIn_Message_test_vector vector2 = { .key                  = kKey2,
                                               .payload_len          = sizeof(kPayload2) };
 
 /**
- * Test 3 Inputs
+ * vector 3
  */
 
 const uint8_t kKey3[] = { 0xd9, 0x0e, 0x13, 0x18, 0x0d, 0x00, 0xba, 0xad, 0xd2, 0x0c, 0xf5, 0xed, 0x49, 0x13, 0xd3, 0xff };
@@ -138,7 +138,7 @@ const CheckIn_Message_test_vector vector3 = { .key                  = kKey3,
                                               .payload_len          = sizeof(kPayload3) };
 
 /**
- * Test 4 Inputs
+ * vector 4
  */
 
 const uint8_t kKey4[] = { 0xca, 0x67, 0xd4, 0x1f, 0xf7, 0x11, 0x29, 0x10, 0xfd, 0xd1, 0x8a, 0x1b, 0xf9, 0x9e, 0xa9, 0x74 };
@@ -172,7 +172,7 @@ const CheckIn_Message_test_vector vector4 = { .key                  = kKey4,
                                               .payload_len          = sizeof(kPayload4) };
 
 /**
- * Test 5 Inputs
+ * vector 5
  */
 
 const uint8_t kKey5[] = { 0xca, 0x67, 0xd4, 0x1f, 0xf7, 0x11, 0x29, 0x10, 0xfd, 0xd1, 0x8a, 0x1b, 0xf9, 0x9e, 0xa9, 0x74 };

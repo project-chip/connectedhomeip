@@ -269,7 +269,7 @@ void TestCheckInMsg::TestCheckinGenerateParse(nlTestSuite * inSuite, void * inCo
 }
 
 /**
- * @brief Test validates that the nonce generation is successful when using valid inputs
+ * @brief Test verifies that the nonce generation is successful when using valid inputs
  */
 void TestCheckInMsg::TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, void * inContext)
 {
@@ -292,11 +292,11 @@ void TestCheckInMsg::TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, vo
         // Verify that the generation succeeded
         NL_TEST_ASSERT_SUCCESS(inSuite, CheckinMessage::GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer));
 
-        // Verify the enough space was present in the buffer
+        // Verify that enough space was present in the buffer
         size_t written = 0;
         NL_TEST_ASSERT(inSuite, writer.Fit(written));
 
-        // Verify the number of written bytes matches the length of the generated nonce
+        // Verify the number of written bytes matches the length of the expected nonce
         NL_TEST_ASSERT_EQUALS(inSuite, vector.nonce_len, written);
 
         // Verify that generated nonce matches the expected nonce
@@ -308,7 +308,7 @@ void TestCheckInMsg::TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, vo
 }
 
 /**
- * @brief Test verifies that nonce generation returns an error if the output writer is too small to fit nonce
+ * @brief Test verifies that the nonce generation returns an error if the output writer is too small to fit the nonce
  */
 void TestCheckInMsg::TestCheckInMessageNonceGenerationTooSmallWriter(nlTestSuite * inSuite, void * inContext)
 {
@@ -351,20 +351,20 @@ void TestCheckInMsg::TestCheckInMessagePayloadSize(nlTestSuite * inSuite, void *
         ByteSpan payload(vector.payload, vector.payload_len);
         size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
 
-        // Verify the AppData size matches the application data size
+        // Verify the AppData size matches the expected application data size
         NL_TEST_ASSERT_EQUALS(inSuite, vector.application_data_len, calculated_size);
     }
 }
 
 /**
- * @brief test verifies that GetAppDataSize returns 0 if a null buffer is given as input
+ * @brief test verifies that GetAppDataSize returns 0 if the payload is smaller that the minimum size
  */
 void TestCheckInMsg::TestCheckInMessagePayloadSizeNullBuffer(nlTestSuite * inSuite, void * inContext)
 {
     ByteSpan payload;
     size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
 
-    // Verify the AppData size is 0
+    // Verify that the size is 0
     NL_TEST_ASSERT_EQUALS(inSuite, calculated_size, 0);
 }
 
