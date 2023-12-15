@@ -99,10 +99,6 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
-} else if (lwip_platform == "silabs") {
-  group("lwip") {
-    public_deps = [ "${lwip_root}:lwip" ]
-  }
 } else if (lwip_platform == "external" || lwip_platform == "mw320") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
@@ -127,7 +123,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     include_dirs = [ "freertos" ]
   }
 
-  lwip_target("lwip") {
+  lwip_target("legacy_lwip") {
     public = [
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/cc.h",
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/arch/perf.h",
@@ -143,6 +139,10 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+  }
+
+  group("lwip") {
+    public_deps = [":legacy_lwip"]
   }
 } else if (lwip_platform == "bl602") {
   group("lwip") {
@@ -191,7 +191,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
     }
   }
 
-  lwip_target("lwip") {
+  lwip_target("legacy_lwip") {
     public = [
       "${lwip_platform}/arch/cc.h",
       "${lwip_platform}/arch/perf.h",
@@ -220,6 +220,8 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
       sources +=
           [ "${chip_root}/third_party/lwip/repo/lwip/src/apps/mdns/mdns.c" ]
+    } else if (lwip_platform == "silabs") {
+      public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
@@ -240,5 +242,9 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
+  }
+
+  group("lwip") {
+    public_deps = [":legacy_lwip"]
   }
 }
