@@ -140,8 +140,6 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
 
     Args:
       timeoutMs:    scan will complete after this time
-      scanCallback: callback when a device is found
-      doneCallback: callback when the scan is complete
       adapter:      what adapter to choose. Either an AdapterInfo object or
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
