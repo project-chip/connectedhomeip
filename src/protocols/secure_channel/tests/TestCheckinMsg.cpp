@@ -16,21 +16,20 @@
  *    limitations under the License.
  */
 
-#include <protocols/secure_channel/CheckinMessage.h>
-
 #include <crypto/DefaultSessionKeystore.h>
+#include <crypto/RandUtils.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <protocols/secure_channel/tests/CheckIn_Message_test_vectors.h>
 #include <transport/CryptoContext.h>
-
+// AES_CCM_128_test_vectors is being replaced by the CheckIn_Message_test_vectors
+// New tests need to use the CheckIn_Message_test_vectors
 #include <crypto/tests/AES_CCM_128_test_vectors.h>
-
-#include <crypto/RandUtils.h>
-
 #include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -40,7 +39,23 @@ using namespace chip::Protocols;
 using namespace chip::Protocols::SecureChannel;
 using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
-void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
+namespace chip {
+namespace Protocols {
+namespace SecureChannel {
+
+class TestCheckInMsg
+{
+public:
+    static void TestCheckinGenerate(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckinParse(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckinGenerateParse(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckInMessageNonceGenerationTooSmallWriter(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckInMessagePayloadSize(nlTestSuite * inSuite, void * inContext);
+    static void TestCheckInMessagePayloadSizeNullBuffer(nlTestSuite * inSuite, void * inContext);
+};
+
+void TestCheckInMsg::TestCheckinGenerate(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t a[300] = { 0 };
     uint8_t b[300] = { 0 };
@@ -139,7 +154,7 @@ void TestCheckin_Generate(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
+void TestCheckInMsg::TestCheckinParse(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t a[300] = { 0 };
     uint8_t b[300] = { 0 };
@@ -191,7 +206,7 @@ void TestCheckin_Parse(nlTestSuite * inSuite, void * inContext)
     keystore.DestroyKey(hmac128KeyHandle);
 }
 
-void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
+void TestCheckInMsg::TestCheckinGenerateParse(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t a[300] = { 0 };
     uint8_t b[300] = { 0 };
@@ -253,6 +268,110 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+/**
+ * @brief Test validates that the nonce generation is successful when using valid inputs
+ */
+void TestCheckInMsg::TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, void * inContext)
+{
+    TestSessionKeystoreImpl keystore;
+
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        uint8_t buffer[300] = { 0 };
+        Encoding::LittleEndian::BufferWriter writer(buffer, sizeof(buffer));
+
+        Symmetric128BitsKeyByteArray hmacKeyMaterial;
+        memcpy(hmacKeyMaterial, vector.key, vector.key_len);
+
+        Hmac128KeyHandle hmac128KeyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
+
+        // Verify that the generation succeeded
+        NL_TEST_ASSERT_SUCCESS(inSuite, CheckinMessage::GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer));
+
+        // Verify the enough space was present in the buffer
+        size_t written = 0;
+        NL_TEST_ASSERT(inSuite, writer.Fit(written));
+
+        // Verify the number of written bytes matches the length of the generated nonce
+        NL_TEST_ASSERT_EQUALS(inSuite, vector.nonce_len, written);
+
+        // Verify that generated nonce matches the expected nonce
+        NL_TEST_ASSERT(inSuite, memcmp(vector.nonce, writer.Buffer(), written) == 0);
+
+        // Clean up
+        keystore.DestroyKey(hmac128KeyHandle);
+    }
+}
+
+/**
+ * @brief Test verifies that nonce generation returns an error if the output writer is too small to fit nonce
+ */
+void TestCheckInMsg::TestCheckInMessageNonceGenerationTooSmallWriter(nlTestSuite * inSuite, void * inContext)
+{
+    TestSessionKeystoreImpl keystore;
+
+    CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
+
+    uint8_t buffer[10] = { 0 };
+    Encoding::LittleEndian::BufferWriter writer(buffer, sizeof(buffer));
+
+    Symmetric128BitsKeyByteArray hmacKeyMaterial;
+    memcpy(hmacKeyMaterial, vector.key, vector.key_len);
+
+    Hmac128KeyHandle hmac128KeyHandle;
+    NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
+
+    // Verify that the generation succeeded
+    CHIP_ERROR err = CheckinMessage::GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer);
+    NL_TEST_ASSERT_EQUALS(inSuite, err, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    // Verify that nothing was written
+    size_t written = 0;
+    NL_TEST_ASSERT(inSuite, writer.Fit(written));
+    NL_TEST_ASSERT_EQUALS(inSuite, written, 0);
+
+    // Clean up
+    keystore.DestroyKey(hmac128KeyHandle);
+}
+
+/**
+ * @brief test verifies that GetAppDataSize returns the correct application data size
+ */
+void TestCheckInMsg::TestCheckInMessagePayloadSize(nlTestSuite * inSuite, void * inContext)
+{
+    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
+
+        ByteSpan payload(vector.payload, vector.payload_len);
+        size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
+
+        // Verify the AppData size matches the application data size
+        NL_TEST_ASSERT_EQUALS(inSuite, vector.application_data_len, calculated_size);
+    }
+}
+
+/**
+ * @brief test verifies that GetAppDataSize returns 0 if a null buffer is given as input
+ */
+void TestCheckInMsg::TestCheckInMessagePayloadSizeNullBuffer(nlTestSuite * inSuite, void * inContext)
+{
+    ByteSpan payload;
+    size_t calculated_size = CheckinMessage::GetAppDataSize(payload);
+
+    // Verify the AppData size is 0
+    NL_TEST_ASSERT_EQUALS(inSuite, calculated_size, 0);
+}
+
+} // namespace SecureChannel
+} // namespace Protocols
+} // namespace chip
+
 // Test Suite
 
 /**
@@ -261,9 +380,13 @@ void TestCheckin_GenerateParse(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestCheckin_Generate", TestCheckin_Generate),
-    NL_TEST_DEF("TestCheckin_Parse", TestCheckin_Parse),
-    NL_TEST_DEF("TestCheckin_GenerateParse", TestCheckin_GenerateParse),
+    NL_TEST_DEF("TestCheckinGenerate", TestCheckInMsg::TestCheckinGenerate),
+    NL_TEST_DEF("TestCheckinParse", TestCheckInMsg::TestCheckinParse),
+    NL_TEST_DEF("TestCheckinGenerateParse", TestCheckInMsg::TestCheckinGenerateParse),
+    NL_TEST_DEF("TestCheckInMessageNonceGeneration", TestCheckInMsg::TestCheckInMessageNonceGeneration),
+    NL_TEST_DEF("TestCheckInMessageNonceGenerationTooSmallWriter", TestCheckInMsg::TestCheckInMessageNonceGenerationTooSmallWriter),
+    NL_TEST_DEF("TestCheckInMessagePayloadSize", TestCheckInMsg::TestCheckInMessagePayloadSize),
+    NL_TEST_DEF("TestCheckInMessagePayloadSizeNullBuffer", TestCheckInMsg::TestCheckInMessagePayloadSizeNullBuffer),
 
     NL_TEST_SENTINEL()
 };
@@ -302,7 +425,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestCheckinMessage()
+int TestCheckInMessage()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -310,4 +433,4 @@ int TestCheckinMessage()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCheckinMessage)
+CHIP_REGISTER_TEST_SUITE(TestCheckInMessage)

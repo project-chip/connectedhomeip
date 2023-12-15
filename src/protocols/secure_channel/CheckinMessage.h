@@ -100,6 +100,8 @@ public:
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
 private:
+    friend class TestCheckInMsg;
+
     /**
      * @brief Generate the Nonce for the Check-In message
      *
