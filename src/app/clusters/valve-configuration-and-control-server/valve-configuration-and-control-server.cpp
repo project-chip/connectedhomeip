@@ -46,7 +46,27 @@ static_assert(kValveConfigurationAndControlDelegateTableSize <= kEmberInvalidEnd
               "ValveConfigurationAndControl Delegate table size error");
 
 namespace {
+
+DataModel::Nullable<uint32_t> gRemainingDuration[kValveConfigurationAndControlDelegateTableSize];
 Delegate * gDelegateTable[kValveConfigurationAndControlDelegateTableSize] = { nullptr };
+
+DataModel::Nullable<uint32_t> GetRemainingDuration(EndpointId endpoint)
+{
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kValveConfigurationAndControlDelegateTableSize ? DataModel::Nullable<uint32_t>() : gRemainingDuration[ep]);
+}
+
+void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
+{
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kValveConfigurationAndControlDelegateTableSize)
+    {
+        gRemainingDuration[ep] = duration;
+    }
+}
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -62,6 +82,47 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
         return true;
     }
     return false;
+}
+
+class ValveConfigAndControlAttrAccess : public AttributeAccessInterface
+{
+public:
+    ValveConfigAndControlAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ValveConfigurationAndControl::Id)
+    {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadRemainingDuration(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+};
+
+ValveConfigAndControlAttrAccess gAttrAccess;
+
+CHIP_ERROR ValveConfigAndControlAttrAccess::ReadRemainingDuration(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(GetRemainingDuration(endpoint));
+}
+
+CHIP_ERROR ValveConfigAndControlAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (aPath.mClusterId != ValveConfigurationAndControl::Id)
+    {
+        return CHIP_ERROR_INVALID_PATH_LIST;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case RemainingDuration::Id: {
+        return ReadRemainingDuration(aPath.mEndpointId, aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return err;
 }
 } // namespace
 
@@ -115,13 +176,13 @@ static void onValveConfigurationAndControlTick(chip::System::Layer * systemLayer
         delegate->mRemainingDuration--;
         if (delegate->mRemainingDuration < 5 || !(delegate->mRemainingDuration % 5))
         {
-            RemainingDuration::Set(ep, delegate->mRemainingDuration);
+            SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(delegate->mRemainingDuration));
         }
         startRemainingDurationTick(ep);
     }
     else
     {
-        RemainingDuration::SetNull(ep);
+        SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>());
     }
 }
 
@@ -192,10 +253,7 @@ CHIP_ERROR CloseValve(EndpointId ep)
     {
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
     }
-    if (EMBER_ZCL_STATUS_SUCCESS == RemainingDuration::Get(ep, rDuration))
-    {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == RemainingDuration::SetNull(ep), attribute_error);
-    }
+    SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>());
 
     if (!isDelegateNull(delegate, ep))
     {
@@ -223,7 +281,7 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Set(ep, openDuration), attribute_error);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == RemainingDuration::Set(ep, openDuration), attribute_error);
+    SetRemainingDuration(ep, openDuration);
 
     // if has timesync feature and autoclosetime available, set autoclosetime to current UTC + openduration field or attribute
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync) &&
@@ -412,4 +470,7 @@ void MatterValveConfigurationAndControlClusterServerAttributeChangedCallback(con
     // TODO
 }
 
-void MatterValveConfigurationAndControlPluginServerInitCallback() {}
+void MatterValveConfigurationAndControlPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
+}
