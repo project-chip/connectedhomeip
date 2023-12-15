@@ -99,6 +99,11 @@ buildconfig_header("lwip_buildconfig") {
 if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
+} else if (get_path_info(lwip_root, "abspath") != get_path_info("${chip_root}/third_party/lwip", "abspath")) {
+  # Redirect old dependencies on ${chip_root}/src/lwip onto ${lwip_root}:lwip
+  group("lwip") {
+    public_deps = ["${lwip_root}:lwip"]
+  }
 } else if (lwip_platform == "external" || lwip_platform == "mw320") {
   group("lwip") {
     public_deps = [ ":lwip_buildconfig" ]
