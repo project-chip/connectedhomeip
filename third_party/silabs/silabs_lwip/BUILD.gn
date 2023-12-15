@@ -24,7 +24,7 @@ config("lwip_config") {
   ]
 }
 
-lwip_target("lwip") {
+lwip_target("silabs_lwip") {
   public = [
     "${chip_root}/src/lwip/freertos/arch/sys_arch.h",
     "${chip_root}/src/lwip/silabs/arch/cc.h",
@@ -44,4 +44,8 @@ lwip_target("lwip") {
     ":lwip_config",
     "${chip_root}/src:includes",
   ]
+}
+
+group("lwip") {
+  public_deps = [":silabs_lwip"]
 }
