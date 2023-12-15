@@ -5932,5 +5932,11 @@
       "endpointId": 1,
       "networkId": 0
     }
+<<<<<<< HEAD
   ]
 }
+=======
+  ],
+  "log": []
+}
+>>>>>>> 1d71d2acd9 (Reworked .zap and .matter files)
