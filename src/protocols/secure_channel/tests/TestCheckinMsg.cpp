@@ -175,6 +175,9 @@ void TestCheckInMsg::TestCheckinMessageGenerate_ValidInputsTooSmallOutput(nlTest
     NL_TEST_ASSERT(inSuite, CHIP_ERROR_BUFFER_TOO_SMALL == GenerateAndVerifyPayload(inSuite, output, vector));
 }
 
+/**
+ * @brief Test verifies that the Check-In Message generations returns an error if the AesKeyHandle is empty
+ */
 void TestCheckInMsg::TestCheckInMessageGenerate_EmptyAesKeyHandle(nlTestSuite * inSuite, void * inContexT)
 {
     TestSessionKeystoreImpl keystore;
@@ -215,6 +218,9 @@ void TestCheckInMsg::TestCheckInMessageGenerate_EmptyAesKeyHandle(nlTestSuite * 
     keystore.DestroyKey(hmac128KeyHandle);
 }
 
+/**
+ * @brief Test verifies that the Check-In Message generations returns an error if the HmacKeyHandle is empty
+ */
 void TestCheckInMsg::TestCheckInMessageGenerate_EmptyHmacKeyHandle(nlTestSuite * inSuite, void * inContexT)
 {
     TestSessionKeystoreImpl keystore;
