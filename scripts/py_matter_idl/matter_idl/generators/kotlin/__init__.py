@@ -126,8 +126,6 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
@@ -542,7 +540,7 @@ class EncodableValue:
             else:
                 return "Ljava/lang/Integer;"
         else:
-            return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+            return "Lchip/controller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
 
 def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:
@@ -669,7 +667,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
 
         self.internal_render_one_output(
             template_path="MatterFiles_gni.jinja",
-            output_file_name="java/matter/devicecontroller/cluster/files.gni",
+            output_file_name="java/matter/controller/cluster/files.gni",
             vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
@@ -678,7 +676,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
 
         # Generate a `.kt` file for each cluster.
         for cluster in clientClusters:
-            output_name = f"java/matter/devicecontroller/cluster/clusters/{cluster.name}Cluster.kt"
+            output_name = f"java/matter/controller/cluster/clusters/{cluster.name}Cluster.kt"
             self.internal_render_one_output(
                 template_path="MatterClusters.jinja",
                 output_file_name=output_name,
@@ -695,7 +693,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                 if struct.tag:
                     continue
 
-                output_name = "java/matter/devicecontroller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                output_name = "java/matter/controller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
                 self.internal_render_one_output(
                     template_path="MatterStructs.jinja",
                     output_file_name=output_name.format(
@@ -712,7 +710,7 @@ class KotlinClassGenerator(__KotlinCodeGenerator):
                 if not event.fields:
                     continue
 
-                output_name = "java/matter/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                output_name = "java/matter/controller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
                 self.internal_render_one_output(
                     template_path="MatterEventStructs.jinja",
                     output_file_name=output_name.format(

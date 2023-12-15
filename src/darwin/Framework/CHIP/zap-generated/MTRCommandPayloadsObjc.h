@@ -3344,9 +3344,9 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull systemTimeUs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull systemTimeMs MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSNumber * _Nullable utcTimeUs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable posixTimeMs MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams with a response-value dictionary

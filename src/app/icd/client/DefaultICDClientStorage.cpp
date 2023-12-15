@@ -258,13 +258,22 @@ CHIP_ERROR DefaultICDClientStorage::Load(FabricIndex fabricIndex, std::vector<IC
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kMonitoredSubject)));
         ReturnErrorOnFailure(reader.Get(clientInfo.monitored_subject));
 
-        // Shared key
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kSharedKey)));
-        ByteSpan buf;
-        ReturnErrorOnFailure(reader.Get(buf));
-        VerifyOrReturnError(buf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
-        memcpy(clientInfo.shared_key.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), buf.data(),
+        // Aes key handle
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kAesKeyHandle)));
+        ByteSpan aesBuf;
+        ReturnErrorOnFailure(reader.Get(aesBuf));
+        VerifyOrReturnError(aesBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aesBuf.data(),
                sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
+        // Hmac key handle
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle)));
+        ByteSpan hmacBuf;
+        ReturnErrorOnFailure(reader.Get(hmacBuf));
+        VerifyOrReturnError(hmacBuf.size() == sizeof(Crypto::Symmetric128BitsKeyByteArray), CHIP_ERROR_INTERNAL);
+        memcpy(clientInfo.hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmacBuf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
         ReturnErrorOnFailure(reader.ExitContainer(ICDClientInfoType));
         clientInfoVector.push_back(clientInfo);
     }
@@ -285,12 +294,20 @@ CHIP_ERROR DefaultICDClientStorage::SetKey(ICDClientInfo & clientInfo, const Byt
     Crypto::Symmetric128BitsKeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
-    return mpKeyStore->CreateKey(keyMaterial, clientInfo.shared_key);
+    // TODO : Update key lifetime once creaKey method supports it.
+    ReturnErrorOnFailure(mpKeyStore->CreateKey(keyMaterial, clientInfo.aes_key_handle));
+    CHIP_ERROR err = mpKeyStore->CreateKey(keyMaterial, clientInfo.hmac_key_handle);
+    if (err != CHIP_NO_ERROR)
+    {
+        mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+    }
+    return err;
 }
 
 void DefaultICDClientStorage::RemoveKey(ICDClientInfo & clientInfo)
 {
-    mpKeyStore->DestroyKey(clientInfo.shared_key);
+    mpKeyStore->DestroyKey(clientInfo.aes_key_handle);
+    mpKeyStore->DestroyKey(clientInfo.hmac_key_handle);
 }
 
 CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, const std::vector<ICDClientInfo> & clientInfoVector)
@@ -306,8 +323,10 @@ CHIP_ERROR DefaultICDClientStorage::SerializeToTlv(TLV::TLVWriter & writer, cons
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kStartICDCounter), clientInfo.start_icd_counter));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kOffset), clientInfo.offset));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kMonitoredSubject), clientInfo.monitored_subject));
-        ByteSpan buf(clientInfo.shared_key.As<Crypto::Symmetric128BitsKeyByteArray>());
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kSharedKey), buf));
+        ByteSpan aesBuf(clientInfo.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kAesKeyHandle), aesBuf));
+        ByteSpan hmacBuf(clientInfo.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(ClientInfoTag::kHmacKeyHandle), hmacBuf));
         ReturnErrorOnFailure(writer.EndContainer(ICDClientInfoContainerType));
     }
     return writer.EndContainer(arrayType);

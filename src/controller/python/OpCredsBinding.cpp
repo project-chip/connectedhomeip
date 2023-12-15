@@ -160,7 +160,7 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo2)
         {
             mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }

@@ -8483,12 +8483,12 @@ class GeneralDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="systemTimeUs", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="UTCTimeUs", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="systemTimeMs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="posixTimeMs", Tag=1, Type=typing.Union[Nullable, uint]),
                     ])
 
-            systemTimeUs: 'uint' = 0
-            UTCTimeUs: 'typing.Union[Nullable, uint]' = NullValue
+            systemTimeMs: 'uint' = 0
+            posixTimeMs: 'typing.Union[Nullable, uint]' = NullValue
 
     class Attributes:
         @dataclass
@@ -47218,4 +47218,26 @@ class SampleMei(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
+
+    class Events:
+        @dataclass
+        class PingCountEvent(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC20
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="count", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            count: 'uint' = 0
+            fabricIndex: 'uint' = 0
 
