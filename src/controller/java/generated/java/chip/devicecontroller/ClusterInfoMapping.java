@@ -3696,13 +3696,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs) {
+    public void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo systemTimeUsResponseValue = new CommandResponseInfo("systemTimeUs", "Long");
-      responseValues.put(systemTimeUsResponseValue, systemTimeUs);
-      CommandResponseInfo UTCTimeUsResponseValue = new CommandResponseInfo("UTCTimeUs", "Long");
-      responseValues.put(UTCTimeUsResponseValue, UTCTimeUs);
+      CommandResponseInfo systemTimeMsResponseValue = new CommandResponseInfo("systemTimeMs", "Long");
+      responseValues.put(systemTimeMsResponseValue, systemTimeMs);
+      CommandResponseInfo posixTimeMsResponseValue = new CommandResponseInfo("posixTimeMs", "Long");
+      responseValues.put(posixTimeMsResponseValue, posixTimeMs);
       callback.onSuccess(responseValues);
     }
 
