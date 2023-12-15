@@ -40,6 +40,10 @@ public:
     virtual void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 
     // Called when a scan was completed (stopped or timed out)
+    //
+    // NOTE: This callback is allowed to delete the scanner instance. Please
+    //       make sure to not use the scanner instance after this callback
+    //       returns.
     virtual void OnScanComplete() = 0;
 
     // Call on scan error
