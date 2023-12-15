@@ -76,16 +76,21 @@ public:
     CHIP_ERROR StartScan(System::Clock::Timeout timeout);
 
     /// Stop any currently running scan
+    ///
+    /// This method calls OnScanComplete() on the delegate. The delegate is allowed to
+    /// delete the scanner instance. If that's the case, the scanner instance must not
+    /// be used after this method returns.
     CHIP_ERROR StopScan();
 
 private:
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
-    static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
-    static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
     static void SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self);
     static void SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object, GDBusProxy * aInterface,
                                        GVariant * aChangedProperties, const gchar * const * aInvalidatedProps,
                                        ChipDeviceScanner * self);
+
+    CHIP_ERROR StartScanImpl();
+    CHIP_ERROR StopScanImpl();
 
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 & device);
