@@ -47,5 +47,5 @@ lwip_target("silabs_lwip") {
 }
 
 group("lwip") {
-  public_deps = [":silabs_lwip"]
+  public_deps = [ ":silabs_lwip" ]
 }

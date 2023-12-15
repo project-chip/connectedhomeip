@@ -67,5 +67,5 @@ lwip_target("mt793x_lwip") {
 }
 
 group("lwip") {
-  public_deps = [":mt793x_lwip"]
+  public_deps = [ ":mt793x_lwip" ]
 }
