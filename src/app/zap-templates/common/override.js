@@ -78,7 +78,7 @@ function atomicType(arg)
   case 'amperage_ma':
   case 'voltage_mv':
   case 'energy_mwh':
-    return 'int64_t';    
+    return 'int64_t';
   case 'epoch_us':
   case 'systime_us':
   case 'posix_ms':
