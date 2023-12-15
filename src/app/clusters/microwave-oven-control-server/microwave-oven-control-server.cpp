@@ -174,7 +174,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
     modeValue = 0;
-    VerifyOrExit(mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal), modeValue) == CHIP_NO_ERROR,
+    VerifyOrExit(mMicrowaveOvenModeInstance.GetModeValueByModeTag(to_underlying(MicrowaveOvenMode::ModeTag::kNormal), modeValue) ==
+                     CHIP_NO_ERROR,
                  status = Status::InvalidCommand;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Normal mode is not found"));
 
