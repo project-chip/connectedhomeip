@@ -93,11 +93,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     transitionTime: UShort,
     sceneName: String,
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): AddSceneResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -126,7 +124,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -157,7 +155,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -182,11 +179,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   suspend fun viewScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ViewSceneResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -202,7 +197,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -290,7 +285,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -322,11 +316,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   suspend fun removeScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): RemoveSceneResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -342,7 +334,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -373,7 +365,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -397,11 +388,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
 
   suspend fun removeAllScenes(
     groupID: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): RemoveAllScenesResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -414,7 +403,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -438,7 +427,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
         groupID_decoded = tlvReader.getUShort(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -459,11 +447,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   suspend fun storeScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): StoreSceneResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -479,7 +465,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -510,7 +496,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -536,11 +521,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     groupID: UShort,
     sceneID: UByte,
     transitionTime: UShort?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -561,7 +544,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -570,11 +553,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
 
   suspend fun getSceneMembership(
     groupID: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): GetSceneMembershipResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -587,7 +568,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -652,7 +633,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -681,11 +661,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     transitionTime: UShort,
     sceneName: String,
     extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): EnhancedAddSceneResponse {
     val commandId: UInt = 64u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -714,7 +692,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -745,7 +723,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
         sceneID_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -770,11 +747,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   suspend fun enhancedViewScene(
     groupID: UShort,
     sceneID: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): EnhancedViewSceneResponse {
     val commandId: UInt = 65u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -790,7 +765,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -878,7 +853,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -913,11 +887,9 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneIdentifierFrom: UByte,
     groupIdentifierTo: UShort,
     sceneIdentifierTo: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): CopySceneResponse {
     val commandId: UInt = 66u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -942,7 +914,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -973,7 +945,6 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
       if (tag == ContextSpecificTag(TAG_SCENE_IDENTIFIER_FROM)) {
         sceneIdentifierFrom_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }

@@ -91,7 +91,8 @@ protected:
         kStartICDCounter  = 3,
         kOffset           = 4,
         kMonitoredSubject = 5,
-        kSharedKey        = 6
+        kAesKeyHandle     = 6,
+        kHmacKeyHandle    = 7,
     };
 
     enum class CounterTag : uint8_t
