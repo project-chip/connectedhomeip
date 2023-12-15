@@ -121,8 +121,8 @@ size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
     return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
 }
 
-CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
-                                       Encoding::LittleEndian::BufferWriter & writer)
+CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
+                                                       Encoding::LittleEndian::BufferWriter & writer)
 {
     VerifyOrReturnError(writer.Available() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 

@@ -98,22 +98,23 @@ public:
 
     static constexpr uint16_t kMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
-};
 
-/**
- * @brief Generate the Nonce for the Check-In message
- *
- * @param[in]   hmacKeyHandle Key handle to use with the HMAC algorithm
- * @param[in]   counter       Check-In Counter value to use as message of the HMAC algorithm
- * @param[out]  output        output buffer for the generated Nonce.
- *                            SUFFICIENT SPACE MUST BE ALLOCATED by the caller
- *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES
- *
- * @return CHIP_ERROR_BUFFER_TOO_SMALL if output buffer is too small
- *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to generate the Check-In message Nonce
- */
-CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
-                                       Encoding::LittleEndian::BufferWriter & writer);
+private:
+    /**
+     * @brief Generate the Nonce for the Check-In message
+     *
+     * @param[in]   hmacKeyHandle Key handle to use with the HMAC algorithm
+     * @param[in]   counter       Check-In Counter value to use as message of the HMAC algorithm
+     * @param[out]  output        output buffer for the generated Nonce.
+     *                            SUFFICIENT SPACE MUST BE ALLOCATED by the caller
+     *                            Size must be at least CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES
+     *
+     * @return CHIP_ERROR_BUFFER_TOO_SMALL if output buffer is too small
+     *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to generate the Check-In message Nonce
+     */
+    static CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
+                                                  Encoding::LittleEndian::BufferWriter & writer);
+};
 
 } // namespace SecureChannel
 } // namespace Protocols
