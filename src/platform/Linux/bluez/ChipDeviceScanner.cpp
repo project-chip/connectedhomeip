@@ -121,26 +121,25 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
-    mIsScanning = true; // optimistic, to allow all callbacks to check this
-    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Failed to schedule BLE scan start.");
-        mIsScanning = false;
-        return CHIP_ERROR_INTERNAL;
-    }
+    ChipLogProgress(Ble, "Start BLE scan: timeout=%ums", System::Clock::Milliseconds32(timeout).count());
 
-    if (!mIsScanning)
-    {
-        ChipLogError(Ble, "Failed to start BLE scan.");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
-
+    mIsScanning    = true; // Optimistic, to allow all callbacks to check this
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed to schedule scan timeout.");
-        StopScan();
+        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
+        mIsScanning = false;
+        // The callback is explicitly allowed to delete the scanner instance, so
+        // we must not access 'this' after this point.
+        mDelegate->OnScanComplete();
+        return err;
+    }
+
+    err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(this));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed to schedule BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
+        StopScan(); // This will call the callback
         return err;
     }
     mTimerExpired = false;
@@ -271,7 +270,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     self->mInterfaceChangedSignal =
         g_signal_connect(self->mManager, "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
 
-    ChipLogProgress(Ble, "BLE removing known devices.");
+    ChipLogProgress(Ble, "BLE removing known devices");
     for (BluezObject & object : BluezObjectList(self->mManager))
     {
         GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
@@ -300,13 +299,11 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         g_clear_error(&MakeUniquePointerReceiver(error).Get());
     }
 
-    ChipLogProgress(Ble, "BLE initiating scan.");
+    ChipLogProgress(Ble, "BLE starting discovery");
     if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
-
-        self->mIsScanning = false;
-        self->mDelegate->OnScanComplete();
+        return CHIP_ERROR_INTERNAL;
     }
 
     return CHIP_NO_ERROR;
