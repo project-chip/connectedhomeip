@@ -50,7 +50,7 @@ public:
 
     /**
      * Called during ICD device registration in commissioning, commissioner/controller
-     * provides raw key data, the shared key handle in clientInfo is updated based upon raw key data
+     * provides raw key data, the shared aes key handle and hmac key handle in clientInfo are updated based upon raw key data
      *
      * @param[inout] clientInfo the ICD Client information to be updated with keyData and be saved
      * @param[in] aKeyData raw key data provided by application

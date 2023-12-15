@@ -81,6 +81,7 @@ source_set("sender") {
   ]
 
   public_deps = [
+    ":configuration-data",
     ":monitoring-table",
     ":notifier",
     "${chip_root}/src/credentials:credentials",

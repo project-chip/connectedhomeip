@@ -8420,8 +8420,8 @@ public:
 namespace TimeSnapshotResponse {
 enum class Fields : uint8_t
 {
-    kSystemTimeUs = 0,
-    kUTCTimeUs    = 1,
+    kSystemTimeMs = 0,
+    kPosixTimeMs  = 1,
 };
 
 struct Type
@@ -8431,8 +8431,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    DataModel::Nullable<uint64_t> UTCTimeUs;
+    uint64_t systemTimeMs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> posixTimeMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -8447,8 +8447,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    DataModel::Nullable<uint64_t> UTCTimeUs;
+    uint64_t systemTimeMs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> posixTimeMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TimeSnapshotResponse
