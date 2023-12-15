@@ -52,8 +52,10 @@ import("//build_overrides/chip.gni")
 #    ]
 #  }
 #
-# Then set lwip_root = "//example/lwip" in build args. Defining the
-# library directly works too.
+# Then set lwip_root = "//example/lwip" in build_overrides (or,
+# if declared as an argument in build_overrides, via args).
+#
+# Defining the library directly works too.
 #
 # If there's no include paths to add, defines to set, sources to
 # compile, or libraries to link, then an empty group target suffices.
