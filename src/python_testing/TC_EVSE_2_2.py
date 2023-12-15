@@ -60,7 +60,8 @@ class TC_EVSE_2_2(MatterBaseTest):
         # Part 5 TODO Requires TestEventTriggers
 
         # Part 6
-        self.print_step(6, "TH sends command EnableCharging with ChargingEnabledUntil = 2 mins into the future. minimumChargeCurrent = 6000, maxmimumChargeCurrent = 60000")
+        self.print_step(
+            6, "TH sends command EnableCharging with ChargingEnabledUntil = 2 mins into the future. minimumChargeCurrent = 6000, maxmimumChargeCurrent = 60000")
 
         # get epoch time for ChargeUntil variable (2 minutes from now)
         utc_time_2_mins = datetime.datetime.now(pytz.utc) + datetime.timedelta(minutes=2)
@@ -81,13 +82,16 @@ class TC_EVSE_2_2(MatterBaseTest):
 
         self.print_step('6d', 'TH reads from the DUT the MinimumChargeCurrent attribute and checks it is the commanded value (6000)')
         minimum_charge_value = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='MinimumChargeCurrent')
-        asserts.assert_equal(minimum_charge_value, 6000, f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
+        asserts.assert_equal(minimum_charge_value, 6000,
+                             f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
 
-        self.print_step('6e', 'TH reads from the DUT the MaximumChargeCurrent attribute and checks it is the MIN(command value (60000), CircuitCapacity)')
+        self.print_step(
+            '6e', 'TH reads from the DUT the MaximumChargeCurrent attribute and checks it is the MIN(command value (60000), CircuitCapacity)')
         maximum_charge_value = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='MinimumChargeCurrent')
         circuit_capacity = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='CircuitCapacity')
         expected_max_charge = min(6000, circuit_capacity)
-        asserts.assert_equal(maximum_charge_value, expected_max_charge, f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
+        asserts.assert_equal(maximum_charge_value, expected_max_charge,
+                             f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
 
         # Part 7
         self.print_step(7, 'Wait for 2 minutes')
@@ -104,7 +108,8 @@ class TC_EVSE_2_2(MatterBaseTest):
         # asserts.assert_equal(current_supply_state, 0, f'SupplyState should be 0, but is actually {current_supply_state}')
 
         # Part 8
-        self.print_step(8, 'TH sends command EnableCharging with ChargingEnabledUntil=NULL, minimumChargeCurrent = 6000, maximumChargeCurrent=12000')
+        self.print_step(
+            8, 'TH sends command EnableCharging with ChargingEnabledUntil=NULL, minimumChargeCurrent = 6000, maximumChargeCurrent=12000')
         await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=6000, max_charge=12000)
 
         self.print_step('8a', 'TH reads from the DUT the State attribute and checks it is 3 (PluggedinCharging)')
@@ -117,13 +122,16 @@ class TC_EVSE_2_2(MatterBaseTest):
 
         self.print_step('8c', f'TH reads from the DUT the ChargingEnabledUntil attribute and checks it is the {epoch_time}')
         charge_until_time = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='ChargingEnabledUntil')
-        asserts.assert_equal(charge_until_time, epoch_time, f'ChargingEnabledUntil should be {epoch_time}, but is actually {charge_until_time}')
+        asserts.assert_equal(charge_until_time, epoch_time,
+                             f'ChargingEnabledUntil should be {epoch_time}, but is actually {charge_until_time}')
 
         self.print_step('8d', 'TH reads from the DUT the MinimumChargeCurrent attribute and checks it is the commanded value (6000)')
         minimum_charge_value = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='MinimumChargeCurrent')
-        asserts.assert_equal(minimum_charge_value, 6000, f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
+        asserts.assert_equal(minimum_charge_value, 6000,
+                             f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
 
-        self.print_step('8e', 'TH reads from the DUT the MaximumChargeCurrent attribute and checks it is the MIN(command value (60000), CircuitCapacity)')
+        self.print_step(
+            '8e', 'TH reads from the DUT the MaximumChargeCurrent attribute and checks it is the MIN(command value (60000), CircuitCapacity)')
         maximum_charge_value = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='MaximumChargeCurrent')
         circuit_capacity = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='CircuitCapacity')
         expected_max_charge = min(12000, circuit_capacity)
@@ -140,7 +148,8 @@ class TC_EVSE_2_2(MatterBaseTest):
         maximum_charge_value = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='MaximumChargeCurrent')
         circuit_capacity = await self.read_evse_attribute_exepct_success(endpoint=1, attribute='CircuitCapacity')
         expected_max_charge = min(maximum_charge_value, circuit_capacity)
-        asserts.assert_equal(maximum_charge_value, expected_max_charge, f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
+        asserts.assert_equal(maximum_charge_value, expected_max_charge,
+                             f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
 
         # Part 10 - TODO Requires Test Event Triggers
 
