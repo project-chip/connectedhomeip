@@ -2049,12 +2049,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DeviceEnergyMa
 } // namespace ESAState
 
 namespace AbsMinPower {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // power_mw
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
 } // namespace AbsMinPower
 
 namespace AbsMaxPower {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // power_mw
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
 } // namespace AbsMaxPower
 
@@ -2210,18 +2210,24 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace SessionID
 
 namespace SessionDuration {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
 } // namespace SessionDuration
 
 namespace SessionEnergyCharged {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // energy_mwh
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value); // energy_mwh
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value);
 } // namespace SessionEnergyCharged
 
 namespace SessionEnergyDischarged {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // energy_mwh
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & value); // energy_mwh
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value);
 } // namespace SessionEnergyDischarged
 
 namespace FeatureMap {
