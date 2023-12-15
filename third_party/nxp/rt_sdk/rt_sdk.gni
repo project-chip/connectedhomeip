@@ -223,8 +223,6 @@ template("rt_wifi") {
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server-main.c",
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server.c",
       "${rt_sdk_root}/middleware/wifi_nxp/dhcpd/dns-server.c",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/net.c",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip/wifi_netif.c",
       "${rt_sdk_root}/middleware/wifi_nxp/port/os/os.c",
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ac.c",
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11d.c",

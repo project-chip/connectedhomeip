@@ -444,9 +444,6 @@ template("rw61x_sdk_drivers") {
 
       # framework coex file to initialize controllers
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_coex.c",
-
-      # other framework files
-      "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider/fwk_factory_data_provider.c",
     ]
 
     if (sdk_fsl_assert_support) {
@@ -678,9 +675,6 @@ template("rw61x_sdk_drivers") {
 
     public_configs += [ ":${target_name}_config" ]
     public_deps += [ nxp_sdk_target ]
-
-    # The FactoryDataProvider/fwk_factory_data_provider.c component has a dependency to mbedtls
-    deps += [ "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk_mbedtls_config" ]
 
     if (chip_enable_openthread) {
       #Dep to ot header files required for mbedtls as mbedtls config file has a dependency to ot

@@ -118,8 +118,8 @@ rt_executable("all_cluster_app") {
     "../../common/main/ZclCallbacks.cpp",
     "../../common/main/include/AppEvent.h",
     "../../common/main/include/AppTask.h",
-    "../../common/main/include/DeviceManager/CHIPDeviceManager.h",
-    "../../common/main/include/DeviceManager/DeviceCallbacks.h",
+    "../../common/main/include/CHIPDeviceManager.h",
+    "../../common/main/include/DeviceCallbacks.h",
     "../../common/main/main.cpp",
     "../../common/main/ICDUtil.cpp",
   ]

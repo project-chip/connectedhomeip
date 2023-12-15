@@ -74,6 +74,8 @@ static_library("nxp_platform") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
+  deps += [ "${chip_root}/src/platform/logging:headers" ]
+
   if (chip_enable_ble) {
     sources += [
       # Adding rand32 file which defines the function sys_csrand_get which is called by BLEManagerImpl from Zephyr
@@ -116,6 +118,7 @@ static_library("nxp_platform") {
     ]
 
     deps += [ "${chip_root}/third_party/openthread:openthread" ]
+    public_deps += [ "${chip_root}/third_party/openthread:openthread-platform" ]
 
     if (chip_mdns == "platform") {
       sources += [

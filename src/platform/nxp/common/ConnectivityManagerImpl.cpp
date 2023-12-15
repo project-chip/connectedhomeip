@@ -51,7 +51,6 @@ extern "C" {
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
-#include <app/server/Dnssd.h>
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
@@ -388,8 +387,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv4Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
@@ -405,8 +402,6 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
         if (haveIPv6Conn)
         {
             event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
-            /* (Re-)start the DNSSD server */
-            chip::app::DnssdServer::Instance().StartServer();
         }
         err = PlatformMgr().PostEvent(&event);
         VerifyOrDie(err == CHIP_NO_ERROR);
