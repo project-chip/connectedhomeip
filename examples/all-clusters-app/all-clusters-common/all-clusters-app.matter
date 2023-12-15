@@ -3717,6 +3717,187 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
+provisional cluster EnergyEvse = 153 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum EnergyTransferStoppedReasonEnum : enum8 {
+    kEVStopped = 0;
+    kEVSEStopped = 1;
+    kOther = 2;
+  }
+
+  enum FaultStateEnum : enum8 {
+    kNoError = 0;
+    kMeterFailure = 1;
+    kOverVoltage = 2;
+    kUnderVoltage = 3;
+    kOverCurrent = 4;
+    kContactWetFailure = 5;
+    kContactDryFailure = 6;
+    kGroundFault = 7;
+    kPowerLoss = 8;
+    kPowerQuality = 9;
+    kPilotShortCircuit = 10;
+    kEmergencyStop = 11;
+    kEVDisconnected = 12;
+    kWrongPowerSupply = 13;
+    kLiveNeutralSwap = 14;
+    kOverTemperature = 15;
+    kOther = 255;
+  }
+
+  enum StateEnum : enum8 {
+    kNotPluggedIn = 0;
+    kPluggedInNoDemand = 1;
+    kPluggedInDemand = 2;
+    kPluggedInCharging = 3;
+    kPluggedInDischarging = 4;
+    kSessionEnding = 5;
+    kFault = 6;
+  }
+
+  enum SupplyStateEnum : enum8 {
+    kDisabled = 0;
+    kChargingEnabled = 1;
+    kDischargingEnabled = 2;
+    kDisabledError = 3;
+    kDisabledDiagnostics = 4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kChargingPreferences = 0x1;
+    kSoCReporting = 0x2;
+    kPlugAndCharge = 0x4;
+    kRFID = 0x8;
+    kV2X = 0x10;
+  }
+
+  bitmap TargetDayOfWeekBitmap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  struct ChargingTargetStruct {
+    int16u targetTimeMinutesPastMidnight = 0;
+    optional percent targetSoC = 1;
+    optional energy_mwh addedEnergy = 2;
+  }
+
+  info event EVConnected = 0 {
+    int32u sessionID = 0;
+  }
+
+  info event EVNotDetected = 1 {
+    int32u sessionID = 0;
+    StateEnum state = 1;
+    elapsed_s sessionDuration = 2;
+    energy_mwh sessionEnergyCharged = 3;
+    optional energy_mwh sessionEnergyDischarged = 4;
+  }
+
+  info event EnergyTransferStarted = 2 {
+    int32u sessionID = 0;
+    StateEnum state = 1;
+    amperage_ma maximumCurrent = 2;
+  }
+
+  info event EnergyTransferStopped = 3 {
+    int32u sessionID = 0;
+    StateEnum state = 1;
+    EnergyTransferStoppedReasonEnum reason = 2;
+    energy_mwh energyTransferred = 4;
+  }
+
+  critical event Fault = 4 {
+    nullable int32u sessionID = 0;
+    StateEnum state = 1;
+    FaultStateEnum faultStatePreviousState = 2;
+    FaultStateEnum faultStateCurrentState = 4;
+  }
+
+  info event RFID = 5 {
+    octet_string uid = 0;
+  }
+
+  readonly attribute nullable StateEnum state = 0;
+  readonly attribute SupplyStateEnum supplyState = 1;
+  readonly attribute FaultStateEnum faultState = 2;
+  readonly attribute nullable epoch_s chargingEnabledUntil = 3;
+  readonly attribute optional nullable epoch_s dischargingEnabledUntil = 4;
+  readonly attribute amperage_ma circuitCapacity = 5;
+  readonly attribute amperage_ma minimumChargeCurrent = 6;
+  readonly attribute amperage_ma maximumChargeCurrent = 7;
+  readonly attribute optional amperage_ma maximumDischargeCurrent = 8;
+  attribute access(write: manage) optional amperage_ma userMaximumChargeCurrent = 9;
+  attribute access(write: manage) optional elapsed_s randomizationDelayWindow = 10;
+  readonly attribute optional int8u numberOfWeeklyTargets = 33;
+  readonly attribute optional int8u numberOfDailyTargets = 34;
+  readonly attribute optional nullable epoch_s nextChargeStartTime = 35;
+  readonly attribute optional nullable epoch_s nextChargeTargetTime = 36;
+  readonly attribute optional nullable energy_mwh nextChargeRequiredEnergy = 37;
+  readonly attribute optional nullable percent nextChargeTargetSoC = 38;
+  attribute access(write: manage) optional nullable int16u approximateEVEfficiency = 39;
+  readonly attribute optional nullable percent stateOfCharge = 48;
+  readonly attribute optional nullable energy_mwh batteryCapacity = 49;
+  readonly attribute optional nullable char_string<32> vehicleID = 50;
+  readonly attribute nullable int32u sessionID = 64;
+  readonly attribute nullable elapsed_s sessionDuration = 65;
+  readonly attribute nullable energy_mwh sessionEnergyCharged = 66;
+  readonly attribute optional nullable energy_mwh sessionEnergyDischarged = 67;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct GetTargetsResponse = 0 {
+    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
+  }
+
+  request struct EnableChargingRequest {
+    nullable epoch_s chargingEnabledUntil = 0;
+    amperage_ma minimumChargeCurrent = 1;
+    amperage_ma maximumChargeCurrent = 2;
+  }
+
+  request struct EnableDischargingRequest {
+    nullable epoch_s dischargingEnabledUntil = 0;
+    amperage_ma maximumDischargeCurrent = 1;
+  }
+
+  request struct SetTargetsRequest {
+    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
+  }
+
+  request struct GetTargetsRequest {
+    TargetDayOfWeekBitmap daysToReturn = 0;
+  }
+
+  /** Allows a client to disable the EVSE from charging and discharging. */
+  timed command Disable(): DefaultSuccess = 1;
+  /** Allows a client to enable the EVSE to charge an EV. */
+  timed command EnableCharging(EnableChargingRequest): DefaultSuccess = 2;
+  /** Allows a client to enable the EVSE to discharge an EV. */
+  timed command EnableDischarging(EnableDischargingRequest): DefaultSuccess = 3;
+  /** Allows a client to put the EVSE into a self-diagnostics mode. */
+  timed command StartDiagnostics(): DefaultSuccess = 4;
+  /** Allows a client to set the user specified charging targets. */
+  timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
+  /** Allows a client to retrieve the user specified charging targets. */
+  timed command GetTargets(GetTargetsRequest): GetTargetsResponse = 6;
+  /** Allows a client to clear all stored charging targets. */
+  timed command ClearTargets(): DefaultSuccess = 7;
+}
+
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
   revision 5;
@@ -7139,6 +7320,40 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster EnergyEvse {
+    callback attribute state default = 0;
+    callback attribute supplyState default = 0;
+    callback attribute faultState default = 0;
+    callback attribute chargingEnabledUntil default = 0;
+    callback attribute dischargingEnabledUntil default = 0;
+    callback attribute circuitCapacity default = 0;
+    callback attribute minimumChargeCurrent default = 6000;
+    callback attribute maximumChargeCurrent default = 0;
+    callback attribute maximumDischargeCurrent default = 0;
+    callback attribute userMaximumChargeCurrent default = 0;
+    callback attribute randomizationDelayWindow default = 600;
+    callback attribute numberOfWeeklyTargets default = 0;
+    callback attribute numberOfDailyTargets default = 1;
+    callback attribute nextChargeStartTime;
+    callback attribute nextChargeTargetTime;
+    callback attribute nextChargeRequiredEnergy;
+    callback attribute nextChargeTargetSoC;
+    callback attribute approximateEVEfficiency default = 0xFFFF;
+    callback attribute stateOfCharge;
+    callback attribute batteryCapacity;
+    callback attribute vehicleID;
+    callback attribute sessionID;
+    callback attribute sessionDuration;
+    callback attribute sessionEnergyCharged;
+    callback attribute sessionEnergyDischarged;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster WindowCovering {
