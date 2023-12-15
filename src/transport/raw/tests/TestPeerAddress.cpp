@@ -136,7 +136,7 @@ int TestPeerAddress()
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));

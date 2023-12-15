@@ -11061,29 +11061,29 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long systemTimeUsFieldID = 0L;
-          Long systemTimeUs = null;
-          final long UTCTimeUsFieldID = 1L;
-          @Nullable Long UTCTimeUs = null;
+          final long systemTimeMsFieldID = 0L;
+          Long systemTimeMs = null;
+          final long posixTimeMsFieldID = 1L;
+          @Nullable Long posixTimeMs = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == systemTimeUsFieldID) {
+            if (element.contextTagNum() == systemTimeMsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                systemTimeUs = castingValue.value(Long.class);
+                systemTimeMs = castingValue.value(Long.class);
               }
-            } else if (element.contextTagNum() == UTCTimeUsFieldID) {
+            } else if (element.contextTagNum() == posixTimeMsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                UTCTimeUs = castingValue.value(Long.class);
+                posixTimeMs = castingValue.value(Long.class);
               }
             }
           }
-          callback.onSuccess(systemTimeUs, UTCTimeUs);
+          callback.onSuccess(systemTimeMs, posixTimeMs);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
     public interface TimeSnapshotResponseCallback extends BaseClusterCallback {
-      void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs);
+      void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs);
     }
 
     public interface NetworkInterfacesAttributeCallback extends BaseAttributeCallback {
