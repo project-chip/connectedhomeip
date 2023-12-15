@@ -91,10 +91,6 @@ buildconfig_header("lwip_buildconfig") {
       # Automatically enable LWIP_DEBUG for internal is_debug builds.
       defines += [ "LWIP_DEBUG=1" ]
     }
-
-    if (current_os == "android") {
-      defines += [ "LWIP_NO_STDINT_H=1" ]
-    }
   }
 }
 
