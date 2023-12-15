@@ -18,6 +18,7 @@
 
 #include <../Zephyr/ZephyrConfig.h>
 #include <AppConfig.h>
+#include <LockManager.h>
 
 #if LOCK_MANAGER_CONFIG_USE_NVM_CREDENTIAL_STORAGE
 namespace chip {
@@ -28,13 +29,13 @@ class LockSettingsStorage : ZephyrConfig
 {
 public:
     static const ZephyrConfig::Key kConfigKey_LockUser;
-    static const ZephyrConfig::Key kConfigKey_Credential;
     static const ZephyrConfig::Key kConfigKey_LockUserName;
-    static const ZephyrConfig::Key kConfigKey_CredentialData;
     static const ZephyrConfig::Key kConfigKey_UserCredentials;
     static const ZephyrConfig::Key kConfigKey_WeekDaySchedules;
     static const ZephyrConfig::Key kConfigKey_YearDaySchedules;
     static const ZephyrConfig::Key kConfigKey_HolidaySchedules;
+    static const char * kConfigKey_Credential[kNumCredentialTypes];
+    static const char * kConfigKey_CredentialData[kNumCredentialTypes];
 };
 } // namespace Internal
 } // namespace DeviceLayer

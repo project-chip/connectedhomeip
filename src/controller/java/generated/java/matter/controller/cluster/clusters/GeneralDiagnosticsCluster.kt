@@ -37,7 +37,7 @@ class GeneralDiagnosticsCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
-  class TimeSnapshotResponse(val systemTimeUs: ULong, val UTCTimeUs: ULong?)
+  class TimeSnapshotResponse(val systemTimeMs: ULong, val posixTimeMs: ULong?)
 
   class NetworkInterfacesAttribute(val value: List<GeneralDiagnosticsClusterNetworkInterface>)
 
@@ -58,11 +58,9 @@ class GeneralDiagnosticsCluster(
   suspend fun testEventTrigger(
     enableKey: ByteArray,
     eventTrigger: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -78,17 +76,15 @@ class GeneralDiagnosticsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun timeSnapshot(timedInvokeTimeoutMs: Int? = null): TimeSnapshotResponse {
+  suspend fun timeSnapshot(timedInvokeTimeout: Duration? = null): TimeSnapshotResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -98,7 +94,7 @@ class GeneralDiagnosticsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -106,21 +102,21 @@ class GeneralDiagnosticsCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_SYSTEM_TIME_US: Int = 0
-    var systemTimeUs_decoded: ULong? = null
+    val TAG_SYSTEM_TIME_MS: Int = 0
+    var systemTimeMs_decoded: ULong? = null
 
-    val TAG_U_T_C_TIME_US: Int = 1
-    var UTCTimeUs_decoded: ULong? = null
+    val TAG_POSIX_TIME_MS: Int = 1
+    var posixTimeMs_decoded: ULong? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_SYSTEM_TIME_US)) {
-        systemTimeUs_decoded = tlvReader.getULong(tag)
+      if (tag == ContextSpecificTag(TAG_SYSTEM_TIME_MS)) {
+        systemTimeMs_decoded = tlvReader.getULong(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_U_T_C_TIME_US)) {
-        UTCTimeUs_decoded =
+      if (tag == ContextSpecificTag(TAG_POSIX_TIME_MS)) {
+        posixTimeMs_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -133,18 +129,17 @@ class GeneralDiagnosticsCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
 
-    if (systemTimeUs_decoded == null) {
-      throw IllegalStateException("systemTimeUs not found in TLV")
+    if (systemTimeMs_decoded == null) {
+      throw IllegalStateException("systemTimeMs not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return TimeSnapshotResponse(systemTimeUs_decoded, UTCTimeUs_decoded)
+    return TimeSnapshotResponse(systemTimeMs_decoded, posixTimeMs_decoded)
   }
 
   suspend fun readNetworkInterfacesAttribute(): NetworkInterfacesAttribute {

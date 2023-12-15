@@ -16,6 +16,8 @@
  */
 #include "simple-app-helper.h"
 
+#include "clusters/ContentLauncherCluster.h"
+
 #include "app/clusters/bindings/BindingManager.h"
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
@@ -26,6 +28,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
+const uint16_t kDesiredEndpointVendorId = 65521;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 
@@ -102,7 +107,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         VerifyOrReturnValue(0 <= index && index < castingPlayers.size(), CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(AppServer, "Invalid casting player index provided: %lu", index));
         std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer = castingPlayers.at(index);
-        targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler);
+
+        matter::casting::core::EndpointFilter desiredEndpointFilter;
+        desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
+        targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler, matter::casting::core::kCommissioningWindowTimeoutSec,
+                                                         desiredEndpointFilter);
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "print-bindings") == 0)

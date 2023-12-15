@@ -45,10 +45,8 @@ class IdentifyCluster(private val controller: MatterController, private val endp
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun identify(identifyTime: UShort, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun identify(identifyTime: UShort, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -61,7 +59,7 @@ class IdentifyCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -71,11 +69,9 @@ class IdentifyCluster(private val controller: MatterController, private val endp
   suspend fun triggerEffect(
     effectIdentifier: UByte,
     effectVariant: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 64u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -91,7 +87,7 @@ class IdentifyCluster(private val controller: MatterController, private val endp
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -129,10 +125,8 @@ class IdentifyCluster(private val controller: MatterController, private val endp
     return decodedValue
   }
 
-  suspend fun writeIdentifyTimeAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeIdentifyTimeAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -147,7 +141,7 @@ class IdentifyCluster(private val controller: MatterController, private val endp
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

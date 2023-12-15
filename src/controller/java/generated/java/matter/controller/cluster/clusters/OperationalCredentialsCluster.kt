@@ -64,11 +64,9 @@ class OperationalCredentialsCluster(
 
   suspend fun attestationRequest(
     attestationNonce: ByteArray,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): AttestationResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -81,7 +79,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -105,7 +103,6 @@ class OperationalCredentialsCluster(
       if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
         attestationSignature_decoded = tlvReader.getByteArray(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -125,11 +122,9 @@ class OperationalCredentialsCluster(
 
   suspend fun certificateChainRequest(
     certificateType: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): CertificateChainResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -142,7 +137,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -159,7 +154,6 @@ class OperationalCredentialsCluster(
       if (tag == ContextSpecificTag(TAG_CERTIFICATE)) {
         certificate_decoded = tlvReader.getByteArray(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -176,11 +170,9 @@ class OperationalCredentialsCluster(
   suspend fun CSRRequest(
     CSRNonce: ByteArray,
     isForUpdateNOC: Boolean?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): CSRResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -198,7 +190,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -222,7 +214,6 @@ class OperationalCredentialsCluster(
       if (tag == ContextSpecificTag(TAG_ATTESTATION_SIGNATURE)) {
         attestationSignature_decoded = tlvReader.getByteArray(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -246,11 +237,9 @@ class OperationalCredentialsCluster(
     IPKValue: ByteArray,
     caseAdminSubject: ULong,
     adminVendorId: UShort,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NOCResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -275,7 +264,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -326,7 +315,6 @@ class OperationalCredentialsCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -343,11 +331,9 @@ class OperationalCredentialsCluster(
   suspend fun updateNOC(
     NOCValue: ByteArray,
     ICACValue: ByteArray?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): NOCResponse {
     val commandId: UInt = 7u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -363,7 +349,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -414,7 +400,6 @@ class OperationalCredentialsCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -428,10 +413,8 @@ class OperationalCredentialsCluster(
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)
   }
 
-  suspend fun updateFabricLabel(label: String, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+  suspend fun updateFabricLabel(label: String, timedInvokeTimeout: Duration? = null): NOCResponse {
     val commandId: UInt = 9u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -444,7 +427,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -495,7 +478,6 @@ class OperationalCredentialsCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -509,10 +491,8 @@ class OperationalCredentialsCluster(
     return NOCResponse(statusCode_decoded, fabricIndex_decoded, debugText_decoded)
   }
 
-  suspend fun removeFabric(fabricIndex: UByte, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+  suspend fun removeFabric(fabricIndex: UByte, timedInvokeTimeout: Duration? = null): NOCResponse {
     val commandId: UInt = 10u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -525,7 +505,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -576,7 +556,6 @@ class OperationalCredentialsCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -592,11 +571,9 @@ class OperationalCredentialsCluster(
 
   suspend fun addTrustedRootCertificate(
     rootCACertificate: ByteArray,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 11u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -609,7 +586,7 @@ class OperationalCredentialsCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

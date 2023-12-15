@@ -818,10 +818,8 @@ class PumpConfigurationAndControlCluster(
     return LifetimeRunningHoursAttribute(decodedValue)
   }
 
-  suspend fun writeLifetimeRunningHoursAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLifetimeRunningHoursAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 21u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -836,7 +834,7 @@ class PumpConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -942,10 +940,11 @@ class PumpConfigurationAndControlCluster(
     return LifetimeEnergyConsumedAttribute(decodedValue)
   }
 
-  suspend fun writeLifetimeEnergyConsumedAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLifetimeEnergyConsumedAttribute(
+    value: UInt,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 23u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -960,7 +959,7 @@ class PumpConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1015,10 +1014,8 @@ class PumpConfigurationAndControlCluster(
     return decodedValue
   }
 
-  suspend fun writeOperationModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOperationModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 32u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1033,7 +1030,7 @@ class PumpConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1093,10 +1090,8 @@ class PumpConfigurationAndControlCluster(
     return decodedValue
   }
 
-  suspend fun writeControlModeAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeControlModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 33u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1111,7 +1106,7 @@ class PumpConfigurationAndControlCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

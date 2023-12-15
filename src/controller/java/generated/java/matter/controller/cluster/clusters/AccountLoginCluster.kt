@@ -49,10 +49,9 @@ class AccountLoginCluster(
 
   suspend fun getSetupPIN(
     tempAccountIdentifier: String,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ): GetSetupPINResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -65,7 +64,7 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -82,7 +81,6 @@ class AccountLoginCluster(
       if (tag == ContextSpecificTag(TAG_SETUP_P_I_N)) {
         setupPIN_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -100,10 +98,9 @@ class AccountLoginCluster(
     tempAccountIdentifier: String,
     setupPIN: String,
     node: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeout: Duration
   ) {
     val commandId: UInt = 2u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -122,16 +119,15 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun logout(node: ULong?, timedInvokeTimeoutMs: Int) {
+  suspend fun logout(node: ULong?, timedInvokeTimeout: Duration) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -144,7 +140,7 @@ class AccountLoginCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
