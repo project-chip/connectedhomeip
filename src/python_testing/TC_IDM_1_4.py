@@ -15,12 +15,9 @@
 #    limitations under the License.
 #
 
-import inspect
-import logging
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
-import chip.discovery as Discovery
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
@@ -68,7 +65,7 @@ class TC_IDM_1_4(MatterBaseTest):
         asserts.assert_greater_equal(len(list_of_commands_to_send), 2,
                                      "Step 2 is always expected to try sending at least 2 command, something wrong with test logic")
         try:
-            result = await dev_ctrl.SendBatchCommands(dut_node_id, list_of_commands_to_send)
+            await dev_ctrl.SendBatchCommands(dut_node_id, list_of_commands_to_send)
             # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
             # This might happen after TCP is enabled and DUT supports TCP.
             asserts.fail("Unexpected success return from sending too many commands")
@@ -114,28 +111,54 @@ class TC_IDM_1_4(MatterBaseTest):
         self.print_step(4, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
 
         self.print_step(5, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths")
+        endpoint = 0
         command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
             Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
-        endpoint = 0
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
 
         command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         try:
             result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
-            asserts.assert_true(isinstance(result, list), "Unexpected return from SendBatchCommands")
+            asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
             asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
-            asserts.assert_true(isinstance(
+            asserts.assert_true(type_matches(
                 result[0], Clusters.OperationalCredentials.Commands.CertificateChainResponse), "Unexpected return type for first InvokeRequest")
-            asserts.assert_true(isinstance(
+            asserts.assert_true(type_matches(
                 result[1], Clusters.GroupKeyManagement.Commands.KeySetReadResponse), "Unexpected return type for second InvokeRequest")
             self.print_step(5, "DUT successfully responded to a InvokeRequest action with two valid commands")
-        except InteractionModelError as e:
+        except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
         self.print_step(6, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30991 resolved")
 
         self.print_step(7, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
+
+        self.print_step(8, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true")
+        endpoint = 0
+        command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
+        invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        command = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+        try:
+            result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], timedRequestTimeoutMs=5000)
+            asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
+            asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
+            asserts.assert_true(type_matches(
+                result[0], Clusters.GroupKeyManagement.Commands.KeySetReadResponse), "Unexpected return type for first InvokeRequest")
+            asserts.assert_true(type_matches(result[1], InteractionModelError), "Unexpected return type for second InvokeRequest")
+
+            # We sent out RevokeCommissioning without an ArmSafe intentionally, confirm that it failed for that reason.
+            asserts.assert_equal(result[1].status, Status.Failure,
+                                 "Timed command, RevokeCommissioning, didn't fail in manner expected by test")
+            window_not_open_cluster_error = 4
+            asserts.assert_equal(result[1].clusterStatus, window_not_open_cluster_error,
+                                 "Timed command, RevokeCommissioning, failed with incorrect cluster code")
+            self.print_step(
+                8, "DUT successfully responded to a InvokeRequest action with two valid commands. One of which required timed invoke, and TimedRequest in InvokeResponseMessage was set to true")
+        except InteractionModelError:
+            asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
         self.print_step(9, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
 
