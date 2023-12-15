@@ -2365,27 +2365,27 @@ void CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject SystemTimeUs;
-    std::string SystemTimeUsClassName     = "java/lang/Long";
-    std::string SystemTimeUsCtorSignature = "(J)V";
-    jlong jniSystemTimeUs                 = static_cast<jlong>(dataResponse.systemTimeUs);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeUsClassName.c_str(), SystemTimeUsCtorSignature.c_str(),
-                                                                jniSystemTimeUs, SystemTimeUs);
-    jobject UTCTimeUs;
-    if (dataResponse.UTCTimeUs.IsNull())
+    jobject SystemTimeMs;
+    std::string SystemTimeMsClassName     = "java/lang/Long";
+    std::string SystemTimeMsCtorSignature = "(J)V";
+    jlong jniSystemTimeMs                 = static_cast<jlong>(dataResponse.systemTimeMs);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeMsClassName.c_str(), SystemTimeMsCtorSignature.c_str(),
+                                                                jniSystemTimeMs, SystemTimeMs);
+    jobject PosixTimeMs;
+    if (dataResponse.posixTimeMs.IsNull())
     {
-        UTCTimeUs = nullptr;
+        PosixTimeMs = nullptr;
     }
     else
     {
-        std::string UTCTimeUsClassName     = "java/lang/Long";
-        std::string UTCTimeUsCtorSignature = "(J)V";
-        jlong jniUTCTimeUs                 = static_cast<jlong>(dataResponse.UTCTimeUs.Value());
-        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(UTCTimeUsClassName.c_str(), UTCTimeUsCtorSignature.c_str(),
-                                                                    jniUTCTimeUs, UTCTimeUs);
+        std::string PosixTimeMsClassName     = "java/lang/Long";
+        std::string PosixTimeMsCtorSignature = "(J)V";
+        jlong jniPosixTimeMs                 = static_cast<jlong>(dataResponse.posixTimeMs.Value());
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(PosixTimeMsClassName.c_str(), PosixTimeMsCtorSignature.c_str(),
+                                                                    jniPosixTimeMs, PosixTimeMs);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeUs, UTCTimeUs);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeMs, PosixTimeMs);
 }
 CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback::CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(
     jobject javaCallback) : Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>(CallbackFn, this)
