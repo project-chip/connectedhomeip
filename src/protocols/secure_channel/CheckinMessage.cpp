@@ -20,10 +20,9 @@
  *      This file implements the Matter Checkin protocol.
  */
 
-#include "CheckinMessage.h"
 #include <lib/core/CHIPCore.h>
-
 #include <lib/core/CHIPEncoding.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -117,8 +116,13 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
-                                                       Encoding::LittleEndian::BufferWriter & writer)
+size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
+{
+    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
+}
+
+CHIP_ERROR GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
+                                       Encoding::LittleEndian::BufferWriter & writer)
 {
     VerifyOrReturnError(writer.Available() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -137,11 +141,6 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
     VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
-}
-
-size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
-{
-    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
 }
 
 } // namespace SecureChannel

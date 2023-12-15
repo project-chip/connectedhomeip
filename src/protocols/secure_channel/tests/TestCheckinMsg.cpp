@@ -290,7 +290,7 @@ void TestCheckInMsg::TestCheckInMessageNonceGeneration(nlTestSuite * inSuite, vo
         NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
         // Verify that the generation succeeded
-        NL_TEST_ASSERT_SUCCESS(inSuite, CheckinMessage::GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer));
+        NL_TEST_ASSERT_SUCCESS(inSuite, GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer));
 
         // Verify that enough space was present in the buffer
         size_t written = 0;
@@ -326,7 +326,7 @@ void TestCheckInMsg::TestCheckInMessageNonceGenerationTooSmallWriter(nlTestSuite
     NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(hmacKeyMaterial, hmac128KeyHandle));
 
     // Verify that the generation succeeded
-    CHIP_ERROR err = CheckinMessage::GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer);
+    CHIP_ERROR err = GenerateCheckInMessageNonce(hmac128KeyHandle, vector.counter, writer);
     NL_TEST_ASSERT_EQUALS(inSuite, err, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Verify that nothing was written
