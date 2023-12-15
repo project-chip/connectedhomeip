@@ -20,6 +20,30 @@
 
 namespace chip {
 namespace app {
+
+class AutoDeleteEstablisher
+{
+public:
+    AutoDeleteEstablisher(SubscriptionResumptionSessionEstablisher * sessionEstablisher) : mSessionEstablisher(sessionEstablisher) {}
+    ~AutoDeleteEstablisher()
+    {
+        chip::Platform::Delete(mSessionEstablisher);
+    }
+
+    SubscriptionResumptionSessionEstablisher * operator->() const
+    {
+        return mSessionEstablisher;
+    }
+
+    SubscriptionResumptionSessionEstablisher & operator*() const
+    {
+        return *mSessionEstablisher;
+    }
+
+private:
+    SubscriptionResumptionSessionEstablisher * mSessionEstablisher;
+};
+
 SubscriptionResumptionSessionEstablisher::SubscriptionResumptionSessionEstablisher() :
     mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {}
@@ -68,32 +92,29 @@ SubscriptionResumptionSessionEstablisher::ResumeSubscription(
 void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                                                      const SessionHandle & sessionHandle)
 {
-    SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
-    SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;
+    AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
+    SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
                                                  subscriptionInfo.mEventPaths.AllocatedSize()))
     {
         ChipLogProgress(InteractionModel, "no resource for subscription resumption");
-        delete _this;
         return;
     }
     ReadHandler * readHandler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
     if (readHandler == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
-        delete _this;
         return;
     }
-    readHandler->OnSubscriptionResumed(sessionHandle, *_this);
-    delete _this;
+    readHandler->OnSubscriptionResumed(sessionHandle, *establisher);
 }
 
 void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId,
                                                                              CHIP_ERROR error)
 {
-    SubscriptionResumptionSessionEstablisher * _this = static_cast<SubscriptionResumptionSessionEstablisher *>(context);
-    SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = _this->mSubscriptionInfo;
+    AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
+    SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
     // If the device fails to establish the session, the subscriber might be offline and its subscription read client will
@@ -105,7 +126,6 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
         subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                               subscriptionInfo.mSubscriptionId);
     }
-    delete _this;
 }
 
 } // namespace app

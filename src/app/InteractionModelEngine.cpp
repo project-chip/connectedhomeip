@@ -41,6 +41,23 @@
 namespace chip {
 namespace app {
 
+class AutoReleaseSubscriptionInfoIterator
+{
+public:
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator *iterator) : mIterator(iterator) {};
+    ~AutoReleaseSubscriptionInfoIterator()
+    {
+        mIterator->Release();
+    }
+
+    SubscriptionResumptionStorage::SubscriptionInfoIterator *operator->() const
+    {
+        return mIterator;
+    }
+private:
+    SubscriptionResumptionStorage::SubscriptionInfoIterator *mIterator;
+};
+
 using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
@@ -1835,7 +1852,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     bool resumedSubscriptions                  = false;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
+    AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -1853,11 +1870,10 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             continue;
         }
 
-        auto subscriptionResumptionSessionEstablisher = Platform::New<SubscriptionResumptionSessionEstablisher>();
+        auto subscriptionResumptionSessionEstablisher = Platform::MakeUnique<SubscriptionResumptionSessionEstablisher>();
         if (subscriptionResumptionSessionEstablisher == nullptr)
         {
             ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionSessionEstablisher");
-            iterator->Release();
             return;
         }
 
@@ -1865,15 +1881,13 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             CHIP_NO_ERROR)
         {
             ChipLogProgress(InteractionModel, "Failed to ResumeSubscription 0x%" PRIx32, subscriptionInfo.mSubscriptionId);
-            iterator->Release();
-            Platform::Delete(subscriptionResumptionSessionEstablisher);
             return;
         }
+        subscriptionResumptionSessionEstablisher.release();
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         resumedSubscriptions = true;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
-    iterator->Release();
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // If no persisted subscriptions needed resumption then all resumption retries are done

@@ -88,18 +88,18 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Observer * observer) :
     mObserver = observer;
 }
 
-void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & helper)
+void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & resumptionSessionEstablisher)
 {
-    mSubscriptionId          = helper.mSubscriptionInfo.mSubscriptionId;
-    mMinIntervalFloorSeconds = helper.mSubscriptionInfo.mMinInterval;
-    mMaxInterval             = helper.mSubscriptionInfo.mMaxInterval;
-    SetStateFlag(ReadHandlerFlags::FabricFiltered, helper.mSubscriptionInfo.mFabricFiltered);
+    mSubscriptionId          = resumptionSessionEstablisher.mSubscriptionInfo.mSubscriptionId;
+    mMinIntervalFloorSeconds = resumptionSessionEstablisher.mSubscriptionInfo.mMinInterval;
+    mMaxInterval             = resumptionSessionEstablisher.mSubscriptionInfo.mMaxInterval;
+    SetStateFlag(ReadHandlerFlags::FabricFiltered, resumptionSessionEstablisher.mSubscriptionInfo.mFabricFiltered);
 
     // Move dynamically allocated attributes and events from the SubscriptionInfo struct into
     // the object pool managed by the IM engine
-    for (size_t i = 0; i < helper.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
+    for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
-        AttributePathParams params = helper.mSubscriptionInfo.mAttributePaths[i].GetParams();
+        AttributePathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths[i].GetParams();
         CHIP_ERROR err             = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
@@ -107,9 +107,9 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle, Sub
             return;
         }
     }
-    for (size_t i = 0; i < helper.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
+    for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
-        EventPathParams params = helper.mSubscriptionInfo.mEventPaths[i].GetParams();
+        EventPathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths[i].GetParams();
         CHIP_ERROR err         = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
