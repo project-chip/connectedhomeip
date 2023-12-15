@@ -33,12 +33,16 @@
         "color-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
+        "content-app-observer-cluster.xml",
+        "content-control-cluster.xml",
         "descriptor-cluster.xml",
+        "device-energy-management-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "electrical-energy-measurement-cluster.xml",
         "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "energy-evse-cluster.xml",
@@ -171,6 +175,7 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
+        "Device Energy Management": ["Forecast"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -210,9 +215,7 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric",
-            "UserActiveModeTriggerHint",
-            "UserActiveModeTriggerInstruction"
+            "ClientsSupportedPerFabric"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -310,7 +313,11 @@
             "OverrunCount"
         ],
         "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
+        "Media Playback": [
+            "SampledPosition",
+            "ActiveAudioTrack",
+            "ActiveTextTrack"
+        ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
         "Time Synchronization": [
@@ -535,7 +542,14 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"]
+        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Electrical Energy Measurement": [
+            "Accuracy",
+            "CumulativeEnergyImported",
+            "CumulativeEnergyExported",
+            "PeriodicEnergyImported",
+            "PeriodicEnergyExported"
+        ]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

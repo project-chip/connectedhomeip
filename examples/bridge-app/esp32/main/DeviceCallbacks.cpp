@@ -26,7 +26,7 @@
 
 #include "DeviceCallbacks.h"
 
-static const char * TAG = "bridge-devicecallbacks";
+static const char TAG[] = "bridge-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -78,7 +78,7 @@ CHIP_ERROR ActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, Att
 
 CHIP_ERROR ActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    const char SetupUrl[] = "https://example.com";
+    static const char SetupUrl[] = "https://example.com";
     return aEncoder.Encode(chip::CharSpan::fromCharString(SetupUrl));
 }
 

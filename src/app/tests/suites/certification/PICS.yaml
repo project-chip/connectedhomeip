@@ -891,7 +891,7 @@ PICS:
     - label:
           "Can the StateValue attribute be changed by manual operation at the
           DUT?"
-      id: BOOL.M.ManuallyControlled
+      id: BOOL.S.M.ManuallyControlled
 
     #
     # client / manually
@@ -6066,10 +6066,10 @@ PICS:
     #
     - label:
           "Does the DUT support reading attribute to get switch state (polling)?"
-      id: SWTCH.C.M.RA
+      id: SWTCH.C.M.SwitchStatePolling
 
     - label: "Does the DUT support eventing to get switch state changes?"
-      id: SWTCH.C.M.EV
+      id: SWTCH.C.M.SwitchStateEventing
 
     - label: "Write all supported optional attributes"
       id: SWTCH.C.AO-WRITE
@@ -7132,6 +7132,12 @@ PICS:
 
     - label: "Does the DUT (Client) support 24 Hr Hour Format ?"
       id: LTIME.C.A0000.24HR
+
+    #Features
+    - label:
+          "Can the device be configured to use different calendar formats when
+          conveying values to a user ?"
+      id: LTIME.S.F00
 
     # Unit Localization Cluster Test Plan
     - label: "Does the device implement the Unit Localization as a server?"

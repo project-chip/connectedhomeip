@@ -189,11 +189,11 @@ IcdManagementFabricDelegate gFabricDelegate;
 IcdManagementAttributeAccess gAttribute;
 
 /**
- * @brief Function checks if the client as admin permissions to the cluster in the commandPath
+ * @brief Function checks if the client has admin permissions to the cluster in the commandPath
  *
  * @param[out] isClientAdmin True : Client has admin permissions
  *                           False : Client does not have admin permissions
- *                           If an error ocurs, isClientAdmin is not changed
+ *                           If an error occurs, isClientAdmin is not changed
  * @return CHIP_ERROR
  */
 CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)

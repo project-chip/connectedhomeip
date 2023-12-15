@@ -203,6 +203,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     );
 
+    SuccessOrExit(err);
     err = mListener.Init(this);
     SuccessOrExit(err);
     mGroupsProvider->SetListener(&mListener);

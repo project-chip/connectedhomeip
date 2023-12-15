@@ -15,15 +15,12 @@
  *    limitations under the License.
  */
 
-#include "ICDCheckInSender.h"
-
-#include "ICDNotifier.h"
-
-#include <system/SystemPacketBuffer.h>
-
-#include <protocols/secure_channel/CheckinMessage.h>
-
+#include <app/icd/ICDCheckInSender.h>
+#include <app/icd/ICDConfigurationData.h>
+#include <app/icd/ICDNotifier.h>
 #include <lib/dnssd/Resolver.h>
+#include <protocols/secure_channel/CheckinMessage.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace app {
@@ -56,15 +53,26 @@ void ICDCheckInSender::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP
 
 CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
 {
-    System::PacketBufferHandle buffer = MessagePacketBuffer::New(CheckinMessage::sMinPayloadSize);
+    System::PacketBufferHandle buffer = MessagePacketBuffer::New(CheckinMessage::kMinPayloadSize);
 
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan output{ buffer->Start(), buffer->MaxDataLength() };
 
-    // TODO retrieve Check-in counter
-    CounterType counter = 0;
+    // Encoded ActiveModeThreshold in littleEndian for Check-In message application data
+    {
+        uint8_t activeModeThresholdBuffer[kApplicationDataSize] = { 0 };
+        size_t writtenBytes                                     = 0;
+        Encoding::LittleEndian::BufferWriter writer(activeModeThresholdBuffer, sizeof(activeModeThresholdBuffer));
 
-    ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mKey, counter, ByteSpan(), output));
+        writer.Put16(ICDConfigurationData::GetInstance().GetActiveModeThresholdMs());
+        VerifyOrReturnError(writer.Fit(writtenBytes), CHIP_ERROR_INTERNAL);
+
+        ByteSpan activeModeThresholdByteSpan(writer.Buffer(), writtenBytes);
+
+        ReturnErrorOnFailure(CheckinMessage::GenerateCheckinMessagePayload(mAes128KeyHandle, mHmac128KeyHandle, mICDCounter,
+                                                                           activeModeThresholdByteSpan, output));
+    }
+
     buffer->SetDataLength(static_cast<uint16_t>(output.size()));
 
     VerifyOrReturnError(mExchangeManager->GetSessionManager() != nullptr, CHIP_ERROR_INTERNAL);
@@ -81,17 +89,22 @@ CHIP_ERROR ICDCheckInSender::SendCheckInMsg(const Transport::PeerAddress & addr)
     return exchangeContext->SendMessage(MsgType::ICD_CheckIn, std::move(buffer), Messaging::SendMessageFlags::kNoAutoRequestAck);
 }
 
-CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable)
+CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter)
 {
     VerifyOrReturnError(entry.IsValid(), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INTERNAL);
     const FabricInfo * fabricInfo = fabricTable->FindFabricWithIndex(entry.fabricIndex);
     PeerId peerId(fabricInfo->GetCompressedFabricId(), entry.checkInNodeID);
 
+    mICDCounter = counter;
+
     AddressResolve::NodeLookupRequest request(peerId);
 
-    memcpy(mKey.AsMutable<Crypto::Aes128KeyByteArray>(), entry.key.As<Crypto::Aes128KeyByteArray>(),
-           sizeof(Crypto::Aes128KeyByteArray));
+    memcpy(mAes128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           entry.aesKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
+
+    memcpy(mHmac128KeyHandle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(),
+           entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray));
 
     CHIP_ERROR err = AddressResolve::Resolver::Instance().LookupNode(request, mAddressLookupHandle);
 

@@ -117,7 +117,10 @@ rt_executable("all_cluster_app") {
   if (nxp_device_type == "all-clusters") {
     defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
     sources += [
+      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseDelegateImpl.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/EnergyEvseManager.cpp",
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/energy-evse-stub.cpp",
       "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
       "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
     ]

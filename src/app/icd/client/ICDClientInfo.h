@@ -30,10 +30,11 @@ namespace app {
 struct ICDClientInfo
 {
     ScopedNodeId peer_node;
-    uint32_t start_icd_counter        = 0;
-    uint32_t offset                   = 0;
-    uint64_t monitored_subject        = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle sharedKey = Crypto::Aes128KeyHandle();
+    uint32_t start_icd_counter               = 0;
+    uint32_t offset                          = 0;
+    uint64_t monitored_subject               = static_cast<uint64_t>(0);
+    Crypto::Aes128KeyHandle aes_key_handle   = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmac_key_handle = Crypto::Hmac128KeyHandle();
 
     ICDClientInfo() {}
     ICDClientInfo(const ICDClientInfo & other) { *this = other; }
@@ -44,8 +45,12 @@ struct ICDClientInfo
         start_icd_counter = other.start_icd_counter;
         offset            = other.offset;
         monitored_subject = other.monitored_subject;
-        ByteSpan buf(other.sharedKey.As<Crypto::Aes128KeyByteArray>());
-        memcpy(sharedKey.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
+        ByteSpan aes_buf(other.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        memcpy(aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aes_buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        ByteSpan hmac_buf(other.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
+        memcpy(hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmac_buf.data(),
+               sizeof(Crypto::Symmetric128BitsKeyByteArray));
         return *this;
     }
 };

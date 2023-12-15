@@ -41,7 +41,7 @@ namespace chip {
 namespace Protocols {
 namespace UserDirectedCommissioning {
 
-inline constexpr const char * kProtocolName = "UserDirectedCommissioning";
+inline constexpr char kProtocolName[] = "UserDirectedCommissioning";
 
 // Cache contains 16 clients. This may need to be tweaked.
 inline constexpr uint8_t kMaxUDCClients = 16;
@@ -81,7 +81,7 @@ public:
     bool HasDiscoveryInfo()
     {
         return mVendorId != 0 || mProductId != 0 || mCdPort != 0 || strlen(mDeviceName) > 0 || GetRotatingIdLength() > 0 ||
-            mNumAppVendorIds > 0 || mNoPasscode || mCdUponPasscodeDialog || mCommissionerPasscode || mCommissionerPasscodeReady;
+            mNumTargetAppInfos > 0 || mNoPasscode || mCdUponPasscodeDialog || mCommissionerPasscode || mCommissionerPasscodeReady;
     }
 
     const char * GetDeviceName() const { return mDeviceName; }
@@ -105,25 +105,29 @@ public:
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
     }
 
-    bool GetAppVendorId(uint8_t index, uint16_t & vid) const
+    bool GetTargetAppInfo(uint8_t index, TargetAppInfo & info) const
     {
-        if (index < mNumAppVendorIds)
+        if (index < mNumTargetAppInfos)
         {
-            vid = mAppVendorIds[index];
+            info.vendorId  = mTargetAppInfos[index].vendorId;
+            info.productId = mTargetAppInfos[index].productId;
             return true;
         }
         return false;
     }
-    size_t GetNumAppVendorIds() const { return mNumAppVendorIds; }
+    size_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
-    void AddAppVendorId(uint16_t vid)
+    bool AddTargetAppInfo(TargetAppInfo vid)
     {
-        if (mNumAppVendorIds >= sizeof(mAppVendorIds))
+        if (mNumTargetAppInfos >= sizeof(mTargetAppInfos))
         {
             // already at max
-            return;
+            return false;
         }
-        mAppVendorIds[mNumAppVendorIds++] = vid;
+        mTargetAppInfos[mNumTargetAppInfos].vendorId  = vid.vendorId;
+        mTargetAppInfos[mNumTargetAppInfos].productId = vid.productId;
+        mNumTargetAppInfos++;
+        return true;
     }
 
     const char * GetPairingInst() const { return mPairingInst; }
@@ -170,12 +174,12 @@ public:
         client->SetRotatingId(GetRotatingId(), GetRotatingIdLength());
         client->SetPairingInst(GetPairingInst());
         client->SetPairingHint(GetPairingHint());
-        for (uint8_t i = 0; i < GetNumAppVendorIds(); i++)
+        for (uint8_t i = 0; i < GetNumTargetAppInfos(); i++)
         {
-            uint16_t vid;
-            if (GetAppVendorId(i, vid))
+            TargetAppInfo info;
+            if (GetTargetAppInfo(i, info))
             {
-                client->AddAppVendorId(vid);
+                client->AddTargetAppInfo(info);
             }
         }
 
@@ -214,9 +218,10 @@ public:
             Encoding::BytesToUppercaseHexString(mRotatingId, mRotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
             ChipLogDetail(AppServer, "\trotating id: %s", rotatingIdString);
         }
-        for (uint8_t i = 0; i < mNumAppVendorIds; i++)
+        for (uint8_t i = 0; i < mNumTargetAppInfos; i++)
         {
-            ChipLogDetail(AppServer, "\tapp vendor id [%d]: %u", i, mAppVendorIds[i]);
+            ChipLogDetail(AppServer, "\tapp vendor id / product id [%d]: %u/%u", i, mTargetAppInfos[i].vendorId,
+                          mTargetAppInfos[i].productId);
         }
         if (strlen(mPairingInst) != 0)
         {
@@ -256,13 +261,16 @@ private:
     {
         kVendorIdTag = 1,
         kProductIdTag,
-        kNameTag,
-        kRotatingIdTag,
-        kCdPortTag,
+        kDeviceNameTag,
+        kDeviceTypeTag,
         kPairingInstTag,
         kPairingHintTag,
-        kAppVendorIdListTag,
+        kRotatingIdTag,
+        kCdPortTag,
+        kTargetAppListTag,
+        kTargetAppTag,
         kAppVendorIdTag,
+        kAppProductIdTag,
         kNoPasscodeTag,
         kCdUponPasscodeDialogTag,
         kCommissionerPasscodeTag,
@@ -281,9 +289,9 @@ private:
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
     size_t mRotatingIdLen = 0;
 
-    constexpr static size_t kMaxAppVendorIds = 10;
-    uint8_t mNumAppVendorIds                 = 0; // number of vendor Ids
-    uint16_t mAppVendorIds[kMaxAppVendorIds];
+    constexpr static size_t kMaxTargetAppInfos = 10;
+    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
 
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;

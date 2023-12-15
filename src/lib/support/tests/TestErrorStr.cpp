@@ -131,8 +131,8 @@ static void CheckFormatErr(nlTestSuite * inSuite, void * inContext)
 #else // CHIP_CONFIG_SHORT_ERROR_STR
     static const size_t kBufSize = 1024;
     static char buf[kBufSize];
-    static const char * subsys = "subsys";
-    static const char * desc   = "desc";
+    static const char subsys[] = "subsys";
+    static const char desc[]   = "desc";
 
     strcpy(buf, "hi");
     // shouldn't touch the buffer
@@ -190,7 +190,7 @@ int TestErrorStr()
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

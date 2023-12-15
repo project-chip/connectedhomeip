@@ -121,7 +121,11 @@ limitations under the License.
         <define>OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOTAProviders</attribute>
+        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="array" entryType="ProviderLocation" writable="true" optional="false">
+            <description>DefaultOTAProviders</description>
+            <access op="read" privilege="view"/>
+            <access op="write" privilege="administer"/>
+        </attribute>
         <attribute side="server" code="0x0001" define="UPDATE_POSSIBLE" type="boolean" default="true" writable="false" optional="false">UpdatePossible</attribute>
         <attribute side="server" code="0x0002" define="UPDATE_STATE" type="UpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
         <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="int8u" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
