@@ -36,8 +36,9 @@ class Delegate
 public:
     Delegate() : mRemainingDuration(0){};
 
-    virtual CHIP_ERROR HandleOpenValve(DataModel::Nullable<chip::Percent> level) = 0;
-    virtual CHIP_ERROR HandleCloseValve()                                        = 0;
+    // shall return current level if supported, otherwise null
+    virtual DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) = 0;
+    virtual CHIP_ERROR HandleCloseValve()                                                                = 0;
 
     virtual ~Delegate() = default;
 

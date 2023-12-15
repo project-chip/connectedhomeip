@@ -22,11 +22,11 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 
-CHIP_ERROR ValveControlDelegate::HandleOpenValve(DataModel::Nullable<chip::Percent> level)
+DataModel::Nullable<chip::Percent> ValveControlDelegate::HandleOpenValve(DataModel::Nullable<chip::Percent> level)
 {
     chip::Percent lvl = level.IsNull() ? 100 : level.Value();
     ChipLogProgress(NotSpecified, "Valve opened to level: %d", lvl);
-    return CHIP_NO_ERROR;
+    return DataModel::Nullable<chip::Percent>();
 }
 
 CHIP_ERROR ValveControlDelegate::HandleCloseValve()

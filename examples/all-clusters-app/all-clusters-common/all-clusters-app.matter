@@ -3676,7 +3676,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
   }
 
   readonly attribute nullable elapsed_s openDuration = 0;
-  readonly attribute nullable elapsed_s defaultOpenDuration = 1;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
   readonly attribute optional nullable epoch_us autoCloseTime = 2;
   readonly attribute nullable elapsed_s remainingDuration = 3;
   readonly attribute nullable ValveStateEnum currentState = 4;
@@ -7194,20 +7194,20 @@ endpoint 1 {
     emits event ValveStateChanged;
     emits event ValveFault;
     ram      attribute openDuration;
-    ram      attribute defaultOpenDuration;
+    persist  attribute defaultOpenDuration;
     ram      attribute autoCloseTime;
-    ram      attribute remainingDuration;
+    callback attribute remainingDuration;
     ram      attribute currentState;
     ram      attribute targetState;
     ram      attribute currentLevel;
     ram      attribute targetLevel;
-    ram      attribute defaultOpenLevel default = 100;
-    ram      attribute valveFault;
+    persist  attribute defaultOpenLevel default = 100;
+    ram      attribute valveFault default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
 
     handle command Open;

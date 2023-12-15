@@ -40,7 +40,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 Delegate * GetDefaultDelegate(EndpointId endpoint);
 
 CHIP_ERROR CloseValve(chip::EndpointId ep);
-CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent> level, chip::Optional<uint32_t> openDuration);
+CHIP_ERROR SetValveLevel(chip::EndpointId ep, chip::Percent level, DataModel::Nullable<uint32_t> openDuration);
 CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
 
 inline bool HasFeature(EndpointId ep, Feature feature)

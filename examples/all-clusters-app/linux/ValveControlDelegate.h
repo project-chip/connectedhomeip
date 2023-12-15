@@ -27,7 +27,7 @@ namespace ValveConfigurationAndControl {
 class ValveControlDelegate : public Delegate
 {
 public:
-    CHIP_ERROR HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
+    DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
     CHIP_ERROR HandleCloseValve() override;
 };
 
