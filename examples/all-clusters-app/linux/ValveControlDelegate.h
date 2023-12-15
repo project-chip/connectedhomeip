@@ -29,6 +29,7 @@ class ValveControlDelegate : public Delegate
 public:
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
     CHIP_ERROR HandleCloseValve() override;
+    void HandleRemainingDurationTick(uint32_t duration) override{};
 };
 
 } // namespace ValveConfigurationAndControl
