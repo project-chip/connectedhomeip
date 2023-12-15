@@ -493,8 +493,8 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
     auto * iterator = IterateICDClientInfo();
     while (iterator->Next(clientInfo))
     {
-        CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(clientInfo.shared_key, payload,
-                                                                                                    counter, appData);
+        CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
+            clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
         if (CHIP_NO_ERROR == err)
         {
             iterator->Release();
