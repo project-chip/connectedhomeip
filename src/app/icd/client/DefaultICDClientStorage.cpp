@@ -39,9 +39,7 @@ static_assert(kMaxFabricListTlvLength <= std::numeric_limits<uint16_t>::max(), "
 
 namespace chip {
 namespace app {
-
-CHIP_ERROR
-DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
+CHIP_ERROR DefaultICDClientStorage::UpdateFabricList(FabricIndex fabricIndex)
 {
     for (auto & fabric_idx : mFabricList)
     {
