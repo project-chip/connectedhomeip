@@ -694,6 +694,10 @@ struct ReadCommissioningInfo
     bool isLIT                        = false;
     bool checkInProtocolSupport       = false;
     bool supportsConcurrentConnection = true;
+
+    app::Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::TypeInfo::DecodableType litUserActiveModeTriggerHint;
+    app::Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType
+        litUserActiveModeTriggerInstruction;
 };
 
 struct TimeZoneResponseInfo
