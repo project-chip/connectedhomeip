@@ -162,6 +162,7 @@ chip_test_suite_using_nltest("tests") {
   }
 
   test_sources += [ "TestAclAttribute.cpp" ]
+  test_sources += [ "TestDefaultICDClientStorage.cpp" ]
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -182,7 +183,6 @@ chip_test_suite_using_nltest("tests") {
 
     #Not sure why TestDefaultICDClientStorage fails on openiotsdk
     #Created https://github.com/project-chip/connectedhomeip/issues/30974 to analyze further
-    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
   }
 
   # The platform manager is not properly clearing queues in test teardown, which results in
