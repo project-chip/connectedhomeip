@@ -54,7 +54,7 @@ public:
      * @param aClustersEndpoint The endpoint ID where all the microwave oven clusters exist.
      */
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-        mOperationalStateInstance(this, aClustersEndpoint, OperationalState::Id),
+        mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, mOperationalStateInstance,
                                       mMicrowaveOvenModeInstance)
