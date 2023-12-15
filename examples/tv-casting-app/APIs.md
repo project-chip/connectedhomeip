@@ -38,8 +38,8 @@ Commissioner. In the context of the
 [Matter Video Player architecture](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc),
 a `CastingPlayer` would map to
 [Casting "Video" Player](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction).
-The `CastingPlayer` is expected to be hosting one or more `Endpoints` (similar
-to
+The `CastingPlayer` is expected to be hosting one or more `Endpoints` (some of
+which can represent
 [Content Apps](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction)
 in the Matter Video Player architecture) that support one or more Matter Media
 `Clusters`.
@@ -73,7 +73,10 @@ The Casting Client is expected to consume the Matter TV Casting library built
 for its respective platform which implements the APIs described in this
 document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
 Android and [iOS](darwin/TvCasting/README.md) to understand how to build and
-consume each platform's specific libraries.
+consume each platform's specific libraries. The libraries MUST be built with the
+client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
+`CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
+[CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
 
 ### Initialize the Casting Client
 
@@ -474,11 +477,21 @@ to a `CastingPlayer`, once the Casting client has been commissioned by it. After
 that, the Casting client is able to skip the full UDC process by establishing
 CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
 object will contain the list of available Endpoints on that `CastingPlayer`.
+Optionally, the following arguments may also be passed in. The optional
+`commissioningWindowTimeoutSec` indicates how long to keep the commissioning
+window open, if commissioning is required. And `DesiredEndpointFilter` specifies
+the attributes, such as Vendor ID and Product ID of the `Endpoint`, the Casting
+client desires to interact with after connecting. This forces the Matter TV
+Casting library to go through the full UDC process in search of the desired
+Endpoint, in cases where it is not available in the Casting client's cache.
 
 On Linux, the Casting Client can connect to a `CastingPlayer` by successfully
 calling `VerifyOrEstablishConnection` on it.
 
 ```c
+
+const uint16_t kDesiredEndpointVendorId = 65521;
+
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
     ChipLogProgress(AppServer, "ConnectionHandler called with %" CHIP_ERROR_FORMAT, err.Format());
@@ -486,7 +499,11 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
 
 ...
 // targetCastingPlayer is a discovered CastingPlayer
-targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler);
+matter::casting::core::EndpointFilter desiredEndpointFilter;
+desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
+targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
+                                                    matter::casting::core::kCommissioningWindowTimeoutSec,
+                                                    desiredEndpointFilter);
 ...
 ```
 

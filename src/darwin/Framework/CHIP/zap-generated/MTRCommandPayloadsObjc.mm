@@ -8831,9 +8831,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _systemTimeUs = @(0);
+        _systemTimeMs = @(0);
 
-        _utcTimeUs = nil;
+        _posixTimeMs = nil;
     }
     return self;
 }
@@ -8842,15 +8842,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams alloc] init];
 
-    other.systemTimeUs = self.systemTimeUs;
-    other.utcTimeUs = self.utcTimeUs;
+    other.systemTimeMs = self.systemTimeMs;
+    other.posixTimeMs = self.posixTimeMs;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemTimeUs:%@; utcTimeUs:%@; >", NSStringFromClass([self class]), _systemTimeUs, _utcTimeUs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemTimeMs:%@; posixTimeMs:%@; >", NSStringFromClass([self class]), _systemTimeMs, _posixTimeMs];
     return descriptionString;
 }
 
@@ -8901,13 +8901,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct
 {
     {
-        self.systemTimeUs = [NSNumber numberWithUnsignedLongLong:decodableStruct.systemTimeUs];
+        self.systemTimeMs = [NSNumber numberWithUnsignedLongLong:decodableStruct.systemTimeMs];
     }
     {
-        if (decodableStruct.UTCTimeUs.IsNull()) {
-            self.utcTimeUs = nil;
+        if (decodableStruct.posixTimeMs.IsNull()) {
+            self.posixTimeMs = nil;
         } else {
-            self.utcTimeUs = [NSNumber numberWithUnsignedLongLong:decodableStruct.UTCTimeUs.Value()];
+            self.posixTimeMs = [NSNumber numberWithUnsignedLongLong:decodableStruct.posixTimeMs.Value()];
         }
     }
     return CHIP_NO_ERROR;
@@ -20941,8 +20941,8 @@ NS_ASSUME_NONNULL_BEGIN
             auto iter_0 = decodableStruct.transitions.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRThermostatClusterThermostatScheduleTransition * newElement_0;
-                newElement_0 = [MTRThermostatClusterThermostatScheduleTransition new];
+                MTRThermostatClusterWeeklyScheduleTransitionStruct * newElement_0;
+                newElement_0 = [MTRThermostatClusterWeeklyScheduleTransitionStruct new];
                 newElement_0.transitionTime = [NSNumber numberWithUnsignedShort:entry_0.transitionTime];
                 if (entry_0.heatSetpoint.IsNull()) {
                     newElement_0.heatSetpoint = nil;
@@ -21034,11 +21034,11 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.transitions.count; ++i_0) {
-                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterThermostatScheduleTransition class]]) {
+                    if (![self.transitions[i_0] isKindOfClass:[MTRThermostatClusterWeeklyScheduleTransitionStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRThermostatClusterThermostatScheduleTransition *) self.transitions[i_0];
+                    auto element_0 = (MTRThermostatClusterWeeklyScheduleTransitionStruct *) self.transitions[i_0];
                     listHolder_0->mList[i_0].transitionTime = element_0.transitionTime.unsignedShortValue;
                     if (element_0.heatSetpoint == nil) {
                         listHolder_0->mList[i_0].heatSetpoint.SetNull();

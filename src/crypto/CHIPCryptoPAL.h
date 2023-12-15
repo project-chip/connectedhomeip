@@ -574,15 +574,11 @@ using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BY
  *
  * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
  *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
- *       Child classes only need to implement a constructor, implement a destructor and delete all the copy operators.
+ *       Child classes only need to implement a constructor and delete all the copy operators.
  */
 class Symmetric128BitsKeyHandle
 {
 public:
-    Symmetric128BitsKeyHandle() = default;
-    // Destructor is implemented in the .cpp. It is pure virtual only to force the class to be abstract.
-    virtual ~Symmetric128BitsKeyHandle() = 0;
-
     Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
     Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
     void operator=(const Symmetric128BitsKeyHandle &)            = delete;
@@ -606,6 +602,10 @@ public:
         return *SafePointerCast<T *>(&mContext);
     }
 
+protected:
+    Symmetric128BitsKeyHandle() = default;
+    ~Symmetric128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+
 private:
     static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
@@ -618,31 +618,29 @@ private:
 /**
  * @brief Platform-specific AES key handle
  */
-class Aes128BitsKeyHandle : public Symmetric128BitsKeyHandle
+class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
 {
 public:
-    Aes128BitsKeyHandle() = default;
-    virtual ~Aes128BitsKeyHandle() {}
+    Aes128KeyHandle() = default;
 
-    Aes128BitsKeyHandle(const Aes128BitsKeyHandle &) = delete;
-    Aes128BitsKeyHandle(Aes128BitsKeyHandle &&)      = delete;
-    void operator=(const Aes128BitsKeyHandle &)      = delete;
-    void operator=(Aes128BitsKeyHandle &&)           = delete;
+    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
+    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
+    void operator=(const Aes128KeyHandle &)  = delete;
+    void operator=(Aes128KeyHandle &&)       = delete;
 };
 
 /**
  * @brief Platform-specific HMAC key handle
  */
-class Hmac128BitsKeyHandle : public Symmetric128BitsKeyHandle
+class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 {
 public:
-    Hmac128BitsKeyHandle() = default;
-    virtual ~Hmac128BitsKeyHandle() {}
+    Hmac128KeyHandle() = default;
 
-    Hmac128BitsKeyHandle(const Hmac128BitsKeyHandle &) = delete;
-    Hmac128BitsKeyHandle(Hmac128BitsKeyHandle &&)      = delete;
-    void operator=(const Hmac128BitsKeyHandle &)       = delete;
-    void operator=(Hmac128BitsKeyHandle &&)            = delete;
+    Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
+    Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
+    void operator=(const Hmac128KeyHandle &)   = delete;
+    void operator=(Hmac128KeyHandle &&)        = delete;
 };
 
 /**
@@ -732,7 +730,7 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const Aes128BitsKeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -756,7 +754,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
 
 /**
@@ -775,7 +773,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * @param output Buffer to write output into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128BitsKeyHandle & key, const uint8_t * nonce,
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                          size_t nonce_length, uint8_t * output);
 
 /**
@@ -981,6 +979,31 @@ public:
      **/
 
     virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * This implements the CHIP_Crypto_HMAC() cryptographic primitive
+     * in the the specification.
+     *
+     * The `out_length` must be at least kSHA256_Hash_Length, and only
+     * kSHA256_Hash_Length bytes are written to out_buffer.
+     *
+     * Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
+     * @param key The HMAC Key handle to use for the HMAC operation
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer into which to write the output.
+     * @param out_length Underlying size of the `out_buffer`.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
                                    uint8_t * out_buffer, size_t out_length);
 };
 

@@ -451,7 +451,7 @@ int TestPool()
 {
     nlTestSuite theSuite = { "CHIP Pool tests", &sTests[0], Setup, Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
