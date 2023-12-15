@@ -99,4 +99,4 @@ tests:
       arguments:
           value: unsupportedSelectedDrynessLevel
       response:
-          error: InvalidInState
+          error: INVALID_IN_STATE
