@@ -37,7 +37,6 @@ import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
 #  header = "lwip_buildconfig.h"
 #  header_dir = "lwip"
 #
-#  defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
 #  if (lwip_platform != "external") {
 #    if (current_os == "android") {
 #      defines += [ "LWIP_NO_STDINT_H=1" ]
