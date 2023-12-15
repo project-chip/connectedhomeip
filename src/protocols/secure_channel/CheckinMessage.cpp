@@ -116,11 +116,6 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
     return CHIP_NO_ERROR;
 }
 
-size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
-{
-    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
-}
-
 CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
                                                        Encoding::LittleEndian::BufferWriter & writer)
 {
@@ -141,6 +136,11 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
     VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;
+}
+
+size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
+{
+    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
 }
 
 } // namespace SecureChannel
