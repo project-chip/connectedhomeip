@@ -355,7 +355,7 @@ void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
         // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
         if (info.litUserActiveModeTriggerInstruction.size() != 0)
         {
-            userActivateModeTriggerInstruction =
+            userActiveModeTriggerInstruction =
                 std::string(info.litUserActiveModeTriggerHint.data(), info.litUserActiveModeTriggerInstruction.size());
         }
 
