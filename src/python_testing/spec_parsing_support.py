@@ -75,6 +75,20 @@ class XmlCluster:
     events: dict[uint, XmlEvent]
 
 
+@dataclass
+class XmlDeviceTypeClusterRequirements:
+    name: str
+    conformance: Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+    # TODO: add element requirements
+
+
+@dataclass
+class XmlDeviceType:
+    name: str
+    revision: int
+    clusters: dict[uint, XmlDeviceTypeClusterRequirements]
+
+
 class CommandType(Enum):
     ACCEPTED = auto()
     GENERATED = auto()
@@ -390,3 +404,24 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         }
 
     return clusters, problems
+
+
+def build_xml_device_types() -> tuple[list[XmlCluster], list[ProblemNotice]]:
+    dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'device_types')
+    device_types: dict[str, XmlDeviceType] = {}
+    problems = []
+    for xml in glob.glob(f"{dir}/*.xml"):
+        logging.info(f'Parsing file {xml}')
+        tree = ElementTree.parse(f'{xml}')
+        root = tree.getroot()
+        device = root.iter('deviceType')
+        for d in device:
+            name = d.attrib['name']
+            id = d.attrib['id']
+            revision = d.attrib['revision']
+            device_types[id] = XmlDeviceType(name=name, revision=revision, clusters={})
+            clusters = d.iter('cluster')
+            for c in clusters:
+                conformance = self.parse_conformance(self.get_conformance(c))
+                device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
+                    name=c.attrib['name'], conformance=conformance)

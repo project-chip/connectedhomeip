@@ -69,7 +69,7 @@ def conformance_allowed(conformance_decision: ConformanceDecision, allow_provisi
 
 
 class zigbee:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.NOT_APPLICABLE
 
     def __str__(self):
@@ -77,7 +77,7 @@ class zigbee:
 
 
 class mandatory:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.MANDATORY
 
     def __str__(self):
@@ -85,7 +85,7 @@ class mandatory:
 
 
 class optional:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.OPTIONAL
 
     def __str__(self):
@@ -93,7 +93,7 @@ class optional:
 
 
 class deprecated:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
     def __str__(self):
@@ -101,7 +101,7 @@ class deprecated:
 
 
 class disallowed:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.DISALLOWED
 
     def __str__(self):
@@ -109,7 +109,7 @@ class disallowed:
 
 
 class provisional:
-    def __call__(self, feature_map: uint, attribute_list: list[uint], all_command_list: list[uint]) -> ConformanceDecision:
+    def __call__(self, feature_map: uint = 0, attribute_list: list[uint] = [], all_command_list: list[uint] = []) -> ConformanceDecision:
         return ConformanceDecision.PROVISIONAL
 
     def __str__(self):
