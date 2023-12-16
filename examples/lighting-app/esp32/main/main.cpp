@@ -18,10 +18,12 @@
 #include "DeviceCallbacks.h"
 
 #include "AppTask.h"
+#include "SensorTask.h"
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
+
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -74,7 +76,10 @@ extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_s
 extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end");
 #endif
 
-static const char * TAG = "light-app";
+static const char * TAG = "presence-sensor-app";
+//static const char * VENDOR_NAME = "Amazon Smart Home";
+//static const uint8_t VENDOR_ID = 4631;
+//static const char * PRODUCT_NAME = "Astro Nano Motion Sensor";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -152,12 +157,10 @@ extern "C" void app_main()
 #endif
 
     ESP_LOGI(TAG, "==================================================");
-    ESP_LOGI(TAG, "chip-esp32-light-example starting");
+    ESP_LOGI(TAG, "chip-esp32-presence-sensor-app starting");
     ESP_LOGI(TAG, "==================================================");
 
-#if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     if (Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
     {
@@ -192,5 +195,11 @@ extern "C" void app_main()
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %s", ErrorStr(error));
+    }
+
+    error = GetSensorTask().StartSensorTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "GetSensorTask().StarSensorTask() failed : %s", ErrorStr(error));
     }
 }

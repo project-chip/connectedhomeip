@@ -1,52 +1,49 @@
-/*
- *
- *    Copyright (c) 2022-2023 Project CHIP Authors
- *    All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-#pragma once
+#ifndef ESP32_BUTTON_H
+#define ESP32_BUTTON_H
 
-#include "driver/gpio.h"
-#include "esp_log.h"
-#include "esp_system.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/timers.h"
+#include "freertos/queue.h"
+#include "driver/gpio.h"
 
-#define APP_BUTTON_PRESSED 0
-#define APP_BUTTON_RELEASED 1
-#define BUTTON_NUMBER 3
-class Button
-{
-public:
-    Button();
-    Button(gpio_num_t gpioNum);
+#ifndef CONFIG_ESP32_BUTTON_LONG_PRESS_DURATION_MS
+#define CONFIG_ESP32_BUTTON_LONG_PRESS_DURATION_MS (5000)
+#endif
 
-    esp_err_t Init();
-    esp_err_t Init(gpio_num_t gpioNum);
+#ifndef CONFIG_ESP32_BUTTON_LONG_PRESS_REPEAT_MS
+#define CONFIG_ESP32_BUTTON_LONG_PRESS_REPEAT_MS (1000)
+#endif
 
-    inline gpio_num_t GetGPIONum();
-    static void TimerCallback(TimerHandle_t xTimer);
+#ifndef CONFIG_ESP32_BUTTON_QUEUE_SIZE
+#define CONFIG_ESP32_BUTTON_QUEUE_SIZE (4)
+#endif
 
-    friend void IRAM_ATTR button_isr_handler(void * arg);
+#ifndef CONFIG_ESP32_BUTTON_TASK_STACK_SIZE
+#define CONFIG_ESP32_BUTTON_TASK_STACK_SIZE 3072
+#endif
 
-private:
-    gpio_num_t mGPIONum;
-    TimerHandle_t mbuttonTimer; // FreeRTOS timers used for debouncing buttons
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define PIN_BIT(x) (1ULL<<x)
+#define BUTTON_DOWN (1)
+#define BUTTON_UP (2)
+#define BUTTON_HELD (3)
+
+typedef struct {
+    uint8_t pin;
+    uint8_t event;
+} button_event_t;
+
+class ButtonTask {
+    public:
+        QueueHandle_t button_init(unsigned long long pin_select);
+        QueueHandle_t pulled_button_init(unsigned long long pin_select, gpio_pull_mode_t pull_mode);
 };
 
-inline gpio_num_t Button::GetGPIONum()
-{
-    return mGPIONum;
+#ifdef __cplusplus
 }
+#endif
+
+#endif
+

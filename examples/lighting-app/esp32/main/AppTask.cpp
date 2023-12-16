@@ -21,14 +21,13 @@
 #include "freertos/FreeRTOS.h"
 
 #include "DeviceWithDisplay.h"
+#include <app/server/Server.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (3072)
-#define BUTTON_PRESSED 1
-#define APP_LIGHT_SWITCH 1
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -37,15 +36,17 @@ using namespace ::chip::DeviceLayer;
 
 static const char * TAG = "app-task";
 
-LEDWidget AppLED;
-
 namespace {
-constexpr EndpointId kLightEndpointId = 1;
-QueueHandle_t sAppEventQueue;
-TaskHandle_t sAppTaskHandle;
+    constexpr EndpointId kEndpointId = 1;
+    QueueHandle_t sAppEventQueue;
+    TaskHandle_t sAppTaskHandle;
 } // namespace
 
+#define BUTTON_1_GPIO_NUM     ((gpio_num_t) 6)
+// Button gButtons[BUTTON_NUMBER] = { Button(BUTTON_1_GPIO_NUM) };
+
 AppTask AppTask::sAppTask;
+ButtonTask AppTask::sButtonTask;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -62,58 +63,12 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
-{
-    if (btnAction != APP_BUTTON_PRESSED)
-    {
-        return;
-    }
-
-    AppEvent button_event = {};
-    button_event.Type     = AppEvent::kEventType_Button;
-
-#if CONFIG_HAVE_DISPLAY
-    button_event.ButtonEvent.PinNo  = buttonHandle;
-    button_event.ButtonEvent.Action = btnAction;
-    button_event.mHandler           = ButtonPressedAction;
-#else
-    button_event.mHandler = AppTask::LightingActionEventHandler;
-#endif
-
-    sAppTask.PostEvent(&button_event);
-}
-
-#if CONFIG_DEVICE_TYPE_M5STACK
-void AppTask::ButtonPressedAction(AppEvent * aEvent)
-{
-    uint32_t io_num = aEvent->ButtonEvent.PinNo;
-    int level       = gpio_get_level((gpio_num_t) io_num);
-    if (level == 0)
-    {
-        bool woken = WakeDisplay();
-        if (woken)
-        {
-            return;
-        }
-        // Button 1 is connected to the pin 39
-        // Button 2 is connected to the pin 38
-        // Button 3 is connected to the pin 37
-        // So we use 40 - io_num to map the pin number to button number
-        ScreenManager::ButtonPressed(40 - io_num);
-    }
-}
-#endif
-
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AppLED.Init();
-
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
-
-    AppLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
 #endif
 
     return err;
@@ -131,6 +86,10 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     ESP_LOGI(TAG, "App Task started");
 
+    button_event_t btn_event;
+    QueueHandle_t button_events = sButtonTask.button_init(PIN_BIT(BUTTON_1_GPIO_NUM));
+    ESP_LOGI(TAG, "Buttons initialized");
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
@@ -138,6 +97,25 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sAppTask.DispatchEvent(&event);
             eventReceived = xQueueReceive(sAppEventQueue, &event, 0); // return immediately if the queue is empty
+        }
+
+        if (xQueueReceive(button_events, &btn_event, pdMS_TO_TICKS(10))) {
+            if (btn_event.pin == BUTTON_1_GPIO_NUM) {
+                switch(btn_event.event) {
+                    case BUTTON_DOWN:
+                        ESP_LOGI(TAG, "BUTTON DOWN EVENT SEEN");
+                        break;
+                    case BUTTON_UP:
+                        ESP_LOGI(TAG, "BUTTON UP EVENT SEEN");
+                        break;
+                    case BUTTON_HELD:
+                        ESP_LOGI(TAG, "BUTTON HELD EVENT SEEN");
+                        chip::Server::GetInstance().ScheduleFactoryReset();
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 }
@@ -177,30 +155,50 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::LightingActionEventHandler(AppEvent * aEvent)
+void AppTask::PersonDetectedEventHandler(AppEvent * aEvent)
 {
-    AppLED.Toggle();
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    sAppTask.personDetected = aEvent->PersonDetectedEvent.PersonDetected;
     sAppTask.UpdateClusterState();
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
-void AppTask::UpdateClusterState()
+void AppTask::EnableStatusUpdates()
 {
-    ESP_LOGI(TAG, "Writing to OnOff cluster");
-    // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kLightEndpointId, AppLED.IsTurnedOn());
+    sAppTask.wifiConnected = true;
+}
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ESP_LOGE(TAG, "Updating on/off cluster failed: %x", status);
+void AppTask::DisableStatusUpdates()
+{
+    sAppTask.wifiConnected = false;
+}
+
+void AppTask::UpdateOccupancySensorConfiguration()
+{
+    if (!sAppTask.wifiConnected) {
+        return;
     }
 
-    ESP_LOGI(TAG, "Writing to Current Level cluster");
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, AppLED.GetLevel());
+    ESP_LOGI(TAG, "Writing to Occupancy Sensing Cluster Configuration");
+    EmberAfStatus status = Clusters::OccupancySensing::Attributes::OccupancySensorType::Set(kEndpointId, Clusters::OccupancySensing::OccupancySensorTypeEnum::kUltrasonic);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ESP_LOGE(TAG, "Updating level cluster failed: %x", status);
+        ESP_LOGE(TAG, "Updating occupancy sensor cluster configuration failed: %x", status);
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    if (!sAppTask.wifiConnected) {
+        return;
+    }
+
+    ESP_LOGI(TAG, "Writing to Occupancy Sensing Cluster");
+    EmberAfStatus status = Clusters::OccupancySensing::Attributes::Occupancy::Set(kEndpointId, sAppTask.personDetected);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ESP_LOGE(TAG, "Updating occupancy sensor cluster failed: %x", status);
     }
 }

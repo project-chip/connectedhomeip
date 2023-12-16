@@ -22,6 +22,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lighting-app/lighting-common/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                      #"${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/platform/ESP32"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
@@ -41,7 +42,6 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/descriptor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/color-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/fixed-label-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
@@ -49,10 +49,8 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/localization-configuration-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/time-format-localization-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/level-control"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/on-off-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ota-requestor"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-configuration-server"
@@ -66,6 +64,9 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/scenes-server"
 )
+
+#set(SRCS                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/platform/ESP32/ESP32Config.cpp" )
+
 
 set(PRIV_REQUIRES_LIST chip QRCode bt led_strip app_update openthread driver nvs_flash spi_flash)
 

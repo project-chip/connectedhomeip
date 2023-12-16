@@ -263,177 +263,6 @@ provisional server cluster Scenes = 5 {
   fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
-/** Attributes and commands for switching devices between 'On' and 'Off' states. */
-server cluster OnOff = 6 {
-  enum DelayedAllOffEffectVariantEnum : enum8 {
-    kDelayedOffFastFade = 0;
-    kNoFade = 1;
-    kDelayedOffSlowFade = 2;
-  }
-
-  enum DyingLightEffectVariantEnum : enum8 {
-    kDyingLightFadeOff = 0;
-  }
-
-  enum EffectIdentifierEnum : enum8 {
-    kDelayedAllOff = 0;
-    kDyingLight = 1;
-  }
-
-  enum StartUpOnOffEnum : enum8 {
-    kOff = 0;
-    kOn = 1;
-    kToggle = 2;
-  }
-
-  bitmap Feature : bitmap32 {
-    kLighting = 0x1;
-    kDeadFrontBehavior = 0x2;
-  }
-
-  bitmap OnOffControlBitmap : bitmap8 {
-    kAcceptOnlyWhenOn = 0x1;
-  }
-
-  readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct OffWithEffectRequest {
-    EffectIdentifierEnum effectIdentifier = 0;
-    int8u effectVariant = 1;
-  }
-
-  request struct OnWithTimedOffRequest {
-    OnOffControlBitmap onOffControl = 0;
-    int16u onTime = 1;
-    int16u offWaitTime = 2;
-  }
-
-  command Off(): DefaultSuccess = 0;
-  command On(): DefaultSuccess = 1;
-  command Toggle(): DefaultSuccess = 2;
-  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-}
-
-/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
-server cluster LevelControl = 8 {
-  enum MoveMode : enum8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  enum StepMode : enum8 {
-    kUp = 0;
-    kDown = 1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-    kLighting = 0x2;
-    kFrequency = 0x4;
-  }
-
-  bitmap LevelControlOptions : bitmap8 {
-    kExecuteIfOff = 0x1;
-    kCoupleColorTempToLevel = 0x2;
-  }
-
-  readonly attribute nullable int8u currentLevel = 0;
-  readonly attribute int16u remainingTime = 1;
-  readonly attribute int8u minLevel = 2;
-  readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
-  attribute LevelControlOptions options = 15;
-  attribute int16u onOffTransitionTime = 16;
-  attribute nullable int8u onLevel = 17;
-  attribute nullable int16u onTransitionTime = 18;
-  attribute nullable int16u offTransitionTime = 19;
-  attribute nullable int8u defaultMoveRate = 20;
-  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MoveToLevelRequest {
-    int8u level = 0;
-    nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
-  }
-
-  request struct MoveRequest {
-    MoveMode moveMode = 0;
-    nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
-  }
-
-  request struct StepRequest {
-    StepMode stepMode = 0;
-    int8u stepSize = 1;
-    nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
-  }
-
-  request struct StopRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
-  }
-
-  request struct MoveToLevelWithOnOffRequest {
-    int8u level = 0;
-    nullable int16u transitionTime = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
-  }
-
-  request struct MoveWithOnOffRequest {
-    MoveMode moveMode = 0;
-    nullable int8u rate = 1;
-    LevelControlOptions optionsMask = 2;
-    LevelControlOptions optionsOverride = 3;
-  }
-
-  request struct StepWithOnOffRequest {
-    StepMode stepMode = 0;
-    int8u stepSize = 1;
-    nullable int16u transitionTime = 2;
-    LevelControlOptions optionsMask = 3;
-    LevelControlOptions optionsOverride = 4;
-  }
-
-  request struct StopWithOnOffRequest {
-    LevelControlOptions optionsMask = 0;
-    LevelControlOptions optionsOverride = 1;
-  }
-
-  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
-  command Move(MoveRequest): DefaultSuccess = 1;
-  command Step(StepRequest): DefaultSuccess = 2;
-  command Stop(StopRequest): DefaultSuccess = 3;
-  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
-  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
-  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
-  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
-}
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   bitmap Feature : bitmap32 {
@@ -1812,274 +1641,6 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** Attributes and commands for controlling the color properties of a color-capable light. */
-server cluster ColorControl = 768 {
-  enum ColorLoopAction : enum8 {
-    kDeactivate = 0;
-    kActivateFromColorLoopStartEnhancedHue = 1;
-    kActivateFromEnhancedCurrentHue = 2;
-  }
-
-  enum ColorLoopDirection : enum8 {
-    kDecrementHue = 0;
-    kIncrementHue = 1;
-  }
-
-  enum ColorMode : enum8 {
-    kCurrentHueAndCurrentSaturation = 0;
-    kCurrentXAndCurrentY = 1;
-    kColorTemperature = 2;
-  }
-
-  enum HueDirection : enum8 {
-    kShortestDistance = 0;
-    kLongestDistance = 1;
-    kUp = 2;
-    kDown = 3;
-  }
-
-  enum HueMoveMode : enum8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum HueStepMode : enum8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationMoveMode : enum8 {
-    kStop = 0;
-    kUp = 1;
-    kDown = 3;
-  }
-
-  enum SaturationStepMode : enum8 {
-    kUp = 1;
-    kDown = 3;
-  }
-
-  bitmap ColorCapabilities : bitmap16 {
-    kHueSaturationSupported = 0x1;
-    kEnhancedHueSupported = 0x2;
-    kColorLoopSupported = 0x4;
-    kXYAttributesSupported = 0x8;
-    kColorTemperatureSupported = 0x10;
-  }
-
-  bitmap ColorLoopUpdateFlags : bitmap8 {
-    kUpdateAction = 0x1;
-    kUpdateDirection = 0x2;
-    kUpdateTime = 0x4;
-    kUpdateStartHue = 0x8;
-  }
-
-  bitmap Feature : bitmap32 {
-    kHueAndSaturation = 0x1;
-    kEnhancedHue = 0x2;
-    kColorLoop = 0x4;
-    kXY = 0x8;
-    kColorTemperature = 0x10;
-  }
-
-  readonly attribute int8u currentHue = 0;
-  readonly attribute int8u currentSaturation = 1;
-  readonly attribute int16u remainingTime = 2;
-  readonly attribute int16u currentX = 3;
-  readonly attribute int16u currentY = 4;
-  readonly attribute int16u colorTemperatureMireds = 7;
-  readonly attribute enum8 colorMode = 8;
-  attribute bitmap8 options = 15;
-  readonly attribute nullable int8u numberOfPrimaries = 16;
-  readonly attribute int16u enhancedCurrentHue = 16384;
-  readonly attribute enum8 enhancedColorMode = 16385;
-  readonly attribute int8u colorLoopActive = 16386;
-  readonly attribute int8u colorLoopDirection = 16387;
-  readonly attribute int16u colorLoopTime = 16388;
-  readonly attribute int16u colorLoopStartEnhancedHue = 16389;
-  readonly attribute int16u colorLoopStoredEnhancedHue = 16390;
-  readonly attribute bitmap16 colorCapabilities = 16394;
-  readonly attribute int16u colorTempPhysicalMinMireds = 16395;
-  readonly attribute int16u colorTempPhysicalMaxMireds = 16396;
-  readonly attribute int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute access(write: manage) nullable int16u startUpColorTemperatureMireds = 16400;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct MoveToHueRequest {
-    int8u hue = 0;
-    HueDirection direction = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveHueRequest {
-    HueMoveMode moveMode = 0;
-    int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct StepHueRequest {
-    HueStepMode stepMode = 0;
-    int8u stepSize = 1;
-    int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveToSaturationRequest {
-    int8u saturation = 0;
-    int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode = 0;
-    int8u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct StepSaturationRequest {
-    SaturationStepMode stepMode = 0;
-    int8u stepSize = 1;
-    int8u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveToHueAndSaturationRequest {
-    int8u hue = 0;
-    int8u saturation = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveToColorRequest {
-    int16u colorX = 0;
-    int16u colorY = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveColorRequest {
-    int16s rateX = 0;
-    int16s rateY = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct StepColorRequest {
-    int16s stepX = 0;
-    int16s stepY = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct MoveToColorTemperatureRequest {
-    int16u colorTemperatureMireds = 0;
-    int16u transitionTime = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct EnhancedMoveToHueRequest {
-    int16u enhancedHue = 0;
-    HueDirection direction = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode = 0;
-    int16u rate = 1;
-    bitmap8 optionsMask = 2;
-    bitmap8 optionsOverride = 3;
-  }
-
-  request struct EnhancedStepHueRequest {
-    HueStepMode stepMode = 0;
-    int16u stepSize = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct EnhancedMoveToHueAndSaturationRequest {
-    int16u enhancedHue = 0;
-    int8u saturation = 1;
-    int16u transitionTime = 2;
-    bitmap8 optionsMask = 3;
-    bitmap8 optionsOverride = 4;
-  }
-
-  request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags = 0;
-    ColorLoopAction action = 1;
-    ColorLoopDirection direction = 2;
-    int16u time = 3;
-    int16u startHue = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
-  }
-
-  request struct StopMoveStepRequest {
-    bitmap8 optionsMask = 0;
-    bitmap8 optionsOverride = 1;
-  }
-
-  request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode = 0;
-    int16u rate = 1;
-    int16u colorTemperatureMinimumMireds = 2;
-    int16u colorTemperatureMaximumMireds = 3;
-    bitmap8 optionsMask = 4;
-    bitmap8 optionsOverride = 5;
-  }
-
-  request struct StepColorTemperatureRequest {
-    HueStepMode stepMode = 0;
-    int16u stepSize = 1;
-    int16u transitionTime = 2;
-    int16u colorTemperatureMinimumMireds = 3;
-    int16u colorTemperatureMaximumMireds = 4;
-    bitmap8 optionsMask = 5;
-    bitmap8 optionsOverride = 6;
-  }
-
-  command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
-  command MoveHue(MoveHueRequest): DefaultSuccess = 1;
-  command StepHue(StepHueRequest): DefaultSuccess = 2;
-  command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
-  command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
-  command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
-  command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
-  command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
-  command MoveColor(MoveColorRequest): DefaultSuccess = 8;
-  command StepColor(StepColorRequest): DefaultSuccess = 9;
-  command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
-  command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
-  command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
-  command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
-  command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
-  command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
-  command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
-  command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
-  command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
-}
-
 /** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : enum8 {
@@ -2099,9 +1660,12 @@ server cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
-  readonly attribute OccupancyBitmap occupancy = 0;
+  readonly nosubscribe attribute OccupancyBitmap occupancy = 0;
   readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
   readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) int16u ultrasonicOccupiedToUnoccupiedDelay = 32;
+  attribute access(write: manage) int16u ultrasonicUnoccupiedToOccupiedDelay = 33;
+  attribute access(write: manage) int8u ultrasonicUnoccupiedToOccupiedThreshold = 34;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2142,9 +1706,9 @@ endpoint 0 {
     emits event ShutDown;
     emits event Leave;
     callback attribute dataModelRevision default = 10;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
+    callback attribute vendorName default = "Amazon (Cliff)";
+    callback attribute vendorID default = 0x1217;
+    callback attribute productName default = "Astro Nano Motion";
     callback attribute productID;
     persist  attribute nodeLabel;
     callback attribute location default = "XX";
@@ -2453,12 +2017,16 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_dimmablelight = 257, version 1;
+  device type ma_occupancysensor = 263, version 1;
 
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
     ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
@@ -2516,110 +2084,30 @@ endpoint 1 {
     handle command CopyScene;
   }
 
-  server cluster OnOff {
-    persist  attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime default = 0x0000;
-    ram      attribute offWaitTime default = 0x0000;
-    persist  attribute startUpOnOff default = 0xFF;
-    ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
-
-    handle command Off;
-    handle command On;
-    handle command Toggle;
-    handle command OffWithEffect;
-    handle command OnWithRecallGlobalScene;
-    handle command OnWithTimedOff;
-  }
-
-  server cluster LevelControl {
-    persist  attribute currentLevel default = 0x01;
-    ram      attribute remainingTime default = 0x0000;
-    ram      attribute minLevel default = 0x01;
-    ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
-    ram      attribute options default = 0x00;
-    ram      attribute onOffTransitionTime default = 0x0000;
-    ram      attribute onLevel default = 0xFF;
-    ram      attribute onTransitionTime;
-    ram      attribute offTransitionTime;
-    ram      attribute defaultMoveRate default = 50;
-    persist  attribute startUpCurrentLevel default = 255;
-    ram      attribute featureMap default = 3;
-    ram      attribute clusterRevision default = 5;
-
-    handle command MoveToLevel;
-    handle command Move;
-    handle command Step;
-    handle command Stop;
-    handle command MoveToLevelWithOnOff;
-    handle command MoveWithOnOff;
-    handle command StepWithOnOff;
-    handle command StopWithOnOff;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
-  }
-
-  server cluster ColorControl {
-    persist  attribute currentHue default = 0x00;
-    persist  attribute currentSaturation default = 0x00;
-    ram      attribute remainingTime default = 0x0000;
-    persist  attribute currentX default = 0x616B;
-    persist  attribute currentY default = 0x607D;
-    persist  attribute colorTemperatureMireds default = 0x00FA;
-    persist  attribute colorMode default = 0x01;
-    ram      attribute options default = 0x00;
-    ram      attribute numberOfPrimaries;
-    persist  attribute enhancedCurrentHue default = 0x0000;
-    persist  attribute enhancedColorMode default = 0x01;
-    persist  attribute colorLoopActive default = 0x00;
-    persist  attribute colorLoopDirection default = 0x00;
-    persist  attribute colorLoopTime default = 0x0019;
-    ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
-    ram      attribute colorCapabilities default = 0x1F;
-    ram      attribute colorTempPhysicalMinMireds default = 0x0000;
-    ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
-    ram      attribute coupleColorTempToLevelMinMireds;
-    persist  attribute startUpColorTemperatureMireds;
-    ram      attribute featureMap default = 0x1F;
-    ram      attribute clusterRevision default = 6;
-
-    handle command MoveToHue;
-    handle command MoveHue;
-    handle command StepHue;
-    handle command MoveToSaturation;
-    handle command MoveSaturation;
-    handle command StepSaturation;
-    handle command MoveToHueAndSaturation;
-    handle command MoveToColor;
-    handle command MoveColor;
-    handle command StepColor;
-    handle command MoveToColorTemperature;
-    handle command EnhancedMoveToHue;
-    handle command EnhancedMoveHue;
-    handle command EnhancedStepHue;
-    handle command EnhancedMoveToHueAndSaturation;
-    handle command ColorLoopSet;
-    handle command StopMoveStep;
-    handle command MoveColorTemperature;
-    handle command StepColorTemperature;
   }
 
   server cluster OccupancySensing {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
+    ram      attribute ultrasonicOccupiedToUnoccupiedDelay default = 0x0000;
+    ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x0000;
+    ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 0x01;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
