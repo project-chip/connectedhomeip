@@ -1373,6 +1373,12 @@ endpoint 1 {
   }
 
   server cluster EnergyEvse {
+    emits event EVConnected;
+    emits event EVNotDetected;
+    emits event EnergyTransferStarted;
+    emits event EnergyTransferStopped;
+    emits event Fault;
+    emits event RFID;
     callback attribute state;
     callback attribute supplyState;
     callback attribute faultState;
