@@ -183,7 +183,7 @@ int TestErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "-Error-Strings",
+        "Test the ErrorStr primitives",
         &sTests[0],
         nullptr,
         nullptr

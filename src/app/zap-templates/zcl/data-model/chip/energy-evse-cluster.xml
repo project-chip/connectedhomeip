@@ -169,11 +169,11 @@ limitations under the License.
       <arg name="ChargingTargets" array="true" type="ChargingTargetStruct"/>
       <description>The GetTargetsResponse is sent in response to the GetTargets Command.</description>
     </command>
-    <event code="0x0000" name="EVConnected" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x0000" name="EVConnected" priority="info" apiMaturity="provisional">
       <description>EVConnected</description>
       <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
     </event>
-    <event code="0x0001" name="EVNotDetected" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x0001" name="EVNotDetected" priority="info" apiMaturity="provisional">
       <description>EVNotDetected</description>
       <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
       <field id="1" name="State" type="StateEnum" apiMaturity="provisional"/>
@@ -181,27 +181,27 @@ limitations under the License.
       <field id="3" name="SessionEnergyCharged" type="energy_mwh" min="0" apiMaturity="provisional"/>
       <field id="4" name="SessionEnergyDischarged" type="energy_mwh" min="0"  optional="true" apiMaturity="provisional"/>
     </event>
-    <event code="0x0002" name="EnergyTransferStarted" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x0002" name="EnergyTransferStarted" priority="info" apiMaturity="provisional">
       <description>EnergyTransferStarted</description>
       <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
       <field id="1" name="State" type="StateEnum" apiMaturity="provisional"/>
       <field id="2" name="MaximumCurrent" type="amperage_ma" min="0" max="80000" apiMaturity="provisional"/>
     </event>
-    <event code="0x0003" name="EnergyTransferStopped" priority="info" apiMaturity="provisional">
+    <event side="server" code="0x0003" name="EnergyTransferStopped" priority="info" apiMaturity="provisional">
       <description>EnergyTransferStopped</description>
       <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
       <field id="1" name="State" type="StateEnum" apiMaturity="provisional"/>
       <field id="2" name="Reason" type="EnergyTransferStoppedReasonEnum" apiMaturity="provisional"/>
       <field id="4" name="EnergyTransferred" type="energy_mwh" min="0" apiMaturity="provisional"/>
     </event>
-    <event code="0x0004" name="Fault" priority="critical" apiMaturity="provisional">
+    <event side="server" code="0x0004" name="Fault" priority="critical" apiMaturity="provisional">
       <description>Fault</description>
       <field id="0" name="SessionID" type="int32u" isNullable="true" apiMaturity="provisional"/>
       <field id="1" name="State" type="StateEnum" apiMaturity="provisional"/>
       <field id="2" name="FaultStatePreviousState" type="FaultStateEnum" apiMaturity="provisional"/>
       <field id="4" name="FaultStateCurrentState" type="FaultStateEnum" apiMaturity="provisional"/>
     </event>
-    <event code="0x0005" name="RFID" priority="info" apiMaturity="provisional" optional="true">
+    <event side="server" code="0x0005" name="RFID" priority="info" apiMaturity="provisional" optional="true">
       <description>RFID</description>
       <field id="0" name="UID" type="octet_string" length="10" apiMaturity="provisional"/>
     </event>
