@@ -4074,12 +4074,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterAttributeValuePair : MTRMatterScenesClusterAttributeValuePair
-@dynamic attributeID;
-@dynamic attributeId;
-@dynamic attributeValue;
-@end
-
 @implementation MTRMatterScenesClusterExtensionFieldSet
 - (instancetype)init
 {
@@ -4108,12 +4102,6 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-@end
-
-@implementation MTRScenesClusterExtensionFieldSet : MTRMatterScenesClusterExtensionFieldSet
-@dynamic clusterID;
-@dynamic clusterId;
-@dynamic attributeValueList;
 @end
 
 @implementation MTRMatterScenesClusterSceneInfoStruct
@@ -4156,15 +4144,6 @@ NS_ASSUME_NONNULL_BEGIN
     return descriptionString;
 }
 
-@end
-
-@implementation MTRScenesClusterSceneInfoStruct : MTRMatterScenesClusterSceneInfoStruct
-@dynamic sceneCount;
-@dynamic currentScene;
-@dynamic currentGroup;
-@dynamic sceneValid;
-@dynamic remainingCapacity;
-@dynamic fabricIndex;
 @end
 
 @implementation MTRHEPAFilterMonitoringClusterReplacementProductStruct

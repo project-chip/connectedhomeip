@@ -13000,16 +13000,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterAddSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-@dynamic transitionTime;
-@dynamic sceneName;
-@dynamic extensionFieldSets;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterAddSceneResponseParams
 - (instancetype)init
 {
@@ -13020,7 +13010,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -13032,7 +13021,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -13103,13 +13091,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterAddSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterViewSceneParams
 - (instancetype)init
 {
@@ -13195,13 +13176,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterViewSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterViewSceneResponseParams
 - (instancetype)init
 {
@@ -13218,7 +13192,6 @@ NS_ASSUME_NONNULL_BEGIN
         _sceneName = nil;
 
         _extensionFieldSets = nil;
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -13233,7 +13206,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -13361,16 +13333,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterViewSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-@dynamic transitionTime;
-@dynamic sceneName;
-@dynamic extensionFieldSets;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterRemoveSceneParams
 - (instancetype)init
 {
@@ -13456,13 +13418,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterRemoveSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterRemoveSceneResponseParams
 - (instancetype)init
 {
@@ -13473,7 +13428,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -13485,7 +13439,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -13556,13 +13509,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterRemoveSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterRemoveAllScenesParams
 - (instancetype)init
 {
@@ -13642,12 +13588,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterRemoveAllScenesParams
-@dynamic groupID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
 {
@@ -13656,7 +13596,6 @@ NS_ASSUME_NONNULL_BEGIN
         _status = @(0);
 
         _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -13667,7 +13606,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.status = self.status;
     other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -13735,12 +13673,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterRemoveAllScenesResponseParams
-@dynamic status;
-@dynamic groupID;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterStoreSceneParams
 - (instancetype)init
 {
@@ -13826,13 +13758,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterStoreSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterStoreSceneResponseParams
 - (instancetype)init
 {
@@ -13843,7 +13768,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -13855,7 +13779,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -13926,13 +13849,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterStoreSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterRecallSceneParams
 - (instancetype)init
 {
@@ -14032,14 +13948,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterRecallSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-@dynamic transitionTime;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterGetSceneMembershipParams
 - (instancetype)init
 {
@@ -14119,12 +14027,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterGetSceneMembershipParams
-@dynamic groupID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
 {
@@ -14137,7 +14039,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _sceneList = nil;
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -14150,7 +14051,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.capacity = self.capacity;
     other.groupID = self.groupID;
     other.sceneList = self.sceneList;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -14246,14 +14146,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterGetSceneMembershipResponseParams
-@dynamic status;
-@dynamic capacity;
-@dynamic groupID;
-@dynamic sceneList;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterEnhancedAddSceneParams
 - (instancetype)init
 {
@@ -14401,16 +14293,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterEnhancedAddSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-@dynamic transitionTime;
-@dynamic sceneName;
-@dynamic extensionFieldSets;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
 {
@@ -14421,7 +14303,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupID = @(0);
 
         _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -14433,7 +14314,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -14504,13 +14384,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterEnhancedAddSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterEnhancedViewSceneParams
 - (instancetype)init
 {
@@ -14596,13 +14469,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterEnhancedViewSceneParams
-@dynamic groupID;
-@dynamic sceneID;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
 {
@@ -14619,7 +14485,6 @@ NS_ASSUME_NONNULL_BEGIN
         _sceneName = nil;
 
         _extensionFieldSets = nil;
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -14634,7 +14499,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -14762,16 +14626,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterEnhancedViewSceneResponseParams
-@dynamic status;
-@dynamic groupID;
-@dynamic sceneID;
-@dynamic transitionTime;
-@dynamic sceneName;
-@dynamic extensionFieldSets;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRMatterScenesClusterCopySceneParams
 - (instancetype)init
 {
@@ -14875,16 +14729,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRScenesClusterCopySceneParams
-@dynamic mode;
-@dynamic groupIdentifierFrom;
-@dynamic sceneIdentifierFrom;
-@dynamic groupIdentifierTo;
-@dynamic sceneIdentifierTo;
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRMatterScenesClusterCopySceneResponseParams
 - (instancetype)init
 {
@@ -14895,7 +14739,6 @@ NS_ASSUME_NONNULL_BEGIN
         _groupIdentifierFrom = @(0);
 
         _sceneIdentifierFrom = @(0);
-        _timedInvokeTimeoutMs = nil;
     }
     return self;
 }
@@ -14907,7 +14750,6 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupIdentifierFrom = self.groupIdentifierFrom;
     other.sceneIdentifierFrom = self.sceneIdentifierFrom;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
 }
@@ -14978,13 +14820,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRScenesClusterCopySceneResponseParams
-@dynamic status;
-@dynamic groupIdentifierFrom;
-@dynamic sceneIdentifierFrom;
-
-@dynamic timedInvokeTimeoutMs;
-@end
 @implementation MTRHEPAFilterMonitoringClusterResetConditionParams
 - (instancetype)init
 {
