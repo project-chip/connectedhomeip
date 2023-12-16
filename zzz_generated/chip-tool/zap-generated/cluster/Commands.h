@@ -6874,7 +6874,7 @@ public:
     DeviceEnergyManagementPowerAdjustRequest(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("power-adjust-request", credsIssuerConfig)
     {
-        AddArgument("Power", 0, UINT64_MAX, &mRequest.power);
+        AddArgument("Power", INT64_MIN, INT64_MAX, &mRequest.power);
         AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
         ClusterCommand::AddArguments();
     }
@@ -19583,9 +19583,9 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::Clusters::DeviceEnergyManagement::ESAStateEnum>>(
             Id, "esastate", 0, UINT8_MAX, Attributes::ESAState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "abs-min-power", 0, UINT64_MAX, Attributes::AbsMinPower::Id,
+        make_unique<WriteAttribute<int64_t>>(Id, "abs-min-power", INT64_MIN, INT64_MAX, Attributes::AbsMinPower::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "abs-max-power", 0, UINT64_MAX, Attributes::AbsMaxPower::Id,
+        make_unique<WriteAttribute<int64_t>>(Id, "abs-max-power", INT64_MIN, INT64_MAX, Attributes::AbsMaxPower::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<
             chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>>>>(
