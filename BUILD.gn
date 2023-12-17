@@ -37,6 +37,10 @@ import("${build_root}/config/compiler/compiler.gni")
 
 import("//src/crypto/crypto.gni")
 
+if (chip_with_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
@@ -152,7 +156,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip" ]
+      deps += [ "${lwip_root}:lwip" ]
     }
 
     if (chip_build_tools) {
