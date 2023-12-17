@@ -265,7 +265,7 @@ CHIP_ERROR Instance::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t & valu
     DataModel::List<ModeTagStructType> mTags(tagsBuffer);
     for (uint8_t i = 0; mDelegate->GetModeTagsByIndex(i, mTags) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
     {
-        for (uint8_t ii = 0; ii < mTags.size(); ii++)
+        for (size_t ii = 0; ii < mTags.size(); ii++)
         {
             if (mTags[ii].value == modeTagValue)
             {

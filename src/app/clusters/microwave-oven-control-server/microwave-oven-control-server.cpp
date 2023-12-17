@@ -208,11 +208,11 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
     opState = mOpStateInstance.GetCurrentOperationalState();
     VerifyOrExit(opState != to_underlying(OperationalStateEnum::kError), status = Status::InvalidInState);
 
-    finalCookTime = GetCookTime() + req.timeToAdd;
     // if the added cooking time is greater than the max cooking time, the cooking time stay unchanged.
     VerifyOrExit(req.timeToAdd <= kMaxCookTime - GetCookTime(), status = Status::ConstraintError;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
+    finalCookTime = GetCookTime() + req.timeToAdd;
     status = mDelegate->HandleModifyCookTimeCallback(finalCookTime);
 
 exit:
