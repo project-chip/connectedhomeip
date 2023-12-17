@@ -22,7 +22,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
-import matter.devicecontroller.cluster.clusters.IdentifyCluster
+import matter.controller.cluster.clusters.IdentifyCluster
 
 class PairOnNetworkLongImInvokeCommand(
   controller: MatterController,
@@ -37,21 +37,13 @@ class PairOnNetworkLongImInvokeCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
     runBlocking {
       try {
         val identifyTime: UShort = 1u
         val identifyCluster = IdentifyCluster(controller = currentCommissioner(), endpointId = 0u)
+
+        // By running command identify, we are implicitly requesting CASE to be established if it's
+        // not already present.
         identifyCluster.identify(identifyTime)
         logger.log(Level.INFO, "Invoke command succeeded")
       } catch (ex: Exception) {

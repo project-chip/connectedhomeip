@@ -5203,7 +5203,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _targetTime = @(0);
+        _targetTimeMinutesPastMidnight = @(0);
 
         _targetSoC = nil;
 
@@ -5216,7 +5216,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterChargingTargetStruct alloc] init];
 
-    other.targetTime = self.targetTime;
+    other.targetTimeMinutesPastMidnight = self.targetTimeMinutesPastMidnight;
     other.targetSoC = self.targetSoC;
     other.addedEnergy = self.addedEnergy;
 
@@ -5225,7 +5225,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTime:%@; targetSoC:%@; addedEnergy:%@; >", NSStringFromClass([self class]), _targetTime, _targetSoC, _addedEnergy];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTimeMinutesPastMidnight:%@; targetSoC:%@; addedEnergy:%@; >", NSStringFromClass([self class]), _targetTimeMinutesPastMidnight, _targetSoC, _addedEnergy];
     return descriptionString;
 }
 
@@ -5371,7 +5371,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _sessionID = @(0);
+        _sessionID = nil;
 
         _state = @(0);
 
@@ -7699,6 +7699,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @dynamic fabricIndex;
+@end
+
+@implementation MTRSampleMEIClusterPingCountEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _count = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRSampleMEIClusterPingCountEventEvent alloc] init];
+
+    other.count = self.count;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: count:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _count, _fabricIndex];
+    return descriptionString;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END
