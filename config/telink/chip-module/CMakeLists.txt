@@ -143,8 +143,6 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
-string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
-
 if(EXISTS "${CHIP_ROOT}/config/telink/app/bootloader.conf")
     set(GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader.conf")
 else()
@@ -162,7 +160,7 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
@@ -214,6 +212,9 @@ endif()
 endif() # CONFIG_CHIP
 
 function(set_overlays)
+  string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
+  string(REPLACE "_usb_dongle" "" BASE_BOARD ${BOARD})
+
   if(${TLNK_MARS_BOARD} MATCHES y)
     if(EXISTS "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}_mars.overlay")
       set(MARS_DTC_OVERLAY_FILE "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}_mars.overlay" CACHE STRING "" FORCE)
@@ -230,19 +231,10 @@ function(set_overlays)
         unset(MARS_CONF_OVERLAY_FILE)
   endif()
 
-  if(${TLNK_USB_DONGLE} MATCHES y)
-    if(EXISTS "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}_usb.overlay")
-      set(USB_DTC_OVERLAY_FILE "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}_usb.overlay" CACHE STRING "" FORCE)
-    else()
-      unset(USB_DTC_OVERLAY_FILE)
-    endif()
-    if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb.conf")
-      set(USB_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_usb.conf" CACHE STRING "" FORCE)
-    else()
-      unset(USB_CONF_OVERLAY_FILE)
-    endif()
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf")
+    set(CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf" CACHE STRING "" FORCE)
   else()
-    unset(USB_CONF_OVERLAY_FILE)
+    unset(CONF_OVERLAY_FILE)
   endif()
 
   if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
@@ -254,12 +246,14 @@ function(set_overlays)
       message(STATUS "FLASH_DTC_OVERLAY_FILE is set to: " ${FLASH_DTC_OVERLAY_FILE})
   endif()
 
-  if(EXISTS "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}.overlay")
-    set(GLOBAL_DTC_OVERLAY_FILE "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}.overlay" CACHE STRING "" FORCE)
+  if(EXISTS "$ENV{ZEPHYR_BASE}/boards/riscv/${BASE_BOARD}/${BOARD}.overlay")
+    message(STATUS "[DEBUG] set " $ENV{ZEPHYR_BASE} "/boards/riscv/" ${BASE_BOARD} "/" ${BOARD} ".overlay")
+    set(GLOBAL_DTC_OVERLAY_FILE "$ENV{ZEPHYR_BASE}/boards/riscv/${BASE_BOARD}/${BASE_BOARD}.overlay" CACHE STRING "" FORCE)
   else()
+    message(STATUS "[DEBUG] unset" $ENV{ZEPHYR_BASE} "/boards/riscv/" ${BASE_BOARD} "/" ${BOARD} ".overlay")
     unset(GLOBAL_DTC_OVERLAY_FILE)
   endif()
-  
+
   set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} CACHE STRING "" FORCE)
   message(STATUS "DTC_OVERLAY_FILE is set to: " ${DTC_OVERLAY_FILE})
 
