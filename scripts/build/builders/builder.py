@@ -31,6 +31,9 @@ class BuilderOptions:
     # Locations where files are pre-generated
     pregen_dir: str = None
 
+    # Additional modifiers specified in the build_examples command as gn args
+    variable_modifiers: str = None
+
 
 class Builder(ABC):
     """Generic builder base class for CHIP.

@@ -131,10 +131,17 @@ def ValidateTargetNames(context, parameter, values):
     help=(
         'Set pigweed command launcher. E.g.: "--pw-command-launcher=ccache" '
         'for using ccache when building examples.'))
+@click.option(
+    '--variable-modifiers',
+    help=(
+        'A variable modifier is a target modifier that does not have a fixed value and '
+        'it is usually specific to the application, rather than the Matter core environment.'
+        'Set additional target modifiers by specifying this option. '
+        'E.g: "--variable-modifiers \"chip_custom_modifier=<changeable_value> chip_another_custom_modifier=10\""'))
 @click.pass_context
 def main(context, log_level, target, repo,
          out_prefix, pregen_dir, clean, dry_run, dry_run_output, enable_flashbundle,
-         no_log_timestamps, pw_command_launcher):
+         no_log_timestamps, pw_command_launcher, variable_modifiers):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -163,6 +170,7 @@ before running this script.
         enable_flashbundle=enable_flashbundle,
         pw_command_launcher=pw_command_launcher,
         pregen_dir=pregen_dir,
+        variable_modifiers=variable_modifiers
     ))
 
     if clean:
