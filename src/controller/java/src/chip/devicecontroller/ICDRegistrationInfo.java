@@ -20,60 +20,65 @@ package chip.devicecontroller;
 import javax.annotation.Nullable;
 
 public class ICDRegistrationInfo {
-    @Nullable private final Long checkInNodeId;
-    @Nullable private final Long monitoredSubject;
-    @Nullable private final byte[] symmetricKey;
+  @Nullable private final Long checkInNodeId;
+  @Nullable private final Long monitoredSubject;
+  @Nullable private final byte[] symmetricKey;
 
-    private ICDRegistrationInfo(Builder builder) {
-        this.checkInNodeId = builder.checkInNodeId;
-        this.monitoredSubject = builder.monitoredSubject;
-        this.symmetricKey = builder.symmetricKey;
+  private ICDRegistrationInfo(Builder builder) {
+    this.checkInNodeId = builder.checkInNodeId;
+    this.monitoredSubject = builder.monitoredSubject;
+    this.symmetricKey = builder.symmetricKey;
+  }
+
+  public Long getCheckInNodeId() {
+    return checkInNodeId;
+  }
+
+  public Long getMonitoredSubject() {
+    return monitoredSubject;
+  }
+
+  public byte[] getSymmetricKey() {
+    return symmetricKey;
+  }
+
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+
+  /** Builder for {@link ICDRegistrationInfo}. */
+  public static class Builder {
+    @Nullable private Long checkInNodeId = null;
+    @Nullable private Long monitoredSubject = null;
+    @Nullable private byte[] symmetricKey = null;
+
+    private Builder() {}
+
+    /** The check-in node id for the ICD. If not set this value, node id of the commissioner. */
+    public Builder setCheckInNodeId(long checkInNodeId) {
+      this.checkInNodeId = checkInNodeId;
+      return this;
     }
 
-    public Long getCheckInNodeId() {
-        return checkInNodeId;
+    /**
+     * The monitored subject of the ICD. If not set this value, the node id used for
+     * icd-check-in-nodeid
+     */
+    public Builder setMonitoredSubject(long monitoredSubject) {
+      this.monitoredSubject = monitoredSubject;
+      return this;
     }
 
-    public Long getMonitoredSubject() {
-        return monitoredSubject;
+    /**
+     * The 16 bytes ICD symmetric key, If not set this value, this value will be randomly generated.
+     */
+    public Builder setSymmetricKey(byte[] symmetricKey) {
+      this.symmetricKey = symmetricKey;
+      return this;
     }
 
-    public byte[] getSymmetricKey() {
-        return symmetricKey;
+    public ICDRegistrationInfo build() {
+      return new ICDRegistrationInfo(this);
     }
-
-    public static Builder newBuilder() {
-        return new Builder();
-    }
-
-      /** Builder for {@link ICDRegistrationInfo}. */
-    public static class Builder {
-        @Nullable private Long checkInNodeId = null;
-        @Nullable private Long monitoredSubject = null;
-        @Nullable private byte[] symmetricKey = null;
-
-        private Builder() {}
-
-        /** The check-in node id for the ICD. If not set this value, node id of the commissioner. */
-        public Builder setCheckInNodeId(long checkInNodeId) {
-            this.checkInNodeId = checkInNodeId;
-            return this;
-        }
-
-        /** The monitored subject of the ICD. If not set this value, the node id used for icd-check-in-nodeid */
-        public Builder setMonitoredSubject(long monitoredSubject) {
-            this.monitoredSubject = monitoredSubject;
-            return this;
-        }
-
-        /** The 16 bytes ICD symmetric key, If not set this value, this value will be randomly generated. */
-        public Builder setSymmetricKey(byte[] symmetricKey) {
-            this.symmetricKey = symmetricKey;
-            return this;
-        }
-
-        public ICDRegistrationInfo build() {
-            return new ICDRegistrationInfo(this);
-        }
-    }
+  }
 }
