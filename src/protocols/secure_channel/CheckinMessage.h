@@ -82,7 +82,6 @@ public:
      *
      * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
-     *         CHIP_ERROR_INVALID_ARGUMENT if the provided arguments cannot be used to parse the Check-In message
      *         CHIP_ERROR_INTERNAL if we were not able to decrypt or validate the Check-In message
      */
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
