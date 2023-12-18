@@ -130,8 +130,6 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     {
         ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format());
         mIsScanning = false;
-        // The callback is explicitly allowed to delete the scanner instance, so
-        // we must not access 'this' after this point.
         mDelegate->OnScanComplete();
         return err;
     }
@@ -140,7 +138,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan timeout: %" CHIP_ERROR_FORMAT, err.Format());
-        StopScan(); // This will call the callback
+        StopScan(); // This will call the OnScanComplete callback
         return err;
     }
     mTimerExpired = false;
@@ -168,8 +166,6 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         +[](ChipDeviceScanner * self) { return self->StopScanImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(Ble, "Failed to stop BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    // The callback is explicitly allowed to delete the scanner instance, so
-    // we must not access 'this' after this point.
     mDelegate->OnScanComplete();
 
     return CHIP_NO_ERROR;
