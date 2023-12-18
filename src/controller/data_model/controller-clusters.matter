@@ -3731,11 +3731,20 @@ provisional cluster MicrowaveOvenMode = 94 {
 provisional cluster MicrowaveOvenControl = 95 {
   revision 1; // NOTE: Default/not specifically set
 
-  readonly attribute elapsed_s cookTime = 1;
-  readonly attribute int8u powerSetting = 2;
+  bitmap Feature : bitmap32 {
+    kPowerAsANumber = 0x1;
+    kPowerInWatts = 0x2;
+  }
+
+  readonly attribute elapsed_s cookTime = 0;
+  readonly attribute elapsed_s maxCookTime = 1;
+  readonly attribute optional int8u powerSetting = 2;
   readonly attribute optional int8u minPower = 3;
   readonly attribute optional int8u maxPower = 4;
   readonly attribute optional int8u powerStep = 5;
+  readonly attribute optional nullable int16u supportedWatts[] = 6;
+  readonly attribute optional int8u selectedWattIndex = 7;
+  readonly attribute optional nullable int16u wattRating = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3747,6 +3756,8 @@ provisional cluster MicrowaveOvenControl = 95 {
     optional int8u cookMode = 0;
     optional elapsed_s cookTime = 1;
     optional int8u powerSetting = 2;
+    optional int8u wattSettingIndex = 3;
+    optional boolean startAfterSetting = 4;
   }
 
   request struct AddMoreTimeRequest {

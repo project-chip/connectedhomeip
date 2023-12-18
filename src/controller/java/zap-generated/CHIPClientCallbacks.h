@@ -653,6 +653,8 @@ typedef void (*MicrowaveOvenModeEventListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*MicrowaveOvenModeAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*MicrowaveOvenControlSupportedWattsListAttributeCallback)(
+    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint16_t>> & data);
 typedef void (*MicrowaveOvenControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MicrowaveOvenControlAcceptedCommandListListAttributeCallback)(

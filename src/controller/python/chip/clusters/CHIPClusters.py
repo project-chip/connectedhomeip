@@ -5674,6 +5674,8 @@ class ChipClusters:
                     "cookMode": "int",
                     "cookTime": "int",
                     "powerSetting": "int",
+                    "wattSettingIndex": "int",
+                    "startAfterSetting": "bool",
                 },
             },
             0x00000001: {
@@ -5685,8 +5687,14 @@ class ChipClusters:
             },
         },
         "attributes": {
-            0x00000001: {
+            0x00000000: {
                 "attributeName": "CookTime",
+                "attributeId": 0x00000000,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000001: {
+                "attributeName": "MaxCookTime",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
@@ -5712,6 +5720,24 @@ class ChipClusters:
             0x00000005: {
                 "attributeName": "PowerStep",
                 "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "SupportedWatts",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "SelectedWattIndex",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000008: {
+                "attributeName": "WattRating",
+                "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
             },

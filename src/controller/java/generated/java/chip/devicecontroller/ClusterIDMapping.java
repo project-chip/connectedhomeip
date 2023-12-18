@@ -8196,11 +8196,15 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            CookTime(1L),
+            CookTime(0L),
+            MaxCookTime(1L),
             PowerSetting(2L),
             MinPower(3L),
             MaxPower(4L),
             PowerStep(5L),
+            SupportedWatts(6L),
+            SelectedWattIndex(7L),
+            WattRating(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8266,7 +8270,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SetCookingParametersCommandField {CookMode(0),CookTime(1),PowerSetting(2),;
+        }public enum SetCookingParametersCommandField {CookMode(0),CookTime(1),PowerSetting(2),WattSettingIndex(3),StartAfterSetting(4),;
                     private final int id;
                     SetCookingParametersCommandField(int id) {
                         this.id = id;

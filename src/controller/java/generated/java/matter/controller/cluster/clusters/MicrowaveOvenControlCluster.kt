@@ -37,6 +37,10 @@ class MicrowaveOvenControlCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
+  class SupportedWattsAttribute(val value: List<UShort>?)
+
+  class WattRatingAttribute(val value: UShort?)
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
@@ -49,6 +53,8 @@ class MicrowaveOvenControlCluster(
     cookMode: UByte?,
     cookTime: UInt?,
     powerSetting: UByte?,
+    wattSettingIndex: UByte?,
+    startAfterSetting: Boolean?,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
@@ -64,6 +70,16 @@ class MicrowaveOvenControlCluster(
 
     val TAG_POWER_SETTING_REQ: Int = 2
     powerSetting?.let { tlvWriter.put(ContextSpecificTag(TAG_POWER_SETTING_REQ), powerSetting) }
+
+    val TAG_WATT_SETTING_INDEX_REQ: Int = 3
+    wattSettingIndex?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_WATT_SETTING_INDEX_REQ), wattSettingIndex)
+    }
+
+    val TAG_START_AFTER_SETTING_REQ: Int = 4
+    startAfterSetting?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_START_AFTER_SETTING_REQ), startAfterSetting)
+    }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -99,7 +115,7 @@ class MicrowaveOvenControlCluster(
   }
 
   suspend fun readCookTimeAttribute(): UInt {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -129,7 +145,38 @@ class MicrowaveOvenControlCluster(
     return decodedValue
   }
 
-  suspend fun readPowerSettingAttribute(): UByte {
+  suspend fun readMaxCookTimeAttribute(): UInt {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maxcooktime attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+    return decodedValue
+  }
+
+  suspend fun readPowerSettingAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -155,7 +202,12 @@ class MicrowaveOvenControlCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -266,6 +318,130 @@ class MicrowaveOvenControlCluster(
       }
 
     return decodedValue
+  }
+
+  suspend fun readSupportedWattsAttribute(): SupportedWattsAttribute {
+    val ATTRIBUTE_ID: UInt = 6u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Supportedwatts attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UShort>? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          buildList<UShort> {
+            tlvReader.enterArray(AnonymousTag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUShort(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return SupportedWattsAttribute(decodedValue)
+  }
+
+  suspend fun readSelectedWattIndexAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 7u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Selectedwattindex attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun readWattRatingAttribute(): WattRatingAttribute {
+    val ATTRIBUTE_ID: UInt = 8u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Wattrating attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return WattRatingAttribute(decodedValue)
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
