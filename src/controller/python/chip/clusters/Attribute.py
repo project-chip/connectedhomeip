@@ -692,11 +692,7 @@ class AsyncReadTransaction:
 
     def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
-            imStatus = status
-            try:
-                imStatus = chip.interaction_model.Status(status)
-            except chip.exceptions.ChipStackException:
-                pass
+            imStatus = chip.interaction_model.Status(status)
 
             if (imStatus != chip.interaction_model.Status.Success):
                 attributeValue = ValueDecodeFailure(
@@ -849,8 +845,8 @@ class AsyncWriteTransaction:
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except chip.exceptions.ChipStackException:
-            self._resultData.append(AttributeWriteResult(Path=path, Status=status))
+        except ValueError as ex:
+            logging.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError
