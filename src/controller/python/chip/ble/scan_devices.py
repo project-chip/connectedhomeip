@@ -17,6 +17,7 @@
 import ctypes
 from dataclasses import dataclass
 from queue import Queue
+from threading import Thread, Semaphore
 from typing import Generator
 
 from chip.ble.library_handle import _GetBleLibraryHandle
@@ -37,6 +38,12 @@ def ScanDoneCallback(closure):
 @ScanErrorCallback
 def ScanErrorCallback(closure, errorCode: int):
     closure.ScanErrorCallback(errorCode)
+
+
+def _DiscoverAsyncDeleter(scanner: ctypes.c_void_p, scanCompletedSem: Semaphore):
+    scanCompletedSem.acquire()
+    handle = _GetBleLibraryHandle()
+    handle.pychip_ble_scanner_delete(scanner)
 
 
 def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, adapter=None):
@@ -66,6 +73,8 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
     if nativeList == 0:
         raise Exception('Failed to list available adapters')
 
+    scanCompletedSem = Semaphore(value=0)
+
     try:
         while handle.pychip_ble_adapter_list_next(nativeList):
             if adapter and (adapter != handle.pychip_ble_adapter_list_get_address(
@@ -80,6 +89,7 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
                 def ScanCompleted(self, *args):
                     doneCallback(*args)
                     ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
+                    scanCompletedSem.release()
 
                 def ScanErrorCallback(self, *args):
                     errorCallback(*args)
@@ -87,7 +97,7 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
             closure = ScannerClosure()
             ctypes.pythonapi.Py_IncRef(ctypes.py_object(closure))
 
-            scanner = handle.pychip_ble_start_scanning(
+            scanner = handle.pychip_ble_scanner_start(
                 ctypes.py_object(closure),
                 handle.pychip_ble_adapter_list_get_raw_adapter(
                     nativeList), timeoutMs,
@@ -95,6 +105,12 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
 
             if scanner == 0:
                 raise Exception('Failed to initiate scan')
+
+            # Spawn a thread to wait for the scan to complete
+            t = Thread(target=_DiscoverAsyncDeleter, args=(scanner, scanCompletedSem))
+            t.daemon = True
+            t.start()
+
             break
     finally:
         handle.pychip_ble_adapter_list_delete(nativeList)
