@@ -189,7 +189,8 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
     wfx_rsi.join_retries = 0;
     retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    if (is_wifi_disconnection_event) {
+    if (is_wifi_disconnection_event)
+    {
         is_wifi_disconnection_event = false;
     }
     callback_status = SL_STATUS_OK;
@@ -517,7 +518,7 @@ static sl_status_t wfx_rsi_do_join(void)
                            wfx_rsi.join_retries);
                 wfx_rsi.join_retries += 1;
                 wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
-                if (is_wifi_disconnection_event ||  wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT)
+                if (is_wifi_disconnection_event || wfx_rsi.join_retries <= MAX_JOIN_RETRIES_COUNT)
                 {
                     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
                 }

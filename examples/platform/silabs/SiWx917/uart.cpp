@@ -72,7 +72,6 @@ void uartConsoleInit(void)
     usart_config.synch_mode    = DISABLE;
     sl_si91x_usart_control_config_t get_config;
 
-
     // Initialize the UART
     status = sl_si91x_usart_init((usart_peripheral_t) usart_config.usart_module, &usart_handle);
     if (status != SL_STATUS_OK)
