@@ -118,7 +118,7 @@ int TestBleErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "Ble-Error-Strings",
+        "Test BLE range error strings conversions",
         &sTests[0],
         nullptr,
         nullptr

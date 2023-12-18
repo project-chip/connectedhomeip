@@ -171,7 +171,7 @@ limitations under the License.
     </command>
     <event side="server" code="0x0000" name="EVConnected" priority="info" apiMaturity="provisional">
       <description>EVConnected</description>
-      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>      
+      <field id="0" name="SessionID" type="int32u" apiMaturity="provisional"/>
     </event>
     <event side="server" code="0x0001" name="EVNotDetected" priority="info" apiMaturity="provisional">
       <description>EVNotDetected</description>
