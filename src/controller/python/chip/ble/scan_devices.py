@@ -54,8 +54,11 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
     """
-    if adapter and not isinstance(adapter, str):
-        adapter = adapter.address
+    if adapter:
+        if isinstance(adapter, str):
+            adapter = adapter.upper()
+        else:
+            adapter = adapter.address
 
     handle = _GetBleLibraryHandle()
 
