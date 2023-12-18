@@ -140,12 +140,12 @@ CHIP_ERROR TestCheckInMsg::GenerateAndVerifyPayload(nlTestSuite * inSuite, Mutab
 }
 
 /**
- * @brief TODO
+ * @brief Helper function that parses the Check-In message based on the test vector
+ *        and verifies parsed Check-In message
+ *        Helper is to avoid having the same code in multiple tests
  *
- * @param inSuite
- * @param applicationData
- * @param vector
- * @return CHIP_ERROR
+ * @return CHIP_NO_ERROR if the parsing was successful
+ *         error code if the generation failed - see ParseCheckinMessagePayload
  */
 CHIP_ERROR TestCheckInMsg::ParseAndVerifyPayload(nlTestSuite * inSuite, MutableByteSpan & applicationData,
                                                  const CheckIn_Message_test_vector & vector, bool injectInvalidNonce)
@@ -342,6 +342,9 @@ void TestCheckInMsg::TestCheckInMessageGenerate_EmptyHmacKeyHandle(nlTestSuite *
     keystore.DestroyKey(aes128KeyHandle);
 }
 
+/**
+ * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to the minimum required size
+ */
 void TestCheckInMsg::TestCheckinMessageParse_ValidInputsSameSizeMinAppData(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
@@ -357,6 +360,9 @@ void TestCheckInMsg::TestCheckinMessageParse_ValidInputsSameSizeMinAppData(nlTes
     }
 }
 
+/**
+ * @brief Test verifies that the Check-In message parsing succeeds with the Application buffer set to a larger than necessary size
+ */
 void TestCheckInMsg::TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData(nlTestSuite * inSuite, void * inContext)
 {
     int numOfTestCases = ArraySize(checkIn_message_test_vectors);
@@ -371,6 +377,9 @@ void TestCheckInMsg::TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData(nlT
     }
 }
 
+/**
+ * @brief Test verifies that the Check-In message throws an error if the application data buffer is too small
+ */
 void TestCheckInMsg::TestCheckinMessageParse_ValidInputsTooSmallAppData(nlTestSuite * inSuite, void * inContext)
 {
     CheckIn_Message_test_vector vector = checkIn_message_test_vectors[0];
