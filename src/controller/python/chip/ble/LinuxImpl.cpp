@@ -141,12 +141,14 @@ extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, u
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
     CHIP_ERROR err = delegate->ScannerInit(static_cast<BluezAdapter1 *>(adapter));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Ble, "Failed to initialize BLE scanner: %" CHIP_ERROR_FORMAT, err.Format()));
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Ble, "Failed to start BLE scan: %" CHIP_ERROR_FORMAT, err.Format()));
 
     return delegate.release();
 }

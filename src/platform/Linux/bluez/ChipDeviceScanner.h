@@ -101,7 +101,7 @@ private:
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
     /// Used to track if timer has already expired and doesn't need to be canceled.
-    bool mTimerExpired = false;
+    bool mTimerExpired = true;
 };
 
 } // namespace Internal
