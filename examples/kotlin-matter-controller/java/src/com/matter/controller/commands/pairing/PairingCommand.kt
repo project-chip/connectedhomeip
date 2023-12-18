@@ -173,6 +173,17 @@ abstract class PairingCommand(
     }
   }
 
+  override fun onICDRegistrationInfoRequired() {
+    logger.log(Level.INFO, "onICDRegistrationInfoRequired")
+  }
+
+  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+    logger.log(
+      Level.INFO,
+      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+    )
+  }
+
   fun getNodeId(): Long {
     return nodeId.get()
   }
