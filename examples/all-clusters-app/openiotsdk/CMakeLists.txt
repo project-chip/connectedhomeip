@@ -1,17 +1,17 @@
 #
-#   Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-#       http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 
 cmake_minimum_required(VERSION 3.21)
@@ -46,25 +46,28 @@ chip_add_data_model(openiotsdk-app PUBLIC all-clusters)
 
 target_include_directories(${APP_TARGET}
     PRIVATE
-        main/include
-        ${ALL_CLUSTERS_COMMON}/include
-        ${ENERGY_MANAGEMENT_COMMON}/include         
+    main/include
+    ${ALL_CLUSTERS_COMMON}/include
+    ${ENERGY_MANAGEMENT_COMMON}/include
 )
 
 target_sources(${APP_TARGET}
     PRIVATE
-        main/main_ns.cpp
-        ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
-        ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
-        ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
-        ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
-        ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
-        ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
-        ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
-        ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
-        ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
-        ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+    main/main_ns.cpp
+    ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
+    ${ALL_CLUSTERS_COMMON}/src/bridged-actions-stub.cpp
+    ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
+    ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
+    ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+    ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
+    ${ALL_CLUSTERS_COMMON}/src/EnergyEvseDelegateImpl.cpp
+    ${ALL_CLUSTERS_COMMON}/src/EnergyEvseManager.cpp
+    ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
+    ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
+    ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
+    ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp
+    ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
+    ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
 )
 
 target_link_libraries(${APP_TARGET}
