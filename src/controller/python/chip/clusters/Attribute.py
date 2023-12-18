@@ -561,7 +561,7 @@ class SubscriptionTransaction:
             self._onResubscriptionSucceededCb = callback
             self._onResubscriptionSucceededCb_isAsync = isAsync
 
-    def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
+    def SetAttributeUpdateCallback(self, callback: Callable[[Union[TypedAttributePath, AttributePath], SubscriptionTransaction], None]):
         '''
         Sets the callback function for the attribute value change event,
         accepts a Callable accepts an attribute path and the cached data.
@@ -620,7 +620,7 @@ def DefaultResubscriptionAttemptedCallback(transaction: SubscriptionTransaction,
     print(f"Previous subscription failed with Error: {terminationError} - re-subscribing in {nextResubscribeIntervalMsec}ms...")
 
 
-def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: SubscriptionTransaction):
+def DefaultAttributeChangeCallback(path: Union[TypedAttributePath, AttributePath], transaction: SubscriptionTransaction):
     data = transaction.GetAttribute(path)
     value = {
         'Endpoint': path.Path.EndpointId,
