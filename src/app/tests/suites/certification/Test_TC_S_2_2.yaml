@@ -271,44 +271,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 3c: TH reads the SceneCount attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "SceneCount"
-      response:
-          value: 1
-          saveAs: SceneCountValue
-          constraints:
-              type: int8u
-
-    - label: "Step 3d: TH reads the CurrentScene attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "CurrentScene"
-      response:
-          value: 0x01
-          constraints:
-              type: int8u
-
-    - label: "Step 3e: TH reads the CurrentGroup attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "CurrentGroup"
-      response:
-          value: G1
-          constraints:
-              type: group_id
-
-    - label: "Step 3f: TH reads the SceneValid attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "SceneValid"
-      response:
-          value: true
-          constraints:
-              type: boolean
-
-    - label: "Step 3g: TH reads attribute SceneTableSize from DUT."
+    - label: "Step 3c: TH reads attribute SceneTableSize from DUT."
       PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
       command: "readAttribute"
       attribute: "SceneTableSize"
@@ -317,7 +280,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
+    - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
       verification: |
           DUT provides FabricSceneInfo containing (for the current fabric) following fields:
 
@@ -448,7 +411,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTime"
+              - name: "TransitionTimeMS"
                 value: 0x0000
               - name: "ExtensionFieldSets"
                 constraints:
@@ -496,7 +459,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTime"
+              - name: "TransitionTimeMS"
                 value: 0x0000
 
     - label:
@@ -556,7 +519,7 @@ tests:
 
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
           to 0x0001 and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
@@ -566,7 +529,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTime"
+              - name: "TransitionTimeMS"
                 value: 0x0001
               - name: "SceneName"
                 value: "Scene1"
@@ -595,7 +558,7 @@ tests:
 
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
           to 0x0001 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:

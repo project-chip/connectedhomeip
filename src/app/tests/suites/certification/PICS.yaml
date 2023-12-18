@@ -5789,13 +5789,6 @@ PICS:
           "Does the device implement receiving the GetSceneMembership command?"
       id: S.S.C06.Rsp
 
-    - label: "Does the device implement receiving the EnhancedAddScene command?"
-      id: S.S.C40.Rsp
-
-    - label:
-          "Does the device implement receiving the EnhancedViewScene command?"
-      id: S.S.C41.Rsp
-
     - label: "Does the device implement receiving the CopyScene command?"
       id: S.S.C42.Rsp
 
@@ -5846,12 +5839,6 @@ PICS:
 
     - label: "Does the device implement sending the GetSceneMembership command?"
       id: S.C.C06.Tx
-
-    - label: "Does the device implement sending the EnhancedAddScene command?"
-      id: S.C.C40.Tx
-
-    - label: "Does the device implement sending the EnhancedViewScene command?"
-      id: S.C.C41.Tx
 
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C42.Tx

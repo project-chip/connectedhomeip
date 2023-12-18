@@ -91,7 +91,7 @@ tests:
 
     - label:
           "Step 3a: TH1 sends a AddScene command to DUT with the GroupID field
-          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTimeMS field
           set to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
@@ -130,7 +130,7 @@ tests:
     - label:
           "Step 4b: TH1 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 1 more than last value used in
-          step 4a, the TransitionTime field set to 0x0014 (20s) and no extension
+          step 4a, the TransitionTimeMS field set to 0x0014 (20s) and no extension
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
@@ -171,7 +171,7 @@ tests:
 
     - label:
           "Step 6: TH3 sends a AddScene command to DUT with the GroupID field
-          set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
+          set to 0x0000, the SceneID field set to 0x01, the TransitionTimeMS field
           set to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |

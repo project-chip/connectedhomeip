@@ -343,7 +343,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTime"
+              - name: "TransitionTimeMS"
                 value: 0x0001
               - name: "SceneName"
                 value: "Scene1"
@@ -449,7 +449,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTime"
+              - name: "TransitionTimeMS"
                 value: 0x0001
               - name: "SceneName"
                 value: "Scene1"

@@ -140,7 +140,7 @@ tests:
 
     - label:
           "Step 5a: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
           to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
@@ -194,7 +194,7 @@ tests:
     - label:
           "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
           command to DUT with the GroupID field set to G1, the SceneID field set
-          to 0x03, the TransitionTime field set to 0x0014 (20s) and no extension
+          to 0x03, the TransitionTimeMS field set to 0x0014 (20s) and no extension
           field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
