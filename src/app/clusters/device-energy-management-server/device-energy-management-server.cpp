@@ -489,11 +489,17 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
 
 void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData)
 {
-    Status status = Status::UnsupportedCommand; // TODO Status::Success;
-    // CHIP_ERROR err = CHIP_NO_ERROR;
+    Status status       = Status::Success;
+    uint32_t forecastId = commandData.forecastId;
 
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
+    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    {
+        ChipLogError(Zcl, "DEM: %s - ESAState = kUserOptOut", __FUNCTION__);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
 
+    auto forecast = mDelegate.GetForecast(); // DataModel::Nullable<Structs::ForecastStruct::Type>
     if (forecast.IsNull())
     {
         ChipLogError(Zcl, "DEM: %s - Forecast is Null", __FUNCTION__);
@@ -501,20 +507,37 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    // TODO update the forecast details
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    return;
+    /* Call the delegate to potentially update the forecast */
+    DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
+    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: %s - mDelegate.ModifyForecastRequest() FAILURE", __FUNCTION__);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
 }
 
 void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                                                     const Commands::RequestConstraintBasedForecast::DecodableType & commandData)
 {
-    Status status = Status::UnsupportedCommand; // TODO Status::Success;
+    Status status = Status::Success;
 
-    // TODO pass this up to the delegate if it supports it
-    ChipLogError(Zcl, "DEM: %s - Handle Constraint based forecast ", __FUNCTION__);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    return;
+    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    {
+        ChipLogError(Zcl, "DEM: %s - ESAState = kUserOptOut", __FUNCTION__);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    /* delegate requested to generate a new forecast */
+    status = mDelegate.RequestConstraintBasedForecast(commandData.constraints);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: %s - mDelegate.commandData.constraints() FAILURE", __FUNCTION__);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
 }
 
 } // namespace DeviceEnergyManagement
