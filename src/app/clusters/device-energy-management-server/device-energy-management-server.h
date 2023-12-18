@@ -157,12 +157,18 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
+enum class OptionalCommands : uint32_t
+{
+    kSupportsModifyForecastRequest          = 0x1,
+    kSupportsRequestConstraintBasedForecast = 0x2
+};
+
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalCommands aOptionalCmds) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature)
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -174,10 +180,12 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
+    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
+    BitMask<OptionalCommands> mOptionalCmds;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

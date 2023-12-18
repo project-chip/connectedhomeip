@@ -115,12 +115,20 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
                  StartTimeAdjustRequest::Id,
                  PauseRequest::Id,
                  ResumeRequest::Id,
-                 ModifyForecastRequest::Id,
-                 RequestConstraintBasedForecast::Id,
              })
         {
             VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
         }
+    }
+
+    if (SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
+    {
+        VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
+    }
+
+    if (SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
+    {
+        VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
     }
 
 exit:
