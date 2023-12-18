@@ -265,7 +265,10 @@
     ],
     "OnOff": ["Test_TC_OO_2_3"],
     "OperationalState": ["Test_TC_OPSTATE_2_2"],
-    "OvenOperationalState": ["Test_TC_OVENOPSTATE_2_2","Test_TC_OVENOPSTATE_2_4"],
+    "OvenOperationalState": [
+        "Test_TC_OVENOPSTATE_2_2",
+        "Test_TC_OVENOPSTATE_2_4"
+    ],
     "RelativeHumidityMeasurement": ["Test_TC_RH_2_2"],
     "SmokeCOAlarm": [],
     "RefrigeratorAlarm": ["Test_TC_REFALM_2_2", "Test_TC_REFALM_2_3"],
