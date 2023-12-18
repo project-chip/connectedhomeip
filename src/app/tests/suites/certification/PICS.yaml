@@ -5740,21 +5740,6 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the SceneCount attribute?"
-      id: S.S.A0000
-
-    - label: "Does the device implement the CurrentScene attribute?"
-      id: S.S.A0001
-
-    - label: "Does the device implement the CurrentGroup attribute?"
-      id: S.S.A0002
-
-    - label: "Does the device implement the SceneValid attribute?"
-      id: S.S.A0003
-
-    - label: "Does the device implement the NameSupport attribute?"
-      id: S.S.A0004
-
     - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0005
 
@@ -5797,15 +5782,6 @@ PICS:
     #
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
-
-    - label: "Does the device implement the Scene Explicit feature?"
-      id: S.S.F01
-
-    - label: "Does the device implement the Scene TableSize feature?"
-      id: S.S.F02
-
-    - label: "Does the device implement the Scene FabricScenes feature?"
-      id: S.S.F03
 
     #
     # server / manually

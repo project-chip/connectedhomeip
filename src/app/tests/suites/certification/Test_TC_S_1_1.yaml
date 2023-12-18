@@ -41,8 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label:
-          "Step 3a: TH reads FeatureMap NameSupport bit (global attribute 65532)"
+    - label: "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
       PICS: (!S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -51,9 +50,8 @@ tests:
               type: bitmap32
               hasMasksClear: [0x1]
 
-    - label:
-          "Step 3a: TH reads FeatureMap NameSupport bit (global attribute 65532)"
-      PICS: S.S.F00
+    - label: "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
+      PICS: (S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -62,66 +60,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "Step 3b: TH reads FeatureMap Explicit bit (global attribute 65532)"
-      PICS: (!S.S.F01)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x2]
-
-    - label:
-          "Step 3b: TH reads FeatureMap Explicit bit (global attribute 65532)"
-      PICS: S.S.F01
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x2]
-
-    - label:
-          "Step 3c: TH reads FeatureMap TableSize bit (global attribute 65532)"
-      PICS: (!S.S.F02)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x4]
-
-    - label:
-          "Step 3c: TH reads FeatureMap TableSize bit (global attribute 65532)"
-      PICS: S.S.F02
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x4]
-
-    - label:
-          "Step 3d: TH reads FeatureMap FabricScene bit (global attribute 65532)"
-      PICS: (!S.S.F03)
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksClear: [0x8]
-
-    - label:
-          "Step 3d: TH reads FeatureMap FabricScene bit (global attribute 65532)"
-      PICS: S.S.F03
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x8]
-
-    - label: "Step 4a: TH reads from the DUT the AttributeList attribute"
+          "Step 4a: TH reads AttributeList mandatory attributes(global attribute
+          65531)"
       PICS: S.S
       command: "readAttribute"
       attribute: "AttributeList"
@@ -131,7 +71,7 @@ tests:
               contains: [1, 2, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: TH reads optinnal attribute(LastConfiguredBy) in
+          "Step 4b: TH reads AttributeList optional attributes(LastConfiguredBy) in
           AttributeList (global attribute 65531)"
       PICS: S.S.A0005
       command: "readAttribute"

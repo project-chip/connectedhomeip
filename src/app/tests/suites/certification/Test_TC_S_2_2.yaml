@@ -520,7 +520,7 @@ tests:
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
-          to 0x0001 and a set of extension fields appropriate to AC1."
+          to 1000 (1s) and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
@@ -530,7 +530,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTimeMS"
-                value: 0x0001
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -559,7 +559,7 @@ tests:
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
-          to 0x0001 and a set of extension fields appropriate to AC1."
+          to 1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 

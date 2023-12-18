@@ -361,7 +361,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     response.sceneID = req.sceneID;
 
     // Verify the attributes are respecting constraints
-    if (req.transitionTime > scenes::kScenesMaxTransitionTimeS || req.sceneName.size() > scenes::kSceneNameMaxLength)
+    if (req.transitionTimeMS > scenes::kScenesMaxTransitionTimeMS || req.sceneName.size() > scenes::kSceneNameMaxLength)
     {
         response.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -378,16 +378,6 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         return;
     }
 
-    uint32_t transitionTimeMs = 0;
-    if (Commands::AddScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        transitionTimeMs = static_cast<uint32_t>(req.transitionTime) * 1000u;
-    }
-    else if (Commands::EnhancedAddScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        transitionTimeMs = static_cast<uint32_t>(req.transitionTime) * 100u;
-    }
-
     auto fieldSetIter = req.extensionFieldSets.begin();
 
     uint8_t EFSCount = 0;
@@ -395,7 +385,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     uint32_t featureMap = 0;
     ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
-    SceneData storageData(CharSpan(), transitionTimeMs);
+    SceneData storageData(CharSpan(), req.transitionTimeMS);
     if (featureMap & to_underlying(Feature::kSceneNames))
     {
         storageData.SetName(req.sceneName);
@@ -524,16 +514,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     }
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
-
-    // Verifies how to convert transition time
-    if (Commands::ViewScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 1000));
-    }
-    else if (Commands::EnhancedViewScene::Id == ctx.mRequestPath.mCommandId)
-    {
-        response.transitionTime.SetValue(static_cast<uint16_t>(scene.mStorageData.mSceneTransitionTimeMs / 100));
-    }
+    response.transitionTimeMS.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
 
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
@@ -603,7 +584,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
 }
 
 CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
-                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint16_t>> & transitionTime,
+                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint32_t>> & transitionTimeMS,
                             GroupDataProvider * groupProvider)
 {
     // Make SceneValid false for all fabrics before recalling a scene
@@ -630,12 +611,12 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     ReturnErrorOnFailure(sceneTable->GetSceneTableEntry(fabricIdx, scene.mStorageId, scene));
 
     // Check for optional
-    if (transitionTime.HasValue())
+    if (transitionTimeMS.HasValue())
     {
         // Check for nullable
-        if (!transitionTime.Value().IsNull())
+        if (!transitionTimeMS.Value().IsNull())
         {
-            scene.mStorageData.mSceneTransitionTimeMs = static_cast<uint32_t>(transitionTime.Value().Value() * 100);
+            scene.mStorageData.mSceneTransitionTimeMs = transitionTimeMS.Value().Value();
         }
     }
 
@@ -680,14 +661,6 @@ void ScenesServer::InvokeCommand(HandlerContext & ctxt)
     case Commands::GetSceneMembership::Id:
         HandleCommand<Commands::GetSceneMembership::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleGetSceneMembership(ctx, req); });
-        return;
-    case Commands::EnhancedAddScene::Id:
-        HandleCommand<Commands::EnhancedAddScene::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedAddScene(ctx, req); });
-        return;
-    case Commands::EnhancedViewScene::Id:
-        HandleCommand<Commands::EnhancedViewScene::DecodableType>(
-            ctxt, [this](HandlerContext & ctx, const auto & req) { HandleEnhancedViewScene(ctx, req); });
         return;
     case Commands::CopyScene::Id:
         HandleCommand<Commands::CopyScene::DecodableType>(
@@ -773,9 +746,9 @@ void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpoint
 }
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    Optional<DataModel::Nullable<uint16_t>> transitionTime;
+    Optional<DataModel::Nullable<uint32_t>> transitionTimeMS;
 
-    RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider);
+    RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTimeMS, mGroupProvider);
 }
 
 bool ScenesServer::IsHandlerRegistered(EndpointId aEndpointId, scenes::SceneHandler * handler)
@@ -955,7 +928,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 {
     MATTER_TRACE_SCOPE("RecallScene", "Scenes");
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
-                                      req.sceneID, req.transitionTime, mGroupProvider);
+                                      req.sceneID, req.transitionTimeMS, mGroupProvider);
 
     if (CHIP_NO_ERROR == err)
     {
@@ -1020,17 +993,6 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void ScenesServer::HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req)
-{
-    MATTER_TRACE_SCOPE("EnhancedAddScene", "Scenes");
-    AddSceneParse<Commands::EnhancedAddScene::DecodableType, Commands::EnhancedAddSceneResponse::Type>(ctx, req, mGroupProvider);
-}
-
-void ScenesServer::HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req)
-{
-    MATTER_TRACE_SCOPE("EnhancedViewScene", "Scenes");
-    ViewSceneParse<Commands::EnhancedViewScene::DecodableType, Commands::EnhancedViewSceneResponse::Type>(ctx, req, mGroupProvider);
-}
 void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req)
 {
     MATTER_TRACE_SCOPE("CopyScene", "Scenes");
@@ -1144,34 +1106,7 @@ using namespace chip::app::Clusters::ScenesManagement;
 
 void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
-    uint32_t featureMap  = 0;
-    EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS == status)
-    {
-        // According to spec, bit 7 MUST match feature bit 0 (SceneNames)
-        BitMask<NameSupportBitmap> nameSupport = (featureMap & to_underlying(Feature::kSceneNames))
-            ? BitMask<NameSupportBitmap>(NameSupportBitmap::kSceneNames)
-            : BitMask<NameSupportBitmap>();
-        status                                 = Attributes::NameSupport::Set(endpoint, nameSupport);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
-        }
-    }
-    else
-    {
-        ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-    }
-
-    // Explicit AttributeValuePairs and TableSize features are mandatory for matter so we force-set them here
-    featureMap |= (to_underlying(Feature::kExplicit) | to_underlying(Feature::kTableSize));
-    status = Attributes::FeatureMap::Set(endpoint, featureMap);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-    }
-
-    status = Attributes::LastConfiguredBy::SetNull(endpoint);
+    EmberAfStatus status = Attributes::LastConfiguredBy::SetNull(endpoint);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         ChipLogDetail(Zcl, "ERR: setting LastConfiguredBy on Endpoint %hu Status: %x", endpoint, status);

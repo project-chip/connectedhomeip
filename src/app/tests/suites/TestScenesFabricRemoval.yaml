@@ -293,7 +293,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTimeMS"
-                value: 0x0001
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
