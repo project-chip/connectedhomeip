@@ -61,8 +61,6 @@ public:
     static void TestCheckinMessageParse_CorruptedNonce(nlTestSuite * inSuite, void * inContext);
     static void TestCheckinMessageParse_InvalidNonce(nlTestSuite * inSuite, void * inContext);
 
-    static void TestCheckinGenerateParseSanity(nlTestSuite * inSuite, void * inContext);
-
 private:
     static CHIP_ERROR GenerateAndVerifyPayload(nlTestSuite * inSuite, MutableByteSpan & output,
                                                const CheckIn_Message_test_vector & vector);
