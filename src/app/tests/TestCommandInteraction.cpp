@@ -1400,7 +1400,8 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands(n
         additionalParams.SetStartOrEndDataStruct(true);
 
         NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.PrepareCommand(commandPathParams, additionalParams));
-        NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+        NL_TEST_ASSERT(apSuite,
+                       CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
         NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.FinishCommand(additionalParams));
     }
 
@@ -1449,7 +1450,8 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
             additionalParams.SetStartOrEndDataStruct(true);
 
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.PrepareCommand(requestCommandPaths[i], additionalParams));
-            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
             // We are taking advantage of the fact that the commandRef was set into additionalParams during PrepareCommand
             // But setting it to a different value here, we are overriding what it was supposed to be.
             additionalParams.mCommandRef.SetValue(hardcodedCommandRef);
@@ -1515,7 +1517,8 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
             additionalParams.SetStartOrEndDataStruct(true);
 
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.PrepareCommand(requestCommandPaths[i], additionalParams));
-            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.FinishCommand(additionalParams));
         }
     }
@@ -1576,7 +1579,8 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
             additionalParams.SetStartOrEndDataStruct(true);
 
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.PrepareCommand(requestCommandPaths[i], additionalParams));
-            NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR == commandSender.GetCommandDataIBTLVWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == commandSender.FinishCommand(additionalParams));
         }
     }
@@ -1592,7 +1596,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     err = commandSender.Finalize(commandDatabuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    sendResponse           = true;
+    sendResponse = true;
     mockCommandHandlerDelegate.ResetCounter();
     commandDispatchedCount = 0;
 
