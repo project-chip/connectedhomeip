@@ -65,10 +65,8 @@ class MediaPlaybackCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun play(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun play(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -78,7 +76,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -112,7 +110,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -126,10 +123,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun pause(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun pause(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -139,7 +134,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -173,7 +168,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -187,10 +181,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun stop(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun stop(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -200,7 +192,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -234,7 +226,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -248,10 +239,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun startOver(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun startOver(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -261,7 +250,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -295,7 +284,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -309,10 +297,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun previous(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun previous(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -322,7 +308,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -356,7 +342,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -370,10 +355,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun next(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun next(timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -383,7 +366,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -417,7 +400,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -433,11 +415,9 @@ class MediaPlaybackCluster(
 
   suspend fun rewind(
     audioAdvanceUnmuted: Boolean?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): PlaybackResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -452,7 +432,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -486,7 +466,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -502,11 +481,9 @@ class MediaPlaybackCluster(
 
   suspend fun fastForward(
     audioAdvanceUnmuted: Boolean?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): PlaybackResponse {
     val commandId: UInt = 7u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -521,7 +498,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -555,7 +532,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -571,11 +547,9 @@ class MediaPlaybackCluster(
 
   suspend fun skipForward(
     deltaPositionMilliseconds: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): PlaybackResponse {
     val commandId: UInt = 8u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -591,7 +565,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -625,7 +599,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -641,11 +614,9 @@ class MediaPlaybackCluster(
 
   suspend fun skipBackward(
     deltaPositionMilliseconds: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): PlaybackResponse {
     val commandId: UInt = 9u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -661,7 +632,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -695,7 +666,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -709,10 +679,8 @@ class MediaPlaybackCluster(
     return PlaybackResponse(status_decoded, data_decoded)
   }
 
-  suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+  suspend fun seek(position: ULong, timedInvokeTimeout: Duration? = null): PlaybackResponse {
     val commandId: UInt = 11u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -725,7 +693,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -759,7 +727,6 @@ class MediaPlaybackCluster(
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -776,11 +743,9 @@ class MediaPlaybackCluster(
   suspend fun activateAudioTrack(
     trackID: String,
     audioOutputIndex: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 12u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -796,17 +761,15 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun activateTextTrack(trackID: String, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun activateTextTrack(trackID: String, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 13u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -819,17 +782,15 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun deactivateTextTrack(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun deactivateTextTrack(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 14u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -839,7 +800,7 @@ class MediaPlaybackCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)

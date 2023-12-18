@@ -1,0 +1,64 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+# Re-export the Matter lwip integration as "lwip"
+#
+# To depend on lwip while keeping the implementation target
+# encapsulated:
+#
+# import("//build_overrides/lwip.gni")
+#
+# source_set("foo") {
+#   public_deps = [
+#      "${lwip_root}:lwip",
+#      ...
+#   ]
+# }
+#
+# and set up the build_overrides appropriately (a typical lwip_root
+# would be //third_party/lwip).
+#
+# To help define the library, a reusable template is provided as
+# lwip_target() in third_party/lwip/lwip.gni. Example usage:
+#
+# //example/lwip/BUILD.gn:
+#
+#  config("lwip_config") {
+#    include_dirs = [ "include" ]
+#  }
+#
+#  lwip_target("lwip") {
+#    public = [
+#      "include/lwipopts.h"
+#    ]
+#
+#    sources = [ "sys_arch.c" ]
+#
+#    public_configs = [
+#      ":lwip_config",
+#    ]
+#  }
+#
+# Then set lwip_root = "//example/lwip" in build_overrides (or,
+# if declared as an argument in build_overrides, via args).
+#
+# Defining the library directly works too.
+#
+# If there's no include paths to add, defines to set, sources to
+# compile, or libraries to link, then an empty group target suffices.
+group("lwip") {
+  public_deps = [ "${chip_root}/src/lwip:lwip" ]
+}
