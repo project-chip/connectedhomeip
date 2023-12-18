@@ -8753,7 +8753,7 @@ PICS:
           "Does the DUT support testing the CommandInvalidInState(0x03) error
           state?"
       id: OVENOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
-        
+
     #Server Attributes
     - label: "Does the device implement the PhaseList attribute?"
       id: OVENOPSTATE.S.A0000
