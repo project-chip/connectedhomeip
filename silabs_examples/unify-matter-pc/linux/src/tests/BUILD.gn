@@ -40,11 +40,11 @@ chip_test_suite_using_nltest("tests") {
 
   test_sources = [
     "TestCli.cpp",
-    #"TestClusterParsers.cpp",
+    "TestClusterParsers.cpp",
     #"TestCmdSender.cpp",
     "TestNodeInterview.cpp",
-    #"TestNodeMonitor.cpp",
-    #"TestParserFramework.cpp",
+    "TestNodeMonitor.cpp",
+    "TestParserFramework.cpp",
   ]
 
   public_deps = [

@@ -26,6 +26,8 @@
 #include <nlunit-test.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <filesystem>
+
 #include <string>
 
 using namespace unify::mpc::Test;
@@ -50,6 +52,9 @@ public:
     static int initialize(void * inContext)
     {
         TestContext * ctxt = static_cast<TestContext *>(inContext);
+        
+        // Makes sure our required state folders exists
+        std::filesystem::create_directories(LOCALSTATEDIR);
 
         if (SUCCESS != TestContext::Initialize(inContext))
             return FAILURE;

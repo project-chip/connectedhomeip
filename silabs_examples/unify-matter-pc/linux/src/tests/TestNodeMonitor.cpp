@@ -27,6 +27,8 @@
 #include "mpc_node_monitor.h"
 #include "mpc_sessionprovider_mock.h"
 
+#include <filesystem>
+
 #include <string>
 
 using namespace unify::mpc::Test;
@@ -39,7 +41,10 @@ class TestContext : public UnifyMPCContext
 public:
     static int Init(void * ctxt)
     {
+        // Makes sure our required state folders exists
+        std::filesystem::create_directories(LOCALSTATEDIR);
         int ret = TestContext::Initialize(ctxt);
+        
         if (ret != SUCCESS)
             return ret;
         if (SL_STATUS_OK != attribute_store_init())
