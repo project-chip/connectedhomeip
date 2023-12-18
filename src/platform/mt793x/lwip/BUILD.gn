@@ -39,7 +39,7 @@ config("lwip_config") {
   ]
 }
 
-lwip_target("lwip") {
+lwip_target("mt793x_lwip") {
   public = [ "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc/lwipopts.h" ]
 
   sources = []
@@ -52,4 +52,8 @@ lwip_target("lwip") {
     ":lwip_config",
     "${chip_root}/src:includes",
   ]
+}
+
+group("lwip") {
+  public_deps = [ ":mt793x_lwip" ]
 }
