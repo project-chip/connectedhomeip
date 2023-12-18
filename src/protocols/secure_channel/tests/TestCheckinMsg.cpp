@@ -20,19 +20,15 @@
 #include <crypto/RandUtils.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <nlunit-test.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <protocols/secure_channel/tests/CheckIn_Message_test_vectors.h>
 #include <transport/CryptoContext.h>
-// AES_CCM_128_test_vectors is being replaced by the CheckIn_Message_test_vectors
-// New tests need to use the CheckIn_Message_test_vectors
-#include <crypto/tests/AES_CCM_128_test_vectors.h>
-#include <lib/support/UnitTestExtendedAssertions.h>
-#include <lib/support/UnitTestRegistration.h>
-#include <nlunit-test.h>
 
 using namespace chip;
 using namespace chip::Protocols;
