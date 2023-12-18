@@ -3223,8 +3223,16 @@
           Thermostat:
               - SetpointAdjustMode
               - ThermostatControlSequence
-              - ThermostatRunningMode
-              - ThermostatSystemMode
+              # ThermostatRunningModeEnum was originally named
+              # ThermostatRunningMode, but we generate the same API for the
+              # names with/without "Enum" at the end, so the name can just
+              # change here.
+              - ThermostatRunningModeEnum
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              - SystemModeEnum
           FanControl:
               - FanModeSequenceType
               - FanModeType
@@ -3935,11 +3943,19 @@
                   - HeatingWithReheat
                   - CoolingAndHeating
                   - CoolingAndHeatingWithReheat
-              ThermostatRunningMode:
+              # ThermostatRunningModeEnum was originally named
+              # ThermostatRunningMode, but we generate the same API for the
+              # names with/without "Enum" at the end, so the name can just
+              # change here.
+              ThermostatRunningModeEnum:
                   - Off
                   - Cool
                   - Heat
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - Off
                   - Auto
                   - Cool
@@ -5899,7 +5915,11 @@
               ParameterEnum:
                   - Video
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - EmergencyHeat
                   - Dry
                   - Sleep
@@ -6319,7 +6339,11 @@
                   - PIXELS
                   - PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - EmergencyHeating
               SetpointAdjustMode:
                   - HeatSetpoint
@@ -6715,7 +6739,11 @@
                   Pixels: PIXELS
                   Percentage: PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   EmergencyHeat: EmergencyHeating
               SetpointAdjustMode:
                   Heat: HeatSetpoint
@@ -7445,7 +7473,6 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
-          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
@@ -7769,6 +7796,7 @@
           - RVCRunMode
           - RVCCleanMode
           - RVCOperationalState
+          - OperationalState
       attributes:
           RVCRunMode:
               - SupportedModes
@@ -7800,6 +7828,18 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           PowerSource:
               - EndpointList
       commands:
@@ -7810,6 +7850,12 @@
               - ChangeToMode
               - ChangeToModeResponse
           RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+          OperationalState:
+              - Start
+              - Stop
               - Pause
               - Resume
               - OperationalCommandResponse
@@ -7829,6 +7875,9 @@
           RVCOperationalState:
               OperationalCommandResponse:
                   - commandResponseState
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
       structs:
           RVCOperationalState:
               - OperationalStateStruct
@@ -7839,6 +7888,11 @@
           RVCCleanMode:
               - ModeTagStruct
               - ModeOptionStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          Thermostat:
+              - WeeklyScheduleTransitionStruct
       struct fields:
           RVCOperationalState:
               OperationalStateStruct:
@@ -7864,8 +7918,24 @@
                   - label
                   - mode
                   - modeTags
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          Thermostat:
+              WeeklyScheduleTransitionStruct:
+                  - transitionTime
+                  - heatSetpoint
+                  - coolSetpoint
       events:
           RVCOperationalState:
+              - OperationalError
+              - OperationCompletion
+          OperationalState:
               - OperationalError
               - OperationCompletion
       event fields:
@@ -7873,6 +7943,13 @@
               AssociationFailure:
                   - associationFailureCause
           RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+          OperationalState:
               OperationalError:
                   - errorState
               OperationCompletion:
@@ -7897,6 +7974,12 @@
           RVCCleanMode:
               - ModeTag
               - StatusCode
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          Thermostat:
+              - ControlSequenceOfOperationEnum
+              - SetpointRaiseLowerModeEnum
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -8043,6 +8126,29 @@
                   - Mop
               StatusCode:
                   - CleaningInProgress
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+          Thermostat:
+              ControlSequenceOfOperationEnum:
+                  - CoolingOnly
+                  - CoolingWithReheat
+                  - HeatingOnly
+                  - HeatingWithReheat
+                  - CoolingAndHeating
+                  - CoolingAndHeatingWithReheat
+              SetpointRaiseLowerModeEnum:
+                  - Heat
+                  - Cool
+                  - Both
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -8056,6 +8162,9 @@
               - Feature
           RVCCleanMode:
               - Feature
+          Thermostat:
+              - ScheduleDayOfWeekBitmap
+              - ScheduleModeBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -8083,7 +8192,23 @@
           RVCCleanMode:
               Feature:
                   - OnOff
+          Thermostat:
+              ScheduleDayOfWeekBitmap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+                  - Away
+              ScheduleModeBitmap:
+                  - HeatSetpointPresent
+                  - CoolSetpointPresent
   deprecated:
+      structs:
+          Thermostat:
+              - ThermostatScheduleTransition
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
@@ -8093,6 +8218,9 @@
               - ContentLaunchStatusEnum
           KeypadInput:
               - CecKeyCode
+          Thermostat:
+              - ThermostatControlSequence
+              - SetpointAdjustMode
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -8105,6 +8233,9 @@
               - SupportedStreamingProtocol
           LevelControl:
               - LevelControlOptions
+          Thermostat:
+              - DayOfWeek
+              - ModeForSequence
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -8128,6 +8259,7 @@
           - ContentControl
           - ContentAppObserver
           - DeviceEnergyManagement
+          - ElectricalEnergyMeasurement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8246,6 +8378,16 @@
               # Targeting Spring 2024 Matter release
               - TargetUpdated
       enums:
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - StartOfWeekEnum
+              - TemperatureSetpointHoldEnum
+              - ACCapacityFormatEnum
+              - ACCompressorTypeEnum
+              - ACLouverPositionEnum
+              - ACRefrigerantTypeEnum
+              - ACTypeEnum
+              - SetpointChangeSourceEnum
           Channel:
               # Targeting Spring 2024 Matter release
               - ChannelTypeEnum
@@ -8277,6 +8419,13 @@
           Scenes:
               # Targeting Spring 2024 Matter release
               - NameSupportBitmap
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - ACErrorCodeBitmap
+              - HVACSystemTypeBitmap
+              - ProgrammingOperationModeBitmap
+              - RelayStateBitmap
+              - RemoteSensingBitmap
           Channel:
               # Targeting Spring 2024 Matter release
               - RecordingFlagBitmap
@@ -8311,6 +8460,9 @@
                   - TextTracks
                   - AudioTracks
   renames:
+      structs:
+          Thermostat:
+              WeeklyScheduleTransitionStruct: ThermostatScheduleTransition
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
@@ -8320,6 +8472,9 @@
               StatusEnum: ContentLaunchStatusEnum
           KeypadInput:
               CECKeyCodeEnum: CecKeyCode
+          Thermostat:
+              ControlSequenceOfOperationEnum: ThermostatControlSequence
+              SetpointRaiseLowerModeEnum: SetpointAdjustMode
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time
@@ -8345,6 +8500,9 @@
               SupportedProtocolsBitmap: SupportedStreamingProtocol
           LevelControl:
               OptionsBitmap: LevelControlOptions
+          Thermostat:
+              ScheduleDayOfWeekBitmap: DayOfWeek
+              ScheduleModeBitmap: ModeForSequence
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

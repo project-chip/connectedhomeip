@@ -61,13 +61,7 @@ static_library("cc13x4_26x4") {
   }
 
   if (chip_enable_ota_requestor) {
-    sources += [
-      # this needs to be in the final link to place the data correctly
-      # see ${chip_root}/third_party/ti_simplelink_sdk/ti_simplelink_executable.gni
-      #"oad_image_header.c",
-      "../OTAImageProcessorImpl.cpp",
-      "../OTAImageProcessorImpl.h",
-    ]
+    sources += [ "OTAImageProcessorImpl.cpp" ]
   }
 
   if (chip_enable_openthread) {

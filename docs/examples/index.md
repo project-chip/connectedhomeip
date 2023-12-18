@@ -247,6 +247,15 @@ smoke-co-alarm-app/**/README
 dishwasher-app/**/README
 ```
 
+## Microwave oven example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+microwave-oven-app/**/README
+```
+
 ## Temperature measurement example
 
 ```{toctree}
@@ -319,4 +328,13 @@ air-purifier-app/**/README
 :maxdepth: 1
 
 network-manager-app/README
+```
+
+## Lit ICD example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+lit-icd-app/**/README
 ```

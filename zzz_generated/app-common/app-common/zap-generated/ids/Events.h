@@ -407,6 +407,20 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 
+namespace ElectricalEnergyMeasurement {
+namespace Events {
+
+namespace CumulativeEnergyMeasured {
+static constexpr EventId Id = 0x00000000;
+} // namespace CumulativeEnergyMeasured
+
+namespace PeriodicEnergyMeasured {
+static constexpr EventId Id = 0x00000001;
+} // namespace PeriodicEnergyMeasured
+
+} // namespace Events
+} // namespace ElectricalEnergyMeasurement
+
 namespace DemandResponseLoadControl {
 namespace Events {
 
@@ -622,6 +636,16 @@ static constexpr EventId Id = 0x00000002;
 
 } // namespace Events
 } // namespace UnitTesting
+
+namespace SampleMei {
+namespace Events {
+
+namespace PingCountEvent {
+static constexpr EventId Id = 0x00000000;
+} // namespace PingCountEvent
+
+} // namespace Events
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

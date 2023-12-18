@@ -7583,5 +7583,6 @@
       "endpointId": 4,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

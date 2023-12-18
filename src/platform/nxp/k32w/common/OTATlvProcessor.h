@@ -90,6 +90,9 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
+#if OTA_ENCRYPTION_ENABLE
+    CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
+#endif
 
 protected:
     /**
@@ -121,6 +124,10 @@ protected:
 
     bool IsError(CHIP_ERROR & status);
 
+#if OTA_ENCRYPTION_ENABLE
+    /*ota decryption*/
+    uint32_t mIVOffset = 0;
+#endif
     uint32_t mLength                             = 0;
     uint32_t mProcessedLength                    = 0;
     bool mWasSelected                            = false;
@@ -140,6 +147,7 @@ public:
     CHIP_ERROR Accumulate(ByteSpan & block);
 
     inline uint8_t * data() { return mBuffer.Get(); }
+    inline uint32_t GetThreshold() { return mThreshold; }
 
 private:
     uint32_t mThreshold;

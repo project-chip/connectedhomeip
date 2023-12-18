@@ -46,6 +46,12 @@ IMWriteStatus = Struct(
     "AttributeId" / Int32ul,
 )
 
+CommandPathIBStruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "CommandId" / Int32ul,
+)
+
 # AttributePath should not contain padding
 AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
@@ -67,6 +73,16 @@ DataVersionFilterIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "DataVersion" / Int32ul,
+)
+
+SessionParametersStruct = Struct(
+    "SessionIdleInterval" / Int32ul,
+    "SessionActiveInterval" / Int32ul,
+    "SessionActiveThreshold" / Int16ul,
+    "DataModelRevision" / Int16ul,
+    "InteractionModelRevision" / Int16ul,
+    "SpecificationVersion" / Int32ul,
+    "MaxPathsPerInvoke" / Int16ul,
 )
 
 
@@ -105,6 +121,17 @@ class EventReadResult:
 class AttributeWriteResult:
     path: AttributePath
     status: int
+
+
+@dataclass
+class SessionParameters:
+    sessionIdleInterval: typing.Optional[int]
+    sessionActiveInterval: typing.Optional[int]
+    sessionActiveThreshold: typing.Optional[int]
+    dataModelRevision: typing.Optional[int]
+    interactionModelRevision: typing.Optional[int]
+    specficiationVersion: typing.Optional[int]
+    maxPathsPerInvoke: int
 
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,

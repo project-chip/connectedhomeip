@@ -3060,6 +3060,128 @@ public static class ValveConfigurationAndControlClusterValveFaultEvent {
     return output.toString();
   }
 }
+public static class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
+  private static final long ENERGY_EXPORTED_ID = 1L;
+
+  public ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
+  ) {
+    this.energyImported = energyImported;
+    this.energyExported = energyExported;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent(
+      energyImported,
+      energyExported
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {\n");
+    output.append("\tenergyImported: ");
+    output.append(energyImported);
+    output.append("\n");
+    output.append("\tenergyExported: ");
+    output.append(energyExported);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
+  public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;
+  private static final long ENERGY_IMPORTED_ID = 0L;
+  private static final long ENERGY_EXPORTED_ID = 1L;
+
+  public ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported,
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported
+  ) {
+    this.energyImported = energyImported;
+    this.energyExported = energyExported;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ENERGY_IMPORTED_ID, energyImported.<BaseTLVType>map((nonOptionalenergyImported) -> nonOptionalenergyImported.encodeTlv()).orElse(new EmptyType())));
+    values.add(new StructElement(ENERGY_EXPORTED_ID, energyExported.<BaseTLVType>map((nonOptionalenergyExported) -> nonOptionalenergyExported.encodeTlv()).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported = Optional.empty();
+    Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ENERGY_IMPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyImported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      } else if (element.contextTagNum() == ENERGY_EXPORTED_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          energyExported = Optional.of(ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct.decodeTlv(castingValue));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent(
+      energyImported,
+      energyExported
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent {\n");
+    output.append("\tenergyImported: ");
+    output.append(energyImported);
+    output.append("\n");
+    output.append("\tenergyExported: ");
+    output.append(energyExported);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent {
   public byte[] eventID;
   public @Nullable Integer transitionIndex;
@@ -3637,7 +3759,7 @@ public static class EnergyEvseClusterEnergyTransferStoppedEvent {
   }
 }
 public static class EnergyEvseClusterFaultEvent {
-  public Long sessionID;
+  public @Nullable Long sessionID;
   public Integer state;
   public Integer faultStatePreviousState;
   public Integer faultStateCurrentState;
@@ -3647,7 +3769,7 @@ public static class EnergyEvseClusterFaultEvent {
   private static final long FAULT_STATE_CURRENT_STATE_ID = 4L;
 
   public EnergyEvseClusterFaultEvent(
-    Long sessionID,
+    @Nullable Long sessionID,
     Integer state,
     Integer faultStatePreviousState,
     Integer faultStateCurrentState
@@ -3660,7 +3782,7 @@ public static class EnergyEvseClusterFaultEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(SESSION_I_D_ID, sessionID != null ? new UIntType(sessionID) : new NullType()));
     values.add(new StructElement(STATE_ID, new UIntType(state)));
     values.add(new StructElement(FAULT_STATE_PREVIOUS_STATE_ID, new UIntType(faultStatePreviousState)));
     values.add(new StructElement(FAULT_STATE_CURRENT_STATE_ID, new UIntType(faultStateCurrentState)));
@@ -3672,7 +3794,7 @@ public static class EnergyEvseClusterFaultEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long sessionID = null;
+    @Nullable Long sessionID = null;
     Integer state = null;
     Integer faultStatePreviousState = null;
     Integer faultStateCurrentState = null;
@@ -4706,6 +4828,67 @@ public static class UnitTestingClusterTestFabricScopedEventEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("UnitTestingClusterTestFabricScopedEventEvent {\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SampleMeiClusterPingCountEventEvent {
+  public Long count;
+  public Integer fabricIndex;
+  private static final long COUNT_ID = 1L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public SampleMeiClusterPingCountEventEvent(
+    Long count,
+    Integer fabricIndex
+  ) {
+    this.count = count;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(COUNT_ID, new UIntType(count)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static SampleMeiClusterPingCountEventEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long count = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          count = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new SampleMeiClusterPingCountEventEvent(
+      count,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SampleMeiClusterPingCountEventEvent {\n");
+    output.append("\tcount: ");
+    output.append(count);
+    output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
     output.append("\n");

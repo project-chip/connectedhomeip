@@ -1897,6 +1897,7 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1981,6 +1982,23 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
+        <name>MA-microwave-oven</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Microwave Oven</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0079</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Microwave Oven Mode"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Control"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-refrigerator</name>
         <domain>CHIP</domain>
         <typeName>Matter Refrigerator</typeName>
@@ -2025,7 +2043,7 @@ limitations under the License.
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Laundry Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Laundry Dryer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
