@@ -47,7 +47,7 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
         return ret
 
     @async_test_body
-    async def test_TC_OPSTATE_2_3(self):
+    async def test_TC_OVENOPSTATE_2_3(self):
 
         asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                             "PIXIT_ENDPOINT must be included on the command line in "
@@ -55,10 +55,10 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
 
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
-        asserts.assert_true(self.check_pics("OPSTATE.S.A0003"), "OPSTATE.S.A0003 must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.A0004"), "OPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.C00.Rsp"), "OPSTATE.S.C00.Rsp must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.C03.Rsp"), "OPSTATE.S.C03.Rsp must be supported")
+        asserts.assert_true(self.check_pics("OVENOPSTATE.S.A0003"), "OVENOPSTATE.S.A0003 must be supported")
+        asserts.assert_true(self.check_pics("OVENOPSTATE.S.A0004"), "OVENOPSTATE.S.A0004 must be supported")
+        asserts.assert_true(self.check_pics("OVENOPSTATE.S.C00.Rsp"), "OVENOPSTATE.S.C00.Rsp must be supported")
+        asserts.assert_true(self.check_pics("OVENOPSTATE.S.C03.Rsp"), "OVENOPSTATE.S.C03.Rsp must be supported")
 
         attributes = Clusters.OperationalState.Attributes
 
@@ -92,7 +92,7 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
                              "OperationalState ID should be Paused(0x02)")
 
-        if self.check_pics("OPSTATE.S.A0002"):
+        if self.check_pics("OVENOPSTATE.S.A0002"):
             self.print_step(6, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.CountdownTime)
