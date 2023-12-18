@@ -1142,8 +1142,8 @@ private:
             //
             callback->AdoptReadClient(std::move(readClient));
             callback.release();
-            attributePathParamsList.Release();
-            eventPathParamsList.Release();
+            (void) attributePathParamsList.Release();
+            (void) eventPathParamsList.Release();
             return err;
         });
     std::move(*bridge).DispatchAction(self);
