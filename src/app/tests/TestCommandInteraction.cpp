@@ -85,6 +85,10 @@ constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
 const app::CommandHandler::TestOnlyMarker kThisIsForTestOnly;
+#if !CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+// This is only used in tests that support sending batch commands.
+(void) kThisIsForTestOnly;
+#endif
 } // namespace
 
 namespace app {
