@@ -28,7 +28,7 @@ namespace app {
  * @brief The application implementing an ICD client should inherit the CheckInDelegate and implement the listed callbacks
  * OnCheckInComplete will be called on successful processing of a received checkIn message from the server
  * OnRefreshKey will be called when the key needs to be refreshed to avoid check in counter roll over problems. On receiving
- * OnRefreshKey callback, the application should generate a new key.
+ * OnRefreshKey callback, the application needs to generate a new key.
  */
 class DLL_EXPORT CheckInDelegate
 {
@@ -43,7 +43,7 @@ public:
     virtual void OnCheckInComplete(ICDClientInfo & clientInfo) = 0;
 
     /**
-     * @brief Callback used to let the application know that a checkin message was received and validated and a key refresh is
+     * @brief Callback used to let the application know that a key refresh is
      * needed to avoid counter roolover problems.
      *
      * The implementer of this function should generate a new key

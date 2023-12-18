@@ -31,7 +31,9 @@
 namespace chip {
 namespace app {
 
+// 4 bytes for counter + 2 bytes for ActiveModeThreshold
 inline constexpr uint8_t kAppDataLength = 6;
+
 using namespace Protocols::SecureChannel;
 /**
  * The ICDClientStorage class is an abstract interface that defines the operations
