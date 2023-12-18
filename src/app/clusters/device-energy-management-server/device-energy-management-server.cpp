@@ -166,7 +166,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case StartTimeAdjustRequest::Id:
-        if (HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kForecastAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -178,7 +178,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case PauseRequest::Id:
-        if (HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kForecastAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -189,7 +189,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ResumeRequest::Id:
-        if (HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kForecastAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -200,7 +200,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ModifyForecastRequest::Id:
-        if (HasFeature(Feature::kForecastAdjustment))
+        if (!SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -212,7 +212,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case RequestConstraintBasedForecast::Id:
-        if (HasFeature(Feature::kForecastAdjustment))
+        if (!SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
