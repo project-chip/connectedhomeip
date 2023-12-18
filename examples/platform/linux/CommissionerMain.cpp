@@ -343,7 +343,7 @@ void PairingCommand::OnCommissioningStatusUpdate(PeerId peerId, CommissioningSta
     }
 }
 
-void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
+void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
@@ -356,11 +356,11 @@ void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
         if (info.litUserActiveModeTriggerInstruction.size() != 0)
         {
             userActiveModeTriggerInstruction =
-                std::string(info.litUserActiveModeTriggerHint.data(), info.litUserActiveModeTriggerInstruction.size());
+                std::string(info.litUserActiveModeTriggerInstruction.data(), info.litUserActiveModeTriggerInstruction.size());
         }
 
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
-                        info.icdUserActiveModeTriggerHint.Raw());
+                        info.litUserActiveModeTriggerHint.Raw());
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }

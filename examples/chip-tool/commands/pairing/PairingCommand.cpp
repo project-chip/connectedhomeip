@@ -403,6 +403,29 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     SetCommandExitStatus(err);
 }
 
+void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
+{
+    ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
+                    info.basic.productId);
+
+    if (info.isLIT)
+    {
+        std::string userActiveModeTriggerInstruction;
+
+        // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+        if (info.litUserActiveModeTriggerInstruction.size() != 0)
+        {
+            userActiveModeTriggerInstruction =
+                std::string(info.litUserActiveModeTriggerInstruction.data(), info.litUserActiveModeTriggerInstruction.size());
+        }
+
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
+                        info.litUserActiveModeTriggerHint.Raw());
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
+                        userActiveModeTriggerInstruction.c_str());
+    }
+}
+
 void PairingCommand::OnICDRegistrationInfoRequired()
 {
     // Since we compute our ICD Registration info up front, we can call ICDRegistrationInfoReady() directly.
