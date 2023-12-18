@@ -152,7 +152,7 @@ private:
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
 
     /* Callback related */
-    EVSECallbackWrapper mCallbacks = { .handler = nullptr }; /* Wrapper to allow callbacks to be registered */
+    EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
     Status NotifyApplicationStateChange();
 
