@@ -76,7 +76,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128Key
 }
 
 CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
-                                                      const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
+                                                      const Crypto::Hmac128KeyHandle & hmacKeyHandle, const ByteSpan & payload,
                                                       CounterType & counter, MutableByteSpan & appData)
 {
     size_t appDataSize = GetAppDataSize(payload);

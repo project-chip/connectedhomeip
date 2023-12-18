@@ -84,7 +84,7 @@ public:
      */
 
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
-                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
+                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, const ByteSpan & payload,
                                                  CounterType & counter, MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + kMinPayloadSize; }
