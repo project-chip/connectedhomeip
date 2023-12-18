@@ -1951,7 +1951,7 @@ void DeviceCommissioner::ParseCommissioningInfo()
     }
 
     // Unref mAttributeCache, but don't release it until this function returns.
-    // So we don't have to make copy during parsing commissioning info, and won't
+    // By doing this, we don't have to make a copy when parsing commissioning info, and it won't
     // affect future commissioning steps.
     auto attributeCache = std::move(mAttributeCache);
 
