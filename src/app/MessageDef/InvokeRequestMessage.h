@@ -106,6 +106,13 @@ public:
      */
     CHIP_ERROR EndOfInvokeRequestMessage();
 
+    /**
+     *  @brief Get number of bytes required to call EndOfInvokeRequestMessage()
+     *
+     *  @return Expected number of bytes required to call EndOfInvokeRequestMessage()
+     */
+    uint32_t GetSizeToEndInvokeRequestMessage();
+
 private:
     InvokeRequests::Builder mInvokeRequests;
 };

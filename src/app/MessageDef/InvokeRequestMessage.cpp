@@ -152,5 +152,14 @@ CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
     }
     return GetError();
 }
+
+uint32_t InvokeRequestMessage::Builder::GetSizeToEndInvokeRequestMessage()
+{
+    // This encodes uint8_t into Tag 0xFF. This means 1 bytes for tag, 1 byte for length, 1 byte for value
+    uint32_t kEncodeInteractionModelSize = 1 + 1 + 1;
+    uint32_t kEndOfContainerSize         = 1;
+
+    return kEncodeInteractionModelSize + kEndOfContainerSize;
+}
 }; // namespace app
 }; // namespace chip

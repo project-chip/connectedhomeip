@@ -69,6 +69,10 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 
         mInvokeResponseBuilder.CreateInvokeResponses();
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
+
+        auto * tlvWriter = mInvokeResponseBuilder.GetWriter();
+        ReturnErrorOnFailure(tlvWriter->ReserveBuffer(mInvokeResponseBuilder.GetInvokeResponses().GetSizeToEndInvokeResponses()));
+        ReturnErrorOnFailure(tlvWriter->ReserveBuffer(mInvokeResponseBuilder.GetSizeToEndInvokeResponseMessage()));
         mBufferAllocated = true;
     }
 
@@ -651,6 +655,9 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
         ReturnErrorOnFailure(commandData.Ref(mRefForResponse.Value()));
     }
 
+    auto * tlvWriter = mInvokeResponseBuilder.GetWriter();
+    ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeResponseBuilder.GetInvokeResponses().GetSizeToEndInvokeResponses()));
+    ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeResponseBuilder.GetSizeToEndInvokeResponseMessage()));
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
     MoveToState(State::AddedCommand);

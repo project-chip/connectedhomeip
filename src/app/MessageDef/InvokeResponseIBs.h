@@ -61,6 +61,13 @@ public:
      */
     CHIP_ERROR EndOfInvokeResponses();
 
+    /**
+     *  @brief Get number of bytes required to call EndOfInvokeResponses()
+     *
+     *  @return Expected number of bytes required to call EndOfInvokeResponses()
+     */
+    uint32_t GetSizeToEndInvokeResponses();
+
 private:
     InvokeResponseIB::Builder mInvokeResponse;
 };

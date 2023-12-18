@@ -61,6 +61,13 @@ public:
      */
     CHIP_ERROR EndOfInvokeRequests();
 
+    /**
+     *  @brief Get number of bytes required to call EndOfInvokeRequests()
+     *
+     *  @return Expected number of bytes required to call EndOfInvokeRequests()
+     */
+    uint32_t GetSizeToEndInvokeRequests();
+
 private:
     CommandDataIB::Builder mCommandData;
 };

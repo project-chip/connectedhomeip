@@ -84,5 +84,11 @@ CHIP_ERROR InvokeResponseIBs::Builder::EndOfInvokeResponses()
     EndOfContainer();
     return GetError();
 }
+
+uint32_t InvokeResponseIBs::Builder::GetSizeToEndInvokeResponses()
+{
+    uint32_t kEndOfContainerSize = 1;
+    return kEndOfContainerSize;
+}
 } // namespace app
 } // namespace chip

@@ -2057,6 +2057,54 @@ void InvokeInvokeRequestMessageTest(nlTestSuite * apSuite, void * apContext)
     ParseInvokeRequestMessage(apSuite, reader);
 }
 
+void InvokeRequestMessageEndOfMessageReservationTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    InvokeRequestMessage::Builder invokeRequestMessageBuilder;
+    const uint32_t kSmallBufferSize = 100;
+    writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
+    err = invokeRequestMessageBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t sizeToReserve = invokeRequestMessageBuilder.GetSizeToEndInvokeRequestMessage();
+    err                    = writer.ReserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
+
+    err = writer.UnreserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remianingLengthAfterEndingInvokeRequestMessage = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeRequestMessage);
+}
+
+void InvokeRequestsEndOfRequestReservationTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    InvokeRequests::Builder invokeRequestsBuilder;
+    const uint32_t kSmallBufferSize = 100;
+    writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
+    err = invokeRequestsBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t sizeToReserve = invokeRequestsBuilder.GetSizeToEndInvokeRequests();
+    err                    = writer.ReserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
+
+    err = writer.UnreserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeRequestsBuilder.EndOfInvokeRequests();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remianingLengthAfterEndingInvokeRequests = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeRequests);
+}
+
 void InvokeInvokeResponseMessageTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2072,6 +2120,54 @@ void InvokeInvokeResponseMessageTest(nlTestSuite * apSuite, void * apContext)
 
     reader.Init(std::move(buf));
     ParseInvokeResponseMessage(apSuite, reader);
+}
+
+void InvokeResponseMessageEndOfMessageReservationTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    InvokeResponseMessage::Builder invokeResponseMessageBuilder;
+    const uint32_t kSmallBufferSize = 100;
+    writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
+    err = invokeResponseMessageBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t sizeToReserve = invokeResponseMessageBuilder.GetSizeToEndInvokeResponseMessage();
+    err                    = writer.ReserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
+
+    err = writer.UnreserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remianingLengthAfterEndingInvokeResponseMessage = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeResponseMessage);
+}
+
+void InvokeResponsesEndOfResponseReservationTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    InvokeResponseIBs::Builder invokeResponsesBuilder;
+    const uint32_t kSmallBufferSize = 100;
+    writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
+    err = invokeResponsesBuilder.Init(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t sizeToReserve = invokeResponsesBuilder.GetSizeToEndInvokeResponses();
+    err                    = writer.ReserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
+
+    err = writer.UnreserveBuffer(sizeToReserve);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeResponsesBuilder.EndOfInvokeResponses();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remianingLengthAfterEndingInvokeResponses = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeResponses);
 }
 
 void ReportDataMessageTest(nlTestSuite * apSuite, void * apContext)
@@ -2283,7 +2379,11 @@ const nlTest sTests[] =
                 NL_TEST_DEF("InvokeRequestsTest", InvokeRequestsTest),
                 NL_TEST_DEF("InvokeResponsesTest", InvokeResponsesTest),
                 NL_TEST_DEF("InvokeInvokeRequestMessageTest", InvokeInvokeRequestMessageTest),
+                NL_TEST_DEF("InvokeRequestMessageEndOfMessageReservationTest", InvokeRequestMessageEndOfMessageReservationTest),
+                NL_TEST_DEF("InvokeRequestsEndOfRequestReservationTest", InvokeRequestsEndOfRequestReservationTest),
                 NL_TEST_DEF("InvokeInvokeResponseMessageTest", InvokeInvokeResponseMessageTest),
+                NL_TEST_DEF("InvokeResponseMessageEndOfMessageReservationTest", InvokeResponseMessageEndOfMessageReservationTest),
+                NL_TEST_DEF("InvokeResponsesEndOfResponseReservationTest", InvokeResponsesEndOfResponseReservationTest),
                 NL_TEST_DEF("ReportDataMessageTest", ReportDataMessageTest),
                 NL_TEST_DEF("ReadRequestMessageTest", ReadRequestMessageTest),
                 NL_TEST_DEF("WriteRequestMessageTest", WriteRequestMessageTest),
