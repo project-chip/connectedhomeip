@@ -34,7 +34,7 @@ public:
     IdentifyClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Identify::Id, "Identify", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -65,7 +65,7 @@ public:
     GroupsClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator_m,
-            dev_translator)
+              dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -100,7 +100,7 @@ public:
     OnOffClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::OnOff::Id, "OnOff", unify_mqtt, group_translator_m,
-            dev_translator)
+              dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -135,7 +135,7 @@ public:
     LevelControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::LevelControl::Id, "Level", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -173,7 +173,7 @@ public:
     DoorLockClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::DoorLock::Id, "DoorLock", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -307,7 +307,7 @@ public:
     BarrierControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::BarrierControl::Id, "BarrierControl", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -338,7 +338,7 @@ public:
     ThermostatClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Thermostat::Id, "Thermostat", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -449,7 +449,7 @@ public:
     FanControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FanControl::Id, "FanControl", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -490,7 +490,7 @@ public:
         UnifyMqtt& unify_mqtt, group_translator& group_translator_m,
         device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
-            "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m, dev_translator)
+              "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -518,7 +518,7 @@ public:
     ColorControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id, "ColorControl", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -566,7 +566,7 @@ public:
     IlluminanceMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::IlluminanceMeasurement::Id, "IlluminanceMeasurement",
-            unify_mqtt, group_translator_m, dev_translator)
+              unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -594,7 +594,7 @@ public:
     TemperatureMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::TemperatureMeasurement::Id, "TemperatureMeasurement",
-            unify_mqtt, group_translator_m, dev_translator)
+              unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -622,7 +622,7 @@ public:
     PressureMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::PressureMeasurement::Id, "PressureMeasurement",
-            unify_mqtt, group_translator_m, dev_translator)
+              unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -650,7 +650,7 @@ public:
     FlowMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FlowMeasurement::Id, "FlowMeasurement", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -678,7 +678,7 @@ public:
     RelativeHumidityMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::RelativeHumidityMeasurement::Id, "RelativityHumidity",
-            unify_mqtt, group_translator_m, dev_translator)
+              unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -706,7 +706,7 @@ public:
     OccupancySensingClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::OccupancySensing::Id, "OccupancySensing", unify_mqtt,
-            group_translator_m, dev_translator)
+              group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }
@@ -734,7 +734,7 @@ public:
     ElectricalMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
         group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id, "ElectricalMeasurement",
-            unify_mqtt, group_translator_m, dev_translator)
+              unify_mqtt, group_translator_m, dev_translator)
         , m_dev_translator(dev_translator)
     {
     }

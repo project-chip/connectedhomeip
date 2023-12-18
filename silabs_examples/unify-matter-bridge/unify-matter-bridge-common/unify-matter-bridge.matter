@@ -1018,12 +1018,12 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  command ResetCounts(): DefaultSuccess = 0;
+  command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Accurate time is required for a number of reasons, including scheduling, display and validating security materials. */
 server cluster TimeSynchronization = 56 {
-  enum GranularityEnum : ENUM8 {
+  enum GranularityEnum : enum8 {
     kNoTimeGranularity = 0;
     kMinutesGranularity = 1;
     kSecondsGranularity = 2;
@@ -1031,11 +1031,11 @@ server cluster TimeSynchronization = 56 {
     kMicrosecondsGranularity = 4;
   }
 
-  enum StatusCode : ENUM8 {
+  enum StatusCode : enum8 {
     kTimeNotAccepted = 2;
   }
 
-  enum TimeSourceEnum : ENUM8 {
+  enum TimeSourceEnum : enum8 {
     kNone = 0;
     kUnknown = 1;
     kAdmin = 2;
@@ -1055,13 +1055,13 @@ server cluster TimeSynchronization = 56 {
     kGNSS = 16;
   }
 
-  enum TimeZoneDatabaseEnum : ENUM8 {
+  enum TimeZoneDatabaseEnum : enum8 {
     kFull = 0;
     kPartial = 1;
     kNone = 2;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kTimeZone = 0x1;
     kNTPClient = 0x2;
     kNTPServer = 0x4;

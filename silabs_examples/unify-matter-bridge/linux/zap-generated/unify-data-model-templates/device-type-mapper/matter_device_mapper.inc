@@ -235,6 +235,7 @@ namespace app {
                     { "MeasuredValue", MeasuredValue::Id },
                     { "MinMeasuredValue", MinMeasuredValue::Id },
                     { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id },
                     { "LightSensorType", LightSensorType::Id }
                 };
             } // namespace Attributes
@@ -245,6 +246,7 @@ namespace app {
                     { "MeasuredValue", MeasuredValue::Id },
                     { "MinMeasuredValue", MinMeasuredValue::Id },
                     { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id }
                 };
             } // namespace Attributes
         } // namespace TemperatureMeasurement
@@ -254,6 +256,12 @@ namespace app {
                     { "MeasuredValue", MeasuredValue::Id },
                     { "MinMeasuredValue", MinMeasuredValue::Id },
                     { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id },
+                    { "ScaledValue", ScaledValue::Id },
+                    { "MinScaledValue", MinScaledValue::Id },
+                    { "MaxScaledValue", MaxScaledValue::Id },
+                    { "ScaledTolerance", ScaledTolerance::Id },
+                    { "Scale", Scale::Id }
                 };
             } // namespace Attributes
         } // namespace PressureMeasurement
@@ -263,6 +271,7 @@ namespace app {
                     { "MeasuredValue", MeasuredValue::Id },
                     { "MinMeasuredValue", MinMeasuredValue::Id },
                     { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id }
                 };
             } // namespace Attributes
         } // namespace FlowMeasurement
@@ -272,6 +281,7 @@ namespace app {
                     { "MeasuredValue", MeasuredValue::Id },
                     { "MinMeasuredValue", MinMeasuredValue::Id },
                     { "MaxMeasuredValue", MaxMeasuredValue::Id },
+                    { "Tolerance", Tolerance::Id }
                 };
             } // namespace Attributes
         } // namespace RelativityHumidity

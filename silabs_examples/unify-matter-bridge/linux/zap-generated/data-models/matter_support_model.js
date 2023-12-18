@@ -929,6 +929,9 @@ exports.model = {
           "NetworkIdentity",
           "ClientIdentifier",
           "PossessionNonce",
+          "NetworkIdentity",
+          "ClientIdentifier",
+          "PossessionNonce",
         ],
       },
       3 : {
@@ -951,6 +954,8 @@ exports.model = {
           "NetworkingStatus",
           "DebugText",
           "NetworkIndex",
+          "ClientIdentity",
+          "PossessionSignature",
           "ClientIdentity",
           "PossessionSignature",
         ],
@@ -976,6 +981,20 @@ exports.model = {
           "NetworkID",
           "NetworkIndex",
           "Breadcrumb",
+        ],
+      },
+      9 : {
+        name : "QueryIdentity",
+        arguments : [
+          "KeyIdentifier",
+          "PossessionNonce",
+        ],
+      },
+      10 : {
+        name : "QueryIdentityResponse",
+        arguments : [
+          "Identity",
+          "PossessionSignature",
         ],
       },
     },
@@ -1037,6 +1056,19 @@ exports.model = {
         arguments : [
           "EnableKey",
           "EventTrigger",
+        ],
+      },
+      1 : {
+        name : "TimeSnapshot",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "TimeSnapshotResponse",
+        arguments : [
+          "SystemTimeUs",
+          "UTCTimeUs",
         ],
       },
     },
@@ -1550,7 +1582,50 @@ exports.model = {
     attributes : {
       0 : "IdleModeDuration",
       1 : "ActiveModeDuration",
+      0 : "IdleModeDuration",
+      1 : "ActiveModeDuration",
       2 : "ActiveModeThreshold",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  71 : {
+    name : "Timer",
+    commands : {
+      0 : {
+        name : "SetTimer",
+        arguments : [
+          "NewTime",
+        ],
+      },
+      1 : {
+        name : "ResetTimer",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "AddTime",
+        arguments : [
+          "AdditionalTime",
+        ],
+      },
+      3 : {
+        name : "ReduceTime",
+        arguments : [
+          "TimeReduction",
+        ],
+      },
+    },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
+    attributes : {
+      0 : "SetTime",
+      1 : "TimeRemaining",
+      2 : "TimerState",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1849,6 +1924,7 @@ exports.model = {
   94 : {
     name : "MicrowaveOvenMode",
     commands : {},
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
@@ -1869,8 +1945,6 @@ exports.model = {
           "CookMode",
           "CookTime",
           "PowerSetting",
-          "WattSettingIndex",
-          "StartAfterSetting",
         ],
       },
       1 : {
@@ -1880,16 +1954,10 @@ exports.model = {
         ],
       },
     },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
-      0 : "CookTime",
-      1 : "MaxCookTime",
+      1 : "CookTime",
       2 : "PowerSetting",
-      3 : "MinPower",
-      4 : "MaxPower",
-      5 : "PowerStep",
-      6 : "SupportedWatts",
-      7 : "SelectedWattIndex",
-      8 : "WattRating",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2166,6 +2234,60 @@ exports.model = {
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       2 : "ChangeIndication",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  150 : {
+    name : "DemandResponseLoadControl",
+    commands : {
+      0 : {
+        name : "RegisterLoadControlProgramRequest",
+        arguments : [
+          "LoadControlProgram",
+        ],
+      },
+      1 : {
+        name : "UnregisterLoadControlProgramRequest",
+        arguments : [
+          "LoadControlProgramID",
+        ],
+      },
+      2 : {
+        name : "AddLoadControlEventRequest",
+        arguments : [
+          "Event",
+        ],
+      },
+      3 : {
+        name : "RemoveLoadControlEventRequest",
+        arguments : [
+          "EventID",
+          "CancelControl",
+        ],
+      },
+      4 : {
+        name : "ClearLoadControlEventsRequest",
+        arguments : [
+
+        ],
+      },
+    },
+    /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
+    attributes : {
+      0 : "DeviceClass",
+      1 : "LoadControlPrograms",
+      2 : "NumberOfLoadControlPrograms",
+      3 : "Events",
+      4 : "ActiveEvents",
+      5 : "NumberOfEventsPerProgram",
+      6 : "NumberOfTransistions",
+      7 : "DefaultRandomStart",
+      8 : "DefaultRandomDuration",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2900,6 +3022,7 @@ exports.model = {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
+      3 : "Tolerance",
       4 : "LightSensorType",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -2917,6 +3040,7 @@ exports.model = {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
+      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2933,6 +3057,12 @@ exports.model = {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
+      3 : "Tolerance",
+      16 : "ScaledValue",
+      17 : "MinScaledValue",
+      18 : "MaxScaledValue",
+      19 : "ScaledTolerance",
+      20 : "Scale",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2949,6 +3079,7 @@ exports.model = {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
+      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -2965,6 +3096,7 @@ exports.model = {
       0 : "MeasuredValue",
       1 : "MinMeasuredValue",
       2 : "MaxMeasuredValue",
+      3 : "Tolerance",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3435,6 +3567,7 @@ exports.model = {
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "OutputList",
+      1 : "CurrentOutput",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -4115,11 +4248,6 @@ exports.model = {
       "UpdateAvailable",
       "UrgentUpdateAvailable",
     ], //
-    "ApplicationLauncherStatusEnum" : [
-      "Success",
-      "AppNotAvailable",
-      "SystemBusy",
-    ], //
     "ApplicationStatusEnum" : [
       "Stopped",
       "ActiveVisibleFocus",
@@ -4442,50 +4570,8 @@ exports.model = {
       "Added",
       "Removed",
     ], //
-    "ChannelTypeEnum" : [
-      "Satellite",
-      "Cable",
-      "Terrestrial",
-    ], //
-    "CharacteristicEnum" : [
-      "ForcedSubtitles",
-      "DescribesVideo",
-      "EasyToRead",
-      "FrameBased",
-      "MainProgram",
-      "OriginalContent",
-      "VoiceOverTranslation",
-      "Caption",
-      "Subtitle",
-      "Alternate",
-      "Supplementary",
-      "Commentary",
-      "DubbedTranslation",
-      "Description",
-      "Metadata",
-      "EnhancedAudioIntelligibility",
-      "Emergency",
-      "Karaoke",
-    ], //
-    "CharacteristicEnum" : [
-      "ForcedSubtitles",
-      "DescribesVideo",
-      "EasyToRead",
-      "FrameBased",
-      "MainProgram",
-      "OriginalContent",
-      "VoiceOverTranslation",
-      "Caption",
-      "Subtitle",
-      "Alternate",
-      "Supplementary",
-      "Commentary",
-      "DubbedTranslation",
-      "Description",
-      "Metadata",
-      "EnhancedAudioIntelligibility",
-      "Emergency",
-      "Karaoke",
+    "ColorControlOptions" : [
+      "ExecuteIfOff",
     ], //
     "ColorEnum" : [
       "Black",
@@ -4607,9 +4693,6 @@ exports.model = {
       "Fingerprint",
       "FingerVein",
       "Face",
-      "AliroCredentialIssuerKey",
-      "AliroEvictableEndpointKey",
-      "AliroNonEvictableEndpointKey",
     ], //
     "CriticalityLevelEnum" : [
       "Unknown",
@@ -4792,12 +4875,6 @@ exports.model = {
       "EnhancedCurrentHueAndCurrentSaturation",
     ], //
     "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
-    ], //
-    "ErrorStateEnum" : [
       "FailedToFindChargingDock",
       "Stuck",
       "DustBinMissing",
@@ -4806,6 +4883,12 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
+    ], //
+    "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -4834,25 +4917,6 @@ exports.model = {
       "OffLowHighAuto",
       "OffHighAuto",
       "OffHigh",
-    ], //
-    "FaultStateEnum" : [
-      "NoError",
-      "MeterFailure",
-      "OverVoltage",
-      "UnderVoltage",
-      "OverCurrent",
-      "ContactWetFailure",
-      "ContactDryFailure",
-      "GroundFault",
-      "PowerLoss",
-      "PowerQuality",
-      "PilotShortCircuit",
-      "EmergencyStop",
-      "EVDisconnected",
-      "WrongPowerSupply",
-      "LiveNeutralSwap",
-      "OverTemperature",
-      "Other",
     ], //
     "FaultType" : [
       "Unspecified",
@@ -4889,6 +4953,11 @@ exports.model = {
       "UserInterfaceFault",
       "NonVolatileMemoryError",
       "TamperDetected",
+    ], //
+    "HeatingSourceEnum" : [
+      "Any",
+      "Electric",
+      "NonElectric",
     ], //
     "HeatingSourceEnum" : [
       "Any",
@@ -4949,6 +5018,14 @@ exports.model = {
       "Cellular",
       "Thread",
     ], //
+    "KeypadLockout" : [
+      "NoLockout",
+      "LevelOneLockout",
+      "LevelTwoLockout",
+      "LevelThreeLockout",
+      "LevelFourLockout",
+      "LevelfiveLockout",
+    ], //
     "KeypadLockoutEnum" : [
       "NoLockout",
       "Lockout1",
@@ -4970,6 +5047,25 @@ exports.model = {
     ], //
     "LineupInfoTypeEnum" : [
       "Mso",
+    ], //
+    "LoadControlEventChangeSourceEnum" : [
+      "Automatic",
+      "UserAction",
+    ], //
+    "LoadControlEventStatusEnum" : [
+      "Unknown",
+      "Received",
+      "InProgress",
+      "Completed",
+      "OptedOut",
+      "OptedIn",
+      "Canceled",
+      "Superseded",
+      "PartialOptedOut",
+      "PartialOptedIn",
+      "NoParticipation",
+      "Unavailable",
+      "Failed",
     ], //
     "LoadControlEventChangeSourceEnum" : [
       "Automatic",
@@ -5051,21 +5147,12 @@ exports.model = {
     ], //
     "ModeTag" : [
       "Normal",
+      "Defrost",
+    ], //
+    "ModeTag" : [
+      "Normal",
       "Heavy",
       "Light",
-    ], //
-    "ModeTag" : [
-      "RapidCool",
-      "RapidFreeze",
-    ], //
-    "ModeTag" : [
-      "Idle",
-      "Cleaning",
-    ], //
-    "ModeTag" : [
-      "DeepClean",
-      "Vacuum",
-      "Mop",
     ], //
     "ModeTag" : [
       "Normal",
@@ -5073,7 +5160,20 @@ exports.model = {
       "Heavy",
       "Whites",
     ], //
-    "MoveMode" : [
+    "ModeTag" : [
+      "RapidCool",
+      "RapidFreeze",
+    ], //
+    "ModeTag" : [
+      "DeepClean",
+      "Vacuum",
+      "Mop",
+    ], //
+    "ModeTag" : [
+      "Idle",
+      "Cleaning",
+    ], //
+    "MoveModeEnum" : [
       "Up",
       "Down",
     ], //
@@ -5163,18 +5263,17 @@ exports.model = {
       "Remote",
       "Rfid",
       "Biometric",
-      "Aliro",
+    ], //
+    "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
     ], //
     "OperationalStateEnum" : [
       "Stopped",
       "Running",
       "Paused",
       "Error",
-    ], //
-    "OperationalStateEnum" : [
-      "SeekingCharger",
-      "Charging",
-      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -5220,6 +5319,11 @@ exports.model = {
       "Paused",
       "NotPlaying",
       "Buffering",
+    ], //
+    "PowerSavingsEnum" : [
+      "Low",
+      "Medium",
+      "High",
     ], //
     "PowerSourceStatusEnum" : [
       "Unspecified",
@@ -5295,6 +5399,10 @@ exports.model = {
       "ScheduleProgrammingPermitted",
       "ScheduleProgrammingDenied",
     ], //
+    "ScheduleProgrammingVisibilityEnum" : [
+      "ScheduleProgrammingPermitted",
+      "ScheduleProgrammingDenied",
+    ], //
     "SecurityTypeEnum" : [
       "Unspecified",
       "None",
@@ -5339,6 +5447,9 @@ exports.model = {
       "Toggle",
     ], //
     "StatusCode" : [
+      "CleaningInProgress",
+    ], //
+    "StatusCode" : [
       "Stuck",
       "DustBinMissing",
       "DustBinFull",
@@ -5349,18 +5460,12 @@ exports.model = {
       "BatteryLow",
     ], //
     "StatusCode" : [
-      "CleaningInProgress",
-    ], //
-    "StatusCode" : [
       "Busy",
       "PAKEParameterError",
       "WindowNotOpen",
     ], //
     "StatusCode" : [
       "TimeNotAccepted",
-    ], //
-    "StatusCodeEnum" : [
-      "FailureDueToFault",
     ], //
     "StatusEnum" : [
       "Success",
@@ -5374,12 +5479,13 @@ exports.model = {
     ], //
     "StatusEnum" : [
       "Success",
-      "UnexpectedData",
+      "AppNotAvailable",
+      "SystemBusy",
     ], //
     "StatusEnum" : [
       "Success",
-      "AppNotAvailable",
-      "SystemBusy",
+      "MultipleMatches",
+      "NoMatches",
     ], //
     "StatusEnum" : [
       "Success",
@@ -5387,6 +5493,19 @@ exports.model = {
       "NoLogs",
       "Busy",
       "Denied",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "URLNotAvailable",
+      "AuthFailed",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "InvalidStateForCommand",
+      "NotAllowed",
+      "NotActive",
+      "SpeedOutOfRange",
+      "SeekOutOfRange",
     ], //
     "StatusEnum" : [
       "UpdateAvailable",
@@ -5399,26 +5518,9 @@ exports.model = {
       "Decrease",
     ], //
     "StepModeEnum" : [
+    "StepModeEnum" : [
       "Up",
       "Down",
-    ], //
-    "SupplyStateEnum" : [
-      "Disabled",
-      "ChargingEnabled",
-      "DischargingEnabled",
-      "DisabledError",
-      "DisabledDiagnostics",
-    ], //
-    "SystemModeEnum" : [
-      "Off",
-      "Auto",
-      "Cool",
-      "Heat",
-      "EmergencyHeat",
-      "Precooling",
-      "FanOnly",
-      "Dry",
-      "Sleep",
     ], //
     "TempUnitEnum" : [
       "Fahrenheit",
@@ -5429,7 +5531,11 @@ exports.model = {
       "Celsius",
       "Fahrenheit",
     ], //
-    "TemperatureSetpointHoldEnum" : [
+    "TemperatureDisplayModeEnum" : [
+      "Celsius",
+      "Fahrenheit",
+    ], //
+    "TemperatureSetpointHold" : [
       "SetpointHoldOff",
       "SetpointHoldOn",
     ], //
@@ -5461,6 +5567,12 @@ exports.model = {
       "Full",
       "Partial",
       "None",
+    ], //
+    "TimerStatusEnum" : [
+      "Running",
+      "Paused",
+      "Expired",
+      "Ready",
     ], //
     "TimerStatusEnum" : [
       "Running",
@@ -5616,6 +5728,9 @@ exports.model = {
     "CancelControlBitmap" : {
       1 : "RandomEnd",
     },
+    "CancelControlBitmap" : {
+      1 : "RandomEnd",
+    },
     "ColorCapabilities" : {
       1 : "HueSaturationSupported",
       2 : "EnhancedHueSupported",
@@ -5655,6 +5770,16 @@ exports.model = {
     "CopyModeBitmap" : {
       1 : "CopyAllScenes",
     },
+    "DayOfWeek" : {
+      1 : "Sunday",
+      2 : "Monday",
+      4 : "Tuesday",
+      8 : "Wednesday",
+      16 : "Thursday",
+      32 : "Friday",
+      64 : "Saturday",
+      128 : "Away",
+    },
     "DaysMaskMap" : {
       1 : "Sunday",
       2 : "Monday",
@@ -5663,6 +5788,25 @@ exports.model = {
       16 : "Thursday",
       32 : "Friday",
       64 : "Saturday",
+    },
+    "DeviceClassBitmap" : {
+      1 : "Hvac",
+      2 : "StripHeater",
+      4 : "WaterHeater",
+      8 : "PoolPump",
+      16 : "SmartAppliance",
+      32 : "IrrigationPump",
+      64 : "CommercialLoad",
+      128 : "ResidentialLoad",
+      256 : "ExteriorLighting",
+      512 : "InteriorLighting",
+      1024 : "Ev",
+      2048 : "GenerationSystem",
+      4096 : "SmartInverter",
+      8192 : "Evse",
+      16384 : "Resu",
+      32768 : "Ems",
+      65536 : "Sem",
     },
     "DeviceClassBitmap" : {
       1 : "Hvac",
@@ -5792,6 +5936,13 @@ exports.model = {
       1 : "RandomDuration",
       2 : "IgnoreOptOut",
     },
+    "EventControlBitmap" : {
+      1 : "RandomStart",
+    },
+    "EventTransitionControlBitmap" : {
+      1 : "RandomDuration",
+      2 : "IgnoreOptOut",
+    },
     "Feature" : {
       1 : "OnOff",
     },
@@ -5805,9 +5956,6 @@ exports.model = {
       1 : "TemperatureUnit",
     },
     "Feature" : {
-      1 : "CalendarFormat",
-    },
-    "Feature" : {
       1 : "Spin",
       2 : "Rinse",
     },
@@ -5815,23 +5963,17 @@ exports.model = {
       1 : "TagList",
     },
     "Feature" : {
-      1 : "OnOff",
-    },
-    "Feature" : {
       1 : "NavigationKeyCodes",
       2 : "LocationKeys",
       4 : "NumberKeys",
     },
     "Feature" : {
-      1 : "WaterMarks",
+      1 : "OnOff",
     },
     "Feature" : {
       1 : "TemperatureNumber",
       2 : "TemperatureLevel",
       4 : "TemperatureStep",
-    },
-    "Feature" : {
-      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "Reset",
@@ -5841,10 +5983,16 @@ exports.model = {
       2 : "ErrorCounts",
     },
     "Feature" : {
-      1 : "NameUpdates",
+      1 : "Extended",
     },
     "Feature" : {
-      1 : "Extended",
+      1 : "Watermarks",
+    },
+    "Feature" : {
+      1 : "Reset",
+    },
+    "Feature" : {
+      1 : "CalendarFormat",
     },
     "Feature" : {
       1 : "ApplicationPlatform",
@@ -5862,13 +6010,16 @@ exports.model = {
       32 : "AirflowDirection",
     },
     "Feature" : {
-      1 : "Condition",
-      2 : "Warning",
-      4 : "ReplacementProductList",
+      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "PacketCounts",
       2 : "ErrorCounts",
+    },
+    "Feature" : {
+      1 : "Condition",
+      2 : "Warning",
+      4 : "ReplacementProductList",
     },
     "Feature" : {
       1 : "ContentSearch",
@@ -5880,10 +6031,10 @@ exports.model = {
     "Feature" : {
       1 : "Lighting",
       2 : "DeadFrontBehavior",
+      4 : "OffOnly",
     },
     "Feature" : {
-      1 : "SmokeAlarm",
-      2 : "CoAlarm",
+      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "LatchingSwitch",
@@ -5897,7 +6048,25 @@ exports.model = {
       2 : "VariableSpeed",
     },
     "Feature" : {
+      1 : "SmokeAlarm",
+      2 : "CoAlarm",
+    },
+    "Feature" : {
+      1 : "Basic",
+    },
+    "Feature" : {
+      1 : "EnrollmentGroups",
+      2 : "TemperatureOffset",
+      4 : "TemperatureSetpoint",
+      8 : "LoadAdjustment",
+      16 : "DutyCycle",
+      32 : "PowerSavings",
+      64 : "HeatingSource",
+    },
+    "Feature" : {
       1 : "CheckInProtocolSupport",
+      2 : "UserActiveModeTrigger",
+      4 : "LongIdleTimeSupport",
       2 : "UserActiveModeTrigger",
       4 : "LongIdleTimeSupport",
     },
@@ -5973,9 +6142,6 @@ exports.model = {
       8 : "PerDeviceCredentials",
     },
     "Feature" : {
-      1 : "SceneNames",
-    },
-    "Feature" : {
       1 : "HueAndSaturation",
       2 : "EnhancedHue",
       4 : "ColorLoop",
@@ -6029,10 +6195,6 @@ exports.model = {
     "LampAlarmModeBitmap" : {
       1 : "LampBurnHours",
     },
-    "LevelControlOptions" : {
-      1 : "ExecuteIfOff",
-      2 : "CoupleColorTempToLevel",
-    },
     "Mode" : {
       1 : "MotorDirectionReversed",
       2 : "CalibrationMode",
@@ -6041,6 +6203,9 @@ exports.model = {
     },
     "NameSupportBitmap" : {
       128 : "GroupNames",
+    },
+    "NameSupportBitmap" : {
+      128 : "SceneNames",
     },
     "OccupancyBitmap" : {
       1 : "Occupied",
@@ -6063,17 +6228,9 @@ exports.model = {
       1 : "ExecuteIfOff",
       2 : "CoupleColorTempToLevel",
     },
-    "PresetTypeFeaturesBitmap" : {
-      1 : "Automatic",
-      2 : "SupportsNames",
-    },
-    "ProgrammingOperationModeBitmap" : {
-      1 : "ScheduleActive",
-      2 : "AutoRecovery",
-      4 : "Economy",
-    },
     "PumpStatusBitmap" : {
       1 : "DeviceFault",
+      2 : "SupplyFault",
       2 : "SupplyFault",
       4 : "SpeedLow",
       8 : "SpeedHigh",
@@ -6121,51 +6278,15 @@ exports.model = {
       1024 : "ManualOperation",
       2048 : "Protection",
     },
-    "ScheduleDayOfWeekBitmap" : {
-      1 : "Sunday",
-      2 : "Monday",
-      4 : "Tuesday",
-      8 : "Wednesday",
-      16 : "Thursday",
-      32 : "Friday",
-      64 : "Saturday",
-      128 : "Away",
-    },
-    "ScheduleModeBitmap" : {
-      1 : "HeatSetpointPresent",
-      2 : "CoolSetpointPresent",
-    },
-    "ScheduleTypeFeaturesBitmap" : {
-      1 : "SupportsPresets",
-      2 : "SupportsSetpoints",
-      4 : "SupportsNames",
-      8 : "SupportsOff",
-    },
-    "SensorFaultBitmap" : {
-      1 : "GeneralFault",
-    },
     "SimpleBitmap" : {
       1 : "ValueA",
       2 : "ValueB",
       4 : "ValueC",
     },
     "SupportedProtocolsBitmap" : {
+    "SupportedProtocolsBitmap" : {
       1 : "Dash",
       2 : "Hls",
-      2 : "WebRTC",
-    },
-    "TargetDayOfWeekBitmap" : {
-      1 : "Sunday",
-      2 : "Monday",
-      4 : "Tuesday",
-      8 : "Wednesday",
-      16 : "Thursday",
-      32 : "Friday",
-      64 : "Saturday",
-    },
-    "TemperatureSetpointHoldPolicyBitmap" : {
-      1 : "HoldDurationElapsed",
-      2 : "HoldDurationElapsedOrPresetChanged",
     },
     "ThreadCapabilitiesBitmap" : {
       1 : "IsBorderRouterCapable",
@@ -6193,20 +6314,13 @@ exports.model = {
       32768 : "SetupButtonTimes",
       65536 : "AppDefinedButton",
     },
-    "ValveFaultBitmap" : {
-      1 : "GeneralFault",
-      2 : "Blocked",
-      4 : "Leaking",
-      8 : "NotConnected",
-      16 : "ShortCircuit",
-      32 : "CurrentExceeded",
-    },
     "WiFiSecurityBitmap" : {
       1 : "Unencrypted",
       2 : "Wep",
       4 : "WpaPersonal",
       8 : "Wpa2Personal",
       16 : "Wpa3Personal",
+      32 : "Wpa3MatterPdc",
       32 : "Wpa3MatterPdc",
     },
     "WindBitmap" : {

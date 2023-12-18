@@ -79,7 +79,25 @@ const ClusterFeatureAttributesSupport = {
     "24": true,       // Cool feature Support
   },
   "Illuminance Measurement": {
-    "4": true,      // This is optional attribute
+    "3": true,      // Tolerance Attribute Support
+    "4": true,      // Light Sensor Type Attribute Support
+  },
+  "Temperature Measurement": {
+    "3": true,      // Tolerance Attribute Support
+  },
+  "Pressure Measurement": {
+    "3": true,      // Tolerance Attribute Support
+    "16": true,     // Scaled Value Attribute Support
+    "17": true,     // Min Scaled Value Attribute Support
+    "18": true,     // Max Scaled Value Attribute Support
+    "19": true,     // Scaled Tolerance Attribute Support
+    "20": true,     // Scale Attribute Support
+  },
+  "Flow Measurement": {
+    "3": true,      // Tolerance Attribute Support
+  },
+  "Relative Humidity Measurement": {
+    "3": true,      // Tolerance Attribute Support
   },
 };
 
