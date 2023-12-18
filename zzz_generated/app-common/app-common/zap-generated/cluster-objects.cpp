@@ -12605,7 +12605,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
     encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
     return encoder.Finalize();
@@ -12633,9 +12633,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
+        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
         {
-            err = DataModel::Decode(reader, transitionTime);
+            err = DataModel::Decode(reader, transitionTimeMS);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
@@ -12743,7 +12743,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
     encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
     return encoder.Finalize();
@@ -12775,9 +12775,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
+        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
         {
-            err = DataModel::Decode(reader, transitionTime);
+            err = DataModel::Decode(reader, transitionTimeMS);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
@@ -13040,7 +13040,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
+    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
     return encoder.Finalize();
 }
 
@@ -13066,9 +13066,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
+        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
         {
-            err = DataModel::Decode(reader, transitionTime);
+            err = DataModel::Decode(reader, transitionTimeMS);
         }
         else
         {
@@ -13161,202 +13161,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace GetSceneMembershipResponse.
-namespace EnhancedAddScene {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
-    encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
-        {
-            err = DataModel::Decode(reader, transitionTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneName))
-        {
-            err = DataModel::Decode(reader, sceneName);
-        }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
-        {
-            err = DataModel::Decode(reader, extensionFieldSets);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedAddScene.
-namespace EnhancedAddSceneResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kStatus))
-        {
-            err = DataModel::Decode(reader, status);
-        }
-        else if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedAddSceneResponse.
-namespace EnhancedViewScene {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedViewScene.
-namespace EnhancedViewSceneResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
-    encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kStatus))
-        {
-            err = DataModel::Decode(reader, status);
-        }
-        else if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
-        {
-            err = DataModel::Decode(reader, transitionTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneName))
-        {
-            err = DataModel::Decode(reader, sceneName);
-        }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
-        {
-            err = DataModel::Decode(reader, extensionFieldSets);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedViewSceneResponse.
 namespace CopyScene {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -13462,16 +13266,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SceneCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sceneCount);
-    case Attributes::CurrentScene::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentScene);
-    case Attributes::CurrentGroup::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentGroup);
-    case Attributes::SceneValid::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sceneValid);
-    case Attributes::NameSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nameSupport);
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, lastConfiguredBy);
     case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
@@ -29383,10 +29177,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::ScenesManagement::Commands::RecallScene::Id:
             return true;
         case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
-            return true;
-        case Clusters::ScenesManagement::Commands::EnhancedAddScene::Id:
-            return true;
-        case Clusters::ScenesManagement::Commands::EnhancedViewScene::Id:
             return true;
         case Clusters::ScenesManagement::Commands::CopyScene::Id:
             return true;

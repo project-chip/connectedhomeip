@@ -5829,7 +5829,7 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "sceneID": "int",
-                    "transitionTime": "int",
+                    "transitionTimeMS": "int",
                     "sceneName": "str",
                     "extensionFieldSets": "ExtensionFieldSet",
                 },
@@ -5871,7 +5871,7 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "sceneID": "int",
-                    "transitionTime": "int",
+                    "transitionTimeMS": "int",
                 },
             },
             0x00000006: {
@@ -5883,25 +5883,6 @@ class ChipClusters:
             },
             0x00000040: {
                 "commandId": 0x00000040,
-                "commandName": "EnhancedAddScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                    "transitionTime": "int",
-                    "sceneName": "str",
-                    "extensionFieldSets": "ExtensionFieldSet",
-                },
-            },
-            0x00000041: {
-                "commandId": 0x00000041,
-                "commandName": "EnhancedViewScene",
-                "args": {
-                    "groupID": "int",
-                    "sceneID": "int",
-                },
-            },
-            0x00000042: {
-                "commandId": 0x00000042,
                 "commandName": "CopyScene",
                 "args": {
                     "mode": "int",
@@ -5914,50 +5895,20 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SceneCount",
+                "attributeName": "LastConfiguredBy",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "CurrentScene",
+                "attributeName": "SceneTableSize",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "CurrentGroup",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "SceneValid",
-                "attributeId": 0x00000003,
-                "type": "bool",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "NameSupport",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "LastConfiguredBy",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "SceneTableSize",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000007: {
                 "attributeName": "FabricSceneInfo",
-                "attributeId": 0x00000007,
+                "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
             },

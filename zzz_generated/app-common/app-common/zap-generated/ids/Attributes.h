@@ -3366,36 +3366,16 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ScenesManagement {
 namespace Attributes {
 
-namespace SceneCount {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace SceneCount
-
-namespace CurrentScene {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentScene
-
-namespace CurrentGroup {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentGroup
-
-namespace SceneValid {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace SceneValid
-
-namespace NameSupport {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace NameSupport
-
 namespace LastConfiguredBy {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace LastConfiguredBy
 
 namespace SceneTableSize {
-static constexpr AttributeId Id = 0x00000006;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace SceneTableSize
 
 namespace FabricSceneInfo {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000002;
 } // namespace FabricSceneInfo
 
 namespace GeneratedCommandList {

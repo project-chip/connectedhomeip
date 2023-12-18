@@ -1680,7 +1680,7 @@ provisional cluster ScenesManagement = 98 {
   request struct AddSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    int16u transitionTime = 2;
+    int32u transitionTimeMS = 2;
     char_string sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -1700,7 +1700,7 @@ provisional cluster ScenesManagement = 98 {
     status status = 0;
     group_id groupID = 1;
     int8u sceneID = 2;
-    optional int16u transitionTime = 3;
+    optional int32u transitionTimeMS = 3;
     optional char_string sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
@@ -1739,7 +1739,7 @@ provisional cluster ScenesManagement = 98 {
   request struct RecallSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    optional nullable int16u transitionTime = 2;
+    optional nullable int32u transitionTimeMS = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -1761,7 +1761,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierTo = 4;
   }
 
-  response struct CopySceneResponse = 60 {
+  response struct CopySceneResponse = 64 {
     status status = 0;
     group_id groupIdentifierFrom = 1;
     int8u sceneIdentifierFrom = 2;
@@ -1782,7 +1782,7 @@ provisional cluster ScenesManagement = 98 {
   /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
   /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 60;
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
@@ -2464,11 +2464,8 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute nameSupport;
-    ram      attribute sceneTableSize;
-    callback attribute fabricSceneInfo;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 4;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -2510,3 +2507,5 @@ endpoint 1 {
     handle command SetpointRaiseLower;
   }
 }
+
+
