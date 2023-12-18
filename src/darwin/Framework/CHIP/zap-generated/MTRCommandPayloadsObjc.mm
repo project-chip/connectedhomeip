@@ -16910,7 +16910,7 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & entry_0 = iter_0.GetValue();
                 MTREnergyEVSEClusterChargingTargetStruct * newElement_0;
                 newElement_0 = [MTREnergyEVSEClusterChargingTargetStruct new];
-                newElement_0.targetTime = [NSNumber numberWithUnsignedShort:entry_0.targetTime];
+                newElement_0.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_0.targetTimeMinutesPastMidnight];
                 if (entry_0.targetSoC.HasValue()) {
                     newElement_0.targetSoC = [NSNumber numberWithUnsignedChar:entry_0.targetSoC.Value()];
                 } else {
@@ -17326,7 +17326,7 @@ NS_ASSUME_NONNULL_BEGIN
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     auto element_0 = (MTREnergyEVSEClusterChargingTargetStruct *) self.chargingTargets[i_0];
-                    listHolder_0->mList[i_0].targetTime = element_0.targetTime.unsignedShortValue;
+                    listHolder_0->mList[i_0].targetTimeMinutesPastMidnight = element_0.targetTimeMinutesPastMidnight.unsignedShortValue;
                     if (element_0.targetSoC != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].targetSoC.Emplace();
                         definedValue_2 = element_0.targetSoC.unsignedCharValue;

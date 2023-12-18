@@ -35,7 +35,7 @@ if (chip_crypto == "") {
 chip_use_transitional_commissionable_data_provider = false
 
 # Use GSDK lwip instead of CHIP
-lwip_root = "${efr32_sdk_build_root}"
+lwip_root = "${efr32_sdk_build_root}/silabs_lwip"
 
 #lwip_platform = "external"
 lwip_platform = "silabs"

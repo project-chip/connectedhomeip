@@ -20,10 +20,9 @@
  *      This file implements the Matter Checkin protocol.
  */
 
-#include "CheckinMessage.h"
 #include <lib/core/CHIPCore.h>
-
 #include <lib/core/CHIPEncoding.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {

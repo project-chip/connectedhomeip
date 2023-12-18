@@ -410,23 +410,6 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
-CHIP_ERROR DefaultICDClientStorage::GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo)
-{
-    size_t clientInfoSize = 0;
-    std::vector<ICDClientInfo> clientInfoVector;
-    ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
-    IgnoreUnusedVariable(clientInfoSize);
-    for (auto & info : clientInfoVector)
-    {
-        if (peerNode.GetNodeId() == info.peer_node.GetNodeId())
-        {
-            clientInfo = info;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
-}
-
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
     size_t clientInfoSize = 0;
