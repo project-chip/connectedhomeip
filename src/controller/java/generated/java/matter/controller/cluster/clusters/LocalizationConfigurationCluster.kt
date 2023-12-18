@@ -77,10 +77,8 @@ class LocalizationConfigurationCluster(
     return decodedValue
   }
 
-  suspend fun writeActiveLocaleAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeActiveLocaleAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -95,7 +93,7 @@ class LocalizationConfigurationCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)

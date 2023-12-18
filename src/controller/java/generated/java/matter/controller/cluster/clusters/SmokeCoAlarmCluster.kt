@@ -47,10 +47,8 @@ class SmokeCoAlarmCluster(
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun selfTestRequest(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun selfTestRequest(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -60,7 +58,7 @@ class SmokeCoAlarmCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -474,10 +472,11 @@ class SmokeCoAlarmCluster(
     return decodedValue
   }
 
-  suspend fun writeSmokeSensitivityLevelAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeSmokeSensitivityLevelAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 11u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -492,7 +491,7 @@ class SmokeCoAlarmCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
