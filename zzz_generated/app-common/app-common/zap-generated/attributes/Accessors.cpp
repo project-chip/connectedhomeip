@@ -10450,7 +10450,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMinPower
@@ -10481,7 +10481,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::DeviceEnergyManagement::Id, Id, writable, ZCL_POWER_MW_ATTRIBUTE_TYPE);
 }
 
 } // namespace AbsMaxPower
