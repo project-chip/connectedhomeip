@@ -129,7 +129,7 @@ public:
      *
      * @param time_ms: Value in milliseconds.
      */
-    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint32_t time_ms)
+    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint64_t time_ms)
     {
         ctx->mMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
         ctx->GetIOContext().DriveIO();
@@ -141,13 +141,13 @@ public:
 
         // After the init we should be in Idle mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
         // Active mode interval expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 

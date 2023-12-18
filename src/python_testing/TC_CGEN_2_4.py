@@ -16,6 +16,7 @@
 #
 
 import logging
+import random
 import time
 
 import chip.CertificateAuthority
@@ -43,8 +44,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     def OpenCommissioningWindow(self) -> CommissioningParameters:
         try:
             params = self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminators[0], option=1)
-            time.sleep(5)
+                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.discriminator, option=1)
             return params
 
         except Exception as e:
@@ -62,7 +62,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
         errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
@@ -75,6 +75,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     @async_test_body
     async def test_TC_CGEN_2_4(self):
         self.th1 = self.default_controller
+        self.discriminator = random.randint(0, 4095)
         th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
         self.th2 = th2_fabric_admin.NewController(nodeId=2, useTestCommissioner=True)
@@ -102,7 +103,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         self.th2.ResetTestCommissioner()
         errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
