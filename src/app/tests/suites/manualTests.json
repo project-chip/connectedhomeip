@@ -295,6 +295,10 @@
         "Test_TC_BRBINFO_3_1"
     ],
     "LaundryWasherControl": [],
+    "Oven Mode":["Test_TC_OM_1_2",
+                "Test_TC_OM_3_2",
+                "Test_TC_OM_3_3"
+            ],
     "AccessControlEnforcement": [],
     "collection": [
         "DeviceDiscovery",
