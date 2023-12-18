@@ -266,7 +266,7 @@ jobs:
                      --factoryreset \
                   '                                                  
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-java-controller
@@ -274,7 +274,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-java-controller
