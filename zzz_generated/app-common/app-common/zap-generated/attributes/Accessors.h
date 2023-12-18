@@ -2024,12 +2024,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::DeviceEnergyMa
 } // namespace ESAState
 
 namespace AbsMinPower {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // power_mw
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
 } // namespace AbsMinPower
 
 namespace AbsMaxPower {
-EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // int64s
+EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value); // power_mw
 EmberAfStatus Set(chip::EndpointId endpoint, int64_t value);
 } // namespace AbsMaxPower
 
