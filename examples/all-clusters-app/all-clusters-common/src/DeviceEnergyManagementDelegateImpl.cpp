@@ -17,9 +17,10 @@
  */
 
 #include "DeviceEnergyManagementDelegateImpl.h"
-// #include <chrono>
-// #include <string>
-// #include <thread>
+
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/EventLogging.h>
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
@@ -60,17 +61,17 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
     Status status = Status::UnsupportedCommand; // Status::Success;
 
     // TODO: implement
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
 
     if (!forecast.IsNull())
     {
-        uint32_t duration = forecast.endTime - forecast.startTime; // the current entire forecast duration
+        uint32_t duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
 
         /* Modify start time and end time */
-        forecast.startTime = requestedStartTime;
-        forecast.endTime   = requestedStartTime + duration;
+        forecast.Value().startTime = requestedStartTime;
+        forecast.Value().endTime   = requestedStartTime + duration;
 
-        mDelegate.SetForecast(forecast);
+        SetForecast(forecast);
     }
     return status;
 }
@@ -150,7 +151,7 @@ DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegat
 
 CHIP_ERROR DeviceEnergyManagementDelegate::SetESAType(ESATypeEnum newValue)
 {
-    ESATypeEnum oldValue = mEsaState;
+    ESATypeEnum oldValue = mEsaType;
 
     if (newValue >= ESATypeEnum::kUnknownEnumValue)
     {
@@ -160,7 +161,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetESAType(ESATypeEnum newValue)
     mEsaType = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mEsaType updated to %d", (int) mEsaType);
+        ChipLogDetail(AppServer, "mEsaType updated to %d", static_cast<int>(mEsaType));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAType::Id);
     }
 
@@ -174,7 +175,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetESACanGenerate(bool newValue)
     mEsaCanGenerate = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mEsaCanGenerate updated to %d", (int) mEsaCanGenerate);
+        ChipLogDetail(AppServer, "mEsaCanGenerate updated to %d", static_cast<int>(mEsaCanGenerate));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESACanGenerate::Id);
     }
 
@@ -193,7 +194,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetESAState(ESAStateEnum newValue)
     mEsaState = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mEsaState updated to %d", (int) mEsaState);
+        ChipLogDetail(AppServer, "mEsaState updated to %d", static_cast<int>(mEsaState));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
     }
 
@@ -207,7 +208,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMinPower(int64_t newValue)
     mAbsMinPower = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mAbsMinPower updated to %d", (int) mAbsMinPower);
+        ChipLogDetail(AppServer, "mAbsMinPower updated to %d", static_cast<int>(mAbsMinPower));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMinPower::Id);
     }
 
@@ -221,14 +222,15 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValue)
     mAbsMaxPower = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "mAbsMaxPower updated to %d", (int) mAbsMaxPower);
+        ChipLogDetail(AppServer, "mAbsMaxPower updated to %d", static_cast<int>(mAbsMaxPower));
         MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, AbsMaxPower::Id);
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
+CHIP_ERROR
+DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
     Attributes::PowerAdjustmentCapability::TypeInfo::Type & powerAdjustmentCapability)
 {
     // TODO copy the value
@@ -237,10 +239,10 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(Structs::ForecastStruct::Type & forecast)
+CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
 {
     mForecast = forecast;
-    mForecast.forecastId++;
+    mForecast.Value().forecastId++;
 
     // TODO update the member variable structure
 

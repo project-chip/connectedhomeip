@@ -20,16 +20,6 @@
 
 #include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/CommandHandlerInterface.h>
-#include <app/ConcreteAttributePath.h>
-#include <app/InteractionModelEngine.h>
-#include <app/MessageDef/StatusIB.h>
-#include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
-#include <lib/core/CHIPError.h>
-
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -63,7 +53,7 @@ public:
     virtual ESAStateEnum GetESAState() override;
     virtual int64_t GetAbsMinPower() override;
     virtual int64_t GetAbsMaxPower() override;
-    virtual DataModel::Nullable<PowerAdjustmentCapability::TypeInfo::Type> GetPowerAdjustmentCapability() override;
+    virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() override;
     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
 
     // ------------------------------------------------------------------
@@ -74,7 +64,7 @@ public:
     virtual CHIP_ERROR SetAbsMinPower(int64_t) override;
     virtual CHIP_ERROR SetAbsMaxPower(int64_t) override;
     virtual CHIP_ERROR SetPowerAdjustmentCapability(Attributes::PowerAdjustmentCapability::TypeInfo::Type &) override;
-    virtual CHIP_ERROR SetForecast(Structs::ForecastStruct::Type &) override;
+    virtual CHIP_ERROR SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> &) override;
 
 private:
     ESATypeEnum mEsaType;
@@ -82,7 +72,7 @@ private:
     ESAStateEnum mEsaState;
     int64_t mAbsMinPower;
     int64_t mAbsMaxPower;
-    DataModel::Nullable<PowerAdjustmentCapability::TypeInfo::Type> mPowerAdjustmentCapability;
+    Attributes::PowerAdjustmentCapability::TypeInfo::Type mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
 };
 
