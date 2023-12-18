@@ -29,7 +29,7 @@
 #include <ota/OTAHelper.h>
 #endif
 
-static const char * TAG = "app-devicecallbacks";
+static const char TAG[] = "app-devicecallbacks";
 
 using namespace chip;
 using namespace chip::DeviceLayer;

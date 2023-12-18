@@ -3223,8 +3223,16 @@
           Thermostat:
               - SetpointAdjustMode
               - ThermostatControlSequence
-              - ThermostatRunningMode
-              - ThermostatSystemMode
+              # ThermostatRunningModeEnum was originally named
+              # ThermostatRunningMode, but we generate the same API for the
+              # names with/without "Enum" at the end, so the name can just
+              # change here.
+              - ThermostatRunningModeEnum
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              - SystemModeEnum
           FanControl:
               - FanModeSequenceType
               - FanModeType
@@ -3935,11 +3943,19 @@
                   - HeatingWithReheat
                   - CoolingAndHeating
                   - CoolingAndHeatingWithReheat
-              ThermostatRunningMode:
+              # ThermostatRunningModeEnum was originally named
+              # ThermostatRunningMode, but we generate the same API for the
+              # names with/without "Enum" at the end, so the name can just
+              # change here.
+              ThermostatRunningModeEnum:
                   - Off
                   - Cool
                   - Heat
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - Off
                   - Auto
                   - Cool
@@ -5899,7 +5915,11 @@
               ParameterEnum:
                   - Video
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - EmergencyHeat
                   - Dry
                   - Sleep
@@ -6319,7 +6339,11 @@
                   - PIXELS
                   - PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   - EmergencyHeating
               SetpointAdjustMode:
                   - HeatSetpoint
@@ -6715,7 +6739,11 @@
                   Pixels: PIXELS
                   Percentage: PERCENTAGE
           Thermostat:
-              ThermostatSystemMode:
+              # SystemModeEnum was originally named ThermostatSystemMode, but we
+              # generate the same API for the names with/without "Enum" at the
+              # end and the cluster name present/absent at the beginning, so the
+              # name can just change here.
+              SystemModeEnum:
                   EmergencyHeat: EmergencyHeating
               SetpointAdjustMode:
                   Heat: HeatSetpoint
@@ -7445,7 +7473,6 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
-          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
@@ -7453,11 +7480,8 @@
           - ICDManagement
           - LaundryWasherMode
           - RefrigeratorAndTemperatureControlledCabinetMode
-          - RVCRunMode
-          - RVCCleanMode
           - DishwasherMode
           - LaundryWasherControls
-          - RVCOperationalState
           - DishwasherAlarm
           - SampleMEI
       attributes:
@@ -7474,6 +7498,10 @@
           DoorLock:
               # Not stable yet
               - UnboltDoor
+          RVCOperationalState:
+              # Disallowed in the spec, but present in our XML?
+              - Start
+              - Stop
       enums:
           FanControl:
               # Not stable yet.
@@ -7569,9 +7597,6 @@
                   - CalendarFormat
   provisional:
       attributes:
-          # New things, not quite finalized.
-          PowerSource:
-              - EndpointList
           Descriptor:
               - TagList
       structs:
@@ -7767,10 +7792,170 @@
 - release: "Future"
   versions: "future"
   introduced:
+      clusters:
+          - RVCRunMode
+          - RVCCleanMode
+          - RVCOperationalState
+          - OperationalState
+      attributes:
+          RVCRunMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCCleanMode:
+              - SupportedModes
+              - CurrentMode
+              - OnMode
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          RVCOperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
+          PowerSource:
+              - EndpointList
+      commands:
+          RVCRunMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCCleanMode:
+              - ChangeToMode
+              - ChangeToModeResponse
+          RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+          OperationalState:
+              - Start
+              - Stop
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+      command fields:
+          RVCRunMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCCleanMode:
+              ChangeToMode:
+                  - newMode
+              ChangeToModeResponse:
+                  - status
+                  - statusText
+          RVCOperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
+      structs:
+          RVCOperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          RVCRunMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          RVCCleanMode:
+              - ModeTagStruct
+              - ModeOptionStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
+          Thermostat:
+              - WeeklyScheduleTransitionStruct
+      struct fields:
+          RVCOperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          RVCRunMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          RVCCleanMode:
+              ModeTagStruct:
+                  - mfgCode
+                  - value
+              ModeOptionStruct:
+                  - label
+                  - mode
+                  - modeTags
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
+          Thermostat:
+              WeeklyScheduleTransitionStruct:
+                  - transitionTime
+                  - heatSetpoint
+                  - coolSetpoint
+      events:
+          RVCOperationalState:
+              - OperationalError
+              - OperationCompletion
+          OperationalState:
+              - OperationalError
+              - OperationCompletion
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
+          RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+          OperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
       enums:
           ContentLauncher:
               - StatusEnum
@@ -7780,6 +7965,21 @@
               - KeypadLockoutEnum
               - ScheduleProgrammingVisibilityEnum
               - TemperatureDisplayModeEnum
+          RVCOperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          RVCRunMode:
+              - ModeTag
+              - StatusCode
+          RVCCleanMode:
+              - ModeTag
+              - StatusCode
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
+          Thermostat:
+              - ControlSequenceOfOperationEnum
+              - SetpointRaiseLowerModeEnum
       enum values:
           ContentLauncher:
               StatusEnum:
@@ -7892,6 +8092,63 @@
               TemperatureDisplayModeEnum:
                   - Celsius
                   - Fahrenheit
+          RVCOperationalState:
+              OperationalStateEnum:
+                  - SeekingCharger
+                  - Charging
+                  - Docked
+              ErrorStateEnum:
+                  - FailedToFindChargingDock
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+          RVCRunMode:
+              ModeTag:
+                  - Idle
+                  - Cleaning
+              StatusCode:
+                  - Stuck
+                  - DustBinMissing
+                  - DustBinFull
+                  - WaterTankEmpty
+                  - WaterTankMissing
+                  - WaterTankLidOpen
+                  - MopCleaningPadMissing
+                  - BatteryLow
+          RVCCleanMode:
+              ModeTag:
+                  - DeepClean
+                  - Vacuum
+                  - Mop
+              StatusCode:
+                  - CleaningInProgress
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
+          Thermostat:
+              ControlSequenceOfOperationEnum:
+                  - CoolingOnly
+                  - CoolingWithReheat
+                  - HeatingOnly
+                  - HeatingWithReheat
+                  - CoolingAndHeating
+                  - CoolingAndHeatingWithReheat
+              SetpointRaiseLowerModeEnum:
+                  - Heat
+                  - Cool
+                  - Both
       bitmaps:
           Scenes:
               - CopyModeBitmap
@@ -7901,6 +8158,13 @@
               - SupportedProtocolsBitmap
           LevelControl:
               - OptionsBitmap
+          RVCRunMode:
+              - Feature
+          RVCCleanMode:
+              - Feature
+          Thermostat:
+              - ScheduleDayOfWeekBitmap
+              - ScheduleModeBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7922,7 +8186,29 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
+          RVCRunMode:
+              Feature:
+                  - OnOff
+          RVCCleanMode:
+              Feature:
+                  - OnOff
+          Thermostat:
+              ScheduleDayOfWeekBitmap:
+                  - Sunday
+                  - Monday
+                  - Tuesday
+                  - Wednesday
+                  - Thursday
+                  - Friday
+                  - Saturday
+                  - Away
+              ScheduleModeBitmap:
+                  - HeatSetpointPresent
+                  - CoolSetpointPresent
   deprecated:
+      structs:
+          Thermostat:
+              - ThermostatScheduleTransition
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
@@ -7932,6 +8218,9 @@
               - ContentLaunchStatusEnum
           KeypadInput:
               - CecKeyCode
+          Thermostat:
+              - ThermostatControlSequence
+              - SetpointAdjustMode
       enum values:
           FanControl:
               FanModeSequenceEnum:
@@ -7944,6 +8233,9 @@
               - SupportedStreamingProtocol
           LevelControl:
               - LevelControlOptions
+          Thermostat:
+              - DayOfWeek
+              - ModeForSequence
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7962,6 +8254,12 @@
           - Timer
           - OvenMode
           - LaundryDryerControls
+          - EnergyEVSE
+          - OvenCavityOperationalState
+          - ContentControl
+          - ContentAppObserver
+          - DeviceEnergyManagement
+          - ElectricalEnergyMeasurement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -7978,6 +8276,12 @@
           Scenes:
               # Targeting Spring 2024 Matter release
               - FabricSceneInfo
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActiveAudioTrack
+              - AvailableAudioTracks
+              - ActiveTextTrack
+              - AvailableTextTracks
       commands:
           GeneralDiagnostics:
               # Targeting Spring 2024 Matter release
@@ -7987,6 +8291,17 @@
               # Targeting Spring 2024 Matter release
               - QueryIdentity
               - QueryIdentityResponse
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - GetProgramGuide
+              - ProgramGuideResponse
+              - RecordProgram
+              - CancelRecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - ActivateAudioTrack
+              - ActivateTextTrack
+              - DeactivateTextTrack
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8003,16 +8318,100 @@
               QueryIdentityResponse:
                   - identity
                   - possessionSignature
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Rewind:
+                  - audioAdvanceUnmuted
+              FastForward:
+                  - audioAdvanceUnmuted
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              LaunchContent:
+                  - playbackPreferences
+                  - useCurrentContext
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              Login:
+                  - node
+              Logout:
+                  - node
       structs:
           Scenes:
               # Targeting Spring 2024 Matter release
               - SceneInfoStruct
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ProgramStruct
+              - SeriesInfoStruct
+              - ProgramCategoryStruct
+              - ProgramCastStruct
+              - PageTokenStruct
+              - ChannelPagingStruct
+              - AdditionalInfoStruct
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - TrackStruct
+              - TrackAttributesStruct
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - PlaybackPreferencesStruct
+              - TrackPreferenceStruct
       struct fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               NetworkInfoStruct:
                   - networkIdentifier
                   - clientIdentifier
+          Channel:
+              # Targeting Spring 2024 Matter release
+              ChannelInfoStruct:
+                  - identifier
+                  - type
+      events:
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - StateChanged
+          AccountLogin:
+              # Targeting Spring 2024 Matter release
+              - LoggedOut
+          TargetNavigator:
+              # Targeting Spring 2024 Matter release
+              - TargetUpdated
+      enums:
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - StartOfWeekEnum
+              - TemperatureSetpointHoldEnum
+              - ACCapacityFormatEnum
+              - ACCompressorTypeEnum
+              - ACLouverPositionEnum
+              - ACRefrigerantTypeEnum
+              - ACTypeEnum
+              - SetpointChangeSourceEnum
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - ChannelTypeEnum
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              - CharacteristicEnum
+      enum values:
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              ParameterEnum:
+                  - Season
+                  - Episode
+                  - Any
+              StatusEnum:
+                  - TextTrackNotAvailable
+                  - AudioTrackNotAvailable
+          TimeFormatLocalization:
+              CalendarTypeEnum:
+                  - UseActiveLocale
+              HourFormatEnum:
+                  - UseActiveLocale
       bitmaps:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8020,6 +8419,16 @@
           Scenes:
               # Targeting Spring 2024 Matter release
               - NameSupportBitmap
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - ACErrorCodeBitmap
+              - HVACSystemTypeBitmap
+              - ProgrammingOperationModeBitmap
+              - RelayStateBitmap
+              - RemoteSensingBitmap
+          Channel:
+              # Targeting Spring 2024 Matter release
+              - RecordingFlagBitmap
       bitmap values:
           OnOff:
               Feature:
@@ -8031,7 +8440,29 @@
                   - PerDeviceCredentials
               WiFiSecurityBitmap:
                   - WPA3MatterPDC
+          Channel:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - ElectronicGuide
+                  - RecordProgram
+          MediaPlayback:
+              # Targeting Spring 2024 Matter release
+              Feature:
+                  - TextTracks
+                  - AudioTracks
+                  - AudioAdvance
+          ContentLauncher:
+              # Targeting Spring 2024 Matter release
+              SupportedProtocolsBitmap:
+                  - WebRTC
+              Feature:
+                  - AdvancedSeek
+                  - TextTracks
+                  - AudioTracks
   renames:
+      structs:
+          Thermostat:
+              WeeklyScheduleTransitionStruct: ThermostatScheduleTransition
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
@@ -8041,6 +8472,9 @@
               StatusEnum: ContentLaunchStatusEnum
           KeypadInput:
               CECKeyCodeEnum: CecKeyCode
+          Thermostat:
+              ControlSequenceOfOperationEnum: ThermostatControlSequence
+              SetpointRaiseLowerModeEnum: SetpointAdjustMode
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time
@@ -8066,6 +8500,9 @@
               SupportedProtocolsBitmap: SupportedStreamingProtocol
           LevelControl:
               OptionsBitmap: LevelControlOptions
+          Thermostat:
+              ScheduleDayOfWeekBitmap: DayOfWeek
+              ScheduleModeBitmap: ModeForSequence
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:

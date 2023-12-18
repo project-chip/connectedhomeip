@@ -326,7 +326,7 @@ cluster LevelControl = 8 {
 }
 
 /** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
-cluster BinaryInputBasic = 15 {
+deprecated cluster BinaryInputBasic = 15 {
   revision 1; // NOTE: Default/not specifically set
 
   attribute optional char_string<16> activeText = 4;
@@ -642,11 +642,13 @@ cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -914,13 +916,13 @@ cluster NetworkCommissioning = 49 {
   }
 
   request struct QueryIdentityRequest {
-    OCTET_STRING<20> keyIdentifier = 0;
-    optional OCTET_STRING<32> possessionNonce = 1;
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
   }
 
   response struct QueryIdentityResponse = 10 {
-    OCTET_STRING<140> identity = 0;
-    optional OCTET_STRING<64> possessionSignature = 1;
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
   }
 
   /** Detemine the set of networks the device sees as available. */
@@ -941,7 +943,7 @@ cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -1044,8 +1046,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1501,6 +1503,12 @@ cluster WakeOnLan = 1283 {
 cluster Channel = 1284 {
   revision 1; // NOTE: Default/not specifically set
 
+  enum ChannelTypeEnum : enum8 {
+    kSatellite = 0;
+    kCable = 1;
+    kTerrestrial = 2;
+  }
+
   enum LineupInfoTypeEnum : enum8 {
     kMSO = 0;
   }
@@ -1514,6 +1522,29 @@ cluster Channel = 1284 {
   bitmap Feature : bitmap32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
+    kElectronicGuide = 0x3;
+    kRecordProgram = 0x4;
+  }
+
+  bitmap RecordingFlagBitmap : bitmap32 {
+    kScheduled = 0x1;
+    kRecordSeries = 0x2;
+    kRecorded = 0x3;
+  }
+
+  struct ProgramCastStruct {
+    char_string name = 0;
+    char_string role = 1;
+  }
+
+  struct ProgramCategoryStruct {
+    char_string category = 0;
+    optional char_string subCategory = 1;
+  }
+
+  struct SeriesInfoStruct {
+    char_string season = 0;
+    char_string episode = 1;
   }
 
   struct ChannelInfoStruct {
@@ -1522,6 +1553,46 @@ cluster Channel = 1284 {
     optional char_string name = 2;
     optional char_string callSign = 3;
     optional char_string affiliateCallSign = 4;
+    optional char_string identifier = 5;
+    optional ChannelTypeEnum type = 6;
+  }
+
+  struct ProgramStruct {
+    char_string identifier = 0;
+    ChannelInfoStruct channel = 1;
+    epoch_s startTime = 2;
+    epoch_s endTime = 3;
+    char_string title = 4;
+    optional char_string subtitle = 5;
+    optional char_string description = 6;
+    optional char_string audioLanguages[] = 7;
+    optional char_string ratings[] = 8;
+    optional char_string thumbnailUrl = 9;
+    optional char_string posterArtUrl = 10;
+    optional char_string dvbiUrl = 11;
+    optional char_string releaseDate = 12;
+    optional char_string parentalGuidanceText = 13;
+    optional RecordingFlagBitmap recordingFlag = 14;
+    optional nullable SeriesInfoStruct seriesInfo = 15;
+    optional ProgramCategoryStruct categoryList[] = 16;
+    optional ProgramCastStruct castList[] = 17;
+    optional ProgramCastStruct externalIDList[] = 18;
+  }
+
+  struct PageTokenStruct {
+    optional int16u limit = 0;
+    optional char_string after = 1;
+    optional char_string before = 2;
+  }
+
+  struct ChannelPagingStruct {
+    optional nullable PageTokenStruct previousToken = 0;
+    optional nullable PageTokenStruct nextToken = 1;
+  }
+
+  struct AdditionalInfoStruct {
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct LineupInfoStruct {
@@ -1559,12 +1630,47 @@ cluster Channel = 1284 {
     int16s count = 0;
   }
 
+  request struct GetProgramGuideRequest {
+    optional epoch_s startTime = 0;
+    optional epoch_s endTime = 1;
+    optional ChannelInfoStruct channelList[] = 2;
+    optional PageTokenStruct pageToken = 3;
+    optional RecordingFlagBitmap recordingFlag = 4;
+    optional AdditionalInfoStruct externalIDList[] = 5;
+    optional octet_string data = 6;
+  }
+
+  response struct ProgramGuideResponse = 5 {
+    int16s channelPagingStruct = 0;
+    ProgramStruct programList[] = 1;
+  }
+
+  request struct RecordProgramRequest {
+    char_string programIdentifier = 0;
+    boolean shouldRecordSeries = 1;
+    AdditionalInfoStruct externalIDList[] = 2;
+    octet_string data = 3;
+  }
+
+  request struct CancelRecordProgramRequest {
+    char_string programIdentifier = 0;
+    boolean shouldRecordSeries = 1;
+    AdditionalInfoStruct externalIDList[] = 2;
+    octet_string data = 3;
+  }
+
   /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
   /** Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute. */
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
   /** This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel. */
   command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
+  /** This command retrieves the program guide. It accepts several filter parameters to return specific schedule and program information from a content app. The command shall receive in response a ProgramGuideResponse. */
+  command GetProgramGuide(GetProgramGuideRequest): ProgramGuideResponse = 4;
+  /** Record a specific program or series when it goes live. This functionality enables DVR recording features. */
+  command RecordProgram(RecordProgramRequest): DefaultSuccess = 6;
+  /** Cancel recording for a specific program or series. */
+  command CancelRecordProgram(CancelRecordProgramRequest): DefaultSuccess = 7;
 }
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
@@ -1580,6 +1686,12 @@ cluster TargetNavigator = 1285 {
   struct TargetInfoStruct {
     int8u identifier = 0;
     char_string name = 1;
+  }
+
+  info event TargetUpdated = 0 {
+    TargetInfoStruct targetList[] = 0;
+    int8u currentTarget = 1;
+    octet_string data = 2;
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
@@ -1609,6 +1721,27 @@ cluster TargetNavigator = 1285 {
 cluster MediaPlayback = 1286 {
   revision 1; // NOTE: Default/not specifically set
 
+  enum CharacteristicEnum : enum8 {
+    kForcedSubtitles = 0;
+    kDescribesVideo = 1;
+    kEasyToRead = 2;
+    kFrameBased = 3;
+    kMainProgram = 4;
+    kOriginalContent = 5;
+    kVoiceOverTranslation = 6;
+    kCaption = 7;
+    kSubtitle = 8;
+    kAlternate = 9;
+    kSupplementary = 10;
+    kCommentary = 11;
+    kDubbedTranslation = 12;
+    kDescription = 13;
+    kMetadata = 14;
+    kEnhancedAudioIntelligibility = 15;
+    kEmergency = 16;
+    kKaraoke = 17;
+  }
+
   enum PlaybackStateEnum : enum8 {
     kPlaying = 0;
     kPaused = 1;
@@ -1628,11 +1761,36 @@ cluster MediaPlayback = 1286 {
   bitmap Feature : bitmap32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
+    kTextTracks = 0x3;
+    kAudioTracks = 0x4;
+    kAudioAdvance = 0x5;
+  }
+
+  struct TrackAttributesStruct {
+    char_string<32> languageCode = 0;
+    optional nullable char_string displayName = 1;
+  }
+
+  struct TrackStruct {
+    char_string<32> id = 0;
+    nullable TrackAttributesStruct trackAttributes = 1;
   }
 
   struct PlaybackPositionStruct {
     epoch_us updatedAt = 0;
     nullable int64u position = 1;
+  }
+
+  info event StateChanged = 0 {
+    PlaybackStateEnum currentState = 0;
+    EPOCH_US startTime = 1;
+    INT64U duration = 2;
+    PlaybackPositionStruct sampledPosition = 3;
+    single playbackSpeed = 4;
+    INT64U seekRangeEnd = 5;
+    INT64U seekRangeStart = 6;
+    optional OCTET_STRING data = 7;
+    boolean audioAdvanceUnmuted = 8;
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
@@ -1642,12 +1800,24 @@ cluster MediaPlayback = 1286 {
   readonly attribute optional single playbackSpeed = 4;
   readonly attribute optional nullable int64u seekRangeEnd = 5;
   readonly attribute optional nullable int64u seekRangeStart = 6;
+  readonly attribute optional nullable TrackStruct activeAudioTrack = 7;
+  readonly attribute optional nullable TrackStruct availableAudioTracks[] = 8;
+  readonly attribute optional nullable TrackStruct activeTextTrack = 9;
+  readonly attribute optional nullable TrackStruct availableTextTracks[] = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct RewindRequest {
+    optional boolean audioAdvanceUnmuted = 0;
+  }
+
+  request struct FastForwardRequest {
+    optional boolean audioAdvanceUnmuted = 0;
+  }
 
   request struct SkipForwardRequest {
     int64u deltaPositionMilliseconds = 0;
@@ -1666,6 +1836,15 @@ cluster MediaPlayback = 1286 {
     int64u position = 0;
   }
 
+  request struct ActivateAudioTrackRequest {
+    CHAR_STRING trackID = 0;
+    INT8U audioOutputIndex = 1;
+  }
+
+  request struct ActivateTextTrackRequest {
+    CHAR_STRING trackID = 0;
+  }
+
   /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
   /** Upon receipt, this SHALL pause media. */
@@ -1679,15 +1858,21 @@ cluster MediaPlayback = 1286 {
   /** Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item. */
   command Next(): PlaybackResponse = 5;
   /** Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
-  command Rewind(): PlaybackResponse = 6;
+  command Rewind(RewindRequest): PlaybackResponse = 6;
   /** Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
-  command FastForward(): PlaybackResponse = 7;
+  command FastForward(FastForwardRequest): PlaybackResponse = 7;
   /** Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows: */
   command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
   /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
   /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command Seek(SeekRequest): PlaybackResponse = 11;
+  /** Upon receipt, the server SHALL set the active Audio Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server will return an error status of INVALID_ARGUMENT. */
+  command ActivateAudioTrack(ActivateAudioTrackRequest): DefaultSuccess = 12;
+  /** Upon receipt, the server SHALL set the active Text Track to the one identified by the TrackID in the Track catalog for the streaming media. If the TrackID does not exist in the Track catalog, OR does not correspond to the streaming media OR no media is being streamed at the time of receipt of this command, the server SHALL return an error status of INVALID_ARGUMENT. */
+  command ActivateTextTrack(ActivateTextTrackRequest): DefaultSuccess = 13;
+  /** If a Text Track is active (i.e. being displayed), upon receipt of this command, the server SHALL stop displaying it. */
+  command DeactivateTextTrack(): DefaultSuccess = 14;
 }
 
 /** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
@@ -1889,7 +2074,28 @@ cluster KeypadInput = 1289 {
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 cluster ContentLauncher = 1290 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
+
+  enum CharacteristicEnum : enum8 {
+    kForcedSubtitles = 0;
+    kDescribesVideo = 1;
+    kEasyToRead = 2;
+    kFrameBased = 3;
+    kMainProgram = 4;
+    kOriginalContent = 5;
+    kVoiceOverTranslation = 6;
+    kCaption = 7;
+    kSubtitle = 8;
+    kAlternate = 9;
+    kSupplementary = 10;
+    kCommentary = 11;
+    kDubbedTranslation = 12;
+    kDescription = 13;
+    kMetadata = 14;
+    kEnhancedAudioIntelligibility = 15;
+    kEmergency = 16;
+    kKaraoke = 17;
+  }
 
   enum MetricTypeEnum : enum8 {
     kPixels = 0;
@@ -1911,28 +2117,49 @@ cluster ContentLauncher = 1290 {
     kSportsTeam = 11;
     kType = 12;
     kVideo = 13;
+    kSeason = 14;
+    kEpisode = 15;
+    kAny = 16;
   }
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kURLNotAvailable = 1;
     kAuthFailed = 2;
+    kTextTrackNotAvailable = 3;
+    kAudioTrackNotAvailable = 4;
   }
 
   bitmap Feature : bitmap32 {
     kContentSearch = 0x1;
     kURLPlayback = 0x2;
+    kAdvancedSeek = 0x3;
+    kTextTracks = 0x4;
+    kAudioTracks = 0x5;
   }
 
   bitmap SupportedProtocolsBitmap : bitmap32 {
     kDASH = 0x1;
     kHLS = 0x2;
+    kWebRTC = 0x2;
   }
 
   struct DimensionStruct {
     double width = 0;
     double height = 1;
     MetricTypeEnum metric = 2;
+  }
+
+  struct TrackPreferenceStruct {
+    char_string<32> languageCode = 0;
+    optional CharacteristicEnum characteristics[] = 1;
+    int8u audioOutputIndex = 2;
+  }
+
+  struct PlaybackPreferencesStruct {
+    int64u playbackPosition = 0;
+    TrackPreferenceStruct textTrack = 1;
+    optional TrackPreferenceStruct audioTracks[] = 2;
   }
 
   struct AdditionalInfoStruct {
@@ -1978,6 +2205,8 @@ cluster ContentLauncher = 1290 {
     ContentSearchStruct search = 0;
     boolean autoPlay = 1;
     optional char_string data = 2;
+    optional PlaybackPreferencesStruct playbackPreferences = 3;
+    optional boolean useCurrentContext = 4;
   }
 
   request struct LaunchURLRequest {
@@ -2139,6 +2368,10 @@ cluster ApplicationBasic = 1293 {
 cluster AccountLogin = 1294 {
   revision 1; // NOTE: Default/not specifically set
 
+  critical event LoggedOut = 0 {
+    optional node_id node = 0;
+  }
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2157,6 +2390,11 @@ cluster AccountLogin = 1294 {
   request struct LoginRequest {
     char_string<100> tempAccountIdentifier = 0;
     char_string setupPIN = 1;
+    optional node_id node = 2;
+  }
+
+  request struct LogoutRequest {
+    optional node_id node = 0;
   }
 
   /** Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response. */
@@ -2164,7 +2402,7 @@ cluster AccountLogin = 1294 {
   /** Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active. */
   fabric timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   /** The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session. */
-  fabric timed command Logout(): DefaultSuccess = 3;
+  fabric timed command Logout(LogoutRequest): DefaultSuccess = 3;
 }
 
 endpoint 0 {

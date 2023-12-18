@@ -259,6 +259,26 @@ bool Instance::IsSupportedMode(uint8_t modeValue)
     return false;
 }
 
+CHIP_ERROR Instance::GetModeValueByModeTag(uint16_t modeTagValue, uint8_t & value)
+{
+    ModeTagStructType tagsBuffer[kMaxNumOfModeTags];
+    DataModel::List<ModeTagStructType> mTags(tagsBuffer);
+    for (uint8_t i = 0; mDelegate->GetModeTagsByIndex(i, mTags) != CHIP_ERROR_PROVIDER_LIST_EXHAUSTED; i++)
+    {
+        for (size_t ii = 0; ii < mTags.size(); ii++)
+        {
+            if (mTags[ii].value == modeTagValue)
+            {
+                mDelegate->GetModeValueByIndex(i, value);
+                return CHIP_NO_ERROR;
+            }
+        }
+        mTags = tagsBuffer;
+    }
+    ChipLogDetail(Zcl, "Cannot find a mode with mode tag %x", modeTagValue);
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
 // private methods
 template <typename RequestT, typename FuncT>
 void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)

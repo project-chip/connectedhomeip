@@ -34,7 +34,7 @@ public:
     ICDCheckInSender(Messaging::ExchangeManager * exchangeManager);
     ~ICDCheckInSender(){};
 
-    CHIP_ERROR RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable);
+    CHIP_ERROR RequestResolve(ICDMonitoringEntry & entry, FabricTable * fabricTable, uint32_t counter);
 
     // AddressResolve::NodeListener - notifications when dnssd finds a node IP address
     void OnNodeAddressResolved(const PeerId & peerId, const AddressResolve::ResolveResult & result) override;
@@ -43,6 +43,8 @@ public:
     bool mResolveInProgress = false;
 
 private:
+    static constexpr uint8_t kApplicationDataSize = 2; // ActiveModeThreshold is 2 bytes
+
     CHIP_ERROR SendCheckInMsg(const Transport::PeerAddress & addr);
 
     // This is used when a node address is required.
@@ -50,7 +52,10 @@ private:
 
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
-    Crypto::Aes128KeyHandle mKey = Crypto::Aes128KeyHandle();
+    Crypto::Aes128KeyHandle mAes128KeyHandle   = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle mHmac128KeyHandle = Crypto::Hmac128KeyHandle();
+
+    uint32_t mICDCounter = 0;
 };
 
 } // namespace app

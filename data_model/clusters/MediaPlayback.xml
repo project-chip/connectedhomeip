@@ -67,6 +67,12 @@ Davis, CA 95616, USA
     <feature bit="1" code="VS" name="VariableSpeed" summary="Variable speed playback">
       <optionalConform/>
     </feature>
+    <feature bit="2" code="TT" name="TextTracks" summary="Device or app supports Text Tracks.">
+      <optionalConform/>
+    </feature>
+    <feature bit="3" code="AT" name="AudioTracks" summary="Device or app supports Audio Tracks.">
+      <optionalConform/>
+    </feature>
   </features>
   <dataTypes>
     <enum name="PlaybackStateEnum">
@@ -118,6 +124,86 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </struct>
+    <struct name="TrackStruct">
+      <field id="0" name="ID" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="TrackAttributes" type="TrackAttributesStruct">
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="TrackAttributesStruct">
+      <field id="0" name="LanguageCode" type="string">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+      <field id="1" name="Characteristics" type="list[CharacteristicEnum Type]" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="2" name="DisplayName" type="string" default="null">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </struct>
+
+    <enum name="CharacteristicEnum">
+      <item value="0" name="ForcedSubtitles" summary="Textual information meant for display when no other text representation is selected. It is used to clarify dialogue, alternate languages, texted graphics or location/person IDs that are not otherwise covered in the dubbed/localized audio.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="DescribesVideo" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="EasyToRead" summary="Simplified or reduced captions as specified in [United States Code Title 47 CFR 79.103(c)(9)].">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="FrameBased" summary="A media characteristic that indicates that a track selection option includes frame-based content.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="MainProgram" summary="Main media component(s) which is/are intended for presentation if no other information is provided">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="OriginalContent" summary="A media characteristic that indicates that a track or media selection option contains original content.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="VoiceOverTranslation" summary="A media characteristic that indicates that a track or media selection option contains a language translation and verbal interpretation of spoken dialog.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Caption" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Subtitle" summary="Textual transcriptions of spoken dialog.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="Alternate" summary="Textual media component containing transcriptions of spoken dialog and auditory cues such as sound effects and music for the hearing impaired.">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="Supplementary" summary="Media content component that is supplementary to a media content component of a different media component type.">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Commentary" summary="Experience that contains a commentary (e.g. director’s commentary) (typically audio)">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="DubbedTranslation" summary="Experience that contains an element that is presented in a different language from the original (e.g. dubbed audio, translated captions)">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="Description" summary="Textual or audio media component containing a textual description (intended for audio synthesis) or an audio description describing a visual component">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="Metadata" summary="Media component containing information intended to be processed by application specific elements.">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="EnhancedAudioIntelligibility" summary="Experience containing an element for improved intelligibility of the dialogue.">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="Emergency" summary="Experience that provides information, about a current emergency, that is intended to enable the protection of life, health, safety, and property, and may also include critical details regarding the emergency and how to respond to the emergency.">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="Karaoke" summary="Textual representation of a songs’ lyrics, usually in the same language as the associated song as specified in [SMPTE ST 2067-2].">
+        <mandatoryConform/>
+      </item>
+    </enum>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="CurrentState" type="PlaybackStateEnum">
@@ -169,6 +255,38 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform>
         <feature name="AS"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0007" name="ActiveAudioTrack" type="TrackStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0008" name="AvailableAudioTracks" type="list[TrackStruct Type]" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0009" name="ActiveTextTrack" type="TrackStruct" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x000A" name="AvailableTextTracks" type="list[TrackStruct Type]" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TT"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
@@ -254,5 +372,88 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </field>
     </command>
+    <command id="0x0c" name="ActivateAudioTrack" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="AT"/>
+      </mandatoryConform>
+      <field id="0" name="TrackID" type="string">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="1" name="AudioOutputIndex" type="uint8">
+        <mandatoryConform/>
+        <quality nullable="true"/>
+      </field>
+    </command>
+    <command id="0x0D" name="ActivateTextTrack" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+      <field id="0" name="TrackID" type="string">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+    </command>
+    <command id="0x0D" name="DeactivateTextTrack" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform>
+        <feature name="TT"/>
+      </mandatoryConform>
+    </command>
   </commands>
+  <events>
+    <event id="0x00" name="StateChanged" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0x0000" name="CurrentState" type="PlaybackStateEnum">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0001" name="StartTime" type="epoch-us">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0002" name="Duration" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0003" name="SampledPosition" type="PlaybackPositionStruct">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0004" name="PlaybackSpeed" type="single">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0005" name="SeekRangeEnd" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0006" name="SeekRangeStart" type="uint64">
+        <mandatoryConform>
+          <feature name="AS"/>
+        </mandatoryConform>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0007" name="Data" type="octets">
+        <optionalConform/>
+        <constraint type="maxLength" value="900"/>
+      </field>
+      <field id="0x0008" name="AudioAdvanceUnmuted" type="bool" default="false">
+        <optionalConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

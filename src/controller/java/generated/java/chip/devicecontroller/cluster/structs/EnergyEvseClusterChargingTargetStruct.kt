@@ -24,13 +24,13 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EnergyEvseClusterChargingTargetStruct(
-  val targetTime: UInt,
+  val targetTimeMinutesPastMidnight: UInt,
   val targetSoC: Optional<UInt>,
   val addedEnergy: Optional<Long>
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterChargingTargetStruct {\n")
-    append("\ttargetTime : $targetTime\n")
+    append("\ttargetTimeMinutesPastMidnight : $targetTimeMinutesPastMidnight\n")
     append("\ttargetSoC : $targetSoC\n")
     append("\taddedEnergy : $addedEnergy\n")
     append("}\n")
@@ -39,7 +39,7 @@ class EnergyEvseClusterChargingTargetStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_TARGET_TIME), targetTime)
+      put(ContextSpecificTag(TAG_TARGET_TIME_MINUTES_PAST_MIDNIGHT), targetTimeMinutesPastMidnight)
       if (targetSoC.isPresent) {
         val opttargetSoC = targetSoC.get()
         put(ContextSpecificTag(TAG_TARGET_SO_C), opttargetSoC)
@@ -53,13 +53,14 @@ class EnergyEvseClusterChargingTargetStruct(
   }
 
   companion object {
-    private const val TAG_TARGET_TIME = 0
+    private const val TAG_TARGET_TIME_MINUTES_PAST_MIDNIGHT = 0
     private const val TAG_TARGET_SO_C = 1
     private const val TAG_ADDED_ENERGY = 2
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val targetTime = tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_TIME))
+      val targetTimeMinutesPastMidnight =
+        tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_TIME_MINUTES_PAST_MIDNIGHT))
       val targetSoC =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_SO_C))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TARGET_SO_C)))
@@ -75,7 +76,11 @@ class EnergyEvseClusterChargingTargetStruct(
 
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterChargingTargetStruct(targetTime, targetSoC, addedEnergy)
+      return EnergyEvseClusterChargingTargetStruct(
+        targetTimeMinutesPastMidnight,
+        targetSoC,
+        addedEnergy
+      )
     }
   }
 }

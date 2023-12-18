@@ -123,6 +123,12 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
+    case ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE: // Amperage milliamps
+    case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:  // Energy milliwatt-hours
+    case ZCL_POWER_MW_ATTRIBUTE_TYPE:    // Power milliwatts
+    case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:  // Voltage millivolts
+        return ZCL_INT64S_ATTRIBUTE_TYPE;
+
     case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
     case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
     case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id

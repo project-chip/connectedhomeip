@@ -80,6 +80,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
+
+@interface MTRDevice (Test)
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+@end
 #endif
 
 @interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
@@ -1458,6 +1462,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // can satisfy the test below.
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     __block unsigned eventReportsReceived = 0;
+    __block BOOL reportEnded = NO;
+    __block BOOL gotOneNonPrimingEvent = NO;
+    XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
 
@@ -1472,10 +1479,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             } else if (eventTimeType == MTREventTimeTypeTimestampDate) {
                 XCTAssertNotNil(eventDict[MTREventTimestampDateKey]);
             }
+
+            if (!reportEnded) {
+                NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                XCTAssertTrue(reportIsHistorical.boolValue);
+            } else {
+                if (!gotOneNonPrimingEvent) {
+                    NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                    XCTAssertFalse(reportIsHistorical.boolValue);
+                    gotOneNonPrimingEvent = YES;
+                    [gotNonPrimingEventExpectation fulfill];
+                }
+            }
         }
     };
     delegate.onReportEnd = ^() {
+        reportEnded = YES;
         [gotReportsExpectation fulfill];
+#ifdef DEBUG
+        [device unitTestInjectEventReport:@[ @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date]
+        } ]];
+#endif
     };
 
     [device setDelegate:delegate queue:queue];
@@ -1506,7 +1533,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
 
-    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation, gotNonPrimingEventExpectation ] timeout:60];
 
     delegate.onReportEnd = nil;
 

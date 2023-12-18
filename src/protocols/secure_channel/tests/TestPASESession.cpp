@@ -83,14 +83,23 @@ constexpr Spake2pVerifierSerialized sTestSpake2p01_SerializedVerifier = {
     0xB7, 0xC0, 0x7F, 0xCC, 0x06, 0x27, 0xA1, 0xB8, 0x57, 0x3A, 0x14, 0x9F, 0xCD, 0x1F, 0xA4, 0x66, 0xCF
 };
 
+class TestContext : public chip::Test::LoopbackMessagingContext
+{
+public:
+    // Performs shared setup for all tests in the test suite
+    CHIP_ERROR SetUpTestSuite() override
+    {
+        ConfigInitializeNodes(false);
+        return chip::Test::LoopbackMessagingContext::SetUpTestSuite();
+    }
+};
+
 class PASETestLoopbackTransportDelegate : public Test::LoopbackTransportDelegate
 {
 public:
     void OnMessageDropped() override { mMessageDropped = true; }
     bool mMessageDropped = false;
 };
-
-using TestContext = chip::Test::LoopbackMessagingContext;
 
 class TestSecurePairingDelegate : public SessionEstablishmentDelegate
 {
@@ -509,61 +518,30 @@ void PASEVerifierSerializeTest(nlTestSuite * inSuite, void * inContext)
 
 // Test Suite
 
-/**
- *  Test Suite that lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
-    NL_TEST_DEF("Start",       SecurePairingStartTest),
-    NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
+static const nlTest sTests[] = {
+    NL_TEST_DEF("WaitInit", SecurePairingWaitTest),
+    NL_TEST_DEF("Start", SecurePairingStartTest),
+    NL_TEST_DEF("Handshake", SecurePairingHandshakeTest),
     NL_TEST_DEF("Handshake with Commissioner MRP Parameters", SecurePairingHandshakeWithCommissionerMRPTest),
     NL_TEST_DEF("Handshake with Device MRP Parameters", SecurePairingHandshakeWithDeviceMRPTest),
     NL_TEST_DEF("Handshake with Both MRP Parameters", SecurePairingHandshakeWithAllMRPTest),
     NL_TEST_DEF("Handshake with packet loss", SecurePairingHandshakeWithPacketLossTest),
     NL_TEST_DEF("Failed Handshake", SecurePairingFailedHandshake),
     NL_TEST_DEF("PASE Verifier Serialize", PASEVerifierSerializeTest),
-
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
-
-int TestSecurePairing_Setup(void * inContext);
-int TestSecurePairing_Teardown(void * inContext);
 
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing-PASE",
     &sTests[0],
-    TestSecurePairing_Setup,
-    TestSecurePairing_Teardown,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
-
-// clang-format on
-//
-/**
- *  Set up the test suite.
- */
-int TestSecurePairing_Setup(void * inContext)
-{
-    auto & ctx = *static_cast<TestContext *>(inContext);
-
-    // Initialize System memory and resources
-    ctx.ConfigInitializeNodes(false);
-    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int TestSecurePairing_Teardown(void * inContext)
-{
-    return TestContext::Finalize(inContext);
-}
 
 } // anonymous namespace
 

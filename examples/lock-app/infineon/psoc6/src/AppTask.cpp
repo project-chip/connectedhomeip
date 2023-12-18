@@ -282,7 +282,7 @@ void AppTask::Init()
     if (rc != 0)
     {
         P6_LOG("boot_set_confirmed failed");
-        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+        appError(CHIP_ERROR_UNINITIALIZED);
     }
 #endif
     // Initialise WSTK buttons PB0 and PB1 (including debounce).

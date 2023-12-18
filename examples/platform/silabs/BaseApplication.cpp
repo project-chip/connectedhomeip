@@ -397,13 +397,6 @@ void BaseApplication::LightEventHandler()
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
 
-#ifdef DISPLAY_ENABLED
-        SilabsLCD::DisplayStatus_t status;
-        status.connected   = sIsEnabled && sIsAttached;
-        status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
-        status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
-        slLCD.SetStatus(status);
-#endif
         PlatformMgr().UnlockChipStack();
     }
 
@@ -467,6 +460,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 
             OutputQrCode(false);
 #ifdef DISPLAY_ENABLED
+            UpdateLCDStatusScreen();
             slLCD.CycleScreens();
 #endif
 
@@ -662,6 +656,31 @@ void BaseApplication::LightTimerEventHandler(TimerHandle_t xTimer)
 SilabsLCD & BaseApplication::GetLCD(void)
 {
     return slLCD;
+}
+
+void BaseApplication::UpdateLCDStatusScreen(void)
+{
+    SilabsLCD::DisplayStatus_t status;
+    bool enabled, attached;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#ifdef SL_WIFI
+    enabled  = ConnectivityMgr().IsWiFiStationEnabled();
+    attached = ConnectivityMgr().IsWiFiStationConnected();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
+    enabled  = ConnectivityMgr().IsThreadEnabled();
+    attached = ConnectivityMgr().IsThreadAttached();
+#endif /* CHIP_ENABLE_OPENTHREAD */
+    status.connected   = enabled && attached;
+    status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
+    status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    status.icdMode = (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT)
+        ? SilabsLCD::ICDMode_e::SIT
+        : SilabsLCD::ICDMode_e::LIT;
+#endif
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    slLCD.SetStatus(status);
 }
 #endif
 

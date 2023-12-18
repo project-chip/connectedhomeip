@@ -38,7 +38,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/logging/Constants.h>
 
-static const char * TAG = "app-devicecallbacks";
+static const char TAG[] = "app-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;

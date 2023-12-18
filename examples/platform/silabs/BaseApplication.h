@@ -36,9 +36,7 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#if defined(ENABLE_WSTK_LEDS)
 #include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
 
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
 #include <app/clusters/identify-server/identify-server.h>
@@ -112,6 +110,8 @@ public:
      * @brief Return LCD object
      */
     static SilabsLCD & GetLCD(void);
+
+    static void UpdateLCDStatusScreen(void);
 #endif
 
     /**
