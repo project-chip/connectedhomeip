@@ -230,7 +230,7 @@ tests:
           [1687258513.235238][17561:17563] CHIP:TOO:     NewPosition: 3
           [1687258513.235239][17561:17563] CHIP:TOO:    }
 
-          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the Max NumberOfPositions. 
+          In the current SDK development, Max number of positions are configured as 2, hence the current  test step should fail as its reached more than the Max NumberOfPositions.
           If the DUT supports NumberOfPositions>3, then position should increase to the next level. Below is the sample command to execute to check the CurrentPosition
 
           switch read current-position 1 1

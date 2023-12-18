@@ -136,7 +136,7 @@ tests:
               SubscriptionId: Verify that it is of type uint32.
               MaxInterval: Verify that it is of type uint32.
 
-          4. Verify MaxInterval against SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT: 
+          4. Verify MaxInterval against SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT:
               Compare the MaxInterval value received in the Subscribe Response to the value of SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT.
                 Verify that the MaxInterval value is less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT.
 
