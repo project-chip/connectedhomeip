@@ -50,6 +50,7 @@
 #include <controller/CommissioningWindowOpener.h>
 #include <controller/CurrentFabricRemover.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <controller/SetUpCodePairer.h>
 
 #include <controller/python/ChipDeviceController-ScriptDevicePairingDelegate.h>
 #include <controller/python/ChipDeviceController-ScriptPairingDeviceDiscoveryDelegate.h>
@@ -136,7 +137,7 @@ PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissio
 PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
-                                                    chip::NodeId nodeid);
+                                                    chip::NodeId nodeid, bool networkOnly);
 PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId,
                                                  DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
@@ -398,10 +399,13 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
 }
 
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
-                                                    chip::NodeId nodeid)
+                                                    chip::NodeId nodeid, bool networkOnly)
 {
+    chip::Controller::DiscoveryType discoveryType = chip::Controller::DiscoveryType::kAll;
     sPairingDelegate.SetExpectingPairingComplete(true);
-    return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
+    if (networkOnly)
+        discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
+    return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters, discoveryType));
 }
 
 namespace {

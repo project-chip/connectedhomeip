@@ -7276,26 +7276,26 @@ public static class DeviceEnergyManagementClusterSlotAdjustmentStruct {
   }
 }
 public static class EnergyEvseClusterChargingTargetStruct {
-  public Integer targetTime;
+  public Integer targetTimeMinutesPastMidnight;
   public Optional<Integer> targetSoC;
   public Optional<Long> addedEnergy;
-  private static final long TARGET_TIME_ID = 0L;
+  private static final long TARGET_TIME_MINUTES_PAST_MIDNIGHT_ID = 0L;
   private static final long TARGET_SO_C_ID = 1L;
   private static final long ADDED_ENERGY_ID = 2L;
 
   public EnergyEvseClusterChargingTargetStruct(
-    Integer targetTime,
+    Integer targetTimeMinutesPastMidnight,
     Optional<Integer> targetSoC,
     Optional<Long> addedEnergy
   ) {
-    this.targetTime = targetTime;
+    this.targetTimeMinutesPastMidnight = targetTimeMinutesPastMidnight;
     this.targetSoC = targetSoC;
     this.addedEnergy = addedEnergy;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(TARGET_TIME_ID, new UIntType(targetTime)));
+    values.add(new StructElement(TARGET_TIME_MINUTES_PAST_MIDNIGHT_ID, new UIntType(targetTimeMinutesPastMidnight)));
     values.add(new StructElement(TARGET_SO_C_ID, targetSoC.<BaseTLVType>map((nonOptionaltargetSoC) -> new UIntType(nonOptionaltargetSoC)).orElse(new EmptyType())));
     values.add(new StructElement(ADDED_ENERGY_ID, addedEnergy.<BaseTLVType>map((nonOptionaladdedEnergy) -> new IntType(nonOptionaladdedEnergy)).orElse(new EmptyType())));
 
@@ -7306,14 +7306,14 @@ public static class EnergyEvseClusterChargingTargetStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Integer targetTime = null;
+    Integer targetTimeMinutesPastMidnight = null;
     Optional<Integer> targetSoC = Optional.empty();
     Optional<Long> addedEnergy = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == TARGET_TIME_ID) {
+      if (element.contextTagNum() == TARGET_TIME_MINUTES_PAST_MIDNIGHT_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          targetTime = castingValue.value(Integer.class);
+          targetTimeMinutesPastMidnight = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == TARGET_SO_C_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -7328,7 +7328,7 @@ public static class EnergyEvseClusterChargingTargetStruct {
       }
     }
     return new EnergyEvseClusterChargingTargetStruct(
-      targetTime,
+      targetTimeMinutesPastMidnight,
       targetSoC,
       addedEnergy
     );
@@ -7338,8 +7338,8 @@ public static class EnergyEvseClusterChargingTargetStruct {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("EnergyEvseClusterChargingTargetStruct {\n");
-    output.append("\ttargetTime: ");
-    output.append(targetTime);
+    output.append("\ttargetTimeMinutesPastMidnight: ");
+    output.append(targetTimeMinutesPastMidnight);
     output.append("\n");
     output.append("\ttargetSoC: ");
     output.append(targetSoC);

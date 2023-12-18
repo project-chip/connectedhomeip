@@ -32,6 +32,7 @@ typedef uint32_t AttributeId;
 typedef uint32_t ClusterId;
 typedef uint8_t ClusterStatus;
 typedef uint32_t CommandId;
+typedef uint16_t CommandRef;
 typedef uint64_t CompressedFabricId;
 typedef uint32_t DataVersion;
 typedef uint32_t DeviceTypeId;

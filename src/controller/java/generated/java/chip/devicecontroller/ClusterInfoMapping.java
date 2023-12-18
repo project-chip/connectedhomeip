@@ -3696,13 +3696,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs) {
+    public void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo systemTimeUsResponseValue = new CommandResponseInfo("systemTimeUs", "Long");
-      responseValues.put(systemTimeUsResponseValue, systemTimeUs);
-      CommandResponseInfo UTCTimeUsResponseValue = new CommandResponseInfo("UTCTimeUs", "Long");
-      responseValues.put(UTCTimeUsResponseValue, UTCTimeUs);
+      CommandResponseInfo systemTimeMsResponseValue = new CommandResponseInfo("systemTimeMs", "Long");
+      responseValues.put(systemTimeMsResponseValue, systemTimeMs);
+      CommandResponseInfo posixTimeMsResponseValue = new CommandResponseInfo("posixTimeMs", "Long");
+      responseValues.put(posixTimeMsResponseValue, posixTimeMs);
       callback.onSuccess(responseValues);
     }
 
@@ -10727,6 +10727,69 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedEnergyEvseClusterSessionIDAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionIDAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionDurationAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionDurationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionEnergyChargedAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionEnergyChargedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionEnergyDischargedAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionEnergyDischargedAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {

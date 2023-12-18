@@ -117,8 +117,8 @@ limitations under the License.
 
     <command source="server" code="0x02" name="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
       <description>Response for the TimeSnapshot command.</description>
-      <arg name="SystemTimeUs" type="systime_us" optional="false"/>
-      <arg name="UTCTimeUs" type="epoch_us" isNullable="true" optional="false"/>
+      <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
+      <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
