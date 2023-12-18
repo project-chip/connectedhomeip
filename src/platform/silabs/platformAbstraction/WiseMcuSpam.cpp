@@ -29,9 +29,9 @@ extern "C" {
 #include "em_core.h"
 #include "rsi_board.h"
 #include "sl_event_handler.h"
-#include "sl_system_init.h"
-#include "sl_si91x_led_config.h"
 #include "sl_si91x_led.h"
+#include "sl_si91x_led_config.h"
+#include "sl_system_init.h"
 void soc_pll_config(void);
 }
 
@@ -75,7 +75,8 @@ void SilabsPlatform::InitLed(void)
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     // TODO add range check
-    (state) ? sl_si91x_led_set(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN) : sl_si91x_led_clear(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
+    (state) ? sl_si91x_led_set(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN)
+            : sl_si91x_led_clear(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
     return CHIP_NO_ERROR;
 }
 

@@ -193,7 +193,7 @@ template("siwx917_sdk") {
       "SI91X_SYSRTC_COUNT=1",
       "SSI_ULP_MASTER=1",
       "SL_MEMLCD_EXTCOMIN_PORT=0",
-        "__STATIC_INLINE=static inline",
+      "__STATIC_INLINE=static inline",
       "SL_SI91X_SI917_RAM_MEM_CONFIG=3",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
     ]
@@ -314,8 +314,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
       "${efr32_sdk_root}/platform/common/src/sl_assert.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
-      "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
+      "${efr32_sdk_root}/util/third_party/freertos/cmsis/Source/cmsis_os2.c",
       "${wifi_sdk_root}/components/protocol/wifi/si91x/sl_wifi.c",
 
       # wifi component
@@ -339,24 +339,13 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
 
       # si91x_basic_buffers component
-      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
-
-      "${wifi_sdk_root}/components/common/src/sl_utility.c",
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",
+      "${wifi_sdk_root}/components/common/src/sl_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c",
@@ -379,6 +368,16 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_bus.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sl_si91x_timer.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/src/sli_siwx917_soc.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_callback_framework.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
+      "${wifi_sdk_root}/components/service/network_manager/si91x/sl_net_si91x.c",
 
       # modified hal
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default_common_linker.c",
@@ -395,11 +394,11 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_event_handler.c",
-      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_m4.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_button_instances.c",
       "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/autogen/sl_si91x_led_instances.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
+      "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/led/src/sl_si91x_led.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # mbedtls
