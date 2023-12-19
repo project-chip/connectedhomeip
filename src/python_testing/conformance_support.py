@@ -116,6 +116,15 @@ class provisional:
         return 'P'
 
 
+# Conformance options that apply regardless of the element set of the cluster or device
+BASIC_CONFORMANCE: dict[str, Callable] = {
+    MANDATORY_CONFORM: mandatory(),
+    OPTIONAL_CONFORM: optional(),
+    PROVISIONAL_CONFORM: provisional(),
+    DEPRECATE_CONFORM: deprecated(),
+    DISALLOW_CONFORM: disallowed()}
+
+
 class feature:
     def __init__(self, requiredFeature: uint, code: str):
         self.requiredFeature = requiredFeature
@@ -287,20 +296,20 @@ class otherwise:
         return ', '.join(op_strs)
 
 
+def parse_basic_callable_from_xml(element: ElementTree.Element):
+    if len(list(element)) != 0:
+        raise TypeError("parse_basic_callable_from_xml called for XML element with children")
+    # This will throw a key error if this is not a basic element key.
+    return BASIC_CONFORMANCE[element.tag]
+
+
 def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
     if len(list(element)) == 0:
-        # no subchildren here, so this can only be mandatory, optional, provisional, deprecated, disallowed, feature or attribute
-        if element.tag == MANDATORY_CONFORM:
-            return mandatory()
-        elif element.tag == OPTIONAL_CONFORM:
-            return optional()
-        elif element.tag == PROVISIONAL_CONFORM:
-            return provisional()
-        elif element.tag == DEPRECATE_CONFORM:
-            return deprecated()
-        elif element.tag == DISALLOW_CONFORM:
-            return disallowed()
-        elif element.tag == FEATURE_TAG:
+        try:
+            return parse_basic_callable_from_xml(element)
+        except KeyError:
+            pass
+        if element.tag == FEATURE_TAG:
             try:
                 return feature(params.feature_map[element.get('name')], element.get('name'))
             except KeyError:

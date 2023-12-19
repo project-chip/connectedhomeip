@@ -81,6 +81,9 @@ class XmlDeviceTypeClusterRequirements:
     conformance: Callable[[uint, list[uint], list[uint]], ConformanceDecision]
     # TODO: add element requirements
 
+    def __str__(self):
+        return f'{self.name}: {str(self.conformance)}'
+
 
 @dataclass
 class XmlDeviceType:
@@ -88,10 +91,38 @@ class XmlDeviceType:
     revision: int
     clusters: dict[uint, XmlDeviceTypeClusterRequirements]
 
+    def __str__(self):
+        msg = f'{self.name} - {self.revision}\n'
+        for id, c in self.clusters.items():
+            msg = msg + f'    {id}: {str(c)}\n'
+        return msg
+
 
 class CommandType(Enum):
     ACCEPTED = auto()
     GENERATED = auto()
+
+
+def get_conformance(element: ElementTree.Element) -> ElementTree.Element:
+    for sub in element:
+        if sub.tag == OTHERWISE_CONFORM or sub.tag == MANDATORY_CONFORM or sub.tag == OPTIONAL_CONFORM or sub.tag == PROVISIONAL_CONFORM or sub.tag == DEPRECATE_CONFORM or sub.tag == DISALLOW_CONFORM:
+            return sub
+
+    # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
+    if element.tag == 'feature':
+        location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
+    elif element.tag == 'command':
+        location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
+    elif element.tag == 'attribute':
+        location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(element.attrib['id'], 0))
+    elif element.tag == 'event':
+        location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
+    else:
+        location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
+    self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                        severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
+
+    return ElementTree.Element(OPTIONAL_CONFORM)
 
 
 class ClusterParser:
@@ -117,27 +148,6 @@ class ClusterParser:
         self.params = ConformanceParseParameters(feature_map=self.create_feature_map(), attribute_map=self.create_attribute_map(),
                                                  command_map=self.create_command_map())
 
-    def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
-        for sub in element:
-            if sub.tag == OTHERWISE_CONFORM or sub.tag == MANDATORY_CONFORM or sub.tag == OPTIONAL_CONFORM or sub.tag == PROVISIONAL_CONFORM or sub.tag == DEPRECATE_CONFORM or sub.tag == DISALLOW_CONFORM:
-                return sub
-
-        # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
-        if element.tag == 'feature':
-            location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
-        elif element.tag == 'command':
-            location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
-        elif element.tag == 'attribute':
-            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(element.attrib['id'], 0))
-        elif element.tag == 'event':
-            location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
-        else:
-            location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
-        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
-
-        return ElementTree.Element(OPTIONAL_CONFORM)
-
     def get_all_type(self, type_container: str, type_name: str, key_name: str) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
         ret = []
         container_tags = self._cluster.iter(type_container)
@@ -149,7 +159,7 @@ class ClusterParser:
                 except KeyError:
                     # This is a conformance tag, which uses the same name
                     continue
-                conformance = self.get_conformance(element)
+                conformance = get_conformance(element)
                 ret.append((element, conformance))
         return ret
 
@@ -410,6 +420,9 @@ def build_xml_device_types() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'device_types')
     device_types: dict[str, XmlDeviceType] = {}
     problems = []
+    # Device types can use the same conformance as clusters, but they only use the base types, so it's OK to have empty lists here because they won't get used. There should perhaps be a way to indicate this to the parser.
+    # TODO: move the base conformance OUT of the parser so we don't need the params
+    params = ConformanceParseParameters([], [], [])
     for xml in glob.glob(f"{dir}/*.xml"):
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
@@ -422,6 +435,12 @@ def build_xml_device_types() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             device_types[id] = XmlDeviceType(name=name, revision=revision, clusters={})
             clusters = d.iter('cluster')
             for c in clusters:
-                conformance = self.parse_conformance(self.get_conformance(c))
-                device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
-                    name=c.attrib['name'], conformance=conformance)
+                try:
+                    conformance = parse_callable_from_xml(get_conformance(c), params)
+                    device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
+                        name=c.attrib['name'], conformance=conformance)
+                except ConformanceException as ex:
+                    # TODO: add to problems here
+                    pass
+
+    return problems, device_types
