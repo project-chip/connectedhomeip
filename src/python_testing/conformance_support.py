@@ -28,6 +28,7 @@ PROVISIONAL_CONFORM = 'provisionalConform'
 MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
+ZIGBEE_CONFORM = 'zigbee'
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
@@ -122,7 +123,8 @@ BASIC_CONFORMANCE: dict[str, Callable] = {
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
     DEPRECATE_CONFORM: deprecated(),
-    DISALLOW_CONFORM: disallowed()}
+    DISALLOW_CONFORM: disallowed(),
+    ZIGBEE_CONFORM: zigbee()}
 
 
 class feature:
@@ -325,7 +327,7 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
                 raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
         elif element.tag == COMMAND_TAG:
             return command(params.command_map[element.get('name')], element.get('name'))
-        elif element.tag == CONDITION_TAG and element.get('name').lower() == 'zigbee':
+        elif element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONFORM:
             return zigbee()
         else:
             raise ConformanceException(
