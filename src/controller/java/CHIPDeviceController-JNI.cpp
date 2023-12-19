@@ -939,7 +939,7 @@ JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
         return;
     }
 
-    // Only invoke ICDRegistrationInfoReady when called in response to NetworkScan result
+    // Only invoke ICDRegistrationInfoReady when called in ICDRegistartionInfo stage.
     if (wrapper->Controller()->GetCommissioningStage() == CommissioningStage::kICDGetRegistrationInfo)
     {
         err = wrapper->Controller()->ICDRegistrationInfoReady();
