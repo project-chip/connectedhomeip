@@ -2321,6 +2321,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         }
         info.icdUserActiveModeTriggerHint.ClearAll();
         err = CHIP_NO_ERROR;
+        return err;
     }
 
     activeModeTriggerInstructionRequired = info.icdUserActiveModeTriggerHint.HasAny(
