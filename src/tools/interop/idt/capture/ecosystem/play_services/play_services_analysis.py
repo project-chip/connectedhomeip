@@ -114,7 +114,7 @@ class PlayServicesAnalysis:
             print_and_write(cause.help_message, analysis_file)
         if found and cause.follow_up_causes:
             for follow_up in cause.follow_up_causes:
-                self.check_cause(self, follow_up)
+                self.check_cause(follow_up, analysis_file)
 
     def do_prescriptive_analysis(self, analysis_file: TextIO) -> None:
         print_and_write(add_border("Prescriptive analysis"), analysis_file)
