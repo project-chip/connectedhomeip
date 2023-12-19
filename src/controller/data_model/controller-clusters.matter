@@ -4754,6 +4754,40 @@ provisional cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/** This cluster provides an interface to specify preferences for how devices should consume energy. */
+cluster EnergyPreference = 155 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum EnergyPriorityEnum : enum8 {
+    kComfort = 0;
+    kSpeed = 1;
+    kEfficiency = 2;
+    kWaterConsumption = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnergyBalance = 0x1;
+    kLowPowerModeSensitivity = 0x2;
+  }
+
+  struct BalanceStruct {
+    percent step = 0;
+    optional char_string<64> label = 1;
+  }
+
+  readonly attribute optional BalanceStruct energyBalances[] = 0;
+  attribute optional int8u currentEnergyBalance = 1;
+  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
+  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
+  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
   revision 7;

@@ -103,6 +103,7 @@
 | DemandResponseLoadControl                                           | 0x0096 |
 | DeviceEnergyManagement                                              | 0x0098 |
 | EnergyEvse                                                          | 0x0099 |
+| EnergyPreference                                                    | 0x009B |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -7461,6 +7462,27 @@ public:
 private:
     chip::app::Clusters::EnergyEvse::Commands::ClearTargets::Type mRequest;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster EnergyPreference                                            | 0x009B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * EnergyBalances                                                    | 0x0000 |
+| * CurrentEnergyBalance                                              | 0x0001 |
+| * EnergyPriorities                                                  | 0x0002 |
+| * LowPowerModeSensitivities                                         | 0x0003 |
+| * CurrentLowPowerModeSensitivity                                    | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -19863,6 +19885,86 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterEnergyPreference(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EnergyPreference;
+
+    const char * clusterName = "EnergyPreference";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "energy-balances", Attributes::EnergyBalances::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "current-energy-balance", Attributes::CurrentEnergyBalance::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "energy-priorities", Attributes::EnergyPriorities::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-low-power-mode-sensitivity", Attributes::CurrentLowPowerModeSensitivity::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type>>>(
+            Id, "energy-balances", Attributes::EnergyBalances::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-energy-balance", 0, UINT8_MAX, Attributes::CurrentEnergyBalance::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::EnergyPriorityEnum>>>(
+            Id, "energy-priorities", Attributes::EnergyPriorities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type>>>(
+            Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-low-power-mode-sensitivity", 0, UINT8_MAX,
+                                             Attributes::CurrentLowPowerModeSensitivity::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "energy-balances", Attributes::EnergyBalances::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "current-energy-balance", Attributes::CurrentEnergyBalance::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "energy-priorities", Attributes::EnergyPriorities::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-low-power-mode-sensitivity", Attributes::CurrentLowPowerModeSensitivity::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::DoorLock;
@@ -25414,6 +25516,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterDemandResponseLoadControl(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagement(commands, credsIssuerConfig);
     registerClusterEnergyEvse(commands, credsIssuerConfig);
+    registerClusterEnergyPreference(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);

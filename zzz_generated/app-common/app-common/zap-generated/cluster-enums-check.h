@@ -1771,6 +1771,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
+{
+    using EnumType = EnergyPreference::EnergyPriorityEnum;
+    switch (val)
+    {
+    case EnumType::kComfort:
+    case EnumType::kSpeed:
+    case EnumType::kEfficiency:
+    case EnumType::kWaterConsumption:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

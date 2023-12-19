@@ -39,6 +39,7 @@
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "ENERGY_PREFERENCE_CLUSTER": [],
         "FAN_CONTROL_CLUSTER": [],
         "FAULT_INJECTION_CLUSTER": [],
         "FIXED_LABEL_CLUSTER": [],
@@ -179,6 +180,7 @@
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
         ],
+        "ENERGY_PREFERENCE_CLUSTER": [""],
         "FAN_CONTROL_CLUSTER": ["fan-control-server"],
         "FAULT_INJECTION_CLUSTER": ["fault-injection-server"],
         "FIXED_LABEL_CLUSTER": ["fixed-label-server"],

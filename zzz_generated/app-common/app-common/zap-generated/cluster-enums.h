@@ -2534,6 +2534,30 @@ enum class TargetDayOfWeekBitmap : uint8_t
 };
 } // namespace EnergyEvse
 
+namespace EnergyPreference {
+
+// Enum for EnergyPriorityEnum
+enum class EnergyPriorityEnum : uint8_t
+{
+    kComfort          = 0x00,
+    kSpeed            = 0x01,
+    kEfficiency       = 0x02,
+    kWaterConsumption = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kEnergyBalance           = 0x1,
+    kLowPowerModeSensitivity = 0x2,
+};
+} // namespace EnergyPreference
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

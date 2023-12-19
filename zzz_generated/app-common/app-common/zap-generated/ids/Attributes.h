@@ -3945,6 +3945,56 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace EnergyEvse
 
+namespace EnergyPreference {
+namespace Attributes {
+
+namespace EnergyBalances {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace EnergyBalances
+
+namespace CurrentEnergyBalance {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentEnergyBalance
+
+namespace EnergyPriorities {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace EnergyPriorities
+
+namespace LowPowerModeSensitivities {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace LowPowerModeSensitivities
+
+namespace CurrentLowPowerModeSensitivity {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace CurrentLowPowerModeSensitivity
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace EnergyPreference
+
 namespace DoorLock {
 namespace Attributes {
 

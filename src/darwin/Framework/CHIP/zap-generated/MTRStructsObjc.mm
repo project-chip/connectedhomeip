@@ -5436,6 +5436,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTREnergyPreferenceClusterBalanceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _step = @(0);
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyPreferenceClusterBalanceStruct alloc] init];
+
+    other.step = self.step;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: step:%@; label:%@; >", NSStringFromClass([self class]), _step, _label];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDoorLockClusterCredentialStruct
 - (instancetype)init
 {
