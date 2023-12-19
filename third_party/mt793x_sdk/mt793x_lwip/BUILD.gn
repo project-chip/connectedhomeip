@@ -1,0 +1,44 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/mt793x_sdk.gni")
+
+import("${mt793x_sdk_build_root}/lwip/lwip.gni")
+
+config("lwip_config") {
+  include_dirs = [
+    "${chip_root}/src/lwip/mt793x",
+    "${chip_root}/src/lwip/freertos",
+  ]
+}
+
+lwip_target("lwip") {
+  public = [
+    "${chip_root}/src/lwip/mt793x/arch/cc.h",
+    "${chip_root}/src/lwip/mt793x/arch/perf.h",
+    "${chip_root}/src/lwip/mt793x/lwipopts.h",
+  ]
+
+  sources = []
+
+  public_deps = [
+    "${chip_root}/src/lwip:lwip_buildconfig",
+    "${mt793x_sdk_build_root}:mt793x_sdk",
+  ]
+
+  public_configs = [
+    ":lwip_config",
+    "${chip_root}/src:includes",
+  ]
+}

@@ -8420,8 +8420,8 @@ public:
 namespace TimeSnapshotResponse {
 enum class Fields : uint8_t
 {
-    kSystemTimeUs = 0,
-    kUTCTimeUs    = 1,
+    kSystemTimeMs = 0,
+    kPosixTimeMs  = 1,
 };
 
 struct Type
@@ -8431,8 +8431,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    DataModel::Nullable<uint64_t> UTCTimeUs;
+    uint64_t systemTimeMs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> posixTimeMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -8447,8 +8447,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
-    uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    DataModel::Nullable<uint64_t> UTCTimeUs;
+    uint64_t systemTimeMs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> posixTimeMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TimeSnapshotResponse
@@ -21830,15 +21830,15 @@ namespace Structs {
 namespace ChargingTargetStruct {
 enum class Fields : uint8_t
 {
-    kTargetTime  = 0,
-    kTargetSoC   = 1,
-    kAddedEnergy = 2,
+    kTargetTimeMinutesPastMidnight = 0,
+    kTargetSoC                     = 1,
+    kAddedEnergy                   = 2,
 };
 
 struct Type
 {
 public:
-    uint16_t targetTime = static_cast<uint16_t>(0);
+    uint16_t targetTimeMinutesPastMidnight = static_cast<uint16_t>(0);
     Optional<chip::Percent> targetSoC;
     Optional<int64_t> addedEnergy;
 
@@ -22431,9 +22431,9 @@ struct TypeInfo
 namespace SessionDuration {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionDuration::Id; }
@@ -22443,9 +22443,9 @@ struct TypeInfo
 namespace SessionEnergyCharged {
 struct TypeInfo
 {
-    using Type             = int64_t;
-    using DecodableType    = int64_t;
-    using DecodableArgType = int64_t;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionEnergyCharged::Id; }
@@ -22455,9 +22455,9 @@ struct TypeInfo
 namespace SessionEnergyDischarged {
 struct TypeInfo
 {
-    using Type             = int64_t;
-    using DecodableType    = int64_t;
-    using DecodableArgType = int64_t;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SessionEnergyDischarged::Id; }
@@ -22533,9 +22533,9 @@ struct TypeInfo
         Attributes::BatteryCapacity::TypeInfo::DecodableType batteryCapacity;
         Attributes::VehicleID::TypeInfo::DecodableType vehicleID;
         Attributes::SessionID::TypeInfo::DecodableType sessionID;
-        Attributes::SessionDuration::TypeInfo::DecodableType sessionDuration                 = static_cast<uint32_t>(0);
-        Attributes::SessionEnergyCharged::TypeInfo::DecodableType sessionEnergyCharged       = static_cast<int64_t>(0);
-        Attributes::SessionEnergyDischarged::TypeInfo::DecodableType sessionEnergyDischarged = static_cast<int64_t>(0);
+        Attributes::SessionDuration::TypeInfo::DecodableType sessionDuration;
+        Attributes::SessionEnergyCharged::TypeInfo::DecodableType sessionEnergyCharged;
+        Attributes::SessionEnergyDischarged::TypeInfo::DecodableType sessionEnergyDischarged;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -22724,7 +22724,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    uint32_t sessionID                     = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> sessionID;
     StateEnum state                        = static_cast<StateEnum>(0);
     FaultStateEnum faultStatePreviousState = static_cast<FaultStateEnum>(0);
     FaultStateEnum faultStateCurrentState  = static_cast<FaultStateEnum>(0);
@@ -22739,7 +22739,7 @@ public:
     static constexpr EventId GetEventId() { return Events::Fault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::EnergyEvse::Id; }
 
-    uint32_t sessionID                     = static_cast<uint32_t>(0);
+    DataModel::Nullable<uint32_t> sessionID;
     StateEnum state                        = static_cast<StateEnum>(0);
     FaultStateEnum faultStatePreviousState = static_cast<FaultStateEnum>(0);
     FaultStateEnum faultStateCurrentState  = static_cast<FaultStateEnum>(0);
