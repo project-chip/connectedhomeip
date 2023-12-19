@@ -10,8 +10,8 @@
    <xi:include href="chip/ballast-configuration-cluster.xml" />
    <xi:include href="chip/basic-information-cluster.xml" />
    <xi:include href="chip/binding-cluster.xml" />
-   <xi:include href="chip/boolean-sensor-configuration-cluster.xml" />
    <xi:include href="chip/boolean-state-cluster.xml" />
+   <xi:include href="chip/boolean-state-configuration-cluster.xml" />
    <xi:include href="chip/actions-cluster.xml" />
    <xi:include href="chip/bridged-device-basic-information.xml" />
    <xi:include href="chip/chip-ota.xml" />

@@ -44,6 +44,15 @@ enum class UDCClientProcessingState : uint8_t
 using PeerAddress = ::chip::Transport::PeerAddress;
 
 /**
+ * Represents information in the TargetAppList of the Identification Declaration message
+ */
+struct TargetAppInfo
+{
+    uint16_t vendorId  = 0;
+    uint16_t productId = 0;
+};
+
+/**
  * Defines the handling state of a UDC Client.
  *
  * Information contained within the state:
@@ -99,25 +108,29 @@ public:
     uint16_t GetPairingHint() const { return mPairingHint; }
     void SetPairingHint(uint16_t pairingHint) { mPairingHint = pairingHint; }
 
-    bool GetAppVendorId(size_t index, uint16_t & vid) const
+    bool GetTargetAppInfo(uint8_t index, TargetAppInfo & info) const
     {
-        if (index < mNumAppVendorIds)
+        if (index < mNumTargetAppInfos)
         {
-            vid = mAppVendorIds[index];
+            info.vendorId  = mTargetAppInfos[index].vendorId;
+            info.productId = mTargetAppInfos[index].productId;
             return true;
         }
         return false;
     }
-    size_t GetNumAppVendorIds() const { return mNumAppVendorIds; }
+    size_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
-    void AddAppVendorId(uint16_t vid)
+    bool AddTargetAppInfo(TargetAppInfo vid)
     {
-        if (mNumAppVendorIds >= sizeof(mAppVendorIds))
+        if (mNumTargetAppInfos >= sizeof(mTargetAppInfos))
         {
             // already at max
-            return;
+            return false;
         }
-        mAppVendorIds[mNumAppVendorIds++] = vid;
+        mTargetAppInfos[mNumTargetAppInfos].vendorId  = vid.vendorId;
+        mTargetAppInfos[mNumTargetAppInfos].productId = vid.productId;
+        mNumTargetAppInfos++;
+        return true;
     }
 
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
@@ -183,9 +196,9 @@ private:
     char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
     uint16_t mPairingHint                                         = 0;
 
-    constexpr static size_t kMaxAppVendorIds = 10;
-    size_t mNumAppVendorIds                  = 0; // number of vendor Ids
-    uint16_t mAppVendorIds[kMaxAppVendorIds];
+    constexpr static size_t kMaxTargetAppInfos = 10;
+    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
 
     bool mNoPasscode                = false;
     bool mCdUponPasscodeDialog      = false;

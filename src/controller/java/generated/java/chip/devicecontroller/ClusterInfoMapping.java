@@ -3696,13 +3696,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs) {
+    public void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo systemTimeUsResponseValue = new CommandResponseInfo("systemTimeUs", "Long");
-      responseValues.put(systemTimeUsResponseValue, systemTimeUs);
-      CommandResponseInfo UTCTimeUsResponseValue = new CommandResponseInfo("UTCTimeUs", "Long");
-      responseValues.put(UTCTimeUsResponseValue, UTCTimeUs);
+      CommandResponseInfo systemTimeMsResponseValue = new CommandResponseInfo("systemTimeMs", "Long");
+      responseValues.put(systemTimeMsResponseValue, systemTimeMs);
+      CommandResponseInfo posixTimeMsResponseValue = new CommandResponseInfo("posixTimeMs", "Long");
+      responseValues.put(posixTimeMsResponseValue, posixTimeMs);
       callback.onSuccess(responseValues);
     }
 
@@ -9672,7 +9672,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBooleanSensorConfigurationClusterGeneratedCommandListAttributeCallback implements ChipClusters.BooleanSensorConfigurationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBooleanStateConfigurationClusterGeneratedCommandListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9693,7 +9693,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBooleanSensorConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.BooleanSensorConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBooleanStateConfigurationClusterAcceptedCommandListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9714,7 +9714,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBooleanSensorConfigurationClusterEventListAttributeCallback implements ChipClusters.BooleanSensorConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBooleanStateConfigurationClusterEventListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.EventListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -9735,7 +9735,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedBooleanSensorConfigurationClusterAttributeListAttributeCallback implements ChipClusters.BooleanSensorConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedBooleanStateConfigurationClusterAttributeListAttributeCallback implements ChipClusters.BooleanStateConfigurationCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -10727,6 +10727,69 @@ public class ClusterInfoMapping {
   }
 
   public static class DelegatedEnergyEvseClusterSessionIDAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionIDAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionDurationAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionDurationAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionEnergyChargedAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionEnergyChargedAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyEvseClusterSessionEnergyDischargedAttributeCallback implements ChipClusters.EnergyEvseCluster.SessionEnergyDischargedAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -19483,9 +19546,9 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.ActivatedCarbonFilterMonitoringCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInfo);
 
-    ClusterInfo booleanSensorConfigurationClusterInfo = new ClusterInfo(
-      (ptr, endpointId) -> new ChipClusters.BooleanSensorConfigurationCluster(ptr, endpointId), new HashMap<>());
-    clusterMap.put("booleanSensorConfiguration", booleanSensorConfigurationClusterInfo);
+    ClusterInfo booleanStateConfigurationClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.BooleanStateConfigurationCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("booleanStateConfiguration", booleanStateConfigurationClusterInfo);
 
     ClusterInfo valveConfigurationAndControlClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ValveConfigurationAndControlCluster(ptr, endpointId), new HashMap<>());
@@ -19746,7 +19809,7 @@ public class ClusterInfoMapping {
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
     destination.get("activatedCarbonFilterMonitoring").combineCommands(source.get("activatedCarbonFilterMonitoring"));
-    destination.get("booleanSensorConfiguration").combineCommands(source.get("booleanSensorConfiguration"));
+    destination.get("booleanStateConfiguration").combineCommands(source.get("booleanStateConfiguration"));
     destination.get("valveConfigurationAndControl").combineCommands(source.get("valveConfigurationAndControl"));
     destination.get("electricalEnergyMeasurement").combineCommands(source.get("electricalEnergyMeasurement"));
     destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
@@ -22600,26 +22663,43 @@ public class ClusterInfoMapping {
 
     commandMap.put("activatedCarbonFilterMonitoring", activatedCarbonFilterMonitoringClusterInteractionInfoMap);
 
-    Map<String, InteractionInfo> booleanSensorConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, InteractionInfo> booleanStateConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> booleanStateConfigurationsuppressAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
-    booleanSensorConfigurationsuppressRequestCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo);
-    InteractionInfo booleanSensorConfigurationsuppressRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo booleanStateConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
+    booleanStateConfigurationsuppressAlarmCommandParams.put("alarmsToSuppress",booleanStateConfigurationsuppressAlarmalarmsToSuppressCommandParameterInfo);
+    InteractionInfo booleanStateConfigurationsuppressAlarmInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
-        .suppressRequest((DefaultClusterCallback) callback
+        ((ChipClusters.BooleanStateConfigurationCluster) cluster)
+        .suppressAlarm((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("alarmsToSuppress")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        booleanSensorConfigurationsuppressRequestCommandParams
+        booleanStateConfigurationsuppressAlarmCommandParams
     );
-    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressRequest", booleanSensorConfigurationsuppressRequestInteractionInfo);
+    booleanStateConfigurationClusterInteractionInfoMap.put("suppressAlarm", booleanStateConfigurationsuppressAlarmInteractionInfo);
 
-    commandMap.put("booleanSensorConfiguration", booleanSensorConfigurationClusterInteractionInfoMap);
+    Map<String, CommandParameterInfo> booleanStateConfigurationenableDisableAlarmCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo booleanStateConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo = new CommandParameterInfo("alarmsToEnableDisable", Integer.class, Integer.class);
+    booleanStateConfigurationenableDisableAlarmCommandParams.put("alarmsToEnableDisable",booleanStateConfigurationenableDisableAlarmalarmsToEnableDisableCommandParameterInfo);
+    InteractionInfo booleanStateConfigurationenableDisableAlarmInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.BooleanStateConfigurationCluster) cluster)
+        .enableDisableAlarm((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("alarmsToEnableDisable")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        booleanStateConfigurationenableDisableAlarmCommandParams
+    );
+    booleanStateConfigurationClusterInteractionInfoMap.put("enableDisableAlarm", booleanStateConfigurationenableDisableAlarmInteractionInfo);
+
+    commandMap.put("booleanStateConfiguration", booleanStateConfigurationClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> valveConfigurationAndControlClusterInteractionInfoMap = new LinkedHashMap<>();
 

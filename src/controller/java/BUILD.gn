@@ -371,6 +371,7 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/MatterControllerImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/SubscriptionStates.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]
