@@ -90,7 +90,7 @@ class EcosystemCapture(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def analyze_real_time(self) -> None:
+    async def analyze_capture(self) -> None:
         """
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem in real time
         Must be async aware and not interact with stdin
@@ -103,13 +103,6 @@ class EcosystemCapture(ABC):
         Stop the capture and pull any artifacts from remote devices
         Write artifacts to artifact_dir passed on instantiation
         Platform is already stopped
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    async def analyze_post(self, existing_artifact_dir: str) -> None:
-        """
-        Same as analyze_real_time but run on an existing capture as post analysis
         """
         raise NotImplementedError
 

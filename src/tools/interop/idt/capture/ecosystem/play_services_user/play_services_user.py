@@ -68,7 +68,7 @@ class PlayServicesUser(EcosystemCapture):
             logger.info(s)
             self.output += f"{s}\n"
 
-    async def analyze_real_time(self) -> None:
+    async def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
         try:
             self.logcat_fd = open(self.logcat_stream.logcat_artifact, "r")
@@ -81,10 +81,6 @@ class PlayServicesUser(EcosystemCapture):
             self.logger.info("Closing logcat stream")
             if self.logcat_fd is not None:
                 self.logcat_fd.close()
-
-    async def analyze_post(self, existing_artifact_dir: str) -> None:
-        # TODO: Implement
-        raise NotImplementedError
 
     def show_analysis(self) -> None:
         with open(self.analysis_file, "w") as analysis_file:

@@ -167,7 +167,7 @@ async def run_analyzers():
         monitor_tasks[platform_name].add_done_callback(sub_task_error_tracker_done_callback)
     for ecosystem_name, ecosystem in _ECOSYSTEM_MAP.items():
         logger.info(f"Creating analysis task for {ecosystem_name}")
-        analysis_tasks[ecosystem_name] = asyncio.create_task(ecosystem.analyze_real_time())
+        analysis_tasks[ecosystem_name] = asyncio.create_task(ecosystem.analyze_capture())
         setattr(analysis_tasks[ecosystem_name], "error_tracking_name", ecosystem_name)
         analysis_tasks[ecosystem_name].add_done_callback(sub_task_error_tracker_done_callback)
     logger.info("Done creating analysis tasks")

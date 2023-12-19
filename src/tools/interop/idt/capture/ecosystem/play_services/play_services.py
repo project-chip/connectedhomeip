@@ -95,7 +95,7 @@ class PlayServices(EcosystemCapture):
             self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
 
-    async def analyze_real_time(self):
+    async def analyze_capture(self):
         try:
             self.logcat_file = open(self.logcat_stream.logcat_artifact, "r")
             while True:
@@ -109,9 +109,6 @@ class PlayServices(EcosystemCapture):
 
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
-
-    async def analyze_post(self, existing_artifact_dir: str) -> None:
-        raise NotImplementedError
 
     async def probe_capture(self) -> None:
         if config.enable_probers:

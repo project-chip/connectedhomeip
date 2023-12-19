@@ -180,40 +180,7 @@ class InteropDebuggingTool:
         output_zip = shutil.move(archive_file, self.artifact_dir_parent)
         border_print(f'Output zip: {output_zip}')
 
-    @staticmethod
-    def search_for_analyze_path(provided_path: str) -> str:
-
-        path = provided_path
-        if os.path.exists(path):
-            border_print(f"{path} found, using as is!", important=True)
-            return path
-        else:
-            border_print(f"{path} does not exist, checking relative path!")
-
-        path = os.path.join(os.path.dirname(__file__), path)
-        if os.path.exists(path):
-            border_print(f"{path} relative path found, using!")
-            return path
-        else:
-            border_print(f"Relative path {path} not found, checking artifact dir relative path!")
-
-        path = os.path.join(os.environ['IDT_OUTPUT_DIR'], provided_path)
-        if os.path.exists(path):
-            border_print(f"{path} relative artifact dir path found, using!")
-            return path
-        else:
-            border_print(f"Relative artifact dir path {path} not found!")
-
-        border_print(f"Exhausted all path searches, {provided_path} not found! Exiting!", important=True)
-        sys.exit(1)
-
     def command_capture(self, args: argparse.Namespace) -> None:
-        if args.analyze:
-            border_print("Executing post analysis only!")
-            path = self.search_for_analyze_path(args.analyze)
-            # TODO: Implement
-            return
-
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)

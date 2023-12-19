@@ -31,8 +31,5 @@ class DemoExtEcosystem(EcosystemCapture):
     async def stop_capture(self) -> None:
         print("Stop capture " + self.message)
 
-    async def analyze_real_time(self) -> None:
+    async def analyze_capture(self) -> None:
         print("Analyze capture real time" + self.message)
-
-    async def analyze_post(self, existing_artifact_dir: str) -> None:
-        print("Analyze capture post" + self.message)
