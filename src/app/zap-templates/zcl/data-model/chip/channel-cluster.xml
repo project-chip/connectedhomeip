@@ -61,7 +61,7 @@ limitations under the License.
       <arg name="Data" type="octet_string" optional="true"/>
     </command>
 
-    <command source="server" code="0x05" name="ProgramGuideResponse" optional="true">
+    <command source="server" code="0x05" name="ProgramGuideResponse" optional="true" apiMaturity="provisional">
       <description>This command is a response to the GetProgramGuide command.</description>
       <arg name="Paging" type="ChannelPagingStruct"/>
       <arg name="ProgramList" type="ProgramStruct" array="true"/>
