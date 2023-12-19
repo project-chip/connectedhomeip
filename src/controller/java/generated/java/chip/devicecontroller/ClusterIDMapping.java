@@ -15941,7 +15941,9 @@ public class ClusterIDMapping {
             TimedInvokeRequest(18L),
             TestSimpleOptionalArgumentRequest(19L),
             TestEmitTestEventRequest(20L),
-            TestEmitTestFabricScopedEventRequest(21L),;
+            TestEmitTestFabricScopedEventRequest(21L),
+            TestBatchHelperRequest(22L),
+            TestSecondBatchHelperRequest(23L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -16242,6 +16244,40 @@ public class ClusterIDMapping {
                     }
                     public static TestEmitTestFabricScopedEventRequestCommandField value(int id) throws NoSuchFieldError {
                         for (TestEmitTestFabricScopedEventRequestCommandField field : TestEmitTestFabricScopedEventRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestBatchHelperRequestCommandField field : TestBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestSecondBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestSecondBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestSecondBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestSecondBatchHelperRequestCommandField field : TestSecondBatchHelperRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

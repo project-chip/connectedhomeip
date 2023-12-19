@@ -27044,6 +27044,40 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace TestListNestedStructListArgumentRequest.
+namespace TestBatchHelperResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kBuffer), buffer);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kBuffer))
+        {
+            err = DataModel::Decode(reader, buffer);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace TestBatchHelperResponse.
 namespace TestListInt8UReverseRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -27406,6 +27440,94 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace TestEmitTestFabricScopedEventRequest.
+namespace TestBatchHelperRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSleepBeforeResponseTimeMs), sleepBeforeResponseTimeMs);
+    encoder.Encode(to_underlying(Fields::kSizeOfResponseBuffer), sizeOfResponseBuffer);
+    encoder.Encode(to_underlying(Fields::kFillCharacter), fillCharacter);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSleepBeforeResponseTimeMs))
+        {
+            err = DataModel::Decode(reader, sleepBeforeResponseTimeMs);
+        }
+        else if (__context_tag == to_underlying(Fields::kSizeOfResponseBuffer))
+        {
+            err = DataModel::Decode(reader, sizeOfResponseBuffer);
+        }
+        else if (__context_tag == to_underlying(Fields::kFillCharacter))
+        {
+            err = DataModel::Decode(reader, fillCharacter);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace TestBatchHelperRequest.
+namespace TestSecondBatchHelperRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSleepBeforeResponseTimeMs), sleepBeforeResponseTimeMs);
+    encoder.Encode(to_underlying(Fields::kSizeOfResponseBuffer), sizeOfResponseBuffer);
+    encoder.Encode(to_underlying(Fields::kFillCharacter), fillCharacter);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSleepBeforeResponseTimeMs))
+        {
+            err = DataModel::Decode(reader, sleepBeforeResponseTimeMs);
+        }
+        else if (__context_tag == to_underlying(Fields::kSizeOfResponseBuffer))
+        {
+            err = DataModel::Decode(reader, sizeOfResponseBuffer);
+        }
+        else if (__context_tag == to_underlying(Fields::kFillCharacter))
+        {
+            err = DataModel::Decode(reader, fillCharacter);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace TestSecondBatchHelperRequest.
 } // namespace Commands
 
 namespace Attributes {
