@@ -53,6 +53,11 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
+bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
+{
+    return mOptionalCmds.Has(aOptionalCmds);
+}
+
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
