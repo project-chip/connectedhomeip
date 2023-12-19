@@ -85,6 +85,7 @@ class PlayServicesAnalysis:
             self.fail_trace_line_counter += 1
         if 'SetupDeviceView' and 'Commissioning failed' in line:
             self.logger.info(line)
+            self.logger.warning("Failure detected, you may want to stop the capture now!")
             self.fail_trace_line_counter = 0
             self.failure_stack_trace += line
 
@@ -125,6 +126,7 @@ class PlayServicesAnalysis:
         analysis_file = open(self.analysis_file_name, mode="w+")
         print_and_write(add_border('Matter commissioner logs'), analysis_file)
         print_and_write(self.matter_commissioner_logs, analysis_file)
+        # TODO: Tell user failure detected capture can end
         print_and_write(
             add_border('Commissioning failure stack trace'),
             analysis_file)
