@@ -30,7 +30,10 @@
         </method>
         <method name="AddBlob">
             <arg name="name" type="s" direction="in" />
-            <arg name="data" type="ay" direction="in" />
+            <arg name="data" type="ay" direction="in">
+                <!-- gdbus-codegen maps "ay" to `gchar *` by default, which truncates at NUL bytes -->
+                <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
+            </arg>
         </method>
         <method name="GetBlob">
             <arg name="name" type="s" direction="in" />

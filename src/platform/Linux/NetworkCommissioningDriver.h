@@ -17,7 +17,12 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+
 #include <vector>
 
 namespace chip {
@@ -103,6 +108,17 @@ public:
         return supportedBands;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    bool SupportsPerDeviceCredentials() override { return true; };
+    CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity, Optional<uint8_t> clientIdentityNetworkIndex,
+                                         Status & outStatus, MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
+                                         uint8_t & outNetworkIndex) override;
+    CHIP_ERROR GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity) override;
+    CHIP_ERROR GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity) override;
+    CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                      Crypto::P256ECDSASignature & outSignature) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
 private:
     struct WiFiNetwork
     {
@@ -116,6 +132,20 @@ private:
         uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
         uint8_t credentialsLen = 0;
         static_assert(std::numeric_limits<decltype(credentialsLen)>::max() >= sizeof(credentials));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+        bool UsingPDC() const { return networkIdentityLen != 0; }
+
+        uint8_t networkIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t networkIdentityLen = 0;
+        static_assert(std::numeric_limits<decltype(networkIdentityLen)>::max() >= sizeof(networkIdentity));
+
+        uint8_t clientIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t clientIdentityLen = 0;
+        static_assert(std::numeric_limits<decltype(clientIdentityLen)>::max() >= sizeof(clientIdentity));
+
+        Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
     WiFiNetwork mSavedNetwork;

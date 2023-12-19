@@ -129,8 +129,15 @@ public:
     {
         mpStatusChangeCallback = statusChangeCallback;
     }
+
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    CHIP_ERROR ConnectWiFiNetworkWithPDCAsync(ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity,
+                                              const Crypto::P256Keypair & clientIdentityKeypair,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
     void PostNetworkConnect();
     CHIP_ERROR CommitConfig();
 
@@ -145,6 +152,9 @@ public:
     CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 
 private:
+    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
+                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
+        CHIP_REQUIRES(mWpaSupplicantMutex);
     static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
 #endif
 
