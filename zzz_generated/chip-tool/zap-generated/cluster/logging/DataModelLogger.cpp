@@ -5532,6 +5532,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ValveLevel", indent + 1, value.valveLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ValveLevel'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -11642,6 +11650,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OpenDuration", 1, value);
         }
+        case ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultOpenDuration", 1, value);
+        }
         case ValveConfigurationAndControl::Attributes::AutoCloseTime::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11662,11 +11675,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TargetState", 1, value);
         }
-        case ValveConfigurationAndControl::Attributes::StartUpState::Id: {
-            chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpState", 1, value);
-        }
         case ValveConfigurationAndControl::Attributes::CurrentLevel::Id: {
             chip::app::DataModel::Nullable<chip::Percent> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11677,10 +11685,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TargetLevel", 1, value);
         }
-        case ValveConfigurationAndControl::Attributes::OpenLevel::Id: {
-            chip::app::DataModel::Nullable<chip::Percent> value;
+        case ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id: {
+            chip::Percent value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OpenLevel", 1, value);
+            return DataModelLogger::LogValue("DefaultOpenLevel", 1, value);
         }
         case ValveConfigurationAndControl::Attributes::ValveFault::Id: {
             chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value;

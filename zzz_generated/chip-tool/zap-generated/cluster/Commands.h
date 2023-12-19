@@ -6480,18 +6480,17 @@ private:
 | Commands:                                                           |        |
 | * Open                                                              |   0x00 |
 | * Close                                                             |   0x01 |
-| * SetLevel                                                          |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OpenDuration                                                      | 0x0000 |
-| * AutoCloseTime                                                     | 0x0001 |
-| * RemainingDuration                                                 | 0x0002 |
-| * CurrentState                                                      | 0x0003 |
-| * TargetState                                                       | 0x0004 |
-| * StartUpState                                                      | 0x0005 |
+| * DefaultOpenDuration                                               | 0x0001 |
+| * AutoCloseTime                                                     | 0x0002 |
+| * RemainingDuration                                                 | 0x0003 |
+| * CurrentState                                                      | 0x0004 |
+| * TargetState                                                       | 0x0005 |
 | * CurrentLevel                                                      | 0x0006 |
 | * TargetLevel                                                       | 0x0007 |
-| * OpenLevel                                                         | 0x0008 |
+| * DefaultOpenLevel                                                  | 0x0008 |
 | * ValveFault                                                        | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -6514,6 +6513,7 @@ public:
     ValveConfigurationAndControlOpen(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("open", credsIssuerConfig)
     {
         AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
+        AddArgument("TargetLevel", 0, UINT8_MAX, &mRequest.targetLevel);
         ClusterCommand::AddArguments();
     }
 
@@ -6576,45 +6576,6 @@ public:
 
 private:
     chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::Type mRequest;
-};
-
-/*
- * Command SetLevel
- */
-class ValveConfigurationAndControlSetLevel : public ClusterCommand
-{
-public:
-    ValveConfigurationAndControlSetLevel(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-level", credsIssuerConfig)
-    {
-        AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
-        AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -19322,23 +19283,22 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),     //
-        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig),    //
-        make_unique<ValveConfigurationAndControlSetLevel>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),  //
+        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -19348,7 +19308,10 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
-            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "default-open-duration", 0, UINT32_MAX,
+                                                                              Attributes::DefaultOpenDuration::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "auto-close-time", 0, UINT64_MAX,
                                                                               Attributes::AutoCloseTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19361,14 +19324,12 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<
             WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>>(
             Id, "target-state", 0, UINT8_MAX, Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>(
-            Id, "start-up-state", 0, UINT8_MAX, Attributes::StartUpState::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "current-level", 0, UINT8_MAX, Attributes::CurrentLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "target-level", 0, UINT8_MAX, Attributes::TargetLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
-            Id, "open-level", 0, UINT8_MAX, Attributes::OpenLevel::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "default-open-level", 0, UINT8_MAX, Attributes::DefaultOpenLevel::Id,
+                                                   WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>>(
             Id, "valve-fault", 0, UINT16_MAX, Attributes::ValveFault::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -19386,14 +19347,14 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //

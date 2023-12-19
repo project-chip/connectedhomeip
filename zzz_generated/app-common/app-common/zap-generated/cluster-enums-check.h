@@ -1508,16 +1508,28 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::StatusCodeEnum val)
+{
+    using EnumType = ValveConfigurationAndControl::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kFailureDueToFault:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
 {
     using EnumType = ValveConfigurationAndControl::ValveStateEnum;
     switch (val)
     {
-    case EnumType::kOpen:
     case EnumType::kClosed:
+    case EnumType::kOpen:
+    case EnumType::kTransitioning:
         return val;
     default:
-        return static_cast<EnumType>(2);
+        return static_cast<EnumType>(3);
     }
 }
 

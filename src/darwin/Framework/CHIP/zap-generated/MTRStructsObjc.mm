@@ -4266,6 +4266,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _valveState = @(0);
+
+        _valveLevel = nil;
     }
     return self;
 }
@@ -4275,13 +4277,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRValveConfigurationAndControlClusterValveStateChangedEvent alloc] init];
 
     other.valveState = self.valveState;
+    other.valveLevel = self.valveLevel;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; >", NSStringFromClass([self class]), _valveState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; valveLevel:%@; >", NSStringFromClass([self class]), _valveState, _valveLevel];
     return descriptionString;
 }
 

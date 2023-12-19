@@ -3582,25 +3582,25 @@ namespace OpenDuration {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace OpenDuration
 
-namespace AutoCloseTime {
+namespace DefaultOpenDuration {
 static constexpr AttributeId Id = 0x00000001;
+} // namespace DefaultOpenDuration
+
+namespace AutoCloseTime {
+static constexpr AttributeId Id = 0x00000002;
 } // namespace AutoCloseTime
 
 namespace RemainingDuration {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace RemainingDuration
 
 namespace CurrentState {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace CurrentState
 
 namespace TargetState {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace TargetState
-
-namespace StartUpState {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace StartUpState
+} // namespace TargetState
 
 namespace CurrentLevel {
 static constexpr AttributeId Id = 0x00000006;
@@ -3610,9 +3610,9 @@ namespace TargetLevel {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace TargetLevel
 
-namespace OpenLevel {
+namespace DefaultOpenLevel {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace OpenLevel
+} // namespace DefaultOpenLevel
 
 namespace ValveFault {
 static constexpr AttributeId Id = 0x00000009;

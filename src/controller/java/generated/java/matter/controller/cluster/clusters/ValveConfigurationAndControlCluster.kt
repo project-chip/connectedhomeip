@@ -57,6 +57,16 @@ class ValveConfigurationAndControlCluster(
     object SubscriptionEstablished : OpenDurationAttributeSubscriptionState()
   }
 
+  class DefaultOpenDurationAttribute(val value: UInt?)
+
+  sealed class DefaultOpenDurationAttributeSubscriptionState {
+    data class Success(val value: UInt?) : DefaultOpenDurationAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : DefaultOpenDurationAttributeSubscriptionState()
+
+    object SubscriptionEstablished : DefaultOpenDurationAttributeSubscriptionState()
+  }
+
   class AutoCloseTimeAttribute(val value: ULong?)
 
   sealed class AutoCloseTimeAttributeSubscriptionState {
@@ -117,16 +127,6 @@ class ValveConfigurationAndControlCluster(
     object SubscriptionEstablished : TargetLevelAttributeSubscriptionState()
   }
 
-  class OpenLevelAttribute(val value: UByte?)
-
-  sealed class OpenLevelAttributeSubscriptionState {
-    data class Success(val value: UByte?) : OpenLevelAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : OpenLevelAttributeSubscriptionState()
-
-    object SubscriptionEstablished : OpenLevelAttributeSubscriptionState()
-  }
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -167,7 +167,7 @@ class ValveConfigurationAndControlCluster(
     object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
   }
 
-  suspend fun open(openDuration: UInt?, timedInvokeTimeout: Duration? = null) {
+  suspend fun open(openDuration: UInt?, targetLevel: UByte?, timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
 
     val tlvWriter = TlvWriter()
@@ -175,6 +175,9 @@ class ValveConfigurationAndControlCluster(
 
     val TAG_OPEN_DURATION_REQ: Int = 0
     openDuration?.let { tlvWriter.put(ContextSpecificTag(TAG_OPEN_DURATION_REQ), openDuration) }
+
+    val TAG_TARGET_LEVEL_REQ: Int = 1
+    targetLevel?.let { tlvWriter.put(ContextSpecificTag(TAG_TARGET_LEVEL_REQ), targetLevel) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -193,30 +196,6 @@ class ValveConfigurationAndControlCluster(
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-  }
-
-  suspend fun setLevel(level: UByte, openDuration: UInt?, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 2u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_LEVEL_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_LEVEL_REQ), level)
-
-    val TAG_OPEN_DURATION_REQ: Int = 1
-    openDuration?.let { tlvWriter.put(ContextSpecificTag(TAG_OPEN_DURATION_REQ), openDuration) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -265,46 +244,6 @@ class ValveConfigurationAndControlCluster(
       }
 
     return OpenDurationAttribute(decodedValue)
-  }
-
-  suspend fun writeOpenDurationAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 0u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timedWriteTimeout
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
   }
 
   suspend fun subscribeOpenDurationAttribute(
@@ -363,8 +302,143 @@ class ValveConfigurationAndControlCluster(
     }
   }
 
-  suspend fun readAutoCloseTimeAttribute(): AutoCloseTimeAttribute {
+  suspend fun readDefaultOpenDurationAttribute(): DefaultOpenDurationAttribute {
     val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Defaultopenduration attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UInt? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUInt(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return DefaultOpenDurationAttribute(decodedValue)
+  }
+
+  suspend fun writeDefaultOpenDurationAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timedWriteTimeout
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeDefaultOpenDurationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<DefaultOpenDurationAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 1u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            DefaultOpenDurationAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Defaultopenduration attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(DefaultOpenDurationAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(DefaultOpenDurationAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAutoCloseTimeAttribute(): AutoCloseTimeAttribute {
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -408,7 +482,7 @@ class ValveConfigurationAndControlCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<AutoCloseTimeAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -465,7 +539,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readRemainingDurationAttribute(): RemainingDurationAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -492,11 +566,7 @@ class ValveConfigurationAndControlCluster(
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UInt? =
       if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUInt(AnonymousTag)
-        } else {
-          null
-        }
+        tlvReader.getUInt(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
@@ -509,7 +579,7 @@ class ValveConfigurationAndControlCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<RemainingDurationAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -548,11 +618,7 @@ class ValveConfigurationAndControlCluster(
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UInt? =
             if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUInt(AnonymousTag)
-              } else {
-                null
-              }
+              tlvReader.getUInt(AnonymousTag)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
@@ -568,7 +634,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readCurrentStateAttribute(): CurrentStateAttribute {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -608,7 +674,7 @@ class ValveConfigurationAndControlCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<CurrentStateAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -661,7 +727,7 @@ class ValveConfigurationAndControlCluster(
   }
 
   suspend fun readTargetStateAttribute(): TargetStateAttribute {
-    val ATTRIBUTE_ID: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -701,7 +767,7 @@ class ValveConfigurationAndControlCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<TargetStateAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -748,137 +814,6 @@ class ValveConfigurationAndControlCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(TargetStateAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readStartUpStateAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 5u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Startupstate attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun writeStartUpStateAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 5u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded()
-            )
-          ),
-        timedRequest = timedWriteTimeout
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeStartUpStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 5u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Startupstate attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -1086,7 +1021,7 @@ class ValveConfigurationAndControlCluster(
     }
   }
 
-  suspend fun readOpenLevelAttribute(): OpenLevelAttribute {
+  suspend fun readDefaultOpenLevelAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
@@ -1108,26 +1043,21 @@ class ValveConfigurationAndControlCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Openlevel attribute not found in response" }
+    requireNotNull(attributeData) { "Defaultopenlevel attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return OpenLevelAttribute(decodedValue)
+    return decodedValue
   }
 
-  suspend fun writeOpenLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+  suspend fun writeDefaultOpenLevelAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
 
     val tlvWriter = TlvWriter()
@@ -1167,10 +1097,10 @@ class ValveConfigurationAndControlCluster(
     }
   }
 
-  suspend fun subscribeOpenLevelAttribute(
+  suspend fun subscribeDefaultOpenLevelAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Flow<OpenLevelAttributeSubscriptionState> {
+  ): Flow<UByteSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
       listOf(
@@ -1189,7 +1119,7 @@ class ValveConfigurationAndControlCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            OpenLevelAttributeSubscriptionState.Error(
+            UByteSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -1202,26 +1132,23 @@ class ValveConfigurationAndControlCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Openlevel attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Defaultopenlevel attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(OpenLevelAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(OpenLevelAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UByteSubscriptionState.SubscriptionEstablished)
         }
       }
     }

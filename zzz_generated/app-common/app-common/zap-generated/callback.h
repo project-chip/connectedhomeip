@@ -10121,12 +10121,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
 /**
- * @brief Valve Configuration and Control Cluster SetLevel Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterSetLevelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::DecodableType & commandData);
-/**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
 bool emberAfDemandResponseLoadControlClusterRegisterLoadControlProgramRequestCallback(

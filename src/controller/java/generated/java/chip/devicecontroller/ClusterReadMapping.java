@@ -8807,6 +8807,17 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlOpenDurationCommandParams
         );
         result.put("readOpenDurationAttribute", readValveConfigurationAndControlOpenDurationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readValveConfigurationAndControlDefaultOpenDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readValveConfigurationAndControlDefaultOpenDurationAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readDefaultOpenDurationAttribute(
+              (ChipClusters.ValveConfigurationAndControlCluster.DefaultOpenDurationAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedValveConfigurationAndControlClusterDefaultOpenDurationAttributeCallback(),
+          readValveConfigurationAndControlDefaultOpenDurationCommandParams
+        );
+        result.put("readDefaultOpenDurationAttribute", readValveConfigurationAndControlDefaultOpenDurationAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlAutoCloseTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlAutoCloseTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8851,17 +8862,6 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlTargetStateCommandParams
         );
         result.put("readTargetStateAttribute", readValveConfigurationAndControlTargetStateAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readValveConfigurationAndControlStartUpStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readValveConfigurationAndControlStartUpStateAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readStartUpStateAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readValveConfigurationAndControlStartUpStateCommandParams
-        );
-        result.put("readStartUpStateAttribute", readValveConfigurationAndControlStartUpStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlCurrentLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlCurrentLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -8884,17 +8884,17 @@ public class ClusterReadMapping {
           readValveConfigurationAndControlTargetLevelCommandParams
         );
         result.put("readTargetLevelAttribute", readValveConfigurationAndControlTargetLevelAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readValveConfigurationAndControlOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readValveConfigurationAndControlOpenLevelAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readValveConfigurationAndControlDefaultOpenLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readOpenLevelAttribute(
-              (ChipClusters.ValveConfigurationAndControlCluster.OpenLevelAttributeCallback) callback
+            ((ChipClusters.ValveConfigurationAndControlCluster) cluster).readDefaultOpenLevelAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedValveConfigurationAndControlClusterOpenLevelAttributeCallback(),
-          readValveConfigurationAndControlOpenLevelCommandParams
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readValveConfigurationAndControlDefaultOpenLevelCommandParams
         );
-        result.put("readOpenLevelAttribute", readValveConfigurationAndControlOpenLevelAttributeInteractionInfo);
+        result.put("readDefaultOpenLevelAttribute", readValveConfigurationAndControlDefaultOpenLevelAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readValveConfigurationAndControlValveFaultCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readValveConfigurationAndControlValveFaultAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
