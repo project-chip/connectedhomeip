@@ -20,20 +20,22 @@
 
 #include "app/clusters/device-energy-management-server/device-energy-management-server.h"
 
-using chip::Protocols::InteractionModel::Status;
+#include <app/util/af.h>
+#include <app/util/config.h>
+#include <cstring>
 
+using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
 
-/** The application delegate.
+/**
+ * The application delegate.
  */
 class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
-    ~DeviceEnergyManagementDelegate();
-
     virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration) override;
     virtual Status CancelPowerAdjustRequest() override;
     virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) override;
