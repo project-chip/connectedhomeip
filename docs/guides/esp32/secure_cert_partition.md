@@ -1,7 +1,5 @@
 # Using esp_secure_cert partition
 
----
-
 **WARNING:** The following steps outline the development workflow for building a
 matter device.
 

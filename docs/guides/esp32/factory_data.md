@@ -1,7 +1,5 @@
 ## Using ESP32 Factory Data Provider
 
----
-
 **WARNING:** The following steps outline the development workflow for building a
 matter device.
 

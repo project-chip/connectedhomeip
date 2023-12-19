@@ -44,8 +44,7 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/lighting-app/esp32/mai
 
         $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 <NODE ID> 1
 
----
+### Matter OTA
 
--   [Matter OTA guide](../../../docs/guides/esp32/ota.md)
-
----
+For Matter OTA please take a look at
+[Matter OTA guide](../../../docs/guides/esp32/ota.md).
