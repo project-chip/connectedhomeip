@@ -3805,7 +3805,7 @@ public static class EnergyEvseClusterEnergyTransferStoppedEvent {
   }
 }
 public static class EnergyEvseClusterFaultEvent {
-  public Long sessionID;
+  public @Nullable Long sessionID;
   public Integer state;
   public Integer faultStatePreviousState;
   public Integer faultStateCurrentState;
@@ -3815,7 +3815,7 @@ public static class EnergyEvseClusterFaultEvent {
   private static final long FAULT_STATE_CURRENT_STATE_ID = 4L;
 
   public EnergyEvseClusterFaultEvent(
-    Long sessionID,
+    @Nullable Long sessionID,
     Integer state,
     Integer faultStatePreviousState,
     Integer faultStateCurrentState
@@ -3828,7 +3828,7 @@ public static class EnergyEvseClusterFaultEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(SESSION_I_D_ID, sessionID != null ? new UIntType(sessionID) : new NullType()));
     values.add(new StructElement(STATE_ID, new UIntType(state)));
     values.add(new StructElement(FAULT_STATE_PREVIOUS_STATE_ID, new UIntType(faultStatePreviousState)));
     values.add(new StructElement(FAULT_STATE_CURRENT_STATE_ID, new UIntType(faultStateCurrentState)));
@@ -3840,7 +3840,7 @@ public static class EnergyEvseClusterFaultEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long sessionID = null;
+    @Nullable Long sessionID = null;
     Integer state = null;
     Integer faultStatePreviousState = null;
     Integer faultStateCurrentState = null;
