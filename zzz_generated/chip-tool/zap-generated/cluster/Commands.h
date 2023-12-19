@@ -97,7 +97,7 @@
 | RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
-| BooleanSensorConfiguration                                          | 0x0080 |
+| BooleanStateConfiguration                                           | 0x0080 |
 | ValveConfigurationAndControl                                        | 0x0081 |
 | ElectricalEnergyMeasurement                                         | 0x0091 |
 | DemandResponseLoadControl                                           | 0x0096 |
@@ -6371,16 +6371,21 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster BooleanSensorConfiguration                                  | 0x0080 |
+| Cluster BooleanStateConfiguration                                   | 0x0080 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SuppressRequest                                                   |   0x00 |
+| * SuppressAlarm                                                     |   0x00 |
+| * EnableDisableAlarm                                                |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * SensitivityLevel                                                  | 0x0000 |
-| * AlarmsActive                                                      | 0x0001 |
-| * AlarmsSuppressed                                                  | 0x0002 |
-| * AlarmsEnabled                                                     | 0x0003 |
+| * CurrentSensitivityLevel                                           | 0x0000 |
+| * SupportedSensitivityLevels                                        | 0x0001 |
+| * DefaultSensitivityLevel                                           | 0x0002 |
+| * AlarmsActive                                                      | 0x0003 |
+| * AlarmsSuppressed                                                  | 0x0004 |
+| * AlarmsEnabled                                                     | 0x0005 |
+| * AlarmsSupported                                                   | 0x0006 |
+| * SensorFault                                                       | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -6394,13 +6399,13 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SuppressRequest
+ * Command SuppressAlarm
  */
-class BooleanSensorConfigurationSuppressRequest : public ClusterCommand
+class BooleanStateConfigurationSuppressAlarm : public ClusterCommand
 {
 public:
-    BooleanSensorConfigurationSuppressRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("suppress-request", credsIssuerConfig)
+    BooleanStateConfigurationSuppressAlarm(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("suppress-alarm", credsIssuerConfig)
     {
         AddArgument("AlarmsToSuppress", 0, UINT8_MAX, &mRequest.alarmsToSuppress);
         ClusterCommand::AddArguments();
@@ -6408,8 +6413,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6418,8 +6423,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6428,7 +6433,45 @@ public:
     }
 
 private:
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type mRequest;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Type mRequest;
+};
+
+/*
+ * Command EnableDisableAlarm
+ */
+class BooleanStateConfigurationEnableDisableAlarm : public ClusterCommand
+{
+public:
+    BooleanStateConfigurationEnableDisableAlarm(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("enable-disable-alarm", credsIssuerConfig)
+    {
+        AddArgument("AlarmsToEnableDisable", 0, UINT8_MAX, &mRequest.alarmsToEnableDisable);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7238,8 +7281,8 @@ public:
     EnergyEvseEnableCharging(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("enable-charging", credsIssuerConfig)
     {
         AddArgument("ChargingEnabledUntil", 0, UINT32_MAX, &mRequest.chargingEnabledUntil);
-        AddArgument("MinimumChargeCurrent", 0, UINT64_MAX, &mRequest.minimumChargeCurrent);
-        AddArgument("MaximumChargeCurrent", 0, UINT64_MAX, &mRequest.maximumChargeCurrent);
+        AddArgument("MinimumChargeCurrent", INT64_MIN, INT64_MAX, &mRequest.minimumChargeCurrent);
+        AddArgument("MaximumChargeCurrent", INT64_MIN, INT64_MAX, &mRequest.maximumChargeCurrent);
         ClusterCommand::AddArguments();
     }
 
@@ -7278,7 +7321,7 @@ public:
         ClusterCommand("enable-discharging", credsIssuerConfig)
     {
         AddArgument("DischargingEnabledUntil", 0, UINT32_MAX, &mRequest.dischargingEnabledUntil);
-        AddArgument("MaximumDischargeCurrent", 0, UINT64_MAX, &mRequest.maximumDischargeCurrent);
+        AddArgument("MaximumDischargeCurrent", INT64_MIN, INT64_MAX, &mRequest.maximumDischargeCurrent);
         ClusterCommand::AddArguments();
     }
 
@@ -19173,43 +19216,58 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterBooleanSensorConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBooleanStateConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BooleanSensorConfiguration;
+    using namespace chip::app::Clusters::BooleanStateConfiguration;
 
-    const char * clusterName = "BooleanSensorConfiguration";
+    const char * clusterName = "BooleanStateConfiguration";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                        //
-        make_unique<BooleanSensorConfigurationSuppressRequest>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<BooleanStateConfigurationSuppressAlarm>(credsIssuerConfig),      //
+        make_unique<BooleanStateConfigurationEnableDisableAlarm>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum>>(
-            Id, "sensitivity-level", 0, UINT8_MAX, Attributes::SensitivityLevel::Id, WriteCommandType::kWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "current-sensitivity-level", Attributes::CurrentSensitivityLevel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-sensitivity-levels", Attributes::SupportedSensitivityLevels::Id,
+                                   credsIssuerConfig),                                                                           //
+        make_unique<ReadAttribute>(Id, "default-sensitivity-level", Attributes::DefaultSensitivityLevel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "alarms-supported", Attributes::AlarmsSupported::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "sensor-fault", Attributes::SensorFault::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                    //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-sensitivity-level", 0, UINT8_MAX, Attributes::CurrentSensitivityLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "supported-sensitivity-levels", 0, UINT8_MAX,
+                                             Attributes::SupportedSensitivityLevels::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "default-sensitivity-level", 0, UINT8_MAX, Attributes::DefaultSensitivityLevel::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
             Id, "alarms-active", 0, UINT8_MAX, Attributes::AlarmsActive::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
             Id, "alarms-suppressed", 0, UINT8_MAX, Attributes::AlarmsSuppressed::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
-            Id, "alarms-enabled", 0, UINT8_MAX, Attributes::AlarmsEnabled::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
+            Id, "alarms-enabled", 0, UINT8_MAX, Attributes::AlarmsEnabled::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
+            Id, "alarms-supported", 0, UINT8_MAX, Attributes::AlarmsSupported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>>(
+            Id, "sensor-fault", 0, UINT16_MAX, Attributes::SensorFault::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19222,12 +19280,19 @@ void registerClusterBooleanSensorConfiguration(Commands & commands, CredentialIs
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "current-sensitivity-level", Attributes::CurrentSensitivityLevel::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supported-sensitivity-levels", Attributes::SupportedSensitivityLevels::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "default-sensitivity-level", Attributes::DefaultSensitivityLevel::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "alarms-supported", Attributes::AlarmsSupported::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "sensor-fault", Attributes::SensorFault::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -19708,16 +19773,18 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "discharging-enabled-until", 0, UINT32_MAX,
                                                                               Attributes::DischargingEnabledUntil::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "circuit-capacity", 0, UINT64_MAX, Attributes::CircuitCapacity::Id,
+        make_unique<WriteAttribute<int64_t>>(Id, "circuit-capacity", INT64_MIN, INT64_MAX, Attributes::CircuitCapacity::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "minimum-charge-current", 0, UINT64_MAX, Attributes::MinimumChargeCurrent::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "maximum-charge-current", 0, UINT64_MAX, Attributes::MaximumChargeCurrent::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "maximum-discharge-current", 0, UINT64_MAX,
+        make_unique<WriteAttribute<int64_t>>(Id, "minimum-charge-current", INT64_MIN, INT64_MAX,
+                                             Attributes::MinimumChargeCurrent::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "maximum-charge-current", INT64_MIN, INT64_MAX,
+                                             Attributes::MaximumChargeCurrent::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<int64_t>>(Id, "maximum-discharge-current", INT64_MIN, INT64_MAX,
                                              Attributes::MaximumDischargeCurrent::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "user-maximum-charge-current", 0, UINT64_MAX,
+        make_unique<WriteAttribute<int64_t>>(Id, "user-maximum-charge-current", INT64_MIN, INT64_MAX,
                                              Attributes::UserMaximumChargeCurrent::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "randomization-delay-window", 0, UINT32_MAX,
@@ -19733,8 +19800,8 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "next-charge-target-time", 0, UINT32_MAX,
                                                                               Attributes::NextChargeTargetTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "next-charge-required-energy", 0, UINT64_MAX,
-                                                                             Attributes::NextChargeRequiredEnergy::Id,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "next-charge-required-energy", INT64_MIN,
+                                                                             INT64_MAX, Attributes::NextChargeRequiredEnergy::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "next-charge-target-so-c", 0, UINT8_MAX, Attributes::NextChargeTargetSoC::Id, WriteCommandType::kForceWrite,
@@ -19745,7 +19812,7 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "state-of-charge", 0, UINT8_MAX, Attributes::StateOfCharge::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "battery-capacity", 0, UINT64_MAX,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "battery-capacity", INT64_MIN, INT64_MAX,
                                                                              Attributes::BatteryCapacity::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::CharSpan>>>(
@@ -19755,10 +19822,10 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "session-duration", 0, UINT32_MAX,
                                                                               Attributes::SessionDuration::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-charged", 0, UINT64_MAX,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-charged", INT64_MIN, INT64_MAX,
                                                                              Attributes::SessionEnergyCharged::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-discharged", 0, UINT64_MAX,
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-discharged", INT64_MIN, INT64_MAX,
                                                                              Attributes::SessionEnergyDischarged::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -25380,7 +25447,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
-    registerClusterBooleanSensorConfiguration(commands, credsIssuerConfig);
+    registerClusterBooleanStateConfiguration(commands, credsIssuerConfig);
     registerClusterValveConfigurationAndControl(commands, credsIssuerConfig);
     registerClusterElectricalEnergyMeasurement(commands, credsIssuerConfig);
     registerClusterDemandResponseLoadControl(commands, credsIssuerConfig);
