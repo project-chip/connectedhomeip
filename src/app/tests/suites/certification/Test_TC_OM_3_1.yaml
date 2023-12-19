@@ -61,7 +61,7 @@ tests:
           saveAs: on_mode_dut
           constraints:
               type: int16u
-              
+
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001 && OM.S.F00
@@ -71,7 +71,7 @@ tests:
           saveAs: old_current_mode_dut
           constraints:
               type: int16u
-              
+
 
     - label:
           "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
