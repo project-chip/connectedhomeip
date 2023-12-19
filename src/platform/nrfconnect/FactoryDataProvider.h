@@ -106,13 +106,56 @@ struct ExternalFlashFactoryData
     uint8_t mFactoryDataBuffer[PM_FACTORY_DATA_SIZE];
 };
 
-template <class FlashFactoryData>
-class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentialsProvider,
-                            public CommissionableDataProvider,
-                            public DeviceInstanceInfoProvider
+class FactoryDataProviderBase : public chip::Credentials::DeviceAttestationCredentialsProvider,
+                                public CommissionableDataProvider,
+                                public DeviceInstanceInfoProvider
 {
 public:
-    CHIP_ERROR Init();
+    /**
+     * @brief Perform all operations needed to initialize factory data provider.
+     *
+     * @returns CHIP_NO_ERROR in case of a success, specific error code otherwise
+     */
+    virtual CHIP_ERROR Init() = 0;
+
+    /**
+     * @brief Get the EnableKey as MutableByteSpan
+     *
+     * @param enableKey MutableByteSpan object to obtain EnableKey
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain enable_key field, or the value cannot be read
+     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
+     */
+    virtual CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey) = 0;
+
+    /**
+     * @brief Get the user data in CBOR format as MutableByteSpan
+     *
+     * @param userData MutableByteSpan object to obtain all user data in CBOR format
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
+     * CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
+     */
+    virtual CHIP_ERROR GetUserData(MutableByteSpan & userData) = 0;
+
+    /**
+     * @brief Try to find user data key and return its value
+     *
+     * @param userKey A key name to be found
+     * @param buf Buffer to store value of found key
+     * @param len Length of the buffer. This value will be updated to the actual value if the key is read.
+     * @returns
+     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user key field, or the value cannot be read
+     * out. CHIP_ERROR_BUFFER_TOO_SMALL if provided buffer length is too small
+     */
+    virtual CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) = 0;
+};
+
+template <class FlashFactoryData>
+class FactoryDataProvider : public FactoryDataProviderBase
+{
+public:
+    CHIP_ERROR Init() override;
 
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
@@ -147,29 +190,9 @@ public:
     CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
     // ===== Members functions that are platform-specific
-    CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey);
-
-    /**
-     * @brief Get the user data in CBOR format as MutableByteSpan
-     *
-     * @param userData MutableByteSpan object to obtain all user data in CBOR format
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
-     * CHIP_ERROR_BUFFER_TOO_SMALL if provided MutableByteSpan is too small
-     */
-    CHIP_ERROR GetUserData(MutableByteSpan & userData);
-
-    /**
-     * @brief Try to find user data key and return its value
-     *
-     * @param userKey A key name to be found
-     * @param buf Buffer to store value of found key
-     * @param len Length of the buffer. This value will be updated to the actual value if the key is read.
-     * @returns
-     * CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND if factory data does not contain user field, or the value cannot be read out.
-     * CHIP_ERROR_BUFFER_TOO_SMALL if provided buffer length is too small
-     */
-    CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len);
+    CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey) override;
+    CHIP_ERROR GetUserData(MutableByteSpan & userData) override;
+    CHIP_ERROR GetUserKey(const char * userKey, void * buf, size_t & len) override;
 
 private:
     static constexpr uint16_t kFactoryDataPartitionSize    = PM_FACTORY_DATA_SIZE;
