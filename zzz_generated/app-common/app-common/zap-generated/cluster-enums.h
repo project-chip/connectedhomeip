@@ -2125,20 +2125,7 @@ enum class Feature : uint32_t
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
-
-// Enum for SensitivityEnum
-enum class SensitivityEnum : uint8_t
-{
-    kHigh     = 0x00,
-    kStandard = 0x01,
-    kLow      = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
+namespace BooleanStateConfiguration {
 
 // Bitmap for AlarmModeBitmap
 enum class AlarmModeBitmap : uint8_t
@@ -2155,7 +2142,13 @@ enum class Feature : uint32_t
     kAlarmSuppress    = 0x4,
     kSensitivityLevel = 0x8,
 };
-} // namespace BooleanSensorConfiguration
+
+// Bitmap for SensorFaultBitmap
+enum class SensorFaultBitmap : uint16_t
+{
+    kGeneralFault = 0x1,
+};
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 
