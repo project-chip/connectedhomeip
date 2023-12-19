@@ -29,7 +29,7 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, optional, or_operation, parse_callable_from_xml)
+                                 feature, optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
@@ -90,9 +90,12 @@ class XmlDeviceType:
     name: str
     revision: int
     clusters: dict[uint, XmlDeviceTypeClusterRequirements]
+    # Keeping these as strings for now because the exact definitions are being discussed in DMTT
+    classification_class: str
+    classification_scope: str
 
     def __str__(self):
-        msg = f'{self.name} - {self.revision}\n'
+        msg = f'{self.name} - Revision {self.revision}, Class {self.classification_class}, Scope {self.classification_scope}\n'
         for id, c in self.clusters.items():
             msg = msg + f'    {id}: {str(c)}\n'
         return msg
@@ -416,31 +419,50 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     return clusters, problems
 
 
-def build_xml_device_types() -> tuple[list[XmlCluster], list[ProblemNotice]]:
+def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
+    problems: list[ProblemNotice] = []
+    device_types: dict[int, XmlDeviceType] = {}
+    device = root.iter('deviceType')
+    for d in device:
+        name = d.attrib['name']
+
+        str_id = d.attrib['id']
+        print(str_id)
+        id = int(str_id, 0)
+        revision = d.attrib['revision']
+        try:
+            classification = next(d.iter('classification'))
+            scope = classification.attrib['scope']
+            device_class = classification.attrib['class']
+        except (KeyError, StopIteration):
+            # TODO: add to problems here
+            print("unable to find classification data")
+            break
+        device_types[id] = XmlDeviceType(name=name, revision=revision, clusters={},
+                                         classification_class=device_class, classification_scope=scope)
+        clusters = d.iter('cluster')
+        for c in clusters:
+            try:
+                conformance = parse_device_type_callable_from_xml(get_conformance(c))
+                device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
+                    name=c.attrib['name'], conformance=conformance)
+            except ConformanceException as ex:
+                # TODO: add to problems here
+                print("unable to find class")
+                pass
+    return problems, device_types
+
+
+def build_xml_device_types() -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
     dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data_model', 'device_types')
-    device_types: dict[str, XmlDeviceType] = {}
+    device_types: dict[int, XmlDeviceType] = {}
     problems = []
-    # Device types can use the same conformance as clusters, but they only use the base types, so it's OK to have empty lists here because they won't get used. There should perhaps be a way to indicate this to the parser.
-    # TODO: move the base conformance OUT of the parser so we don't need the params
-    params = ConformanceParseParameters([], [], [])
     for xml in glob.glob(f"{dir}/*.xml"):
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
-        device = root.iter('deviceType')
-        for d in device:
-            name = d.attrib['name']
-            id = d.attrib['id']
-            revision = d.attrib['revision']
-            device_types[id] = XmlDeviceType(name=name, revision=revision, clusters={})
-            clusters = d.iter('cluster')
-            for c in clusters:
-                try:
-                    conformance = parse_callable_from_xml(get_conformance(c), params)
-                    device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
-                        name=c.attrib['name'], conformance=conformance)
-                except ConformanceException as ex:
-                    # TODO: add to problems here
-                    pass
+        tmp_problems, tmp_device_types = parse_single_device_type(root)
+        problems = problems + tmp_problems
+        device_types.update(tmp_device_types)
 
     return problems, device_types

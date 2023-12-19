@@ -17,7 +17,7 @@
 
 import xml.etree.ElementTree as ElementTree
 
-from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml, parse_basic_callable_from_xml, mandatory, optional, disallowed, provisional, deprecated, zigbee
+from conformance_support import ConformanceDecision, ConformanceException, ConformanceParseParameters, parse_callable_from_xml, parse_basic_callable_from_xml, parse_device_type_callable_from_xml, mandatory, optional, disallowed, provisional, deprecated, zigbee
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -611,15 +611,16 @@ class TestConformanceSupport(MatterBaseTest):
         basic_test('<optionalConform />', optional)
         basic_test('<disallowConform />', disallowed)
         basic_test('<deprecateConform />', deprecated)
-        basic_test('<zigbee />', zigbee)
+        basic_test('<provisionalConform />', provisional)
+        basic_test('<condition name="zigbee" />', zigbee)
 
         # feature is not basic so we should get an exception
         xml = '<feature name="CD" />'
         et = ElementTree.fromstring(xml)
         try:
-            xml_callable = parse_basic_callable_from_xml(et)
+            parse_basic_callable_from_xml(et)
             asserts.fail("Unexpected success parsing non-basic conformance")
-        except KeyError:
+        except ConformanceException:
             pass
 
         # mandatory tag is basic, but this one is a wrapper, so we should get a TypeError
@@ -633,9 +634,48 @@ class TestConformanceSupport(MatterBaseTest):
                '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
         try:
-            xml_callable = parse_basic_callable_from_xml(et)
+            parse_basic_callable_from_xml(et)
             asserts.fail("Unexpected success parsing mandatory wrapper")
-        except TypeError:
+        except ConformanceException:
+            pass
+
+    def test_device_type_conformance(self):
+        # device types can have wrappers of basic types, but not wrappers of
+        # features or attributes since they don't have those
+        xml = ('<mandatoryConform>'
+               '<condition name="zigbee" />'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        asserts.assert_equal(str(xml_callable), 'Zigbee', "Unexpected conformance returned for device type")
+
+        xml = ('<optionalConform>'
+               '<condition name="zigbee" />'
+               '</optionalConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        # expect no exception here
+        asserts.assert_equal(str(xml_callable), '[Zigbee]', "Unexpected conformance returned for device type")
+
+        # otherwise conforms are allowed, if both are base types
+        xml = ('<otherwiseConform>'
+               '<condition name="zigbee" />'
+               '<provisionalConform />'
+               '</otherwiseConform>')
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_device_type_callable_from_xml(et)
+        # expect no exception here
+        asserts.assert_equal(str(xml_callable), 'Zigbee, P', "Unexpected conformance returned for device type")
+
+        # Wrapped conformances with non-base types should throw an exception
+        xml = ('<mandatoryConform>'
+               '<feature name="CD" />'
+               '</mandatoryConform>')
+        et = ElementTree.fromstring(xml)
+        try:
+            parse_device_type_callable_from_xml(et)
+            asserts.fail("Unexpected success for cluster conformance on device type")
+        except ConformanceException:
             pass
 
 

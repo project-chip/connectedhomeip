@@ -28,7 +28,7 @@ PROVISIONAL_CONFORM = 'provisionalConform'
 MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
-ZIGBEE_CONFORM = 'zigbee'
+
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
@@ -36,6 +36,7 @@ FEATURE_TAG = 'feature'
 ATTRIBUTE_TAG = 'attribute'
 COMMAND_TAG = 'command'
 CONDITION_TAG = 'condition'
+ZIGBEE_CONDITION = 'zigbee'
 
 
 class ConformanceException(Exception):
@@ -123,8 +124,8 @@ BASIC_CONFORMANCE: dict[str, Callable] = {
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
     DEPRECATE_CONFORM: deprecated(),
-    DISALLOW_CONFORM: disallowed(),
-    ZIGBEE_CONFORM: zigbee()}
+    DISALLOW_CONFORM: disallowed()
+}
 
 
 class feature:
@@ -298,46 +299,21 @@ class otherwise:
         return ', '.join(op_strs)
 
 
-def parse_basic_callable_from_xml(element: ElementTree.Element):
+def parse_basic_callable_from_xml(element: ElementTree.Element) -> Callable:
     if len(list(element)) != 0:
-        raise TypeError("parse_basic_callable_from_xml called for XML element with children")
+        raise ConformanceException("parse_basic_callable_from_xml called for XML element with children")
     # This will throw a key error if this is not a basic element key.
-    return BASIC_CONFORMANCE[element.tag]
-
-
-def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
-    if len(list(element)) == 0:
-        try:
-            return parse_basic_callable_from_xml(element)
-        except KeyError:
-            pass
-        if element.tag == FEATURE_TAG:
-            try:
-                return feature(params.feature_map[element.get('name')], element.get('name'))
-            except KeyError:
-                raise ConformanceException(f'Conformance specifies feature not in feature table: {element.get("name")}')
-        elif element.tag == ATTRIBUTE_TAG:
-            # Some command conformance tags are marked as attribute, so if this key isn't in attribute, try command
-            name = element.get('name')
-            if name in params.attribute_map:
-                return attribute(params.attribute_map[name], name)
-            elif name in params.command_map:
-                return command(params.command_map[name], name)
-            else:
-                raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
-        elif element.tag == COMMAND_TAG:
-            return command(params.command_map[element.get('name')], element.get('name'))
-        elif element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONFORM:
+    try:
+        return BASIC_CONFORMANCE[element.tag]
+    except KeyError:
+        if element.tag == CONDITION_TAG and element.get('name').lower() == ZIGBEE_CONDITION:
             return zigbee()
         else:
             raise ConformanceException(
-                f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
+                f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
 
-    # First build the list, then create the callable for this element
-    ops = []
-    for sub in element:
-        ops.append(parse_callable_from_xml(sub, params))
 
+def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Callable]) -> Callable:
     # optional can be a wrapper as well as a standalone
     # This can be any of the boolean operations, optional or otherwise
     if element.tag == OPTIONAL_CONFORM:
@@ -360,3 +336,49 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
         return otherwise(ops)
     else:
         raise ConformanceException(f'Unexpected conformance tag with children {element}')
+
+
+def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callable:
+    ''' Only allows basic, or wrappers over things that degrade to basic.'''
+    if len(list(element)) == 0:
+        return parse_basic_callable_from_xml(element)
+
+    ops = []
+    for sub in element:
+        ops.append(parse_device_type_callable_from_xml(sub))
+
+    return parse_wrapper_callable_from_xml(element, ops)
+
+
+def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Callable:
+    if len(list(element)) == 0:
+        try:
+            return parse_basic_callable_from_xml(element)
+        except ConformanceException:
+            pass
+        if element.tag == FEATURE_TAG:
+            try:
+                return feature(params.feature_map[element.get('name')], element.get('name'))
+            except KeyError:
+                raise ConformanceException(f'Conformance specifies feature not in feature table: {element.get("name")}')
+        elif element.tag == ATTRIBUTE_TAG:
+            # Some command conformance tags are marked as attribute, so if this key isn't in attribute, try command
+            name = element.get('name')
+            if name in params.attribute_map:
+                return attribute(params.attribute_map[name], name)
+            elif name in params.command_map:
+                return command(params.command_map[name], name)
+            else:
+                raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
+        elif element.tag == COMMAND_TAG:
+            return command(params.command_map[element.get('name')], element.get('name'))
+        else:
+            raise ConformanceException(
+                f'Unexpected xml conformance element with no children {str(element.tag)} {str(element.attrib)}')
+
+    # First build the list, then create the callable for this element
+    ops = []
+    for sub in element:
+        ops.append(parse_callable_from_xml(sub, params))
+
+    return parse_wrapper_callable_from_xml(element, ops)
