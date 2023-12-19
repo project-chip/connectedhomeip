@@ -24,6 +24,7 @@
 
 #include <jni.h>
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -205,6 +206,8 @@ public:
 
     CHIP_ERROR FinishOTAProvider();
 
+    chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
@@ -216,6 +219,8 @@ private:
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+
+    chip::app::DefaultICDClientStorage mICDClientStorage;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
@@ -249,6 +254,7 @@ private:
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
 #endif
+    bool mDeviceIsICD = false;
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,

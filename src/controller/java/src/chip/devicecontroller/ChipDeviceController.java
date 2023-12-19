@@ -712,6 +712,20 @@ public class ChipDeviceController {
     return getFabricIndex(deviceControllerPtr);
   }
 
+
+  public List<ICDClientInfo> getICDClientInfo() {
+    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+  }
+
+  /**
+   * Returns the ICD Client Information
+   *
+   * @param fabricIndex the fabric index to check
+   */
+  public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
+    return getICDClientInfo(deviceControllerPtr, fabricIndex);
+  }
+
   /* Shuts down all active subscriptions. */
   public void shutdownSubscriptions() {
     shutdownSubscriptions(deviceControllerPtr, null, null, null);
@@ -1485,6 +1499,8 @@ public class ChipDeviceController {
 
   private native void updateCommissioningICDRegistrationInfo(
       long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
+
+  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
