@@ -7313,7 +7313,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -8182,9 +8182,9 @@ cluster ContentAppObserver = 1296 {
   }
 
   response struct ContentAppMessageResponse = 1 {
-    optional StatusEnum status = 0;
-    char_string data = 1;
-    char_string encodingHint = 2;
+    StatusEnum status = 0;
+    optional char_string data = 1;
+    optional char_string encodingHint = 2;
   }
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
