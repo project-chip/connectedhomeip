@@ -572,9 +572,9 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -642,6 +642,15 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
     case Commands::ClearTargets::Id: {
         return YES;
     }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyPreference;
+    switch (aAttributeId) {
     default: {
         return NO;
     }
@@ -1248,8 +1257,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(commandID);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);
@@ -1265,6 +1274,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyEvse::Id: {
         return CommandNeedsTimedInvokeInEnergyEVSECluster(commandID);
+    }
+    case Clusters::EnergyPreference::Id: {
+        return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);
