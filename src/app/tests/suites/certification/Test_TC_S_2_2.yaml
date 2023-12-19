@@ -618,16 +618,6 @@ tests:
                                         },
                                     ],
                             },
-                            {
-                                ClusterID: 0x0050,
-                                AttributeValueList:
-                                    [
-                                        {
-                                            AttributeID: 0x0003,
-                                            AttributeValue: 0x00,
-                                        },
-                                    ],
-                            },
                         ]
 
     - label:

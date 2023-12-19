@@ -30,8 +30,13 @@
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <tracing/macros.h>
+
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/scenes-server.h>
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
 #ifdef MATTER_DM_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -113,23 +118,21 @@ Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
 {
     MATTER_TRACE_SCOPE("ChangeToMode", "ModeSelect");
     ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
-    EndpointId endpointId = commandPath.mEndpointId;
-    uint8_t newMode       = commandData.newMode;
+
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
     const ModeSelect::SupportedModesManager * gSupportedModeManager = ModeSelect::getSupportedModesManager();
     if (gSupportedModeManager == nullptr)
     {
         ChipLogError(Zcl, "ModeSelect: SupportedModesManager is NULL");
-        commandHandler->AddStatus(commandPath, Status::Failure);
-        return true;
+        return Status::Failure;
     }
     Status checkSupportedModeStatus = gSupportedModeManager->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
     if (Status::Success != checkSupportedModeStatus)
     {
+        ChipLogProgress(Zcl, "ModeSelect: Failed to find the option with mode %u", newMode);
         return checkSupportedModeStatus;
     }
-
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
     return Status::Success;
@@ -137,16 +140,16 @@ Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
 
 } // anonymous namespace
 
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 static constexpr size_t kModeSelectMaxEnpointCount =
-    EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 static void timerCallback(System::Layer *, void * callbackContext);
 static void sceneModeSelectCallback(EndpointId endpoint);
 using ModeSelectEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
 using ModeSelectTransitionTimeInterface =
     scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kModeSelectMaxEnpointCount,
-                                                             EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+                                                             MATTER_DM_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -181,27 +184,27 @@ public:
     }
 
     /// @brief Serialize the Cluster's EFS value
-    /// @param endpoint target endpoint
-    /// @param cluster  target cluster
-    /// @param serializedBytes data to serialize into EFS
+    /// @param [in] endpoint target endpoint
+    /// @param [in] cluster  target cluster
+    /// @param [out] serializedBytes data to serialize into EFS
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
-        using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePairStruct::Type;
 
         uint8_t currentMode;
         // read CurrentMode value
-        EmberAfStatus status = Attributes::CurrentMode::Get(endpoint, &currentMode);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        Status status = Attributes::CurrentMode::Get(endpoint, &currentMode);
+        if (status != Status::Success)
         {
-            ChipLogError(Zcl, "ERR: reading CurrentMode %x", status);
+            ChipLogError(Zcl, "ERR: reading CurrentMode 0x%02x", to_underlying(status));
             return CHIP_ERROR_READ_FAILED;
         }
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID    = Attributes::CurrentMode::Id;
-        pairs[0].attributeValue = currentMode;
+        pairs[0].attributeID = Attributes::CurrentMode::Id;
+        pairs[0].valueUnsigned8.SetValue(currentMode);
 
         app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
 
@@ -217,7 +220,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           scenes::TransitionTimeMs timeMs) override
     {
-        app::DataModel::DecodableList<Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
 
         VerifyOrReturnError(cluster == ModeSelect::Id, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -232,8 +235,9 @@ public:
         {
             auto & decodePair = pair_iterator.GetValue();
             VerifyOrReturnError(decodePair.attributeID == Attributes::CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
-                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.attributeValue))));
+                ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.HasValue()))));
         }
         // Verify that the EFS was completely read
         CHIP_ERROR err = pair_iterator.GetStatus();
@@ -243,6 +247,7 @@ public:
             return err;
         }
 
+        VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,
                                               mTransitionTimeInterface.sceneEventControl(endpoint));
 
@@ -251,7 +256,7 @@ public:
 
 private:
     ModeSelectTransitionTimeInterface mTransitionTimeInterface =
-        ModeSelectTransitionTimeInterface(Attributes::CurrentMode::Id, sceneModeSelectCallback);
+        ModeSelectTransitionTimeInterface(ModeSelect::Id, sceneModeSelectCallback);
 };
 static DefaultModeSelectSceneHandler sModeSelectSceneHandler;
 
@@ -261,6 +266,13 @@ static void timerCallback(System::Layer *, void * callbackContext)
     (control->callback)(control->endpoint);
 }
 
+/**
+ * @brief This function is a callback to apply the mode that was saved when the ApplyScene was called with a transition time greater
+ * than 0.
+ *
+ * @param endpoint The endpoint ID that the scene mode selection is associated with.
+ *
+ */
 static void sceneModeSelectCallback(EndpointId endpoint)
 {
     ModeSelectEndPointPair savedState;
@@ -269,7 +281,7 @@ static void sceneModeSelectCallback(EndpointId endpoint)
     sModeSelectSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint);
 }
 
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
 
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
@@ -278,26 +290,25 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
 
     uint8_t currentMode = 0;
     ModeSelect::Attributes::CurrentMode::Get(commandPath.mEndpointId, &currentMode);
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
     if (currentMode != commandData.newMode)
     {
         //  the scene has been changed (the value of CurrentMode has changed) so
         //  the current scene as described in the scene table is invalid
-        Scenes::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
+        ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(commandPath.mEndpointId);
     }
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
 
     Status status = ChangeToMode(commandPath.mEndpointId, commandData.newMode);
 
     if (Status::Success != status)
     {
-        ChipLogProgress(Zcl, "ModeSelect: Failed to find the option with mode %u", commandData.newMode);
         commandHandler->AddStatus(commandPath, status);
         return true;
     }
 
     ChipLogProgress(Zcl, "ModeSelect: ChangeToMode successful");
-    commandHandler->AddStatus(commandPath, Status::Success);
+    commandHandler->AddStatus(commandPath, status);
     return true;
 }
 
@@ -308,6 +319,10 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
  */
 void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
 {
+#if defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpointId, &sModeSelectSceneHandler);
+#endif // defined(MATTER_DM_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+
     // StartUp behavior relies on CurrentMode StartUpMode attributes being non-volatile.
     if (areStartUpModeAndCurrentModeNonVolatile(endpointId))
     {
@@ -321,23 +336,15 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         Status status = Attributes::StartUpMode::Get(endpointId, startUpMode);
         if (status == Status::Success && !startUpMode.IsNull())
         {
-<<<<<<< HEAD
+
 #ifdef MATTER_DM_PLUGIN_ON_OFF
-            == == == =
-
-#if defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-                         app::Clusters::Scenes::ScenesServer::Instance().RegisterSceneHandler(endpointId, &sModeSelectSceneHandler);
-#endif // defined(EMBER_AF_PLUGIN_SCENES) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
-
-#ifdef EMBER_AF_PLUGIN_ON_OFF
-            >>>>>>> 908c492c15(Added scene handler to mode select cluster)
-                // OnMode with Power Up
-                // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
-                // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
-                // value when the server is supplied with power, except if the OnMode attribute is null.
-                if (emberAfContainsServer(endpointId, OnOff::Id) &&
-                    emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
-                    emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
+            // OnMode with Power Up
+            // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
+            // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
+            // value when the server is supplied with power, except if the OnMode attribute is null.
+            if (emberAfContainsServer(endpointId, OnOff::Id) &&
+                emberAfContainsAttribute(endpointId, OnOff::Id, OnOff::Attributes::StartUpOnOff::Id) &&
+                emberAfContainsAttribute(endpointId, ModeSelect::Id, ModeSelect::Attributes::OnMode::Id))
             {
                 Attributes::OnMode::TypeInfo::Type onMode;
                 bool onOffValueForStartUp = false;
