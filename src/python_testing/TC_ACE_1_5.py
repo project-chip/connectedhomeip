@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,17 +27,6 @@ from mobly import asserts
 
 
 class TC_ACE_1_5(MatterBaseTest):
-
-    def OpenCommissioningWindow(self) -> CommissioningParameters:
-        try:
-            params = self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminators[0], option=1)
-            time.sleep(5)
-            return params
-
-        except Exception as e:
-            logging.exception('Error running OpenCommissioningWindow %s', e)
-            asserts.assert_true(False, 'Failed to open commissioning window')
 
     async def read_currentfabricindex_expected_success(self, th) -> int:
         cluster = Clusters.Objects.OperationalCredentials
@@ -79,9 +68,6 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(1, "Comissioning, already done ")
         self.th1 = self.default_controller
 
-        self.print_step(2, "TH1 opens the commissioning window on the DUT")
-        params = self.OpenCommissioningWindow()
-
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 
@@ -90,6 +76,9 @@ class TC_ACE_1_5(MatterBaseTest):
 
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+
+        params = self.openCommissioningWindow(self.th1, TH1_nodeid, self.matter_test_config.discriminators[0])
+        self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
         errcode = self.th2.CommissionOnNetwork(
             nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
