@@ -18,10 +18,18 @@
 
 #include "OTAConfig.h"
 #include <app/server/Server.h>
+#include "sl_matter_ota_config.h" // MATTER_GSDK_INTEGRATION
 
 #ifndef SIWX_917
+
 #include "application_properties.h"
 
+#if defined(SL_COMPONENT_CATALOG_PRESENT)
+#include "sl_component_catalog.h"
+#endif
+
+// Only include app properties if the Gecko SDK component that does it automatically isn't present
+#if !defined(SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT)
 // Header used for building the image GBL file
 #define APP_PROPERTIES_VERSION 1
 #define APP_PROPERTIES_ID                                                                                                          \
@@ -66,6 +74,8 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
     /// Pointer to Long Token Data Section
     .longTokenSectionAddress = NULL,
 };
+#endif // SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT
+#endif // SIWX_917
 
 #endif
 // Global OTA objects
