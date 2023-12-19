@@ -8948,12 +8948,12 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterBooleanSensorConfiguration
+@implementation MTRClusterBooleanStateConfiguration
 
-- (void)suppressRequestWithParams:(MTRBooleanSensorConfigurationClusterSuppressRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)suppressAlarmWithParams:(MTRBooleanStateConfigurationClusterSuppressAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRBooleanSensorConfigurationClusterSuppressRequestParams
+        params = [[MTRBooleanStateConfigurationClusterSuppressAlarmParams
             alloc] init];
     }
 
@@ -8963,7 +8963,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = BooleanSensorConfiguration::Commands::SuppressRequest::Type;
+    using RequestType = BooleanStateConfiguration::Commands::SuppressAlarm::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8977,76 +8977,112 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensitivityLevelWithParams:(MTRReadParams * _Nullable)params
+- (void)enableDisableAlarmWithParams:(MTRBooleanStateConfigurationClusterEnableDisableAlarmParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeSensitivityLevelID) params:params];
+    if (params == nil) {
+        params = [[MTRBooleanStateConfigurationClusterEnableDisableAlarmParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BooleanStateConfiguration::Commands::EnableDisableAlarm::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
-- (void)writeAttributeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentSensitivityLevelWithParams:(MTRReadParams * _Nullable)params
 {
-    [self writeAttributeSensitivityLevelWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID) params:params];
 }
-- (void)writeAttributeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+
+- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeCurrentSensitivityLevelWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeCurrentSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeSensitivityLevelID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeCurrentSensitivityLevelID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedSensitivityLevelsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSupportedSensitivityLevelsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultSensitivityLevelWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeDefaultSensitivityLevelID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsActiveWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsActiveID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsActiveID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSuppressedWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsSuppressedID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSuppressedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsEnabledWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsEnabledID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsEnabledID) params:params];
 }
 
-- (void)writeAttributeAlarmsEnabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAlarmsSupportedWithParams:(MTRReadParams * _Nullable)params
 {
-    [self writeAttributeAlarmsEnabledWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAlarmsSupportedID) params:params];
 }
-- (void)writeAttributeAlarmsEnabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
-    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAlarmsEnabledID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensorFaultWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeSensorFaultID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeEventListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanSensorConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanSensorConfigurationAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeBooleanStateConfigurationID) attributeID:@(MTRAttributeIDTypeClusterBooleanStateConfigurationAttributeClusterRevisionID) params:params];
 }
 
 @end

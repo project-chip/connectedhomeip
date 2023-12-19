@@ -19507,20 +19507,25 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SuppressRequest {
+namespace SuppressAlarm {
 struct Type;
 struct DecodableType;
-} // namespace SuppressRequest
+} // namespace SuppressAlarm
+
+namespace EnableDisableAlarm {
+struct Type;
+struct DecodableType;
+} // namespace EnableDisableAlarm
 
 } // namespace Commands
 
 namespace Commands {
-namespace SuppressRequest {
+namespace SuppressAlarm {
 enum class Fields : uint8_t
 {
     kAlarmsToSuppress = 0,
@@ -19530,8 +19535,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SuppressRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SuppressAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 
     chip::BitMask<AlarmModeBitmap> alarmsToSuppress = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
 
@@ -19545,37 +19550,93 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SuppressRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SuppressAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 
     chip::BitMask<AlarmModeBitmap> alarmsToSuppress = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SuppressRequest
+}; // namespace SuppressAlarm
+namespace EnableDisableAlarm {
+enum class Fields : uint8_t
+{
+    kAlarmsToEnableDisable = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::EnableDisableAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+
+    chip::BitMask<AlarmModeBitmap> alarmsToEnableDisable = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::EnableDisableAlarm::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+
+    chip::BitMask<AlarmModeBitmap> alarmsToEnableDisable = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace EnableDisableAlarm
 } // namespace Commands
 
 namespace Attributes {
 
-namespace SensitivityLevel {
+namespace CurrentSensitivityLevel {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum;
-    using DecodableType    = chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum;
-    using DecodableArgType = chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SensitivityLevel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSensitivityLevel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SensitivityLevel
+} // namespace CurrentSensitivityLevel
+namespace SupportedSensitivityLevels {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedSensitivityLevels::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedSensitivityLevels
+namespace DefaultSensitivityLevel {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultSensitivityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultSensitivityLevel
 namespace AlarmsActive {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmsActive::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -19583,11 +19644,11 @@ struct TypeInfo
 namespace AlarmsSuppressed {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmsSuppressed::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -19595,49 +19656,73 @@ struct TypeInfo
 namespace AlarmsEnabled {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>;
+    using Type             = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmsEnabled::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmsEnabled
+namespace AlarmsSupported {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AlarmsSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AlarmsSupported
+namespace SensorFault {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SensorFault::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SensorFault
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace GeneratedCommandList
 namespace AcceptedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace AcceptedCommandList
 namespace EventList {
 struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace EventList
 namespace AttributeList {
 struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace AttributeList
 namespace FeatureMap {
 struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
 struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
 {
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 };
 } // namespace ClusterRevision
 
@@ -19645,18 +19730,23 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::SensitivityLevel::TypeInfo::DecodableType sensitivityLevel =
-            static_cast<chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum>(0);
+        Attributes::CurrentSensitivityLevel::TypeInfo::DecodableType currentSensitivityLevel       = static_cast<uint8_t>(0);
+        Attributes::SupportedSensitivityLevels::TypeInfo::DecodableType supportedSensitivityLevels = static_cast<uint8_t>(0);
+        Attributes::DefaultSensitivityLevel::TypeInfo::DecodableType defaultSensitivityLevel       = static_cast<uint8_t>(0);
         Attributes::AlarmsActive::TypeInfo::DecodableType alarmsActive =
-            static_cast<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>(0);
         Attributes::AlarmsSuppressed::TypeInfo::DecodableType alarmsSuppressed =
-            static_cast<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>(0);
         Attributes::AlarmsEnabled::TypeInfo::DecodableType alarmsEnabled =
-            static_cast<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>(0);
+        Attributes::AlarmsSupported::TypeInfo::DecodableType alarmsSupported =
+            static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>(0);
+        Attributes::SensorFault::TypeInfo::DecodableType sensorFault =
+            static_cast<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -19681,7 +19771,7 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AlarmsStateChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
     static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmModeBitmap> alarmsActive = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
@@ -19695,7 +19785,7 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::AlarmsStateChanged::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
 
     chip::BitMask<AlarmModeBitmap> alarmsActive = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
     Optional<chip::BitMask<AlarmModeBitmap>> alarmsSuppressed;
@@ -19708,6 +19798,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
+    kSensorFault = 0,
 };
 
 struct Type
@@ -19715,8 +19806,10 @@ struct Type
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SensorFault::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
     static constexpr bool kIsFabricScoped = false;
+
+    chip::BitMask<SensorFaultBitmap> sensorFault = static_cast<chip::BitMask<SensorFaultBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -19726,13 +19819,15 @@ struct DecodableType
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
     static constexpr EventId GetEventId() { return Events::SensorFault::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BooleanStateConfiguration::Id; }
+
+    chip::BitMask<SensorFaultBitmap> sensorFault = static_cast<chip::BitMask<SensorFaultBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace SensorFault
 } // namespace Events
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 namespace ValveConfigurationAndControl {
 
 namespace Commands {

@@ -21483,17 +21483,21 @@ class ActivatedCarbonFilterMonitoring(Cluster):
 
 
 @dataclass
-class BooleanSensorConfiguration(Cluster):
+class BooleanStateConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x00000080
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="sensitivityLevel", Tag=0x00000000, Type=typing.Optional[BooleanSensorConfiguration.Enums.SensitivityEnum]),
-                ClusterObjectFieldDescriptor(Label="alarmsActive", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="alarmsSuppressed", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="alarmsEnabled", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="currentSensitivityLevel", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="supportedSensitivityLevels", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="defaultSensitivityLevel", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="alarmsActive", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="alarmsSuppressed", Tag=0x00000004, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="alarmsEnabled", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="alarmsSupported", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="sensorFault", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -21502,27 +21506,20 @@ class BooleanSensorConfiguration(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    sensitivityLevel: 'typing.Optional[BooleanSensorConfiguration.Enums.SensitivityEnum]' = None
+    currentSensitivityLevel: 'typing.Optional[uint]' = None
+    supportedSensitivityLevels: 'typing.Optional[uint]' = None
+    defaultSensitivityLevel: 'typing.Optional[uint]' = None
     alarmsActive: 'typing.Optional[uint]' = None
     alarmsSuppressed: 'typing.Optional[uint]' = None
     alarmsEnabled: 'typing.Optional[uint]' = None
+    alarmsSupported: 'typing.Optional[uint]' = None
+    sensorFault: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
-
-    class Enums:
-        class SensitivityEnum(MatterIntEnum):
-            kHigh = 0x00
-            kStandard = 0x01
-            kLow = 0x02
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
 
     class Bitmaps:
         class AlarmModeBitmap(IntFlag):
@@ -21535,9 +21532,12 @@ class BooleanSensorConfiguration(Cluster):
             kAlarmSuppress = 0x4
             kSensitivityLevel = 0x8
 
+        class SensorFaultBitmap(IntFlag):
+            kGeneralFault = 0x1
+
     class Commands:
         @dataclass
-        class SuppressRequest(ClusterCommand):
+        class SuppressAlarm(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000080
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
@@ -21552,9 +21552,25 @@ class BooleanSensorConfiguration(Cluster):
 
             alarmsToSuppress: 'uint' = 0
 
+        @dataclass
+        class EnableDisableAlarm(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000080
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="alarmsToEnableDisable", Tag=0, Type=uint),
+                    ])
+
+            alarmsToEnableDisable: 'uint' = 0
+
     class Attributes:
         @dataclass
-        class SensitivityLevel(ClusterAttributeDescriptor):
+        class CurrentSensitivityLevel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000080
@@ -21565,12 +21581,12 @@ class BooleanSensorConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[BooleanSensorConfiguration.Enums.SensitivityEnum])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Optional[BooleanSensorConfiguration.Enums.SensitivityEnum]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class AlarmsActive(ClusterAttributeDescriptor):
+        class SupportedSensitivityLevels(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000080
@@ -21586,7 +21602,7 @@ class BooleanSensorConfiguration(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class AlarmsSuppressed(ClusterAttributeDescriptor):
+        class DefaultSensitivityLevel(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000080
@@ -21602,7 +21618,7 @@ class BooleanSensorConfiguration(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class AlarmsEnabled(ClusterAttributeDescriptor):
+        class AlarmsActive(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000080
@@ -21610,6 +21626,70 @@ class BooleanSensorConfiguration(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AlarmsSuppressed(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AlarmsEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AlarmsSupported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SensorFault(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -21749,7 +21829,10 @@ class BooleanSensorConfiguration(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
+                        ClusterObjectFieldDescriptor(Label="sensorFault", Tag=0, Type=uint),
                     ])
+
+            sensorFault: 'uint' = 0
 
 
 @dataclass

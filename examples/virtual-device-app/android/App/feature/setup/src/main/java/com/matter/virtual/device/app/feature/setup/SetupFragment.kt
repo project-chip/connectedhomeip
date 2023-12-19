@@ -20,7 +20,6 @@ import com.matter.virtual.device.app.core.model.OnboardingType
 import com.matter.virtual.device.app.feature.setup.databinding.DialogSetupContinueBinding
 import com.matter.virtual.device.app.feature.setup.databinding.FragmentSetupBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.abs
 import kotlinx.coroutines.launch
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
@@ -56,16 +55,6 @@ class SetupFragment : Fragment() {
 
     (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
     (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-      var ratio = 0F
-      if (abs(verticalOffset) != 0) {
-        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-      }
-
-      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
-    }
 
     val args: SetupFragmentArgs by navArgs()
     this.matterSettings = Json.decodeFromString(args.setting)

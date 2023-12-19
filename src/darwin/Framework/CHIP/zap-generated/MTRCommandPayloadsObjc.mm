@@ -15382,7 +15382,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15396,7 +15396,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSuppressRequestParams alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterSuppressAlarmParams alloc] init];
 
     other.alarmsToSuppress = self.alarmsToSuppress;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15413,14 +15413,93 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type encodableStruct;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.alarmsToSuppress = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToSuppress)>>(self.alarmsToSuppress.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmsToEnableDisable = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRBooleanStateConfigurationClusterEnableDisableAlarmParams alloc] init];
+
+    other.alarmsToEnableDisable = self.alarmsToEnableDisable;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alarmsToEnableDisable:%@; >", NSStringFromClass([self class]), _alarmsToEnableDisable];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.alarmsToEnableDisable = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToEnableDisable)>>(self.alarmsToEnableDisable.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);

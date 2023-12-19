@@ -2366,9 +2366,9 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForBooleanStateConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aEventId) {
     case Events::AlarmsStateChanged::Id: {
         Events::AlarmsStateChanged::DecodableType cppValue;
@@ -2377,7 +2377,7 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
             return nil;
         }
 
-        __auto_type * value = [MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent new];
+        __auto_type * value = [MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent new];
 
         do {
             NSNumber * _Nonnull memberValue;
@@ -2403,7 +2403,13 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
             return nil;
         }
 
-        __auto_type * value = [MTRBooleanSensorConfigurationClusterSensorFaultEvent new];
+        __auto_type * value = [MTRBooleanStateConfigurationClusterSensorFaultEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.sensorFault.Raw()];
+            value.sensorFault = memberValue;
+        } while (0);
 
         return value;
     }
@@ -4458,8 +4464,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return DecodeEventPayloadForBooleanSensorConfigurationCluster(aPath.mEventId, aReader, aError);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return DecodeEventPayloadForBooleanStateConfigurationCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return DecodeEventPayloadForValveConfigurationAndControlCluster(aPath.mEventId, aReader, aError);
