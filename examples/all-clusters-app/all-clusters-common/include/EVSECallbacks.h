@@ -56,12 +56,14 @@ struct EVSECbInfo
 
     union
     {
+        /* for type = StateChanged */
         struct
         {
             StateEnum state;
             SupplyStateEnum supplyState;
         } StateChange;
 
+        /* for type = ChargeCurrentChanged */
         struct
         {
             int64_t maximumChargeCurrent;
