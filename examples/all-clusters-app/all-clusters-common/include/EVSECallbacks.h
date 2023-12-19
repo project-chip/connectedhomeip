@@ -24,8 +24,8 @@ namespace Clusters {
 
 using namespace chip::app::Clusters::EnergyEvse;
 
-/* This callbacks mechanism is intended to allow different delegates to callback
- * and inform the manufacturer that something has changed.
+/* This callbacks mechanism is intended to allow different delegates to
+ * dispatch notifications that something has changed.
  *
  * This is not specific to the EnergyEVSE cluster, but includes DeviceEnergyManagement
  * and potential future clusters.
