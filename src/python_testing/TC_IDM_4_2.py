@@ -39,54 +39,58 @@ class TC_IDM_4_2(MatterBaseTest):
             self.print_step("0a", "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins")
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 3600
         else:
+            logging.info("debux")
             # Get IdleModeDuration attribute (IdleModeInterval?)
+            self.print_step("0b", "CR1 reads from the DUT the IdleModeDuration attribute.")
+
+            logging.info("debux - Setting enpoint...")
             endpoint = self.user_params.get("endpoint", 0)
+
+            logging.info("debux - Setting cluster...")
             cluster = Clusters.Objects.IcdManagement
+            
+            logging.info("debux - Setting attributes...")
             attributes = Clusters.IcdManagement.Attributes
+            
             idleModeDuration = 0
 
-            if (self.check_pics("ICDM.S.A0000")):
-                self.print_step("0b", "CR1 reads from the DUT the IdleModeDuration attribute.")
-                idleModeDuration = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, 
-                    cluster=cluster, 
-                    attribute=attributes.IdleModeDuration)
-                
-                SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = idleModeDuration
-            else:
-                asserts.assert_true(False, "IdleModeDuration is a mandatory attribute and must be present in the PICS file")
-        
-        self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+            logging.info("debux - Getting idleModeDuration...")
+            idleModeDuration = await self.read_single_attribute_check_success(
+                endpoint=endpoint, 
+                cluster=cluster, 
+                attribute=attributes.IdleModeDuration)
+            
+            logging.info('debux - idleModeDuration: ' + idleModeDuration)
+            
+            SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = idleModeDuration
+
+        # self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
     
-        
-        
-        
-        # Controllers
+        # # Controllers Setup
+        # fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
 
-        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-
-        CR1_nodeid = self.matter_test_config.controller_node_id
-        CR2_nodeid = self.matter_test_config.controller_node_id + 1
+        # CR1_nodeid = self.matter_test_config.controller_node_id
+        # CR2_nodeid = self.matter_test_config.controller_node_id + 1
         
-        TH1 = fabric_admin.NewController(nodeId=CR1_nodeid,
-                                         paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
-        TH2 = fabric_admin.NewController(nodeId=CR2_nodeid,
-                                         paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+        # CR1 = fabric_admin.NewController(nodeId=CR1_nodeid,
+        #                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
+        # CR2 = fabric_admin.NewController(nodeId=CR2_nodeid,
+        #                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
         
-        CR1_admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[CR1_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=0x001f)])
+        # CR1_admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+        #     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+        #     subjects=[CR1_nodeid],
+        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=0x001f)])
         
-        CR2_limited_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            subjects=[CR2_nodeid],
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])        
+        # CR2_limited_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+        #     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+        #     subjects=[CR2_nodeid],
+        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])        
         
-        acl = [CR1_admin_acl, CR2_limited_acl]
-        await self.write_acl(acl)
+        # acl = [CR1_admin_acl, CR2_limited_acl]
+        # await self.write_acl(acl)
         
         
         
