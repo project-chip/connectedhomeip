@@ -139,7 +139,7 @@ int64_t DeviceEnergyManagementDelegate::GetAbsMaxPower()
     return mAbsMaxPower;
 }
 
-Attributes::PowerAdjustmentCapability::TypeInfo::Type DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
+PowerAdjustmentCapability::TypeInfo::Type DeviceEnergyManagementDelegate::GetPowerAdjustmentCapability()
 {
     return mPowerAdjustmentCapability;
 }
@@ -233,21 +233,67 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValue)
 }
 
 CHIP_ERROR
-DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(
-    Attributes::PowerAdjustmentCapability::TypeInfo::Type & powerAdjustmentCapability)
+DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type powerAdjustmentCapability)
 {
-    // TODO copy the value
+    if (powerAdjustmentCapability.IsNull())
+    {
+        mPowerAdjustmentCapability.SetNull();
+        ChipLogDetail(AppServer, "null src - %s", __FUNCTION__);
+    }
+    else
+    {
+        auto src    = powerAdjustmentCapability.Value();
+        auto target = mPowerAdjustmentCapability.Value();
+        auto size   = src.size();
+
+        if (size > 8)
+        {
+            return CHIP_ERROR_BAD_REQUEST;
+        }
+
+        target.reduce_size(0);
+
+        for (size_t i = 0; i < size; i++)
+        {
+            const_cast<Structs::PowerAdjustStruct::Type &>(target[i]) = src[i];
+        }
+    }
 
     MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerAdjustmentCapability::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> & forecast)
+CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> forecast)
 {
-    mForecast = forecast;
-    mForecast.Value().forecastId++;
+    if (forecast.IsNull())
+    {
+        mForecast.SetNull();
+        ChipLogDetail(AppServer, "null src - %s", __FUNCTION__);
+    }
+    else
+    {
+        auto src    = forecast.Value();
+        auto target = mForecast.Value();
 
-    // TODO update the member variable structure
+        target.forecastId++;
+        target.activeSlotNumber  = src.activeSlotNumber;
+        target.startTime         = src.startTime;
+        target.endTime           = src.endTime;
+        target.earliestStartTime = src.earliestStartTime;
+        target.latestEndTime     = src.latestEndTime;
+        target.isPauseable       = src.isPauseable;
+
+        auto slots = src.slots;
+        auto size  = slots.size();
+        target.slots.reduce_size(0); // clear them
+        ChipLogDetail(AppServer, "src.slots.size() %d - %s", (int) size, __FUNCTION__);
+
+        for (size_t i = 0; i < size; i++)
+        {
+            const_cast<Structs::SlotStruct::Type &>(target.slots[i]) =
+                slots[i]; // TODO: test if this works for optional/nullable stuff
+        }
+    }
 
     MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
 
