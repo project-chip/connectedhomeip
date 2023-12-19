@@ -44,7 +44,7 @@ tests:
 
           Note: The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application
 
-          Verify the DUT receives "AddSceneResponse" command on sending message to the all-clusters-app. The log below should be seen on TH
+          Verify the DUT receives "AddSceneResponse" command on sending message to the all-clusters-app. The log below should be seen on DUT
 
           [1702307872.231804][4852:4854] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0000
           [1702307872.231895][4852:4854] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0000
@@ -61,8 +61,9 @@ tests:
           DUT issues a C_VIEW_SCENE command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes view-scene GroupID SceneID1 NodeID EndpointID
 
-          Verify the DUT receives the view-scenes response and that the extension fields in the log match the ones expected. The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet,
-          The number of ExtensionFieldSets, the value of clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values varies for each application.
+          Verify the DUT receives the view-scenes response and that the extension fields in the log match the ones expected.
+          The expected number of ExtensionFieldSets, the value of the clusterId of each ExtensionFieldSet, the number of attributes in attributeValueList and their values
+          will vary depending on the TH application.
 
           [1702308535.141808][4874:4876] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0001
           [1702308535.141865][4874:4876] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0001
@@ -90,7 +91,7 @@ tests:
           DUT issues a C_REMOVE_SCENE command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes remove-scene GroupID SceneID1 NodeID EndpointID
 
-          Verify the DUT receives the RemoveSceneResponse command. The log below should be seen on TH
+          Verify the DUT receives the RemoveSceneResponse command. The log below should be seen on DUT
 
           [1702309101.681384][4891:4893] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0002
           [1702309101.681465][4891:4893] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0002
@@ -102,14 +103,13 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: DUT issues a C_REMOVE_ALL_SCENES command to the Test
-          Harness."
+          "Step 4: DUT issues a C_REMOVE_ALL_SCENES command to the Test Harness."
       PICS: S.C.C03.Tx
       verification: |
           DUT issues a C_REMOVE_ALL_SCENES command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes remove-all-scenes GroupID NodeID EndpointID
 
-          Verify the DUT receives the RemoveAllScenesResponse command. The log below should be seen on TH
+          Verify the DUT receives the RemoveAllScenesResponse command. The log below should be seen on DUT
 
           [1702313181.462597][5014:5016] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0003
           [1702313181.462674][5014:5016] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0003
@@ -126,7 +126,7 @@ tests:
           DUT issues a C_STORE_SCENE command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes store-scene GroupID SceneID1 NodeID EndpointID
 
-          Verify the DUT receives the StoreSceneResponse command. The log below should be seen on TH
+          Verify the DUT receives the StoreSceneResponse command. The log below should be seen on DUT
 
           [1702313453.832028][5031:5033] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0004
           [1702313453.832181][5031:5033] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0004
@@ -143,7 +143,7 @@ tests:
           DUT issues a C_RECALL_SCENE command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes recall-scene GroupID SceneID1 NodeID EndpointID
 
-          Verify the DUT receives Success (0x00) status as a response. The log below should be seen on TH
+          Verify the DUT receives Success (0x00) status as a response. The log below should be seen on DUT
 
           [1702313771.265859][5044:5046] CHIP:DMG: Received Command Response Status for Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0005 Status=0x0
       disabled: true
@@ -156,7 +156,7 @@ tests:
           DUT issues a C_GET_SCENE_MEMBERSHIP command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes get-scene-membership GroupID NodeID EndpointID
 
-          Verify the DUT receives the GetSceneMembershipResponse command. The log below should be seen on TH
+          Verify the DUT receives the GetSceneMembershipResponse command. The log below should be seen on DUT
 
           [1702313969.025404][5063:5065] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0006
           [1702313969.025568][5063:5065] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0006
@@ -175,7 +175,7 @@ tests:
           DUT issues a C_COPY_SCENE command to the Test Harness equivalent to the following chip-tool command:
           ./chip-tool scenes copy-scene 0 GroupID SceneID1 GroupID SceneID2 NodeID EndpointID
 
-          Verify the DUT receives the CopySceneResponse command. The log below should be seen on TH
+          Verify the DUT receives the CopySceneResponse command. The log below should be seen on DUT
 
           [1702314797.599704][5095:5097] CHIP:DMG: Received Command Response Data, Endpoint=EndpointID Cluster=0x0000_0005 Command=0x0000_0042
           [1702314797.599778][5095:5097] CHIP:TOO: Endpoint: EndpointID Cluster: 0x0000_0005 Command 0x0000_0042
