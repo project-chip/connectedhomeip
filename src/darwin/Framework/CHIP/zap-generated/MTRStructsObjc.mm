@@ -4203,7 +4203,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent
+@implementation MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4217,7 +4217,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent alloc] init];
 
     other.alarmsActive = self.alarmsActive;
     other.alarmsSuppressed = self.alarmsSuppressed;
@@ -4233,24 +4233,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSensorFaultEvent
+@implementation MTRBooleanStateConfigurationClusterSensorFaultEvent
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _sensorFault = @(0);
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSensorFaultEvent alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterSensorFaultEvent alloc] init];
+
+    other.sensorFault = self.sensorFault;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sensorFault:%@; >", NSStringFromClass([self class]), _sensorFault];
     return descriptionString;
 }
 
@@ -4262,6 +4266,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _valveState = @(0);
+
+        _valveLevel = nil;
     }
     return self;
 }
@@ -4271,13 +4277,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRValveConfigurationAndControlClusterValveStateChangedEvent alloc] init];
 
     other.valveState = self.valveState;
+    other.valveLevel = self.valveLevel;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; >", NSStringFromClass([self class]), _valveState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; valveLevel:%@; >", NSStringFromClass([self class]), _valveState, _valveLevel];
     return descriptionString;
 }
 
@@ -5203,7 +5210,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _targetTime = @(0);
+        _targetTimeMinutesPastMidnight = @(0);
 
         _targetSoC = nil;
 
@@ -5216,7 +5223,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterChargingTargetStruct alloc] init];
 
-    other.targetTime = self.targetTime;
+    other.targetTimeMinutesPastMidnight = self.targetTimeMinutesPastMidnight;
     other.targetSoC = self.targetSoC;
     other.addedEnergy = self.addedEnergy;
 
@@ -5225,7 +5232,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTime:%@; targetSoC:%@; addedEnergy:%@; >", NSStringFromClass([self class]), _targetTime, _targetSoC, _addedEnergy];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTimeMinutesPastMidnight:%@; targetSoC:%@; addedEnergy:%@; >", NSStringFromClass([self class]), _targetTimeMinutesPastMidnight, _targetSoC, _addedEnergy];
     return descriptionString;
 }
 
@@ -5371,7 +5378,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _sessionID = @(0);
+        _sessionID = nil;
 
         _state = @(0);
 

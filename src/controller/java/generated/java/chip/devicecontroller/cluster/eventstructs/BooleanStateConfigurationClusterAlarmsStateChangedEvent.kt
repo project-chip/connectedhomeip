@@ -14,21 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.controller.cluster.eventstructs
+package chip.devicecontroller.cluster.eventstructs
 
+import chip.devicecontroller.cluster.*
 import java.util.Optional
-import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-  val alarmsActive: UByte,
-  val alarmsSuppressed: Optional<UByte>
+class BooleanStateConfigurationClusterAlarmsStateChangedEvent(
+  val alarmsActive: UInt,
+  val alarmsSuppressed: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
-    append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n")
+    append("BooleanStateConfigurationClusterAlarmsStateChangedEvent {\n")
     append("\talarmsActive : $alarmsActive\n")
     append("\talarmsSuppressed : $alarmsSuppressed\n")
     append("}\n")
@@ -53,22 +53,19 @@ class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader
-    ): BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+    ): BooleanStateConfigurationClusterAlarmsStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
-      val alarmsActive = tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_ACTIVE))
+      val alarmsActive = tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_ACTIVE))
       val alarmsSuppressed =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
-          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
         } else {
           Optional.empty()
         }
 
       tlvReader.exitContainer()
 
-      return BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-        alarmsActive,
-        alarmsSuppressed
-      )
+      return BooleanStateConfigurationClusterAlarmsStateChangedEvent(alarmsActive, alarmsSuppressed)
     }
   }
 }

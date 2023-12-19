@@ -3663,8 +3663,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BooleanSensorConfiguration::Id: {
-        using namespace app::Clusters::BooleanSensorConfiguration;
+    case app::Clusters::BooleanStateConfiguration::Id: {
+        using namespace app::Clusters::BooleanStateConfiguration;
         switch (aPath.mEventId)
         {
         case Events::AlarmsStateChanged::Id: {
@@ -3702,19 +3702,19 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass alarmsStateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent",
+                env, "chip/devicecontroller/ChipEventStructs$BooleanStateConfigurationClusterAlarmsStateChangedEvent",
                 alarmsStateChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanStateConfigurationClusterAlarmsStateChangedEvent");
                 return nullptr;
             }
             jmethodID alarmsStateChangedStructCtor =
                 env->GetMethodID(alarmsStateChangedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
             if (alarmsStateChangedStructCtor == nullptr)
             {
-                ChipLogError(
-                    Zcl, "Could not find ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent constructor");
+                ChipLogError(Zcl,
+                             "Could not find ChipEventStructs$BooleanStateConfigurationClusterAlarmsStateChangedEvent constructor");
                 return nullptr;
             }
 
@@ -3730,23 +3730,31 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_sensorFault;
+            std::string value_sensorFaultClassName     = "java/lang/Integer";
+            std::string value_sensorFaultCtorSignature = "(I)V";
+            jint jnivalue_sensorFault                  = static_cast<jint>(cppValue.sensorFault.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_sensorFaultClassName.c_str(),
+                                                                       value_sensorFaultCtorSignature.c_str(), jnivalue_sensorFault,
+                                                                       value_sensorFault);
+
             jclass sensorFaultStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent",
+                env, "chip/devicecontroller/ChipEventStructs$BooleanStateConfigurationClusterSensorFaultEvent",
                 sensorFaultStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanStateConfigurationClusterSensorFaultEvent");
                 return nullptr;
             }
-            jmethodID sensorFaultStructCtor = env->GetMethodID(sensorFaultStructClass, "<init>", "()V");
+            jmethodID sensorFaultStructCtor = env->GetMethodID(sensorFaultStructClass, "<init>", "(Ljava/lang/Integer;)V");
             if (sensorFaultStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BooleanStateConfigurationClusterSensorFaultEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(sensorFaultStructClass, sensorFaultStructCtor);
+            jobject value = env->NewObject(sensorFaultStructClass, sensorFaultStructCtor, value_sensorFault);
 
             return value;
         }
@@ -3774,6 +3782,23 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_valveStateClassName.c_str(), value_valveStateCtorSignature.c_str(), jnivalue_valveState, value_valveState);
 
+            jobject value_valveLevel;
+            if (!cppValue.valveLevel.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_valveLevel);
+            }
+            else
+            {
+                jobject value_valveLevelInsideOptional;
+                std::string value_valveLevelInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_valveLevelInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_valveLevelInsideOptional                  = static_cast<jint>(cppValue.valveLevel.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_valveLevelInsideOptionalClassName.c_str(), value_valveLevelInsideOptionalCtorSignature.c_str(),
+                    jnivalue_valveLevelInsideOptional, value_valveLevelInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_valveLevelInsideOptional, value_valveLevel);
+            }
+
             jclass valveStateChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent",
@@ -3785,7 +3810,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jmethodID valveStateChangedStructCtor =
-                env->GetMethodID(valveStateChangedStructClass, "<init>", "(Ljava/lang/Integer;)V");
+                env->GetMethodID(valveStateChangedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
             if (valveStateChangedStructCtor == nullptr)
             {
                 ChipLogError(
@@ -3793,7 +3818,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
 
-            jobject value = env->NewObject(valveStateChangedStructClass, valveStateChangedStructCtor, value_valveState);
+            jobject value =
+                env->NewObject(valveStateChangedStructClass, valveStateChangedStructCtor, value_valveState, value_valveLevel);
 
             return value;
         }
@@ -5248,11 +5274,18 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 return nullptr;
             }
             jobject value_sessionID;
-            std::string value_sessionIDClassName     = "java/lang/Long";
-            std::string value_sessionIDCtorSignature = "(J)V";
-            jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            if (cppValue.sessionID.IsNull())
+            {
+                value_sessionID = nullptr;
+            }
+            else
+            {
+                std::string value_sessionIDClassName     = "java/lang/Long";
+                std::string value_sessionIDCtorSignature = "(J)V";
+                jlong jnivalue_sessionID                 = static_cast<jlong>(cppValue.sessionID.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                    value_sessionIDClassName.c_str(), value_sessionIDCtorSignature.c_str(), jnivalue_sessionID, value_sessionID);
+            }
 
             jobject value_state;
             std::string value_stateClassName     = "java/lang/Integer";
