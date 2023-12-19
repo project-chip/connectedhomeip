@@ -107,7 +107,6 @@ Status ChangeToMode(EndpointId endpointId, uint8_t newMode)
     {
         return checkSupportedModeStatus;
     }
-
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
     return Status::Success;
@@ -124,7 +123,7 @@ static void sceneModeSelectCallback(EndpointId endpoint);
 using ModeSelectEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<uint8_t>;
 using ModeSelectTransitionTimeInterface =
     scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kModeSelectMaxEnpointCount,
-                                                             EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+                                                             EMBER_AF_MODE_SELECT_CLUSTER_SERVER_ENDPOINT_COUNT>;
 
 class DefaultModeSelectSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -159,15 +158,16 @@ public:
     }
 
     /// @brief Serialize the Cluster's EFS value
-    /// @param endpoint target endpoint
-    /// @param cluster  target cluster
-    /// @param serializedBytes data to serialize into EFS
+    /// @param [in] endpoint target endpoint
+    /// @param [in] cluster  target cluster
+    /// @param [out] serializedBytes data to serialize into EFS
     /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
     {
         using AttributeValuePair = Scenes::Structs::AttributeValuePair::Type;
 
         uint8_t currentMode;
+        uint8_t attributeCount = 0;
         // read CurrentMode value
         EmberAfStatus status = Attributes::CurrentMode::Get(endpoint, &currentMode);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -178,10 +178,11 @@ public:
 
         AttributeValuePair pairs[scenableAttributeCount];
 
-        pairs[0].attributeID    = Attributes::CurrentMode::Id;
-        pairs[0].attributeValue = currentMode;
+        pairs[attributeCount].attributeID    = Attributes::CurrentMode::Id;
+        pairs[attributeCount].attributeValue = currentMode;
+        attributeCount++;
 
-        app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
+        app::DataModel::List<AttributeValuePair> attributeValueList(pairs, attributeCount);
 
         return EncodeAttributeValueList(attributeValueList, serializedBytes);
     }
@@ -229,7 +230,7 @@ public:
 
 private:
     ModeSelectTransitionTimeInterface mTransitionTimeInterface =
-        ModeSelectTransitionTimeInterface(Attributes::CurrentMode::Id, sceneModeSelectCallback);
+        ModeSelectTransitionTimeInterface(ModeSelect::Id, sceneModeSelectCallback);
 };
 static DefaultModeSelectSceneHandler sModeSelectSceneHandler;
 
@@ -239,6 +240,13 @@ static void timerCallback(System::Layer *, void * callbackContext)
     (control->callback)(control->endpoint);
 }
 
+/**
+ * @brief This function is a callback to apply the mode that was saved when the ApplyScene was called with a transition time greater
+ * than 0.
+ *
+ * @param endpoint The endpoint ID that the scene mode selection is associated with.
+ *
+ */
 static void sceneModeSelectCallback(EndpointId endpoint)
 {
     ModeSelectEndPointPair savedState;
@@ -275,7 +283,7 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     }
 
     ChipLogProgress(Zcl, "ModeSelect: ChangeToMode successful");
-    commandHandler->AddStatus(commandPath, Status::Success);
+    commandHandler->AddStatus(commandPath, status);
     return true;
 }
 
