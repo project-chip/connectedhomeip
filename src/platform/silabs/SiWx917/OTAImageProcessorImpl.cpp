@@ -37,12 +37,13 @@ extern "C" {
 #define RPS_DATA 2
 /// No error, operation OK
 #define SL_BOOTLOADER_OK 0L
-#define SL_STATUS_FW_UPDATE_DONE ((sl_status_t) 0x10003)
+#define SL_STATUS_FW_UPDATE_DONE SL_STATUS_SI91X_NO_AP_FOUND
 uint8_t flag = RPS_HEADER;
 
 namespace chip {
 
 // Define static memebers
+bool OTAImageProcessorImpl::mReset                                                      = false;
 uint8_t OTAImageProcessorImpl::mSlotId                                                  = 0;
 uint32_t OTAImageProcessorImpl::mWriteOffset                                            = 0;
 uint16_t OTAImageProcessorImpl::writeBufOffset                                          = 0;
@@ -139,6 +140,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "HandlePrepareDownload");
 
+    mReset                                  = false;
     mSlotId                                 = 0; // Single slot until we support multiple images
     writeBufOffset                          = 0;
     mWriteOffset                            = 0;
@@ -167,14 +169,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
         ChipLogProgress(SoftwareUpdate, "status: 0x%lX", status);
 
-        if (status != 0)
+        if (status != SL_STATUS_OK)
         {
             if (status == SL_STATUS_FW_UPDATE_DONE)
             {
-                ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
-                // send system reset request to reset the MCU and upgrade the m4 image
-                ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
-                sl_si91x_soc_soft_reset();
+                mReset = true;
             }
             else
             {
@@ -185,7 +184,8 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         }
     }
     imageProcessor->ReleaseBlock();
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleFinalize");
+
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully");
 }
 
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
@@ -198,6 +198,15 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleApply");
+
+    if(mReset)
+    {
+        ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
+        // send system reset request to reset the MCU and upgrade the m4 image
+        ChipLogProgress(SoftwareUpdate, "SoC Soft Reset initiated!");
+        // Reboots the device
+        sl_si91x_soc_soft_reset();
+    }
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -242,7 +251,6 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     // Copy data into the word-aligned writeBuffer, once it fills write its contents to the bootloader storage
     // Final data block is handled in HandleFinalize().
     uint32_t blockReadOffset = 0;
-
     while (blockReadOffset < block.size())
     {
         writeBuffer[writeBufOffset] = *((block.data()) + blockReadOffset);
@@ -262,7 +270,22 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
             {
                 // Send RPS content
                 status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+                if (status != SL_STATUS_OK)
+                {
+                    // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value should be set to true in HandleProcessBlock
+                    if (status == SL_STATUS_FW_UPDATE_DONE)
+                    {
+                        mReset = true;
+                    }
+                    else
+                    {
+                        ChipLogError(SoftwareUpdate, "ERROR: In HandleFinalize for last chunk rsi_fwup() error %ld", status);
+                        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+                        return;
+                    }
+                }
             }
+       //     ChipLogProgress(SoftwareUpdate, "HandleProcessBlock status: 0x%lX", status);
             imageProcessor->mParams.downloadedBytes += kAlignmentBytes;
         }
     }
