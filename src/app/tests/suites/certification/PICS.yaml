@@ -757,6 +757,12 @@ PICS:
           "Does the device implement an Application Device Type on any endpoint"
       id: APPDEVICE.S
 
+    # Content App Observer Cluster
+    - label:
+          "Does the device implement the Content App Observer cluster as a
+          server?"
+      id: APPOBSERVER.S
+
     # Actions Cluster Test Plan
     - label: "Does the device implement the Actions cluster as a server?"
       id: ACT.S
@@ -1807,11 +1813,8 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
-    - label: "Does the DUT support testing the failed ChangeToMode command?"
+    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
       id: DISHM.S.M.CAN_TEST_MODE_FAILURE
-
-    - label: "Can the mode changed by manually control at the device?"
-      id: DISHM.S.M.CAN_MANUALLY_CONTROLLED
 
     # PIXIT
 
@@ -8995,9 +8998,6 @@ PICS:
           "Id of mode the device will fail to transition to, given its current
           state"
       id: PIXIT.TCCM.MODE_CHANGE_FAIL
-
-    - label: "Can the mode changed by manually control at the device?"
-      id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Features
     - label:
