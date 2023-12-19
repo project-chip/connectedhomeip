@@ -17,8 +17,8 @@
  */
 
 #include "OTAConfig.h"
-#include <app/server/Server.h>
 #include "sl_matter_ota_config.h" // MATTER_GSDK_INTEGRATION
+#include <app/server/Server.h>
 
 #ifndef SIWX_917
 

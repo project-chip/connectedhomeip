@@ -199,7 +199,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded successfully in HandleApply");
 
-    if(mReset)
+    if (mReset)
     {
         ChipLogProgress(SoftwareUpdate, "M4 Firmware update complete");
         // send system reset request to reset the MCU and upgrade the m4 image
@@ -272,7 +272,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                 status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
                 if (status != SL_STATUS_OK)
                 {
-                    // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value should be set to true in HandleProcessBlock
+                    // If the last chunk of last block-writeBufOffset length is exactly kAlignmentBytes(64) bytes then mReset value
+                    // should be set to true in HandleProcessBlock
                     if (status == SL_STATUS_FW_UPDATE_DONE)
                     {
                         mReset = true;
@@ -285,7 +286,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
                     }
                 }
             }
-       //     ChipLogProgress(SoftwareUpdate, "HandleProcessBlock status: 0x%lX", status);
+            //     ChipLogProgress(SoftwareUpdate, "HandleProcessBlock status: 0x%lX", status);
             imageProcessor->mParams.downloadedBytes += kAlignmentBytes;
         }
     }
