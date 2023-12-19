@@ -63,7 +63,7 @@ limitations under the License.
 
     <command source="server" code="0x05" name="ProgramGuideResponse" optional="true">
       <description>This command is a response to the GetProgramGuide command.</description>
-      <arg name="ChannelPagingStruct" type="int16s"/>
+      <arg name="Paging" type="ChannelPagingStruct"/>
       <arg name="ProgramList" type="ProgramStruct" array="true"/>
     </command>
 

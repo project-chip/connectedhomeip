@@ -33,9 +33,9 @@ limitations under the License.
 
     <command source="server" code="0x01" name="ContentAppMessageResponse" optional="false">
       <description>This command SHALL be generated in response to ContentAppMessage command.</description>
-      <arg name="Status" type="StatusEnum" optional="true"/>
-      <arg name="Data" type="char_string" optional="false"/>
-      <arg name="EncodingHint" type="char_string" optional="false"/>
+      <arg name="Status" type="StatusEnum" optional="false"/>
+      <arg name="Data" type="char_string" optional="true"/>
+      <arg name="EncodingHint" type="char_string" optional="true"/>
     </command>
 
   </cluster>
