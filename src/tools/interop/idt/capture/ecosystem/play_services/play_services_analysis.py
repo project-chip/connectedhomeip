@@ -16,12 +16,22 @@
 #
 
 import os
+from dataclasses import dataclass
+from typing import TextIO
 
 from capture.platform.android import Android
 from utils.artifact import create_standard_log_name, log
 from utils.log import add_border, print_and_write
 
 logger = log.get_logger(__file__)
+
+
+@dataclass(repr=True)
+class Cause:
+    search_terms: [str]
+    search_attr: [str]
+    help_message: str
+    follow_up_causes: []  # : [Cause] (Recursive reference does not work for type hint here)
 
 
 class PlayServicesAnalysis:
@@ -41,6 +51,24 @@ class PlayServicesAnalysis:
         self.resolver_logs = ''
         self.sigma_logs = ''
         self.fail_trace_line_counter = -1
+        self.causes = [
+            Cause(["Failed to discover commissionable device."],
+                  "failure_stack_trace",
+                  "Play Services could not locate the device's initial advertisement. Use $ idt discover to check!",
+                  []),
+            Cause(["SetupDeviceViewModel", "Failed to discover operational device"],
+                  "failure_stack_trace",
+                  "All steps of PASE completed as expected, but we failed to establish a secure session on IP network",
+                  [Cause(["AddressResolve_DefaultImpl", "Timeout"],
+                         "matter_commissioner_logs",
+                         "Play Services failed to locate end device via DNS-SD. Inspect pcaps / $ idt discover -t d",
+                         []),
+                   Cause(["CASESession", "Timeout"],
+                         "matter_commissioner_logs",
+                         "End device discovered via DNS-SD, but the secure session handshake failed! Try $ idt probe",
+                         []),
+                   ])
+        ]
 
     def _log_proc_matter_commissioner(self, line: str) -> None:
         """Core commissioning flow"""
@@ -77,6 +105,22 @@ class PlayServicesAnalysis:
             self.logger.info(line)
             self.sigma_logs += line
 
+    def check_cause(self, cause: Cause, analysis_file: TextIO):
+        to_search = getattr(self, cause.search_attr)
+        found = True
+        for search_term in cause.search_terms:
+            found = found and search_term in to_search
+        if found:
+            print_and_write(cause.help_message, analysis_file)
+        if found and cause.follow_up_causes:
+            for follow_up in cause.follow_up_causes:
+                self.check_cause(self, follow_up)
+
+    def do_prescriptive_analysis(self, analysis_file: TextIO) -> None:
+        print_and_write(add_border("Prescriptive analysis"), analysis_file)
+        for cause in self.causes:
+            self.check_cause(cause, analysis_file)
+
     def show_analysis(self) -> None:
         analysis_file = open(self.analysis_file_name, mode="w+")
         print_and_write(add_border('Matter commissioner logs'), analysis_file)
@@ -91,6 +135,7 @@ class PlayServicesAnalysis:
         print_and_write(self.resolver_logs, analysis_file)
         print_and_write(add_border('CASE handshake'), analysis_file)
         print_and_write(self.sigma_logs, analysis_file)
+        self.do_prescriptive_analysis(analysis_file)
         analysis_file.close()
 
     def process_line(self, line: str) -> None:
