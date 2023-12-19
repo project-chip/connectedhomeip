@@ -1053,18 +1053,20 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
+@interface MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable alarmsSuppressed MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBooleanSensorConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
+@interface MTRBooleanStateConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sensorFault MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRValveConfigurationAndControlClusterValveStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull valveState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable valveLevel MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

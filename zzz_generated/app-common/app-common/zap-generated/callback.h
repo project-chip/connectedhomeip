@@ -537,13 +537,13 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Init
+/** @brief Boolean State Configuration Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Valve Configuration and Control Cluster Init
  *
@@ -5801,42 +5801,42 @@ void emberAfActivatedCarbonFilterMonitoringClusterServerTickCallback(chip::Endpo
 void emberAfActivatedCarbonFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Boolean Sensor Configuration Cluster
+// Boolean State Configuration Cluster
 //
 
-/** @brief Boolean Sensor Configuration Cluster Server Init
+/** @brief Boolean State Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Server Shutdown
+/** @brief Boolean State Configuration Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterBooleanSensorConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterBooleanStateConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Client Init
+/** @brief Boolean State Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Server Attribute Changed
+/** @brief Boolean State Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBooleanSensorConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterBooleanStateConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Boolean Sensor Configuration Cluster Server Pre Attribute Changed
+/** @brief Boolean State Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -5845,10 +5845,10 @@ void MatterBooleanSensorConfigurationClusterServerAttributeChangedCallback(const
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterBooleanStateConfigurationClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Boolean Sensor Configuration Cluster Client Pre Attribute Changed
+/** @brief Boolean State Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -5857,24 +5857,24 @@ chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationCluste
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationClusterClientPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterBooleanStateConfigurationClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Boolean Sensor Configuration Cluster Server Tick
+/** @brief Boolean State Configuration Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBooleanSensorConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Client Tick
+/** @brief Boolean State Configuration Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBooleanSensorConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Valve Configuration and Control Cluster
@@ -10183,11 +10183,17 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Boolean Sensor Configuration Cluster SuppressRequest Command callback (from client)
+ * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */
-bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
+bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData);
+    const chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData);
+/**
+ * @brief Boolean State Configuration Cluster EnableDisableAlarm Command callback (from client)
+ */
+bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData);
 /**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */
@@ -10200,12 +10206,6 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
 bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
-/**
- * @brief Valve Configuration and Control Cluster SetLevel Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterSetLevelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::DecodableType & commandData);
 /**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
