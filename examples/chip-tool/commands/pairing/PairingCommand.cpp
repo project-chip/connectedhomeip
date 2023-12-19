@@ -408,19 +408,19 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
 
-    if (info.isLIT)
+    std::string userActiveModeTriggerInstruction;
+
+    // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+    if (info.icdUserActiveModeTriggerInstruction.size() != 0)
     {
-        std::string userActiveModeTriggerInstruction;
+        userActiveModeTriggerInstruction =
+            std::string(info.icdUserActiveModeTriggerInstruction.data(), info.icdUserActiveModeTriggerInstruction.size());
+    }
 
-        // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
-        if (info.litUserActiveModeTriggerInstruction.size() != 0)
-        {
-            userActiveModeTriggerInstruction =
-                std::string(info.litUserActiveModeTriggerInstruction.data(), info.litUserActiveModeTriggerInstruction.size());
-        }
-
+    if (info.icdUserActiveModeTriggerHint.HasAny())
+    {
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
-                        info.litUserActiveModeTriggerHint.Raw());
+                        info.icdUserActiveModeTriggerHint.Raw());
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }
