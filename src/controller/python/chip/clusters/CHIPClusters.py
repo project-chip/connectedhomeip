@@ -6135,44 +6135,74 @@ class ChipClusters:
             },
         },
     }
-    _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO = {
-        "clusterName": "BooleanSensorConfiguration",
+    _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO = {
+        "clusterName": "BooleanStateConfiguration",
         "clusterId": 0x00000080,
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SuppressRequest",
+                "commandName": "SuppressAlarm",
                 "args": {
                     "alarmsToSuppress": "int",
+                },
+            },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "EnableDisableAlarm",
+                "args": {
+                    "alarmsToEnableDisable": "int",
                 },
             },
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SensitivityLevel",
+                "attributeName": "CurrentSensitivityLevel",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
             0x00000001: {
-                "attributeName": "AlarmsActive",
+                "attributeName": "SupportedSensitivityLevels",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "AlarmsSuppressed",
+                "attributeName": "DefaultSensitivityLevel",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "AlarmsEnabled",
+                "attributeName": "AlarmsActive",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
+            },
+            0x00000004: {
+                "attributeName": "AlarmsSuppressed",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "AlarmsEnabled",
+                "attributeId": 0x00000005,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "AlarmsSupported",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "SensorFault",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -6221,20 +6251,13 @@ class ChipClusters:
                 "commandName": "Open",
                 "args": {
                     "openDuration": "int",
+                    "targetLevel": "int",
                 },
             },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Close",
                 "args": {
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "SetLevel",
-                "args": {
-                    "level": "int",
-                    "openDuration": "int",
                 },
             },
         },
@@ -6244,38 +6267,37 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000001: {
-                "attributeName": "AutoCloseTime",
+                "attributeName": "DefaultOpenDuration",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000002: {
-                "attributeName": "RemainingDuration",
+                "attributeName": "AutoCloseTime",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "CurrentState",
+                "attributeName": "RemainingDuration",
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "TargetState",
+                "attributeName": "CurrentState",
                 "attributeId": 0x00000004,
                 "type": "int",
                 "reportable": True,
             },
             0x00000005: {
-                "attributeName": "StartUpState",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000006: {
                 "attributeName": "CurrentLevel",
@@ -6290,7 +6312,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000008: {
-                "attributeName": "OpenLevel",
+                "attributeName": "DefaultOpenLevel",
                 "attributeId": 0x00000008,
                 "type": "int",
                 "reportable": True,
@@ -13836,7 +13858,7 @@ class ChipClusters:
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        0x00000080: _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
+        0x00000080: _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000091: _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
@@ -13951,7 +13973,7 @@ class ChipClusters:
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
-        "BooleanSensorConfiguration": _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
+        "BooleanStateConfiguration": _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "ElectricalEnergyMeasurement": _ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_INFO,
         "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,

@@ -3997,14 +3997,8 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster is used to configure a boolean sensor. */
-provisional cluster BooleanSensorConfiguration = 128 {
+provisional cluster BooleanStateConfiguration = 128 {
   revision 1;
-
-  enum SensitivityEnum : enum8 {
-    kHigh = 0;
-    kStandard = 1;
-    kLow = 2;
-  }
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4018,18 +4012,27 @@ provisional cluster BooleanSensorConfiguration = 128 {
     kSensitivityLevel = 0x8;
   }
 
+  bitmap SensorFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+  }
+
   info event AlarmsStateChanged = 0 {
     AlarmModeBitmap alarmsActive = 0;
     optional AlarmModeBitmap alarmsSuppressed = 1;
   }
 
   info event SensorFault = 1 {
+    SensorFaultBitmap sensorFault = 0;
   }
 
-  attribute optional SensitivityEnum sensitivityLevel = 0;
-  readonly attribute optional AlarmModeBitmap alarmsActive = 1;
-  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 2;
-  attribute optional AlarmModeBitmap alarmsEnabled = 3;
+  attribute optional int8u currentSensitivityLevel = 0;
+  readonly attribute optional int8u supportedSensitivityLevels = 1;
+  readonly attribute optional int8u defaultSensitivityLevel = 2;
+  readonly attribute optional AlarmModeBitmap alarmsActive = 3;
+  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 4;
+  readonly attribute optional AlarmModeBitmap alarmsEnabled = 5;
+  readonly attribute optional AlarmModeBitmap alarmsSupported = 6;
+  readonly attribute optional SensorFaultBitmap sensorFault = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4037,21 +4040,32 @@ provisional cluster BooleanSensorConfiguration = 128 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SuppressRequestRequest {
+  request struct SuppressAlarmRequest {
     AlarmModeBitmap alarmsToSuppress = 0;
   }
 
-  /** This command is used to suppress the specified alarm. */
-  command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
+  request struct EnableDisableAlarmRequest {
+    AlarmModeBitmap alarmsToEnableDisable = 0;
+  }
+
+  /** This command is used to suppress the specified alarm mode. */
+  command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
+  /** This command is used to enable or disable the specified alarm mode. */
+  command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
 /** This cluster is used to configure a valve. */
 provisional cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
   enum ValveStateEnum : enum8 {
-    kOpen = 0;
-    kClosed = 1;
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
   }
 
   bitmap Feature : bitmap32 {
@@ -4063,25 +4077,29 @@ provisional cluster ValveConfigurationAndControl = 129 {
     kGeneralFault = 0x1;
     kBlocked = 0x2;
     kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
   }
 
   info event ValveStateChanged = 0 {
     ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
   }
 
   info event ValveFault = 1 {
     ValveFaultBitmap valveFault = 0;
   }
 
-  attribute access(write: manage) nullable elapsed_s openDuration = 0;
-  readonly attribute optional nullable epoch_us autoCloseTime = 1;
-  readonly attribute optional nullable elapsed_s remainingDuration = 2;
-  readonly attribute nullable ValveStateEnum currentState = 3;
-  readonly attribute nullable ValveStateEnum targetState = 4;
-  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
+  readonly attribute nullable elapsed_s openDuration = 0;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
   readonly attribute optional nullable percent currentLevel = 6;
   readonly attribute optional nullable percent targetLevel = 7;
-  attribute access(write: manage) optional nullable percent openLevel = 8;
+  attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4091,20 +4109,14 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenRequest {
-    optional elapsed_s openDuration = 0;
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
   }
 
-  request struct SetLevelRequest {
-    percent level = 0;
-    optional elapsed_s openDuration = 1;
-  }
-
-  /** This command is used to set the valve to its fully open position. */
+  /** This command is used to set the valve to its open position. */
   command Open(OpenRequest): DefaultSuccess = 0;
-  /** This command is used to set the valve to its fully closed position. */
+  /** This command is used to set the valve to its closed position. */
   command Close(): DefaultSuccess = 1;
-  /** This command is used to set the valve to a specific level. */
-  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
@@ -4451,13 +4463,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s minPauseDuration = 6;
     elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
-    optional int64s nominalPower = 9;
-    optional int64s minPower = 10;
-    optional int64s maxPower = 11;
-    optional int64s nominalEnergy = 12;
+    optional power_mw nominalPower = 9;
+    optional power_mw minPower = 10;
+    optional power_mw maxPower = 11;
+    optional energy_mwh nominalEnergy = 12;
     optional CostStruct costs[] = 13;
-    optional int64s minPowerAdjustment = 14;
-    optional int64s maxPowerAdjustment = 15;
+    optional power_mw minPowerAdjustment = 14;
+    optional power_mw maxPowerAdjustment = 15;
     optional elapsed_s minDurationAdjustment = 16;
     optional elapsed_s maxDurationAdjustment = 17;
   }
@@ -4476,21 +4488,21 @@ provisional cluster DeviceEnergyManagement = 152 {
   struct ConstraintsStruct {
     epoch_s startTime = 0;
     elapsed_s duration = 1;
-    optional int64s nominalPower = 2;
-    optional int64s maximumEnergy = 3;
+    optional power_mw nominalPower = 2;
+    optional energy_mwh maximumEnergy = 3;
     optional int8s loadControl = 4;
   }
 
   struct PowerAdjustStruct {
-    int64s minPower = 0;
-    int64s maxPower = 1;
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
     elapsed_s minDuration = 2;
     elapsed_s maxDuration = 3;
   }
 
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
-    int64s nominalPower = 1;
+    power_mw nominalPower = 1;
     elapsed_s duration = 2;
   }
 
@@ -4500,7 +4512,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   info event PowerAdjustEnd = 1 {
     CauseEnum cause = 0;
     elapsed_s duration = 1;
-    int64s energyUse = 2;
+    energy_mwh energyUse = 2;
   }
 
   info event Paused = 2 {
@@ -4512,8 +4524,8 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute ESATypeEnum ESAType = 0;
   readonly attribute boolean ESACanGenerate = 1;
   readonly attribute ESAStateEnum ESAState = 2;
-  readonly attribute int64s absMinPower = 3;
-  readonly attribute int64s absMaxPower = 4;
+  readonly attribute power_mw absMinPower = 3;
+  readonly attribute power_mw absMaxPower = 4;
   readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4524,7 +4536,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PowerAdjustRequestRequest {
-    int64s power = 0;
+    power_mw power = 0;
     elapsed_s duration = 1;
   }
 

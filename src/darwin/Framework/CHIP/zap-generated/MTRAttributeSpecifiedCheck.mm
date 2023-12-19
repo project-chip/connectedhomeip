@@ -2819,11 +2819,17 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
-static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
-    case Attributes::SensitivityLevel::Id: {
+    case Attributes::CurrentSensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSensitivityLevels::Id: {
+        return YES;
+    }
+    case Attributes::DefaultSensitivityLevel::Id: {
         return YES;
     }
     case Attributes::AlarmsActive::Id: {
@@ -2833,6 +2839,12 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
         return YES;
     }
     case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSupported::Id: {
+        return YES;
+    }
+    case Attributes::SensorFault::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2865,6 +2877,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::OpenDuration::Id: {
         return YES;
     }
+    case Attributes::DefaultOpenDuration::Id: {
+        return YES;
+    }
     case Attributes::AutoCloseTime::Id: {
         return YES;
     }
@@ -2877,16 +2892,13 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::TargetState::Id: {
         return YES;
     }
-    case Attributes::StartUpState::Id: {
-        return YES;
-    }
     case Attributes::CurrentLevel::Id: {
         return YES;
     }
     case Attributes::TargetLevel::Id: {
         return YES;
     }
-    case Attributes::OpenLevel::Id: {
+    case Attributes::DefaultOpenLevel::Id: {
         return YES;
     }
     case Attributes::ValveFault::Id: {
@@ -6342,8 +6354,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return AttributeIsSpecifiedInBooleanSensorConfigurationCluster(aAttributeId);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return AttributeIsSpecifiedInBooleanStateConfigurationCluster(aAttributeId);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);

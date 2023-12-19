@@ -3513,24 +3513,40 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 namespace Attributes {
 
-namespace SensitivityLevel {
+namespace CurrentSensitivityLevel {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace SensitivityLevel
+} // namespace CurrentSensitivityLevel
+
+namespace SupportedSensitivityLevels {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedSensitivityLevels
+
+namespace DefaultSensitivityLevel {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace DefaultSensitivityLevel
 
 namespace AlarmsActive {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace AlarmsActive
 
 namespace AlarmsSuppressed {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace AlarmsSuppressed
 
 namespace AlarmsEnabled {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000005;
 } // namespace AlarmsEnabled
+
+namespace AlarmsSupported {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace AlarmsSupported
+
+namespace SensorFault {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace SensorFault
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3557,7 +3573,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 namespace Attributes {
@@ -3566,25 +3582,25 @@ namespace OpenDuration {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace OpenDuration
 
-namespace AutoCloseTime {
+namespace DefaultOpenDuration {
 static constexpr AttributeId Id = 0x00000001;
+} // namespace DefaultOpenDuration
+
+namespace AutoCloseTime {
+static constexpr AttributeId Id = 0x00000002;
 } // namespace AutoCloseTime
 
 namespace RemainingDuration {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace RemainingDuration
 
 namespace CurrentState {
-static constexpr AttributeId Id = 0x00000003;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace CurrentState
 
 namespace TargetState {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace TargetState
-
-namespace StartUpState {
 static constexpr AttributeId Id = 0x00000005;
-} // namespace StartUpState
+} // namespace TargetState
 
 namespace CurrentLevel {
 static constexpr AttributeId Id = 0x00000006;
@@ -3594,9 +3610,9 @@ namespace TargetLevel {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace TargetLevel
 
-namespace OpenLevel {
+namespace DefaultOpenLevel {
 static constexpr AttributeId Id = 0x00000008;
-} // namespace OpenLevel
+} // namespace DefaultOpenLevel
 
 namespace ValveFault {
 static constexpr AttributeId Id = 0x00000009;
