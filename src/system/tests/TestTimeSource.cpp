@@ -84,7 +84,7 @@ int TestTimeSource()
         "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */
     };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr /* context */);
 
     return (nlTestRunnerStats(&theSuite));

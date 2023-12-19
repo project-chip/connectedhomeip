@@ -8,6 +8,8 @@ import kotlinx.coroutines.runBlocking
 import matter.controller.MatterController
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.UShortSubscriptionState
+import matter.controller.cluster.clusters.IdentifyCluster
 import matter.controller.model.AttributePath
 import matter.controller.model.EventPath
 
@@ -24,6 +26,38 @@ class PairOnNetworkLongImSubscribeCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
+    currentCommissioner()
+      .pairDevice(
+        getNodeId(),
+        getRemoteAddr().address.hostAddress,
+        MATTER_PORT,
+        getDiscriminator(),
+        getSetupPINCode(),
+      )
+    currentCommissioner().setCompletionListener(this)
+    waitCompleteMs(getTimeoutMillis())
+
+    runBlocking {
+      try {
+        // Verify Wildcard subscription
+        startWildcardSubscription()
+
+        // Verify IdentifyTime attribute subscription
+        subscribeIdentifyTimeAttribute()
+      } catch (ex: Exception) {
+        logger.log(Level.WARNING, "General subscribe failure occurred with error ${ex.message}")
+        setFailure("subscribe failure")
+      } finally {
+        clear()
+      }
+    }
+
+    setSuccess()
+  }
+
+  private suspend fun startWildcardSubscription() {
+    logger.log(Level.INFO, "Starting wildcard subscription")
+
     val attributePaths =
       listOf(
         AttributePath(
@@ -42,35 +76,7 @@ class PairOnNetworkLongImSubscribeCommand(
         )
       )
 
-    val subscribeRequest: SubscribeRequest = SubscribeRequest(eventPaths, attributePaths)
-
-    currentCommissioner()
-      .pairDevice(
-        getNodeId(),
-        getRemoteAddr().address.hostAddress,
-        MATTER_PORT,
-        getDiscriminator(),
-        getSetupPINCode(),
-      )
-    currentCommissioner().setCompletionListener(this)
-    waitCompleteMs(getTimeoutMillis())
-
-    runBlocking {
-      try {
-        startSubscription(subscribeRequest)
-      } catch (ex: Exception) {
-        logger.log(Level.WARNING, "General subscribe failure occurred with error ${ex.message}")
-        setFailure("subscribe failure")
-      } finally {
-        clear()
-      }
-    }
-
-    setSuccess()
-  }
-
-  private suspend fun startSubscription(request: SubscribeRequest) {
-    logger.log(Level.INFO, "Starting subscription")
+    val request: SubscribeRequest = SubscribeRequest(eventPaths, attributePaths)
 
     currentCommissioner()
       .subscribe(request)
@@ -92,7 +98,39 @@ class PairOnNetworkLongImSubscribeCommand(
             )
           }
           is SubscriptionState.SubscriptionEstablished -> {
-            logger.log(Level.INFO, "Subscription is established")
+            logger.log(Level.INFO, "Wildcard Subscription is established")
+          }
+          else -> {
+            logger.log(Level.SEVERE, "Unexpected subscription state: $subscriptionState")
+          }
+        }
+      }
+  }
+
+  private suspend fun subscribeIdentifyTimeAttribute() {
+    logger.log(Level.INFO, "Subscribe IdentifyTime attribute")
+
+    val identifyCluster = IdentifyCluster(controller = currentCommissioner(), endpointId = 0u)
+
+    identifyCluster
+      .subscribeIdentifyTimeAttribute(minInterval = 0, maxInterval = 5)
+      .takeWhile { subscriptionState ->
+        // Keep collecting as long as it's not SubscriptionEstablished
+        subscriptionState !is UShortSubscriptionState.SubscriptionEstablished
+      }
+      .collect { subscriptionState ->
+        when (subscriptionState) {
+          is UShortSubscriptionState.Success -> {
+            logger.log(Level.INFO, "Received IdentifyTime Update: ${subscriptionState.value}")
+          }
+          is UShortSubscriptionState.Error -> {
+            logger.log(
+              Level.WARNING,
+              "Received SubscriptionErrorNotification with terminationCause: ${subscriptionState.exception}"
+            )
+          }
+          is UShortSubscriptionState.SubscriptionEstablished -> {
+            logger.log(Level.INFO, "IdentifyTime Subscription is established")
           }
           else -> {
             logger.log(Level.SEVERE, "Unexpected subscription state: $subscriptionState")

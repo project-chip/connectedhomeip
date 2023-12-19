@@ -11061,29 +11061,29 @@ public class ChipClusters {
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long systemTimeUsFieldID = 0L;
-          Long systemTimeUs = null;
-          final long UTCTimeUsFieldID = 1L;
-          @Nullable Long UTCTimeUs = null;
+          final long systemTimeMsFieldID = 0L;
+          Long systemTimeMs = null;
+          final long posixTimeMsFieldID = 1L;
+          @Nullable Long posixTimeMs = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == systemTimeUsFieldID) {
+            if (element.contextTagNum() == systemTimeMsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                systemTimeUs = castingValue.value(Long.class);
+                systemTimeMs = castingValue.value(Long.class);
               }
-            } else if (element.contextTagNum() == UTCTimeUsFieldID) {
+            } else if (element.contextTagNum() == posixTimeMsFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                UTCTimeUs = castingValue.value(Long.class);
+                posixTimeMs = castingValue.value(Long.class);
               }
             }
           }
-          callback.onSuccess(systemTimeUs, UTCTimeUs);
+          callback.onSuccess(systemTimeMs, posixTimeMs);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
     public interface TimeSnapshotResponseCallback extends BaseClusterCallback {
-      void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs);
+      void onSuccess(Long systemTimeMs, @Nullable Long posixTimeMs);
     }
 
     public interface NetworkInterfacesAttributeCallback extends BaseAttributeCallback {
@@ -29898,6 +29898,18 @@ public class ChipClusters {
       void onSuccess(@Nullable Long value);
     }
 
+    public interface SessionDurationAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface SessionEnergyChargedAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
+    public interface SessionEnergyDischargedAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Long value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -30492,76 +30504,76 @@ public class ChipClusters {
     }
 
     public void readSessionDurationAttribute(
-        LongAttributeCallback callback) {
+        SessionDurationAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_DURATION_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SESSION_DURATION_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSessionDurationAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        SessionDurationAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_DURATION_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, SESSION_DURATION_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSessionEnergyChargedAttribute(
-        LongAttributeCallback callback) {
+        SessionEnergyChargedAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ENERGY_CHARGED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SESSION_ENERGY_CHARGED_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSessionEnergyChargedAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        SessionEnergyChargedAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ENERGY_CHARGED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, SESSION_ENERGY_CHARGED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readSessionEnergyDischargedAttribute(
-        LongAttributeCallback callback) {
+        SessionEnergyDischargedAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID, true);
     }
 
     public void subscribeSessionEnergyDischargedAttribute(
-        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        SessionEnergyDischargedAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, SESSION_ENERGY_DISCHARGED_ATTRIBUTE_ID, minInterval, maxInterval);
     }
