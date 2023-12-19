@@ -108,16 +108,14 @@ tests:
               maxValue: 254
 
 #Skipping test-7 because SDK is not enabled with this failure response
-    - label:
-     "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
-      to PIXIT.OM.MODE_CHANGE_FAIL"
-    PICS: OM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp
-    command: "ChangeToMode"
-    arguments:
+    - label: "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set to PIXIT.OM.MODE_CHANGE_FAIL"
+      PICS: OM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp
+      command: "ChangeToMode"
+      arguments:
        values:
            - name: "NewMode"
              value: NewMode_CHANGE_FAIL
-    response:
+      response:
        values:
            - name: "Status"
              constraints:
