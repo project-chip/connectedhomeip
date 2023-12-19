@@ -109,6 +109,18 @@ const char * StageToString(CommissioningStage stage)
         return "ConfigureTrustedTimeSource";
         break;
 
+    case kICDGetRegistrationInfo:
+        return "ICDGetRegistrationInfo";
+        break;
+
+    case kICDRegistration:
+        return "ICDRegistration";
+        break;
+
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
+        break;
+
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
         break;

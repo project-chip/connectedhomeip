@@ -2365,27 +2365,27 @@ void CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject SystemTimeUs;
-    std::string SystemTimeUsClassName     = "java/lang/Long";
-    std::string SystemTimeUsCtorSignature = "(J)V";
-    jlong jniSystemTimeUs                 = static_cast<jlong>(dataResponse.systemTimeUs);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeUsClassName.c_str(), SystemTimeUsCtorSignature.c_str(),
-                                                                jniSystemTimeUs, SystemTimeUs);
-    jobject UTCTimeUs;
-    if (dataResponse.UTCTimeUs.IsNull())
+    jobject SystemTimeMs;
+    std::string SystemTimeMsClassName     = "java/lang/Long";
+    std::string SystemTimeMsCtorSignature = "(J)V";
+    jlong jniSystemTimeMs                 = static_cast<jlong>(dataResponse.systemTimeMs);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeMsClassName.c_str(), SystemTimeMsCtorSignature.c_str(),
+                                                                jniSystemTimeMs, SystemTimeMs);
+    jobject PosixTimeMs;
+    if (dataResponse.posixTimeMs.IsNull())
     {
-        UTCTimeUs = nullptr;
+        PosixTimeMs = nullptr;
     }
     else
     {
-        std::string UTCTimeUsClassName     = "java/lang/Long";
-        std::string UTCTimeUsCtorSignature = "(J)V";
-        jlong jniUTCTimeUs                 = static_cast<jlong>(dataResponse.UTCTimeUs.Value());
-        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(UTCTimeUsClassName.c_str(), UTCTimeUsCtorSignature.c_str(),
-                                                                    jniUTCTimeUs, UTCTimeUs);
+        std::string PosixTimeMsClassName     = "java/lang/Long";
+        std::string PosixTimeMsCtorSignature = "(J)V";
+        jlong jniPosixTimeMs                 = static_cast<jlong>(dataResponse.posixTimeMs.Value());
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(PosixTimeMsClassName.c_str(), PosixTimeMsCtorSignature.c_str(),
+                                                                    jniPosixTimeMs, PosixTimeMs);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeUs, UTCTimeUs);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeMs, PosixTimeMs);
 }
 CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback::CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(
     jobject javaCallback) : Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>(CallbackFn, this)
@@ -3959,13 +3959,14 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
     {
         auto & entry_0 = iter_ChargingTargets_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_targetTime;
-        std::string newElement_0_targetTimeClassName     = "java/lang/Integer";
-        std::string newElement_0_targetTimeCtorSignature = "(I)V";
-        jint jninewElement_0_targetTime                  = static_cast<jint>(entry_0.targetTime);
-        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_targetTimeClassName.c_str(),
-                                                                   newElement_0_targetTimeCtorSignature.c_str(),
-                                                                   jninewElement_0_targetTime, newElement_0_targetTime);
+        jobject newElement_0_targetTimeMinutesPastMidnight;
+        std::string newElement_0_targetTimeMinutesPastMidnightClassName     = "java/lang/Integer";
+        std::string newElement_0_targetTimeMinutesPastMidnightCtorSignature = "(I)V";
+        jint jninewElement_0_targetTimeMinutesPastMidnight = static_cast<jint>(entry_0.targetTimeMinutesPastMidnight);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_targetTimeMinutesPastMidnightClassName.c_str(),
+                                                                   newElement_0_targetTimeMinutesPastMidnightCtorSignature.c_str(),
+                                                                   jninewElement_0_targetTimeMinutesPastMidnight,
+                                                                   newElement_0_targetTimeMinutesPastMidnight);
         jobject newElement_0_targetSoC;
         if (!entry_0.targetSoC.HasValue())
         {
@@ -4016,8 +4017,8 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
             return;
         }
 
-        newElement_0 = env->NewObject(chargingTargetStructStructClass_1, chargingTargetStructStructCtor_1, newElement_0_targetTime,
-                                      newElement_0_targetSoC, newElement_0_addedEnergy);
+        newElement_0 = env->NewObject(chargingTargetStructStructClass_1, chargingTargetStructStructCtor_1,
+                                      newElement_0_targetTimeMinutesPastMidnight, newElement_0_targetSoC, newElement_0_addedEnergy);
         chip::JniReferences::GetInstance().AddToList(ChargingTargets, newElement_0);
     }
 
@@ -4947,24 +4948,24 @@ void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
                                                                        jninewElement_0_coolSetpoint, newElement_0_coolSetpoint);
         }
 
-        jclass thermostatScheduleTransitionStructClass_1;
+        jclass weeklyScheduleTransitionStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$ThermostatClusterThermostatScheduleTransition",
-            thermostatScheduleTransitionStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct",
+            weeklyScheduleTransitionStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterThermostatScheduleTransition");
+            ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct");
             return;
         }
-        jmethodID thermostatScheduleTransitionStructCtor_1 = env->GetMethodID(
-            thermostatScheduleTransitionStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (thermostatScheduleTransitionStructCtor_1 == nullptr)
+        jmethodID weeklyScheduleTransitionStructStructCtor_1 = env->GetMethodID(
+            weeklyScheduleTransitionStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        if (weeklyScheduleTransitionStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterThermostatScheduleTransition constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterWeeklyScheduleTransitionStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(thermostatScheduleTransitionStructClass_1, thermostatScheduleTransitionStructCtor_1,
+        newElement_0 = env->NewObject(weeklyScheduleTransitionStructStructClass_1, weeklyScheduleTransitionStructStructCtor_1,
                                       newElement_0_transitionTime, newElement_0_heatSetpoint, newElement_0_coolSetpoint);
         chip::JniReferences::GetInstance().AddToList(Transitions, newElement_0);
     }

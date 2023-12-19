@@ -256,7 +256,22 @@
     <string name="group_setting_write_btn_text">Write</string>
 
     <string name="ota_provider_btn_text">OTA Provider</string>
+    <string name="ota_provider_query_image_response_status_text">Query Image Response Status</string>
+    <string name="ota_provider_delayed_action_time_text">DelayTime</string>
+    <string name="ota_provider_user_consent_needed_text">User Consent Needed (bool)</string>
+    <string name="ota_provider_read_write_attribute_text">R/W Attribute</string>
+    <string name="ota_provider_write_acl_btn_text">Write Acl</string>
+    <string name="ota_provider_read_attribute_btn_text">Read</string>
+    <string name="ota_provider_write_attribute_btn_text">Write</string>
     <string name="ota_provider_vendorId_text">Vendor ID</string>
     <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
+    <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
     <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
+    <string name="ota_provider_invalid_attribute">Invalid Attribute</string>
+    <string name="ota_provider_write_default_ota_providers_text">Write Default OTA Providers</string>
+    <string name="ota_provider_fabric_index_text">Fabric Index</string>
+    <string name="ota_provider_provider_node_id_text">Provider Node ID</string>
+    <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
+    <string name="ota_provider_write_text">Write</string>
+    <string name="ota_provider_node_id_text">Node ID</string>
 </resources>

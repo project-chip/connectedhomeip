@@ -37,7 +37,6 @@ ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
-    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",
@@ -46,6 +45,10 @@ ti_sysconfig("sysconfig") {
     "ti_ble_config.h",
     "ti_dmm_application_policy.c",
     "ti_dmm_application_policy.h",
+
+    # CCFG generation disabled for OTA-able application
+    #"ti_devices_config.c",
+    #"ti_devices_config.h",
 
     # disabled until upstream generation is aligned
     #"tiop_config.h",
@@ -75,10 +78,13 @@ ti_simplelink_executable("all-clusters-app") {
   output_name = "chip-${ti_simplelink_board}-all-clusters-example.out"
 
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",

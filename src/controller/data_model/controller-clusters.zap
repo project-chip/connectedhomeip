@@ -19,17 +19,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -428,6 +428,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -562,6 +563,7 @@
           "define": "BINARY_INPUT_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -3070,6 +3072,49 @@
           ]
         },
         {
+          "name": "Device Energy Management",
+          "code": 152,
+          "mfgCode": null,
+          "define": "DEVICE_ENERGY_MANAGEMENT_CLUSTER",
+          "side": "client",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Energy EVSE",
           "code": 153,
           "mfgCode": null,
@@ -3441,6 +3486,7 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -5065,6 +5111,7 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",

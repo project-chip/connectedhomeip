@@ -1173,6 +1173,31 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
+void DeviceCommissioner::OnICDManagementRegisterClientResponse(
+    void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
+{
+    DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
+    VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Command response callback with null context. Ignoring"));
+
+    if (commissioner->mCommissioningStage != CommissioningStage::kICDRegistration)
+    {
+        return;
+    }
+
+    if (commissioner->mDeviceBeingCommissioned == nullptr)
+    {
+        return;
+    }
+
+    if (commissioner->mPairingDelegate != nullptr)
+    {
+        commissioner->mPairingDelegate->OnICDRegistrationComplete(commissioner->mDeviceBeingCommissioned->GetDeviceId(),
+                                                                  data.ICDCounter);
+    }
+    CommissioningDelegate::CommissioningReport report;
+    commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+}
+
 bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                            OnExtendFailsafeFailure onFailure)
@@ -1897,25 +1922,50 @@ void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedN
 // ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone(app::ReadClient *)
 {
+    mReadClient = nullptr;
     switch (mCommissioningStage)
     {
     case CommissioningStage::kReadCommissioningInfo:
-        ParseCommissioningInfo();
+        // Silently complete the stage, data will be saved in attribute cache and
+        // will be parsed after all ReadCommissioningInfo stages are completed.
+        CommissioningStageComplete(CHIP_NO_ERROR);
         break;
     case CommissioningStage::kReadCommissioningInfo2:
-        ParseCommissioningInfo2();
+        // Note: Only parse commissioning info in the last ReadCommissioningInfo stage.
+        ParseCommissioningInfo();
         break;
     default:
-        // We're not trying to read anything here, just exit
         break;
     }
 }
 
 void DeviceCommissioner::ParseCommissioningInfo()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReadCommissioningInfo info;
+
+    err = ParseCommissioningInfo1(info);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = ParseCommissioningInfo2(info);
+    }
+
+    mAttributeCache = nullptr;
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnReadCommissioningInfo(info);
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<ReadCommissioningInfo>(info);
+    CommissioningStageComplete(err, report);
+}
+
+CHIP_ERROR DeviceCommissioner::ParseCommissioningInfo1(ReadCommissioningInfo & info)
+{
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
-    ReadCommissioningInfo info;
 
     // Try to parse as much as we can here before returning, even if attributes
     // are missing or cannot be decoded.
@@ -2055,17 +2105,8 @@ void DeviceCommissioner::ParseCommissioningInfo()
     {
         ChipLogError(Controller, "Error parsing commissioning information");
     }
-    mAttributeCache = nullptr;
-    mReadClient     = nullptr;
 
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnReadCommissioningInfo(info);
-    }
-
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<ReadCommissioningInfo>(info);
-    CommissioningStageComplete(return_err, report);
+    return return_err;
 }
 
 void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
@@ -2128,34 +2169,31 @@ void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
     }
 }
 
-void DeviceCommissioner::ParseCommissioningInfo2()
+CHIP_ERROR DeviceCommissioner::ParseCommissioningInfo2(ReadCommissioningInfo & info)
 {
-    ReadCommissioningInfo2 info;
-    CHIP_ERROR return_err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
-    CHIP_ERROR err =
-        mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection);
-    if (err != CHIP_NO_ERROR)
+
+    if (mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection) !=
+        CHIP_NO_ERROR)
     {
         // May not be present so don't return the error code, non fatal, default concurrent
         ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
         info.supportsConcurrentConnection = true;
     }
 
-    return_err = ParseFabrics(info);
+    err = ParseFabrics(info);
 
-    if (return_err == CHIP_NO_ERROR)
+    if (err == CHIP_NO_ERROR)
     {
-        return_err = ParseICDInfo(info);
+        err = ParseICDInfo(info);
     }
 
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<ReadCommissioningInfo2>(info);
-    CommissioningStageComplete(return_err, report);
+    return err;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo2 & info)
+CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
 {
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
@@ -2205,7 +2243,7 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo2 & info)
                     else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
                     {
                         ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
-                        info.nodeId = fabricDescriptor.nodeID;
+                        info.remoteNodeId = fabricDescriptor.nodeID;
                     }
                 }
             }
@@ -2219,13 +2257,13 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo2 & info)
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnFabricCheck(info.nodeId);
+        mPairingDelegate->OnFabricCheck(info.remoteNodeId);
     }
 
     return return_err;
 }
 
-CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
+CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 {
     CHIP_ERROR err;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
@@ -2233,14 +2271,14 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
-        info.isIcd                  = true;
+        info.isLIT                  = true;
         info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         // This key is optional so not an error
         err        = CHIP_NO_ERROR;
-        info.isIcd = false;
+        info.isLIT = false;
         err        = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
@@ -2252,7 +2290,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
         {
             if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
             {
-                info.isIcd = false;
+                info.isLIT = false;
             }
             else
             {
@@ -2362,6 +2400,16 @@ CHIP_ERROR DeviceCommissioner::NetworkCredentialsReady()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceCommissioner::ICDRegistrationInfoReady()
+{
+    ReturnErrorCodeIf(mCommissioningStage != CommissioningStage::kICDGetRegistrationInfo, CHIP_ERROR_INCORRECT_STATE);
+
+    // need to advance to next step
+    CommissioningStageComplete(CHIP_NO_ERROR);
+
+    return CHIP_NO_ERROR;
+}
+
 void DeviceCommissioner::OnNetworkConfigResponse(void * context,
                                                  const NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
@@ -2423,7 +2471,8 @@ void DeviceCommissioner::SendCommissioningReadRequest(DeviceProxy * proxy, Optio
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = readPathsSize;
 
-    auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
+    // Take ownership of the attribute cache, so it can be released when SendRequest fails.
+    auto attributeCache = std::move(mAttributeCache);
     auto readClient     = chip::Platform::MakeUnique<app::ReadClient>(
         engine, proxy->GetExchangeManager(), attributeCache->GetBufferedCallback(), app::ReadClient::InteractionType::Read);
     CHIP_ERROR err = readClient->SendRequest(readParams);
@@ -2474,6 +2523,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kReadCommissioningInfo: {
         ChipLogProgress(Controller, "Sending read request for commissioning information");
+        // Allocate a new ClusterStateCache when starting reading the first batch of attributes.
+        // The cache will be released in:
+        // - SendCommissioningReadRequest when failing to send a read request.
+        // - ParseCommissioningInfo when the last ReadCommissioningInfo stage is completed.
+        // Currently, we have two ReadCommissioningInfo* stages.
+        mAttributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
+
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
         app::AttributePathParams readPaths[9];
@@ -3005,6 +3061,41 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(err);
             return;
         }
+    }
+    break;
+    case CommissioningStage::kICDGetRegistrationInfo: {
+        GetPairingDelegate()->OnICDRegistrationInfoRequired();
+        return;
+    }
+    break;
+    case CommissioningStage::kICDRegistration: {
+        IcdManagement::Commands::RegisterClient::Type request;
+
+        if (!(params.GetICDCheckInNodeId().HasValue() && params.GetICDMonitoredSubject().HasValue() &&
+              params.GetICDSymmetricKey().HasValue()))
+        {
+            ChipLogError(Controller, "No ICD Registration information provided!");
+            CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE);
+            return;
+        }
+
+        request.checkInNodeID    = params.GetICDCheckInNodeId().Value();
+        request.monitoredSubject = params.GetICDMonitoredSubject().Value();
+        request.key              = params.GetICDSymmetricKey().Value();
+
+        CHIP_ERROR err = SendCommand(proxy, request, OnICDManagementRegisterClientResponse, OnBasicFailure, endpoint, timeout);
+        if (err != CHIP_NO_ERROR)
+        {
+            // We won't get any async callbacks here, so just complete our stage.
+            ChipLogError(Controller, "Failed to send IcdManagement.RegisterClient command: %" CHIP_ERROR_FORMAT, err.Format());
+            CommissioningStageComplete(err);
+            return;
+        }
+    }
+    break;
+    case CommissioningStage::kICDSendStayActive: {
+        // TODO(#24259): Send StayActiveRequest once server supports this.
+        CommissioningStageComplete(CHIP_NO_ERROR);
     }
     break;
     case CommissioningStage::kFindOperational: {

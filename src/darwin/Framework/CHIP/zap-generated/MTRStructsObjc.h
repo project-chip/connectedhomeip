@@ -990,29 +990,29 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterErrorStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTROperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTROperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_PROVISIONALLY_AVAILABLE
+MTR_NEWLY_AVAILABLE
 @interface MTROperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_PROVISIONALLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_NEWLY_AVAILABLE
@@ -1053,23 +1053,67 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
+@interface MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable alarmsSuppressed MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBooleanSensorConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
+@interface MTRBooleanStateConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull sensorFault MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRValveConfigurationAndControlClusterValveStateChangedEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull valveState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable valveLevel MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRValveConfigurationAndControlClusterValveFaultEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull valveFault MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull rangeMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable percentTypical MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedMax MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedMin MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable fixedTypical MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalEnergyMeasurementClusterMeasurementAccuracyStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull measurementType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull measured MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxMeasuredValue MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull accuracyRanges MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull energy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable startSystime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable endSystime MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyImported MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyExported MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent : NSObject <NSCopying>
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyImported MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable energyExported MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1147,8 +1191,93 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterCostStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull costType MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull decimalPoints MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable currency MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterSlotStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull minDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull defaultDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull elapsedSlotTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull remainingSlotTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull slotIsPauseable MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minPauseDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxPauseDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable manufacturerESAState MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nominalPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable minPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable maxPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nominalEnergy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable costs MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable minPowerAdjustment MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable maxPowerAdjustment MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable minDurationAdjustment MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable maxDurationAdjustment MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterForecastStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull forecastId MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable activeSlotNumber MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull endTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable earliestStartTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable latestEndTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull isPauseable MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull slots MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterConstraintsStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull startTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable nominalPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable maximumEnergy MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable loadControl MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterPowerAdjustStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull minPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull minDuration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull maxDuration MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterSlotAdjustmentStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull slotIndex MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull nominalPower MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterPowerAdjustStartEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterPowerAdjustEndEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull cause MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull duration MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull energyUse MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterPausedEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRDeviceEnergyManagementClusterResumedEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterChargingTargetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull targetTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull targetTimeMinutesPastMidnight MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable targetSoC MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nullable addedEnergy MTR_PROVISIONALLY_AVAILABLE;
 @end
@@ -1184,7 +1313,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterFaultEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull sessionID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable sessionID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull state MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull faultStatePreviousState MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull faultStateCurrentState MTR_PROVISIONALLY_AVAILABLE;
@@ -1193,6 +1322,12 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterRFIDEvent : NSObject <NSCopying>
 @property (nonatomic, copy) NSData * _Nonnull uid MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTREnergyPreferenceClusterBalanceStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull step MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable label MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
@@ -1317,11 +1452,22 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
 @end
 
+MTR_NEWLY_AVAILABLE
+@interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_NEWLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-@interface MTRThermostatClusterThermostatScheduleTransition : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct")
+@interface MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1821,6 +1967,12 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 MTR_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRSampleMEIClusterPingCountEventEvent : NSObject <NSCopying>
+@property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 NS_ASSUME_NONNULL_END

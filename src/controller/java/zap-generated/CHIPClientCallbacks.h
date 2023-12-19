@@ -713,13 +713,13 @@ typedef void (*ActivatedCarbonFilterMonitoringEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ActivatedCarbonFilterMonitoringAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BooleanSensorConfigurationGeneratedCommandListListAttributeCallback)(
+typedef void (*BooleanStateConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BooleanSensorConfigurationAcceptedCommandListListAttributeCallback)(
+typedef void (*BooleanStateConfigurationAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BooleanSensorConfigurationEventListListAttributeCallback)(
+typedef void (*BooleanStateConfigurationEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*BooleanSensorConfigurationAttributeListListAttributeCallback)(
+typedef void (*BooleanStateConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*ValveConfigurationAndControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
@@ -728,6 +728,14 @@ typedef void (*ValveConfigurationAndControlAcceptedCommandListListAttributeCallb
 typedef void (*ValveConfigurationAndControlEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ValveConfigurationAndControlAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ElectricalEnergyMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalEnergyMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalEnergyMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ElectricalEnergyMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DemandResponseLoadControlLoadControlProgramsListAttributeCallback)(
     void * context,
@@ -749,6 +757,18 @@ typedef void (*DemandResponseLoadControlEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*DemandResponseLoadControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DeviceEnergyManagementPowerAdjustmentCapabilityListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::DecodableType>> & data);
+typedef void (*DeviceEnergyManagementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DeviceEnergyManagementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*DeviceEnergyManagementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*DeviceEnergyManagementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*EnergyEvseGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*EnergyEvseAcceptedCommandListListAttributeCallback)(
@@ -757,6 +777,22 @@ typedef void (*EnergyEvseEventListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*EnergyEvseAttributeListListAttributeCallback)(void * context,
                                                              const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*EnergyPreferenceEnergyBalancesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType> & data);
+typedef void (*EnergyPreferenceEnergyPrioritiesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::EnergyPriorityEnum> & data);
+typedef void (*EnergyPreferenceLowPowerModeSensitivitiesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType> & data);
+typedef void (*EnergyPreferenceGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EnergyPreferenceAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*EnergyPreferenceEventListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*EnergyPreferenceAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,

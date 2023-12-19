@@ -35,6 +35,16 @@ using namespace ::chip;
 
 namespace {
 
+void WriteUntilRemainingLessThan(nlTestSuite * inSuite, PacketBufferTLVWriter & writer, const uint32_t remainingSize)
+{
+    uint32_t lengthRemaining = writer.GetRemainingFreeLength();
+    while (lengthRemaining >= remainingSize)
+    {
+        NL_TEST_ASSERT(inSuite, writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7)) == CHIP_NO_ERROR);
+        lengthRemaining = writer.GetRemainingFreeLength();
+    }
+}
+
 class TLVPacketBufferBackingStoreTest
 {
 public:
@@ -43,6 +53,9 @@ public:
 
     static void BasicEncodeDecode(nlTestSuite * inSuite, void * inContext);
     static void MultiBufferEncode(nlTestSuite * inSuite, void * inContext);
+    static void NonChainedBufferCanReserve(nlTestSuite * inSuite, void * inContext);
+    static void TestWriterReserveUnreserveDoesNotOverflow(nlTestSuite * inSuite, void * inContext);
+    static void TestWriterReserve(nlTestSuite * inSuite, void * inContext);
 };
 
 int TLVPacketBufferBackingStoreTest::TestSetup(void * inContext)
@@ -238,14 +251,111 @@ void TLVPacketBufferBackingStoreTest::MultiBufferEncode(nlTestSuite * inSuite, v
     NL_TEST_ASSERT(inSuite, error == CHIP_END_OF_TLV);
 }
 
+void TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve(nlTestSuite * inSuite, void * inContext)
+{
+    // Start with a too-small buffer.
+    uint32_t smallSize             = 5;
+    uint32_t smallerSizeToReserver = smallSize - 1;
+
+    auto buffer = PacketBufferHandle::New(smallSize, /* aReservedSize = */ 0);
+
+    PacketBufferTLVWriter writer;
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+}
+
+// This test previously was created to show that there was an overflow bug, now this test mainly
+// just checks that you cannot reserve this type of TLVBackingStorage buffer.
+void TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow(nlTestSuite * inSuite, void * inContext)
+{
+    // Start with a too-small buffer.
+    uint32_t smallSize             = 100;
+    uint32_t smallerSizeToReserver = smallSize - 1;
+
+    auto buffer = PacketBufferHandle::New(smallSize, 0);
+
+    PacketBufferTLVWriter writer;
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ true);
+
+    CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
+    if (error == CHIP_NO_ERROR)
+    {
+        uint32_t lengthRemaining = writer.GetRemainingFreeLength();
+        NL_TEST_ASSERT(inSuite, lengthRemaining == 1);
+        // Lets try to overflow by getting next buffer in the chain,
+        // unreserving then writing until the end of the current buffer.
+        error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        lengthRemaining = writer.GetRemainingFreeLength();
+        NL_TEST_ASSERT(inSuite, lengthRemaining > smallerSizeToReserver);
+
+        WriteUntilRemainingLessThan(inSuite, writer, 2);
+
+        lengthRemaining = writer.GetRemainingFreeLength();
+        NL_TEST_ASSERT(inSuite, lengthRemaining != 0);
+        NL_TEST_ASSERT(inSuite, lengthRemaining < smallerSizeToReserver);
+
+        error = writer.UnreserveBuffer(smallerSizeToReserver);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        lengthRemaining = writer.GetRemainingFreeLength();
+        NL_TEST_ASSERT(inSuite, lengthRemaining > smallerSizeToReserver);
+
+        // This is where we get overflow.
+        WriteUntilRemainingLessThan(inSuite, writer, 2);
+
+        // If we get here then the overflow condition we were expecting did not happen. If that is the case,
+        // either we have fixed reservation for chained buffers, or expected failure didn't hit on this
+        // platform.
+        //
+        // If there is a fix please add reservation for chained buffers, please make sure you account for
+        // what happens if TLVWriter::WriteData fails to get a new buffer but we are not at max size, do
+        // you actually have space for what was supposed to be reserved.
+        NL_TEST_ASSERT(inSuite, false);
+    }
+
+    // We no longer allow non-contigous buffers to be reserved.
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INCORRECT_STATE);
+}
+
+void TLVPacketBufferBackingStoreTest::TestWriterReserve(nlTestSuite * inSuite, void * inContext)
+{
+    // Start with a too-small buffer.
+    uint32_t smallSize             = 5;
+    uint32_t smallerSizeToReserver = smallSize - 1;
+
+    auto buffer = PacketBufferHandle::New(smallSize, 0);
+
+    PacketBufferTLVWriter writer;
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    CHIP_ERROR error = writer.ReserveBuffer(smallerSizeToReserver);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
+    NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_NO_MEMORY);
+
+    error = writer.UnreserveBuffer(smallerSizeToReserver);
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+    error = writer.Put(TLV::AnonymousTag(), static_cast<uint8_t>(7));
+    NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("BasicEncodeDecode",                    TLVPacketBufferBackingStoreTest::BasicEncodeDecode),
-    NL_TEST_DEF("MultiBufferEncode",                    TLVPacketBufferBackingStoreTest::MultiBufferEncode),
+    NL_TEST_DEF("BasicEncodeDecode",                         TLVPacketBufferBackingStoreTest::BasicEncodeDecode),
+    NL_TEST_DEF("MultiBufferEncode",                         TLVPacketBufferBackingStoreTest::MultiBufferEncode),
+    NL_TEST_DEF("NonChainedBufferCanReserve",                TLVPacketBufferBackingStoreTest::NonChainedBufferCanReserve),
+    NL_TEST_DEF("TestWriterReserveUnreserveDoesNotOverflow", TLVPacketBufferBackingStoreTest::TestWriterReserveUnreserveDoesNotOverflow),
+    NL_TEST_DEF("TestWriterReserve",                         TLVPacketBufferBackingStoreTest::TestWriterReserve),
 
     NL_TEST_SENTINEL()
 };

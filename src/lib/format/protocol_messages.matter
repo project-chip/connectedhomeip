@@ -222,6 +222,8 @@ client cluster IMProtocol = 0xFFFF0001 {
     kPathsExhausted = 0xc8;
     kTimedRequestMismatch = 0xc9;
     kFailsafeRequired = 0xca;
+    kInvalidInState = 0xcb;
+    kNoCommandResponse = 0xcc;
     kWriteIgnored = 0xF0;
   }
 

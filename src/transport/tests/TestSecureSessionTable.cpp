@@ -120,10 +120,14 @@ void TestSecureSessionTable::CreateSessionTable(std::vector<SessionParameters> &
             ScopedNodeId(1, sessionParams[i].mPeer.GetFabricIndex()), sessionParams[i].mPeer, CATValues(), static_cast<uint16_t>(i),
             ReliableMessageProtocolConfig(System::Clock::Milliseconds32(0), System::Clock::Milliseconds32(0),
                                           System::Clock::Milliseconds16(0)));
+
+        // Make sure we set up our holder _before_ the session goes into a state
+        // other than active, because holders refuse to hold non-active
+        // sessions.
+        mSessionList.push_back(Platform::MakeUnique<SessionNotificationListener>(session.Value()));
+
         session.Value()->AsSecureSession()->mLastActivityTime = sessionParams[i].mLastActivityTime;
         session.Value()->AsSecureSession()->mState            = sessionParams[i].mState;
-
-        mSessionList.push_back(Platform::MakeUnique<SessionNotificationListener>(session.Value()));
     }
 }
 
@@ -279,12 +283,76 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
     // This validates evicting from a table with equally loaded fabrics. In this scenario,
     // bias is given to the fabric that matches that of the eviction hint.
     //
-    // There are equal sessions to Node 2 as well as Node 3 in that fabric, so the Node
-    // that matches the session eviction hint will be selected, and in that, the older session.
+    // There is an equal number sessions to nodes 1, 2, and 3 in that fabric, so the Node
+    // that matches the session eviction hint will be selected.
+    //
+    // All the sessions in the table are defunct, because for unique active
+    // sessions eviction hints are ignored.
+    //
+    {
+        ChipLogProgress(
+            SecureChannel,
+            "-------- Equal Fabrics Eviction (Single equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kDefunct },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kDefunct },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kDefunct },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kDefunct },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kDefunct },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kDefunct },
+        };
+
+        _this->CreateSessionTable(sessionParamList);
+        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal number sessions to nodes 1, 2, and 3 in that fabric, so the Node
+    // that matches the session eviction hint will be selected.
+    //
+    // All the peers in this table have two sessions to them, so that we pay
+    // attention to the eviction hint.  The older of the two should be selected.
+    //
+    {
+        ChipLogProgress(
+            SecureChannel,
+            "-------- Equal Fabrics Eviction (Multiple equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kActive },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 1, kFabric1 }, System::Clock::Timestamp(10), SecureSession::State::kActive },
+            { { 1, kFabric2 }, System::Clock::Timestamp(4), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(8), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+        };
+
+        _this->CreateSessionTable(sessionParamList);
+        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal sessions to nodes 1, 2, and 3 in that fabric, and only
+    // one per node.  Since all the sessions are active, the eviction hint's
+    // node id will be ignored and the oldest session on the fabric will be selected.
     //
     {
         ChipLogProgress(SecureChannel,
-                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node) ---------");
+                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node, hint node "
+                        "ignored) ---------");
 
         std::vector<SessionParameters> sessionParamList = {
             { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kActive },
@@ -296,7 +364,34 @@ void TestSecureSessionTable::ValidateSessionSorting(nlTestSuite * inSuite, void 
         };
 
         _this->CreateSessionTable(sessionParamList);
-        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 3);
+        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 2);
+    }
+
+    //
+    // This validates evicting from a table with equally loaded fabrics. In this scenario,
+    // bias is given to the fabric that matches that of the eviction hint.
+    //
+    // There is an equal sessions to nodes 1, 2, and 3 in that fabric, and only
+    // one per node.  Since the hinted session is active, the eviction hint's
+    // node id will be ignored and the defunct session will be selected, even
+    // though it's the newest one.
+    //
+    {
+        ChipLogProgress(SecureChannel,
+                        "-------- Equal Fabrics Eviction (Equal # Sessions to Nodes, Hint Match On Fabric & Node, hint node "
+                        "ignored and state wins) ---------");
+
+        std::vector<SessionParameters> sessionParamList = {
+            { { 1, kFabric1 }, System::Clock::Timestamp(9), SecureSession::State::kDefunct },
+            { { 1, kFabric2 }, System::Clock::Timestamp(3), SecureSession::State::kActive },
+            { { 2, kFabric1 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+            { { 3, kFabric1 }, System::Clock::Timestamp(7), SecureSession::State::kActive },
+            { { 3, kFabric2 }, System::Clock::Timestamp(1), SecureSession::State::kActive },
+            { { 4, kFabric2 }, System::Clock::Timestamp(2), SecureSession::State::kActive },
+        };
+
+        _this->CreateSessionTable(sessionParamList);
+        _this->AllocateSession(ScopedNodeId(3, kFabric1), sessionParamList, 0);
     }
 
     //

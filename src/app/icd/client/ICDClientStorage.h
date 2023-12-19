@@ -24,7 +24,6 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/CommonIterator.h>
 #include <stddef.h>
 
 namespace chip {
@@ -37,22 +36,13 @@ namespace app {
 class ICDClientStorage
 {
 public:
-    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
-
     virtual ~ICDClientStorage() = default;
 
     /**
-     * Iterate through persisted ICD Client Info
-     *
-     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
-     */
-    virtual ICDClientInfoIterator * IterateICDClientInfo() = 0;
-
-    /**
      * Called during ICD device registration in commissioning, commissioner/controller
-     * provides raw key data, the shared key handle in clientInfo is updated based upon raw key data
+     * provides raw key data, the shared aes key handle and hmac key handle in clientInfo are updated based upon raw key data
      *
-     * @param[inout] aICDClientInfo the ICD Client information to be updated with keyData and be saved
+     * @param[inout] clientInfo the ICD Client information to be updated with keyData and be saved
      * @param[in] aKeyData raw key data provided by application
      */
     virtual CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) = 0;
@@ -61,26 +51,24 @@ public:
      * Store updated ICD ClientInfo to storage when ICD registration completes or check-in message
      * comes.
      *
-     * @param[in] aICDClientInfo the updated ICD Client Info.
+     * @param[in] clientInfo the updated ICD Client Info.
      */
     virtual CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) = 0;
 
     /**
-     * Delete ICD Client persistent information associated with the specified scoped node Id.
-     * when ICD device is unpaired/removed, the corresponding entry in ICD storage is removed.
-     * @param aPeerNodeId scoped node with peer node id and fabric index
+     * This function removes the ICD key from the provided clientInfo object in the event
+     *  of a failed LIT ICD device registration attempt. If the key handle is not found within
+     *  the Keystore, the function will not perform any operation.
+     * @param[inout] clientInfo The ICD Client Info to update with uninitialized key handle if key is removed successfully.
      */
-    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) = 0;
+    virtual void RemoveKey(ICDClientInfo & clientInfo) = 0;
 
     /**
-     * Remove all ICDClient persistent information associated with the specified
-     * fabric index.  If no entries for the fabric index exist, this is a no-op
-     * and is considered successful.
-     * When the whole fabric is removed, all entries from persistent storage in current fabric index are removed.
-     *
-     * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
+     * Delete ICD Client persistent information associated with the specified scoped node Id.
+     * when ICD device is unpaired/removed, the corresponding entry in ICD storage is removed.
+     * @param peerNode scoped node with peer node id and fabric index
      */
-    virtual CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) = 0;
+    virtual CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) = 0;
 
     /**
      * Process received ICD Check-in message payload.  The implementation needs to parse the payload,

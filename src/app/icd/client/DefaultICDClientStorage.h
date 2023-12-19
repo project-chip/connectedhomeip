@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+// Do not use the DefaultICDClientStorage class in settings where fabric indices are not stable.
+// This class relies on the stability of fabric indices for efficient storage and retrieval of ICD client information.
+// If fabric indices are not stable, the functionality of this class will be compromised and can lead to unexpected behavior.
+
 #pragma once
 
 #include "ICDClientStorage.h"
@@ -27,6 +31,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CommonIterator.h>
 #include <lib/support/Pool.h>
 #include <vector>
 
@@ -46,21 +51,49 @@ namespace app {
 class DefaultICDClientStorage : public ICDClientStorage
 {
 public:
+    using ICDClientInfoIterator = CommonIterator<ICDClientInfo>;
+
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_ICD_CLIENTS_INFO_STORAGE_CONCURRENT_ITERATORS;
 
     CHIP_ERROR Init(PersistentStorageDelegate * clientInfoStore, Crypto::SymmetricKeystore * keyStore);
 
-    ICDClientInfoIterator * IterateICDClientInfo() override;
+    /**
+     * Iterate through persisted ICD Client Info
+     *
+     * @return A valid iterator on success. Use CommonIterator accessor to retrieve ICDClientInfo
+     */
+    ICDClientInfoIterator * IterateICDClientInfo();
 
+    /**
+     * When decrypting check-in messages, the system needs to iterate through all keys
+     * from all ICD clientInfos. In DefaultICDClientStorage, ICDClientInfos for the same fabric are stored in
+     * storage using the fabricIndex as the key. To retrieve all relevant ICDClientInfos
+     * from storage, the system needs to know all fabricIndices in advance. The
+     * `UpdateFabricList` function provides a way to inject newly created fabricIndices
+     * into a dedicated table. It is recommended to call this function whenever a controller is created
+     * with a new fabric index.
+     *
+     * @param[in] fabricIndex The newly created fabric index.
+     */
     CHIP_ERROR UpdateFabricList(FabricIndex fabricIndex);
 
     CHIP_ERROR SetKey(ICDClientInfo & clientInfo, const ByteSpan keyData) override;
 
+    void RemoveKey(ICDClientInfo & clientInfo) override;
+
     CHIP_ERROR StoreEntry(const ICDClientInfo & clientInfo) override;
 
-    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNodeId) override;
+    CHIP_ERROR DeleteEntry(const ScopedNodeId & peerNode) override;
 
-    CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex) override;
+    /**
+     * Remove all ICDClient persistent information associated with the specified
+     * fabric index.  If no entries for the fabric index exist, this is a no-op
+     * and is considered successful.
+     * When the whole fabric is removed, all entries from persistent storage in current fabric index are removed.
+     *
+     * @param[in] fabricIndex the index of the fabric for which to remove ICDClient persistent information
+     */
+    CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
     CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
 
@@ -72,7 +105,8 @@ protected:
         kStartICDCounter  = 3,
         kOffset           = 4,
         kMonitoredSubject = 5,
-        kSharedKey        = 6
+        kAesKeyHandle     = 6,
+        kHmacKeyHandle    = 7,
     };
 
     enum class CounterTag : uint8_t
@@ -100,7 +134,7 @@ protected:
     {
         // All the fields added together
         return TLV::EstimateStructOverhead(sizeof(NodeId), sizeof(FabricIndex), sizeof(uint32_t), sizeof(uint32_t),
-                                           sizeof(uint64_t), sizeof(Crypto::Aes128KeyByteArray));
+                                           sizeof(uint64_t), sizeof(Crypto::Symmetric128BitsKeyByteArray));
     }
 
     static constexpr size_t MaxICDCounterSize()
