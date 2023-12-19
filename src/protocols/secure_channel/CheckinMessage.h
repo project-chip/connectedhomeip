@@ -77,8 +77,9 @@ public:
      *                                    If an error occurs, no value will be set.
      * @param[in,out]   appData           The optional application data decrypted. The input size of appData must be at least the
      *                                    size of GetAppDataSize(payload) + sizeof(CounterType), because appData is used as a work
-     * buffer for the decryption process. The output size on success will be GetAppDataSize(payload).
-     * If an error occurs, appData might countain data, but the data CANNOT be used since we were not able to validate it.
+     *                                    buffer for the decryption process. The output size on success will be
+     *                                    GetAppDataSize(payload). If an error occurs, appData might countain data,
+     *                                    but the data CANNOT be used since we were not able to validate it.
      *
      * @return CHIP_ERROR_INVALID_MESSAGE_LENGTH if the payload is shorter than the minimum payload size
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
