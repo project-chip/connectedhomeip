@@ -204,7 +204,7 @@ Status EnergyEvseDelegate::StartDiagnostics()
     /* For EVSE manufacturers to customize */
     ChipLogProgress(AppServer, "EnergyEvseDelegate::StartDiagnostics()");
 
-    /* update SupplyState to indicate in Diagnostics mode */
+    /* update SupplyState to indicate we are now in Diagnostics mode */
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
     // TODO: Generate events

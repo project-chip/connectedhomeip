@@ -69,9 +69,13 @@ public:
      */
     Status StartDiagnostics() override;
 
+    /**
+     * @brief    Called by EVSE Hardware to register a single callback handler
+     */
+    Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
+
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
-    Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
