@@ -31,6 +31,27 @@ public:
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer) override;
     CHIP_ERROR SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
+
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    /**
+     * API to set the CD.
+     *
+     * GetCertificationDeclaration() API impl reads the CD from the NVS namespace `chip-factory`.
+     * Use this API to set the CD if it is stored at a different place, eg: embedded in the firmware.
+     * Subsequent reads after calling this API will return the set CD.
+     */
+    CHIP_ERROR SetCertificationDeclaration(const ByteSpan & cd)
+    {
+        VerifyOrReturnError(!cd.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+        mCD = cd;
+        return CHIP_NO_ERROR;
+    }
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
+
+private:
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    ByteSpan mCD;
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
 };
 } // namespace DeviceLayer
 } // namespace chip
