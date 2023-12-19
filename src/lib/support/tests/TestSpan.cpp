@@ -276,7 +276,7 @@ static void TestFromZclString(nlTestSuite * inSuite, void * inContext)
     // Purposefully larger size than data.
     constexpr uint8_t array[16] = { 3, 0x41, 0x63, 0x45 };
 
-    constexpr char str[] = "AcE";
+    static constexpr char str[] = "AcE";
 
     ByteSpan s1 = ByteSpan::fromZclString(array);
     NL_TEST_ASSERT(inSuite, s1.data_equal(ByteSpan(&array[1], 3)));
@@ -287,7 +287,7 @@ static void TestFromZclString(nlTestSuite * inSuite, void * inContext)
 
 static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr char str[] = "AcE";
+    static constexpr char str[] = "AcE";
 
     CharSpan s1 = CharSpan::fromCharString(str);
     NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
@@ -379,7 +379,7 @@ int TestSpan()
 {
     nlTestSuite theSuite = { "CHIP Span tests", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

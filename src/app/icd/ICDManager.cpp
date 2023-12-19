@@ -18,7 +18,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/icd/ICDManagementServer.h>
+#include <app/InteractionModelEngine.h>
+#include <app/icd/ICDConfig.h>
+#include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
@@ -27,11 +29,6 @@
 #include <platform/LockTracker.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <stdlib.h>
-
-#ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-// Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
-#define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
-#endif
 
 namespace chip {
 namespace app {
@@ -43,11 +40,13 @@ using namespace chip::app::Clusters::IcdManagement;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore)
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
+                      Messaging::ExchangeManager * exchangeManager)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
+    VerifyOrDie(exchangeManager != nullptr);
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
@@ -63,12 +62,13 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
+    mExchangeManager   = exchangeManager;
 
-    ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
+    VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
 
     // Removing the check for now since it is possible for the Fast polling
     // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
+    // uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
     // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
@@ -82,11 +82,12 @@ void ICDManager::Shutdown()
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
-    mICDMode          = ICDMode::SIT;
+    ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState = OperationalState::ActiveMode;
     mStorage          = nullptr;
     mFabricTable      = nullptr;
     mStateObserverPool.ReleaseAll();
+    mICDSenderPool.ReleaseAll();
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
@@ -101,11 +102,126 @@ bool ICDManager::SupportsFeature(Feature feature)
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+void ICDManager::SendCheckInMsgs()
+{
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    VerifyOrDie(mStorage != nullptr);
+    VerifyOrDie(mFabricTable != nullptr);
+    uint32_t counter        = ICDConfigurationData::GetInstance().GetICDCounter();
+    bool counterIncremented = false;
+
+    for (const auto & fabricInfo : *mFabricTable)
+    {
+        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
+
+        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
+                                 mSymmetricKeystore);
+        if (table.IsEmpty())
+        {
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                break;
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry for Check-In msg, will try next entry.");
+                continue;
+            }
+
+            bool active =
+                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            if (active)
+            {
+                continue;
+            }
+
+            // Increment counter only once to prevent depletion of the available range.
+            if (!counterIncremented)
+            {
+                counterIncremented = true;
+
+                if (CHIP_NO_ERROR != IncrementCounter())
+                {
+                    ChipLogError(AppServer, "Incremented ICDCounter but failed to access/save to Persistent storage");
+                }
+            }
+
+            // SenderPool will be released upon transition from active to idle state
+            // This will happen when all ICD Check-In messages are sent on the network
+            ICDCheckInSender * sender = mICDSenderPool.CreateObject(mExchangeManager);
+            VerifyOrReturn(sender != nullptr, ChipLogError(AppServer, "Failed to allocate ICDCheckinSender"));
+
+            if (CHIP_NO_ERROR != sender->RequestResolve(entry, mFabricTable, counter))
+            {
+                ChipLogError(AppServer, "Failed to send ICD Check-In");
+            }
+        }
+    }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+}
+
+CHIP_ERROR ICDManager::InitCounter()
+{
+    CHIP_ERROR err;
+    uint32_t temp;
+    uint16_t size = static_cast<uint16_t>(sizeof(uint32_t));
+
+    err = mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        // First time retrieving the counter
+        temp = chip::Crypto::GetRandU32();
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    ICDConfigurationData::GetInstance().SetICDCounter(temp);
+    temp += ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
+
+    // Increment the count directly to minimize flash write.
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::ICDCheckInCounter().KeyName(), &temp, size);
+}
+
+CHIP_ERROR ICDManager::IncrementCounter()
+{
+    uint32_t temp      = 0;
+    StorageKeyName key = DefaultStorageKeyAllocator::ICDCheckInCounter();
+    uint16_t size      = static_cast<uint16_t>(sizeof(uint32_t));
+
+    ICDConfigurationData::GetInstance().mICDCounter++;
+
+    if (mStorage == nullptr)
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    }
+
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(key.KeyName(), &temp, size));
+
+    if (temp == ICDConfigurationData::GetInstance().mICDCounter)
+    {
+        temp = ICDConfigurationData::GetInstance().mICDCounter + ICDConfigurationData::ICD_CHECK_IN_COUNTER_MIN_INCREMENT;
+        return mStorage->SyncSetKeyValue(key.KeyName(), &temp, size);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 void ICDManager::UpdateICDMode()
 {
     assertChipStackLockedByCurrentThread();
 
-    ICDMode tempMode = ICDMode::SIT;
+    ICDConfigurationData::ICDMode tempMode = ICDConfigurationData::ICDMode::SIT;
 
     // Device can only switch to the LIT operating mode if LIT support is present
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
@@ -119,23 +235,24 @@ void ICDManager::UpdateICDMode()
             ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSymmetricKeystore);
             if (!table.IsEmpty())
             {
-                tempMode = ICDMode::LIT;
+                tempMode = ICDConfigurationData::ICDMode::LIT;
                 break;
             }
         }
     }
 
-    if (mICDMode != tempMode)
+    if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
-        mICDMode = tempMode;
+        ICDConfigurationData::GetInstance().SetICDMode(tempMode);
         postObserverEvent(ObserverEventType::ICDModeChange);
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
+    if (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT &&
+        ICDConfigurationData::GetInstance().GetSlowPollingInterval() > ICDConfigurationData::GetInstance().GetSITPollingThreshold())
     {
         ChipLogDetail(AppServer, "The Slow Polling Interval of an ICD in SIT mode should be <= %" PRIu32 " seconds",
-                      (GetSITPollingThreshold().count() / 1000));
+                      (ICDConfigurationData::GetInstance().GetSITPollingThreshold().count() / 1000));
     }
 }
 
@@ -150,21 +267,16 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        if (ICDManagementServer::GetInstance().GetActiveModeDurationMs() > 0)
+        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0)
         {
-            uint32_t idleModeDuration = ICDManagementServer::GetInstance().GetIdleModeDurationSec();
+            uint32_t idleModeDuration = ICDConfigurationData::GetInstance().GetIdleModeDurationSec();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
         }
 
-        System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
+        System::Clock::Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
-        {
-            slowPollInterval = GetSITPollingThreshold();
-        }
-#endif
+        // Going back to Idle, all Check-In messages are sent
+        mICDSenderPool.ReleaseAll();
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
@@ -181,13 +293,13 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
+            uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
 
             if (activeModeDuration == 0 && !mKeepActiveFlags.HasAny())
             {
                 // A Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+                activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeThresholdMs();
             }
 
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeDuration), OnActiveModeDone, this);
@@ -196,17 +308,23 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 (activeModeDuration >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeDuration - ICD_ACTIVE_TIME_JITTER_MS : 0;
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
 
-            CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());
+            CHIP_ERROR err =
+                DeviceLayer::ConnectivityMgr().SetPollingInterval(ICDConfigurationData::GetInstance().GetFastPollingInterval());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
+            }
+
+            if (SupportsFeature(Feature::kCheckInProtocolSupport))
+            {
+                SendCheckInMsgs();
             }
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
         }
         else
         {
-            uint16_t activeModeThreshold = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+            uint16_t activeModeThreshold = ICDConfigurationData::GetInstance().GetActiveModeThresholdMs();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
             uint16_t activeModeJitterThreshold =
                 (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;
@@ -363,20 +481,6 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     default:
         break;
     }
-}
-
-System::Clock::Milliseconds32 ICDManager::GetSlowPollingInterval()
-{
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-    // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-    // This is important for ICD device configured for LIT operation but currently operating as a SIT
-    // due to a lack of client registration
-    if (mICDMode == ICDMode::SIT && GetSlowPollingInterval() > GetSITPollingThreshold())
-    {
-        return GetSITPollingThreshold();
-    }
-#endif
-    return kSlowPollingInterval;
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)

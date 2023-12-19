@@ -163,7 +163,7 @@ portpicker==1.5.2
     # via
     #   -r requirements.all.txt
     #   mobly
-prompt-toolkit==3.0.38
+prompt-toolkit==3.0.43
     # via ipython
 protobuf==4.24.4
     # via

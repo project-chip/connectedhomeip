@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,10 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
-    4.1.9. [TC-CADMIN-1.9] Device exit commissioning mode after 20 failed
+    24.1.9. [TC-CADMIN-1.9] Device exit commissioning mode after 20 failed
     commission attempts [ECM] [DUT - Commissionee]
 
 PICS:
@@ -22,29 +21,112 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    timeout: 700
+    nodeIdForDuplicateCommissioning:
+        type: node_id
+        defaultValue: 0x11
+    nodeId2:
+        type: node_id
+        defaultValue: 0xCAFE
+    nodeId3:
+        type: node_id
+        defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    correctPayload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    incorrectSetupCodePayload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00I.0648G00"
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 900
 
 tests:
-    - label: "Precondition"
+    - label: "Precondition: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Precondition: Reset Devices to factory defaults"
       verification: |
           Reset Devices to factory defaults
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1a: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
       PICS: CADMIN.S
-      verification: |
-          "1. Provision the DUT_CE (all-cluster-app) device using TH_CR1 (chip-tool ) on the raspi"
-      disabled: true
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: correctPayload
+
+    - label: "Step 1b: TH_CR1 commissioned with DUT_CE"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
-      PICS: CADMIN.S.C00.Rsp
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: PIXIT.CADMIN.CwDuration
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       verification: |
           On TH_CR1 send the below command
 
-          ./chip-tool pairing open-commissioning-window 1 1 900 1000 3841
+          ./chip-tool pairing open-commissioning-window 1 1 PIXIT.CADMIN.CwDuration 1000 3841
 
           Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
 
@@ -59,63 +141,411 @@ tests:
           [1635864513.699566][3850:3855] CHIP:CTL: SetupQRCode: [MT:00000CQM00YZN476420]
           [1635864513.699636][3850:3855] CHIP:EM: Sending Standalone Ack for MessageCounter:2599714227 on exchange 60688i
           [1635864513.699685][3850:3855] CHIP:IN: Prepared plaintext message 0xffff8a7cd960 to 0x0000000000000000 of type
-      disabled: true
-
-    - label: "Step 3: DNS-SD records shows DUT_CE advertising"
-      verification: |
-          On TH_CR1 send the below command
-           avahi-browse -rt _matterc._udp
-
-          +   eth0 IPv6 B755245DE9E5E186                              _matterc._udp        local
-          =   eth0 IPv6 B755245DE9E5E186                              _matterc._udp        local
-             hostname = [E45F010F27530000.local]
-             address = [fe80::e65f:1ff:fe0f:2753]
-             port = [5540]
-             txt = [""PI="" ""PH=36"" ""CM=2"" ""D=3840"" ""T=1"" ""SAI=300"" ""SII=5000"" ""VP=65521+32769""]"
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Step 4: Before the expiration of PIXIT.CADMIN.CwDuration set in step
-          2, Set up a TH_CR2 to start attempting to do PASE to DUT_CE and
-          failing 20 times. This can be done using a valid onboarding payload
-          with an incorrect setupcode"
-      PICS: CADMIN.S
-      verification: |
-          On TH_CR2 send the below command
-
-          The manualcode with wrong setupcode is generated by using below command
-          ./chip-tool payload generate-manualcode --discriminator 0xF00 --setup-pin-code 20202022 --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --commissioning-mode 0
-          [1658404815.887421][2367:2367] CHIP:TOO: Manual Code: 34970212338
-
-          Attempt to do pairing with wrong manual code for 20 times
-          ./chip-tool pairing  code  2  34970212338  --timeout 40  --commissioner-name beta
-
-          Verify the failure response in any one of following error for 20 attempts of wrong passcode in TH_CR2(chip-tool)
-
-          [1660903056.889713][31261:31266] CHIP:SC: Failed to verify peer's MAC. This can happen when setup code is incorrect.
-          [1660903056.889744][31261:31266] CHIP:SC: Sending status report. Protocol code 2, exchange 28732
-          [1660903056.889781][31261:31266] CHIP:EM: Piggybacking Ack for MessageCounter:72597021 on exchange: 28732i
-          [1660903056.889817][31261:31266] CHIP:IN: Prepared unauthenticated message 0x7fbf5403c308 to 0x0000000000000000 (0)  of type 0x40 and protocolId (0, 0) on exchange 28732i with MessageCounter:110107069.
-          [1660903056.889855][31261:31266] CHIP:IN: Sending unauthenticated msg 0x7fbf5403c308 with MessageCounter:110107069 to 0x0000000000000000 at monotonic time: 00000000012CB695 msec
-          [1660903056.890044][31261:31266] CHIP:IN: SecureSession[0x55686a679ff0]: Released - Type:1 LSID:10585
-          [1660903056.890094][31261:31266] CHIP:SC: Failed during PASE session setup: ../../third_party/connectedhomeip/src/crypto/CHIPCryptoPALOpenSSL.cpp:1437: CHIP Error 0x000000AC: Internal error
-          (or)
-          [1678862522.832525][700613:700613] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
-          [1678862522.832537][700613:700613] CHIP:DL: Inet Layer shutdown
-          [1678862522.832545][700613:700613] CHIP:DL: BLE shutdown
-          [1678862522.832554][700613:700613] CHIP:DL: System Layer shutdown
-          [1678862522.832663][700613:700613] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:215: CHIP Error 0x00000003: Incorrect state
-      disabled: true
+          "Step 3: DNS-SD records shows DUT_CE advertising. Verify that the
+          DNS-SD advertisement shows CM=2"
+      PICS: CADMIN.S.C00.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
+          values:
+              - name: "commissioningMode"
+                value: 2
 
     - label:
-          "Step 5: Before the expiration of PIXIT.CADMIN.CwDuration set in step
-          2, TH_CR2 attempts to do PASE to DUT_CE using the correct onboarding
-          payload"
+          "Step 4.1: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
       PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.2: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.3: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.4: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.5: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.6: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.7: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.8: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.9: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.10: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.11: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.12: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.13: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.14: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.15: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.16: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.17: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.18: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.19: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "Step 4.20: TH_CR2 starts a commissioning process with DUT_CE using
+          Invalid setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    # This step must match the verification step above where we checked `payload`
+    - label:
+          "Step 5: TH_CR2 starts a commissioning process with DUT_CE using valid
+          setup code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: correctPayload
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 5: TH_CR2 starts a commissioning process with DUT_CE"
       verification: |
           On TH_CR2 send the below command  (with correct passcode)
 
-          ./chip-tool pairing code 2 36177160937  --commissioner-name beta
+          ./chip-tool pairing code 0xCAFE 36177160937  --commissioner-name beta
+
           Verify the following error on 21st attempt using correct passcode in TH_CR2(chip-tool)
 
           [1665484807.015876][5399:5399] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
@@ -124,23 +554,50 @@ tests:
           [1665484807.016163][5399:5399] CHIP:DL: BLE shutdown
           [1665484807.016215][5399:5399] CHIP:DL: System Layer shutdown
           [1665484807.016460][5399:5399] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-    - label:
-          "Step 6: TH_CR3 starts a commissioning process with DUT_CE using the
-          correct PAKEVerifier"
-      PICS: CADMIN.S
+    - label: "Step 6: TH_CR3 starts a commissioning process with DUT_CE"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S && PICS_SDK_CI_ONLY
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
+              - name: "payload"
+                value: correctPayload
+      response:
+          error: FAILURE
+
+    #Issue https://github.com/project-chip/connectedhomeip/issues/26127
+    - label: "Step 6: TH_CR2 starts a commissioning process with DUT_CE"
       verification: |
           On TH_CR3 send the below command  (with correct passcode)
 
-          ./chip-tool pairing code 3 36177160938  (With correct passcode)  --commissioner-name gamma
+          ./chip-tool pairing code 0xC00FEE 36177160938  (With correct passcode)  --commissioner-name gamma
 
           Verify the following error on  correct passcode in TH_CR3(chip-tool)
-
           [1665484807.015876][5399:5399] CHIP:DL: renamed tmp file to file (/tmp/chip_counters.ini)
           [1665484807.016042][5399:5399] CHIP:DL: NVS set: chip-counters/total-operational-hours = 0 (0x0)
           [1665484807.016108][5399:5399] CHIP:DL: Inet Layer shutdown
           [1665484807.016163][5399:5399] CHIP:DL: BLE shutdown
           [1665484807.016215][5399:5399] CHIP:DL: System Layer shutdown
           [1665484807.016460][5399:5399] CHIP:TOO: Run command failure: ../../commands/pairing/PairingCommand.cpp:164: CHIP Error 0x00000003: Incorrect state
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

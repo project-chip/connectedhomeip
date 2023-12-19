@@ -33,6 +33,8 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "channel/ChannelManager.h"
+#include "content-app-observer/ContentAppObserver.h"
+#include "content-control/ContentController.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "keypad-input/KeypadInputManager.h"
 #include "media-playback/MediaPlaybackManager.h"
@@ -57,6 +59,8 @@ using ApplicationBasicDelegate    = app::Clusters::ApplicationBasic::Delegate;
 using ApplicationLauncherDelegate = app::Clusters::ApplicationLauncher::Delegate;
 using ChannelDelegate             = app::Clusters::Channel::Delegate;
 using ContentLauncherDelegate     = app::Clusters::ContentLauncher::Delegate;
+using ContentControllerDelegate   = app::Clusters::ContentControl::Delegate;
+using ContentAppObserverDelegate  = app::Clusters::ContentAppObserver::Delegate;
 using KeypadInputDelegate         = app::Clusters::KeypadInput::Delegate;
 using MediaPlaybackDelegate       = app::Clusters::MediaPlayback::Delegate;
 using TargetNavigatorDelegate     = app::Clusters::TargetNavigator::Delegate;
@@ -85,6 +89,8 @@ public:
     ApplicationLauncherDelegate * GetApplicationLauncherDelegate() override { return &mApplicationLauncherDelegate; };
     ChannelDelegate * GetChannelDelegate() override { return &mChannelDelegate; };
     ContentLauncherDelegate * GetContentLauncherDelegate() override { return &mContentLauncherDelegate; };
+    ContentControllerDelegate * GetContentControlDelegate() override { return &mContentControlDelegate; };
+    ContentAppObserverDelegate * GetContentAppObserverDelegate() override { return &mContentAppObserverDelegate; };
     KeypadInputDelegate * GetKeypadInputDelegate() override { return &mKeypadInputDelegate; };
     MediaPlaybackDelegate * GetMediaPlaybackDelegate() override { return &mMediaPlaybackDelegate; };
     TargetNavigatorDelegate * GetTargetNavigatorDelegate() override { return &mTargetNavigatorDelegate; };
@@ -95,6 +101,8 @@ protected:
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
     ContentLauncherManager mContentLauncherDelegate;
+    ContentAppObserver mContentAppObserverDelegate;
+    ContentController mContentControlDelegate;
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;

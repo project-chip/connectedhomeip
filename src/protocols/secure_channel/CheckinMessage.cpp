@@ -20,81 +20,127 @@
  *      This file implements the Matter Checkin protocol.
  */
 
-#include "CheckinMessage.h"
 #include <lib/core/CHIPCore.h>
-
 #include <lib/core/CHIPEncoding.h>
+#include <protocols/secure_channel/CheckinMessage.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(Crypto::Aes128KeyHandle & key, CounterType counter,
-                                                         const ByteSpan & appData, MutableByteSpan & output)
+CHIP_ERROR CheckinMessage::GenerateCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
+                                                         const Crypto::Hmac128KeyHandle & hmacKeyHandle,
+                                                         const CounterType & counter, const ByteSpan & appData,
+                                                         MutableByteSpan & output)
 {
-    VerifyOrReturnError(appData.size() <= sMaxAppDataSize, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(output.size() >= (appData.size() + sMinPayloadSize), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output.size() >= (appData.size() + kMinPayloadSize), CHIP_ERROR_BUFFER_TOO_SMALL);
+    size_t cursorIndex = 0;
 
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    uint8_t * appDataStartPtr = output.data() + CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES;
-    Encoding::LittleEndian::Put32(appDataStartPtr, counter);
+    // Generate Nonce from Key and counter value
+    {
+        MutableByteSpan nonce = output.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        cursorIndex += nonce.size();
 
-    chip::Crypto::HMAC_sha shaHandler;
-    uint8_t nonceWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
+        Encoding::LittleEndian::BufferWriter writer(nonce);
+        ReturnErrorOnFailure(GenerateCheckInMessageNonce(hmacKeyHandle, counter, writer));
+    }
 
-    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(key.As<Aes128KeyByteArray>(), sizeof(Aes128KeyByteArray), appDataStartPtr,
-                                                sizeof(CounterType), nonceWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
+    // Encrypt Counter and Application Data
+    {
+        MutableByteSpan payloadByteSpan = output.SubSpan(cursorIndex, sizeof(CounterType) + appData.size());
+        cursorIndex += payloadByteSpan.size();
 
-    static_assert(sizeof(nonceWorkBuffer) >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, "We're reading off the end of our buffer.");
-    memcpy(output.data(), nonceWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        Encoding::LittleEndian::BufferWriter payloadWriter(payloadByteSpan);
 
-    // In place encryption to save some RAM
-    memcpy(appDataStartPtr + sizeof(CounterType), appData.data(), appData.size());
+        payloadWriter.EndianPut(counter, sizeof(counter));
+        payloadWriter.Put(appData.data(), appData.size());
+        VerifyOrReturnError(payloadWriter.Fit(), CHIP_ERROR_INTERNAL);
 
-    uint8_t * micPtr = appDataStartPtr + sizeof(CounterType) + appData.size();
-    ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(appDataStartPtr, sizeof(CounterType) + appData.size(), nullptr, 0, key,
-                                                 output.data(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, appDataStartPtr, micPtr,
-                                                 CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
+        MutableByteSpan mic = output.SubSpan(cursorIndex, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+        cursorIndex += mic.size();
 
-    output.reduce_size(appData.size() + sMinPayloadSize);
+        // Validate that the cursorIndex is within the available output space
+        VerifyOrReturnError(cursorIndex <= output.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        // Validate that the cursorIndex matchs the message length
+        VerifyOrReturnError(cursorIndex == appData.size() + kMinPayloadSize, CHIP_ERROR_INTERNAL);
 
-    return err;
+        ReturnErrorOnFailure(Crypto::AES_CCM_encrypt(payloadByteSpan.data(), payloadByteSpan.size(), nullptr, 0, aes128KeyHandle,
+                                                     output.data(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, payloadByteSpan.data(),
+                                                     mic.data(), mic.size()));
+    }
+
+    output.reduce_size(appData.size() + kMinPayloadSize);
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(Crypto::Aes128KeyHandle & key, ByteSpan & payload, CounterType & counter,
-                                                      MutableByteSpan & appData)
+CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
+                                                      const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
+                                                      CounterType & counter, MutableByteSpan & appData)
 {
-    VerifyOrReturnError(payload.size() >= sMinPayloadSize, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(payload.size() <= (sMinPayloadSize + sMaxAppDataSize), CHIP_ERROR_INVALID_ARGUMENT);
-
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t appDataSize = GetAppDataSize(payload);
 
+    VerifyOrReturnError(payload.size() >= kMinPayloadSize, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     // To prevent workbuffer usage, appData size needs to be large enough to hold both the appData and the counter
-    VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(appData.size() >= sizeof(CounterType) + appDataSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    ByteSpan nonce         = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
-    ByteSpan encryptedData = payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, sizeof(CounterType) + appDataSize);
-    ByteSpan mic =
-        payload.SubSpan(CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + appDataSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    // Decrypt received data
+    {
+        size_t cursorIndex = 0;
 
-    err = Crypto::AES_CCM_decrypt(encryptedData.data(), encryptedData.size(), nullptr, 0, mic.data(), mic.size(), key, nonce.data(),
-                                  nonce.size(), appData.data());
+        ByteSpan nonce = payload.SubSpan(cursorIndex, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        cursorIndex += nonce.size();
 
-    ReturnErrorOnFailure(err);
+        ByteSpan encryptedData = payload.SubSpan(cursorIndex, sizeof(CounterType) + appDataSize);
+        cursorIndex += encryptedData.size();
 
+        ByteSpan mic = payload.SubSpan(cursorIndex, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+        cursorIndex += mic.size();
+
+        // Return Invalid message length since the payload isn't the right size
+        VerifyOrReturnError(cursorIndex == payload.size(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+        ReturnErrorOnFailure(Crypto::AES_CCM_decrypt(encryptedData.data(), encryptedData.size(), nullptr, 0, mic.data(), mic.size(),
+                                                     aes128KeyHandle, nonce.data(), nonce.size(), appData.data()));
+    }
+
+    // Read decrypted counter and application data
     counter = Encoding::LittleEndian::Get32(appData.data());
+
+    // TODO : Validate received nonce by calculating it with the hmacKeyHandle and received Counter value
+
     // Shift to remove the counter from the appData
     memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
-
     appData.reduce_size(appDataSize);
-    return err;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyHandle & hmacKeyHandle, CounterType counter,
+                                                       Encoding::LittleEndian::BufferWriter & writer)
+{
+    VerifyOrReturnError(writer.Available() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    uint8_t hashWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
+    uint8_t counterBuffer[sizeof(CounterType)];
+
+    // validate that Check-In counter is a uint32_t
+    static_assert(sizeof(CounterType) == sizeof(uint32_t), "Expect counter to be 32 bits for correct encoding");
+    Encoding::LittleEndian::Put32(counterBuffer, counter);
+
+    chip::Crypto::HMAC_sha shaHandler;
+    ReturnErrorOnFailure(
+        shaHandler.HMAC_SHA256(hmacKeyHandle, counterBuffer, sizeof(CounterType), hashWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
+
+    writer.Put(hashWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+    VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    return CHIP_NO_ERROR;
 }
 
 size_t CheckinMessage::GetAppDataSize(ByteSpan & payload)
 {
-    return (payload.size() <= sMinPayloadSize) ? 0 : payload.size() - sMinPayloadSize;
+    return (payload.size() <= kMinPayloadSize) ? 0 : payload.size() - kMinPayloadSize;
 }
 
 } // namespace SecureChannel

@@ -225,7 +225,7 @@ public:
     /// This method will return CHIP_ERROR_INCORRECT_STATE if the handle is
     /// still active.
     ///
-    /// This method will return CHIP_ERROR_WELL_EMPTY if there are no more
+    /// This method will return CHIP_ERROR_NOT_FOUND if there are no more
     /// results.
     ///
     /// This method may return other errors in some cases.

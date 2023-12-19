@@ -74,8 +74,8 @@ struct TestBuffers
 
 static void TestCopyString(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr char testWord[] = "testytest";
-    ByteSpan testWordSpan     = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord) - 1);
+    static constexpr char testWord[] = "testytest";
+    ByteSpan testWordSpan            = ByteSpan(reinterpret_cast<const uint8_t *>(testWord), sizeof(testWord) - 1);
     CharSpan testWordSpan2(testWord, sizeof(testWord) - 1);
     TestBuffers<sizeof(testWord)> testBuffers;
 
@@ -130,8 +130,8 @@ static void TestCopyString(nlTestSuite * inSuite, void * inContext)
 
 static void TestMemoryAllocString(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr char testStr[] = "testytestString";
-    char * allocatedStr      = MemoryAllocString(testStr, sizeof(testStr));
+    static constexpr char testStr[] = "testytestString";
+    char * allocatedStr             = MemoryAllocString(testStr, sizeof(testStr));
     NL_TEST_ASSERT(inSuite, allocatedStr != nullptr);
     if (allocatedStr == nullptr)
     {
@@ -145,7 +145,7 @@ static void TestScopedBuffer(nlTestSuite * inSuite, void * inContext)
 {
     // Scoped buffer has its own tests that check the memory properly. Here we are just testing that the string is copied in
     // properly.
-    constexpr char testStr[]        = "testytestString";
+    static constexpr char testStr[] = "testytestString";
     ScopedMemoryString scopedString = ScopedMemoryString(testStr, sizeof(testStr));
     NL_TEST_ASSERT(inSuite, strcmp(scopedString.Get(), testStr) == 0);
 }
@@ -175,7 +175,7 @@ int TestMemString()
 {
     nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestMemString_Setup, TestMemString_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

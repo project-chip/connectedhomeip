@@ -46,6 +46,9 @@
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
+#endif
 #include <setup_payload/SetupPayload.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -200,6 +203,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     );
 
+    SuccessOrExit(err);
     err = mListener.Init(this);
     SuccessOrExit(err);
     mGroupsProvider->SetListener(&mListener);
@@ -255,15 +259,6 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
 
-// ICD Init needs to be after data model init
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore);
-    // Register the ICDStateObservers. All observers are released at mICDManager.Shutdown()
-    // They can be released individually with ReleaseObserver
-    mICDManager.RegisterObserver(mReportScheduler);
-    mICDManager.RegisterObserver(&app::DnssdServer::Instance());
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
     SuccessOrExit(err);
@@ -279,6 +274,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
     app::DnssdServer::Instance().SetUnsecuredPort(mUserDirectedCommissioningPort);
     app::DnssdServer::Instance().SetInterfaceId(mInterfaceId);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // We set the ICDManager reference betfore calling the ICDManager init due to the init ordering limitations.
+    // DnssdServer will use the default value initially and will update advertisement once ICDManager
+    // init is called.
+    app::DnssdServer::Instance().SetICDManager(&mICDManager);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (GetFabricTable().FabricCount() != 0)
     {
@@ -328,6 +330,18 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                                                                  &mCASESessionManager, mSubscriptionResumptionStorage);
     SuccessOrExit(err);
 
+    // ICD Init needs to be after data model init and InteractionModel Init
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Register the ICDStateObservers.
+    // Call register before init so that observers are notified of any state change during the init.
+    // All observers are released at mICDManager.Shutdown(). They can be released individually with ReleaseObserver
+    mICDManager.RegisterObserver(mReportScheduler);
+    mICDManager.RegisterObserver(&app::DnssdServer::Instance());
+
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mSessionKeystore, &mExchangeMgr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
     // This code is necessary to restart listening to existing groups after a reboot
     // Each manufacturer needs to validate that they can rejoin groups by placing this code at the appropriate location for them
     //
@@ -371,6 +385,23 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
                 reinterpret_cast<intptr_t>(this));
         }
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT // support UDC port for commissioner declaration msgs
+    mUdcTransportMgr = chip::Platform::New<UdcTransportMgr>();
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                    .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                    .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+#if INET_CONFIG_ENABLE_IPV4
+                                                    ,
+                                                Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                                                    .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                    .SetListenPort(static_cast<uint16_t>(mCdcListenPort))
+#endif // INET_CONFIG_ENABLE_IPV4
+                                                    ));
+
+    gUDCClient = chip::Platform::New<Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient>();
+    mUdcTransportMgr->SetSessionManager(gUDCClient);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));
     PlatformMgr().HandleServerStarted();
@@ -495,8 +526,24 @@ void Server::Shutdown()
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    app::DnssdServer::Instance().SetICDManager(nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    if (mUdcTransportMgr != nullptr)
+    {
+        chip::Platform::Delete(mUdcTransportMgr);
+        mUdcTransportMgr = nullptr;
+    }
+    if (gUDCClient != nullptr)
+    {
+        chip::Platform::Delete(gUDCClient);
+        gUDCClient = nullptr;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     chip::Dnssd::Resolver::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
@@ -534,14 +581,54 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     }
     ChipLogDetail(AppServer, "instanceName=%s", nameBuffer);
 
-    chip::System::PacketBufferHandle payloadBuf = chip::MessagePacketBuffer::NewWithData(nameBuffer, strlen(nameBuffer));
-    if (payloadBuf.IsNull())
+    Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
+    id.SetInstanceName(nameBuffer);
+
+    uint16_t vendorId = 0;
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "Unable to allocate packet buffer\n");
-        return CHIP_ERROR_NO_MEMORY;
+        ChipLogDetail(Discovery, "Vendor ID not known");
+    }
+    else
+    {
+        id.SetVendorId(vendorId);
     }
 
-    err = gUDCClient.SendUDCMessage(&mTransports, std::move(payloadBuf), commissioner);
+    uint16_t productId = 0;
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Product ID not known");
+    }
+    else
+    {
+        id.SetProductId(productId);
+    }
+
+    char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1] = {};
+    if (!chip::DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() ||
+        chip::DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Device Name not known");
+    }
+    else
+    {
+        id.SetDeviceName(deviceName);
+    }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    ReturnErrorOnFailure(
+        app::DnssdServer::Instance().GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+
+    uint8_t * rotatingId = reinterpret_cast<uint8_t *>(rotatingDeviceIdHexBuffer);
+    size_t rotatingIdLen = strlen(rotatingDeviceIdHexBuffer);
+    id.SetRotatingId(rotatingId, rotatingIdLen);
+#endif
+
+    id.SetCdPort(mCdcListenPort);
+
+    err = gUDCClient->SendUDCMessage(&mTransports, id, commissioner);
+
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "Send UDC request success");

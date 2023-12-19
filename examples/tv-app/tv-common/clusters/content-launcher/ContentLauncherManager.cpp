@@ -95,13 +95,18 @@ ContentLauncherManager::ContentLauncherManager(list<std::string> acceptHeaderLis
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                 const CharSpan & data)
+                                                 const CharSpan & data,
+                                                 const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                 bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
     string dataString(data.data(), data.size());
 
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent TEST CASE autoplay=%d data=%s ", (autoplay ? 1 : 0),
                     dataString.c_str());
+
+    // TODO: Add playbackPreferences as part of search query
+    // TODO: Add useCurrentContext as part of search query
 
     bool foundMatch = false;
     for (auto const & contentEntry : this->mContentList)

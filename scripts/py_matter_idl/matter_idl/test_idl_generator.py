@@ -17,7 +17,8 @@
 import os
 import sys
 import unittest
-from typing import Optional
+from difflib import unified_diff
+from typing import List, Optional
 
 try:
     from matter_idl.matter_idl_parser import CreateParser
@@ -43,11 +44,12 @@ class TestCaseStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if self.content:
-            raise Exception("Unexpected extra data: single file generation expected")
+            raise Exception(
+                "Unexpected extra data: single file generation expected")
         self.content = content
 
 
-def ReadMatterIdl(repo_path: str) -> Idl:
+def ReadMatterIdl(repo_path: str) -> str:
     path = os.path.join(os.path.dirname(__file__), "../../..", repo_path)
     with open(path, "rt") as stream:
         return stream.read()
@@ -60,19 +62,38 @@ def ParseMatterIdl(repo_path: str, skip_meta: bool) -> Idl:
 def RenderAsIdlTxt(idl: Idl) -> str:
     storage = TestCaseStorage()
     IdlGenerator(storage=storage, idl=idl).render(dry_run=False)
-    return storage.content
+    return storage.content or ""
 
 
-def SkipLeadingComments(txt: str) -> str:
+def SkipLeadingComments(txt: str, also_strip: List[str] = list()) -> str:
     """Skips leading lines starting with // in a file. """
     lines = txt.split("\n")
     idx = 0
     while lines[idx].startswith("//") or not lines[idx]:
         idx = idx + 1
-    return "\n".join(lines[idx:])
+
+    result = "\n".join(lines[idx:])
+
+    for s in also_strip:
+        result = result.replace(s, "")
+
+    return result
 
 
 class TestIdlRendering(unittest.TestCase):
+    def assertTextEqual(self, a: str, b: str):
+        if a == b:
+            # seems the same. This will just pass
+            self.assertEqual(a, b)
+            return
+
+        delta = unified_diff(a.splitlines(keepends=True),
+                             b.splitlines(keepends=True),
+                             fromfile='actual.matter',
+                             tofile='expected.matter',
+                             )
+        self.assertEqual(a, b, '\n' + ''.join(delta))
+
     def test_client_clusters(self):
         # IDL renderer was updated to have IDENTICAL output for client side
         # cluster rendering, so this diff will be verbatim
@@ -83,10 +104,12 @@ class TestIdlRendering(unittest.TestCase):
         path = "src/controller/data_model/controller-clusters.matter"
 
         # Files MUST be identical except the header comments which are different
-        original = SkipLeadingComments(ReadMatterIdl(path))
-        generated = SkipLeadingComments(RenderAsIdlTxt(ParseMatterIdl(path, skip_meta=False)))
+        original = SkipLeadingComments(ReadMatterIdl(path), also_strip=[
+                                       " // NOTE: Default/not specifically set"])
+        generated = SkipLeadingComments(RenderAsIdlTxt(
+            ParseMatterIdl(path, skip_meta=False)))
 
-        self.assertEqual(original, generated)
+        self.assertTextEqual(original, generated)
 
     def test_app_rendering(self):
         # When endpoints are involved, default value formatting is lost

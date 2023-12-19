@@ -266,6 +266,21 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
 
+    case Attributes::SupportedWiFiBands::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
+
+    case Attributes::SupportedThreadFeatures::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
+
+    case Attributes::ThreadVersion::Id:
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
+        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+        return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
+
     default:
         return CHIP_NO_ERROR;
     }
@@ -815,8 +830,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
@@ -927,8 +944,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     WiFiScanResponse scanResponse;
     size_t networksEncoded = 0;
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));

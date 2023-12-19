@@ -115,4 +115,21 @@ Davis, CA 95616, USA
       </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="TargetUpdated" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0x0000" name="TargetList" type="list[TargetInfoStruct Type]">
+        <optionalConform/>
+      </field>
+      <field id="0x0001" name="CurrentTarget" type="uint8" default="0xFF">
+        <optionalConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="0x0002" name="Data" type="octets">
+        <constraint type="maxLength" value="900"/>
+        <optionalConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

@@ -21,8 +21,8 @@
 #include <credentials/CHIPCert.h>
 #include <lib/support/Base64.h>
 
-constexpr const char kBase64Header[] = "base64:";
-constexpr size_t kBase64HeaderLen    = ArraySize(kBase64Header) - 1;
+constexpr char kBase64Header[]    = "base64:";
+constexpr size_t kBase64HeaderLen = ArraySize(kBase64Header) - 1;
 
 CHIP_ERROR ToBase64(const chip::ByteSpan & input, std::string & outputAsPrefixedBase64)
 {

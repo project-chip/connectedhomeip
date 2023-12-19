@@ -124,11 +124,11 @@ char * GetCatStringForLogging(char * buf, size_t size, const CATValues & cats)
     //   2 for 0x prefix
     //   8 for 32-bit hex value
     //   1 for null terminator (at end)
-    constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
-    constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
-    constexpr int countWithoutComma  = 10;
-    constexpr int countWithComma     = countWithoutComma + 1;
-    bool withComma                   = false;
+    static constexpr char fmtWithoutComma[] = "0x%08" PRIX32;
+    static constexpr char fmtWithComma[]    = ",0x%08" PRIX32;
+    constexpr int countWithoutComma         = 10;
+    constexpr int countWithComma            = countWithoutComma + 1;
+    bool withComma                          = false;
     for (auto cat : cats.values)
     {
         if (cat == chip::kUndefinedCAT)

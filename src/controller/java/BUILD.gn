@@ -63,6 +63,7 @@ shared_library("jni") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -351,7 +352,7 @@ kotlin_library("chipcluster_test") {
 
 kotlin_library("kotlin_matter_controller") {
   import(
-      "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/files.gni")
+      "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/files.gni")
 
   output_name = "KotlinMatterController.jar"
 
@@ -370,12 +371,14 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/MatterControllerImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/SubscriptionStates.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]
 
   sources += matter_structs_sources
   sources += matter_eventstructs_sources
+  sources += matter_clusters_sources
 
   if (matter_enable_java_compilation) {
     deps += [
