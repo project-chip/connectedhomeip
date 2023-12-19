@@ -37,8 +37,8 @@ limitations under the License.
   </bitmap>
 
   <cluster apiMaturity="provisional">
+    <domain>General</domain>
     <name>Boolean State Configuration</name>
-    <domain>Measurement &amp; Sensing</domain>
     <code>0x0080</code>
     <define>BOOLEAN_STATE_CONFIGURATION_CLUSTER</define>
     <client tick="false" init="false">true</client>
