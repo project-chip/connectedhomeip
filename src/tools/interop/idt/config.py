@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 import logging
+from res.splash import splash as _splash
 
 enable_color = True
 log_level = logging.INFO
 py_major_version = 3
 py_minor_version = 11
+splash = _splash

@@ -31,24 +31,12 @@ from utils.log import border_print
 
 import config
 
-splash = '''\x1b[0m
-\x1b[32;1m┌────────┐\x1b[33;20m▪\x1b[32;1m \x1b[34;1m┌──────┐ \x1b[33;20m• \x1b[35;1m┌──────────┐ \x1b[33;20m●
-\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░└┐ \x1b[33;20mﾟ\x1b[35;1m│░░░░░░░░░░│
-\x1b[32;1m└──┐░░┌──┘\x1b[33;20m۰\x1b[32;1m \x1b[34;1m│░░┌┐░░░│  \x1b[35;1m└───┐░░┌───┘
-\x1b[32;1m   │░░│     \x1b[34;1m│░░│└┐░░│\x1b[33;20m▫ \x1b[35;1m \x1b[33;20m۰\x1b[35;1m  │░░│  \x1b[33;20m｡
-\x1b[32;1m \x1b[33;20m•\x1b[32;1m │░░│  \x1b[33;20m●  \x1b[34;1m│░░│┌┘░░│  \x1b[35;1m    │░░│
-\x1b[32;1m┌──┘░░└──┐  \x1b[34;1m│░░└┘░░░│  \x1b[35;1m    │░░│ \x1b[33;20m•
-\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░┌┘\x1b[33;20m۰ \x1b[35;1m \x1b[33;20m▪\x1b[35;1m  │░░│
-\x1b[32;1m└────────┘\x1b[33;20m•\x1b[32;1m \x1b[34;1m└──────┘\x1b[33;20m｡  \x1b[35;1m    └──┘ \x1b[33;20m▫
-\x1b[32;1m✰ Interop\x1b[34;1m  ✰ Debugging\x1b[35;1m   ✰ Tool
-\x1b[0m'''
-
 
 class InteropDebuggingTool:
 
     def __init__(self) -> None:
         if config.enable_color:
-            print(splash)
+            print(config.splash)
         self.artifact_dir = None
         create_artifact_dir = True
         if len(sys.argv) == 1:
@@ -155,6 +143,12 @@ class InteropDebuggingTool:
             choices=self.available_net_interfaces,
             default=self.available_net_interfaces_default)
 
+        capture_parser.add_argument(
+            "--analyze",
+            "-a",
+            help="Execute post analysis on an existing capture output dir (specify fully qualified path as arg)",
+            required=False)
+
         capture_parser.set_defaults(func=self.command_capture)
 
         prober_parser = subparsers.add_parser("probe",
@@ -187,6 +181,14 @@ class InteropDebuggingTool:
         border_print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
+        if args.analyze:
+            border_print("Executing post analysis only!")
+            asyncio.run(controller.init_ecosystems(args.platform,
+                                                   args.ecosystem,
+                                                   self.artifact_dir))
+            # TODO: Implement
+            return
+
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)
