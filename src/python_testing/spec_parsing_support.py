@@ -153,7 +153,7 @@ class ClusterParser:
 
         return ElementTree.Element(OPTIONAL_CONFORM)
 
-    def get_access(self, element: ElementTree.Element) -> ElementTree.Element:
+    def get_access(self, element: ElementTree.Element) -> Optional[ElementTree.Element]:
         for sub in element:
             if sub.tag == 'access':
                 return sub
