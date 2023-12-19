@@ -17,7 +17,6 @@
  */
 
 #include "OTAConfig.h"
-#include "sl_matter_ota_config.h" // MATTER_GSDK_INTEGRATION
 #include <app/server/Server.h>
 
 #ifndef SIWX_917
@@ -77,7 +76,6 @@ __attribute__((used)) ApplicationProperties_t sl_app_properties = {
 #endif // SL_CATALOG_GECKO_BOOTLOADER_INTERFACE_PRESENT
 #endif // SIWX_917
 
-#endif
 // Global OTA objects
 chip::DefaultOTARequestor gRequestorCore;
 chip::DefaultOTARequestorStorage gRequestorStorage;
