@@ -199,7 +199,7 @@ tests:
                 value: 0x00
 
     - label:
-          "Step 12: TH reads from the DUT the CurrentMode attribute.   Verify
+          "Step 12: TH reads from the DUT the CurrentMode attribute. Verify
           that the DUT response contains an integer value equal to
           PIXIT.OM.MODE_CHANGE_OK"
       PICS: OM.S.A0001
