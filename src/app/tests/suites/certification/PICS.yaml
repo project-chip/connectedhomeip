@@ -8891,15 +8891,15 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OM.S.M.CAN_TEST_MODE_FAILURE
 
-    - label:
-          "Id of mode the device will fail to transition to, given its current
-          state"
-      id: PIXIT.OM.MODE_CHANGE_FAIL
+    #- label:
+    #      "Id of mode the device will fail to transition to, given its current
+    #      state"
+    #  id: PIXIT.OM.MODE_CHANGE_FAIL
 
-    - label:
-          "Id of mode the device will successfully transition to, given its
-          current state"
-      id: PIXIT.OM.MODE_CHANGE_OK
+    #- label:
+    #      "Id of mode the device will successfully transition to, given its
+    #      current state"
+    #  id: PIXIT.OM.MODE_CHANGE_OK
 
     #
     # server / features

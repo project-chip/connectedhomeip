@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Laundry Washer Mode"
+    cluster: "Oven Mode"
     endpoint: 1
 
     new_start_up_mode_th:
@@ -176,8 +176,7 @@ tests:
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-          constraints:
-              anyOf: [new_start_up_mode_th, startup_mode_dut]
+          value: new_start_up_mode_th
 
     - label: "Step 12: TH reads from the DUT the CurrentMode attribute."
       PICS: OM.S.A0001 && PICS_USER_PROMPT
