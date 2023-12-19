@@ -212,9 +212,15 @@ endif()
 endif() # CONFIG_CHIP
 
 function(set_overlays)
-  string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
-  string(REPLACE "_usb_dongle" "" BASE_BOARD ${BOARD})
+  if("${BOARD}" MATCHES "_retention")
+    string(REPLACE "_retention" "" BASE_BOARD ${BOARD})
+  elseif( "${BOARD}" MATCHES "_usb_dongle")
+    string(REPLACE "_usb_dongle" "" BASE_BOARD ${BOARD})
+  else()
+    set(BASE_BOARD ${BOARD})
+  endif()
   set(BASE_BOARD ${BASE_BOARD} CACHE STRING "" FORCE)
+  message(STATUS "SET BASE BOARD:" ${BASE_BOARD} ", BOARD:" ${BOARD})
 
   if(${TLNK_MARS_BOARD} MATCHES y)
     if(EXISTS "$ENV{ZEPHYR_BASE}/boards/riscv/${BOARD}/${BOARD}_mars.overlay")
