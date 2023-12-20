@@ -23,15 +23,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
+CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * evseInstance, DeviceEnergyManagementManager * demInstance)
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
     /* Register callbacks */
-    EnergyEvseDelegate * dg = aInstance->GetDelegate();
+    EnergyEvseDelegate * dg = evseInstance->GetDelegate();
     if (dg == nullptr)
     {
-        ChipLogError(AppServer, "Delegate is not initialized");
+        ChipLogError(AppServer, "EVSE Delegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
 
@@ -62,7 +62,7 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::Shutdown(EnergyEvseManager * aInstance)
+CHIP_ERROR EVSEManufacturer::Shutdown(EnergyEvseManager * evseInstance, DeviceEnergyManagementManager * demInstance)
 {
 
     return CHIP_NO_ERROR;
@@ -88,6 +88,6 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
         break;
     default:
-        ChipLogError(AppServer, "Unhandler EVSE Callback type %d", static_cast<int>(cb->type));
+        ChipLogError(AppServer, "Unhandled EVSE Callback type %d", static_cast<int>(cb->type));
     }
 }
