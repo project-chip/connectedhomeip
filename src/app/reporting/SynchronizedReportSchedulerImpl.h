@@ -59,7 +59,7 @@ private:
     Timestamp mNextMinTimestamp = Milliseconds64(0);
 
     // Timestamp of the next report to be scheduled, only used for testing
-    Timestamp mTestNextReportTimestamp = Milliseconds64(0);
+    Timestamp mNextReportTimestamp = Milliseconds64(0);
 };
 
 } // namespace reporting
