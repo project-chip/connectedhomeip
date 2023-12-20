@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#pragma once  
+#pragma once
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
