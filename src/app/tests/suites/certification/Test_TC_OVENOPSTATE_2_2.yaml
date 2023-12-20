@@ -52,7 +52,7 @@ tests:
            - all entries include an ID (enum8) and a label (string)
            - all provided IDs are in the allowed range
            - the list includes IDs for Error (0x03), Running (0x01), and Stopped (0x00)
-OVENOPSTATE
+
           [1689674049.504261][17222:17224] CHIP:DMG: }
           [1689674049.504390][17222:17224] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0060 Attribute 0x0000_0003 DataVersion: 2102885775
           [1689674049.504440][17222:17224] CHIP:TOO:   OperationalStateList: 4 entries
