@@ -1054,6 +1054,12 @@ menu "CHIP Device Layer"
             help
                 The directory of the external platform.
 
+        config CHIP_EXTERNAL_PLATFORM_INCLUDE_DIR
+            string "The external platform including directory"
+            depends on CHIP_ENABLE_EXTERNAL_PLATFORM
+            help
+                The including directory of the external platform.
+
     endmenu
 
     menu "Matter Manufacturing Options"
