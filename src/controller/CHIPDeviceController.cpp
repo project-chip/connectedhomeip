@@ -1951,7 +1951,7 @@ void DeviceCommissioner::ParseCommissioningInfo()
     }
 
     // Move ownership of mAttributeCache to the stack, but don't release it until this function returns.
-    // This way we can don't have to make a copy while parsing commissioning info, and won't
+    // This way we don't have to make a copy while parsing commissioning info, and it won't
     // affect future commissioning steps.
     //
     // The stack reference needs to survive until CommissioningStageComplete and OnReadCommissioningInfo
