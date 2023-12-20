@@ -57,6 +57,9 @@ target_sources(${APP_TARGET}
         ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
         ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
         ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+        ${ALL_CLUSTERS_COMMON}/src/EnergyEvseDelegateImpl.cpp
+        ${ALL_CLUSTERS_COMMON}/src/EnergyEvseManager.cpp
+        ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
         ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
         ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp
         ${ALL_CLUSTERS_COMMON}/src/binding-handler.cpp

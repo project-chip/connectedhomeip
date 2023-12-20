@@ -33,25 +33,13 @@ declare_args() {
 import("//build_overrides/mt793x_sdk.gni")
 import("${mt793x_sdk_build_root}/mt793x_sdk.gni")
 
-#buildconfig_header("lwip_buildconfig") {
-#  header = "lwip_buildconfig.h"
-#  header_dir = "lwip"
-#
-#  defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
-#  if (lwip_platform != "external") {
-#    if (current_os == "android") {
-#      defines += [ "LWIP_NO_STDINT_H=1" ]
-#    }
-#  }
-#}
-
 config("lwip_config") {
   include_dirs = [
     "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc",
   ]
 }
 
-lwip_target("lwip") {
+lwip_target("mt793x_lwip") {
   public = [ "${mt793x_sdk_root}/project/mt7933_hdk/apps/${mt793x_project_name}/inc/lwipopts.h" ]
 
   sources = []
@@ -64,4 +52,8 @@ lwip_target("lwip") {
     ":lwip_config",
     "${chip_root}/src:includes",
   ]
+}
+
+group("lwip") {
+  public_deps = [ ":mt793x_lwip" ]
 }

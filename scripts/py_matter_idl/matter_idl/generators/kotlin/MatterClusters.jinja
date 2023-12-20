@@ -126,6 +126,8 @@ package matter.controller.cluster.clusters
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.time.Duration
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import matter.controller.MatterController
 import matter.controller.ReadRequest
 import matter.controller.ReadData
@@ -133,6 +135,20 @@ import matter.controller.ReadFailure
 import matter.controller.ReadResponse
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.ByteSubscriptionState
+import matter.controller.ShortSubscriptionState
+import matter.controller.IntSubscriptionState
+import matter.controller.LongSubscriptionState
+import matter.controller.FloatSubscriptionState
+import matter.controller.DoubleSubscriptionState
+import matter.controller.CharSubscriptionState
+import matter.controller.BooleanSubscriptionState
+import matter.controller.UByteSubscriptionState
+import matter.controller.UShortSubscriptionState
+import matter.controller.UIntSubscriptionState
+import matter.controller.ULongSubscriptionState
+import matter.controller.StringSubscriptionState
+import matter.controller.ByteArraySubscriptionState
 import matter.controller.WriteRequest
 import matter.controller.WriteRequests
 import matter.controller.WriteResponse
@@ -173,9 +189,20 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
 {%- if interfaceName not in already_handled_attribute %}
+{%- set valueType = encode_value(cluster, encodable, 0) -%}
   class {{interfaceName}}(
-    val value: {{encode_value(cluster, encodable, 0)}}
+    val value: {{valueType}}
   )
+
+  sealed class {{interfaceName}}SubscriptionState {
+    data class Success(
+    val value: {{valueType}}
+    ) : {{interfaceName}}SubscriptionState()
+    
+    data class Error(val exception: Exception) : {{interfaceName}}SubscriptionState()
+
+    object SubscriptionEstablished : {{interfaceName}}SubscriptionState()    
+  }  
 {% if already_handled_attribute.append(interfaceName) -%}
 {#- This block does nothing, it only exists to append to already_handled_attribute. -#}
 {%- endif -%}
@@ -185,33 +212,19 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {% for command in cluster.commands | sort(attribute='code') -%}
 {%- set callbackName = command | javaCommandCallbackName() %}
   suspend fun {{command.name | lowfirst_except_acronym}}(
-{%- if command.input_param -%}
-{%- for field in (cluster.structs | named(command.input_param)).fields -%}
-  {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
-{%- if not loop.last -%}, {% endif %}  
-{%- endfor -%}
-{%- if command.is_timed_invoke -%}
-  , timedInvokeTimeoutMs: Int)
-{%- else -%}
-  , timedInvokeTimeoutMs: Int? = null)
-{%- endif -%}
-{%- else -%}
-{%- if command.is_timed_invoke -%}
-  timedInvokeTimeoutMs: Int)
-{%- else -%}
-  timedInvokeTimeoutMs: Int? = null)
-{%- endif -%}
-{%- endif -%}
+    {%- if command.input_param -%}
+      {%- for field in (cluster.structs | named(command.input_param)).fields -%}
+        {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
+      , 
+      {%- endfor -%}
+    {%- endif -%}
+    timedInvokeTimeout: Duration {%- if not command.is_timed_invoke -%}? = null {%- endif -%}
+  )
 {%- if command | hasResponse -%}
     : {{callbackName}} {
 {%- else %} {
 {%- endif %}
     val commandId: UInt = {{command.code}}u
-{% if command.is_timed_invoke -%}
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
-{%- else -%}
-    val timeoutMs: Duration = timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO 
-{%- endif %}
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -229,7 +242,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -271,7 +284,6 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
       {% endfor %}
 
       else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -351,18 +363,9 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {%- set attribute_id = "ATTRIBUTE_ID_" + attribute.definition.name | upper %}
   suspend fun write{{ attribute.definition.name | upfirst }}Attribute(
     value: {{ encode_value_without_optional_nullable(cluster, encodable, 0) }},
-{%- if attribute.requires_timed_write -%}
-    timedWriteTimeoutMs: Int
-{%- else %}
-    timedWriteTimeoutMs: Int? = null
-{%- endif %}
+    timedWriteTimeout: Duration {%- if not attribute.requires_timed_write -%}? = null {%- endif -%}
   ) {
     val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
-{% if attribute.requires_timed_write -%}
-    val timeoutMs: Duration = Duration.ofMillis(timedWriteTimeoutMs.toLong())
-{%- else -%}
-    val timeoutMs: Duration = timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO 
-{%- endif %}    
 
     val tlvWriter = TlvWriter()
     {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
@@ -387,7 +390,7 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
             tlvPayload = tlvWriter.getEncoded()
           )
         ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -411,6 +414,63 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
     }   
   }
 {% endif %}
+{%- if attribute.is_subscribable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+{%- set encodable_was_optional = encodable.is_optional or encodable.is_nullable %}
+  suspend fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<{{interfaceName}}SubscriptionState> {
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
+    val attributePaths = listOf(
+      AttributePath(
+          endpointId = endpointId,
+          clusterId = CLUSTER_ID,
+          attributeId = ATTRIBUTE_ID
+      )
+    )
+
+    val subscribeRequest: SubscribeRequest = SubscribeRequest(
+      eventPaths = emptyList(), 
+      attributePaths = attributePaths, 
+      minInterval = Duration.ofSeconds(minInterval.toLong()), 
+      maxInterval = Duration.ofSeconds(maxInterval.toLong())
+    )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit({{interfaceName}}SubscriptionState.Error(Exception("Subscription terminated with error code: ${subscriptionState.terminationCause}")))
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+              it.path.attributeId == ATTRIBUTE_ID
+            }        
+             
+          requireNotNull(attributeData) { 
+            "{{ attribute.definition.name | capitalize }} attribute not found in Node State update" 
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
+
+          {% if encodable_was_optional-%}
+          decodedValue?.let {
+            emit({{interfaceName}}SubscriptionState.Success(it))
+          }
+          {% else -%}
+          emit({{interfaceName}}SubscriptionState.Success(decodedValue))
+          {%- endif %}
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit({{interfaceName}}SubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }    
+  }
+{% endif -%}
 {%- endfor %}
   companion object {
     private val logger = Logger.getLogger({{cluster.name}}Cluster::class.java.name)

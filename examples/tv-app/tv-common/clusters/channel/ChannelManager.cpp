@@ -62,6 +62,36 @@ ChannelManager::ChannelManager()
 
     mCurrentChannelIndex = 0;
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+
+    ProgramType program1;
+    program1.identifier = chip::CharSpan::fromCharString("progid-abc1");
+    program1.channel    = abc;
+    program1.title      = chip::CharSpan::fromCharString("ABC Title1");
+    program1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program1.startTime  = 0;
+    program1.endTime    = 30 * 60 * 60;
+
+    mPrograms.push_back(program1);
+
+    ProgramType program_abc1;
+    program_abc1.identifier = chip::CharSpan::fromCharString("progid-pbs1");
+    program_abc1.channel    = pbs;
+    program_abc1.title      = chip::CharSpan::fromCharString("PBS Title1");
+    program_abc1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program_abc1.startTime  = 0;
+    program_abc1.endTime    = 30 * 60 * 60;
+
+    mPrograms.push_back(program_abc1);
+
+    ProgramType program2;
+    program2.identifier = chip::CharSpan::fromCharString("progid-abc2");
+    program2.channel    = abc;
+    program2.title      = chip::CharSpan::fromCharString("My Program Title2");
+    program2.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle2"));
+    program2.startTime  = 30 * 60 * 60;
+    program2.endTime    = 30 * 60 * 60;
+
+    mPrograms.push_back(program2);
 }
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
@@ -203,9 +233,19 @@ void ChannelManager::HandleGetProgramGuide(
     // 1. Decode received parameters
     // 2. Perform search
     // 3. Return results
+
+    // PageTokenType paging;
+    // paging.limit  = MakeOptional(static_cast<uint16_t>(10));
+    // paging.after  = MakeOptional(chip::CharSpan::fromCharString("after-token"));
+    // paging.before = MakeOptional(chip::CharSpan::fromCharString("before-token"));
+
+    // ChannelPagingStructType channelPaging;
+    // channelPaging.nextToken = MakeOptional<DataModel::Nullable<Structs::PageTokenStruct::Type>>(paging);
+
     ProgramGuideResponseType response;
-    // response.channelPagingStruct;
-    // response.programList;
+    // response.channelPagingStruct = channelPaging;
+    response.programList = DataModel::List<const ProgramType>(mPrograms.data(), mPrograms.size());
+
     helper.Success(response);
 }
 
@@ -214,6 +254,16 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
                                          const chip::ByteSpan & data)
 {
     // Start recording
+    std::string idString(programIdentifier.data(), programIdentifier.size());
+    for (auto & program : mPrograms)
+    {
+        std::string nextIdString(program.identifier.data(), program.identifier.size());
+        if (strcmp(idString.c_str(), nextIdString.c_str()) == 0)
+        {
+            program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? 2 : 1));
+        }
+    }
+
     return true;
 }
 
@@ -222,6 +272,15 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
                                                const chip::ByteSpan & data)
 {
     // Cancel recording
+    std::string idString(programIdentifier.data(), programIdentifier.size());
+    for (auto & program : mPrograms)
+    {
+        std::string nextIdString(program.identifier.data(), program.identifier.size());
+        if (strcmp(idString.c_str(), nextIdString.c_str()) == 0)
+        {
+            program.recordingFlag = MakeOptional(static_cast<uint32_t>(0));
+        }
+    }
     return true;
 }
 
