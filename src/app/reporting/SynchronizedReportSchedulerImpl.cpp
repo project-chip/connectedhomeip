@@ -182,6 +182,9 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     bool firedEarly = true;
 
+    // If there are no handlers registers, no need to take actions
+    VerifyOrReturn(mNodesPool.Allocated());
+
     mNodesPool.ForEachActiveObject([now, &firedEarly](ReadHandlerNode * node) {
         if (node->GetMinTimestamp() <= now)
         {
@@ -201,8 +204,7 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         return Loop::Continue;
     });
 
-    // If there are no handlers registers, no need to schedule the next report
-    if (mNodesPool.Allocated() && firedEarly)
+    if (firedEarly)
     {
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));
