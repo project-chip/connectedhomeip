@@ -218,10 +218,14 @@ protected:
     void Clear();
 
     /**
-     * Notify our delegate about a session establishment error, if we have not
-     * notified it of an error or success before.
+     * Notify our delegate about a session establishment error and the stage when the error occurs
+     * if we have not already notified it of an error or success before.
+     *
+     * @param error The error code to report.
+     * @param stage The stage of the session when the error occurs, defaults to kNotInKeyExchange.
      */
-    void NotifySessionEstablishmentError(CHIP_ERROR error);
+    void NotifySessionEstablishmentError(CHIP_ERROR error,
+                                         SessionEstablishmentStage stage = SessionEstablishmentStage::kNotInKeyExchange);
 
 protected:
     CryptoContext::SessionRole mRole;
