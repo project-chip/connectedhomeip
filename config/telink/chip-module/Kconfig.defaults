@@ -170,7 +170,7 @@ config PWM
 endif
 
 # Board non-retention config
-if BOARD_TLSR9528A || BOARD_TLSR9518ADK80D
+if BOARD_TLSR9528A || BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_MARS
 config PWM
     default y
 endif

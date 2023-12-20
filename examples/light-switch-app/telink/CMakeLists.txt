@@ -30,7 +30,7 @@ endif()
 include( ${CHIP_ROOT}/config/telink/chip-module/CMakeLists.txt OPTIONAL)
 set_overlays() # from config/telink/chip-module/CMakeLists.txt
 
-set(CONF_FILE ${CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} prj.conf)
+set(CONF_FILE ${CONF_OVERLAY_FILE} prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
