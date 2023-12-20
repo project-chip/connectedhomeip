@@ -16,6 +16,7 @@
 #
 
 from dataclasses import dataclass
+import logging
 
 import chip.clusters as Clusters
 from chip import ChipUtility
@@ -50,14 +51,27 @@ class TC_IDM_1_4(MatterBaseTest):
 
         self.print_step(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU")
         # In practice, it was noticed that we could only fit 57 commands before we hit the MTU limit as a result we
-        # conservatively try putting up to 100 commands into an Invoke request.
+        # conservatively try putting up to 100 commands into an Invoke request. We are expecting one of 2 things to
+        # happen if max_paths_per_invoke + 1 is greater than what cap_for_batch_commands is set to:
+        # 1. Client (TH) fails to send command, since we cannot fit all the commands single MTU.
+        #    When this happens we get ChipStackError with CHIP_ERROR_NO_MEMORY. Test step is skipped
+        #    as per test spec instructions
+        # 2. Client (TH) able to send command. While unexpected we will hit two different test failure depending on
+        #    what the server does.
+        #    a. Server successfully handle command and send InvokeResponse with results of all individual commands
+        #       being failure. In this case, test fails on unexpected successes like this
+        #    b. Server fails to handle command that is between cap_for_batch_commands and max_paths_per_invoke + 1.
+        #       In this case, test fails as device should have actually succeeded and been caught in 2.a.
         cap_for_batch_commands = 100
         number_of_commands_to_send = min(max_paths_per_invoke + 1, cap_for_batch_commands)
 
         invalid_command_id = 0xffff_ffff
         list_of_commands_to_send = []
         for endpoint_index in range(number_of_commands_to_send):
-            invalid_command = Clusters.BasicInformation.Commands.MfgSpecificPing()
+            # Using Toggle command to form the base as it is a command that doesn't take
+            # any arguments, this allows us to fit as more requests into single MTU.
+            invalid_command = Clusters.OnOff.Commands.Toggle()
+            # This is how we make the command invalid
             invalid_command.command_id = invalid_command_id
 
             list_of_commands_to_send.append(Clusters.Command.InvokeRequestInfo(endpoint_index, invalid_command))
@@ -68,8 +82,11 @@ class TC_IDM_1_4(MatterBaseTest):
             await dev_ctrl.SendBatchCommands(dut_node_id, list_of_commands_to_send)
             # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
             # This might happen after TCP is enabled and DUT supports TCP.
-            asserts.fail("Unexpected success return from sending too many commands")
+            asserts.fail(f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
         except InteractionModelError as e:
+            # This check is for 2.a., mentioned above introduction of variable cap_for_batch_commands.
+            asserts.assert_equal(number_of_commands_to_send, max_paths_per_invoke + 1,
+                                 "Test didn't send as many command as max_paths_per_invoke + 1, likely due to MTU cap_for_batch_commands, but we still got an error from server. This should have been a success from server")
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             self.print_step(2, "DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
@@ -82,6 +99,7 @@ class TC_IDM_1_4(MatterBaseTest):
             self.print_step(2, "DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
 
         if max_paths_per_invoke == 1:
+            # TODO(#31139) After issue is resolved use that API properly to mark tests steps as skipped
             self.print_step(3, "Skipping test step as max_paths_per_invoke == 1")
             self.print_step(4, "Skipping test step as max_paths_per_invoke == 1")
             self.print_step(5, "Skipping test step as max_paths_per_invoke == 1")
@@ -106,7 +124,7 @@ class TC_IDM_1_4(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
-            self.print_step(3, "DUT successfully failed to process two InvokeRequests that contains non-unique paths")
+            logging.info("DUT successfully failed to process two InvokeRequests that contains non-unique paths")
 
         self.print_step(4, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
 
