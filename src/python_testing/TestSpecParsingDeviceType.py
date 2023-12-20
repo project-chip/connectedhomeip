@@ -30,6 +30,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
     # This just tests that the current spec can be parsed without failures
     def test_spec_device_parsing(self):
         problems, device_types = build_xml_device_types()
+        self.problems += problems
         for id, d in device_types.items():
             print(str(d))
 
@@ -40,13 +41,14 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         classification_scope = "endpoint"
         clusters = {0x0003: "Identify", 0x0004: "Groups"}
         # Conformance support tests the different types of conformance for clusters, so here we just want to ensure that we're correctly parsing the XML into python
+        # adds the same attributes and features to every cluster. This is fine for testing.
         template = Template('<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="{{ device_type_id }}" name="Test Device Type" revision="{{ revision }}">\n'
                             '<revisionHistory>\n'
                             '{% for i in range(revision) %}'
                             '<revision revision="{{ i }}" summary="Rev"/>\n'
                             '{% endfor %}'
                             '</revisionHistory>\n'
-                            '<classification class="{{ classification_class }}" scope="{{ classification_scope }}"/>\n'
+                            '<classification {% if classification_class %} class="{{ classification_class }}" {% endif %} {% if classification_scope %} scope="{{ classification_scope }}" {% endif %}/>\n'
                             '<conditions/>\n'
                             '<clusters>\n'
                             '{% for k,v in clusters.items() %}'
@@ -59,18 +61,48 @@ class TestSpecParsingDeviceType(MatterBaseTest):
 
         xml = template.render(device_type_id=device_type_id, revision=revision, classification_class=classification_class,
                               classification_scope=classification_scope, clusters=clusters)
-        print(xml)
         et = ElementTree.fromstring(xml)
         problems, device_type = parse_single_device_type(et)
-        print(device_type.keys())
-        for id, d in device_type.items():
-            print(device_type_id)
-            print(id)
-            print(str(d))
         asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
         asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
         asserts.assert_true(device_type_id in device_type.keys(), "device type id not found in returned data")
-        asserts.assert_equal(device_type[device_type_id].revision, {revision}, "Unexpected revision")
+        asserts.assert_equal(device_type[device_type_id].revision, revision, "Unexpected revision")
+        asserts.assert_equal(len(device_type[device_type_id].clusters), len(clusters), "Unexpected number of clusters")
+        for id, name in clusters.items():
+            asserts.assert_equal(device_type[device_type_id].clusters[id].name, name, "Incorrect cluster name")
+            asserts.assert_equal(str(device_type[device_type_id].clusters[id].conformance), 'M', 'Incorrect cluster conformance')
+
+        clusters = {}
+        xml = template.render(device_type_id=device_type_id, revision=revision, classification_class=classification_class,
+                              classification_scope=classification_scope, clusters=clusters)
+        et = ElementTree.fromstring(xml)
+        problems, device_type = parse_single_device_type(et)
+        asserts.assert_equal(len(problems), 0, "Unexpected problems parsing device type conformance")
+        asserts.assert_equal(len(device_type.keys()), 1, "Unexpected number of device types returned")
+        asserts.assert_true(device_type_id in device_type.keys(), "device type id not found in returned data")
+        asserts.assert_equal(device_type[device_type_id].revision, revision, "Unexpected revision")
+        asserts.assert_equal(len(device_type[device_type_id].clusters), len(clusters), "Unexpected number of clusters")
+
+        # Bad device type ID
+        xml = template.render(device_type_id="", revision=revision, classification_class=classification_class,
+                              classification_scope=classification_scope, clusters=clusters)
+        et = ElementTree.fromstring(xml)
+        problems, device_type = parse_single_device_type(et)
+        asserts.assert_equal(len(problems), 1, "Device with blank ID did not generate a problem notice")
+
+        # Bad class
+        xml = template.render(device_type_id=device_type_id, revision=revision, classification_class="",
+                              classification_scope=classification_scope, clusters=clusters)
+        et = ElementTree.fromstring(xml)
+        problems, device_type = parse_single_device_type(et)
+        asserts.assert_equal(len(problems), 1, "Device with no class did not generate a problem notice")
+
+        # Bad scope
+        xml = template.render(device_type_id=device_type_id, revision=revision, classification_class=classification_class,
+                              classification_scope="", clusters=clusters)
+        et = ElementTree.fromstring(xml)
+        problems, device_type = parse_single_device_type(et)
+        asserts.assert_equal(len(problems), 1, "Device with no scope did not generate a problem notice")
 
 
 if __name__ == "__main__":

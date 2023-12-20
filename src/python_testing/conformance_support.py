@@ -213,8 +213,11 @@ class not_operation:
         # not operations also can't be used with things that are optional
         # ie, ![AB] doesn't make sense, nor does !O
         decision = self.op(feature_map, attribute_list, all_command_list)
-        if decision == ConformanceDecision.OPTIONAL or decision == ConformanceDecision.DISALLOWED or decision == ConformanceDecision.PROVISIONAL:
+        if decision == ConformanceDecision.DISALLOWED or decision == ConformanceDecision.PROVISIONAL:
             raise ConformanceException('NOT operation on optional or disallowed item')
+        # Features in device types degrade to optional so a not operation here is still optional because we don't have any way to verify the features since they're not exposed anywhere
+        elif decision == ConformanceDecision.OPTIONAL:
+            return ConformanceDecision.OPTIONAL
         elif decision == ConformanceDecision.NOT_APPLICABLE:
             return ConformanceDecision.MANDATORY
         elif decision == ConformanceDecision.MANDATORY:
@@ -341,7 +344,17 @@ def parse_wrapper_callable_from_xml(element: ElementTree.Element, ops: list[Call
 def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Callable:
     ''' Only allows basic, or wrappers over things that degrade to basic.'''
     if len(list(element)) == 0:
-        return parse_basic_callable_from_xml(element)
+        try:
+            return parse_basic_callable_from_xml(element)
+        # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
+        # For example, temperature controlled cabinet has conditions called "heating" and "cooling". The cluster conditions are dependent on them, but they're not
+        # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
+        # as just optional, because it's optional to implement any device type feature.
+        # Device types also have some marked as "condition" that are similarly optional
+        except ConformanceException as e:
+            if element.tag == ATTRIBUTE_TAG or element.tag == CONDITION_TAG:
+                return optional()
+            raise e
 
     ops = []
     for sub in element:

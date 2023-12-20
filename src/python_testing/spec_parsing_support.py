@@ -29,8 +29,8 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
+                                 feature, mandatory, optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 
@@ -106,26 +106,26 @@ class CommandType(Enum):
     GENERATED = auto()
 
 
-def get_conformance(element: ElementTree.Element) -> ElementTree.Element:
+def get_conformance(element: ElementTree.Element, cluster_id: int) -> ElementTree.Element:
     for sub in element:
         if sub.tag == OTHERWISE_CONFORM or sub.tag == MANDATORY_CONFORM or sub.tag == OPTIONAL_CONFORM or sub.tag == PROVISIONAL_CONFORM or sub.tag == DEPRECATE_CONFORM or sub.tag == DISALLOW_CONFORM:
-            return sub
+            return [], sub
 
     # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
     if element.tag == 'feature':
-        location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
+        location = FeaturePathLocation(endpoint_id=0, cluster_id=cluster_id, feature_code=element.attrib['code'])
     elif element.tag == 'command':
-        location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
+        location = CommandPathLocation(endpoint_id=0, cluster_id=cluster_id, command_id=int(element.attrib['id'], 0))
     elif element.tag == 'attribute':
-        location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(element.attrib['id'], 0))
+        location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=int(element.attrib['id'], 0))
     elif element.tag == 'event':
-        location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
+        location = EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
     else:
-        location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
-    self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                                        severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
+        location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
+    problem = ProblemNotice(test_name='Spec XML parsing', location=location,
+                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element')
 
-    return ElementTree.Element(OPTIONAL_CONFORM)
+    return [problem], ElementTree.Element(OPTIONAL_CONFORM)
 
 
 class ClusterParser:
@@ -162,8 +162,9 @@ class ClusterParser:
                 except KeyError:
                     # This is a conformance tag, which uses the same name
                     continue
-                conformance = get_conformance(element)
+                problems, conformance = get_conformance(element, self._cluster_id)
                 ret.append((element, conformance))
+                self._problems += problems
         return ret
 
     def get_all_feature_elements(self) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
@@ -427,30 +428,48 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
         name = d.attrib['name']
 
         str_id = d.attrib['id']
-        print(str_id)
+        if not str_id:
+            location = DeviceTypePathLocation(device_type_id=0)
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING, problem=f"Device type {name} does not have an ID listed"))
+            break
         id = int(str_id, 0)
-        revision = d.attrib['revision']
+        revision = int(d.attrib['revision'], 0)
         try:
             classification = next(d.iter('classification'))
             scope = classification.attrib['scope']
             device_class = classification.attrib['class']
         except (KeyError, StopIteration):
-            # TODO: add to problems here
-            print("unable to find classification data")
+            location = DeviceTypePathLocation(device_type_id=id)
+            problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                            severity=ProblemSeverity.WARNING, problem="Unable to find classification data for device type"))
             break
         device_types[id] = XmlDeviceType(name=name, revision=revision, clusters={},
                                          classification_class=device_class, classification_scope=scope)
         clusters = d.iter('cluster')
         for c in clusters:
             try:
-                conformance = parse_device_type_callable_from_xml(get_conformance(c))
-                device_types[id].clusters[c.attrib['id']] = XmlDeviceTypeClusterRequirements(
+                cid = int(c.attrib['id'], 0)
+                tmp_problems, conformance_xml = get_conformance(c, cid)
+                problems += tmp_problems
+                conformance = parse_device_type_callable_from_xml(conformance_xml)
+                device_types[id].clusters[cid] = XmlDeviceTypeClusterRequirements(
                     name=c.attrib['name'], conformance=conformance)
             except ConformanceException as ex:
-                # TODO: add to problems here
-                print("unable to find class")
-                pass
-    return problems, device_types
+                location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))
+            # TODO: Check for features, attributes and commands as element requirements
+            # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
+            # so this will need a bit of fancy handling here to get this right.
+    return device_types, problems
+
+
+# The base device type requirements are not scraped properly currently, so add them manually
+# see https://github.com/csa-data-model/projects/issues/389
+BASE_CLUSTERS = {Clusters.Descriptor.id: XmlDeviceTypeClusterRequirements(name="Descriptor", conformance=mandatory()),
+                 Clusters.FixedLabel.id: XmlDeviceTypeClusterRequirements(name="Fixed Label", conformance=optional()),
+                 Clusters.UserLabel.id: XmlDeviceTypeClusterRequirements(name="User Label", conformance=optional())}
 
 
 def build_xml_device_types() -> tuple[list[ProblemNotice], dict[int, XmlDeviceType]]:
@@ -461,8 +480,11 @@ def build_xml_device_types() -> tuple[list[ProblemNotice], dict[int, XmlDeviceTy
         logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
-        tmp_problems, tmp_device_types = parse_single_device_type(root)
+        tmp_device_types, tmp_problems = parse_single_device_type(root)
         problems = problems + tmp_problems
         device_types.update(tmp_device_types)
 
-    return problems, device_types
+    for d in device_types.values():
+        d.clusters.update(BASE_CLUSTERS)
+
+    return device_types, problems

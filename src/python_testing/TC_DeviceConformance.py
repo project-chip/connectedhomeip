@@ -22,9 +22,9 @@ from basic_composition_support import BasicCompositionTests
 from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, MatterBaseTest,
                                     async_test_body, default_matter_test_main)
-from spec_parsing_support import CommandType, build_xml_clusters
+from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
 class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
@@ -33,6 +33,8 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
         super().setup_class()
         await self.setup_class_helper()
         self.xml_clusters, self.problems = build_xml_clusters()
+        self.xml_device_types, problems = build_xml_device_types()
+        self.problems += problems
 
     def test_TC_IDM_10_2(self):
         def conformance_str(conformance: Callable, feature_map: uint, feature_dict: dict[str, uint]) -> str:
@@ -214,6 +216,51 @@ class TC_DeviceConformance(MatterBaseTest, BasicCompositionTests):
                     success = False
         if not success:
             self.fail_current_test("Problems with cluster revision on at least one cluster")
+
+    def test_IDM_10_5(self):
+        success = True
+        warn_on_extra_clusters = self.user_params.get("warn_on_extra_clusters", True)
+        test_name = self.get_test_name()
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            device_types = [x for x in endpoint[Clusters.Descriptor]
+                            [Clusters.Descriptor.Attributes.DeviceTypeList] if x.deviceType <= 0xBFFF]
+            endpoint_clusters = []
+            for device_type in device_types:
+                device_type_id = device_type.deviceType
+                if device_type_id not in self.xml_device_types.keys():
+                    # TODO: report a problem here
+                    continue
+                # TODO: check revision
+                xml_device = self.xml_device_types[device_type_id]
+                server_clusters = [x for x in endpoint[Clusters.Descriptor]
+                                   [Clusters.Descriptor.Attributes.ServerList] if x <= 0x7FFF]
+                for cluster_id, cluster_requirement in xml_device.clusters.items():
+                    # Device type cluster conformances do not include any conformances based on cluster elements
+                    print(
+                        f'device type {xml_device.name} cluster = {cluster_requirement.name} conformance = {str(cluster_requirement.conformance)}')
+                    conformance = cluster_requirement.conformance(0, [], [])
+                    location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
+                    if conformance == ConformanceDecision.MANDATORY and cluster_id not in server_clusters:
+                        self.record_error(test_name=test_name, location=location,
+                                          problem=f"Mandatory cluster {cluster_requirement.name} for device type {xml_device.name} is not present in the server list")
+                        success = False
+
+                    if (conformance == ConformanceDecision.DISALLOWED or conformance == ConformanceDecision.PROVISIONAL) and cluster_id in server_clusters:
+                        self.record_error(test_name=test_name, location=location,
+                                          problem=f"Disallowed cluster {cluster_requirement.name} found in server list for device type {xml_device.name}")
+                        success = False
+                # If we want to check for extra clusters on the endpoint, we need to know the entire set of clusters in all the device type
+                # lists across all the device types on the endpoint.
+                endpoint_clusters += xml_device.clusters.keys()
+            if warn_on_extra_clusters:
+                extra_clusters = set(server_clusters) - set(endpoint_clusters)
+                for extra in extra_clusters:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=extra)
+                    self.record_warning(test_name=test_name, location=location,
+                                        problem=f"Extra cluster found on endpoint with device types {device_types}")
+        if not success:
+            self.fail_current_test("One or more device type violations found")
 
 
 if __name__ == "__main__":
