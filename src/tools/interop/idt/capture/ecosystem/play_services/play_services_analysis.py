@@ -60,7 +60,7 @@ class PlayServicesAnalysis:
                             "matter_commissioner_logs",
                             "End device discovered via DNS-SD, secure session handshake failed! Try $ idt probe",
                             []),
-                  ])
+            ])
         ]
 
     def _log_proc_matter_commissioner(self, line: str) -> None:
