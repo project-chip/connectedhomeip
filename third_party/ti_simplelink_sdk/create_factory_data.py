@@ -15,10 +15,11 @@
 # limitations under the License.
 
 import argparse
-import intelhex
 import json
-from jsonschema import validate
 import subprocess
+
+import intelhex
+from jsonschema import validate
 
 
 def create_hex_file(args):

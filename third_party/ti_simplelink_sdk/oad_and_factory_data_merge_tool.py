@@ -23,6 +23,7 @@ Run with:
 """
 
 import sys
+
 import intelhex
 
 oad_bin_file = sys.argv[1]

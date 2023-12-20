@@ -23,6 +23,7 @@ Run with:
 """
 
 import sys
+
 import intelhex
 
 hex_file = sys.argv[1]

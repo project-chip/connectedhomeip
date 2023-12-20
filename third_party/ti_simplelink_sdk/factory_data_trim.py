@@ -22,10 +22,11 @@ Run with:
     python factory_data_trim.py <matter image> <matter image map file> <factory data image> <device family>
 """
 
-import sys
-import intelhex
 import itertools
 import re
+import sys
+
+import intelhex
 
 matter_app_file = sys.argv[1]
 matter_app_map_file = sys.argv[2]
