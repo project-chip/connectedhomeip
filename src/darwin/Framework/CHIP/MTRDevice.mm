@@ -327,7 +327,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // Return YES if there's a valid delegate AND subscription is expected to report value
 - (BOOL)_subscriptionAbleToReport
 {
-    return (_weakDelegate.strongObject) && (_state == MTRDeviceStateReachable);
+    os_unfair_lock_lock(&self->_lock);
+    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+    auto state = _state;
+    os_unfair_lock_unlock(&self->_lock);
+    return (delegate != nil) && (state == MTRDeviceStateReachable);
 }
 
 // assume lock is held
@@ -634,6 +638,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_setupSubscription
 {
+    os_unfair_lock_assert_owner(&self->_lock);
+
 #ifdef DEBUG
     id delegate = _weakDelegate.strongObject;
     Optional<System::Clock::Seconds32> maxIntervalOverride;
@@ -644,8 +650,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     }
 #endif
-
-    os_unfair_lock_assert_owner(&self->_lock);
 
     // for now just subscribe once
     if (_subscriptionActive) {
@@ -1088,7 +1092,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     BOOL useValueAsExpectedValue = YES;
 #ifdef DEBUG
+    os_unfair_lock_lock(&self->_lock);
     id delegate = _weakDelegate.strongObject;
+    os_unfair_lock_unlock(&self->_lock);
     if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
         useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
     }

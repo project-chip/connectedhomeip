@@ -17,58 +17,39 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-  val alarmsActive: UInt,
-  val alarmsSuppressed: Optional<UInt>
-) {
+class BooleanStateConfigurationClusterSensorFaultEvent(val sensorFault: UInt) {
   override fun toString(): String = buildString {
-    append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n")
-    append("\talarmsActive : $alarmsActive\n")
-    append("\talarmsSuppressed : $alarmsSuppressed\n")
+    append("BooleanStateConfigurationClusterSensorFaultEvent {\n")
+    append("\tsensorFault : $sensorFault\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_ALARMS_ACTIVE), alarmsActive)
-      if (alarmsSuppressed.isPresent) {
-        val optalarmsSuppressed = alarmsSuppressed.get()
-        put(ContextSpecificTag(TAG_ALARMS_SUPPRESSED), optalarmsSuppressed)
-      }
+      put(ContextSpecificTag(TAG_SENSOR_FAULT), sensorFault)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ALARMS_ACTIVE = 0
-    private const val TAG_ALARMS_SUPPRESSED = 1
+    private const val TAG_SENSOR_FAULT = 0
 
     fun fromTlv(
       tlvTag: Tag,
       tlvReader: TlvReader
-    ): BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+    ): BooleanStateConfigurationClusterSensorFaultEvent {
       tlvReader.enterStructure(tlvTag)
-      val alarmsActive = tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_ACTIVE))
-      val alarmsSuppressed =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
-        } else {
-          Optional.empty()
-        }
+      val sensorFault = tlvReader.getUInt(ContextSpecificTag(TAG_SENSOR_FAULT))
 
       tlvReader.exitContainer()
 
-      return BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
-        alarmsActive,
-        alarmsSuppressed
-      )
+      return BooleanStateConfigurationClusterSensorFaultEvent(sensorFault)
     }
   }
 }

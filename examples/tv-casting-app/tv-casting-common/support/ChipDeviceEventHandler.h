@@ -27,7 +27,7 @@ namespace support {
 /**
  * @brief Handles chip::DeviceLayer::ChipDeviceEvent events (such as kFailSafeTimerExpired, kBindingsChangedViaCluster,
  * kCommissioningComplete) sent by the Matter DeviceLayer.
- * ChipDeviceEventHandlerhelps the CastingPlayer class commission with and connect to a CastingPlayer
+ * ChipDeviceEventHandler helps the CastingPlayer class commission with and connect to a CastingPlayer
  */
 class ChipDeviceEventHandler
 {

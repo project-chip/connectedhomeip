@@ -952,12 +952,14 @@ private:
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    // Parsers for the two different read clients
     void ParseCommissioningInfo();
-    void ParseCommissioningInfo2();
+    // Parsing attributes read in kReadCommissioningInfo stage.
+    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
+    // Parsing attributes read in kReadCommissioningInfo2 stage.
+    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
     // Called by ParseCommissioningInfo2
-    CHIP_ERROR ParseFabrics(ReadCommissioningInfo2 & info);
-    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo2 & info);
+    CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
