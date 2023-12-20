@@ -1,6 +1,7 @@
 # Matter ESP32 Energy Management Example
 
-This example demonstrates the Matter EVSE application on ESP platforms.
+This example demonstrates the Matter Electric Vehicle Supply Equipment
+application on ESP platforms.
 
 Please
 [setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
