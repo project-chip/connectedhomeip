@@ -351,16 +351,16 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
     std::string userActiveModeTriggerInstruction;
 
     // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
-    if (info.icdUserActiveModeTriggerInstruction.size() != 0)
+    if (info.icd.userActiveModeTriggerInstruction.size() != 0)
     {
         userActiveModeTriggerInstruction =
-            std::string(info.icdUserActiveModeTriggerInstruction.data(), info.icdUserActiveModeTriggerInstruction.size());
+            std::string(info.icd.userActiveModeTriggerInstruction.data(), info.icd.userActiveModeTriggerInstruction.size());
     }
 
-    if (info.icdUserActiveModeTriggerHint.HasAny())
+    if (info.icd.userActiveModeTriggerHint.HasAny())
     {
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
-                        info.icdUserActiveModeTriggerHint.Raw());
+                        info.icd.userActiveModeTriggerHint.Raw());
         ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
                         userActiveModeTriggerInstruction.c_str());
     }

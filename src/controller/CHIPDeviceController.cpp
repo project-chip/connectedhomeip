@@ -2275,19 +2275,20 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 
     CHIP_ERROR err;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+    bool hasUserActiveModeTrigger = false;
 
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
-
-        info.isLIT                  = !!(featureMap & to_underlying(IcdManagement::Feature::kLongIdleTimeSupport));
-        info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
+        info.icd.isLIT                  = !!(featureMap & to_underlying(IcdManagement::Feature::kLongIdleTimeSupport));
+        info.icd.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
+        hasUserActiveModeTrigger        = !!(featureMap & to_underlying(IcdManagement::Feature::kUserActiveModeTrigger));
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         // This key is optional so not an error
-        info.isLIT = false;
-        err        = CHIP_NO_ERROR;
+        info.icd.isLIT = false;
+        err            = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
@@ -2298,7 +2299,7 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         {
             if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
             {
-                info.isLIT = false;
+                info.icd.isLIT = false;
             }
             else
             {
@@ -2309,43 +2310,41 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 
     ReturnErrorOnFailure(err);
 
-    // Intentionally ignore errors since they are not mandatory.
-    bool activeModeTriggerInstructionRequired = false;
-    err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerHint::TypeInfo>(kRootEndpointId,
-                                                                                               info.icdUserActiveModeTriggerHint);
-    if (err != CHIP_NO_ERROR)
+    info.icd.userActiveModeTriggerHint.ClearAll();
+    info.icd.userActiveModeTriggerInstruction = CharSpan();
+    if (hasUserActiveModeTrigger)
     {
-        if (info.isLIT)
+        // Intentionally ignore errors since they are not mandatory.
+        bool activeModeTriggerInstructionRequired = false;
+
+        err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerHint::TypeInfo>(
+            kRootEndpointId, info.icd.userActiveModeTriggerHint);
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Controller, "IcdManagement.UserActiveModeTriggerHint expected for LIT ICD, but failed to read.");
+            ChipLogError(Controller, "IcdManagement.UserActiveModeTriggerHint expected, but failed to read.");
             return err;
         }
-        info.icdUserActiveModeTriggerHint.ClearAll();
-        err = CHIP_NO_ERROR;
-        return err;
-    }
 
-    activeModeTriggerInstructionRequired = info.icdUserActiveModeTriggerHint.HasAny(
-        UserActiveModeTriggerBitmap::kCustomInstruction, UserActiveModeTriggerBitmap::kActuateSensorSeconds,
-        UserActiveModeTriggerBitmap::kActuateSensorTimes, UserActiveModeTriggerBitmap::kActuateSensorLightsBlink,
-        UserActiveModeTriggerBitmap::kResetButtonLightsBlink, UserActiveModeTriggerBitmap::kResetButtonSeconds,
-        UserActiveModeTriggerBitmap::kResetButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonSeconds,
-        UserActiveModeTriggerBitmap::kSetupButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonTimes,
-        UserActiveModeTriggerBitmap::kAppDefinedButton);
+        activeModeTriggerInstructionRequired = info.icd.userActiveModeTriggerHint.HasAny(
+            UserActiveModeTriggerBitmap::kCustomInstruction, UserActiveModeTriggerBitmap::kActuateSensorSeconds,
+            UserActiveModeTriggerBitmap::kActuateSensorTimes, UserActiveModeTriggerBitmap::kActuateSensorLightsBlink,
+            UserActiveModeTriggerBitmap::kResetButtonLightsBlink, UserActiveModeTriggerBitmap::kResetButtonSeconds,
+            UserActiveModeTriggerBitmap::kResetButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonSeconds,
+            UserActiveModeTriggerBitmap::kSetupButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonTimes,
+            UserActiveModeTriggerBitmap::kAppDefinedButton);
 
-    err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerInstruction::TypeInfo>(
-        kRootEndpointId, info.icdUserActiveModeTriggerInstruction);
-    if (err != CHIP_NO_ERROR)
-    {
         if (activeModeTriggerInstructionRequired)
         {
-            ChipLogError(
-                Controller,
-                "IcdManagement.UserActiveModeTriggerInstruction expected for given active mode trigger hint, but failed to read.");
-            return err;
+            err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerInstruction::TypeInfo>(
+                kRootEndpointId, info.icd.userActiveModeTriggerInstruction);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller,
+                             "IcdManagement.UserActiveModeTriggerInstruction expected for given active mode trigger hint, but "
+                             "failed to read.");
+                return err;
+            }
         }
-        info.icdUserActiveModeTriggerInstruction = CharSpan();
-        err                                      = CHIP_NO_ERROR;
     }
 
     return err;

@@ -679,6 +679,16 @@ struct GeneralCommissioningInfo
     ;
 };
 
+struct ICDManagementClusterInfo
+{
+    bool isLIT                  = false;
+    bool checkInProtocolSupport = false;
+
+    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint =
+        BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>();
+    CharSpan userActiveModeTriggerInstruction = CharSpan();
+};
+
 struct ReadCommissioningInfo
 {
     NetworkClusters network;
@@ -691,12 +701,8 @@ struct ReadCommissioningInfo
     uint8_t maxTimeZoneSize           = 1;
     uint8_t maxDSTSize                = 1;
     NodeId remoteNodeId               = kUndefinedNodeId;
-    bool isLIT                        = false;
-    bool checkInProtocolSupport       = false;
     bool supportsConcurrentConnection = true;
-
-    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> icdUserActiveModeTriggerHint;
-    CharSpan icdUserActiveModeTriggerInstruction;
+    ICDManagementClusterInfo icd;
 };
 
 struct TimeZoneResponseInfo
