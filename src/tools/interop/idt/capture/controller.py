@@ -193,8 +193,8 @@ def write_error_report(artifact_dir: str):
         error_report_file_name = create_standard_log_name("error_report", "txt", parent=artifact_dir)
         with open(error_report_file_name, "a+") as error_report_file:
             for ecosystem in _ERROR_REPORT:
-                log.print_and_write(add_border(f"Errors for {ecosystem}"), error_report_file)
+                log.print_and_write(add_border(f"Errors for {ecosystem}"), error_report_file, important=True)
                 for record in _ERROR_REPORT[ecosystem]:
-                    log.print_and_write(str(record), error_report_file)
+                    log.print_and_write(str(record), error_report_file, important=True)
     else:
         logger.info("No errors seen this run!")

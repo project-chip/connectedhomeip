@@ -67,8 +67,10 @@ def border_print(to_print: str, important: bool = False) -> None:
     print(to_print)
 
 
-def print_and_write(to_print: str, file: TextIO) -> None:
-    if config.enable_color:
+def print_and_write(to_print: str, file: TextIO, important: bool = False) -> None:
+    if config.enable_color and important:
+        print(colored(to_print, "red", attrs=["bold"]))
+    elif config.enable_color:
         print(colored(to_print, "green"))
     else:
         print(to_print)

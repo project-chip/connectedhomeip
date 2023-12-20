@@ -19,14 +19,14 @@ import os
 from typing import TextIO
 
 from capture.platform.android import Android
-from utils.analysis import Cause, check_cause
+from utils.analysis import Cause, PrescriptiveAnalysis
 from utils.artifact import create_standard_log_name, log
 from utils.log import add_border, print_and_write
 
 logger = log.get_logger(__file__)
 
 
-class PlayServicesAnalysis:
+class PlayServicesAnalysis(PrescriptiveAnalysis):
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
         self.logger = logger
@@ -50,7 +50,7 @@ class PlayServicesAnalysis:
                   []),
             Cause(["SetupDeviceViewModel", "Failed to discover operational device"],
                   "failure_stack_trace",
-                  "All steps of PASE completed as expected, but we failed to establish a secure session on IP network",
+                  "All steps of PASE completed as expected, but the secure session setup on IP network failed.",
                   [
                       Cause(["AddressResolve_DefaultImpl", "Timeout"],
                             "matter_commissioner_logs",
@@ -58,7 +58,7 @@ class PlayServicesAnalysis:
                             []),
                       Cause(["secure_channel/CASESession"],
                             "matter_commissioner_logs",
-                            "End device discovered via DNS-SD, secure session handshake failed! Try $ idt probe",
+                            "End device discovered via DNS-SD, but session handshake failed! Try $ idt probe",
                             []),
             ])
         ]
@@ -99,27 +99,22 @@ class PlayServicesAnalysis:
             self.logger.info(line)
             self.sigma_logs += line
 
-    def do_prescriptive_analysis(self, analysis_file: TextIO) -> None:
-        print_and_write(add_border("Prescriptive analysis"), analysis_file)
-        for cause in self.causes:
-            check_cause(self, cause, analysis_file)
-
     def show_analysis(self) -> None:
-        analysis_file = open(self.analysis_file_name, mode="w+")
-        print_and_write(add_border('Matter commissioner logs'), analysis_file)
-        print_and_write(self.matter_commissioner_logs, analysis_file)
-        print_and_write(
-            add_border('Commissioning failure stack trace'),
-            analysis_file)
-        print_and_write(self.failure_stack_trace, analysis_file)
-        print_and_write(add_border('PASE Handshake'), analysis_file)
-        print_and_write(self.pake_logs, analysis_file)
-        print_and_write(add_border('DNS-SD resolution'), analysis_file)
-        print_and_write(self.resolver_logs, analysis_file)
-        print_and_write(add_border('CASE handshake'), analysis_file)
-        print_and_write(self.sigma_logs, analysis_file)
-        self.do_prescriptive_analysis(analysis_file)
-        analysis_file.close()
+        with open(self.analysis_file_name, mode="w+") as analysis_file:
+            print_and_write(add_border('Matter commissioner logs'), analysis_file)
+            print_and_write(self.matter_commissioner_logs, analysis_file)
+            print_and_write(
+                add_border('Commissioning failure stack trace'),
+                analysis_file)
+            print_and_write(self.failure_stack_trace, analysis_file)
+            print_and_write(add_border('PASE Handshake'), analysis_file)
+            print_and_write(self.pake_logs, analysis_file)
+            print_and_write(add_border('DNS-SD resolution'), analysis_file)
+            print_and_write(self.resolver_logs, analysis_file)
+            print_and_write(add_border('CASE handshake'), analysis_file)
+            print_and_write(self.sigma_logs, analysis_file)
+            print_and_write(add_border('Prescriptive analysis findings'), analysis_file)
+        self.check_causes()
 
     def process_line(self, line: str) -> None:
         for line_func in [s for s in dir(self) if s.startswith('_log')]:

@@ -143,12 +143,6 @@ class InteropDebuggingTool:
             choices=self.available_net_interfaces,
             default=self.available_net_interfaces_default)
 
-        capture_parser.add_argument(
-            "--analyze",
-            "-a",
-            help="Execute post analysis on an existing capture output dir (specify fully qualified path as arg)",
-            required=False)
-
         capture_parser.set_defaults(func=self.command_capture)
 
         prober_parser = subparsers.add_parser("probe",

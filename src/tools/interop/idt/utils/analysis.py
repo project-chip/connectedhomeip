@@ -16,7 +16,7 @@
 #
 
 from dataclasses import dataclass
-from typing import Any, TextIO
+from logging import Logger
 
 from utils.log import print_and_write
 
@@ -24,11 +24,11 @@ from utils.log import print_and_write
 @dataclass
 class Cause:
     """
-    A representation of a prescriptive log analysis
-    search_terms: terms to match in a log line (term1 AND term2 AND term3 etc...)
+    A representation of a possible problem cause in a log
+    search_terms: terms to match in a log line (term 1 AND term 2 AND term N...)
     search_attr: analyze this attribute of an analysis object for this cause
     help_message: how to help the user if this cause is discovered
-    follow_up_causes: more checks to continue narrowing down the root cause
+    follow_up_causes: more checks to continue narrowing down the root cause (depth first)
     """
     search_terms: [str]
     search_attr: [str]
@@ -36,19 +36,32 @@ class Cause:
     follow_up_causes: []  # : [Cause] (Recursive reference does not work for type hint here)
 
 
-def check_cause(analysis_object: Any, cause: Cause, analysis_file: TextIO) -> None:
-    """
-    Check if an analysis object has revealed any problem causes
-    analysis_object: the object containing log lines as search sources
-    cause: the cause object to check for
-    analysis_file: the open file to write discovered causes too
-    """
-    to_search = getattr(analysis_object, cause.search_attr)
-    found = True
-    for search_term in cause.search_terms:
-        found = found and search_term in to_search
-    if found:
-        print_and_write(cause.help_message, analysis_file)
-    if found and cause.follow_up_causes:
-        for follow_up in cause.follow_up_causes:
-            check_cause(analysis_object, follow_up, analysis_file)
+class PrescriptiveAnalysis:
+
+    def __init__(self, causes: [Cause], analysis_file_name: str, logger: Logger):
+        """
+        An "analysis object" is an object which subclasses this class
+        and contains log lines collected in instance variables
+        """
+        self.causes = causes
+        self.analysis_file_name = analysis_file_name
+        self.logger = logger
+
+    def check_cause(self, cause: Cause) -> None:
+        if not hasattr(self, cause.search_attr):
+            self.logger.error(f"{cause.search_attr} not found on this analysis object!")
+            return
+        to_search = getattr(self, cause.search_attr)
+        found = True
+        for search_term in cause.search_terms:
+            found = found and search_term in to_search
+        if found:
+            with open(self.analysis_file_name, mode="w+") as analysis_file:
+                print_and_write(cause.help_message, analysis_file, important=True)
+        if found and cause.follow_up_causes:
+            for follow_up in cause.follow_up_causes:
+                self.check_cause(follow_up)
+
+    def check_causes(self) -> None:
+        for cause in self.causes:
+            self.check_cause(cause)
