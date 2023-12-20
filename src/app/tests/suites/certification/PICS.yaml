@@ -8883,23 +8883,14 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id:
           LWM.S.C01.Tx
-          #  Oven Mode Cluster
+    
+    #  Oven Mode Cluster
 
     - label: "Does the device implement the OM cluster as a server?"
-      id: OM.S
+      id: OTCCM.S
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
-      id: OM.S.M.CAN_TEST_MODE_FAILURE
-
-    #- label:
-    #      "Id of mode the device will fail to transition to, given its current
-    #      state"
-    #  id: PIXIT.OM.MODE_CHANGE_FAIL
-
-    #- label:
-    #      "Id of mode the device will successfully transition to, given its
-    #      current state"
-    #  id: PIXIT.OM.MODE_CHANGE_OK
+      id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
 
     #
     # server / features
@@ -8907,35 +8898,35 @@ PICS:
     - label:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
-      id: OM.S.F00
+      id: OTCCM.S.F00
 
     #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
-      id: OM.S.A0000
+      id: OTCCM.S.A0000
 
     - label: "Does the device implement the CurrentMode attribute?"
-      id: OM.S.A0001
+      id: OTCCM.S.A0001
 
     - label: "Does the device implement the StartUpMode attribute?"
-      id: OM.S.A0002
+      id: OTCCM.S.A0002
 
     - label: "Does the device implement the OnMode attribute?"
-      id: OM.S.A0003
+      id: OTCCM.S.A0003
 
     #
     # server / Commands received
     #
     - label: "Does the device implement receiving the ChangeToMode command?"
-      id: OM.S.C00.Rsp
+      id: OTCCM.S.C00.Rsp
 
     #
     # server / Commands generated
     #
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
-      id: OM.S.C01.Tx
+      id: OTCCM.S.C01.Tx
 
     # RVC Clean Mode Cluster
 
