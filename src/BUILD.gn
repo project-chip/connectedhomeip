@@ -60,6 +60,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]

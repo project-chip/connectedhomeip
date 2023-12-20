@@ -19,6 +19,7 @@
 #pragma once
 
 #include "app/clusters/energy-evse-server/energy-evse-server.h"
+#include <EVSECallbacks.h>
 
 #include <app/util/af.h>
 #include <app/util/config.h>
@@ -68,9 +69,13 @@ public:
      */
     Status StartDiagnostics() override;
 
+    /**
+     * @brief    Called by EVSE Hardware to register a single callback handler
+     */
+    Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
+
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
-    // TODO Status HwRegisterEvseHardwareCallback(Callback);
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
@@ -149,6 +154,11 @@ private:
     int64_t mMaximumChargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when charging enabled */
     int64_t mActualChargingCurrentLimit             = 0;
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
+
+    /* Callback related */
+    EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
+    Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
+    Status NotifyApplicationStateChange();
 
     /**
      * @brief Helper function to work out the charge limit based on conditions and settings

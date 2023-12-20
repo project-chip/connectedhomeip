@@ -37,6 +37,8 @@ CommandHandlerInterfaceOnlyClusters:
     - RVC Operational State
     - Sample MEI
     - Microwave Oven Control
+    - Energy EVSE
+    - Device Energy Management
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
