@@ -469,7 +469,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     err =
         chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getSymmetricKey", "()[B", &getSymmetricKeyMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    jbyteArray jSymmetricKey = (jbyteArray) env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod);
+    jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
     params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
 

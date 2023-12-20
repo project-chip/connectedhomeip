@@ -1593,12 +1593,12 @@ public class ChipDeviceController {
     void onOpCSRGenerationComplete(byte[] csr);
 
     /**
-     * Nodifies when the ICD registration information (ICD symmetric key, check-in node ID and
+     * Notifies when the ICD registration information (ICD symmetric key, check-in node ID and
      * monitored subject) is required.
      */
     void onICDRegistrationInfoRequired();
 
-    /** Nodifies when the registration flow for the ICD completes. */
+    /** Notifies when the registration flow for the ICD completes. */
     void onICDRegistrationComplete(long icdNodeId, long icdCounter);
   }
 }
