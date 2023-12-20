@@ -17,12 +17,13 @@
 
 #include "FactoryDataParser.h"
 
+#include <zcbor_common.h>
 #include <zcbor_decode.h>
 
 #include <ctype.h>
 #include <string.h>
 
-#define MAX_FACTORY_DATA_NESTING_LEVEL 4
+#define MAX_FACTORY_DATA_NESTING_LEVEL 2
 
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
@@ -123,6 +124,11 @@ bool FindUserDataEntry(struct FactoryData * factoryData, const char * entry, voi
 
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
 {
+    if (!buffer || !factoryData || bufferSize == 0)
+    {
+        return false;
+    }
+
     memset(factoryData, 0, sizeof(*factoryData));
     ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1, 0);
 
@@ -209,7 +215,8 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("dac_key", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
+            res                              = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
+            factoryData->dacPrivateKeyOffset = (size_t) ((uint8_t *) factoryData->dac_priv_key.data - buffer);
         }
         else if (strncmp("pai_cert", (const char *) currentString.value, currentString.len) == 0)
         {

@@ -140,6 +140,9 @@ class FactoryDataProvider : public FactoryDataProviderBase
 {
 public:
     CHIP_ERROR Init() override;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    CHIP_ERROR MoveDACPrivateKeyToSecureStorage(uint8_t * factoryDataPartition, size_t factoryDataSize);
+#endif
 
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
@@ -186,6 +189,9 @@ private:
 
     struct FactoryData mFactoryData;
     FlashFactoryData mFlashFactoryData;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    psa_key_id_t mDACPrivKeyId = to_underlying(chip::Crypto::KeyIdBase::DACPrivKey);
+#endif
 };
 
 } // namespace DeviceLayer

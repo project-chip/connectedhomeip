@@ -289,7 +289,18 @@ endif # CHIP_FACTORY_DATA_NRFCONNECT_BACKEND
 # See config/zephyr/Kconfig for full definition
 config CHIP_FACTORY_RESET_ERASE_SETTINGS
 	default y
-	depends on NVS || ZMS
+	depends on !CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+
+config CHIP_CRYPTO_PSA_MIGRATE_DAC_PRIV_KEY
+	bool "Migrate DAC private key from factory data to PSA ITS"
+	depends on CHIP_CRYPTO_PSA
+	depends on CHIP_FACTORY_DATA
+	select EXPERIMENTAL
+	help
+	  Move DAC private key from the factory data set to the PSA ITS secure storage
+	  and remove it. After the first boot of the device the DAC private key will be moved
+	  to the PSA ITS secure storage and will not be available in the factory data anymore.
+	  It will be overwritten in the factory data set by zeros.
 
 config CHIP_STORE_KEYS_IN_KMU
 	bool "Use KMU to store crypto keys"
