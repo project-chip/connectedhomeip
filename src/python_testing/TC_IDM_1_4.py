@@ -82,7 +82,8 @@ class TC_IDM_1_4(MatterBaseTest):
             await dev_ctrl.SendBatchCommands(dut_node_id, list_of_commands_to_send)
             # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
             # This might happen after TCP is enabled and DUT supports TCP.
-            asserts.fail(f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
+            asserts.fail(
+                f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
         except InteractionModelError as e:
             # This check is for 2.a., mentioned above introduction of variable cap_for_batch_commands.
             asserts.assert_equal(number_of_commands_to_send, max_paths_per_invoke + 1,
