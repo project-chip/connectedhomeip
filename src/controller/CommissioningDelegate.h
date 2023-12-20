@@ -683,14 +683,14 @@ struct GeneralCommissioningInfo
 // the ICD Management cluster, and is used to communicate that information.
 struct ICDManagementClusterInfo
 {
-    // Depict whether it is LIT or SIT device
+    // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
     bool isLIT;
     // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
     // might or might not.
     bool checkInProtocolSupport;
 
     // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
-    // For a LIT: The device is required to provide a value for the bitmap.  
+    // For a LIT: The device is required to provide a value for the bitmap.
     // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.
     //
     // userActiveModeTriggerInstruction may provide additional information for users for some specific

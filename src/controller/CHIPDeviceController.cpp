@@ -2613,6 +2613,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // This is done in a separate step since we've already used up all the available read paths in the previous read step
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
+
+        // Currently, we have at most 5 attributes to read in this stage.
         app::AttributePathParams readPaths[5];
 
         // Mandatory attribute
