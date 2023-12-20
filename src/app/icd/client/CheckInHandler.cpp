@@ -88,7 +88,8 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_NO_ERROR);
     CounterType receivedCheckInCounterOffset = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
-    VerifyOrReturnError(receivedCheckInCounterOffset > clientInfo.offset, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
+    ChipLogError(ICD, "A duplicate CheckIn message was received and discarded");
+    VerifyOrReturnError(receivedCheckInCounterOffset > clientInfo.offset, CHIP_NO_ERROR);
     clientInfo.offset = receivedCheckInCounterOffset;
     bool refreshKey   = (receivedCheckInCounterOffset > kKeyRefreshLimit);
 
