@@ -1037,44 +1037,46 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
 // command paths in the same batch to be unique. These command allow for
 // client to control order of the response and control size of CommandDataIB
 // being sent back to help test some corner cases.
-bool emberAfUnitTestingClusterTestBatchHelperCommon(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const uint16_t sleepTimeMs, const uint16_t sizeOfResponseBuffer,
-    const uint8_t fillCharacter)
+bool emberAfUnitTestingClusterTestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                    const uint16_t sleepTimeMs, const uint16_t sizeOfResponseBuffer,
+                                                    const uint8_t fillCharacter)
 {
-    if (sizeOfResponseBuffer > 800) {
+    if (sizeOfResponseBuffer > 800)
+    {
         commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
         return true;
     }
 
     AsyncBatchCommandsWorkData * asyncWorkData = Platform::New<AsyncBatchCommandsWorkData>();
-    if (asyncWorkData == nullptr) {
+    if (asyncWorkData == nullptr)
+    {
         commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy);
         return true;
     }
 
-    asyncWorkData->asyncCommandHandle = commandObj;
-    asyncWorkData->commandPath = commandPath;
+    asyncWorkData->asyncCommandHandle   = commandObj;
+    asyncWorkData->commandPath          = commandPath;
     asyncWorkData->sizeOfResponseBuffer = sizeOfResponseBuffer;
-    asyncWorkData->fillCharacter = fillCharacter;
+    asyncWorkData->fillCharacter        = fillCharacter;
 
     scheduleTimerCallbackMs(asyncWorkData, sleepTimeMs);
 
     return true;
 }
 
-bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::TestBatchHelperRequest::DecodableType & commandData)
+bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::TestBatchHelperRequest::DecodableType & commandData)
 {
-    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer, commandData.fillCharacter);
+    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
+                                                          commandData.sizeOfResponseBuffer, commandData.fillCharacter);
 }
 
 bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
 {
-    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer, commandData.fillCharacter);
+    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
+                                                          commandData.sizeOfResponseBuffer, commandData.fillCharacter);
 }
 
 // -----------------------------------------------------------------------------
