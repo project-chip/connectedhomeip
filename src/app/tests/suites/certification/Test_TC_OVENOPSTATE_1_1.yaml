@@ -134,8 +134,8 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
-          "!OVENOPSTATE.S.C00.Rsp && !OVENOPSTATE.S.C01.Rsp && !OVENOPSTATE.S.C02.Rsp &&
-          !OVENOPSTATE.S.C03.Rsp"
+          "!OVENOPSTATE.S.C00.Rsp && !OVENOPSTATE.S.C01.Rsp &&
+          !OVENOPSTATE.S.C02.Rsp && !OVENOPSTATE.S.C03.Rsp"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -145,8 +145,8 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
-          (OVENOPSTATE.S.C00.Rsp || OVENOPSTATE.S.C01.Rsp || OVENOPSTATE.S.C02.Rsp ||
-          OVENOPSTATE.S.C03.Rsp)
+          (OVENOPSTATE.S.C00.Rsp || OVENOPSTATE.S.C01.Rsp ||
+          OVENOPSTATE.S.C02.Rsp || OVENOPSTATE.S.C03.Rsp)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
