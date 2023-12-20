@@ -67,6 +67,8 @@ public:
      * GetCertificationDeclaration() API impl reads the CD from the NVS namespace `chip-factory`.
      * Use this API to set the CD if it is stored at a different place, eg: embedded in the firmware.
      * Subsequent reads after calling this API will return the set CD.
+     *
+     * API do not make a copy of underlying data, and any calls made by the Matter stack shall reach it.
      */
     CHIP_ERROR SetCertificationDeclaration(const ByteSpan & cd)
     {
