@@ -75,12 +75,13 @@ Generally regenerate using one of:
 |         97 |       0x61 | RvcOperationalState                                     |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
-|        128 |       0x80 | BooleanSensorConfiguration                              |
+|        128 |       0x80 | BooleanStateConfiguration                               |
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        145 |       0x91 | ElectricalEnergyMeasurement                             |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
+|        155 |       0x9B | EnergyPreference                                        |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |
