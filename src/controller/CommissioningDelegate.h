@@ -689,9 +689,12 @@ struct ICDManagementClusterInfo
     // might or might not.
     bool checkInProtocolSupport;
 
-    // UserActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
-    // For a LIT:  UserActiveModeTriggerHint is mandatory, For a SIT: UserActiveModeTriggerHint may not be there.
-    // UserActiveModeTriggerInstruction is dependent upon theref_UserActiveModeTriggerHint>> and may not be there.
+    // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
+    // For a LIT: The device is required to provide a value for the bitmap.  
+    // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.
+    //
+    // userActiveModeTriggerInstruction may provide additional information for users for some specific
+    // userActiveModeTriggerHint values.
     BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
     CharSpan userActiveModeTriggerInstruction;
 };
