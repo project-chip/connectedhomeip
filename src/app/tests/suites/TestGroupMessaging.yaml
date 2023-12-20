@@ -233,7 +233,7 @@ tests:
       response:
           value: 0
 
-    - label: "Check on/off attribute value is false for endpoint 1"
+    - label: "Check on/off attribute value is false for endpoint 2"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
@@ -275,12 +275,12 @@ tests:
       response:
           value: 1
 
-    - label: "Turn off the light to get ready for the next test"
+    - label: "Turn off the light to get ready for the next test for endpoint 1"
       cluster: "On/Off"
       command: "Off"
       endpoint: 1
 
-    - label: "Turn off the light to get ready for the next test"
+    - label: "Turn off the light to get ready for the next test for endpoint 2"
       cluster: "On/Off"
       command: "Off"
       endpoint: 2
