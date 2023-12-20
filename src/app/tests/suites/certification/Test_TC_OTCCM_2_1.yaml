@@ -50,7 +50,7 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-          saveAs: "suppoted_mode_dut"
+          saveAs: "supported_mode_dut"
           constraints:
               type: list
               minLength: 2
