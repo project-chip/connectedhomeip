@@ -32519,9 +32519,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRTestClusterClusterTestBatchHelperResponseParams
-
-@end
 @implementation MTRUnitTestingClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
@@ -33656,11 +33653,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRTestClusterClusterTestBatchHelperRequestParams
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRUnitTestingClusterTestSecondBatchHelperRequestParams
 - (instancetype)init
 {
@@ -33752,11 +33744,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRTestClusterClusterTestSecondBatchHelperRequestParams
-
-@dynamic timedInvokeTimeoutMs;
-@dynamic serverSideProcessingTimeout;
-@end
 @implementation MTRSampleMEIClusterPingParams
 - (instancetype)init
 {

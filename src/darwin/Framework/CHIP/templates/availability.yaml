@@ -7859,10 +7859,6 @@
               - Pause
               - Resume
               - OperationalCommandResponse
-          UnitTesting:
-              - TestBatchHelperResponse
-              - TestBatchHelperRequest
-              - TestSecondBatchHelperRequest
       command fields:
           RVCRunMode:
               ChangeToMode:
@@ -7882,17 +7878,6 @@
           OperationalState:
               OperationalCommandResponse:
                   - commandResponseState
-          UnitTesting:
-              TestBatchHelperResponse:
-                  - buffer
-              TestBatchHelperRequest:
-                  - sleepBeforeResponseTimeMs
-                  - sizeOfResponseBuffer
-                  - fillCharacter
-              TestSecondBatchHelperRequest:
-                  - sleepBeforeResponseTimeMs
-                  - sizeOfResponseBuffer
-                  - fillCharacter
       structs:
           RVCOperationalState:
               - OperationalStateStruct
@@ -8317,6 +8302,12 @@
               - ActivateAudioTrack
               - ActivateTextTrack
               - DeactivateTextTrack
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestBatchHelperResponse
+              - TestBatchHelperRequest
+              - TestSecondBatchHelperRequest
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
