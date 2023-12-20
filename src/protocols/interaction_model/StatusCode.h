@@ -59,27 +59,27 @@ const char * StatusName(Status status);
  * the cluster-specific code is set.
  *
  * This class can only be directly constructed from a `Status`. To
- * attach a cluster-specific-code, please use the `ClusterSpecificFailure`
- * and `ClusterSpecificSuccess` factory methods.
+ * attach a cluster-specific-code, please use the `ClusterSpecificFailure()`
+ * and `ClusterSpecificSuccess()` factory methods.
  */
-class StatusCode
+class ClusterStatus
 {
 public:
-    explicit StatusCode(Status status) : mStatus(status) {}
+    explicit ClusterStatus(Status status) : mStatus(status) {}
 
     // We only have simple copyable members, so we should be trivially copyable.
-    StatusCode(const StatusCode & other)             = default;
-    StatusCode & operator=(const StatusCode & other) = default;
+    ClusterStatus(const ClusterStatus & other)             = default;
+    ClusterStatus & operator=(const ClusterStatus & other) = default;
 
-    bool operator==(const StatusCode & other)
+    bool operator==(const ClusterStatus & other)
     {
         return (this->mStatus == other.mStatus) && (this->HasClusterSpecificCode() == other.HasClusterSpecificCode()) &&
             (this->GetClusterSpecificCode() == other.GetClusterSpecificCode());
     }
 
-    bool operator!=(const StatusCode & other) { return !(*this == other); }
+    bool operator!=(const ClusterStatus & other) { return !(*this == other); }
 
-    StatusCode & operator=(const Status & status)
+    ClusterStatus & operator=(const Status & status)
     {
         this->mStatus              = status;
         this->mClusterSpecificCode = chip::NullOptional;
@@ -93,13 +93,13 @@ public:
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum)
      * @param cluster_specific_code - cluster-specific code to record with the failure
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen)
-     * @return a StatusCode instance properly configured.
+     * @return a ClusterStatus instance properly configured.
      */
     template <typename T>
-    static StatusCode ClusterSpecificFailure(T cluster_specific_code)
+    static ClusterStatus ClusterSpecificFailure(T cluster_specific_code)
     {
         static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<uint8_t>::max(), "Type used must fit in uint8_t");
-        return StatusCode(Status::Failure, static_cast<uint8_t>(cluster_specific_code));
+        return ClusterStatus(Status::Failure, chip::to_underlying(cluster_specific_code));
     }
 
     /**
@@ -109,28 +109,28 @@ public:
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum)
      * @param cluster_specific_code - cluster-specific code to record with the success
      *             (e.g. chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kBasicWindowOpen)
-     * @return a StatusCode instance properly configured.
+     * @return a ClusterStatus instance properly configured.
      */
     template <typename T>
-    static StatusCode ClusterSpecificSuccess(T cluster_specific_code)
+    static ClusterStatus ClusterSpecificSuccess(T cluster_specific_code)
     {
         static_assert(std::numeric_limits<T>::max() <= std::numeric_limits<uint8_t>::max(), "Type used must fit in uint8_t");
-        return StatusCode(Status::Success, static_cast<uint8_t>(cluster_specific_code));
+        return ClusterStatus(Status::Success, chip::to_underlying(cluster_specific_code));
     }
 
-    /// @return true if the core Status associated with this StatusCode is the one for success.
+    /// @return true if the core Status associated with this ClusterStatus is the one for success.
     bool IsSuccess() const { return mStatus == Status::Success; }
 
-    /// @return the core Status code associated withi this StatusCode.
+    /// @return the core Status code associated withi this ClusterStatus.
     Status GetStatus() const { return mStatus; }
 
-    /// @return true if a cluster-specific code is associated with the StatusCode.
+    /// @return true if a cluster-specific code is associated with the ClusterStatus.
     bool HasClusterSpecificCode() const { return mClusterSpecificCode.HasValue(); }
 
-    /// @return the cluster-specific code associated with this StatusCode or chip::NullOptional if none is associated.
+    /// @return the cluster-specific code associated with this ClusterStatus or chip::NullOptional if none is associated.
     chip::Optional<uint8_t> GetClusterSpecificCode() const
     {
-        if (!mClusterSpecificCode.HasValue() || !((mStatus == Status::Failure) || (mStatus == Status::Success)))
+        if ((mStatus != Status::Failure) && (mStatus != Status::Success))
         {
             return chip::NullOptional;
         }
@@ -139,18 +139,18 @@ public:
 
     // Automatic conversions to common types, using the status code alone.
     operator Status() const { return mStatus; }
-    operator int() const { return static_cast<int>(mStatus); }
-    operator uint8_t() const { return static_cast<uint8_t>(mStatus); }
 
 private:
-    StatusCode() = delete;
-    StatusCode(Status status, uint8_t cluster_specific_code) :
+    ClusterStatus() = delete;
+    ClusterStatus(Status status, uint8_t cluster_specific_code) :
         mStatus(status), mClusterSpecificCode(chip::MakeOptional(cluster_specific_code))
     {}
 
     Status mStatus;
     chip::Optional<uint8_t> mClusterSpecificCode;
 };
+
+static_assert(sizeof(ClusterStatus) <= sizeof(uint32_t), "ClusterStatus must not grow to be larger than a uint32_t");
 
 } // namespace InteractionModel
 } // namespace Protocols

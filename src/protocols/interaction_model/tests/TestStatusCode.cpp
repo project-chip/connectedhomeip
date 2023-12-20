@@ -38,41 +38,37 @@ void TestStatusBasicValues(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT_EQUALS(inSuite, static_cast<int>(Status::InvalidInState), 0xcb);
 }
 
-void TestStatusCode(nlTestSuite * inSuite, void * inContext)
+void TestClusterStatus(nlTestSuite * inSuite, void * inContext)
 {
     // Basic usage as a Status.
     {
-        StatusCode status_code_success{ Status::Success };
+        ClusterStatus status_code_success{ Status::Success };
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_success, Status::Success);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_success.GetStatus(), Status::Success);
         NL_TEST_ASSERT(inSuite, !status_code_success.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_success, 0);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_success.GetClusterSpecificCode(), chip::NullOptional);
         NL_TEST_ASSERT(inSuite, status_code_success.IsSuccess());
 
-        StatusCode status_code_failure{ Status::Failure };
+        ClusterStatus status_code_failure{ Status::Failure };
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure, Status::Failure);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure.GetStatus(), Status::Failure);
         NL_TEST_ASSERT(inSuite, !status_code_failure.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure, 1u);
         NL_TEST_ASSERT(inSuite, !status_code_failure.IsSuccess());
 
-        StatusCode status_code_unsupported_ep{ Status::UnsupportedEndpoint };
+        ClusterStatus status_code_unsupported_ep{ Status::UnsupportedEndpoint };
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_unsupported_ep, Status::UnsupportedEndpoint);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_unsupported_ep.GetStatus(), Status::UnsupportedEndpoint);
         NL_TEST_ASSERT(inSuite, !status_code_unsupported_ep.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_unsupported_ep, static_cast<uint8_t>(0x7f));
         NL_TEST_ASSERT(inSuite, !status_code_unsupported_ep.IsSuccess());
 
-        StatusCode status_code_invalid_in_state{ Status::InvalidInState };
+        ClusterStatus status_code_invalid_in_state{ Status::InvalidInState };
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_invalid_in_state, Status::InvalidInState);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_invalid_in_state.GetStatus(), Status::InvalidInState);
         NL_TEST_ASSERT(inSuite, !status_code_invalid_in_state.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_invalid_in_state, static_cast<uint8_t>(0xcb));
         NL_TEST_ASSERT(inSuite, !status_code_invalid_in_state.IsSuccess());
     }
 
-    enum RobotoStatusCode : uint8_t
+    enum RobotoClusterStatus : uint8_t
     {
         kSandwichError = 7,
         kSauceSuccess  = 81,
@@ -80,38 +76,36 @@ void TestStatusCode(nlTestSuite * inSuite, void * inContext)
 
     // Cluster-specific usage.
     {
-        StatusCode status_code_success = StatusCode::ClusterSpecificSuccess(RobotoStatusCode::kSauceSuccess);
+        ClusterStatus status_code_success = ClusterStatus::ClusterSpecificSuccess(RobotoClusterStatus::kSauceSuccess);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_success, Status::Success);
         NL_TEST_ASSERT(inSuite, status_code_success.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_success, 0);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_success.GetClusterSpecificCode(),
-                              static_cast<uint8_t>(RobotoStatusCode::kSauceSuccess));
+                              static_cast<uint8_t>(RobotoClusterStatus::kSauceSuccess));
         NL_TEST_ASSERT(inSuite, status_code_success.IsSuccess());
 
-        StatusCode status_code_failure = StatusCode::ClusterSpecificFailure(RobotoStatusCode::kSandwichError);
+        ClusterStatus status_code_failure = ClusterStatus::ClusterSpecificFailure(RobotoClusterStatus::kSandwichError);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure, Status::Failure);
         NL_TEST_ASSERT(inSuite, status_code_failure.HasClusterSpecificCode());
-        NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure, 1);
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure.GetClusterSpecificCode(),
-                              static_cast<uint8_t>(RobotoStatusCode::kSandwichError));
+                              static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
         NL_TEST_ASSERT(inSuite, !status_code_failure.IsSuccess());
     }
 
     // Copy/Assignment
     {
-        StatusCode status_code_failure1 = StatusCode::ClusterSpecificFailure(RobotoStatusCode::kSandwichError);
-        StatusCode status_code_failure2(status_code_failure1);
+        ClusterStatus status_code_failure1 = ClusterStatus::ClusterSpecificFailure(RobotoClusterStatus::kSandwichError);
+        ClusterStatus status_code_failure2(status_code_failure1);
 
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure1, status_code_failure2);
         NL_TEST_ASSERT(inSuite, status_code_failure1.HasClusterSpecificCode());
         NL_TEST_ASSERT(inSuite, status_code_failure2.HasClusterSpecificCode());
 
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure1.GetClusterSpecificCode(),
-                              static_cast<uint8_t>(RobotoStatusCode::kSandwichError));
+                              static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
         NL_TEST_ASSERT_EQUALS(inSuite, status_code_failure2.GetClusterSpecificCode(),
-                              static_cast<uint8_t>(RobotoStatusCode::kSandwichError));
+                              static_cast<uint8_t>(RobotoClusterStatus::kSandwichError));
 
-        StatusCode status_code_failure3{ Status::InvalidCommand };
+        ClusterStatus status_code_failure3{ Status::InvalidCommand };
         NL_TEST_ASSERT(inSuite, status_code_failure2 != status_code_failure3);
 
         status_code_failure3 = status_code_failure2;
@@ -123,7 +117,7 @@ void TestStatusCode(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestStatusBasicValues", TestStatusBasicValues),
-    NL_TEST_DEF("TestStatusCode", TestStatusCode),
+    NL_TEST_DEF("TestClusterStatus", TestClusterStatus),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -131,11 +125,11 @@ const nlTest sTests[] =
 nlTestSuite sSuite = { "Test IM Status Code abstractions", &sTests[0], nullptr, nullptr };
 } // namespace
 
-int TestStatusCode()
+int TestClusterStatus()
 {
     nlTestRunner(&sSuite, nullptr);
 
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestStatusCode)
+CHIP_REGISTER_TEST_SUITE(TestClusterStatus)
