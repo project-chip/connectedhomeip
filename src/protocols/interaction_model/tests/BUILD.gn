@@ -21,9 +21,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite_using_nltest("tests") {
   output_name = "libInteractionModelTests"
 
-  test_sources = [
-    "TestStatusCode.cpp",
-  ]
+  test_sources = [ "TestStatusCode.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
