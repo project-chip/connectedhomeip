@@ -22,6 +22,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <src/protocols/interaction_model/StatusCode.h>
 
 #include <nlunit-test.h>
 
