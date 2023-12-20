@@ -58,8 +58,8 @@ private:
     Timestamp mNextMaxTimestamp = Milliseconds64(0);
     Timestamp mNextMinTimestamp = Milliseconds64(0);
 
-    // Timestamp of the next report to be scheduled, used by OnTransitionToIdle to determine if we should emit a report before the
-    // device goes to iddle mode
+    // Timestamp of the next report to be scheduled, used by OnTransitionToIdle to determine whether we should emit a report before the
+    // device goes to idle mode
     Timestamp mNextReportTimestamp = Milliseconds64(0);
 };
 
