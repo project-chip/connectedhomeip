@@ -276,7 +276,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         //TODO: ServerClusterCommandExists may always be returns true
         VerifyOrExit(chip::app::ServerClusterCommandExists(chip::app::ConcreteCommandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
                 status = Status::InvalidCommand;
-                ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, Start command of operational state is not supported"));
+                ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, Start command of operational state is not supported"));
     }
     reqStartAfterSetting = startAfterSetting.ValueOr(false);
     
