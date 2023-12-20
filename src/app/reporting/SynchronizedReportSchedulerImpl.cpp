@@ -182,7 +182,7 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     bool firedEarly = true;
 
-    // If there are no handlers registers, no need to take actions
+    // If there are no handlers registered, no need to do anything.
     VerifyOrReturn(mNodesPool.Allocated());
 
     mNodesPool.ForEachActiveObject([now, &firedEarly](ReadHandlerNode * node) {
