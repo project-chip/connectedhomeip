@@ -14,11 +14,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.matter.virtual.device.app.core.common.*
+import com.matter.virtual.device.app.core.common.DeepLink
+import com.matter.virtual.device.app.core.common.EventObserver
+import com.matter.virtual.device.app.core.common.MatterConstants
+import com.matter.virtual.device.app.core.common.MatterSettings
+import com.matter.virtual.device.app.core.common.QrcodeUtil
 import com.matter.virtual.device.app.core.ui.SharedViewModel
 import com.matter.virtual.device.app.feature.qrcode.databinding.FragmentQrcodeBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.abs
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -54,16 +57,6 @@ class QrcodeFragment : Fragment() {
 
     (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
     (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    binding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-      var ratio = 0F
-      if (abs(verticalOffset) != 0) {
-        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-      }
-
-      binding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-      binding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
-    }
 
     val args: QrcodeFragmentArgs by navArgs()
     val matterSettings = Json.decodeFromString<MatterSettings>(args.setting)
