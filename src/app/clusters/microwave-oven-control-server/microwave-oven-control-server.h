@@ -31,8 +31,8 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTime    = 30u;
-constexpr uint32_t kMinCookTime        = 1u;
+constexpr uint32_t kDefaultCookTime = 30u;
+constexpr uint32_t kMinCookTime     = 1u;
 
 class Delegate;
 
@@ -141,7 +141,8 @@ public:
      *   @param  feature: featureMap value of Microwave Oven Control.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                   uint8_t powerSetting, bool startAfterSetting, uint32_t feature) = 0;
+                                                                                   uint8_t powerSetting, bool startAfterSetting,
+                                                                                   uint32_t feature) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime.
@@ -152,7 +153,8 @@ public:
 
     /**
      *   Get the watt setting from the supported watts list.
-     *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no gaps.
+     *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no
+     * gaps.
      *   @param wattSetting A reference to receive the watt setting on success.
      *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
      *   CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available labels.
