@@ -7990,6 +7990,8 @@ endpoint 1 {
     handle command TestSimpleOptionalArgumentRequest;
     handle command TestEmitTestEventRequest;
     handle command TestEmitTestFabricScopedEventRequest;
+    handle command TestBatchHelperRequest;
+    handle command TestSecondBatchHelperRequest;
   }
 }
 endpoint 2 {

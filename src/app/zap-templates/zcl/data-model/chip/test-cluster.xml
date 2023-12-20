@@ -446,7 +446,7 @@ limitations under the License.
         Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
       </description>
       <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
-      <arg name="sizeOfResponseBuffer" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
       <arg name="fillCharacter" type="int8u"/>
     </command>
 
@@ -456,7 +456,7 @@ limitations under the License.
         Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
       </description>
       <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
-      <arg name="sizeOfResponseBuffer" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
       <arg name="fillCharacter" type="int8u"/>
     </command>
 
@@ -588,7 +588,7 @@ limitations under the License.
 
     <command source="server" code="0x0C" name="TestBatchHelperResponse" optional="true" disableDefaultResponse="true" apiMaturity="provisional">
       <description>
-        Delivers the ID of an event in response to test command emitting fabric scoped events.
+        Response to TestBatchHelperResponse or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
       </description>
       <arg name="buffer" type="octet_string" length="800"/>
     </command>

@@ -55,6 +55,9 @@ constexpr uint8_t kFabricSensitiveCharLength = 128;
 // The maximum length of the fabric sensitive integer list within the TestFabricScoped struct.
 constexpr uint8_t kFabricSensitiveIntListLength = 8;
 
+// The maximum buffer size allowed in TestBatchHelperResponse
+constexpr uint16_t kTestBatchHelperResponseBufferMax = 800;
+
 namespace {
 
 class OctetStringData
@@ -145,7 +148,7 @@ SimpleEnum gSimpleEnums[kAttributeListLength];
 size_t gSimpleEnumCount = 0;
 Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
 
-void emberAfUnitTestingClusterTestBatchWork(AsyncBatchCommandsWorkData * asyncWorkData)
+void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
 {
     auto commandHandleRef = std::move(asyncWorkData->asyncCommandHandle);
     auto commandHandle    = commandHandleRef.Get();
@@ -156,7 +159,7 @@ void emberAfUnitTestingClusterTestBatchWork(AsyncBatchCommandsWorkData * asyncWo
         return;
     }
 
-    uint8_t buffer[800];
+    uint8_t buffer[kTestBatchHelperResponseBufferMax];
     memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
     Commands::TestBatchHelperResponse::Type response;
     response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
@@ -166,7 +169,7 @@ void emberAfUnitTestingClusterTestBatchWork(AsyncBatchCommandsWorkData * asyncWo
 
 static void timerCallback(System::Layer *, void * callbackContext)
 {
-    emberAfUnitTestingClusterTestBatchWork(reinterpret_cast<AsyncBatchCommandsWorkData *>(callbackContext));
+    AsyncBatchCommandWork(reinterpret_cast<AsyncBatchCommandsWorkData *>(callbackContext));
 }
 
 static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
@@ -1037,11 +1040,11 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
 // command paths in the same batch to be unique. These command allow for
 // client to control order of the response and control size of CommandDataIB
 // being sent back to help test some corner cases.
-bool emberAfUnitTestingClusterTestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                    const uint16_t sleepTimeMs, const uint16_t sizeOfResponseBuffer,
-                                                    const uint8_t fillCharacter)
+bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                           const uint16_t sleepTimeMs, const uint16_t sizeOfResponseBuffer,
+                           const uint8_t fillCharacter)
 {
-    if (sizeOfResponseBuffer > 800)
+    if (sizeOfResponseBuffer > kTestBatchHelperResponseBufferMax)
     {
         commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
         return true;
@@ -1067,7 +1070,7 @@ bool emberAfUnitTestingClusterTestBatchHelperCommon(CommandHandler * commandObj,
 bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                              const Commands::TestBatchHelperRequest::DecodableType & commandData)
 {
-    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
                                                           commandData.sizeOfResponseBuffer, commandData.fillCharacter);
 }
 
@@ -1075,7 +1078,7 @@ bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
 {
-    return emberAfUnitTestingClusterTestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
                                                           commandData.sizeOfResponseBuffer, commandData.fillCharacter);
 }
 
