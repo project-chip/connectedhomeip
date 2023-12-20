@@ -1955,7 +1955,7 @@ void DeviceCommissioner::ParseCommissioningInfo()
     // affect future commissioning steps.
     //
     // The stack reference needs to survive until CommissioningStageComplete and OnReadCommissioningInfo
-    // returns (this function returns).
+    // return.
     auto attributeCache = std::move(mAttributeCache);
 
     if (mPairingDelegate != nullptr)
