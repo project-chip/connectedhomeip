@@ -13667,10 +13667,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ActivatedCarbonFilterMonitoring
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 
 namespace Commands {
-namespace SuppressRequest {
+namespace SuppressAlarm {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -13703,7 +13703,41 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         ReturnErrorOnFailure(err);
     }
 }
-} // namespace SuppressRequest.
+} // namespace SuppressAlarm.
+namespace EnableDisableAlarm {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kAlarmsToEnableDisable), alarmsToEnableDisable);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kAlarmsToEnableDisable))
+        {
+            err = DataModel::Decode(reader, alarmsToEnableDisable);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace EnableDisableAlarm.
 } // namespace Commands
 
 namespace Attributes {
@@ -13711,14 +13745,22 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SensitivityLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sensitivityLevel);
+    case Attributes::CurrentSensitivityLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentSensitivityLevel);
+    case Attributes::SupportedSensitivityLevels::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedSensitivityLevels);
+    case Attributes::DefaultSensitivityLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, defaultSensitivityLevel);
     case Attributes::AlarmsActive::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, alarmsActive);
     case Attributes::AlarmsSuppressed::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, alarmsSuppressed);
     case Attributes::AlarmsEnabled::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, alarmsEnabled);
+    case Attributes::AlarmsSupported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, alarmsSupported);
+    case Attributes::SensorFault::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, sensorFault);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -13783,6 +13825,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kSensorFault), sensorFault));
     return aWriter.EndContainer(outer);
 }
 
@@ -13796,12 +13839,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSensorFault))
+        {
+            err = DataModel::Decode(reader, sensorFault);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SensorFault.
 } // namespace Events
 
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 namespace ValveConfigurationAndControl {
 
 namespace Commands {
@@ -13810,6 +13866,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kOpenDuration), openDuration);
+    encoder.Encode(to_underlying(Fields::kTargetLevel), targetLevel);
     return encoder.Finalize();
 }
 
@@ -13830,6 +13887,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kOpenDuration))
         {
             err = DataModel::Decode(reader, openDuration);
+        }
+        else if (__context_tag == to_underlying(Fields::kTargetLevel))
+        {
+            err = DataModel::Decode(reader, targetLevel);
         }
         else
         {
@@ -13859,45 +13920,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace Close.
-namespace SetLevel {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kLevel), level);
-    encoder.Encode(to_underlying(Fields::kOpenDuration), openDuration);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kLevel))
-        {
-            err = DataModel::Decode(reader, level);
-        }
-        else if (__context_tag == to_underlying(Fields::kOpenDuration))
-        {
-            err = DataModel::Decode(reader, openDuration);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace SetLevel.
 } // namespace Commands
 
 namespace Attributes {
@@ -13907,6 +13929,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::OpenDuration::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, openDuration);
+    case Attributes::DefaultOpenDuration::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, defaultOpenDuration);
     case Attributes::AutoCloseTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, autoCloseTime);
     case Attributes::RemainingDuration::TypeInfo::GetAttributeId():
@@ -13915,14 +13939,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, currentState);
     case Attributes::TargetState::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, targetState);
-    case Attributes::StartUpState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpState);
     case Attributes::CurrentLevel::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentLevel);
     case Attributes::TargetLevel::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, targetLevel);
-    case Attributes::OpenLevel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, openLevel);
+    case Attributes::DefaultOpenLevel::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, defaultOpenLevel);
     case Attributes::ValveFault::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, valveFault);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
@@ -13950,6 +13972,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kValveState), valveState));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kValveLevel), valveLevel));
     return aWriter.EndContainer(outer);
 }
 
@@ -13970,6 +13993,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kValveState))
         {
             err = DataModel::Decode(reader, valveState);
+        }
+        else if (__context_tag == to_underlying(Fields::kValveLevel))
+        {
+            err = DataModel::Decode(reader, valveLevel);
         }
         else
         {
@@ -16429,6 +16456,89 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace EnergyEvse
+namespace EnergyPreference {
+namespace Structs {
+
+namespace BalanceStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStep), step);
+    encoder.Encode(to_underlying(Fields::kLabel), label);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStep))
+        {
+            err = DataModel::Decode(reader, step);
+        }
+        else if (__context_tag == to_underlying(Fields::kLabel))
+        {
+            err = DataModel::Decode(reader, label);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace BalanceStruct
+} // namespace Structs
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::EnergyBalances::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, energyBalances);
+    case Attributes::CurrentEnergyBalance::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentEnergyBalance);
+    case Attributes::EnergyPriorities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, energyPriorities);
+    case Attributes::LowPowerModeSensitivities::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, lowPowerModeSensitivities);
+    case Attributes::CurrentLowPowerModeSensitivity::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentLowPowerModeSensitivity);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace EnergyPreference
 namespace DoorLock {
 namespace Structs {
 
@@ -28417,7 +28527,7 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
+    case Clusters::BooleanStateConfiguration::Id: {
         switch (aCommand)
         {
         default:

@@ -2100,9 +2100,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-boolean-sensor</name>
+        <name>MA-water-freeze-detector</name>
         <domain>CHIP</domain>
-        <typeName>Matter Boolean Sensor</typeName>
+        <typeName>Matter Water Freeze Detector</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0041</deviceId>
         <class>Simple</class>
@@ -2110,15 +2110,14 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>TAG_LIST</requireAttribute>
-            </include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-valve</name>
+        <name>MA-water-valve</name>
         <domain>CHIP</domain>
-        <typeName>Matter Valve</typeName>
+        <typeName>Matter Water Valve</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0042</deviceId>
         <class>Simple</class>
@@ -2137,14 +2136,26 @@ limitations under the License.
         <deviceId editable="false">0x0043</deviceId>
         <class>Simple</class>
         <scope>Endpoint</scope>
-        <superset>Matter Boolean Sensor</superset>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Boolean Sensor Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>TAG_LIST</requireAttribute>
-            </include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-rain-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Rain Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0044</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>

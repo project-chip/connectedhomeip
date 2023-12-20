@@ -2133,20 +2133,7 @@ enum class Feature : uint32_t
 };
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
-
-// Enum for SensitivityEnum
-enum class SensitivityEnum : uint8_t
-{
-    kHigh     = 0x00,
-    kStandard = 0x01,
-    kLow      = 0x02,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
-};
+namespace BooleanStateConfiguration {
 
 // Bitmap for AlarmModeBitmap
 enum class AlarmModeBitmap : uint8_t
@@ -2163,20 +2150,38 @@ enum class Feature : uint32_t
     kAlarmSuppress    = 0x4,
     kSensitivityLevel = 0x8,
 };
-} // namespace BooleanSensorConfiguration
+
+// Bitmap for SensorFaultBitmap
+enum class SensorFaultBitmap : uint16_t
+{
+    kGeneralFault = 0x1,
+};
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 
-// Enum for ValveStateEnum
-enum class ValveStateEnum : uint8_t
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
 {
-    kOpen   = 0x00,
-    kClosed = 0x01,
+    kFailureDueToFault = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
+    kUnknownEnumValue = 0,
+};
+
+// Enum for ValveStateEnum
+enum class ValveStateEnum : uint8_t
+{
+    kClosed        = 0x00,
+    kOpen          = 0x01,
+    kTransitioning = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
 };
 
 // Bitmap for Feature
@@ -2189,9 +2194,12 @@ enum class Feature : uint32_t
 // Bitmap for ValveFaultBitmap
 enum class ValveFaultBitmap : uint16_t
 {
-    kGeneralFault = 0x1,
-    kBlocked      = 0x2,
-    kLeaking      = 0x4,
+    kGeneralFault    = 0x1,
+    kBlocked         = 0x2,
+    kLeaking         = 0x4,
+    kNotConnected    = 0x8,
+    kShortCircuit    = 0x10,
+    kCurrentExceeded = 0x20,
 };
 } // namespace ValveConfigurationAndControl
 
@@ -2533,6 +2541,30 @@ enum class TargetDayOfWeekBitmap : uint8_t
     kSaturday  = 0x40,
 };
 } // namespace EnergyEvse
+
+namespace EnergyPreference {
+
+// Enum for EnergyPriorityEnum
+enum class EnergyPriorityEnum : uint8_t
+{
+    kComfort          = 0x00,
+    kSpeed            = 0x01,
+    kEfficiency       = 0x02,
+    kWaterConsumption = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kEnergyBalance           = 0x1,
+    kLowPowerModeSensitivity = 0x2,
+};
+} // namespace EnergyPreference
 
 namespace DoorLock {
 

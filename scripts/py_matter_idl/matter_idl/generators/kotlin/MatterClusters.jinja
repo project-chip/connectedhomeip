@@ -126,6 +126,8 @@ package matter.controller.cluster.clusters
 import java.util.logging.Level
 import java.util.logging.Logger
 import java.time.Duration
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import matter.controller.MatterController
 import matter.controller.ReadRequest
 import matter.controller.ReadData
@@ -133,6 +135,20 @@ import matter.controller.ReadFailure
 import matter.controller.ReadResponse
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
+import matter.controller.ByteSubscriptionState
+import matter.controller.ShortSubscriptionState
+import matter.controller.IntSubscriptionState
+import matter.controller.LongSubscriptionState
+import matter.controller.FloatSubscriptionState
+import matter.controller.DoubleSubscriptionState
+import matter.controller.CharSubscriptionState
+import matter.controller.BooleanSubscriptionState
+import matter.controller.UByteSubscriptionState
+import matter.controller.UShortSubscriptionState
+import matter.controller.UIntSubscriptionState
+import matter.controller.ULongSubscriptionState
+import matter.controller.StringSubscriptionState
+import matter.controller.ByteArraySubscriptionState
 import matter.controller.WriteRequest
 import matter.controller.WriteRequests
 import matter.controller.WriteResponse
@@ -173,9 +189,20 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
 {%- if interfaceName not in already_handled_attribute %}
+{%- set valueType = encode_value(cluster, encodable, 0) -%}
   class {{interfaceName}}(
-    val value: {{encode_value(cluster, encodable, 0)}}
+    val value: {{valueType}}
   )
+
+  sealed class {{interfaceName}}SubscriptionState {
+    data class Success(
+    val value: {{valueType}}
+    ) : {{interfaceName}}SubscriptionState()
+    
+    data class Error(val exception: Exception) : {{interfaceName}}SubscriptionState()
+
+    object SubscriptionEstablished : {{interfaceName}}SubscriptionState()    
+  }  
 {% if already_handled_attribute.append(interfaceName) -%}
 {#- This block does nothing, it only exists to append to already_handled_attribute. -#}
 {%- endif -%}
@@ -387,6 +414,63 @@ class {{cluster.name}}Cluster(private val controller: MatterController, private 
     }   
   }
 {% endif %}
+{%- if attribute.is_subscribable %}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+{%- set encodable_was_optional = encodable.is_optional or encodable.is_nullable %}
+  suspend fun subscribe{{ attribute.definition.name | upfirst }}Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<{{interfaceName}}SubscriptionState> {
+    val ATTRIBUTE_ID: UInt = {{attribute.definition.code}}u
+    val attributePaths = listOf(
+      AttributePath(
+          endpointId = endpointId,
+          clusterId = CLUSTER_ID,
+          attributeId = ATTRIBUTE_ID
+      )
+    )
+
+    val subscribeRequest: SubscribeRequest = SubscribeRequest(
+      eventPaths = emptyList(), 
+      attributePaths = attributePaths, 
+      minInterval = Duration.ofSeconds(minInterval.toLong()), 
+      maxInterval = Duration.ofSeconds(maxInterval.toLong())
+    )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit({{interfaceName}}SubscriptionState.Error(Exception("Subscription terminated with error code: ${subscriptionState.terminationCause}")))
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+              it.path.attributeId == ATTRIBUTE_ID
+            }        
+             
+          requireNotNull(attributeData) { 
+            "{{ attribute.definition.name | capitalize }} attribute not found in Node State update" 
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: {{encode_value(cluster, encodable, 0)}} = {{decode_tlv(cluster, attribute.definition | asEncodable(typeLookup), "AnonymousTag", 0)}}
+
+          {% if encodable_was_optional-%}
+          decodedValue?.let {
+            emit({{interfaceName}}SubscriptionState.Success(it))
+          }
+          {% else -%}
+          emit({{interfaceName}}SubscriptionState.Success(decodedValue))
+          {%- endif %}
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit({{interfaceName}}SubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }    
+  }
+{% endif -%}
 {%- endfor %}
   companion object {
     private val logger = Logger.getLogger({{cluster.name}}Cluster::class.java.name)

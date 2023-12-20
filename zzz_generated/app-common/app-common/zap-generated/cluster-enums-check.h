@@ -1508,30 +1508,28 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BooleanSensorConfiguration::SensitivityEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::StatusCodeEnum val)
 {
-    using EnumType = BooleanSensorConfiguration::SensitivityEnum;
+    using EnumType = ValveConfigurationAndControl::StatusCodeEnum;
     switch (val)
     {
-    case EnumType::kHigh:
-    case EnumType::kStandard:
-    case EnumType::kLow:
+    case EnumType::kFailureDueToFault:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(0);
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
 {
     using EnumType = ValveConfigurationAndControl::ValveStateEnum;
     switch (val)
     {
-    case EnumType::kOpen:
     case EnumType::kClosed:
+    case EnumType::kOpen:
+    case EnumType::kTransitioning:
         return val;
     default:
-        return static_cast<EnumType>(2);
+        return static_cast<EnumType>(3);
     }
 }
 
@@ -1770,6 +1768,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
         return val;
     default:
         return static_cast<EnumType>(5);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
+{
+    using EnumType = EnergyPreference::EnergyPriorityEnum;
+    switch (val)
+    {
+    case EnumType::kComfort:
+    case EnumType::kSpeed:
+    case EnumType::kEfficiency:
+    case EnumType::kWaterConsumption:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
     }
 }
 
