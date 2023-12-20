@@ -21,14 +21,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-
 namespace chip {
 namespace DeviceLayer {
 
 typedef struct
 {
     uint32_t len;
-    uint8_t* data;
+    uint8_t * data;
 } data_ptr;
 
 typedef struct
@@ -53,13 +52,13 @@ typedef struct
 } factoryData;
 
 #if defined(__GNUC__)
-factoryData __attribute__((section( ".factory_data_struct"))) __attribute__((used)) mFactoryData =
+factoryData __attribute__((section(".factory_data_struct"))) __attribute__((used)) mFactoryData =
 #else
 
 #error "compiler currently not supported"
 
 #endif
-{};
+    {};
 
 CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto::P256Keypair & keypair)
 {
@@ -164,7 +163,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // Extract public key from DAC cert.
-    uint8_t dacBuf[600] = {0};
+    uint8_t dacBuf[600] = { 0 };
     MutableByteSpan dacCertSpan(dacBuf);
     memcpy(dacCertSpan.data(), mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
     dacCertSpan.reduce_size(mFactoryData.dac_cert.len);
@@ -174,15 +173,16 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
     // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    // MutableByteSpan privKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t *>(mFactoryData.dac_priv_key.data)), mFactoryData.dac_priv_key.len};
-    // MutableByteSpan pubKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t *>(dacPublicKey.Bytes())), dacPublicKey.Length()};
+    // MutableByteSpan privKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t *>(mFactoryData.dac_priv_key.data)),
+    // mFactoryData.dac_priv_key.len}; MutableByteSpan pubKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t
+    // *>(dacPublicKey.Bytes())), dacPublicKey.Length()};
 
-    uint8_t privKeyBuf[600] = {0};
+    uint8_t privKeyBuf[600] = { 0 };
     MutableByteSpan privKeySpan(privKeyBuf);
     memcpy(privKeySpan.data(), mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
     privKeySpan.reduce_size(mFactoryData.dac_priv_key.len);
 
-    uint8_t pubKeyBuf[600] = {0};
+    uint8_t pubKeyBuf[600] = { 0 };
     MutableByteSpan pubKeySpan(pubKeyBuf);
     memcpy(pubKeySpan.data(), dacPublicKey.Bytes(), dacPublicKey.Length());
     pubKeySpan.reduce_size(dacPublicKey.Length());
@@ -191,7 +191,6 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
-
 }
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
@@ -248,7 +247,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
     ReturnErrorCodeIf(!mFactoryData.vendor_id.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    memcpy(&vendorId,mFactoryData.vendor_id.data, mFactoryData.vendor_id.len);
+    memcpy(&vendorId, mFactoryData.vendor_id.data, mFactoryData.vendor_id.len);
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
@@ -287,19 +286,19 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-//#pragma GCC push_options
-//#pragma GCC optimize("O0")
+// #pragma GCC push_options
+// #pragma GCC optimize("O0")
 CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     ReturnErrorCodeIf(!mFactoryData.manufacturing_date.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    uint8_t tmp[10] = {0};
+    uint8_t tmp[10] = { 0 };
     memcpy(tmp, mFactoryData.manufacturing_date.data, 10);
-    year = ((tmp[0] - 0x30) * 1000) + ((tmp[1] - 0x30) * 100) + ((tmp[2] - 0x30) * 10) + (tmp[3] - 0x30);
+    year  = ((tmp[0] - 0x30) * 1000) + ((tmp[1] - 0x30) * 100) + ((tmp[2] - 0x30) * 10) + (tmp[3] - 0x30);
     month = ((tmp[5] - 0x30) * 10) + (tmp[6] - 0x30);
-    day = ((tmp[8] - 0x30) * 10) + (tmp[9] - 0x30);
+    day   = ((tmp[8] - 0x30) * 10) + (tmp[9] - 0x30);
     return CHIP_NO_ERROR;
 }
-//#pragma GCC pop_options
+// #pragma GCC pop_options
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {

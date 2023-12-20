@@ -23,7 +23,7 @@
 
 namespace chip {
 namespace DeviceLayer {
-class FactoryDataProvider  : public chip::Credentials::DeviceAttestationCredentialsProvider,
+class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentialsProvider,
                             public CommissionableDataProvider,
                             public DeviceInstanceInfoProvider
 {
@@ -63,7 +63,6 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-
 };
 
 } // namespace DeviceLayer

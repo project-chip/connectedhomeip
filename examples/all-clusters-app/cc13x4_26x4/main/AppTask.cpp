@@ -272,7 +272,6 @@ int AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
-
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 

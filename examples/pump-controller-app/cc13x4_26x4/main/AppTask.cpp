@@ -189,7 +189,6 @@ int AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
     static chip::CommonCaseDeviceServerInitParams initParams;

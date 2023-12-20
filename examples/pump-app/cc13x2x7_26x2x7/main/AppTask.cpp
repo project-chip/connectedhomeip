@@ -207,7 +207,6 @@ int AppTask::Init()
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
-
     // Initialize device attestation config
 #ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
 #ifdef CC13XX_26XX_FACTORY_DATA
@@ -235,7 +234,6 @@ int AppTask::Init()
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
-
 
     ConfigurationMgr().LogDeviceConfig();
 
