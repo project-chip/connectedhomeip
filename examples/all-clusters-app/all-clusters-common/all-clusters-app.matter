@@ -7519,6 +7519,14 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
+
+    handle command PowerAdjustRequest;
+    handle command CancelPowerAdjustRequest;
+    handle command StartTimeAdjustRequest;
+    handle command PauseRequest;
+    handle command ResumeRequest;
+    handle command ModifyForecastRequest;
+    handle command RequestConstraintBasedForecast;
   }
 
   server cluster EnergyEvse {
