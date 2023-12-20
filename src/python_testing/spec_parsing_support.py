@@ -29,9 +29,10 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-                                 feature, mandatory, optional, or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation, EventPathLocation,
-                                    FeaturePathLocation, ProblemNotice, ProblemSeverity)
+                                 feature, mandatory, optional, or_operation, parse_callable_from_xml,
+                                 parse_device_type_callable_from_xml)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                    EventPathLocation, FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 
 @dataclass

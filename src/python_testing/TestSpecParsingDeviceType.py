@@ -15,14 +15,14 @@
 #    limitations under the License.
 #
 import time
+import xml.etree.ElementTree as ElementTree
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
+from jinja2 import Template
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 from spec_parsing_support import build_xml_device_types, parse_single_device_type
-from jinja2 import Template
-import xml.etree.ElementTree as ElementTree
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):
