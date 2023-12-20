@@ -588,7 +588,7 @@ limitations under the License.
 
     <command source="server" code="0x0C" name="TestBatchHelperResponse" optional="true" disableDefaultResponse="true" apiMaturity="provisional">
       <description>
-        Response to TestBatchHelperResponse or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
+        Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
       </description>
       <arg name="buffer" type="octet_string" length="800"/>
     </command>

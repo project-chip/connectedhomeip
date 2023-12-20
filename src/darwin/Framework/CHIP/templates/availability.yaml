@@ -7859,6 +7859,10 @@
               - Pause
               - Resume
               - OperationalCommandResponse
+          UnitTesting:
+              - TestBatchHelperResponse
+              - TestBatchHelperRequest
+              - TestSecondBatchHelperRequest
       command fields:
           RVCRunMode:
               ChangeToMode:
@@ -7878,6 +7882,17 @@
           OperationalState:
               OperationalCommandResponse:
                   - commandResponseState
+          UnitTesting:
+              TestBatchHelperResponse:
+                  - buffer
+              TestBatchHelperRequest:
+                  - sleepBeforeResponseTimeMs
+                  - sizeOfResponseBuffer
+                  - fillCharacter
+              TestSecondBatchHelperRequest:
+                  - sleepBeforeResponseTimeMs
+                  - sizeOfResponseBuffer
+                  - fillCharacter
       structs:
           RVCOperationalState:
               - OperationalStateStruct
