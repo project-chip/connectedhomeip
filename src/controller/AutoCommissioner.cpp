@@ -409,7 +409,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kConfigureTrustedTimeSource:
         if (mNeedIcdRegistration)
         {
-            if (mParams.GetICDCheckInNodeId().HasValue() && mParams.GetICDMonitoredSubject().HasValue() && mParams.GetICDSymmetricKey().HasValue())
+            if (mParams.GetICDCheckInNodeId().HasValue() && mParams.GetICDMonitoredSubject().HasValue() &&
+                mParams.GetICDSymmetricKey().HasValue())
             {
                 return CommissioningStage::kICDRegistration;
             }
