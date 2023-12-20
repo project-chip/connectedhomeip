@@ -32,7 +32,7 @@ matter_app_map_file = sys.argv[2]
 matter_image_without_factory_data_hex = sys.argv[3]
 device_family = sys.argv[4]
 
-# extract factory data length from map file 
+# extract factory data length from map file
 with open(matter_app_map_file, "r") as map_file:
     if device_family == 'cc13x2_26x2':
         pattern = ".factory_data   0x000ac000"
@@ -46,7 +46,7 @@ with open(matter_app_map_file, "r") as map_file:
 # this is the length of the factory data in hexadecmial form
 factory_data_num_bytes = factory_data_num_bytes[32:]
 
-# convert hex image to dictionary 
+# convert hex image to dictionary
 matter_image = intelhex.IntelHex()
 matter_image.fromfile(matter_app_file, format='hex')
 matter_image_dict = matter_image.todict()
@@ -55,16 +55,16 @@ if device_family == 'cc13x2_26x2':
     # 704512 is 0xAC000 - start of factory data
     start_index = list(matter_image_dict.keys()).index(704512)
 else:
-    #1042432 is 0xFE800 - start of factory data
+    # 1042432 is 0xFE800 - start of factory data
     start_index = list(matter_image_dict.keys()).index(1042432)
-# convert length of factory data into a decimal value 
+# convert length of factory data into a decimal value
 end_index = start_index + int(factory_data_num_bytes, 16)
 
-# slice dictionary to remove factory data elements 
+# slice dictionary to remove factory data elements
 matter_image_dict_first_half = dict(itertools.islice(matter_image_dict.items(), 0, start_index))
 matter_image_dict_second_half = dict(itertools.islice(matter_image_dict.items(), end_index, len(matter_image_dict)))
 
-# convert sliced dictionary to back to hex 
+# convert sliced dictionary to back to hex
 matter_image_without_factory_data_first_half = intelhex.IntelHex()
 matter_image_without_factory_data_second_half = intelhex.IntelHex()
 
