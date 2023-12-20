@@ -65,7 +65,7 @@ static_library("shell_common") {
 
     sources += [
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",      
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
       "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
@@ -76,10 +76,10 @@ static_library("shell_common") {
       "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     ]
 
-  include_dirs = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",
-  ]
+    include_dirs = [
+      "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+      "${chip_root}/examples/energy-management-app/energy-management-common/include",
+    ]
 
     public_deps +=
         [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]

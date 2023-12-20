@@ -82,7 +82,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",    
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
@@ -119,7 +119,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${project_dir}",
     "${project_dir}/main",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",    
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
     "${chip_root}/examples/providers/",
   ]
 
