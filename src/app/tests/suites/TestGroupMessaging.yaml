@@ -109,6 +109,23 @@ tests:
               - name: "GroupID"
                 value: 0x0101
 
+    - label: "Add Group 1 (endpoint 1)"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0101
+              - name: "GroupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0101
+
     - label: "Add Group 2 (endpoint 0)"
       cluster: "Groups"
       command: "AddGroup"
