@@ -1040,9 +1040,8 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
 // command paths in the same batch to be unique. These command allow for
 // client to control order of the response and control size of CommandDataIB
 // being sent back to help test some corner cases.
-bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                           const uint16_t sleepTimeMs, const uint16_t sizeOfResponseBuffer,
-                           const uint8_t fillCharacter)
+bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const uint16_t sleepTimeMs,
+                           const uint16_t sizeOfResponseBuffer, const uint8_t fillCharacter)
 {
     if (sizeOfResponseBuffer > kTestBatchHelperResponseBufferMax)
     {
@@ -1070,16 +1069,16 @@ bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPat
 bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                              const Commands::TestBatchHelperRequest::DecodableType & commandData)
 {
-    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
-                                                          commandData.sizeOfResponseBuffer, commandData.fillCharacter);
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
 }
 
 bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
 {
-    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs,
-                                                          commandData.sizeOfResponseBuffer, commandData.fillCharacter);
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
 }
 
 // -----------------------------------------------------------------------------
