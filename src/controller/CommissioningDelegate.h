@@ -685,6 +685,8 @@ struct ICDManagementClusterInfo
 {
     // Depict whether it is LIT or SIT device
     bool isLIT;
+    // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
+    // might or might not.
     bool checkInProtocolSupport;
 
     // UserActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
