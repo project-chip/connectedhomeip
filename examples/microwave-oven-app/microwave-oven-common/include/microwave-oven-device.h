@@ -38,9 +38,21 @@ namespace Clusters {
 constexpr uint8_t kDefaultMinPower  = 10u;
 constexpr uint8_t kDefaultMaxPower  = 100u;
 constexpr uint8_t kDefaultPowerStep = 10u;
+constexpr uint32_t kMaxCookTime     = 86400u;
+constexpr uint8_t kDefaultPowerSetting = 100u;
 
 constexpr uint8_t ModeNormal  = 0;
 constexpr uint8_t ModeDefrost = 1;
+
+constexpr uint32_t kFeaturePowerAsNumber = 0x01;
+constexpr uint32_t kFeaturePowerInWatts  = 0x02;
+
+constexpr uint16_t kExampleWatt1 = 100u;
+constexpr uint16_t kExampleWatt2 = 300u;
+constexpr uint16_t kExampleWatt3 = 500u;
+constexpr uint16_t kExampleWatt4 = 800u;
+constexpr uint16_t kExampleWatt5 = 1000u;
+
 
 class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
                                    public ModeBase::Delegate,
@@ -55,8 +67,8 @@ public:
      */
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         mOperationalStateInstance(this, aClustersEndpoint),
-        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, mOperationalStateInstance,
+        mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0), 
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, kFeaturePowerAsNumber, mOperationalStateInstance,  
                                       mMicrowaveOvenModeInstance)
     {}
 
@@ -70,12 +82,26 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           uint8_t powerSetting) override;
+                                                                           uint8_t powerSetting, bool startAfterSetting, uint32_t feature) override;
 
     /**
      * handle command for microwave oven control: add more time
      */
     Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) override;
+
+    /**
+     *   Get the watt setting from the supported watts array.
+     *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no gaps.
+     *   @param wattSetting A reference to receive the watt setting on success.
+     *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
+     *   CHIP_ERROR_NOT_FOUND if the index in beyond the list of available labels.
+     */
+    CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) override;
+
+    /**
+     * Get the value of PowerSetting.
+     */
+    uint8_t GetPowerSetting() const override { return mPowerSetting; }
 
     /**
      * Get the value of MinPower.
@@ -91,6 +117,21 @@ public:
      * Get the value of PowerStep.
      */
     uint8_t GetPowerStep() const override { return kDefaultPowerStep; }
+
+    /**
+     * Get the value of MaxCookTime.
+     */
+    uint32_t GetMaxCookTime() const override { return kMaxCookTime; }
+
+    /**
+     * Get the value of SelectedWattIndex.
+     */
+    uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
+
+    /**
+     * Get the value of WattRating.
+     */
+    uint16_t GetCurrentWattRating() const override { return mWattRatting; };
 
     // delegates from OperationalState cluster
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
@@ -196,6 +237,12 @@ private:
     OperationalState::Instance mOperationalStateInstance;
     ModeBase::Instance mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
+
+    //MicrowaveOvenControl variables
+    uint8_t mPowerSetting      = kDefaultPowerSetting;
+    uint8_t mSelectedWattIndex = 0;
+    uint16_t mWattRatting      = 0;
+    uint16_t mWattSettingList[5] = {kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5};
 
     // MicrowaveOvenMode types
     ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };

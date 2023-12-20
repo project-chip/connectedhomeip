@@ -1406,11 +1406,13 @@ endpoint 1 {
   }
 
   server cluster MicrowaveOvenControl {
+    callback attribute cookTime;
     callback attribute maxCookTime;
     callback attribute powerSetting;
     callback attribute minPower;
     callback attribute maxPower;
     callback attribute powerStep;
+    callback attribute wattRating;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

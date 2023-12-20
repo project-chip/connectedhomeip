@@ -35,22 +35,53 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     mOperationalStateInstance.Init();
     mMicrowaveOvenModeInstance.Init();
     mMicrowaveOvenControlInstance.Init();
+    
+    //set default value for attribute SelectedWattIndex and WattRatting
+    if(mMicrowaveOvenControlInstance.HasFeature(to_underlying(MicrowaveOvenControl::Feature::kPowerInWatts)))
+    {
+        mSelectedWattIndex = sizeof(mWattSettingList) / sizeof(uint16_t) - 1;
+        mWattRatting = mWattSettingList[mSelectedWattIndex];
+    }
+    else
+    {
+        mWattRatting = kExampleWatt5;
+    }
+    
 }
 
 /**
  * MicrowaveOvenControl cluster
  */
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                               uint8_t powerSetting, bool startAfterSetting, uint32_t feature)
 {
     // placeholder implementation
     Status status;
+    //set cook mode
     if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
     {
         return status;
     }
+
+    //set cook time
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
-    mMicrowaveOvenControlInstance.SetPowerSetting(powerSetting);
+
+    //set powerSetting if power is in number
+    if(feature == to_underlying(MicrowaveOvenControl::Feature::kPowerAsANumber))
+    {
+        mPowerSetting = powerSetting;
+    }
+    else //set wattRatting and selectedWattIndex if power is in watt
+    {
+        mSelectedWattIndex = powerSetting;
+        mWattRatting = mWattSettingList[mSelectedWattIndex];
+    }
+
+    if(startAfterSetting)
+    {
+        mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    }
     return Status::Success;
 }
 
@@ -59,6 +90,17 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
     // placeholder implementation
     mMicrowaveOvenControlInstance.SetCookTime(finalCookTime);
     return Status::Success;
+}
+
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting)
+{
+    // placeholder implementation
+    if (index > (sizeof(mWattSettingList) / sizeof(uint16_t) - 1))
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    wattSetting = mWattSettingList[index];
+    return CHIP_NO_ERROR;
 }
 
 /**

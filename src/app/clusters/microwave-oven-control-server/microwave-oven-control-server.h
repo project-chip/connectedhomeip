@@ -32,10 +32,7 @@ namespace Clusters {
 namespace MicrowaveOvenControl {
 
 constexpr uint32_t kDefaultCookTime    = 30u;
-constexpr uint8_t kDefaultPowerSetting = 100u;
-constexpr uint32_t kMaxCookTime        = 65535u;
 constexpr uint32_t kMinCookTime        = 1u;
-constexpr uint16_t kDerivedModeTag     = 16384u;
 
 class Delegate;
 
@@ -54,7 +51,7 @@ public:
      * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
      * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId,
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
              Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
 
     ~Instance() override;
@@ -68,27 +65,36 @@ public:
     CHIP_ERROR Init();
 
     /**
+     * Returns true if the feature is supported.
+     * @param feature the feature to check.
+     */
+    bool HasFeature(uint32_t feature) const;
+
+    /**
+     * @brief Get the number of supported watts
+     */
+    uint8_t GetSupportedWattsNum() const;
+
+    /**
      * @brief define the get/set api for the mandatory attributes
      */
     uint32_t GetCookTime() const;
     void SetCookTime(uint32_t cookTime);
 
-    uint8_t GetPowerSetting() const;
-    void SetPowerSetting(uint8_t powerSetting);
-
 private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
+    uint32_t mFeature;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
-    uint32_t mCookTime    = kDefaultCookTime;
-    uint8_t mPowerSetting = kDefaultPowerSetting;
+    uint32_t mCookTime       = kDefaultCookTime;
+    uint8_t mSupportWattsNum = 0;
 
     /**
      * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable (may return CHIP_IM_GLOBAL_STATUS errors)
+     * @return appropriately mapped CHIP_ERROR if applicable 
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -125,27 +131,47 @@ public:
     virtual ~Delegate() = default;
 
     /**
-     *   @brief Handle Command Callback in application: SetCookingParameters
-     *   @return Returns the Interaction Model status code which was user determined in the business logic
-     *   @param  cookMode: the user defined modes which from the Microwave Oven Mode application level
-     *   @param  cookTime: the input cook time value
-     *   @param  powerSetting: the input power setting value
+     *   @brief Handle Command Callback in application: SetCookingParameters.
+     *   @return Returns the Interaction Model status code which was user determined in the business logic.
+     *   @param  cookMode: the user defined modes which from the Microwave Oven Mode application level.
+     *   @param  cookTime: the input cook time value.
+     *   @param  powerSetting: the input power setting value.
+     *   Note: if using power in watt, this parameter is expressed as WattSettingIndex.
+     *   @param  startAfterSetting: the flag to indicate if start for the operation after handling the command.
+     *   @param  feature: featureMap value of Microwave Oven Control.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                   uint8_t powerSetting) = 0;
+                                                                                   uint8_t powerSetting, bool startAfterSetting, uint32_t feature) = 0;
 
     /**
-     *   @brief Handle Command Callback in application: AddMoreTime
-     *   @return Returns the Interaction Model status code which was user determined in the business logic
-     *   @param  finalCookTime: the cook time value after adding input time
+     *   @brief Handle Command Callback in application: AddMoreTime.
+     *   @return Returns the Interaction Model status code which was user determined in the business logic.
+     *   @param  finalCookTime: the cook time value after adding input time.
      */
     virtual Protocols::InteractionModel::Status HandleModifyCookTimeCallback(uint32_t finalCookTime) = 0;
+
+    /**
+     *   Get the watt setting from the supported watts list.
+     *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no gaps.
+     *   @param wattSetting A reference to receive the watt setting on success.
+     *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully.
+     *   CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index in beyond the list of available labels.
+     */
+    virtual CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) = 0;
+
+    virtual uint32_t GetMaxCookTime() const = 0;
+
+    virtual uint8_t GetPowerSetting() const = 0;
 
     virtual uint8_t GetMinPower() const = 0;
 
     virtual uint8_t GetMaxPower() const = 0;
 
     virtual uint8_t GetPowerStep() const = 0;
+
+    virtual uint8_t GetCurrentWattIndex() const = 0;
+
+    virtual uint16_t GetCurrentWattRating() const = 0;
 
 private:
     friend class Instance;
@@ -166,7 +192,7 @@ protected:
  *  @brief Check if the given cook time is in range
  *  @param cookTime    cookTime that given by user
  */
-bool IsCookTimeInRange(uint32_t cookTime);
+bool IsCookTimeInRange(uint32_t cookTime, uint32_t maxCookTime);
 
 /**
  *  @brief Check if the given cooking power is in range
