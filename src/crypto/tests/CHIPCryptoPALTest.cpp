@@ -3081,7 +3081,7 @@ int TestCHIPCryptoPAL(void)
         TestCHIPCryptoPAL_Teardown
     };
     // clang-format on
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     add_entropy_source(test_entropy_source, nullptr, 16);

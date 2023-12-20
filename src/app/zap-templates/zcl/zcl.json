@@ -23,8 +23,8 @@
         "barrier-control-cluster.xml",
         "basic-information-cluster.xml",
         "binding-cluster.xml",
-        "boolean-sensor-configuration-cluster.xml",
         "boolean-state-cluster.xml",
+        "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
         "chip-ota.xml",
@@ -340,6 +340,13 @@
             "FeatureMap"
         ],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Microwave Oven Control": [
+            "CookTime",
+            "PowerSetting",
+            "MinPower",
+            "MaxPower",
+            "PowerStep"
+        ],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",

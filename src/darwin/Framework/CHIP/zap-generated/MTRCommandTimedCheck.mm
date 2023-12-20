@@ -572,9 +572,9 @@ static BOOL CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(Attr
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1248,8 +1248,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInActivatedCarbonFilterMonitoringCluster(commandID);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return CommandNeedsTimedInvokeInBooleanSensorConfigurationCluster(commandID);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return CommandNeedsTimedInvokeInBooleanStateConfigurationCluster(commandID);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return CommandNeedsTimedInvokeInValveConfigurationAndControlCluster(commandID);

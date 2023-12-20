@@ -2907,13 +2907,13 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
     return output.toString();
   }
 }
-public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+public static class BooleanStateConfigurationClusterAlarmsStateChangedEvent {
   public Integer alarmsActive;
   public Optional<Integer> alarmsSuppressed;
   private static final long ALARMS_ACTIVE_ID = 0L;
   private static final long ALARMS_SUPPRESSED_ID = 1L;
 
-  public BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+  public BooleanStateConfigurationClusterAlarmsStateChangedEvent(
     Integer alarmsActive,
     Optional<Integer> alarmsSuppressed
   ) {
@@ -2929,7 +2929,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return new StructType(values);
   }
 
-  public static BooleanSensorConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static BooleanStateConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -2948,7 +2948,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
         }
       }
     }
-    return new BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+    return new BooleanStateConfigurationClusterAlarmsStateChangedEvent(
       alarmsActive,
       alarmsSuppressed
     );
@@ -2957,12 +2957,58 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n");
+    output.append("BooleanStateConfigurationClusterAlarmsStateChangedEvent {\n");
     output.append("\talarmsActive: ");
     output.append(alarmsActive);
     output.append("\n");
     output.append("\talarmsSuppressed: ");
     output.append(alarmsSuppressed);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class BooleanStateConfigurationClusterSensorFaultEvent {
+  public Integer sensorFault;
+  private static final long SENSOR_FAULT_ID = 0L;
+
+  public BooleanStateConfigurationClusterSensorFaultEvent(
+    Integer sensorFault
+  ) {
+    this.sensorFault = sensorFault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SENSOR_FAULT_ID, new UIntType(sensorFault)));
+
+    return new StructType(values);
+  }
+
+  public static BooleanStateConfigurationClusterSensorFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sensorFault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SENSOR_FAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensorFault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BooleanStateConfigurationClusterSensorFaultEvent(
+      sensorFault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanStateConfigurationClusterSensorFaultEvent {\n");
+    output.append("\tsensorFault: ");
+    output.append(sensorFault);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -3759,7 +3805,7 @@ public static class EnergyEvseClusterEnergyTransferStoppedEvent {
   }
 }
 public static class EnergyEvseClusterFaultEvent {
-  public Long sessionID;
+  public @Nullable Long sessionID;
   public Integer state;
   public Integer faultStatePreviousState;
   public Integer faultStateCurrentState;
@@ -3769,7 +3815,7 @@ public static class EnergyEvseClusterFaultEvent {
   private static final long FAULT_STATE_CURRENT_STATE_ID = 4L;
 
   public EnergyEvseClusterFaultEvent(
-    Long sessionID,
+    @Nullable Long sessionID,
     Integer state,
     Integer faultStatePreviousState,
     Integer faultStateCurrentState
@@ -3782,7 +3828,7 @@ public static class EnergyEvseClusterFaultEvent {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SESSION_I_D_ID, new UIntType(sessionID)));
+    values.add(new StructElement(SESSION_I_D_ID, sessionID != null ? new UIntType(sessionID) : new NullType()));
     values.add(new StructElement(STATE_ID, new UIntType(state)));
     values.add(new StructElement(FAULT_STATE_PREVIOUS_STATE_ID, new UIntType(faultStatePreviousState)));
     values.add(new StructElement(FAULT_STATE_CURRENT_STATE_ID, new UIntType(faultStateCurrentState)));
@@ -3794,7 +3840,7 @@ public static class EnergyEvseClusterFaultEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long sessionID = null;
+    @Nullable Long sessionID = null;
     Integer state = null;
     Integer faultStatePreviousState = null;
     Integer faultStateCurrentState = null;

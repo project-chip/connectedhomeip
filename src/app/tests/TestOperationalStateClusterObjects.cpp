@@ -583,7 +583,7 @@ int TestOperationalStateClusterObjects()
 {
     nlTestSuite theSuite = { "Test Operational State Cluster Objects tests", &sTests[0], TestSetup, TestTearDown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
