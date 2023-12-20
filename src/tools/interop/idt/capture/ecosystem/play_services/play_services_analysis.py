@@ -16,22 +16,14 @@
 #
 
 import os
-from dataclasses import dataclass
 from typing import TextIO
 
 from capture.platform.android import Android
+from utils.analysis import Cause, check_cause
 from utils.artifact import create_standard_log_name, log
 from utils.log import add_border, print_and_write
 
 logger = log.get_logger(__file__)
-
-
-@dataclass(repr=True)
-class Cause:
-    search_terms: [str]
-    search_attr: [str]
-    help_message: str
-    follow_up_causes: []  # : [Cause] (Recursive reference does not work for type hint here)
 
 
 class PlayServicesAnalysis:
@@ -59,15 +51,16 @@ class PlayServicesAnalysis:
             Cause(["SetupDeviceViewModel", "Failed to discover operational device"],
                   "failure_stack_trace",
                   "All steps of PASE completed as expected, but we failed to establish a secure session on IP network",
-                  [Cause(["AddressResolve_DefaultImpl", "Timeout"],
-                         "matter_commissioner_logs",
-                         "Play Services failed to locate end device via DNS-SD. Inspect pcaps / $ idt discover -t d",
-                         []),
-                   Cause(["CASESession", "Timeout"],
-                         "matter_commissioner_logs",
-                         "End device discovered via DNS-SD, but the secure session handshake failed! Try $ idt probe",
-                         []),
-                   ])
+                  [
+                      Cause(["AddressResolve_DefaultImpl", "Timeout"],
+                            "matter_commissioner_logs",
+                            "Play Services failed to locate end device via DNS-SD. Inspect pcaps / $ idt discover -t d",
+                            []),
+                      Cause(["secure_channel/CASESession"],
+                            "matter_commissioner_logs",
+                            "End device discovered via DNS-SD, secure session handshake failed! Try $ idt probe",
+                            []),
+                  ])
         ]
 
     def _log_proc_matter_commissioner(self, line: str) -> None:
@@ -106,27 +99,15 @@ class PlayServicesAnalysis:
             self.logger.info(line)
             self.sigma_logs += line
 
-    def check_cause(self, cause: Cause, analysis_file: TextIO):
-        to_search = getattr(self, cause.search_attr)
-        found = True
-        for search_term in cause.search_terms:
-            found = found and search_term in to_search
-        if found:
-            print_and_write(cause.help_message, analysis_file)
-        if found and cause.follow_up_causes:
-            for follow_up in cause.follow_up_causes:
-                self.check_cause(follow_up, analysis_file)
-
     def do_prescriptive_analysis(self, analysis_file: TextIO) -> None:
         print_and_write(add_border("Prescriptive analysis"), analysis_file)
         for cause in self.causes:
-            self.check_cause(cause, analysis_file)
+            check_cause(self, cause, analysis_file)
 
     def show_analysis(self) -> None:
         analysis_file = open(self.analysis_file_name, mode="w+")
         print_and_write(add_border('Matter commissioner logs'), analysis_file)
         print_and_write(self.matter_commissioner_logs, analysis_file)
-        # TODO: Tell user failure detected capture can end
         print_and_write(
             add_border('Commissioning failure stack trace'),
             analysis_file)
