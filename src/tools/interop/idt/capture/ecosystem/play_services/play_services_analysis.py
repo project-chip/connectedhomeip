@@ -16,7 +16,6 @@
 #
 
 import os
-from typing import TextIO
 
 from capture.platform.android import Android
 from utils.analysis import Cause, PrescriptiveAnalysis
@@ -48,7 +47,7 @@ class PlayServicesAnalysis(PrescriptiveAnalysis):
                   "failure_stack_trace",
                   "Play Services could not locate the device's initial advertisement. Use $ idt discover to check!",
                   []),
-            Cause(["SetupDeviceViewModel", "Failed to discover operational device"],
+            Cause(["Failed to discover operational device"],
                   "failure_stack_trace",
                   "All steps of PASE completed as expected, but the secure session setup on IP network failed.",
                   [
