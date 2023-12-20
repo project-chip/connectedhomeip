@@ -64,28 +64,24 @@ const char * StatusName(Status status);
  */
 class StatusCode
 {
-  public:
+public:
     explicit StatusCode(Status status) : mStatus(status) {}
 
     // We only have simple copyable members, so we should be trivially copyable.
-    StatusCode(const StatusCode & other) = default;
+    StatusCode(const StatusCode & other)             = default;
     StatusCode & operator=(const StatusCode & other) = default;
 
-    bool operator==(const StatusCode &other)
+    bool operator==(const StatusCode & other)
     {
-        return (this->mStatus == other.mStatus)
-            && (this->HasClusterSpecificCode() == other.HasClusterSpecificCode())
-            && (this->GetClusterSpecificCode() == other.GetClusterSpecificCode());
+        return (this->mStatus == other.mStatus) && (this->HasClusterSpecificCode() == other.HasClusterSpecificCode()) &&
+            (this->GetClusterSpecificCode() == other.GetClusterSpecificCode());
     }
 
-    bool operator!=(const StatusCode &other)
-    {
-        return !(*this == other);
-    }
+    bool operator!=(const StatusCode & other) { return !(*this == other); }
 
     StatusCode & operator=(const Status & status)
     {
-        this->mStatus = status;
+        this->mStatus              = status;
         this->mClusterSpecificCode = chip::NullOptional;
         return *this;
     }
@@ -146,9 +142,11 @@ class StatusCode
     operator int() const { return static_cast<int>(mStatus); }
     operator uint8_t() const { return static_cast<uint8_t>(mStatus); }
 
-  private:
+private:
     StatusCode() = delete;
-    StatusCode(Status status, uint8_t cluster_specific_code) : mStatus(status), mClusterSpecificCode(chip::MakeOptional(cluster_specific_code)) { }
+    StatusCode(Status status, uint8_t cluster_specific_code) :
+        mStatus(status), mClusterSpecificCode(chip::MakeOptional(cluster_specific_code))
+    {}
 
     Status mStatus;
     chip::Optional<uint8_t> mClusterSpecificCode;
