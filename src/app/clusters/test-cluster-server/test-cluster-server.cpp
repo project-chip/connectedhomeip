@@ -1034,7 +1034,7 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
 
 // TestBatchHelperRequest and TestSecondBatchHelperRequest do the same thing.
 // The reason there are two identical commands is because batch command requires
-// command paths in the same batch to be unique. These command allow for 
+// command paths in the same batch to be unique. These command allow for
 // client to control order of the response and control size of CommandDataIB
 // being sent back to help test some corner cases.
 bool emberAfUnitTestingClusterTestBatchHelperCommon(
@@ -1057,7 +1057,7 @@ bool emberAfUnitTestingClusterTestBatchHelperCommon(
     asyncWorkData->commandPath = commandPath;
     asyncWorkData->sizeOfResponseBuffer = sizeOfResponseBuffer;
     asyncWorkData->fillCharacter = fillCharacter;
-    
+
     scheduleTimerCallbackMs(asyncWorkData, sleepTimeMs);
 
     return true;
