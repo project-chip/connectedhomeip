@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -134,8 +134,8 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
-          "!OPSTATE.S.C00.Rsp && !OPSTATE.S.C01.Rsp && !OPSTATE.S.C02.Rsp &&
-          !OPSTATE.S.C03.Rsp"
+          "!OVENOPSTATE.S.C00.Rsp && !OVENOPSTATE.S.C01.Rsp && !OVENOPSTATE.S.C02.Rsp &&
+          !OVENOPSTATE.S.C03.Rsp"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -145,8 +145,8 @@ tests:
 
     - label: "Step 7: Read the global attribute: GeneratedCommandList"
       PICS:
-          (OPSTATE.S.C00.Rsp || OPSTATE.S.C01.Rsp || OPSTATE.S.C02.Rsp ||
-          OPSTATE.S.C03.Rsp)
+          (OVENOPSTATE.S.C00.Rsp || OVENOPSTATE.S.C01.Rsp || OVENOPSTATE.S.C02.Rsp ||
+          OVENOPSTATE.S.C03.Rsp)
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
