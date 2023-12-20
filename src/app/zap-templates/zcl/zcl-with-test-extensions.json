@@ -344,7 +344,7 @@
         ],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
-	    "CookTime",
+            "CookTime",
             "MaxCookTime",
             "PowerSetting",
             "MinPower",
