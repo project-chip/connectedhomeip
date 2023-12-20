@@ -28,11 +28,12 @@
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 
-using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace DeviceEnergyManagement {
+
+using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
 
