@@ -16,7 +16,7 @@
 #
 
 from dataclasses import dataclass
-from typing import TextIO, Any
+from typing import Any, TextIO
 
 from utils.log import print_and_write
 

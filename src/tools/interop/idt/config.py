@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 import logging
+
 from res.splash import splash as _splash
 
 enable_color = True
