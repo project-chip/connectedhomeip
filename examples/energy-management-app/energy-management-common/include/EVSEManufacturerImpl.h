@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <DeviceEnergyManagementManager.h>
 #include <EnergyEvseManager.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -36,12 +37,12 @@ public:
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init(EnergyEvseManager * aInstance);
+    CHIP_ERROR Init(EnergyEvseManager * evseInstance, DeviceEnergyManagementManager * demInstance);
 
     /**
      * @brief   Called at shutdown
      */
-    CHIP_ERROR Shutdown(EnergyEvseManager * aInstance);
+    CHIP_ERROR Shutdown(EnergyEvseManager * evseInstance, DeviceEnergyManagementManager * demInstance);
 
     /**
      * @brief   Main Callback handler from delegate to user code
