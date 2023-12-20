@@ -679,14 +679,19 @@ struct GeneralCommissioningInfo
     ;
 };
 
+// ICDManagementClusterInfo is updated when controller read ICDManagementCluster, and used to instruct whether to go with ICD Configuration
+// and further indicate to the user how to trigger the ICD to switch to active mode.
 struct ICDManagementClusterInfo
 {
-    bool isLIT                  = false;
-    bool checkInProtocolSupport = false;
+    // Depict whether it is LIT or SIT device
+    bool isLIT;
+    bool checkInProtocolSupport;
 
-    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint =
-        BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>();
-    CharSpan userActiveModeTriggerInstruction = CharSpan();
+    // UserActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
+    // For a LIT:  UserActiveModeTriggerHint is mandatory, For a SIT: UserActiveModeTriggerHint may not be there.
+    // UserActiveModeTriggerInstruction is dependent upon theref_UserActiveModeTriggerHint>> and may not be there.
+    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+    CharSpan userActiveModeTriggerInstruction;
 };
 
 struct ReadCommissioningInfo
