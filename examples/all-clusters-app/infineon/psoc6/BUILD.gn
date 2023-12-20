@@ -144,7 +144,7 @@ psoc6_executable("clusters_app") {
     "${examples_plat_dir}",
     "${psoc6_project_dir}/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
-    "${chip_root}/examples/energy-management-app/energy-management-common/include",    
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
   ]
 
   defines = []
