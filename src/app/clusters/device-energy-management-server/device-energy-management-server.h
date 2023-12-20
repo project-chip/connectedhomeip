@@ -36,7 +36,9 @@ namespace DeviceEnergyManagement {
 
 using chip::Protocols::InteractionModel::Status;
 
-/** @brief  Defines methods for implementing application-specific logic for this Cluster.
+/**
+ *  @brief  Defines methods for implementing application-specific logic for this Cluster.
+ *
  */
 class Delegate
 {
@@ -49,8 +51,7 @@ public:
      * @brief Delegate should implement a handler to begin to adjust client power
      *        consumption/generation to the level requested.
      *
-     * @param power Milli-Watts the ESA SHALL use during the adjustment period. Positive values indicate the direction of current
-     * flow -towards- a load.
+     * @param power Milli-Watts the ESA SHALL use during the adjustment period.
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
@@ -81,32 +82,34 @@ public:
     virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) = 0;
 
     /**
-     * @brief Delegate implementation:
-     *   If the ESA supports FA and either the SlotIsPauseable field is true in the ActiveSlotNumber index in the
-     *   Slots list, or the IsPausable field is true in the Forecast attribute structure, and the ESAState is not
-     *   UserOptOut then the ESA SHALL pause its current operation.
+     * @brief Delegate handler for PauseRequest command
+     *
+     *   If the ESA supports FA and the SlotIsPauseable field is true in the ActiveSlotNumber
+     *   index in the Slots list, and the ESAState is not UserOptOut then the ESA SHALL allow its current
+     *   operation to be Paused.
+     *
      *   During this state the ESA SHALL not consume or produce significant power (other than required to keep its
      *   basic control system operational).
-     *   The ESA SHALL also generate a Paused Event and the ESAState SHALL be restored to Paused.
      *
-     * @param duration Duration that the ESA SHALL be paused for. SHALL be between MinPauseDuration & MaxPauseDuration for current
-     * slot.
-     * @return  Success if the ESA is paused, otherwise returns other IM_Statuses.
+     * @param duration Duration that the ESA SHALL be paused for.
+     * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
     virtual Status PauseRequest(const uint32_t duration) = 0;
 
     /**
-     * @brief Delegate implementation:
+     * @brief Delegate handler for ResumeRequest command
+     *
      *   If the ESA supports FA and it is currently Paused then the ESA SHALL resume its operation.
      *   The ESA SHALL also generate a Resumed Event and the ESAState SHALL be updated accordingly to
      *   reflect its current state.
      *
-     * @return  Success if the ESA is resumed, otherwise returns other IM_Statuss.
+     * @return  Success if the ESA is resumed, otherwise returns other IM_Status.
      */
     virtual Status ResumeRequest() = 0;
 
     /**
-     * @brief Delegate should implement:
+     * @brief Delegate handler for ModifyForecastRequest
+     *
      *   If the ESA supports FA, and the ESAState is not UserOptOut it SHALL attempt to adjust its power forecast.
      *   This allows a one or more modifications in a single command by sending a list of modifications (one for each 'slot').
      *   Attempts to modify slots which have already past, SHALL result in the entire command being rejected.
@@ -116,20 +119,21 @@ public:
      * @param forecastId Indicates the ESA ForecastId that is to be modified.
      * @param slotAdjustments List of adjustments to be applied to the ESA, corresponding to the expected ESA forecastId.
      * @return  Success if the entire list of SlotAdjustmentStruct are accepted, otherwise the command
-     * SHALL be rejected returning other IM_Statuss.
+     *          SHALL be rejected returning other IM_Status.
      */
     virtual Status ModifyForecastRequest(const uint32_t forecastId,
                                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments) = 0;
 
     /**
-     * @brief Delegate should implement:
+     * @brief Delegate handler for RequestConstraintBasedForecast
+     *
      *   The ESA SHALL inspect the requested power limits to ensure that there are no overlapping elements. The ESA
      *   manufacturer may also reject the request if it could cause the user’s preferences to be breached (e.g. may
      *   cause the home to be too hot or too cold, or a battery to be insufficiently charged).
      *   If the ESA can meet the requested power limits, it SHALL regenerate a new Power Forecast with a new ForecastId.
      *
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
-     * @return  Success if successfull, otherwise the command SHALL be rejected returning other IM_Statuss.
+     * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
     virtual Status
     RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints) = 0;

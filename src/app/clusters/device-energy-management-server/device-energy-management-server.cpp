@@ -238,7 +238,8 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
     bool validArgs       = false;
     Status status        = Status::Success;
 
-    auto powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
+    PowerAdjustmentCapability::TypeInfo::Type powerAdjustmentCapability;
+    powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
 
     if (powerAdjustmentCapability.IsNull())
     {
@@ -268,7 +269,6 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 
     ChipLogProgress(Zcl, "DEM: %s Good PowerAdjustRequest() args.", __FUNCTION__);
 
-    /* Call the delegate to do the power adjustment */
     status = mDelegate.PowerAdjustRequest(power, durationSec);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
@@ -293,7 +293,6 @@ void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
         return;
     }
 
-    /* Call the delegate to cancel the power adjustment */
     status = mDelegate.CancelPowerAdjustRequest();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
@@ -335,7 +334,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
      * LatestEndTime, then the command SHALL be rejected with CONSTRAINT_ERROR;
      * otherwise the command SHALL be rejected with FAILURE
      */
-    /* earliestStartTime is optional based on the FA (ForecastAdjust) feature AND can be nullable */
+    /* earliestStartTime is optional based on the FA (ForecastAdjust) feature AND is nullable */
     if (forecast.Value().earliestStartTime.HasValue() || forecast.Value().latestEndTime.HasValue())
     {
         /* These Should not be NULL since this command requires FA feature and these are mandatory for that */
@@ -344,20 +343,28 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         return;
     }
 
-    chip::System::Clock::Milliseconds64 cTMs;
-    auto chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (chipError != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "DEM: Unable to get current time - error=%d (%s)]", chipError.AsInteger(), chipError.AsString());
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-        return;
-    }
-    uint32_t epochNow = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
-
     if (forecast.Value().earliestStartTime.Value().IsNull())
     {
+        chip::System::Clock::Milliseconds64 cTMs;
+        CHIP_ERROR chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+        if (chipError != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "DEM: Unable to get current time - error=%d (%s)]", chipError.AsInteger(), chipError.AsString());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
+
+        auto unixEpoch     = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
+        uint32_t chipEpoch = 0;
+        if (!chip::UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+        {
+            ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+            return;
+        }
+
         /* Null means - We can start immediately */
-        earliestStartTime = epochNow; /* NOW */
+        earliestStartTime = chipEpoch; /* NOW */
     }
     else
     {
@@ -368,23 +375,29 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
 
     duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
 
-    if ((requestedStartTime < earliestStartTime) || ((requestedStartTime + duration) > latestEndTime))
+    if (requestedStartTime < earliestStartTime)
     {
-        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime %d.", __FUNCTION__, requestedStartTime);
+        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime %d, earlier than earliestStartTime %d.", __FUNCTION__,
+                     requestedStartTime, earliestStartTime);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
-    else
-    {
-        ChipLogProgress(Zcl, "DEM: %s - Good requestedStartTime %d.", __FUNCTION__, requestedStartTime);
 
-        status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        if (status != Status::Success)
-        {
-            ChipLogError(Zcl, "DEM: %s - StartTimeAdjustRequest(%d) FAILURE", __FUNCTION__, requestedStartTime);
-            return;
-        }
+    if ((requestedStartTime + duration) > latestEndTime)
+    {
+        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime + duration %d, later than latestEndTime %d.", __FUNCTION__,
+                     requestedStartTime + duration, latestEndTime);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    ChipLogProgress(Zcl, "DEM: %s - Good requestedStartTime %d.", __FUNCTION__, requestedStartTime);
+    status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: %s - StartTimeAdjustRequest(%d) FAILURE", __FUNCTION__, requestedStartTime);
+        return;
     }
 
     return;
@@ -434,7 +447,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
 
     if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable)
     {
-        ChipLogError(Zcl, "DEM: %s - activeSlotNumber %d is NOT pausible.", __FUNCTION__, activeSlotNumber);
+        ChipLogError(Zcl, "DEM: %s - activeSlotNumber %d is NOT pauseable.", __FUNCTION__, activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
@@ -455,7 +468,6 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    /* Finally - we can call the delegate to ask for a pause */
     status = mDelegate.PauseRequest(duration);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     if (status != Status::Success)
@@ -469,8 +481,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
 
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
 {
-    Status status = Status::Success;
-
+    Status status                                               = Status::Success;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
@@ -480,7 +491,6 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
         return;
     }
 
-    /* Call the delegate to resume */
     status = mDelegate.ResumeRequest();
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     if (status != Status::Success)
@@ -496,6 +506,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
 {
     Status status       = Status::Success;
     uint32_t forecastId = commandData.forecastId;
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 
     if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
     {
@@ -504,7 +515,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    auto forecast = mDelegate.GetForecast(); // DataModel::Nullable<Structs::ForecastStruct::Type>
+    forecast = mDelegate.GetForecast();
     if (forecast.IsNull())
     {
         ChipLogError(Zcl, "DEM: %s - Forecast is Null", __FUNCTION__);
@@ -512,7 +523,6 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    /* Call the delegate to potentially update the forecast */
     DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
     status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments);
     if (status != Status::Success)
@@ -535,7 +545,6 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
         return;
     }
 
-    /* delegate requested to generate a new forecast */
     status = mDelegate.RequestConstraintBasedForecast(commandData.constraints);
     if (status != Status::Success)
     {

@@ -61,22 +61,22 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
 
 Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime)
 {
-    Status status = Status::UnsupportedCommand; // Status::Success;
-
-    // TODO: implement
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
 
-    if (!forecast.IsNull())
+    if (forecast.IsNull())
     {
-        uint32_t duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
-
-        /* Modify start time and end time */
-        forecast.Value().startTime = requestedStartTime;
-        forecast.Value().endTime   = requestedStartTime + duration;
-
-        SetForecast(forecast);
+        return Status::Failure;
     }
-    return status;
+
+    uint32_t duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
+
+    /* Modify start time and end time */
+    forecast.Value().startTime = requestedStartTime;
+    forecast.Value().endTime   = requestedStartTime + duration;
+
+    SetForecast(forecast); // This will increment forecast ID
+
+    return Status::Success;
 }
 
 Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t duration)
