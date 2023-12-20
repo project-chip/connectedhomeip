@@ -50,7 +50,6 @@ ClustersWithInitFunctions:
     - Mode Select
     - Sample MEI
     - Scenes
-    - Oven Mode
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
