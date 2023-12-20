@@ -32,6 +32,23 @@ using chip::Optional;
 using namespace chip::app;
 using CostsList = DataModel::List<const Structs::CostStruct::Type>;
 
+/**
+ * @brief Delegate handler for PowerAdjustRequest
+ *
+ * Note: checking of the validity of the PowerAdjustRequest has been done by the lower layer
+ *
+ * This function needs to notify the appliance that it should apply a new power setting.
+ * It should:
+ *   1) notify the appliance - if the appliance hardware cannot be adjusted, then return Failure
+ *   2) start a timer (or restart the existing PowerAdjust timer) for duration seconds
+ *   3) generate a PowerAdjustStart event (if there is not an existing PowerAdjustRequest running)
+ *   4) if appropriate, update the forecast with the new expected end time
+ *
+ *  and when the timer expires:
+ *   5) notify the appliance's that it can resume its intended power setting (or go idle)
+ *   6) generate a PowerAdjustEnd event with cause NormalCompletion
+ *   7) if necessary, update the forecast with new expected end time
+ */
 Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, const uint32_t duration)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
@@ -46,7 +63,18 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, c
 
     return status;
 }
+/**
+ * @brief Delegate handler for CancelPowerAdjustRequest
+ *
+ * Note: checking of the validity of the CancelPowerAdjustRequest has been done by the lower layer
+ *
+ * This function needs to notify the appliance that it should resume its intended power setting (or go idle).
 
+ * It should:
+ *   1) notify the appliance's that it can resume its intended power setting (or go idle)
+ *   2) generate a PowerAdjustEnd event with cause code Cancelled
+ *   3) if necessary, update the forecast with new expected end time
+ */
 Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
@@ -59,6 +87,17 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
     return status;
 }
 
+/**
+ * @brief Delegate handler for StartTimeAdjustRequest
+ *
+ * Note: checking of the validity of the StartTimeAdjustRequest has been done by the lower layer
+ *
+ * This function needs to notify the appliance that the forecast has been updated by a client.
+ *
+ * It should:
+ *      1) update the forecast attribute with the revised start time
+ *      2) send a callback notification to the appliance so it can refresh its internal schedule
+ */
 Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime)
 {
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
@@ -76,39 +115,97 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
 
     SetForecast(forecast); // This will increment forecast ID
 
+    // TODO: callback to the appliance to notify it of a new start time
+
     return Status::Success;
 }
-
+/**
+ * @brief Delegate handler for Pause Request
+ *
+ * Note: checking of the validity of the Pause Request has been done by the lower layer
+ *
+ * This function needs to notify the appliance that it should now pause.
+ * It should:
+ *   1) pause the appliance - if the appliance hardware cannot be paused, then return Failure
+ *   2) start a timer for duration seconds
+ *   3) generate a Paused event
+ *   4) update the forecast with the new expected end time
+ *
+ *  and when the timer expires:
+ *   5) restore the appliance's operational state
+ *   6) generate a Resumed event
+ *   7) if necessary, update the forecast with new expected end time
+ */
 Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t duration)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
-    // TODO: implement
+    // TODO: implement the behaviour above
     return status;
 }
 
+/**
+ * @brief Delegate handler for ResumeRequest
+ *
+ * Note: checking of the validity of the ResumeRequest has been done by the lower layer
+ *
+ * This function needs to notify the appliance that it should now resume operation
+ *
+ * It should:
+ *   1) restore the appliance's operational state
+ *   2) generate a Resumed event
+ *   3) update the forecast with new expected end time (given that the pause duration was shorter than originally requested)
+ *
+ */
 Status DeviceEnergyManagementDelegate::ResumeRequest()
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
-    // TODO: implement
-    mEsaState = ESAStateEnum::kOnline;
-    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, ESAState::Id);
+
+    // TODO: implement the behaviour above
+    SetESAState(ESAStateEnum::kOnline);
 
     return status;
 }
 
+/**
+ * @brief Delegate handler for ModifyForecastRequest
+ *
+ * Note: Only basic checking of the validity of the ModifyForecastRequest has been
+ * done by the lower layer. This is a more complex use-case and requires higher-level
+ * work by the delegate.
+ *
+ * It should:
+ *      1) determine if the new forecast adjustments are acceptable to the appliance
+ *       - if not return Failure. For example, if it may cause the home to be too hot
+ *         or too cold, or a battery to be insufficiently charged
+ *      2) if the slot adjustments are acceptable, then update the forecast
+ *      3) notify the appliance to follow the revised schedule
+ */
 Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
     const uint32_t forecastId, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
-    // TODO: implement
+
+    // TODO: implement the behaviour above
     return status;
 }
 
+/**
+ * @brief Delegate handler for RequestConstraintBasedForecast
+ *
+ * Note: Only basic checking of the validity of the RequestConstraintBasedForecast has been
+ * done by the lower layer. This is a more complex use-case and requires higher-level
+ * work by the delegate.
+ *
+ * It should:
+ *      1) perform a higher level optimization (e.g. using tariff information, and user preferences)
+ *      2) if a solution can be found, then update the forecast, else return Failure
+ *      3) notify the appliance to follow the revised schedule
+ */
 Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
     const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
-    // TODO: implement
+    // TODO: implement the behaviour above
     return status;
 }
 
