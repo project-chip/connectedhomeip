@@ -35,7 +35,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     mOperationalStateInstance.Init();
     mMicrowaveOvenModeInstance.Init();
     mMicrowaveOvenControlInstance.Init();
-    
+
     //set default value for attribute SelectedWattIndex and WattRatting
     if(mMicrowaveOvenControlInstance.HasFeature(to_underlying(MicrowaveOvenControl::Feature::kPowerInWatts)))
     {
@@ -46,7 +46,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     {
         mWattRatting = kExampleWatt5;
     }
-    
+
 }
 
 /**

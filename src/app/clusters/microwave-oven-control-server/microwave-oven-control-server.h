@@ -94,7 +94,7 @@ private:
 
     /**
      * IM-level implementation of read
-     * @return appropriately mapped CHIP_ERROR if applicable 
+     * @return appropriately mapped CHIP_ERROR if applicable
      */
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
