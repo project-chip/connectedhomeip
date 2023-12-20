@@ -43,6 +43,11 @@ public:
      */
     CHIP_ERROR Shutdown(EnergyEvseManager * aInstance);
 
+    /**
+     * @brief   Main Callback handler from delegate to user code
+     */
+    static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
+
 private:
 };
 

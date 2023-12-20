@@ -105,10 +105,25 @@ CHIP_ERROR CheckinMessage::ParseCheckinMessagePayload(const Crypto::Aes128KeyHan
     }
 
     // Read decrypted counter and application data
-    counter = Encoding::LittleEndian::Get32(appData.data());
+    static_assert(sizeof(CounterType) == sizeof(uint32_t), "Expect counter to be 32 bits for correct decoding");
+    CounterType tempCounter = Encoding::LittleEndian::Get32(appData.data());
 
-    // TODO : Validate received nonce by calculating it with the hmacKeyHandle and received Counter value
+    // Validate that the received nonce is correct
+    {
+        uint8_t calculatedNonceBuffer[CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES] = { 0 };
+        Encoding::LittleEndian::BufferWriter writer(calculatedNonceBuffer, sizeof(calculatedNonceBuffer));
 
+        ReturnErrorOnFailure(GenerateCheckInMessageNonce(hmacKeyHandle, tempCounter, writer));
+
+        // Validate received nonce is the same as the calculated
+        ByteSpan nonce = payload.SubSpan(0, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+        VerifyOrReturnError(memcmp(nonce.data(), calculatedNonceBuffer, sizeof(calculatedNonceBuffer)) == 0, CHIP_ERROR_INTERNAL);
+    }
+
+    // We have successfully decrypted and validated Check-In message
+    // Set output values
+
+    counter = tempCounter;
     // Shift to remove the counter from the appData
     memmove(appData.data(), sizeof(CounterType) + appData.data(), appDataSize);
     appData.reduce_size(appDataSize);

@@ -38,14 +38,14 @@ limitations under the License.
     <attribute code="0x0000" side="server" type="ESATypeEnum" define="ESA_TYPE" writable="false" optional="false">ESAType</attribute>
     <attribute code="0x0001" side="server" type="boolean" define="ESA_CAN_GENERATE" writable="false" optional="false">ESACanGenerate</attribute>
     <attribute code="0x0002" side="server" type="ESAStateEnum" define="ESA_STATE" default="0" writable="false" optional="false">ESAState</attribute>
-    <attribute code="0x0003" side="server" type="int64s" define="ABS_MIN_POWER" default="0" writable="false" optional="false">AbsMinPower</attribute>
-    <attribute code="0x0004" side="server" type="int64s" define="ABS_MAX_POWER" default="0" writable="false" optional="false">AbsMaxPower</attribute>
+    <attribute code="0x0003" side="server" type="power_mw" define="ABS_MIN_POWER" default="0" writable="false" optional="false">AbsMinPower</attribute>
+    <attribute code="0x0004" side="server" type="power_mw" define="ABS_MAX_POWER" default="0" writable="false" optional="false">AbsMaxPower</attribute>
     <!--Conformance feature PA - for now optional-->
     <attribute code="0x0005" side="server" type="ARRAY" entryType="PowerAdjustStruct" define="POWER_ADJUSTMENT_CAPABILITY" isNullable="true" writable="false" optional="true">PowerAdjustmentCapability</attribute>
     <!--Conformance feature PFR \| SFR - for now optional-->
     <attribute code="0x0006" side="server" type="ForecastStruct" define="FORECAST" isNullable="true" writable="false" optional="true">Forecast</attribute>
     <command source="client" code="0x0000" name="PowerAdjustRequest" optional="true" apiMaturity="provisional">
-      <arg name="Power" type="int64s"/>
+      <arg name="Power" type="power_mw"/>
       <arg name="Duration" type="elapsed_s"/>
       <description>Allows a client to request an adjustment in the power consumption of an ESA for a specified duration.</description>
     </command>
@@ -79,7 +79,7 @@ limitations under the License.
       <description>PowerAdjustEnd</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional"/>
       <field id="1" name="Duration" type="elapsed_s" apiMaturity="provisional"/>
-      <field id="2" name="EnergyUse" type="int64s" apiMaturity="provisional"/>
+      <field id="2" name="EnergyUse" type="energy_mwh" apiMaturity="provisional"/>
     </event>
     <event code="0x0002" name="Paused" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>Paused</description>
@@ -138,8 +138,8 @@ limitations under the License.
   </struct>
   <struct name="PowerAdjustStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
-    <item fieldId="0" name="MinPower" type="int64s"/>
-    <item fieldId="1" name="MaxPower" type="int64s"/>
+    <item fieldId="0" name="MinPower" type="power_mw"/>
+    <item fieldId="1" name="MaxPower" type="power_mw"/>
     <item fieldId="2" name="MinDuration" type="elapsed_s"/>
     <item fieldId="3" name="MaxDuration" type="elapsed_s"/>
   </struct>
@@ -165,28 +165,28 @@ limitations under the License.
     <item fieldId="6" name="MinPauseDuration" type="elapsed_s"/>
     <item fieldId="7" name="MaxPauseDuration" type="elapsed_s"/>
     <item fieldId="8" name="ManufacturerESAState" type="int16u" optional="true"/>
-    <item fieldId="9" name="NominalPower" type="int64s" optional="true"/>
-    <item fieldId="10" name="MinPower" type="int64s" optional="true"/>
-    <item fieldId="11" name="MaxPower" type="int64s" optional="true"/>
-    <item fieldId="12" name="NominalEnergy" type="int64s" optional="true"/>
+    <item fieldId="9" name="NominalPower" type="power_mw" optional="true"/>
+    <item fieldId="10" name="MinPower" type="power_mw" optional="true"/>
+    <item fieldId="11" name="MaxPower" type="power_mw" optional="true"/>
+    <item fieldId="12" name="NominalEnergy" type="energy_mwh" optional="true"/>
     <item fieldId="13" name="Costs" array="true" type="CostStruct" optional="true"/>
-    <item fieldId="14" name="MinPowerAdjustment" type="int64s" optional="true"/>
-    <item fieldId="15" name="MaxPowerAdjustment" type="int64s" optional="true"/>
+    <item fieldId="14" name="MinPowerAdjustment" type="power_mw" optional="true"/>
+    <item fieldId="15" name="MaxPowerAdjustment" type="power_mw" optional="true"/>
     <item fieldId="16" name="MinDurationAdjustment" type="elapsed_s" optional="true"/>
     <item fieldId="17" name="MaxDurationAdjustment" type="elapsed_s" optional="true"/>
   </struct>
   <struct name="SlotAdjustmentStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item fieldId="0" name="SlotIndex" type="int8u"/>
-    <item fieldId="1" name="NominalPower" type="int64s"/>
+    <item fieldId="1" name="NominalPower" type="power_mw"/>
     <item fieldId="2" name="Duration" type="elapsed_s"/>
   </struct>
   <struct name="ConstraintsStruct" apiMaturity="provisional">
     <cluster code="0x0098"/>
     <item fieldId="0" name="StartTime" type="epoch_s"/>
     <item fieldId="1" name="Duration" type="elapsed_s" min="0" max="86400"/>
-    <item fieldId="2" name="NominalPower" type="int64s" optional="true"/>
-    <item fieldId="3" name="MaximumEnergy" type="int64s" optional="true"/>
+    <item fieldId="2" name="NominalPower" type="power_mw" optional="true"/>
+    <item fieldId="3" name="MaximumEnergy" type="energy_mwh" optional="true"/>
     <item fieldId="4" name="LoadControl" type="int8s" optional="true"/>
   </struct>
 </configurator>

@@ -48,7 +48,7 @@ Status EnergyEvseDelegate::Disable()
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Disable()");
 
-    /* update State */
+    /* Update State */
     switch (mHwState)
     {
     case StateEnum::kNotPluggedIn:
@@ -83,6 +83,7 @@ Status EnergyEvseDelegate::Disable()
     /* update MaximumDischargeCurrent to 0 */
     SetMaximumDischargeCurrent(0);
 
+    NotifyApplicationStateChange();
     // TODO: Generate events
 
     return Status::Success;
@@ -102,31 +103,31 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 
     if (maximumChargeCurrent < kMinimumChargeCurrent || maximumChargeCurrent > kMaximumChargeCurrent)
     {
-        ChipLogError(NotSpecified, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
     if (minimumChargeCurrent < kMinimumChargeCurrent || minimumChargeCurrent > kMaximumChargeCurrent)
     {
-        ChipLogError(NotSpecified, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
     if (minimumChargeCurrent > maximumChargeCurrent)
     {
-        ChipLogError(NotSpecified, "Minium Current > Maximum Current!");
+        ChipLogError(AppServer, "Minium Current > Maximum Current!");
         return Status::ConstraintError;
     }
 
     if (chargingEnabledUntil.IsNull())
     {
         /* Charging enabled indefinitely */
-        ChipLogError(NotSpecified, "Charging enabled indefinitely");
+        ChipLogError(AppServer, "Charging enabled indefinitely");
     }
     else
     {
         /* check chargingEnabledUntil is in the future */
-        ChipLogError(NotSpecified, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
+        ChipLogError(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
         // TODO
         // if (checkChargingEnabled)
     }
@@ -169,6 +170,8 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 
     // TODO: Generate events
 
+    NotifyApplicationStateChange();
+
     return this->ComputeMaxChargeCurrentLimit();
 }
 
@@ -188,6 +191,8 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 
     // TODO: Generate events
 
+    NotifyApplicationStateChange();
+
     return Status::Success;
 }
 
@@ -199,25 +204,42 @@ Status EnergyEvseDelegate::StartDiagnostics()
     /* For EVSE manufacturers to customize */
     ChipLogProgress(AppServer, "EnergyEvseDelegate::StartDiagnostics()");
 
-    /* update SupplyState */
+    /* update SupplyState to indicate we are now in Diagnostics mode */
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
     // TODO: Generate events
+
+    // TODO: Notify Application to implement Diagnostics
+
+    NotifyApplicationStateChange();
 
     return Status::Success;
 }
 
 /* ---------------------------------------------------------------------------
- * FUNCTIONS BELOW:
- *    - EVSE Hardware interface
- *
- *  SetMaxHardwareCurrentLimit( currentmA )
- *  SetCircuitCapacity( currentmA )
- *  SetCableAssemblyLimit( currentmA )
- *  SetState( EVSEStateEnum )
- *  SetFault
- *
+ *  EVSE Hardware interface below
  */
+
+/**
+ * @brief    Called by EVSE Hardware to register a callback handler mechanism
+ *
+ *           This is normally called at start-up.
+ *
+ * @param    EVSECallbackFunct - function pointer to call
+ * @param    intptr_t          - optional context to provide back to callback handler
+ */
+Status EnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg)
+{
+    if (mCallbacks.handler != nullptr)
+    {
+        ChipLogError(AppServer, "Callback handler already initialized");
+        return Status::Failure;
+    }
+    mCallbacks.handler = handler;
+    mCallbacks.arg     = arg;
+
+    return Status::Success;
+}
 
 /**
  * @brief    Called by EVSE Hardware to notify the delegate of the maximum
@@ -420,17 +442,18 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 
 /**
  *  @brief   Called to compute the safe charging current limit
+ *
+ * mActualChargingCurrentLimit is the minimum of:
+ *   - MaxHardwareCurrentLimit (of the hardware)
+ *   - CircuitCapacity (set by the electrician - less than the hardware)
+ *   - CableAssemblyLimit (detected when the cable is inserted)
+ *   - MaximumChargeCurrent (from charging command)
+ *   - UserMaximumChargeCurrent (could dynamically change)
+ *
  */
 Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
 {
     int64_t oldValue;
-    /* mActualChargingCurrentLimit is the minimum of:
-     *   - MaxHardwareCurrentLimit (of the hardware)
-     *   - CircuitCapacity (set by the electrician - less than the hardware)
-     *   - CableAssemblyLimit (detected when the cable is inserted)
-     *   - MaximumChargeCurrent (from charging command)
-     *   - UserMaximumChargeCurrent (could dynamically change)
-     */
 
     oldValue                    = mActualChargingCurrentLimit;
     mActualChargingCurrentLimit = mMaxHardwareCurrentLimit;
@@ -448,8 +471,39 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id);
 
         /* Call the EV Charger hardware current limit callback */
-        // TODO
+        NotifyApplicationCurrentLimitChange(mMaximumChargeCurrent);
     }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent)
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type                                 = EVSECallbackType::ChargeCurrentChanged;
+    cbInfo.ChargingCurrent.maximumChargeCurrent = maximumChargeCurrent;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::NotifyApplicationStateChange()
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type                    = EVSECallbackType::StateChanged;
+    cbInfo.StateChange.state       = mState;
+    cbInfo.StateChange.supplyState = mSupplyState;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
     return Status::Success;
 }
 
