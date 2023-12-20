@@ -679,8 +679,8 @@ struct GeneralCommissioningInfo
     ;
 };
 
-// ICDManagementClusterInfo is updated when controller read ICDManagementCluster, and used to instruct whether to go with ICD Configuration
-// and further indicate to the user how to trigger the ICD to switch to active mode.
+// ICDManagementClusterInfo is populated when the controller reads information from
+// the ICD Management cluster, and is used to communicate that information.
 struct ICDManagementClusterInfo
 {
     // Depict whether it is LIT or SIT device
