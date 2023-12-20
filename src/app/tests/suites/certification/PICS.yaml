@@ -8881,8 +8881,7 @@ PICS:
     #
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
-      id:
-          LWM.S.C01.Tx
+      id: LWM.S.C01.Tx
 
     #  Oven Mode Cluster
 

@@ -155,7 +155,6 @@ tests:
           constraints:
               type: int16u
 
-
     - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.OTCCM.MODE_CHANGE_OK"
