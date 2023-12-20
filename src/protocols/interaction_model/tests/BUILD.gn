@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,23 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
 
-static_library("cluster-objects") {
-  output_name = "libClusterObjects"
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  sources = [
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums-check.h",
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp",
-    "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h",
-  ]
+chip_test_suite_using_nltest("tests") {
+  output_name = "libInteractionModelTests"
+
+  test_sources = [ "TestStatusCode.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:testing",
     "${chip_root}/src/protocols/interaction_model",
+    "${nlunit_test_root}:nlunit-test",
   ]
 
-  defines = []
+  cflags = [ "-Wconversion" ]
 }

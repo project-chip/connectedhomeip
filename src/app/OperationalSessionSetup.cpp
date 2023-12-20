@@ -92,7 +92,8 @@ bool OperationalSessionSetup::AttachToExistingSecureSession()
 }
 
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                      Callback::Callback<OnSetupFailure> * onSetupFailure)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     bool isConnected = false;
@@ -102,7 +103,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
     // If anything goes wrong below, we'll trigger failures (including any queued from
     // a previous iteration which in theory shouldn't happen, but this is written to be more defensive)
     //
-    EnqueueConnectionCallbacks(onConnection, onFailure);
+    EnqueueConnectionCallbacks(onConnection, onFailure, onSetupFailure);
 
     switch (mState)
     {
@@ -176,6 +177,18 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
         // as a precaution in case someone later on adds something to the end of this function.
         return;
     }
+}
+
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+{
+    Connect(onConnection, onFailure, nullptr);
+}
+
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnSetupFailure> * onSetupFailure)
+{
+    Connect(onConnection, nullptr, onSetupFailure);
 }
 
 void OperationalSessionSetup::UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config)
@@ -291,7 +304,8 @@ CHIP_ERROR OperationalSessionSetup::EstablishConnection(const ReliableMessagePro
 }
 
 void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                                         Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                                         Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                                         Callback::Callback<OnSetupFailure> * onSetupFailure)
 {
     if (onConnection != nullptr)
     {
@@ -302,11 +316,17 @@ void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDe
     {
         mConnectionFailure.Enqueue(onFailure->Cancel());
     }
+
+    if (onSetupFailure != nullptr)
+    {
+        mSetupFailure.Enqueue(onSetupFailure->Cancel());
+    }
 }
 
-void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior)
+void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, SessionEstablishmentStage stage,
+                                                         ReleaseBehavior releaseBehavior)
 {
-    Cancelable failureReady, successReady;
+    Cancelable failureReady, setupFailureReady, successReady;
 
     //
     // Dequeue both failure and success callback lists into temporary stack args before invoking either of them.
@@ -314,6 +334,7 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Relea
     // since the callee may destroy this object as part of that callback.
     //
     mConnectionFailure.DequeueAll(failureReady);
+    mSetupFailure.DequeueAll(setupFailureReady);
     mConnectionSuccess.DequeueAll(successReady);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -339,13 +360,14 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error, Relea
 
     // DO NOT touch any members of this object after this point.  It's dead.
 
-    NotifyConnectionCallbacks(failureReady, successReady, error, peerId, performingAddressUpdate, exchangeMgr,
-                              optionalSessionHandle);
+    NotifyConnectionCallbacks(failureReady, setupFailureReady, successReady, error, stage, peerId, performingAddressUpdate,
+                              exchangeMgr, optionalSessionHandle);
 }
 
-void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & successReady, CHIP_ERROR error,
-                                                        const ScopedNodeId & peerId, bool performingAddressUpdate,
-                                                        Messaging::ExchangeManager * exchangeMgr,
+void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureReady, Cancelable & setupFailureReady,
+                                                        Cancelable & successReady, CHIP_ERROR error,
+                                                        SessionEstablishmentStage stage, const ScopedNodeId & peerId,
+                                                        bool performingAddressUpdate, Messaging::ExchangeManager * exchangeMgr,
                                                         const Optional<SessionHandle> & optionalSessionHandle)
 {
     //
@@ -367,6 +389,22 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
         }
     }
 
+    while (setupFailureReady.mNext != &setupFailureReady)
+    {
+        // We expect that we only have callbacks if we are not performing just address update.
+        VerifyOrDie(!performingAddressUpdate);
+        Callback::Callback<OnSetupFailure> * cb = Callback::Callback<OnSetupFailure>::FromCancelable(setupFailureReady.mNext);
+
+        cb->Cancel();
+
+        if (error != CHIP_NO_ERROR)
+        {
+            // Initialize the ConnnectionFailureInfo object
+            ConnnectionFailureInfo failureInfo(peerId, error, stage);
+            cb->mCall(cb->mContext, failureInfo);
+        }
+    }
+
     while (successReady.mNext != &successReady)
     {
         // We expect that we only have callbacks if we are not performing just address update.
@@ -383,7 +421,7 @@ void OperationalSessionSetup::NotifyConnectionCallbacks(Cancelable & failureRead
     }
 }
 
-void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
+void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage)
 {
     VerifyOrReturn(mState == State::Connecting,
                    ChipLogError(Discovery, "OnSessionEstablishmentError was called while we were not connecting"));
@@ -438,7 +476,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     }
 
-    DequeueConnectionCallbacks(error);
+    DequeueConnectionCallbacks(error, stage);
     // Do not touch `this` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }
 
