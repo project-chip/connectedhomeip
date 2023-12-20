@@ -35,7 +35,7 @@ Each element is described in more detail below:
    specification.
 2. Matter Application with dummy factory data: Any TI Matter example
    application
-3. BIM/MCUBoot: Boot Image Manager/MCUBoot image used for OTA. This is built
+3. `BIM`/MCUBoot: Boot Image Manager/MCUBoot image used for OTA. This is built
    with the Matter application and does not require additional build steps
    from developers.
 4. create_factory_data.py: Processes a factory data JSON file and generates
@@ -43,8 +43,8 @@ Each element is described in more detail below:
 5. factory_data_trim.py: When using the custom factory data option, this script
    removes the dummy factory data which is required to be able to successfully
    compile the application.
-6. oad_and_factory_data_merge_tool.py: Merges the factory data hex, Matter 
-   application without factory data and BIM/MCUBoot image to generate a 
+6. `oad`_and_factory_data_merge_tool.py: Merges the factory data hex, Matter 
+   application without factory data and `BIM`/MCUBoot image to generate a 
    functional hex that can be programmed onto the device.
 
  
@@ -57,14 +57,14 @@ Each element is described in more detail below:
 ## How to use
 
 Out of box factory data location is configured to be on second last page of
-flash. For CC13x2, the starting address is 0xAC000. For CC13x4, the starting 
-address is 0xFE800. This can be configured in the linker file.
+flash. For CC13x2, the starting address is `0xAC000`. For CC13x4, the starting 
+address is `0xFE800`. This can be configured in the linker file.
 
 To configure:
 
 1. Linker file: Set the start address for factory data in the linker file being
    used by the application
-   
+
 ```
 FLASH_FACTORY_DATA (R)  : ORIGIN = 0x000ac000, LENGTH = 0x00000900
 ```
@@ -123,6 +123,6 @@ copied into the JSON file.
 The example application can be built using the instructions in the example's
 README. The factory data from the JSON file will be formatted into a hex file
 that will then be merged into the final executable. The final executable will be
-named _{example-application}-bim.hex_ for CC13x2 and 
+named _{example-application}-`bim`.hex_ for CC13x2 and 
 _{example-application}-mcuboot.hex_ for CC13x4, and the factory data 
 that was inputted into the JSON file will be named _{example-application}-factory-data.hex_.
