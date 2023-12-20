@@ -27,61 +27,136 @@ from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+from chip.clusters import ClusterObjects as ClustersObjects
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
+from chip.utils import CommissioningBuildingBlocks
+import queue
+
+class AttributeChangeAccumulator:
+    def __init__(self, name: str, expected_attribute: ClustersObjects.ClusterAttributeDescriptor, output: queue.Queue):
+        self._name = name
+        self._output = output
+        self._expected_attribute = expected_attribute
+
+    def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
+        if path.AttributeType == self._expected_attribute:
+            data = transaction.GetAttribute(path)
+
+            value = {
+                'name': self._name,
+                'endpoint': path.Path.EndpointId,
+                'attribute': path.AttributeType,
+                'value': data
+            }
+            logging.info("Got subscription report on client %s for %s: %s" % (self.name, path.AttributeType, data))
+            self._output.put(value)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
 class TC_IDM_4_2(MatterBaseTest):
+    
+    async def write_acl(self, acl):
+        result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
+        logging.info("debux - write_acl Status result: " + str(result[0].Status))
+        asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
+        print(result)    
+    
+    async def read_descriptor_server_list_expect_success(self, th):
+        cluster = Clusters.Objects.Descriptor
+        attribute = Clusters.Descriptor.Attributes.ServerList
+        return await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+    
+    async def read_basic_expect_success(self, th):
+        cluster = Clusters.Objects.BasicInformation
+        attribute = Clusters.BasicInformation.Attributes.VendorID
+        return await self.read_single_attribute_check_success(
+            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
     @async_test_body
     async def test_TC_IDM_4_2(self):
         
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
-
-        # Checks if ICDM.S PICS is not set
-        if not self.check_pics("ICDM.S"):
-            self.print_step("0a", "SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins")
-            SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 3600
-        else:
-            logging.info("debux")
-            # Get IdleModeDuration attribute (IdleModeInterval?)
-            self.print_step("0b", "CR1 reads from the DUT the IdleModeDuration attribute.")
-
-            logging.info("debux - Setting enpoint...")
-            endpoint = self.user_params.get("endpoint", 0)
-
-            logging.info("debux - Setting cluster...")
+        
+        # Controller 1 Setup
+        CR1 = self.default_controller
+        CR1_node_id = self.matter_test_config.controller_node_id
+        
+        CR1_ace_full_access = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            subjects=[CR1_node_id],
+            targets=[])
+        
+        acl = [CR1_ace_full_access]
+        await self.write_acl(acl)
+        
+        # Read ServerList attribute
+        self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
+        ep0_servers = await self.read_descriptor_server_list_expect_success(CR1)
+        
+        # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
+        if Clusters.IcdManagement.id in ep0_servers:
+            # Read the IdleModeDuration attribute from the DUT
+            self.print_step("0b", "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = IdleModeDuration")
+            logging.info("debux - Setting IcdManagement cluster...")
             cluster = Clusters.Objects.IcdManagement
             
-            logging.info("debux - Setting attributes...")
-            attributes = Clusters.IcdManagement.Attributes
-            
-            idleModeDuration = 0
-
-            logging.info("debux - Getting idleModeDuration...")
+            logging.info("debux - Setting IdleModeDuration attribute...")
+            idle_mode_duration_attr = Clusters.IcdManagement.Attributes.IdleModeDuration
+        
+            logging.info("debux - Getting idleModeDuration attribute value...")
             idleModeDuration = await self.read_single_attribute_check_success(
-                endpoint=endpoint, 
                 cluster=cluster, 
-                attribute=attributes.IdleModeDuration)
+                attribute=idle_mode_duration_attr, 
+                dev_ctrl=CR1, 
+                node_id=self.dut_node_id, 
+                endpoint=0)
             
             logging.info('debux - idleModeDuration: ' + idleModeDuration)
             
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = idleModeDuration
+        else:
+            # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT to 60 minutes
+            self.print_step("0b", "Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins")
+            SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 3600
+        
+        # Step 1
+        self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+        min_interval_floor_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 60
+        max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT + 60
+        
+        sub = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.BasicInformation.Attributes.NodeLabel)],
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
+            keepSubscriptions=False
+        )
+        
+        output_queue = queue.Queue()
+        attribute_handler = AttributeChangeAccumulator(
+            name=CR1.name, 
+            expected_attribute=Clusters.BasicInformation.Attributes.NodeLabel, 
+            output=output_queue)
+        
+        sub.SetAttributeUpdateCallback(attribute_handler)
 
-        # self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+
+
+
+
+
+
+
+
     
-        # # Controllers Setup
+        # Controller 2 Setup
         # fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
 
-        # CR1_nodeid = self.matter_test_config.controller_node_id
         # CR2_nodeid = self.matter_test_config.controller_node_id + 1
-        
-        # CR1 = fabric_admin.NewController(nodeId=CR1_nodeid,
-        #                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
         # CR2 = fabric_admin.NewController(nodeId=CR2_nodeid,
         #                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
-        
-        # CR1_admin_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-        #     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-        #     subjects=[CR1_nodeid],
-        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=0x001f)])
         
         # CR2_limited_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
         #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
@@ -89,16 +164,7 @@ class TC_IDM_4_2(MatterBaseTest):
         #     subjects=[CR2_nodeid],
         #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])        
         
-        # acl = [CR1_admin_acl, CR2_limited_acl]
-        # await self.write_acl(acl)
-        
-        
-        
-        
-
-
-
-
+        logging.info("debux - test_TC_IDM_4_2 end")
 
 if __name__ == "__main__":
     default_matter_test_main()
