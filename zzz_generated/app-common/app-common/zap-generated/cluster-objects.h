@@ -23186,6 +23186,16 @@ struct Type;
 struct DecodableType;
 } // namespace UnboltDoor
 
+namespace SetAliroReaderConfig {
+struct Type;
+struct DecodableType;
+} // namespace SetAliroReaderConfig
+
+namespace ClearAliroReaderConfig {
+struct Type;
+struct DecodableType;
+} // namespace ClearAliroReaderConfig
+
 } // namespace Commands
 
 namespace Commands {
@@ -24163,6 +24173,75 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnboltDoor
+namespace SetAliroReaderConfig {
+enum class Fields : uint8_t
+{
+    kSigningKey        = 0,
+    kVerificationKey   = 1,
+    kGroupIdentifier   = 2,
+    kGroupResolvingKey = 3,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetAliroReaderConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    chip::ByteSpan signingKey;
+    chip::ByteSpan verificationKey;
+    chip::ByteSpan groupIdentifier;
+    Optional<chip::ByteSpan> groupResolvingKey;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetAliroReaderConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    chip::ByteSpan signingKey;
+    chip::ByteSpan verificationKey;
+    chip::ByteSpan groupIdentifier;
+    Optional<chip::ByteSpan> groupResolvingKey;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetAliroReaderConfig
+namespace ClearAliroReaderConfig {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearAliroReaderConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearAliroReaderConfig::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearAliroReaderConfig
 } // namespace Commands
 
 namespace Attributes {
@@ -24600,6 +24679,120 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ExpiringUserTimeout
+namespace AliroReaderVerificationKey {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroReaderVerificationKey::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 65; }
+};
+} // namespace AliroReaderVerificationKey
+namespace AliroReaderGroupIdentifier {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroReaderGroupIdentifier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace AliroReaderGroupIdentifier
+namespace AliroReaderGroupSubIdentifier {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroReaderGroupSubIdentifier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace AliroReaderGroupSubIdentifier
+namespace AliroExpeditedTransactionSupportedProtocolVersions {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 2; }
+};
+} // namespace AliroExpeditedTransactionSupportedProtocolVersions
+namespace AliroGroupResolvingKey {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroGroupResolvingKey::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace AliroGroupResolvingKey
+namespace AliroSupportedBLEUWBProtocolVersions {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroSupportedBLEUWBProtocolVersions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 2; }
+};
+} // namespace AliroSupportedBLEUWBProtocolVersions
+namespace AliroBLEAdvertisingVersion {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AliroBLEAdvertisingVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AliroBLEAdvertisingVersion
+namespace NumberOfAliroCredentialIssuerKeysSupported {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfAliroCredentialIssuerKeysSupported
+namespace NumberOfAliroEndpointKeysSupported {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfAliroEndpointKeysSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfAliroEndpointKeysSupported
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -24690,6 +24883,18 @@ struct TypeInfo
         Attributes::SendPINOverTheAir::TypeInfo::DecodableType sendPINOverTheAir                       = static_cast<bool>(0);
         Attributes::RequirePINforRemoteOperation::TypeInfo::DecodableType requirePINforRemoteOperation = static_cast<bool>(0);
         Attributes::ExpiringUserTimeout::TypeInfo::DecodableType expiringUserTimeout                   = static_cast<uint16_t>(0);
+        Attributes::AliroReaderVerificationKey::TypeInfo::DecodableType aliroReaderVerificationKey;
+        Attributes::AliroReaderGroupIdentifier::TypeInfo::DecodableType aliroReaderGroupIdentifier;
+        Attributes::AliroReaderGroupSubIdentifier::TypeInfo::DecodableType aliroReaderGroupSubIdentifier;
+        Attributes::AliroExpeditedTransactionSupportedProtocolVersions::TypeInfo::DecodableType
+            aliroExpeditedTransactionSupportedProtocolVersions;
+        Attributes::AliroGroupResolvingKey::TypeInfo::DecodableType aliroGroupResolvingKey;
+        Attributes::AliroSupportedBLEUWBProtocolVersions::TypeInfo::DecodableType aliroSupportedBLEUWBProtocolVersions;
+        Attributes::AliroBLEAdvertisingVersion::TypeInfo::DecodableType aliroBLEAdvertisingVersion = static_cast<uint8_t>(0);
+        Attributes::NumberOfAliroCredentialIssuerKeysSupported::TypeInfo::DecodableType numberOfAliroCredentialIssuerKeysSupported =
+            static_cast<uint16_t>(0);
+        Attributes::NumberOfAliroEndpointKeysSupported::TypeInfo::DecodableType numberOfAliroEndpointKeysSupported =
+            static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
