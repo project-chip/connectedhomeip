@@ -349,7 +349,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         CHIP_ERROR chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
         if (chipError != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "DEM: Unable to get current time - error=%d (%s)]", chipError.AsInteger(), chipError.AsString());
+            ChipLogError(Zcl, "DEM: Unable to get current time - error=%ld (%s)]",
+                         static_cast<long unsigned int>(chipError.AsInteger()), chipError.AsString());
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
@@ -377,26 +378,28 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
 
     if (requestedStartTime < earliestStartTime)
     {
-        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime %d, earlier than earliestStartTime %d.", __FUNCTION__,
-                     requestedStartTime, earliestStartTime);
+        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime %ld, earlier than earliestStartTime %ld.", __FUNCTION__,
+                     static_cast<long unsigned int>(requestedStartTime), static_cast<long unsigned int>(earliestStartTime));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
     if ((requestedStartTime + duration) > latestEndTime)
     {
-        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime + duration %d, later than latestEndTime %d.", __FUNCTION__,
-                     requestedStartTime + duration, latestEndTime);
+        ChipLogError(Zcl, "DEM: %s - Bad requestedStartTime + duration %ld, later than latestEndTime %ld.", __FUNCTION__,
+                     static_cast<long unsigned int>(requestedStartTime + duration), static_cast<long unsigned int>(latestEndTime));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    ChipLogProgress(Zcl, "DEM: %s - Good requestedStartTime %d.", __FUNCTION__, requestedStartTime);
+    ChipLogProgress(Zcl, "DEM: %s - Good requestedStartTime %ld.", __FUNCTION__,
+                    static_cast<long unsigned int>(requestedStartTime));
     status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: %s - StartTimeAdjustRequest(%d) FAILURE", __FUNCTION__, requestedStartTime);
+        ChipLogError(Zcl, "DEM: %s - StartTimeAdjustRequest(%ld) FAILURE", __FUNCTION__,
+                     static_cast<long unsigned int>(requestedStartTime));
         return;
     }
 
@@ -455,7 +458,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration) &&
         (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration))
     {
-        ChipLogError(Zcl, "DEM: %s - out of range pause duration %d", __FUNCTION__, duration);
+        ChipLogError(Zcl, "DEM: %s - out of range pause duration %ld", __FUNCTION__, static_cast<long unsigned int>(duration));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
@@ -472,7 +475,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: %s - mDelegate.PauseRequest(%d) FAILURE", __FUNCTION__, duration);
+        ChipLogError(Zcl, "DEM: %s - mDelegate.PauseRequest(%ld) FAILURE", __FUNCTION__, static_cast<long unsigned int>(duration));
         return;
     }
 
