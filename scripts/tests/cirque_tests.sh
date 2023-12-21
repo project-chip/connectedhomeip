@@ -62,7 +62,7 @@ function __cirquetest_start_flask() {
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
     # This is not expected. Start a new session to prevent it from receiving signals
     setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
-        PATH="'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/:"'"$PATH"'" \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
         python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
     FLASK_PID=$!
     echo "Flask running in backgroud with pid $FLASK_PID"
@@ -78,7 +78,7 @@ function __cirquetest_clean_flask() {
 
 function __cirquetest_build_ot() {
     echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
-    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF -DWEB_GUI=0 -DNETWORK_MANAGER=0 -DREST_API=0 -DNAT64=0
+    script/cmake-build simulation -DOT_THREAD_VERSION=1.2 -DOT_MTD=OFF -DOT_FTD=OFF -DWEB_GUI=0 -DNETWORK_MANAGER=0 -DREST_API=0 -DNAT64=0 -DOT_LOG_OUTPUT=PLATFORM_DEFINED -DOT_LOG_LEVEL=DEBG
     mkdir -p "$(dirname "$OT_SIMULATION_CACHE")"
     tar czf "$OT_SIMULATION_CACHE" build
     echo "$OPENTHREAD_CHECKOUT" >"$OT_SIMULATION_CACHE_STAMP_FILE"
