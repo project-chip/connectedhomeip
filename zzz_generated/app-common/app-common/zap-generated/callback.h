@@ -10097,18 +10097,6 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Microwave Oven Control Cluster SetCookingParameters Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData);
-/**
- * @brief Microwave Oven Control Cluster AddMoreTime Command callback (from client)
- */
-bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
-/**
  * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */
 bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(

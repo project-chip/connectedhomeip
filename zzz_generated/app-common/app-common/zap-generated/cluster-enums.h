@@ -2146,7 +2146,7 @@ enum class Feature : uint32_t
 // Bitmap for SensorFaultBitmap
 enum class SensorFaultBitmap : uint16_t
 {
-    kGneralFault = 0x1,
+    kGeneralFault = 0x1,
 };
 } // namespace BooleanStateConfiguration
 

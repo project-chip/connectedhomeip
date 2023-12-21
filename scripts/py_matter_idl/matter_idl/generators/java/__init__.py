@@ -126,8 +126,6 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
@@ -320,8 +318,6 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
         "int64u",
         "enum8",
         "enum16",
-        "enum32",
-        "enum64",
         "bitmap8",
         "bitmap16",
         "bitmap32",
