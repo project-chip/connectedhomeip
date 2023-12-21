@@ -19,6 +19,7 @@ package chip.devicecontroller;
 
 import javax.annotation.Nullable;
 
+/** Class for holding ICD registration infomation. */
 public class ICDRegistrationInfo {
   @Nullable private final Long checkInNodeId;
   @Nullable private final Long monitoredSubject;
@@ -30,14 +31,17 @@ public class ICDRegistrationInfo {
     this.symmetricKey = builder.symmetricKey;
   }
 
+  /** Returns the check in node ID. */
   public Long getCheckInNodeId() {
     return checkInNodeId;
   }
 
+  /** Returns the monitored subject of the ICD. */
   public Long getMonitoredSubject() {
     return monitoredSubject;
   }
 
+  /** Returns the 16 bytes ICD symmetric key. */
   public byte[] getSymmetricKey() {
     return symmetricKey;
   }

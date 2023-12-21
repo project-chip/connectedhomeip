@@ -59,12 +59,12 @@ interface MatterController : Closeable, InteractionClient {
     fun onOpCSRGenerationComplete(csr: ByteArray)
 
     /**
-     * Nodifies when the ICD registration information (ICD symmetric key, check-in node ID and
+     * Notifies when the ICD registration information (ICD symmetric key, check-in node ID and
      * monitored subject) is required.
      */
     fun onICDRegistrationInfoRequired()
 
-    /** Nodifies when the registration flow for the ICD completes. */
+    /** Notifies when the registration flow for the ICD completes. */
     fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long)
   }
 
