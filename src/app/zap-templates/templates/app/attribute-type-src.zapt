@@ -1,0 +1,26 @@
+{{> header}}
+
+#include <app-common/zap-generated/attribute-type.h>
+
+namespace chip {
+namespace app {
+
+size_t AttributeTypeSize(uint8_t attributeType)
+{
+    switch (attributeType)
+    {
+{{#zcl_atomics}}
+    case ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPE:
+        {{#if size}}
+        return {{size}};
+        {{else}}
+        return 0;
+        {{/if}}
+{{/zcl_atomics}}
+    default:
+        return 0;
+    }
+}
+
+} // namespace app
+} // namespace chip

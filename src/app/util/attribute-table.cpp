@@ -16,6 +16,7 @@
  */
 #include <app/util/attribute-table.h>
 
+#include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
@@ -28,6 +29,7 @@
 using chip::Protocols::InteractionModel::Status;
 
 using namespace chip;
+using namespace chip::app;
 
 Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                   EmberAfAttributeType dataType)
@@ -36,9 +38,9 @@ Status emAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, Attrib
 }
 
 Status emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                             EmberAfAttributeType dataType)
+                             EmberAfAttributeType dataType, MarkAttributeDirty markDirty)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */);
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */, markDirty);
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +103,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 }
 
 Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType)
+                          EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, MarkAttributeDirty markDirty)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
@@ -179,6 +181,35 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
         }
     }
 
+    // Check whether anything is actually changing, before we do any work here.
+    size_t valueSize = AttributeTypeSize(dataType);
+
+    constexpr size_t maxValueSize = 16; // ipv6adr
+    if (valueSize > maxValueSize)
+    {
+        // Very much unexpected
+        ChipLogError(Zcl, "Attribute type %d has too-large size %u", dataType, static_cast<unsigned>(valueSize));
+        return Status::ConstraintError;
+    }
+
+    // valueSize will be 0 when we have no size information for dataType.
+    // In that case, we can't usefully read the current value, since we
+    // don't know how big it is.
+    if (valueSize != 0)
+    {
+        uint8_t oldValueBuffer[maxValueSize];
+        // Cast to uint16_t is safe, because we checked valueSize <= maxValueSize above.
+        if (emberAfReadAttribute(endpoint, cluster, attributeID, oldValueBuffer, static_cast<uint16_t>(valueSize)) ==
+            Status::Success)
+        {
+            if (memcmp(data, oldValueBuffer, valueSize) == 0)
+            {
+                // Value has not changed.  Just do nothing.
+                return Status::Success;
+            }
+        }
+    }
+
     const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
 
     // Pre write attribute callback for all attribute changes,
@@ -221,7 +252,10 @@ Status emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId at
     // The callee will weed out attributes that do not need to be stored.
     emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-    MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+    if (markDirty != MarkAttributeDirty::No)
+    {
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+    }
 
     // Post write attribute callback for all attributes changes, regardless
     // of cluster.

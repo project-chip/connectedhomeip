@@ -61,6 +61,7 @@ chip::Protocols::InteractionModel::Status emAfWriteAttributeExternal(chip::Endpo
  *           the attribute
  * - Status::Success: if the attribute was found and successfully written
  */
-chip::Protocols::InteractionModel::Status emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                             chip::AttributeId attributeID, uint8_t * data,
-                                                             EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
+chip::Protocols::InteractionModel::Status
+emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
+                   EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType,
+                   chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::IfChanged);

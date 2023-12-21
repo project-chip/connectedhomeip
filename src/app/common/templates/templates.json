@@ -41,6 +41,11 @@
             "output": "attribute-type.h"
         },
         {
+            "path": "../../zap-templates/templates/app/attribute-type-src.zapt",
+            "name": "ZCL attribute-type implementation",
+            "output": "attribute-type.cpp"
+        },
+        {
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"

@@ -24,6 +24,7 @@
 
 #include <app/util/af-types.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/endpoint-config-api.h>
 
 #include <lib/core/DataModelTypes.h>
@@ -96,9 +97,10 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * data type (as Accessors.h/cpp have this correct by default).
  * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
-chip::Protocols::InteractionModel::Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
-                                                                chip::AttributeId attributeID, uint8_t * dataPtr,
-                                                                EmberAfAttributeType dataType);
+chip::Protocols::InteractionModel::Status
+emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
+                      EmberAfAttributeType dataType,
+                      chip::app::MarkAttributeDirty markDirty = chip::app::MarkAttributeDirty::IfChanged);
 
 /**
  * @brief Read the attribute value, performing all the checks.
