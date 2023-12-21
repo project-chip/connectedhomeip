@@ -7351,6 +7351,67 @@ public static class EnergyEvseClusterChargingTargetStruct {
     return output.toString();
   }
 }
+public static class EnergyPreferenceClusterBalanceStruct {
+  public Integer step;
+  public Optional<String> label;
+  private static final long STEP_ID = 0L;
+  private static final long LABEL_ID = 1L;
+
+  public EnergyPreferenceClusterBalanceStruct(
+    Integer step,
+    Optional<String> label
+  ) {
+    this.step = step;
+    this.label = label;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(STEP_ID, new UIntType(step)));
+    values.add(new StructElement(LABEL_ID, label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyPreferenceClusterBalanceStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer step = null;
+    Optional<String> label = Optional.empty();
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == STEP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          step = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = Optional.of(castingValue.value(String.class));
+        }
+      }
+    }
+    return new EnergyPreferenceClusterBalanceStruct(
+      step,
+      label
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyPreferenceClusterBalanceStruct {\n");
+    output.append("\tstep: ");
+    output.append(step);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DoorLockClusterCredentialStruct {
   public Integer credentialType;
   public Integer credentialIndex;
