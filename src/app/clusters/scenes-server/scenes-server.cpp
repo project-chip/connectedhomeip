@@ -40,12 +40,12 @@ using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
-using ScenesServer      = chip::app::Clusters::MatterScenes::ScenesServer;
+using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace MatterScenes {
+namespace ScenesManagement {
 
 namespace {
 
@@ -260,7 +260,7 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint16_t index =
-        emberAfGetClusterServerEndpointIndex(endpoint, MatterScenes::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {
@@ -1056,7 +1056,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
-    if (req.mode.GetField(app::Clusters::MatterScenes::CopyModeBitmap::kCopyAllScenes))
+    if (req.mode.GetField(app::Clusters::ScenesManagement::CopyModeBitmap::kCopyAllScenes))
     {
         // Scene Table interface data
         SceneId scenesInGroup[scenes::kMaxScenesPerFabric];
@@ -1122,16 +1122,16 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-} // namespace MatterScenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::MatterScenes;
+using namespace chip::app::Clusters::ScenesManagement;
 
-void emberAfMatterScenesClusterServerInitCallback(EndpointId endpoint)
+void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
     uint32_t featureMap  = 0;
     EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
@@ -1174,7 +1174,7 @@ void emberAfMatterScenesClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterMatterScenesClusterServerShutdownCallback(EndpointId endpoint)
+void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
     ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
@@ -1184,7 +1184,7 @@ void MatterMatterScenesClusterServerShutdownCallback(EndpointId endpoint)
     sceneTable->RemoveEndpoint();
 }
 
-void MatterMatterScenesPluginServerInitCallback()
+void MatterScenesManagementPluginServerInitCallback()
 {
     CHIP_ERROR err = ScenesServer::Instance().Init();
     if (err != CHIP_NO_ERROR)

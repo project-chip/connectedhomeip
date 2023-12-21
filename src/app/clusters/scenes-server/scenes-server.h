@@ -29,7 +29,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace MatterScenes {
+namespace ScenesManagement {
 
 class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
@@ -128,7 +128,7 @@ private:
     static ScenesServer mInstance;
 };
 
-} // namespace MatterScenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip

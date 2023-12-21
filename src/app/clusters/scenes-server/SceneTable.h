@@ -87,7 +87,7 @@ public:
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR
     SerializeAdd(EndpointId endpoint,
-                 const app::Clusters::MatterScenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                 const app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
                  MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
@@ -113,7 +113,7 @@ public:
     /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
-                                   app::Clusters::MatterScenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
+                                   app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
 
     /// @brief Restore a stored scene for the given cluster instance, over timeMs milliseconds (e.g. when handling RecallScene)
     ///
