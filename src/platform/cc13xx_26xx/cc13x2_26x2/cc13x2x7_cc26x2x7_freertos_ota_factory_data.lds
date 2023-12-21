@@ -64,7 +64,7 @@ SECTIONS {
         KEEP (*(.oad_image_header))
     } > REGION_TEXT
 
-    /* interrupt vectors shifted to accomodate BIM header */
+    /* interrupt vectors shifted to accommodate BIM header */
     PROVIDE (_intvecs_base_address =
         DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x100);
 
