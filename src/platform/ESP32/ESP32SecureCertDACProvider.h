@@ -34,13 +34,17 @@ public:
 
 #ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
     /**
-     * API to set the CD.
+     * @brief API to set the Certification Declaration (CD).
      *
-     * GetCertificationDeclaration() API impl reads the CD from the NVS namespace `chip-factory`.
-     * Use this API to set the CD if it is stored at a different place, eg: embedded in the firmware.
+     * The GetCertificationDeclaration() API implementation reads the CD from the NVS namespace `chip-factory`.
+     * Use this API to set the CD if it is stored at a different location, e.g., embedded in the firmware.
      * Subsequent reads after calling this API will return the set CD.
      *
-     * API do not make a copy of underlying data, and any calls made by the Matter stack shall reach it.
+     * @param[in] cd ByteSpan containing the Certification Declaration.
+     *               The underlying data must remain allocated throughout the lifetime of the device,
+     *               as the API does not make a copy.
+     *
+     * @return CHIP_ERROR indicating the success or failure of the operation.
      */
     CHIP_ERROR SetCertificationDeclaration(const ByteSpan & cd)
     {
