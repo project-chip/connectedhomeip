@@ -195,7 +195,6 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-    void OnICDRegistrationInfoRequired() override;
     void OnICDRegistrationComplete(NodeId deviceId, uint32_t icdCounter) override;
 
     /////////// DeviceDiscoveryDelegate Interface /////////
