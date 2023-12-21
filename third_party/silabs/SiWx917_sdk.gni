@@ -271,8 +271,12 @@ template("siwx917_sdk") {
 
     if (chip_enable_icd_server) {
       defines += [
-        "SL_CATALOG_POWER_MANAGER_PRESENT",
-        "SL_CATALOG_SLEEPTIMER_PRESENT",
+        "WIFI_DEBUG_ENABLED=1",
+        "SL_ICD_ENABLED=1",
+        "SL_ACTIVE_MODE_THRESHOLD=${sl_active_mode_threshold_ms}",
+        "SL_ACTIVE_MODE_INTERVAL=${sl_active_mode_interval_ms}",
+        "SL_IDLE_MODE_INTERVAL=${sl_idle_mode_interval_s}",
+        "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
       ]
     }
 
