@@ -101,8 +101,7 @@ FLASH_FACTORY_DATA (R)  : ORIGIN = 0x000ac000, LENGTH = 0x00000900
         subprocess.call(['objcopy', 'temp.bin','--input-target','binary','--output-target', 'ihex', args.factory_data_hex_file, '--change-addresses=0xfe800'])
 ```
 
-3. In the example's args.gni file, set 'custom_factory_data' to true  
-
+3. In the example's args.gni file, set 'custom_factory_data' to true
 
 It is recommended to keep a dedicated page (2 pages for CC13x4) for factory
 data.
