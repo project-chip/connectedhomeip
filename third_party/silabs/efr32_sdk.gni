@@ -204,12 +204,17 @@ template("efr32_sdk") {
       "${sl_ot_efr32_root}",
     ]
 
+    if (silabs_family == "efr32mg24") {
+    _include_dirs += [
+      "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
+      ]
+    }
+
     if (use_SiWx917) {
       _include_dirs += [
         "${wifi_sdk_root}/components/si91x/memory",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/inc",
         "${wifi_sdk_root}/components/common/inc",
@@ -500,7 +505,6 @@ template("efr32_sdk") {
       defines += [ "EFR32MG12" ]
     } else if (silabs_family == "efr32mg24") {
       _include_dirs += [
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg24",
@@ -608,6 +612,7 @@ template("efr32_sdk") {
 
   source_set(sdk_target_name) {
     sources = [
+
       "${efr32_sdk_root}/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_init.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
@@ -714,7 +719,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_aead.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_client.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers_no_static.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_hash.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_mac.c",

@@ -48,7 +48,6 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 
 // variable to identify spi configured for expansion header
 // EUSART configuration available on the SPIDRV
-static bool spi_enabled = false;
 
 #if SL_SPICTRL_MUX
 sl_status_t spi_board_init(void);
