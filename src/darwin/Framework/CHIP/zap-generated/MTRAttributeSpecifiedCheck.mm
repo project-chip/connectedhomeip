@@ -2681,9 +2681,9 @@ static BOOL AttributeIsSpecifiedInRVCOperationalStateCluster(AttributeId aAttrib
     }
     }
 }
-static BOOL AttributeIsSpecifiedInMatterScenesCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::MatterScenes;
+    using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
     case Attributes::SceneCount::Id: {
         return YES;
@@ -6420,8 +6420,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::RvcOperationalState::Id: {
         return AttributeIsSpecifiedInRVCOperationalStateCluster(aAttributeId);
     }
-    case Clusters::MatterScenes::Id: {
-        return AttributeIsSpecifiedInMatterScenesCluster(aAttributeId);
+    case Clusters::ScenesManagement::Id: {
+        return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);

@@ -18044,8 +18044,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         }
         break;
     }
-    case app::Clusters::MatterScenes::Id: {
-        using namespace app::Clusters::MatterScenes;
+    case app::Clusters::ScenesManagement::Id: {
+        using namespace app::Clusters::ScenesManagement;
         switch (aPath.mAttributeId)
         {
         case Attributes::SceneCount::Id: {
@@ -18228,10 +18228,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                 jclass sceneInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$MatterScenesClusterSceneInfoStruct", sceneInfoStructStructClass_1);
+                    env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterSceneInfoStruct", sceneInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$MatterScenesClusterSceneInfoStruct");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterSceneInfoStruct");
                     return nullptr;
                 }
                 jmethodID sceneInfoStructStructCtor_1 =
@@ -18240,7 +18240,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                      "Integer;Ljava/lang/Integer;)V");
                 if (sceneInfoStructStructCtor_1 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$MatterScenesClusterSceneInfoStruct constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterSceneInfoStruct constructor");
                     return nullptr;
                 }
 

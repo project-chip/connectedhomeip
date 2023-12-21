@@ -678,17 +678,18 @@ typedef void (*RvcOperationalStateEventListListAttributeCallback)(void * context
                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RvcOperationalStateAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*MatterScenesFabricSceneInfoListAttributeCallback)(
+typedef void (*ScenesManagementFabricSceneInfoListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::DecodableType> & data);
-typedef void (*MatterScenesGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType> &
+        data);
+typedef void (*ScenesManagementGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MatterScenesAcceptedCommandListListAttributeCallback)(
+typedef void (*ScenesManagementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*MatterScenesEventListListAttributeCallback)(void * context,
-                                                           const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*MatterScenesAttributeListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ScenesManagementEventListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ScenesManagementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HepaFilterMonitoringReplacementProductListListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<

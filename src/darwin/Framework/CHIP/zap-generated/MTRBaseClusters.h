@@ -6611,73 +6611,73 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @end
 
 /**
- * Cluster Matter Scenes
+ * Cluster Scenes Management
  *
  * Attributes and commands for scene configuration and manipulation.
  */
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBaseClusterMatterScenes : MTRGenericBaseCluster
+@interface MTRBaseClusterScenesManagement : MTRGenericBaseCluster
 
 /**
  * Command AddScene
  *
  * Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}'
  */
-- (void)addSceneWithParams:(MTRMatterScenesClusterAddSceneParams *)params completion:(void (^)(MTRMatterScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ViewScene
  *
  * Retrieves the requested scene entry from its Scene table.
  */
-- (void)viewSceneWithParams:(MTRMatterScenesClusterViewSceneParams *)params completion:(void (^)(MTRMatterScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)viewSceneWithParams:(MTRScenesManagementClusterViewSceneParams *)params completion:(void (^)(MTRScenesManagementClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveScene
  *
  * Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table
  */
-- (void)removeSceneWithParams:(MTRMatterScenesClusterRemoveSceneParams *)params completion:(void (^)(MTRMatterScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)removeSceneWithParams:(MTRScenesManagementClusterRemoveSceneParams *)params completion:(void (^)(MTRScenesManagementClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RemoveAllScenes
  *
  * Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table
  */
-- (void)removeAllScenesWithParams:(MTRMatterScenesClusterRemoveAllScenesParams *)params completion:(void (^)(MTRMatterScenesClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)removeAllScenesWithParams:(MTRScenesManagementClusterRemoveAllScenesParams *)params completion:(void (^)(MTRScenesManagementClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command StoreScene
  *
  * Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint
  */
-- (void)storeSceneWithParams:(MTRMatterScenesClusterStoreSceneParams *)params completion:(void (^)(MTRMatterScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)storeSceneWithParams:(MTRScenesManagementClusterStoreSceneParams *)params completion:(void (^)(MTRScenesManagementClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command RecallScene
  *
  * Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table
  */
-- (void)recallSceneWithParams:(MTRMatterScenesClusterRecallSceneParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)recallSceneWithParams:(MTRScenesManagementClusterRecallSceneParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command GetSceneMembership
  *
  * Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group
  */
-- (void)getSceneMembershipWithParams:(MTRMatterScenesClusterGetSceneMembershipParams *)params completion:(void (^)(MTRMatterScenesClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)getSceneMembershipWithParams:(MTRScenesManagementClusterGetSceneMembershipParams *)params completion:(void (^)(MTRScenesManagementClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EnhancedAddScene
  *
  * Allows a scene to be added using a finer scene transition time than the AddScene command.
  */
-- (void)enhancedAddSceneWithParams:(MTRMatterScenesClusterEnhancedAddSceneParams *)params completion:(void (^)(MTRMatterScenesClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)enhancedAddSceneWithParams:(MTRScenesManagementClusterEnhancedAddSceneParams *)params completion:(void (^)(MTRScenesManagementClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command EnhancedViewScene
  *
  * Allows a scene to be retrieved using a finer scene transition time than the ViewScene command
  */
-- (void)enhancedViewSceneWithParams:(MTRMatterScenesClusterEnhancedViewSceneParams *)params completion:(void (^)(MTRMatterScenesClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)enhancedViewSceneWithParams:(MTRScenesManagementClusterEnhancedViewSceneParams *)params completion:(void (^)(MTRScenesManagementClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command CopyScene
  *
  * Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair.
  */
-- (void)copySceneWithParams:(MTRMatterScenesClusterCopySceneParams *)params completion:(void (^)(MTRMatterScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)copySceneWithParams:(MTRScenesManagementClusterCopySceneParams *)params completion:(void (^)(MTRScenesManagementClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSceneCountWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeSceneCountWithParams:(MTRSubscribeParams *)params
@@ -6768,7 +6768,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @end
 
-@interface MTRBaseClusterMatterScenes (Availability)
+@interface MTRBaseClusterScenesManagement (Availability)
 
 /**
  * For all instance methods (reads, writes, commands) that take a completion,
@@ -16979,19 +16979,19 @@ typedef NS_ENUM(uint8_t, MTRRVCOperationalStateOperationalState) {
     MTRRVCOperationalStateOperationalStateDocked MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x42,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
-typedef NS_OPTIONS(uint8_t, MTRMatterScenesCopyModeBitmap) {
-    MTRMatterScenesCopyModeBitmapCopyAllScenes MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint8_t, MTRScenesManagementCopyModeBitmap) {
+    MTRScenesManagementCopyModeBitmapCopyAllScenes MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRMatterScenesFeature) {
-    MTRMatterScenesFeatureSceneNames MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRMatterScenesFeatureExplicit MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRMatterScenesFeatureTableSize MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRMatterScenesFeatureFabricScenes MTR_PROVISIONALLY_AVAILABLE = 0x8,
+typedef NS_OPTIONS(uint32_t, MTRScenesManagementFeature) {
+    MTRScenesManagementFeatureSceneNames MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRScenesManagementFeatureExplicit MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRScenesManagementFeatureTableSize MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRScenesManagementFeatureFabricScenes MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint8_t, MTRMatterScenesNameSupportBitmap) {
-    MTRMatterScenesNameSupportBitmapSceneNames MTR_PROVISIONALLY_AVAILABLE = 0x80,
+typedef NS_OPTIONS(uint8_t, MTRScenesManagementNameSupportBitmap) {
+    MTRScenesManagementNameSupportBitmapSceneNames MTR_PROVISIONALLY_AVAILABLE = 0x80,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRHEPAFilterMonitoringChangeIndication) {

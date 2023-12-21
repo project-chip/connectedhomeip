@@ -255,18 +255,18 @@
 #define EMBER_AF_PLUGIN_MODE_SELECT_SERVER
 #define EMBER_AF_PLUGIN_MODE_SELECT
 
-// Use this macro to check if the server side of the Matter Scenes cluster is included
+// Use this macro to check if the server side of the Scenes Management cluster is included
 #define ZCL_USING_SCENES_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_MATTER_SCENES_SERVER
-#define EMBER_AF_PLUGIN_MATTER_SCENES
-// User options for server plugin Matter Scenes
+#define EMBER_AF_PLUGIN_SCENES_MANAGEMENT_SERVER
+#define EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+// User options for server plugin Scenes Management
 // Cluster spec 1.4.8.7
-#define MATTER_SCENES_TABLE_SIZE 16
+#define SCENES_MANAGEMENT_TABLE_SIZE 16
 // Scenes FeatureMap Attribute Toggle Scenes Name feature
 // App cluster specs 1.4.4
 #define MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK 0x0001
 #define MATTER_CLUSTER_SCENE_NAME_SUPPORT (0x000F & MATTER_CLUSTER_SCENE_NAME_SUPPORT_MASK)
-// Scenes FeatureMap Table Size feature used for the MATTER_SCENES_TABLE_SIZE define
+// Scenes FeatureMap Table Size feature used for the SCENES_MANAGEMENT_TABLE_SIZE define
 // App cluster specs 1.4.4.2
 #define MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK 0x0001
 #define MATTER_CLUSTER_TABLE_SIZE_SUPPORT (0x000F & MATTER_CLUSTER_TABLE_SIZE_SUPPORT_MASK)

@@ -1114,8 +1114,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
-    Map<String, InteractionInfo> writeMatterScenesInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("matterScenes", writeMatterScenesInteractionInfo);
+    Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =

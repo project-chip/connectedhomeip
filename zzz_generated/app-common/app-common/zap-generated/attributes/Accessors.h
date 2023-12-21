@@ -1748,7 +1748,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace RvcOperationalState
 
-namespace MatterScenes {
+namespace ScenesManagement {
 namespace Attributes {
 
 namespace SceneCount {
@@ -1773,8 +1773,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace NameSupport {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap> * value); // NameSupportBitmap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap> value);
+                  chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap> * value); // NameSupportBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap> value);
 } // namespace NameSupport
 
 namespace LastConfiguredBy {
@@ -1800,7 +1800,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace MatterScenes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 namespace Attributes {

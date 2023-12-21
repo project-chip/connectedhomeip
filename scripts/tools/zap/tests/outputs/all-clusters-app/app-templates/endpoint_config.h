@@ -871,7 +871,7 @@
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },                                /* FeatureMap */       \
             { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                  /* ClusterRevision */  \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: Matter Scenes (server) */                                                                     \
+            /* Endpoint: 1, Cluster: Scenes Management (server) */                                                                 \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* SceneCount */        \
             { ZAP_SIMPLE_DEFAULT(0x00), 0x00000001, 1, ZAP_TYPE(INT8U), 0 },                               /* CurrentScene */      \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000002, 2, ZAP_TYPE(GROUP_ID), 0 },                          /* CurrentGroup */      \
@@ -1445,7 +1445,7 @@
             { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },                               /* FeatureMap */        \
             { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                 /* ClusterRevision */   \
                                                                                                                                    \
-            /* Endpoint: 2, Cluster: Matter Scenes (server) */                                                                     \
+            /* Endpoint: 2, Cluster: Scenes Management (server) */                                                                 \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(INT8U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* SceneCount */        \
             { ZAP_SIMPLE_DEFAULT(0x00), 0x00000001, 1, ZAP_TYPE(INT8U), 0 },                               /* CurrentScene */      \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000002, 2, ZAP_TYPE(GROUP_ID), 0 },                          /* CurrentGroup */      \
@@ -1567,9 +1567,9 @@
         (EmberAfGenericClusterFunction) emberAfModeSelectClusterServerInitCallback,                                                \
         (EmberAfGenericClusterFunction) MatterModeSelectClusterServerPreAttributeChangedCallback,                                  \
     };                                                                                                                             \
-    const EmberAfGenericClusterFunction chipFuncArrayMatterScenesServer[] = {                                                      \
-        (EmberAfGenericClusterFunction) emberAfMatterScenesClusterServerInitCallback,                                              \
-        (EmberAfGenericClusterFunction) MatterMatterScenesClusterServerShutdownCallback,                                           \
+    const EmberAfGenericClusterFunction chipFuncArrayScenesManagementServer[] = {                                                  \
+        (EmberAfGenericClusterFunction) emberAfScenesManagementClusterServerInitCallback,                                          \
+        (EmberAfGenericClusterFunction) MatterScenesManagementClusterServerShutdownCallback,                                       \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
@@ -1767,7 +1767,7 @@
   /*   AcceptedCommandList (index=110) */ \
   0x00000000 /* ChangeToMode */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: Matter Scenes (server) */\
+  /* Endpoint: 1, Cluster: Scenes Management (server) */\
   /*   AcceptedCommandList (index=112) */ \
   0x00000000 /* AddScene */, \
   0x00000001 /* ViewScene */, \
@@ -1936,7 +1936,7 @@
   0x00000041 /* OnWithRecallGlobalScene */, \
   0x00000042 /* OnWithTimedOff */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 2, Cluster: Matter Scenes (server) */\
+  /* Endpoint: 2, Cluster: Scenes Management (server) */\
   /*   AcceptedCommandList (index=247) */ \
   0x00000000 /* AddScene */, \
   0x00000001 /* ViewScene */, \
@@ -2523,13 +2523,13 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: Matter Scenes (server) */ \
+      /* Endpoint: 1, Cluster: Scenes Management (server) */ \
       .clusterId = 0x00000062, \
       .attributes = ZAP_ATTRIBUTE_INDEX(316), \
       .attributeCount = 9, \
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayMatterScenesServer, \
+      .functions = chipFuncArrayScenesManagementServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 112 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 120 ), \
       .eventList = nullptr, \
@@ -2965,13 +2965,13 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 2, Cluster: Matter Scenes (server) */ \
+      /* Endpoint: 2, Cluster: Scenes Management (server) */ \
       .clusterId = 0x00000062, \
       .attributes = ZAP_ATTRIBUTE_INDEX(709), \
       .attributeCount = 9, \
       .clusterSize = 13, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayMatterScenesServer, \
+      .functions = chipFuncArrayScenesManagementServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 247 ), \
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 255 ), \
       .eventList = nullptr, \

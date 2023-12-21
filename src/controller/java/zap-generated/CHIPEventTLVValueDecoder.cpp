@@ -3843,8 +3843,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::MatterScenes::Id: {
-        using namespace app::Clusters::MatterScenes;
+    case app::Clusters::ScenesManagement::Id: {
+        using namespace app::Clusters::ScenesManagement;
         switch (aPath.mEventId)
         {
         default:

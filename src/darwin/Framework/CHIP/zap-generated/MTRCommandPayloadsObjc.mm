@@ -12853,7 +12853,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterAddSceneParams
+@implementation MTRScenesManagementClusterAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -12875,7 +12875,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterAddSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterAddSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -12896,11 +12896,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterAddSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterAddSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::AddScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::AddScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -12925,11 +12925,11 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRMatterScenesClusterExtensionFieldSet class]]) {
+                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesManagementClusterExtensionFieldSet class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRMatterScenesClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
+                    auto element_0 = (MTRScenesManagementClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
@@ -12941,11 +12941,11 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRMatterScenesClusterAttributeValuePair class]]) {
+                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePair class]]) {
                                     // Wrong kind of value.
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRMatterScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                 listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                             }
@@ -13000,7 +13000,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterAddSceneResponseParams
+@implementation MTRScenesManagementClusterAddSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13016,7 +13016,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterAddSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterAddSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -13038,7 +13038,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::AddSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -13073,9 +13073,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterAddSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::AddSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -13091,7 +13091,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterViewSceneParams
+@implementation MTRScenesManagementClusterViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13107,7 +13107,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterViewSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterViewSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -13125,11 +13125,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterViewSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterViewSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::ViewScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::ViewScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -13176,7 +13176,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterViewSceneResponseParams
+@implementation MTRScenesManagementClusterViewSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13198,7 +13198,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterViewSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterViewSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -13223,7 +13223,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::ViewSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -13258,9 +13258,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterViewSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -13296,16 +13296,16 @@ NS_ASSUME_NONNULL_BEGIN
                 auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRMatterScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRMatterScenesClusterExtensionFieldSet new];
+                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
                     newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRMatterScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRMatterScenesClusterAttributeValuePair new];
+                            MTRScenesManagementClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
@@ -13333,7 +13333,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveSceneParams
+@implementation MTRScenesManagementClusterRemoveSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13349,7 +13349,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterRemoveSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterRemoveSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -13367,11 +13367,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterRemoveSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::RemoveScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::RemoveScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -13418,7 +13418,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterRemoveSceneResponseParams
+@implementation MTRScenesManagementClusterRemoveSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13434,7 +13434,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterRemoveSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterRemoveSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -13456,7 +13456,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::RemoveSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -13491,9 +13491,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterRemoveSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -13509,7 +13509,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveAllScenesParams
+@implementation MTRScenesManagementClusterRemoveAllScenesParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13523,7 +13523,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterRemoveAllScenesParams alloc] init];
+    auto other = [[MTRScenesManagementClusterRemoveAllScenesParams alloc] init];
 
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -13540,11 +13540,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveAllScenesParams (InternalMethods)
+@implementation MTRScenesManagementClusterRemoveAllScenesParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::RemoveAllScenes::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenes::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -13588,7 +13588,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterRemoveAllScenesResponseParams
+@implementation MTRScenesManagementClusterRemoveAllScenesResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13602,7 +13602,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterRemoveAllScenesResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterRemoveAllScenesResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -13623,7 +13623,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::RemoveAllScenesResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -13658,9 +13658,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRemoveAllScenesResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterRemoveAllScenesResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -13673,7 +13673,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterStoreSceneParams
+@implementation MTRScenesManagementClusterStoreSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13689,7 +13689,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterStoreSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterStoreSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -13707,11 +13707,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterStoreSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterStoreSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::StoreScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::StoreScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -13758,7 +13758,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterStoreSceneResponseParams
+@implementation MTRScenesManagementClusterStoreSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13774,7 +13774,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterStoreSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterStoreSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -13796,7 +13796,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::StoreSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -13831,9 +13831,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterStoreSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterStoreSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -13849,7 +13849,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRecallSceneParams
+@implementation MTRScenesManagementClusterRecallSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13867,7 +13867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterRecallSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterRecallSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -13886,11 +13886,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterRecallSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterRecallSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::RecallScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::RecallScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -13948,7 +13948,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterGetSceneMembershipParams
+@implementation MTRScenesManagementClusterGetSceneMembershipParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -13962,7 +13962,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterGetSceneMembershipParams alloc] init];
+    auto other = [[MTRScenesManagementClusterGetSceneMembershipParams alloc] init];
 
     other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -13979,11 +13979,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterGetSceneMembershipParams (InternalMethods)
+@implementation MTRScenesManagementClusterGetSceneMembershipParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::GetSceneMembership::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::GetSceneMembership::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -14027,7 +14027,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterGetSceneMembershipResponseParams
+@implementation MTRScenesManagementClusterGetSceneMembershipResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14045,7 +14045,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterGetSceneMembershipResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterGetSceneMembershipResponseParams alloc] init];
 
     other.status = self.status;
     other.capacity = self.capacity;
@@ -14068,7 +14068,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::GetSceneMembershipResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -14103,9 +14103,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterGetSceneMembershipResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterGetSceneMembershipResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -14146,7 +14146,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedAddSceneParams
+@implementation MTRScenesManagementClusterEnhancedAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14168,7 +14168,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterEnhancedAddSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterEnhancedAddSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -14189,11 +14189,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedAddSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterEnhancedAddSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::EnhancedAddScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedAddScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -14218,11 +14218,11 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRMatterScenesClusterExtensionFieldSet class]]) {
+                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesManagementClusterExtensionFieldSet class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTRMatterScenesClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
+                    auto element_0 = (MTRScenesManagementClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
                     listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
                     {
                         using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
@@ -14234,11 +14234,11 @@ NS_ASSUME_NONNULL_BEGIN
                             }
                             listFreer.add(listHolder_2);
                             for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRMatterScenesClusterAttributeValuePair class]]) {
+                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePair class]]) {
                                     // Wrong kind of value.
                                     return CHIP_ERROR_INVALID_ARGUMENT;
                                 }
-                                auto element_2 = (MTRMatterScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
                                 listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
                                 listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
                             }
@@ -14293,7 +14293,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterEnhancedAddSceneResponseParams
+@implementation MTRScenesManagementClusterEnhancedAddSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14309,7 +14309,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterEnhancedAddSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterEnhancedAddSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -14331,7 +14331,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -14366,9 +14366,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterEnhancedAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -14384,7 +14384,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedViewSceneParams
+@implementation MTRScenesManagementClusterEnhancedViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14400,7 +14400,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterEnhancedViewSceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterEnhancedViewSceneParams alloc] init];
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
@@ -14418,11 +14418,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedViewSceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterEnhancedViewSceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::EnhancedViewScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedViewScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.groupID = self.groupID.unsignedShortValue;
@@ -14469,7 +14469,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterEnhancedViewSceneResponseParams
+@implementation MTRScenesManagementClusterEnhancedViewSceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14491,7 +14491,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterEnhancedViewSceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterEnhancedViewSceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupID = self.groupID;
@@ -14516,7 +14516,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -14551,9 +14551,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterEnhancedViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -14589,16 +14589,16 @@ NS_ASSUME_NONNULL_BEGIN
                 auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
                 while (iter_1.Next()) {
                     auto & entry_1 = iter_1.GetValue();
-                    MTRMatterScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRMatterScenesClusterExtensionFieldSet new];
+                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
                     newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
                     { // Scope for our temporary variables
                         auto * array_3 = [NSMutableArray new];
                         auto iter_3 = entry_1.attributeValueList.begin();
                         while (iter_3.Next()) {
                             auto & entry_3 = iter_3.GetValue();
-                            MTRMatterScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRMatterScenesClusterAttributeValuePair new];
+                            MTRScenesManagementClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
                             newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
                             newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
                             [array_3 addObject:newElement_3];
@@ -14626,7 +14626,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterCopySceneParams
+@implementation MTRScenesManagementClusterCopySceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14648,7 +14648,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterCopySceneParams alloc] init];
+    auto other = [[MTRScenesManagementClusterCopySceneParams alloc] init];
 
     other.mode = self.mode;
     other.groupIdentifierFrom = self.groupIdentifierFrom;
@@ -14669,11 +14669,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterCopySceneParams (InternalMethods)
+@implementation MTRScenesManagementClusterCopySceneParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::MatterScenes::Commands::CopyScene::Type encodableStruct;
+    chip::app::Clusters::ScenesManagement::Commands::CopyScene::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.mode = static_cast<std::remove_reference_t<decltype(encodableStruct.mode)>>(self.mode.unsignedCharValue);
@@ -14729,7 +14729,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRMatterScenesClusterCopySceneResponseParams
+@implementation MTRScenesManagementClusterCopySceneResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -14745,7 +14745,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMatterScenesClusterCopySceneResponseParams alloc] init];
+    auto other = [[MTRScenesManagementClusterCopySceneResponseParams alloc] init];
 
     other.status = self.status;
     other.groupIdentifierFrom = self.groupIdentifierFrom;
@@ -14767,7 +14767,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType = chip::app::Clusters::MatterScenes::Commands::CopySceneResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -14802,9 +14802,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterCopySceneResponseParams (InternalMethods)
+@implementation MTRScenesManagementClusterCopySceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::CopySceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];

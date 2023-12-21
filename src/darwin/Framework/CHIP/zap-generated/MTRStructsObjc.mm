@@ -4044,7 +4044,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterAttributeValuePair
+@implementation MTRScenesManagementClusterAttributeValuePair
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4058,7 +4058,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMatterScenesClusterAttributeValuePair alloc] init];
+    auto other = [[MTRScenesManagementClusterAttributeValuePair alloc] init];
 
     other.attributeID = self.attributeID;
     other.attributeValue = self.attributeValue;
@@ -4074,7 +4074,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterExtensionFieldSet
+@implementation MTRScenesManagementClusterExtensionFieldSet
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4088,7 +4088,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMatterScenesClusterExtensionFieldSet alloc] init];
+    auto other = [[MTRScenesManagementClusterExtensionFieldSet alloc] init];
 
     other.clusterID = self.clusterID;
     other.attributeValueList = self.attributeValueList;
@@ -4104,7 +4104,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRMatterScenesClusterSceneInfoStruct
+@implementation MTRScenesManagementClusterSceneInfoStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4126,7 +4126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRMatterScenesClusterSceneInfoStruct alloc] init];
+    auto other = [[MTRScenesManagementClusterSceneInfoStruct alloc] init];
 
     other.sceneCount = self.sceneCount;
     other.currentScene = self.currentScene;

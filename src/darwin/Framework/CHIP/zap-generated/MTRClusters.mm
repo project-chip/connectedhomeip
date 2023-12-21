@@ -8323,12 +8323,12 @@ using chip::System::Clock::Timeout;
 
 @end
 
-@implementation MTRClusterMatterScenes
+@implementation MTRClusterScenesManagement
 
-- (void)addSceneWithParams:(MTRMatterScenesClusterAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)addSceneWithParams:(MTRScenesManagementClusterAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterAddSceneParams
+        params = [[MTRScenesManagementClusterAddSceneParams
             alloc] init];
     }
 
@@ -8338,7 +8338,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::AddScene::Type;
+    using RequestType = ScenesManagement::Commands::AddScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8347,15 +8347,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterAddSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterAddSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)viewSceneWithParams:(MTRMatterScenesClusterViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)viewSceneWithParams:(MTRScenesManagementClusterViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterViewSceneParams
+        params = [[MTRScenesManagementClusterViewSceneParams
             alloc] init];
     }
 
@@ -8365,7 +8365,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::ViewScene::Type;
+    using RequestType = ScenesManagement::Commands::ViewScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8374,15 +8374,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterViewSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterViewSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)removeSceneWithParams:(MTRMatterScenesClusterRemoveSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)removeSceneWithParams:(MTRScenesManagementClusterRemoveSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterRemoveSceneParams
+        params = [[MTRScenesManagementClusterRemoveSceneParams
             alloc] init];
     }
 
@@ -8392,7 +8392,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::RemoveScene::Type;
+    using RequestType = ScenesManagement::Commands::RemoveScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8401,15 +8401,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterRemoveSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterRemoveSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)removeAllScenesWithParams:(MTRMatterScenesClusterRemoveAllScenesParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)removeAllScenesWithParams:(MTRScenesManagementClusterRemoveAllScenesParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterRemoveAllScenesParams
+        params = [[MTRScenesManagementClusterRemoveAllScenesParams
             alloc] init];
     }
 
@@ -8419,7 +8419,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::RemoveAllScenes::Type;
+    using RequestType = ScenesManagement::Commands::RemoveAllScenes::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8428,15 +8428,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterRemoveAllScenesResponseParams.class
+                                     responseClass:MTRScenesManagementClusterRemoveAllScenesResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)storeSceneWithParams:(MTRMatterScenesClusterStoreSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)storeSceneWithParams:(MTRScenesManagementClusterStoreSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterStoreSceneParams
+        params = [[MTRScenesManagementClusterStoreSceneParams
             alloc] init];
     }
 
@@ -8446,7 +8446,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::StoreScene::Type;
+    using RequestType = ScenesManagement::Commands::StoreScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8455,15 +8455,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterStoreSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterStoreSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)recallSceneWithParams:(MTRMatterScenesClusterRecallSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)recallSceneWithParams:(MTRScenesManagementClusterRecallSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterRecallSceneParams
+        params = [[MTRScenesManagementClusterRecallSceneParams
             alloc] init];
     }
 
@@ -8473,7 +8473,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::RecallScene::Type;
+    using RequestType = ScenesManagement::Commands::RecallScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8487,10 +8487,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)getSceneMembershipWithParams:(MTRMatterScenesClusterGetSceneMembershipParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)getSceneMembershipWithParams:(MTRScenesManagementClusterGetSceneMembershipParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterGetSceneMembershipParams
+        params = [[MTRScenesManagementClusterGetSceneMembershipParams
             alloc] init];
     }
 
@@ -8500,7 +8500,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::GetSceneMembership::Type;
+    using RequestType = ScenesManagement::Commands::GetSceneMembership::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8509,15 +8509,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterGetSceneMembershipResponseParams.class
+                                     responseClass:MTRScenesManagementClusterGetSceneMembershipResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)enhancedAddSceneWithParams:(MTRMatterScenesClusterEnhancedAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)enhancedAddSceneWithParams:(MTRScenesManagementClusterEnhancedAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterEnhancedAddSceneParams
+        params = [[MTRScenesManagementClusterEnhancedAddSceneParams
             alloc] init];
     }
 
@@ -8527,7 +8527,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::EnhancedAddScene::Type;
+    using RequestType = ScenesManagement::Commands::EnhancedAddScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8536,15 +8536,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterEnhancedAddSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterEnhancedAddSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)enhancedViewSceneWithParams:(MTRMatterScenesClusterEnhancedViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)enhancedViewSceneWithParams:(MTRScenesManagementClusterEnhancedViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterEnhancedViewSceneParams
+        params = [[MTRScenesManagementClusterEnhancedViewSceneParams
             alloc] init];
     }
 
@@ -8554,7 +8554,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::EnhancedViewScene::Type;
+    using RequestType = ScenesManagement::Commands::EnhancedViewScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8563,15 +8563,15 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterEnhancedViewSceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterEnhancedViewSceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
-- (void)copySceneWithParams:(MTRMatterScenesClusterCopySceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMatterScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)copySceneWithParams:(MTRScenesManagementClusterCopySceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRScenesManagementClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
-        params = [[MTRMatterScenesClusterCopySceneParams
+        params = [[MTRScenesManagementClusterCopySceneParams
             alloc] init];
     }
 
@@ -8581,7 +8581,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = MatterScenes::Commands::CopyScene::Type;
+    using RequestType = ScenesManagement::Commands::CopyScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -8590,79 +8590,79 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:MTRMatterScenesClusterCopySceneResponseParams.class
+                                     responseClass:MTRScenesManagementClusterCopySceneResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeSceneCountID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeSceneCountID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentSceneWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeCurrentSceneID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeCurrentSceneID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentGroupWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeCurrentGroupID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeCurrentGroupID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSceneValidWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeSceneValidID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeSceneValidID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeNameSupportID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeNameSupportID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLastConfiguredByWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeLastConfiguredByID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSceneTableSizeWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeSceneTableSizeID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricSceneInfoWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeFabricSceneInfoID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeFabricSceneInfoID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeEventListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMatterScenesID) attributeID:@(MTRAttributeIDTypeClusterMatterScenesAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesManagementID) attributeID:@(MTRAttributeIDTypeClusterScenesManagementAttributeClusterRevisionID) params:params];
 }
 
 @end

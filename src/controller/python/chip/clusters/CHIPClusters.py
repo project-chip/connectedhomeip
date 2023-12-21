@@ -5787,8 +5787,8 @@ class ChipClusters:
             },
         },
     }
-    _MATTER_SCENES_CLUSTER_INFO = {
-        "clusterName": "MatterScenes",
+    _SCENES_MANAGEMENT_CLUSTER_INFO = {
+        "clusterName": "ScenesManagement",
         "clusterId": 0x00000062,
         "commands": {
             0x00000000: {
@@ -14031,7 +14031,7 @@ class ChipClusters:
         0x0000005F: _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
         0x00000060: _OPERATIONAL_STATE_CLUSTER_INFO,
         0x00000061: _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
-        0x00000062: _MATTER_SCENES_CLUSTER_INFO,
+        0x00000062: _SCENES_MANAGEMENT_CLUSTER_INFO,
         0x00000071: _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,
@@ -14147,7 +14147,7 @@ class ChipClusters:
         "MicrowaveOvenControl": _MICROWAVE_OVEN_CONTROL_CLUSTER_INFO,
         "OperationalState": _OPERATIONAL_STATE_CLUSTER_INFO,
         "RvcOperationalState": _RVC_OPERATIONAL_STATE_CLUSTER_INFO,
-        "MatterScenes": _MATTER_SCENES_CLUSTER_INFO,
+        "ScenesManagement": _SCENES_MANAGEMENT_CLUSTER_INFO,
         "HepaFilterMonitoring": _HEPA_FILTER_MONITORING_CLUSTER_INFO,
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "BooleanStateConfiguration": _BOOLEAN_STATE_CONFIGURATION_CLUSTER_INFO,

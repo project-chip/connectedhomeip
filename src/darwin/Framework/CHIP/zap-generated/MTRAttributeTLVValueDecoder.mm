@@ -7059,9 +7059,9 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForMatterScenesCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::MatterScenes;
+    using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
     case Attributes::SceneCount::Id: {
         using TypeInfo = Attributes::SceneCount::TypeInfo;
@@ -7157,8 +7157,8 @@ static id _Nullable DecodeAttributeValueForMatterScenesCluster(AttributeId aAttr
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTRMatterScenesClusterSceneInfoStruct * newElement_0;
-                newElement_0 = [MTRMatterScenesClusterSceneInfoStruct new];
+                MTRScenesManagementClusterSceneInfoStruct * newElement_0;
+                newElement_0 = [MTRScenesManagementClusterSceneInfoStruct new];
                 newElement_0.sceneCount = [NSNumber numberWithUnsignedChar:entry_0.sceneCount];
                 newElement_0.currentScene = [NSNumber numberWithUnsignedChar:entry_0.currentScene];
                 newElement_0.currentGroup = [NSNumber numberWithUnsignedShort:entry_0.currentGroup];
@@ -18236,8 +18236,8 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
     case Clusters::RvcOperationalState::Id: {
         return DecodeAttributeValueForRVCOperationalStateCluster(aPath.mAttributeId, aReader, aError);
     }
-    case Clusters::MatterScenes::Id: {
-        return DecodeAttributeValueForMatterScenesCluster(aPath.mAttributeId, aReader, aError);
+    case Clusters::ScenesManagement::Id: {
+        return DecodeAttributeValueForScenesManagementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeAttributeValueForHEPAFilterMonitoringCluster(aPath.mAttributeId, aReader, aError);

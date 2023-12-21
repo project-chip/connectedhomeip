@@ -1020,19 +1020,19 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterAttributeValuePair : NSObject <NSCopying>
+@interface MTRScenesManagementClusterAttributeValuePair : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull attributeID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull attributeValue MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterExtensionFieldSet : NSObject <NSCopying>
+@interface MTRScenesManagementClusterExtensionFieldSet : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull clusterID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSArray * _Nonnull attributeValueList MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterSceneInfoStruct : NSObject <NSCopying>
+@interface MTRScenesManagementClusterSceneInfoStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull sceneCount MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull currentScene MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull currentGroup MTR_PROVISIONALLY_AVAILABLE;

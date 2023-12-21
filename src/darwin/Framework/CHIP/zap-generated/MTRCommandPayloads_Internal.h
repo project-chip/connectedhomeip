@@ -868,117 +868,117 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRMatterScenesClusterAddSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterAddSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterAddSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::AddSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterViewSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterViewSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterViewSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterRemoveSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterRemoveSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterRemoveSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterRemoveSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterRemoveAllScenesParams (InternalMethods)
+@interface MTRScenesManagementClusterRemoveAllScenesParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterRemoveAllScenesResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterRemoveAllScenesResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterStoreSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterStoreSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterStoreSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterStoreSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterRecallSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterRecallSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterGetSceneMembershipParams (InternalMethods)
+@interface MTRScenesManagementClusterGetSceneMembershipParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterGetSceneMembershipResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterGetSceneMembershipResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterEnhancedAddSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterEnhancedAddSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterEnhancedAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterEnhancedViewSceneParams (InternalMethods)
+@interface MTRScenesManagementClusterEnhancedViewSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterEnhancedViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct;
 
 @end
 
-@interface MTRMatterScenesClusterCopySceneParams (InternalMethods)
+@interface MTRScenesManagementClusterCopySceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRMatterScenesClusterCopySceneResponseParams (InternalMethods)
+@interface MTRScenesManagementClusterCopySceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MatterScenes::Commands::CopySceneResponse::DecodableType &)decodableStruct;
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct;
 
 @end
 

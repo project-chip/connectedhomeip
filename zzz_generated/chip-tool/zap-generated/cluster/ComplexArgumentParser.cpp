@@ -2029,7 +2029,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ModeSelect::Structs::M
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::MatterScenes::Structs::AttributeValuePair::Type & request,
+                                        chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2054,14 +2054,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::MatterScenes::Structs::AttributeValuePair::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type & request)
 {
     ComplexArgumentParser::Finalize(request.attributeID);
     ComplexArgumentParser::Finalize(request.attributeValue);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::Type & request,
+                                        chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2086,14 +2086,14 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type & request)
 {
     ComplexArgumentParser::Finalize(request.clusterID);
     ComplexArgumentParser::Finalize(request.attributeValueList);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::Type & request,
+                                        chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -2143,7 +2143,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.sceneCount);
     ComplexArgumentParser::Finalize(request.currentScene);

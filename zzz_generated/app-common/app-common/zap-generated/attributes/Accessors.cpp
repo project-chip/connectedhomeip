@@ -8931,7 +8931,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace RvcOperationalState
 
-namespace MatterScenes {
+namespace ScenesManagement {
 namespace Attributes {
 
 namespace SceneCount {
@@ -8941,7 +8941,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -8960,7 +8960,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneCount
@@ -8972,7 +8972,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -8991,7 +8991,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentScene
@@ -9003,7 +9003,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::GroupId * value)
     using Traits = NumericAttributeTraits<chip::GroupId>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9022,7 +9022,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::GroupId value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_GROUP_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_GROUP_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace CurrentGroup
@@ -9034,7 +9034,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9053,19 +9053,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneValid
 
 namespace NameSupport {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9074,9 +9074,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -9084,7 +9084,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace NameSupport
@@ -9096,7 +9096,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::NodeId> &
     using Traits = NumericAttributeTraits<chip::NodeId>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -9118,7 +9118,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -9127,7 +9127,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_NODE_ID_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::NodeId> & value)
@@ -9149,7 +9149,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9168,7 +9168,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SceneTableSize
@@ -9180,7 +9180,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9199,7 +9199,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -9211,7 +9211,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::MatterScenes::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ScenesManagement::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -9230,13 +9230,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::MatterScenes::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::ScenesManagement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace MatterScenes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 namespace Attributes {

@@ -2012,7 +2012,7 @@ enum class OperationalStateEnum : uint8_t
 };
 } // namespace RvcOperationalState
 
-namespace MatterScenes {
+namespace ScenesManagement {
 
 // Bitmap for CopyModeBitmap
 enum class CopyModeBitmap : uint8_t
@@ -2034,7 +2034,7 @@ enum class NameSupportBitmap : uint8_t
 {
     kSceneNames = 0x80,
 };
-} // namespace MatterScenes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 

@@ -1826,8 +1826,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::MatterScenes::Structs::AttributeValuePair::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1852,7 +1853,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::DecodableType & value)
+                                     const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -1877,7 +1878,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::DecodableType & value)
+                                     const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -6865,7 +6866,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::AddSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::AddSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6875,7 +6876,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::ViewSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::ViewSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6888,7 +6889,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::RemoveSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::RemoveSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6898,7 +6899,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::RemoveAllScenesResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6907,7 +6908,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::StoreSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::StoreSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6917,7 +6918,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::GetSceneMembershipResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6928,7 +6929,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6938,7 +6939,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -6951,7 +6952,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const MatterScenes::Commands::CopySceneResponse::DecodableType & value)
+                                     const ScenesManagement::Commands::CopySceneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
@@ -11400,75 +11401,76 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case MatterScenes::Id: {
+    case ScenesManagement::Id: {
         switch (path.mAttributeId)
         {
-        case MatterScenes::Attributes::SceneCount::Id: {
+        case ScenesManagement::Attributes::SceneCount::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SceneCount", 1, value);
         }
-        case MatterScenes::Attributes::CurrentScene::Id: {
+        case ScenesManagement::Attributes::CurrentScene::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentScene", 1, value);
         }
-        case MatterScenes::Attributes::CurrentGroup::Id: {
+        case ScenesManagement::Attributes::CurrentGroup::Id: {
             chip::GroupId value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentGroup", 1, value);
         }
-        case MatterScenes::Attributes::SceneValid::Id: {
+        case ScenesManagement::Attributes::SceneValid::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SceneValid", 1, value);
         }
-        case MatterScenes::Attributes::NameSupport::Id: {
-            chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap> value;
+        case ScenesManagement::Attributes::NameSupport::Id: {
+            chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("NameSupport", 1, value);
         }
-        case MatterScenes::Attributes::LastConfiguredBy::Id: {
+        case ScenesManagement::Attributes::LastConfiguredBy::Id: {
             chip::app::DataModel::Nullable<chip::NodeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastConfiguredBy", 1, value);
         }
-        case MatterScenes::Attributes::SceneTableSize::Id: {
+        case ScenesManagement::Attributes::SceneTableSize::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SceneTableSize", 1, value);
         }
-        case MatterScenes::Attributes::FabricSceneInfo::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::DecodableType> value;
+        case ScenesManagement::Attributes::FabricSceneInfo::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FabricSceneInfo", 1, value);
         }
-        case MatterScenes::Attributes::GeneratedCommandList::Id: {
+        case ScenesManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case MatterScenes::Attributes::AcceptedCommandList::Id: {
+        case ScenesManagement::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case MatterScenes::Attributes::EventList::Id: {
+        case ScenesManagement::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case MatterScenes::Attributes::AttributeList::Id: {
+        case ScenesManagement::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case MatterScenes::Attributes::FeatureMap::Id: {
+        case ScenesManagement::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case MatterScenes::Attributes::ClusterRevision::Id: {
+        case ScenesManagement::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -17234,51 +17236,51 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case MatterScenes::Id: {
+    case ScenesManagement::Id: {
         switch (path.mCommandId)
         {
-        case MatterScenes::Commands::AddSceneResponse::Id: {
-            MatterScenes::Commands::AddSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::AddSceneResponse::Id: {
+            ScenesManagement::Commands::AddSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AddSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::ViewSceneResponse::Id: {
-            MatterScenes::Commands::ViewSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::ViewSceneResponse::Id: {
+            ScenesManagement::Commands::ViewSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::RemoveSceneResponse::Id: {
-            MatterScenes::Commands::RemoveSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::RemoveSceneResponse::Id: {
+            ScenesManagement::Commands::RemoveSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::RemoveAllScenesResponse::Id: {
-            MatterScenes::Commands::RemoveAllScenesResponse::DecodableType value;
+        case ScenesManagement::Commands::RemoveAllScenesResponse::Id: {
+            ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveAllScenesResponse", 1, value);
         }
-        case MatterScenes::Commands::StoreSceneResponse::Id: {
-            MatterScenes::Commands::StoreSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::StoreSceneResponse::Id: {
+            ScenesManagement::Commands::StoreSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StoreSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::GetSceneMembershipResponse::Id: {
-            MatterScenes::Commands::GetSceneMembershipResponse::DecodableType value;
+        case ScenesManagement::Commands::GetSceneMembershipResponse::Id: {
+            ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetSceneMembershipResponse", 1, value);
         }
-        case MatterScenes::Commands::EnhancedAddSceneResponse::Id: {
-            MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::EnhancedAddSceneResponse::Id: {
+            ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedAddSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::EnhancedViewSceneResponse::Id: {
-            MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType value;
+        case ScenesManagement::Commands::EnhancedViewSceneResponse::Id: {
+            ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EnhancedViewSceneResponse", 1, value);
         }
-        case MatterScenes::Commands::CopySceneResponse::Id: {
-            MatterScenes::Commands::CopySceneResponse::DecodableType value;
+        case ScenesManagement::Commands::CopySceneResponse::Id: {
+            ScenesManagement::Commands::CopySceneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CopySceneResponse", 1, value);
         }

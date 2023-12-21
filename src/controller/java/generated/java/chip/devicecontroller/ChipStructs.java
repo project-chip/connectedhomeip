@@ -5063,13 +5063,13 @@ public static class RvcOperationalStateClusterOperationalStateStruct {
     return output.toString();
   }
 }
-public static class MatterScenesClusterAttributeValuePair {
+public static class ScenesManagementClusterAttributeValuePair {
   public Long attributeID;
   public Long attributeValue;
   private static final long ATTRIBUTE_I_D_ID = 0L;
   private static final long ATTRIBUTE_VALUE_ID = 1L;
 
-  public MatterScenesClusterAttributeValuePair(
+  public ScenesManagementClusterAttributeValuePair(
     Long attributeID,
     Long attributeValue
   ) {
@@ -5085,7 +5085,7 @@ public static class MatterScenesClusterAttributeValuePair {
     return new StructType(values);
   }
 
-  public static MatterScenesClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -5104,7 +5104,7 @@ public static class MatterScenesClusterAttributeValuePair {
         }
       }
     }
-    return new MatterScenesClusterAttributeValuePair(
+    return new ScenesManagementClusterAttributeValuePair(
       attributeID,
       attributeValue
     );
@@ -5113,7 +5113,7 @@ public static class MatterScenesClusterAttributeValuePair {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("MatterScenesClusterAttributeValuePair {\n");
+    output.append("ScenesManagementClusterAttributeValuePair {\n");
     output.append("\tattributeID: ");
     output.append(attributeID);
     output.append("\n");
@@ -5124,15 +5124,15 @@ public static class MatterScenesClusterAttributeValuePair {
     return output.toString();
   }
 }
-public static class MatterScenesClusterExtensionFieldSet {
+public static class ScenesManagementClusterExtensionFieldSet {
   public Long clusterID;
-  public ArrayList<ChipStructs.MatterScenesClusterAttributeValuePair> attributeValueList;
+  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList;
   private static final long CLUSTER_I_D_ID = 0L;
   private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
 
-  public MatterScenesClusterExtensionFieldSet(
+  public ScenesManagementClusterExtensionFieldSet(
     Long clusterID,
-    ArrayList<ChipStructs.MatterScenesClusterAttributeValuePair> attributeValueList
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList
   ) {
     this.clusterID = clusterID;
     this.attributeValueList = attributeValueList;
@@ -5146,12 +5146,12 @@ public static class MatterScenesClusterExtensionFieldSet {
     return new StructType(values);
   }
 
-  public static MatterScenesClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
     Long clusterID = null;
-    ArrayList<ChipStructs.MatterScenesClusterAttributeValuePair> attributeValueList = null;
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == CLUSTER_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -5161,11 +5161,11 @@ public static class MatterScenesClusterExtensionFieldSet {
       } else if (element.contextTagNum() == ATTRIBUTE_VALUE_LIST_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.MatterScenesClusterAttributeValuePair.decodeTlv(elementcastingValue));
+          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePair.decodeTlv(elementcastingValue));
         }
       }
     }
-    return new MatterScenesClusterExtensionFieldSet(
+    return new ScenesManagementClusterExtensionFieldSet(
       clusterID,
       attributeValueList
     );
@@ -5174,7 +5174,7 @@ public static class MatterScenesClusterExtensionFieldSet {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("MatterScenesClusterExtensionFieldSet {\n");
+    output.append("ScenesManagementClusterExtensionFieldSet {\n");
     output.append("\tclusterID: ");
     output.append(clusterID);
     output.append("\n");
@@ -5185,7 +5185,7 @@ public static class MatterScenesClusterExtensionFieldSet {
     return output.toString();
   }
 }
-public static class MatterScenesClusterSceneInfoStruct {
+public static class ScenesManagementClusterSceneInfoStruct {
   public Integer sceneCount;
   public Integer currentScene;
   public Integer currentGroup;
@@ -5199,7 +5199,7 @@ public static class MatterScenesClusterSceneInfoStruct {
   private static final long REMAINING_CAPACITY_ID = 4L;
   private static final long FABRIC_INDEX_ID = 254L;
 
-  public MatterScenesClusterSceneInfoStruct(
+  public ScenesManagementClusterSceneInfoStruct(
     Integer sceneCount,
     Integer currentScene,
     Integer currentGroup,
@@ -5227,7 +5227,7 @@ public static class MatterScenesClusterSceneInfoStruct {
     return new StructType(values);
   }
 
-  public static MatterScenesClusterSceneInfoStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ScenesManagementClusterSceneInfoStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -5270,7 +5270,7 @@ public static class MatterScenesClusterSceneInfoStruct {
         }
       }
     }
-    return new MatterScenesClusterSceneInfoStruct(
+    return new ScenesManagementClusterSceneInfoStruct(
       sceneCount,
       currentScene,
       currentGroup,
@@ -5283,7 +5283,7 @@ public static class MatterScenesClusterSceneInfoStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("MatterScenesClusterSceneInfoStruct {\n");
+    output.append("ScenesManagementClusterSceneInfoStruct {\n");
     output.append("\tsceneCount: ");
     output.append(sceneCount);
     output.append("\n");

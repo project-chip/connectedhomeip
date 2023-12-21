@@ -2341,9 +2341,9 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForMatterScenesCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForScenesManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::MatterScenes;
+    using namespace Clusters::ScenesManagement;
     switch (aEventId) {
     default: {
         break;
@@ -4478,8 +4478,8 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::RvcOperationalState::Id: {
         return DecodeEventPayloadForRVCOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::MatterScenes::Id: {
-        return DecodeEventPayloadForMatterScenesCluster(aPath.mEventId, aReader, aError);
+    case Clusters::ScenesManagement::Id: {
+        return DecodeEventPayloadForScenesManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

@@ -408,7 +408,7 @@
 #endif
 
 #if defined(ZCL_USING_SCENES_CLUSTER_SERVER) || defined(ZCL_USING_SCENES_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::MatterScenes::Id, "Matter Scenes" },
+#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::ScenesManagement::Id, "Scenes Management" },
 #else
 #define CHIP_PRINTCLUSTER_SCENES_CLUSTER
 #endif

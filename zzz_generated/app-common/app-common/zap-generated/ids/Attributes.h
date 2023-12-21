@@ -3347,7 +3347,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace RvcOperationalState
 
-namespace MatterScenes {
+namespace ScenesManagement {
 namespace Attributes {
 
 namespace SceneCount {
@@ -3407,7 +3407,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace MatterScenes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 namespace Attributes {

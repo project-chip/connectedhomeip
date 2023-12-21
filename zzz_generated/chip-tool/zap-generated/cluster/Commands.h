@@ -95,7 +95,7 @@
 | MicrowaveOvenControl                                                | 0x005F |
 | OperationalState                                                    | 0x0060 |
 | RvcOperationalState                                                 | 0x0061 |
-| MatterScenes                                                        | 0x0062 |
+| ScenesManagement                                                    | 0x0062 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
 | BooleanStateConfiguration                                           | 0x0080 |
@@ -5826,7 +5826,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster MatterScenes                                                | 0x0062 |
+| Cluster ScenesManagement                                            | 0x0062 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
@@ -5862,10 +5862,10 @@ private:
 /*
  * Command AddScene
  */
-class MatterScenesAddScene : public ClusterCommand
+class ScenesManagementAddScene : public ClusterCommand
 {
 public:
-    MatterScenesAddScene(CredentialIssuerCommands * credsIssuerConfig) :
+    ScenesManagementAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
@@ -5878,8 +5878,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::AddScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::AddScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -5888,8 +5888,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::AddScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::AddScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -5898,18 +5898,18 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::AddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::Type>>
+    chip::app::Clusters::ScenesManagement::Commands::AddScene::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
 /*
  * Command ViewScene
  */
-class MatterScenesViewScene : public ClusterCommand
+class ScenesManagementViewScene : public ClusterCommand
 {
 public:
-    MatterScenesViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-scene", credsIssuerConfig)
+    ScenesManagementViewScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("view-scene", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
@@ -5918,8 +5918,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::ViewScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::ViewScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -5928,8 +5928,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::ViewScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::ViewScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -5938,16 +5938,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::ViewScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::ViewScene::Type mRequest;
 };
 
 /*
  * Command RemoveScene
  */
-class MatterScenesRemoveScene : public ClusterCommand
+class ScenesManagementRemoveScene : public ClusterCommand
 {
 public:
-    MatterScenesRemoveScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-scene", credsIssuerConfig)
+    ScenesManagementRemoveScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("remove-scene", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
@@ -5956,8 +5956,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RemoveScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RemoveScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -5966,8 +5966,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RemoveScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RemoveScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -5976,16 +5976,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::RemoveScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::RemoveScene::Type mRequest;
 };
 
 /*
  * Command RemoveAllScenes
  */
-class MatterScenesRemoveAllScenes : public ClusterCommand
+class ScenesManagementRemoveAllScenes : public ClusterCommand
 {
 public:
-    MatterScenesRemoveAllScenes(CredentialIssuerCommands * credsIssuerConfig) :
+    ScenesManagementRemoveAllScenes(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("remove-all-scenes", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
@@ -5994,8 +5994,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RemoveAllScenes::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenes::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6004,8 +6004,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RemoveAllScenes::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenes::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6014,16 +6014,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::RemoveAllScenes::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenes::Type mRequest;
 };
 
 /*
  * Command StoreScene
  */
-class MatterScenesStoreScene : public ClusterCommand
+class ScenesManagementStoreScene : public ClusterCommand
 {
 public:
-    MatterScenesStoreScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("store-scene", credsIssuerConfig)
+    ScenesManagementStoreScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("store-scene", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
@@ -6032,8 +6032,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::StoreScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::StoreScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6042,8 +6042,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::StoreScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::StoreScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6052,16 +6052,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::StoreScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::StoreScene::Type mRequest;
 };
 
 /*
  * Command RecallScene
  */
-class MatterScenesRecallScene : public ClusterCommand
+class ScenesManagementRecallScene : public ClusterCommand
 {
 public:
-    MatterScenesRecallScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("recall-scene", credsIssuerConfig)
+    ScenesManagementRecallScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("recall-scene", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
@@ -6071,8 +6071,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RecallScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RecallScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6081,8 +6081,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::RecallScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::RecallScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6091,16 +6091,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::RecallScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::RecallScene::Type mRequest;
 };
 
 /*
  * Command GetSceneMembership
  */
-class MatterScenesGetSceneMembership : public ClusterCommand
+class ScenesManagementGetSceneMembership : public ClusterCommand
 {
 public:
-    MatterScenesGetSceneMembership(CredentialIssuerCommands * credsIssuerConfig) :
+    ScenesManagementGetSceneMembership(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("get-scene-membership", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
@@ -6109,8 +6109,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::GetSceneMembership::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::GetSceneMembership::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6119,8 +6119,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::GetSceneMembership::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::GetSceneMembership::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6129,16 +6129,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::GetSceneMembership::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::GetSceneMembership::Type mRequest;
 };
 
 /*
  * Command EnhancedAddScene
  */
-class MatterScenesEnhancedAddScene : public ClusterCommand
+class ScenesManagementEnhancedAddScene : public ClusterCommand
 {
 public:
-    MatterScenesEnhancedAddScene(CredentialIssuerCommands * credsIssuerConfig) :
+    ScenesManagementEnhancedAddScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enhanced-add-scene", credsIssuerConfig), mComplex_ExtensionFieldSets(&mRequest.extensionFieldSets)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
@@ -6151,8 +6151,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::EnhancedAddScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::EnhancedAddScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6161,8 +6161,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::EnhancedAddScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::EnhancedAddScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6171,18 +6171,18 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::EnhancedAddScene::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::Type>>
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedAddScene::Type mRequest;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type>>
         mComplex_ExtensionFieldSets;
 };
 
 /*
  * Command EnhancedViewScene
  */
-class MatterScenesEnhancedViewScene : public ClusterCommand
+class ScenesManagementEnhancedViewScene : public ClusterCommand
 {
 public:
-    MatterScenesEnhancedViewScene(CredentialIssuerCommands * credsIssuerConfig) :
+    ScenesManagementEnhancedViewScene(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("enhanced-view-scene", credsIssuerConfig)
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
@@ -6192,8 +6192,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::EnhancedViewScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::EnhancedViewScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6202,8 +6202,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::EnhancedViewScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::EnhancedViewScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6212,16 +6212,16 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::EnhancedViewScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedViewScene::Type mRequest;
 };
 
 /*
  * Command CopyScene
  */
-class MatterScenesCopyScene : public ClusterCommand
+class ScenesManagementCopyScene : public ClusterCommand
 {
 public:
-    MatterScenesCopyScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("copy-scene", credsIssuerConfig)
+    ScenesManagementCopyScene(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("copy-scene", credsIssuerConfig)
     {
         AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
         AddArgument("GroupIdentifierFrom", 0, UINT16_MAX, &mRequest.groupIdentifierFrom);
@@ -6233,8 +6233,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::CopyScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::CopyScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6243,8 +6243,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::MatterScenes::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::MatterScenes::Commands::CopyScene::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::ScenesManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::ScenesManagement::Commands::CopyScene::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6253,7 +6253,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::MatterScenes::Commands::CopyScene::Type mRequest;
+    chip::app::Clusters::ScenesManagement::Commands::CopyScene::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -19123,27 +19123,27 @@ void registerClusterRvcOperationalState(Commands & commands, CredentialIssuerCom
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterMatterScenes(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterScenesManagement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::MatterScenes;
+    using namespace chip::app::Clusters::ScenesManagement;
 
-    const char * clusterName = "MatterScenes";
+    const char * clusterName = "ScenesManagement";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
-        make_unique<MatterScenesAddScene>(credsIssuerConfig),           //
-        make_unique<MatterScenesViewScene>(credsIssuerConfig),          //
-        make_unique<MatterScenesRemoveScene>(credsIssuerConfig),        //
-        make_unique<MatterScenesRemoveAllScenes>(credsIssuerConfig),    //
-        make_unique<MatterScenesStoreScene>(credsIssuerConfig),         //
-        make_unique<MatterScenesRecallScene>(credsIssuerConfig),        //
-        make_unique<MatterScenesGetSceneMembership>(credsIssuerConfig), //
-        make_unique<MatterScenesEnhancedAddScene>(credsIssuerConfig),   //
-        make_unique<MatterScenesEnhancedViewScene>(credsIssuerConfig),  //
-        make_unique<MatterScenesCopyScene>(credsIssuerConfig),          //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
+        make_unique<ScenesManagementAddScene>(credsIssuerConfig),           //
+        make_unique<ScenesManagementViewScene>(credsIssuerConfig),          //
+        make_unique<ScenesManagementRemoveScene>(credsIssuerConfig),        //
+        make_unique<ScenesManagementRemoveAllScenes>(credsIssuerConfig),    //
+        make_unique<ScenesManagementStoreScene>(credsIssuerConfig),         //
+        make_unique<ScenesManagementRecallScene>(credsIssuerConfig),        //
+        make_unique<ScenesManagementGetSceneMembership>(credsIssuerConfig), //
+        make_unique<ScenesManagementEnhancedAddScene>(credsIssuerConfig),   //
+        make_unique<ScenesManagementEnhancedViewScene>(credsIssuerConfig),  //
+        make_unique<ScenesManagementCopyScene>(credsIssuerConfig),          //
         //
         // Attributes
         //
@@ -19171,7 +19171,7 @@ void registerClusterMatterScenes(Commands & commands, CredentialIssuerCommands *
                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "scene-valid", 0, 1, Attributes::SceneValid::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::MatterScenes::NameSupportBitmap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ScenesManagement::NameSupportBitmap>>>(
             Id, "name-support", 0, UINT8_MAX, Attributes::NameSupport::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::NodeId>>>(
             Id, "last-configured-by", 0, UINT64_MAX, Attributes::LastConfiguredBy::Id, WriteCommandType::kForceWrite,
@@ -19179,7 +19179,7 @@ void registerClusterMatterScenes(Commands & commands, CredentialIssuerCommands *
         make_unique<WriteAttribute<uint16_t>>(Id, "scene-table-size", 0, UINT16_MAX, Attributes::SceneTableSize::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::List<const chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::Type>>>(
+            chip::app::DataModel::List<const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::Type>>>(
             Id, "fabric-scene-info", Attributes::FabricSceneInfo::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -25761,7 +25761,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterMicrowaveOvenControl(commands, credsIssuerConfig);
     registerClusterOperationalState(commands, credsIssuerConfig);
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
-    registerClusterMatterScenes(commands, credsIssuerConfig);
+    registerClusterScenesManagement(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
     registerClusterBooleanStateConfiguration(commands, credsIssuerConfig);

@@ -205,9 +205,9 @@ static constexpr ClusterId Id = 0x00000060;
 namespace RvcOperationalState {
 static constexpr ClusterId Id = 0x00000061;
 } // namespace RvcOperationalState
-namespace MatterScenes {
+namespace ScenesManagement {
 static constexpr ClusterId Id = 0x00000062;
-} // namespace MatterScenes
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring

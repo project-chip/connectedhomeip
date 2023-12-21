@@ -12387,7 +12387,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace RvcOperationalState
-namespace MatterScenes {
+namespace ScenesManagement {
 namespace Structs {
 
 namespace AttributeValuePair {
@@ -13460,7 +13460,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 
 namespace Events {} // namespace Events
 
-} // namespace MatterScenes
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 namespace Structs {
 
@@ -28705,28 +28705,28 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
-    case Clusters::MatterScenes::Id: {
+    case Clusters::ScenesManagement::Id: {
         switch (aCommand)
         {
-        case Clusters::MatterScenes::Commands::AddScene::Id:
+        case Clusters::ScenesManagement::Commands::AddScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::ViewScene::Id:
+        case Clusters::ScenesManagement::Commands::ViewScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::RemoveScene::Id:
+        case Clusters::ScenesManagement::Commands::RemoveScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::RemoveAllScenes::Id:
+        case Clusters::ScenesManagement::Commands::RemoveAllScenes::Id:
             return true;
-        case Clusters::MatterScenes::Commands::StoreScene::Id:
+        case Clusters::ScenesManagement::Commands::StoreScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::RecallScene::Id:
+        case Clusters::ScenesManagement::Commands::RecallScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::GetSceneMembership::Id:
+        case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
             return true;
-        case Clusters::MatterScenes::Commands::EnhancedAddScene::Id:
+        case Clusters::ScenesManagement::Commands::EnhancedAddScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::EnhancedViewScene::Id:
+        case Clusters::ScenesManagement::Commands::EnhancedViewScene::Id:
             return true;
-        case Clusters::MatterScenes::Commands::CopyScene::Id:
+        case Clusters::ScenesManagement::Commands::CopyScene::Id:
             return true;
         default:
             return false;

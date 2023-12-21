@@ -4721,7 +4721,7 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterAddSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterAddSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4759,7 +4759,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterAddSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterAddSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4768,7 +4768,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull sceneID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterAddSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterAddSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4782,7 +4782,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterViewSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterViewSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4814,7 +4814,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterViewSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterViewSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4829,7 +4829,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nullable extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterViewSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterViewSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4843,7 +4843,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterRemoveSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterRemoveSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4875,7 +4875,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterRemoveSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterRemoveSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4884,7 +4884,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull sceneID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterRemoveSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterRemoveSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4898,7 +4898,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterRemoveAllScenesParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterRemoveAllScenesParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -4928,14 +4928,14 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterRemoveAllScenesResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterRemoveAllScenesResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterRemoveAllScenesResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -4949,7 +4949,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterStoreSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterStoreSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4981,7 +4981,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterStoreSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterStoreSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -4990,7 +4990,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull sceneID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterStoreSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterStoreSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -5004,7 +5004,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterRecallSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterRecallSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5038,7 +5038,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterGetSceneMembershipParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterGetSceneMembershipParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 /**
@@ -5068,7 +5068,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterGetSceneMembershipResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5079,7 +5079,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nullable sceneList MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterGetSceneMembershipResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterGetSceneMembershipResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -5093,7 +5093,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterEnhancedAddSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterEnhancedAddSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5131,7 +5131,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterEnhancedAddSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5140,7 +5140,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull sceneID MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterEnhancedAddSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterEnhancedAddSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -5154,7 +5154,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterEnhancedViewSceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterEnhancedViewSceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull groupID MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5186,7 +5186,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterEnhancedViewSceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5201,7 +5201,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nullable extensionFieldSets MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterEnhancedViewSceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterEnhancedViewSceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not
@@ -5215,7 +5215,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterCopySceneParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterCopySceneParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull mode MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5253,7 +5253,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRMatterScenesClusterCopySceneResponseParams : NSObject <NSCopying>
+@interface MTRScenesManagementClusterCopySceneResponseParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_PROVISIONALLY_AVAILABLE;
 
@@ -5262,7 +5262,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull sceneIdentifierFrom MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Initialize an MTRMatterScenesClusterCopySceneResponseParams with a response-value dictionary
+ * Initialize an MTRScenesManagementClusterCopySceneResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.
  *
  * Will return nil and hand out an error if the response-value dictionary is not

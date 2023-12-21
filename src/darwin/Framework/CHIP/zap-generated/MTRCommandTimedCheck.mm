@@ -545,9 +545,9 @@ static BOOL CommandNeedsTimedInvokeInRVCOperationalStateCluster(AttributeId aAtt
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInMatterScenesCluster(AttributeId aAttributeId)
+static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::MatterScenes;
+    using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1254,8 +1254,8 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::RvcOperationalState::Id: {
         return CommandNeedsTimedInvokeInRVCOperationalStateCluster(commandID);
     }
-    case Clusters::MatterScenes::Id: {
-        return CommandNeedsTimedInvokeInMatterScenesCluster(commandID);
+    case Clusters::ScenesManagement::Id: {
+        return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);

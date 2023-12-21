@@ -208,8 +208,8 @@ public class ClusterIDMapping {
         if (clusterId == RvcOperationalState.ID) {
             return new RvcOperationalState();
         }
-        if (clusterId == MatterScenes.ID) {
-            return new MatterScenes();
+        if (clusterId == ScenesManagement.ID) {
+            return new ScenesManagement();
         }
         if (clusterId == HepaFilterMonitoring.ID) {
             return new HepaFilterMonitoring();
@@ -8271,7 +8271,7 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
-    public static class MatterScenes implements BaseCluster {
+    public static class ScenesManagement implements BaseCluster {
         public static final long ID = 98L;
         public long getID() {
             return ID;

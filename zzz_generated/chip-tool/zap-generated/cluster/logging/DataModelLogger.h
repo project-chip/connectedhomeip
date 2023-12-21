@@ -157,13 +157,13 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Structs::AttributeValuePair::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Structs::ExtensionFieldSet::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Structs::SceneInfoStruct::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value);
 
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
@@ -652,23 +652,24 @@ static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::AddSceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::ViewSceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::RemoveSceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::RemoveAllScenesResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::StoreSceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType & value);
+static CHIP_ERROR
+LogValue(const char * label, size_t indent,
+         const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::GetSceneMembershipResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType & value);
-static CHIP_ERROR LogValue(const char * label, size_t indent,
-                           const chip::app::Clusters::MatterScenes::Commands::CopySceneResponse::DecodableType & value);
+                           const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,

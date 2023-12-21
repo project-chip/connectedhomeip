@@ -2999,8 +2999,8 @@ void CHIPRvcOperationalStateClusterOperationalCommandResponseCallback::CallbackF
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, CommandResponseState);
 }
-CHIPMatterScenesClusterAddSceneResponseCallback::CHIPMatterScenesClusterAddSceneResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterAddSceneResponseCallbackType>(CallbackFn, this)
+CHIPScenesManagementClusterAddSceneResponseCallback::CHIPScenesManagementClusterAddSceneResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPScenesManagementClusterAddSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3016,7 +3016,7 @@ CHIPMatterScenesClusterAddSceneResponseCallback::CHIPMatterScenesClusterAddScene
     }
 }
 
-CHIPMatterScenesClusterAddSceneResponseCallback::~CHIPMatterScenesClusterAddSceneResponseCallback()
+CHIPScenesManagementClusterAddSceneResponseCallback::~CHIPScenesManagementClusterAddSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3027,8 +3027,8 @@ CHIPMatterScenesClusterAddSceneResponseCallback::~CHIPMatterScenesClusterAddScen
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterAddSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::AddSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterAddSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3038,9 +3038,10 @@ void CHIPMatterScenesClusterAddSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterAddSceneResponseCallback, void (*)(CHIPMatterScenesClusterAddSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterAddSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterAddSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterAddSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterAddSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterAddSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterAddSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3072,8 +3073,8 @@ void CHIPMatterScenesClusterAddSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID);
 }
-CHIPMatterScenesClusterViewSceneResponseCallback::CHIPMatterScenesClusterViewSceneResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterViewSceneResponseCallbackType>(CallbackFn, this)
+CHIPScenesManagementClusterViewSceneResponseCallback::CHIPScenesManagementClusterViewSceneResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPScenesManagementClusterViewSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3089,7 +3090,7 @@ CHIPMatterScenesClusterViewSceneResponseCallback::CHIPMatterScenesClusterViewSce
     }
 }
 
-CHIPMatterScenesClusterViewSceneResponseCallback::~CHIPMatterScenesClusterViewSceneResponseCallback()
+CHIPScenesManagementClusterViewSceneResponseCallback::~CHIPScenesManagementClusterViewSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3100,8 +3101,8 @@ CHIPMatterScenesClusterViewSceneResponseCallback::~CHIPMatterScenesClusterViewSc
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterViewSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::ViewSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterViewSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3111,9 +3112,10 @@ void CHIPMatterScenesClusterViewSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterViewSceneResponseCallback, void (*)(CHIPMatterScenesClusterViewSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterViewSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterViewSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterViewSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterViewSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterViewSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterViewSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3219,18 +3221,18 @@ void CHIPMatterScenesClusterViewSceneResponseCallback::CallbackFn(
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$MatterScenesClusterAttributeValuePair",
+                    env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterAttributeValuePair",
                     attributeValuePairStructClass_4);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$MatterScenesClusterAttributeValuePair");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterAttributeValuePair");
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
                     env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$MatterScenesClusterAttributeValuePair constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterAttributeValuePair constructor");
                     return;
                 }
 
@@ -3241,17 +3243,17 @@ void CHIPMatterScenesClusterViewSceneResponseCallback::CallbackFn(
 
             jclass extensionFieldSetStructClass_2;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$MatterScenesClusterExtensionFieldSet", extensionFieldSetStructClass_2);
+                env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterExtensionFieldSet", extensionFieldSetStructClass_2);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$MatterScenesClusterExtensionFieldSet");
+                ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterExtensionFieldSet");
                 return;
             }
             jmethodID extensionFieldSetStructCtor_2 =
                 env->GetMethodID(extensionFieldSetStructClass_2, "<init>", "(Ljava/lang/Long;Ljava/util/ArrayList;)V");
             if (extensionFieldSetStructCtor_2 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$MatterScenesClusterExtensionFieldSet constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterExtensionFieldSet constructor");
                 return;
             }
 
@@ -3264,8 +3266,9 @@ void CHIPMatterScenesClusterViewSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID, TransitionTime, SceneName, ExtensionFieldSets);
 }
-CHIPMatterScenesClusterRemoveSceneResponseCallback::CHIPMatterScenesClusterRemoveSceneResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterRemoveSceneResponseCallbackType>(CallbackFn, this)
+CHIPScenesManagementClusterRemoveSceneResponseCallback::CHIPScenesManagementClusterRemoveSceneResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPScenesManagementClusterRemoveSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3281,7 +3284,7 @@ CHIPMatterScenesClusterRemoveSceneResponseCallback::CHIPMatterScenesClusterRemov
     }
 }
 
-CHIPMatterScenesClusterRemoveSceneResponseCallback::~CHIPMatterScenesClusterRemoveSceneResponseCallback()
+CHIPScenesManagementClusterRemoveSceneResponseCallback::~CHIPScenesManagementClusterRemoveSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3292,8 +3295,8 @@ CHIPMatterScenesClusterRemoveSceneResponseCallback::~CHIPMatterScenesClusterRemo
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterRemoveSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::RemoveSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterRemoveSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3303,10 +3306,10 @@ void CHIPMatterScenesClusterRemoveSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterRemoveSceneResponseCallback,
-                    void (*)(CHIPMatterScenesClusterRemoveSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterRemoveSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterRemoveSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterRemoveSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterRemoveSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterRemoveSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterRemoveSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3338,9 +3341,9 @@ void CHIPMatterScenesClusterRemoveSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID);
 }
-CHIPMatterScenesClusterRemoveAllScenesResponseCallback::CHIPMatterScenesClusterRemoveAllScenesResponseCallback(
+CHIPScenesManagementClusterRemoveAllScenesResponseCallback::CHIPScenesManagementClusterRemoveAllScenesResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterRemoveAllScenesResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPScenesManagementClusterRemoveAllScenesResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3356,7 +3359,7 @@ CHIPMatterScenesClusterRemoveAllScenesResponseCallback::CHIPMatterScenesClusterR
     }
 }
 
-CHIPMatterScenesClusterRemoveAllScenesResponseCallback::~CHIPMatterScenesClusterRemoveAllScenesResponseCallback()
+CHIPScenesManagementClusterRemoveAllScenesResponseCallback::~CHIPScenesManagementClusterRemoveAllScenesResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3367,8 +3370,8 @@ CHIPMatterScenesClusterRemoveAllScenesResponseCallback::~CHIPMatterScenesCluster
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterRemoveAllScenesResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::RemoveAllScenesResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterRemoveAllScenesResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3378,10 +3381,10 @@ void CHIPMatterScenesClusterRemoveAllScenesResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterRemoveAllScenesResponseCallback,
-                    void (*)(CHIPMatterScenesClusterRemoveAllScenesResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterRemoveAllScenesResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterRemoveAllScenesResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterRemoveAllScenesResponseCallback,
+                    void (*)(CHIPScenesManagementClusterRemoveAllScenesResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterRemoveAllScenesResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterRemoveAllScenesResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3407,8 +3410,8 @@ void CHIPMatterScenesClusterRemoveAllScenesResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID);
 }
-CHIPMatterScenesClusterStoreSceneResponseCallback::CHIPMatterScenesClusterStoreSceneResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterStoreSceneResponseCallbackType>(CallbackFn, this)
+CHIPScenesManagementClusterStoreSceneResponseCallback::CHIPScenesManagementClusterStoreSceneResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPScenesManagementClusterStoreSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3424,7 +3427,7 @@ CHIPMatterScenesClusterStoreSceneResponseCallback::CHIPMatterScenesClusterStoreS
     }
 }
 
-CHIPMatterScenesClusterStoreSceneResponseCallback::~CHIPMatterScenesClusterStoreSceneResponseCallback()
+CHIPScenesManagementClusterStoreSceneResponseCallback::~CHIPScenesManagementClusterStoreSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3435,8 +3438,8 @@ CHIPMatterScenesClusterStoreSceneResponseCallback::~CHIPMatterScenesClusterStore
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterStoreSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::StoreSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterStoreSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3446,10 +3449,10 @@ void CHIPMatterScenesClusterStoreSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterStoreSceneResponseCallback,
-                    void (*)(CHIPMatterScenesClusterStoreSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterStoreSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterStoreSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterStoreSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterStoreSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterStoreSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterStoreSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3481,9 +3484,9 @@ void CHIPMatterScenesClusterStoreSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID);
 }
-CHIPMatterScenesClusterGetSceneMembershipResponseCallback::CHIPMatterScenesClusterGetSceneMembershipResponseCallback(
+CHIPScenesManagementClusterGetSceneMembershipResponseCallback::CHIPScenesManagementClusterGetSceneMembershipResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterGetSceneMembershipResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPScenesManagementClusterGetSceneMembershipResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3499,7 +3502,7 @@ CHIPMatterScenesClusterGetSceneMembershipResponseCallback::CHIPMatterScenesClust
     }
 }
 
-CHIPMatterScenesClusterGetSceneMembershipResponseCallback::~CHIPMatterScenesClusterGetSceneMembershipResponseCallback()
+CHIPScenesManagementClusterGetSceneMembershipResponseCallback::~CHIPScenesManagementClusterGetSceneMembershipResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3510,8 +3513,8 @@ CHIPMatterScenesClusterGetSceneMembershipResponseCallback::~CHIPMatterScenesClus
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::GetSceneMembershipResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterGetSceneMembershipResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3521,10 +3524,10 @@ void CHIPMatterScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterGetSceneMembershipResponseCallback,
-                    void (*)(CHIPMatterScenesClusterGetSceneMembershipResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterGetSceneMembershipResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterGetSceneMembershipResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterGetSceneMembershipResponseCallback,
+                    void (*)(CHIPScenesManagementClusterGetSceneMembershipResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterGetSceneMembershipResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterGetSceneMembershipResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3588,9 +3591,9 @@ void CHIPMatterScenesClusterGetSceneMembershipResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Capacity, GroupID, SceneList);
 }
-CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::CHIPMatterScenesClusterEnhancedAddSceneResponseCallback(
+CHIPScenesManagementClusterEnhancedAddSceneResponseCallback::CHIPScenesManagementClusterEnhancedAddSceneResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterEnhancedAddSceneResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPScenesManagementClusterEnhancedAddSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3606,7 +3609,7 @@ CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::CHIPMatterScenesCluster
     }
 }
 
-CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::~CHIPMatterScenesClusterEnhancedAddSceneResponseCallback()
+CHIPScenesManagementClusterEnhancedAddSceneResponseCallback::~CHIPScenesManagementClusterEnhancedAddSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3617,8 +3620,8 @@ CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::~CHIPMatterScenesCluste
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::EnhancedAddSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterEnhancedAddSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3628,10 +3631,10 @@ void CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterEnhancedAddSceneResponseCallback,
-                    void (*)(CHIPMatterScenesClusterEnhancedAddSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterEnhancedAddSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterEnhancedAddSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterEnhancedAddSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterEnhancedAddSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterEnhancedAddSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterEnhancedAddSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3663,9 +3666,9 @@ void CHIPMatterScenesClusterEnhancedAddSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID);
 }
-CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CHIPMatterScenesClusterEnhancedViewSceneResponseCallback(
+CHIPScenesManagementClusterEnhancedViewSceneResponseCallback::CHIPScenesManagementClusterEnhancedViewSceneResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterEnhancedViewSceneResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPScenesManagementClusterEnhancedViewSceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3681,7 +3684,7 @@ CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CHIPMatterScenesCluste
     }
 }
 
-CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::~CHIPMatterScenesClusterEnhancedViewSceneResponseCallback()
+CHIPScenesManagementClusterEnhancedViewSceneResponseCallback::~CHIPScenesManagementClusterEnhancedViewSceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3692,8 +3695,8 @@ CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::~CHIPMatterScenesClust
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::EnhancedViewSceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterEnhancedViewSceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3703,10 +3706,10 @@ void CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterEnhancedViewSceneResponseCallback,
-                    void (*)(CHIPMatterScenesClusterEnhancedViewSceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterEnhancedViewSceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterEnhancedViewSceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterEnhancedViewSceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterEnhancedViewSceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterEnhancedViewSceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterEnhancedViewSceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -3812,18 +3815,18 @@ void CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
 
                 jclass attributeValuePairStructClass_4;
                 err = chip::JniReferences::GetInstance().GetClassRef(
-                    env, "chip/devicecontroller/ChipStructs$MatterScenesClusterAttributeValuePair",
+                    env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterAttributeValuePair",
                     attributeValuePairStructClass_4);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(Zcl, "Could not find class ChipStructs$MatterScenesClusterAttributeValuePair");
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterAttributeValuePair");
                     return;
                 }
                 jmethodID attributeValuePairStructCtor_4 =
                     env->GetMethodID(attributeValuePairStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;)V");
                 if (attributeValuePairStructCtor_4 == nullptr)
                 {
-                    ChipLogError(Zcl, "Could not find ChipStructs$MatterScenesClusterAttributeValuePair constructor");
+                    ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterAttributeValuePair constructor");
                     return;
                 }
 
@@ -3834,17 +3837,17 @@ void CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
 
             jclass extensionFieldSetStructClass_2;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipStructs$MatterScenesClusterExtensionFieldSet", extensionFieldSetStructClass_2);
+                env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterExtensionFieldSet", extensionFieldSetStructClass_2);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipStructs$MatterScenesClusterExtensionFieldSet");
+                ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterExtensionFieldSet");
                 return;
             }
             jmethodID extensionFieldSetStructCtor_2 =
                 env->GetMethodID(extensionFieldSetStructClass_2, "<init>", "(Ljava/lang/Long;Ljava/util/ArrayList;)V");
             if (extensionFieldSetStructCtor_2 == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipStructs$MatterScenesClusterExtensionFieldSet constructor");
+                ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterExtensionFieldSet constructor");
                 return;
             }
 
@@ -3857,8 +3860,8 @@ void CHIPMatterScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID, TransitionTime, SceneName, ExtensionFieldSets);
 }
-CHIPMatterScenesClusterCopySceneResponseCallback::CHIPMatterScenesClusterCopySceneResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMatterScenesClusterCopySceneResponseCallbackType>(CallbackFn, this)
+CHIPScenesManagementClusterCopySceneResponseCallback::CHIPScenesManagementClusterCopySceneResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPScenesManagementClusterCopySceneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3874,7 +3877,7 @@ CHIPMatterScenesClusterCopySceneResponseCallback::CHIPMatterScenesClusterCopySce
     }
 }
 
-CHIPMatterScenesClusterCopySceneResponseCallback::~CHIPMatterScenesClusterCopySceneResponseCallback()
+CHIPScenesManagementClusterCopySceneResponseCallback::~CHIPScenesManagementClusterCopySceneResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3885,8 +3888,8 @@ CHIPMatterScenesClusterCopySceneResponseCallback::~CHIPMatterScenesClusterCopySc
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMatterScenesClusterCopySceneResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MatterScenes::Commands::CopySceneResponse::DecodableType & dataResponse)
+void CHIPScenesManagementClusterCopySceneResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3896,9 +3899,10 @@ void CHIPMatterScenesClusterCopySceneResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMatterScenesClusterCopySceneResponseCallback, void (*)(CHIPMatterScenesClusterCopySceneResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMatterScenesClusterCopySceneResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMatterScenesClusterCopySceneResponseCallback>);
+    std::unique_ptr<CHIPScenesManagementClusterCopySceneResponseCallback,
+                    void (*)(CHIPScenesManagementClusterCopySceneResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPScenesManagementClusterCopySceneResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPScenesManagementClusterCopySceneResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;

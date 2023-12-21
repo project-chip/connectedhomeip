@@ -811,7 +811,7 @@ static constexpr CommandId Id = 0x00000004;
 } // namespace Commands
 } // namespace RvcOperationalState
 
-namespace MatterScenes {
+namespace ScenesManagement {
 namespace Commands {
 
 namespace AddScene {
@@ -891,7 +891,7 @@ static constexpr CommandId Id = 0x00000042;
 } // namespace CopySceneResponse
 
 } // namespace Commands
-} // namespace MatterScenes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 namespace Commands {
