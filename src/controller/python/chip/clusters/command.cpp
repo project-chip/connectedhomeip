@@ -262,7 +262,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     {
         void * commandPath = batchCommandData[i].mCommandPath;
         void * tlv         = batchCommandData[i].mTlvData;
-        size_t tlvLength = batchCommandData[i].mTlvLength;
+        size_t tlvLength   = batchCommandData[i].mTlvLength;
 
         python::CommandPath invokeRequestInfoObj;
         memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
