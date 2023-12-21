@@ -25,74 +25,74 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentControl;
 
-ContentController::ContentController()
+ContentControlManager::ContentControlManager()
 {
     // Create Test Data
 }
 
 // Attribute Delegates
-bool ContentController::HandleGetEnabled()
+bool ContentControlManager::HandleGetEnabled()
 {
     return false;
 }
 
-CHIP_ERROR ContentController::HandleGetOnDemandRatings(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentControlManager::HandleGetOnDemandRatings(chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(chip::CharSpan());
 }
 
-chip::CharSpan ContentController::HandleGetOnDemandRatingThreshold()
+chip::CharSpan ContentControlManager::HandleGetOnDemandRatingThreshold()
 {
     return chip::CharSpan();
 }
 
-CHIP_ERROR ContentController::HandleGetScheduledContentRatings(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentControlManager::HandleGetScheduledContentRatings(chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(chip::CharSpan());
 }
 
-chip::CharSpan ContentController::HandleGetScheduledContentRatingThreshold()
+chip::CharSpan ContentControlManager::HandleGetScheduledContentRatingThreshold()
 {
     return chip::CharSpan();
 }
 
-uint32_t ContentController::HandleGetScreenDailyTime()
+uint32_t ContentControlManager::HandleGetScreenDailyTime()
 {
     return (uint32_t) 0xFFFFFFFF;
 }
 
-uint32_t ContentController::HandleGetRemainingScreenTime()
+uint32_t ContentControlManager::HandleGetRemainingScreenTime()
 {
     return (uint32_t) 0xFFFFFFFF;
 }
 
-bool ContentController::HandleGetBlockUnrated()
+bool ContentControlManager::HandleGetBlockUnrated()
 {
     return false;
 }
 
 // Command Delegates
-void ContentController::HandleUpdatePIN(chip::Optional<chip::CharSpan> oldPIN, chip::CharSpan newPIN) {}
+void ContentControlManager::HandleUpdatePIN(chip::Optional<chip::CharSpan> oldPIN, chip::CharSpan newPIN) {}
 
-void ContentController::HandleResetPIN(chip::app::CommandResponseHelper<ResetPINResponseType> & helper) {}
+void ContentControlManager::HandleResetPIN(chip::app::CommandResponseHelper<ResetPINResponseType> & helper) {}
 
-void ContentController::HandleEnable() {}
+void ContentControlManager::HandleEnable() {}
 
-void ContentController::HandleDisable() {}
+void ContentControlManager::HandleDisable() {}
 
-void ContentController::HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, chip::Optional<uint32_t> bonusTime) {}
+void ContentControlManager::HandleAddBonusTime(chip::Optional<chip::CharSpan> PINCode, chip::Optional<uint32_t> bonusTime) {}
 
-void ContentController::HandleSetScreenDailyTime(uint32_t screenDailyTime) {}
+void ContentControlManager::HandleSetScreenDailyTime(uint32_t screenDailyTime) {}
 
-void ContentController::HandleBlockUnratedContent() {}
+void ContentControlManager::HandleBlockUnratedContent() {}
 
-void ContentController::HandleUnblockUnratedContent() {}
+void ContentControlManager::HandleUnblockUnratedContent() {}
 
-void ContentController::HandleSetOnDemandRatingThreshold(chip::CharSpan rating) {}
+void ContentControlManager::HandleSetOnDemandRatingThreshold(chip::CharSpan rating) {}
 
-void ContentController::HandleSetScheduledContentRatingThreshold(chip::CharSpan rating) {}
+void ContentControlManager::HandleSetScheduledContentRatingThreshold(chip::CharSpan rating) {}
 
-uint32_t ContentController::GetFeatureMap(chip::EndpointId endpoint)
+uint32_t ContentControlManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= EMBER_AF_CONTENT_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
