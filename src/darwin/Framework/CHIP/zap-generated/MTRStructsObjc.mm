@@ -4266,6 +4266,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _valveState = @(0);
+
+        _valveLevel = nil;
     }
     return self;
 }
@@ -4275,13 +4277,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRValveConfigurationAndControlClusterValveStateChangedEvent alloc] init];
 
     other.valveState = self.valveState;
+    other.valveLevel = self.valveLevel;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; >", NSStringFromClass([self class]), _valveState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: valveState:%@; valveLevel:%@; >", NSStringFromClass([self class]), _valveState, _valveLevel];
     return descriptionString;
 }
 
@@ -5428,6 +5431,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: uid:%@; >", NSStringFromClass([self class]), [_uid base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyPreferenceClusterBalanceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _step = @(0);
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyPreferenceClusterBalanceStruct alloc] init];
+
+    other.step = self.step;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: step:%@; label:%@; >", NSStringFromClass([self class]), _step, _label];
     return descriptionString;
 }
 

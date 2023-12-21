@@ -2439,6 +2439,15 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.valveState)];
             value.valveState = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.valveLevel.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.valveLevel.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.valveLevel = memberValue;
+        } while (0);
 
         return value;
     }
@@ -3027,6 +3036,18 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
 
         return value;
     }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EnergyPreference;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -4472,6 +4493,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::EnergyEvse::Id: {
         return DecodeEventPayloadForEnergyEVSECluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EnergyPreference::Id: {
+        return DecodeEventPayloadForEnergyPreferenceCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

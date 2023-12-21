@@ -2744,12 +2744,10 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 
 @end
 
-@interface MTREventReport () {
+@implementation MTREventReport {
     NSNumber * _timestampValue;
 }
-@end
 
-@implementation MTREventReport
 + (void)initialize
 {
     // One of our init methods ends up doing Platform::MemoryAlloc.
