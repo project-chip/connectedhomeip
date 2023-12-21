@@ -39,7 +39,7 @@ void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
 {
     VerifyOrReturn(IsArmed());
     persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
-    mValue.Release();
+    mValue.Free();
 }
 
 CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & path, const ByteSpan & value)
