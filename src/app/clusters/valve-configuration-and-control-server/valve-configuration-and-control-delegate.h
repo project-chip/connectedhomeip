@@ -34,7 +34,7 @@ namespace ValveConfigurationAndControl {
 class Delegate
 {
 public:
-    Delegate() : mRemainingDuration(0){};
+    Delegate(){};
 
     // shall return current level if supported, otherwise null
     virtual DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) = 0;
@@ -42,9 +42,6 @@ public:
     virtual void HandleRemainingDurationTick(uint32_t duration)                                          = 0;
 
     virtual ~Delegate() = default;
-
-    chip::EndpointId mEndpoint;
-    uint32_t mRemainingDuration;
 };
 
 } // namespace ValveConfigurationAndControl

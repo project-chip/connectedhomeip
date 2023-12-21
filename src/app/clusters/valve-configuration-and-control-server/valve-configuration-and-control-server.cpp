@@ -27,6 +27,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
 #include <app/data-model/Encode.h>
+#include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -47,35 +48,65 @@ static_assert(kValveConfigurationAndControlDelegateTableSize <= kEmberInvalidEnd
 
 namespace {
 
-DataModel::Nullable<uint32_t> gRemainingDuration[kValveConfigurationAndControlDelegateTableSize];
+struct RemainingDurationTable
+{
+    EndpointId endpoint;
+    DataModel::Nullable<uint32_t> remainingDuration;
+};
+
+RemainingDurationTable gRemainingDuration[kValveConfigurationAndControlDelegateTableSize];
 Delegate * gDelegateTable[kValveConfigurationAndControlDelegateTableSize] = { nullptr };
 
 bool GetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> & duration)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    VerifyOrReturnValue(ep < kValveConfigurationAndControlDelegateTableSize, false);
-    duration = gRemainingDuration[ep];
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    VerifyOrReturnValue(epIdx < kValveConfigurationAndControlDelegateTableSize, false);
+    duration = gRemainingDuration[epIdx].remainingDuration;
     return true;
 }
 
 void SetRemainingDuration(EndpointId endpoint, DataModel::Nullable<uint32_t> duration)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
-    if (ep < kValveConfigurationAndControlDelegateTableSize)
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
     {
-        gRemainingDuration[ep] = duration;
-        // MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
+        gRemainingDuration[epIdx].endpoint          = endpoint;
+        gRemainingDuration[epIdx].remainingDuration = duration;
     }
+}
+
+void SetRemainingDurationNull(EndpointId endpoint)
+{
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
+    {
+        if (!gRemainingDuration[epIdx].remainingDuration.IsNull())
+        {
+            MatterReportingAttributeChangeCallback(endpoint, ValveConfigurationAndControl::Id, RemainingDuration::Id);
+        }
+        gRemainingDuration[epIdx].remainingDuration.SetNull();
+    }
+}
+
+RemainingDurationTable * GetRemainingDurationItem(EndpointId endpoint)
+{
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (epIdx < kValveConfigurationAndControlDelegateTableSize)
+    {
+        return &gRemainingDuration[epIdx];
+    }
+    return nullptr;
 }
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
-                                                       EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
-    return (ep >= kValveConfigurationAndControlDelegateTableSize ? nullptr : gDelegateTable[ep]);
+    uint16_t epIdx = emberAfGetClusterServerEndpointIndex(endpoint, ValveConfigurationAndControl::Id,
+                                                          EMBER_AF_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (epIdx >= kValveConfigurationAndControlDelegateTableSize ? nullptr : gDelegateTable[epIdx]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -148,11 +179,11 @@ static bool emitValveStateChangedEvent(EndpointId ep, ValveConfigurationAndContr
         return false;
     }
 
-    ChipLogProgress(Zcl, "Emit ValveStateChanged event [ep=%d]", ep);
+    ChipLogProgress(Zcl, "Emit ValveStateChanged event [ep=%d] %d", ep, to_underlying(state));
     return true;
 }
 
-static CHIP_ERROR emitValveFaultEvent(EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+static CHIP_ERROR emitValveFaultEvent(EndpointId ep, BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ValveConfigurationAndControl::Events::ValveFault::Type event;
     EventNumber eventNumber;
@@ -170,47 +201,46 @@ static CHIP_ERROR emitValveFaultEvent(EndpointId ep, chip::BitMask<ValveConfigur
     return CHIP_NO_ERROR;
 }
 
-static void onValveConfigurationAndControlTick(chip::System::Layer * systemLayer, void * data)
-{ // TODO move endpoint from delegate to remainingduration struct, then remove all endpoint info from delegate
-    Delegate * delegate = reinterpret_cast<Delegate *>(data);
-    VerifyOrReturn(delegate != nullptr);
+static void onValveConfigurationAndControlTick(System::Layer * systemLayer, void * data)
+{
+    RemainingDurationTable * item = reinterpret_cast<RemainingDurationTable *>(data);
+    VerifyOrReturn(item != nullptr, ChipLogError(Zcl, "Error retrieving RemainingDuration item"));
 
-    EndpointId ep = delegate->mEndpoint;
+    DataModel::Nullable<uint32_t> rDuration = item->remainingDuration;
+    VerifyOrReturn(!rDuration.IsNull());
 
-    if (delegate->mRemainingDuration > 0)
+    EndpointId ep = item->endpoint;
+
+    if (rDuration.Value() > 0)
     {
-        delegate->mRemainingDuration--;
-        if (delegate->mRemainingDuration < 5 || !(delegate->mRemainingDuration % 5))
-        {
-            SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(delegate->mRemainingDuration));
-        }
+        SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>(--rDuration.Value()));
         startRemainingDurationTick(ep);
     }
     else
     {
-        SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>());
+        SetRemainingDurationNull(ep);
     }
 }
 
 void startRemainingDurationTick(EndpointId ep)
 {
-    DataModel::Nullable<uint32_t> rDuration;
-    Delegate * delegate = GetDelegate(ep);
+    RemainingDurationTable * item = GetRemainingDurationItem(ep);
+    VerifyOrReturn(item != nullptr, ChipLogError(Zcl, "Error retrieving RemainingDuration item"));
 
-    VerifyOrReturn(GetRemainingDuration(ep, rDuration), ChipLogError(Zcl, "Error retrieving RemainingDuration"));
-    VerifyOrReturn(!isDelegateNull(delegate, ep));
+    DataModel::Nullable<uint32_t> rDuration = item->remainingDuration;
     VerifyOrReturn(!rDuration.IsNull());
+    Delegate * delegate = GetDelegate(item->endpoint);
+    VerifyOrReturn(delegate != nullptr);
 
+    delegate->HandleRemainingDurationTick(rDuration.Value());
     if (rDuration.Value() > 0)
     {
-        delegate->HandleRemainingDurationTick(rDuration.Value());
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onValveConfigurationAndControlTick,
-                                                           delegate);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(1), onValveConfigurationAndControlTick, item);
     }
     else
     {
         ValveConfigurationAndControl::CloseValve(ep);
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, delegate);
+        (void) DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, item);
     }
 }
 
@@ -226,8 +256,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     // if endpoint is found
     if (ep < kValveConfigurationAndControlDelegateTableSize)
     {
-        delegate->mEndpoint = endpoint;
-        gDelegateTable[ep]  = delegate;
+        gDelegateTable[ep] = delegate;
     }
 }
 
@@ -239,53 +268,45 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 CHIP_ERROR CloseValve(EndpointId ep)
 {
     Delegate * delegate = GetDelegate(ep);
-    DataModel::Nullable<uint64_t> autoCloseTime;
     DataModel::Nullable<uint32_t> rDuration;
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
                         attribute_error);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed),
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS ==
+                            CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
                         attribute_error);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::SetNull(ep), attribute_error);
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::SetNull(ep), attribute_error);
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetLevel::Set(ep, 0), attribute_error);
     }
-    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync) &&
-        EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Get(ep, autoCloseTime))
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
     }
-    SetRemainingDuration(ep, DataModel::MakeNullable<uint32_t>());
+    SetRemainingDurationNull(ep);
+    RemainingDurationTable * item = GetRemainingDurationItem(ep);
+    (void) DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, item);
 
+    emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
     if (!isDelegateNull(delegate, ep))
     {
         delegate->HandleCloseValve();
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, delegate);
-        delegate->mRemainingDuration = 0;
     }
-    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
-    {
-        // TODO not in current spec but proposed in
-        // https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/8575
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, chip::Percent(0)), attribute_error);
-    }
-    emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kClosed);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent> level, DataModel::Nullable<uint32_t> openDuration)
+CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> openDuration)
 {
     Delegate * delegate     = GetDelegate(ep);
     Optional<Status> status = Optional<Status>::Missing();
-    DataModel::Nullable<chip::Percent> openLevel;
+    DataModel::Nullable<Percent> openLevel;
     DataModel::Nullable<uint64_t> autoCloseTime;
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
-    // if has timesync feature and autoclosetime available, set autoclosetime to current UTC + openduration field or attribute
-    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync) &&
-        EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Get(ep, autoCloseTime))
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
         System::Clock::Microseconds64 utcTime;
         ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
@@ -309,20 +330,10 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
     }
 
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == OpenDuration::Set(ep, openDuration), attribute_error);
+
     SetRemainingDuration(ep, openDuration);
-    startRemainingDurationTick(ep);
-
-    // start movement towards target ( delegate )
-    if (!isDelegateNull(delegate, ep))
-    {
-        delegate->mRemainingDuration              = openDuration.IsNull() ? 0 : openDuration.Value();
-        DataModel::Nullable<chip::Percent> cLevel = delegate->HandleOpenValve(level);
-        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
-        {
-            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, cLevel), attribute_error);
-        }
-    }
-
+    // Trigger report for remainingduration
+    MatterReportingAttributeChangeCallback(ep, ValveConfigurationAndControl::Id, RemainingDuration::Id);
     // set targetstate to open
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == TargetState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kOpen),
                         attribute_error);
@@ -330,17 +341,41 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, DataModel::Nullable<chip::Percent>
                             CurrentState::Set(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning),
                         attribute_error);
 
-    // if has level feature set targetlevel to openlevel
-
-    // start movement and countdown
-    // if level feature, update currentLevel at the start of movement
-    // when movement is complete, update currentState to Open
+    // start movement towards target
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
+    if (!isDelegateNull(delegate, ep))
+    {
+        DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
+        if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
+        {
+            VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, cLevel), attribute_error);
+        }
+    }
+    // start countdown
+    startRemainingDurationTick(ep);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EmitValveFault(EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
+CHIP_ERROR UpdateCurrentLevel(EndpointId ep, Percent currentLevel)
+{
+    if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
+    {
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentLevel::Set(ep, currentLevel),
+                            CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+}
+
+CHIP_ERROR UpdateCurrentState(EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState)
+{
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentState::Set(ep, currentState), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    emitValveStateChangedEvent(ep, currentState);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault)
 {
     ReturnErrorOnFailure(emitValveFaultEvent(ep, fault));
     return CHIP_NO_ERROR;
@@ -358,7 +393,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
     const auto & openDuration = commandData.openDuration;
     const auto & targetLevel  = commandData.targetLevel;
     const auto & ep           = commandPath.mEndpointId;
-    DataModel::Nullable<chip::Percent> level;
+    DataModel::Nullable<Percent> level;
     DataModel::Nullable<uint32_t> duration;
     BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault(0);
     Optional<Status> status = Optional<Status>::Missing();
@@ -388,7 +423,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
     {
-        chip::Percent defOpenLevel;
+        Percent defOpenLevel;
         if (targetLevel.HasValue())
         {
             level.SetNonNull(targetLevel.Value());
@@ -399,7 +434,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
         }
         else
         {
-            level.SetNonNull(chip::Percent(100));
+            level.SetNonNull(Percent(100));
         }
     }
 
@@ -409,7 +444,7 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
 exit:
     if (status.HasValue())
     {
-        BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> gFault(
+        BitMask<ValveConfigurationAndControl::ValveFaultBitmap> gFault(
             ValveConfigurationAndControl::ValveFaultBitmap::kGeneralFault);
         emitValveFaultEvent(ep, gFault);
         commandObj->AddStatus(commandPath, status.Value());
@@ -427,6 +462,15 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     const ValveConfigurationAndControl::Commands::Close::DecodableType & commandData)
 {
     const auto & ep = commandPath.mEndpointId;
+    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault(0);
+
+    // if fault is registered return FailureDueToFault
+    if (EMBER_ZCL_STATUS_SUCCESS == ValveFault::Get(ep, &fault) && fault.HasAny())
+    {
+        commandObj->AddClusterSpecificFailure(commandPath,
+                                              to_underlying(ValveConfigurationAndControl::StatusCodeEnum::kFailureDueToFault));
+        return true;
+    }
 
     if (CHIP_NO_ERROR == ValveConfigurationAndControl::CloseValve(ep))
     {
@@ -438,39 +482,6 @@ bool emberAfValveConfigurationAndControlClusterCloseCallback(
     }
 
     return true;
-}
-
-#if 0
-bool emberAfValveConfigurationAndControlClusterSetLevelCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const ValveConfigurationAndControl::Commands::SetLevel::DecodableType & commandData)
-{
-    const auto & level        = commandData.level;
-    const auto & openDuration = commandData.openDuration;
-    const auto & ep = commandPath.mEndpointId;
-    Optional<Status> status   = Optional<Status>::Missing();
-    DataModel::Nullable<chip::Percent> cLevel;
-	chip::Percent defOpenLevel;
-
-
-
-exit:
-    if (status.HasValue())
-    {
-        commandObj->AddStatus(commandPath, status.Value());
-    }
-    else
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-    }
-
-    return true;
-}
-#endif
-
-void MatterValveConfigurationAndControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
-{
-    // TODO
 }
 
 void MatterValveConfigurationAndControlPluginServerInitCallback()

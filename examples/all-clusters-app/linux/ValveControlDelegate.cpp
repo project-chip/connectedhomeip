@@ -16,21 +16,49 @@
  */
 
 #include "ValveControlDelegate.h"
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
 
+static chip::Percent sLevel                = 1;
+static uint32_t sLastOpenDuration          = 0;
+static constexpr EndpointId kValveEndpoint = 1;
+
 DataModel::Nullable<chip::Percent> ValveControlDelegate::HandleOpenValve(DataModel::Nullable<chip::Percent> level)
 {
-    chip::Percent lvl = level.IsNull() ? 100 : level.Value();
-    ChipLogProgress(NotSpecified, "Valve opened to level: %d", lvl);
-    return DataModel::Nullable<chip::Percent>();
+    chip::Percent currentLevel = sLevel;
+    sLevel                     = level.IsNull() ? 100 : level.Value();
+    sLastOpenDuration          = 0;
+    ChipLogProgress(NotSpecified, "Valve openinig from level: %d to %d", currentLevel, sLevel);
+    return DataModel::Nullable<chip::Percent>(currentLevel);
 }
 
 CHIP_ERROR ValveControlDelegate::HandleCloseValve()
 {
+    sLastOpenDuration = 0;
+    sLevel            = 0;
+    ReturnErrorOnFailure(ValveConfigurationAndControl::UpdateCurrentLevel(kValveEndpoint, sLevel));
+    ReturnErrorOnFailure(
+        ValveConfigurationAndControl::UpdateCurrentState(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kClosed));
     ChipLogProgress(NotSpecified, "Valve closed");
     return CHIP_NO_ERROR;
+}
+
+void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
+{
+    ChipLogProgress(NotSpecified, "Valve remaining duration ticking: %dsec level: %d duration %d", duration, sLevel,
+                    sLastOpenDuration);
+    if (sLastOpenDuration == 0)
+    {
+        VerifyOrReturn(CHIP_NO_ERROR == ValveConfigurationAndControl::UpdateCurrentLevel(kValveEndpoint, sLevel),
+                       ChipLogError(NotSpecified, "Updating current level failed"));
+        VerifyOrReturn(CHIP_NO_ERROR ==
+                           ValveConfigurationAndControl::UpdateCurrentState(kValveEndpoint,
+                                                                            ValveConfigurationAndControl::ValveStateEnum::kOpen),
+                       ChipLogError(NotSpecified, "Updating current state failed"));
+    }
+    sLastOpenDuration = duration;
 }
