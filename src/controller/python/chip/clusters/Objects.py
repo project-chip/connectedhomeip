@@ -19869,9 +19869,9 @@ class MicrowaveOvenControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="minPower", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="maxPower", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="powerStep", Tag=0x00000005, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="supportedWatts", Tag=0x00000006, Type=typing.Union[None, Nullable, typing.List[uint]]),
+                ClusterObjectFieldDescriptor(Label="supportedWatts", Tag=0x00000006, Type=typing.Optional[typing.List[uint]]),
                 ClusterObjectFieldDescriptor(Label="selectedWattIndex", Tag=0x00000007, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="wattRating", Tag=0x00000008, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="wattRating", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -19886,9 +19886,9 @@ class MicrowaveOvenControl(Cluster):
     minPower: 'typing.Optional[uint]' = None
     maxPower: 'typing.Optional[uint]' = None
     powerStep: 'typing.Optional[uint]' = None
-    supportedWatts: 'typing.Union[None, Nullable, typing.List[uint]]' = None
+    supportedWatts: 'typing.Optional[typing.List[uint]]' = None
     selectedWattIndex: 'typing.Optional[uint]' = None
-    wattRating: 'typing.Union[None, Nullable, uint]' = None
+    wattRating: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -20051,9 +20051,9 @@ class MicrowaveOvenControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, typing.List[uint]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[uint]])
 
-            value: 'typing.Union[None, Nullable, typing.List[uint]]' = None
+            value: 'typing.Optional[typing.List[uint]]' = None
 
         @dataclass
         class SelectedWattIndex(ClusterAttributeDescriptor):
@@ -20083,9 +20083,9 @@ class MicrowaveOvenControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'typing.Union[None, Nullable, uint]' = None
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

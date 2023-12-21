@@ -8083,10 +8083,10 @@ public class ClusterReadMapping {
         InteractionInfo readMicrowaveOvenControlWattRatingAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.MicrowaveOvenControlCluster) cluster).readWattRatingAttribute(
-              (ChipClusters.MicrowaveOvenControlCluster.WattRatingAttributeCallback) callback
+              (ChipClusters.IntegerAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterWattRatingAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
           readMicrowaveOvenControlWattRatingCommandParams
         );
         result.put("readWattRatingAttribute", readMicrowaveOvenControlWattRatingAttributeInteractionInfo);

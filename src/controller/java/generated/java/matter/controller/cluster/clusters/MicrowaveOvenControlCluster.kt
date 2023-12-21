@@ -54,16 +54,6 @@ class MicrowaveOvenControlCluster(
     object SubscriptionEstablished : SupportedWattsAttributeSubscriptionState()
   }
 
-  class WattRatingAttribute(val value: UShort?)
-
-  sealed class WattRatingAttributeSubscriptionState {
-    data class Success(val value: UShort?) : WattRatingAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : WattRatingAttributeSubscriptionState()
-
-    object SubscriptionEstablished : WattRatingAttributeSubscriptionState()
-  }
-
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -722,20 +712,15 @@ class MicrowaveOvenControlCluster(
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: List<UShort>? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          buildList<UShort> {
-            tlvReader.enterArray(AnonymousTag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(tlvReader.getUShort(AnonymousTag))
-            }
-            tlvReader.exitContainer()
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<UShort> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUShort(AnonymousTag))
           }
-        } else {
-          null
+          tlvReader.exitContainer()
         }
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
@@ -784,20 +769,15 @@ class MicrowaveOvenControlCluster(
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: List<UShort>? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                buildList<UShort> {
-                  tlvReader.enterArray(AnonymousTag)
-                  while (!tlvReader.isEndOfContainer()) {
-                    add(tlvReader.getUShort(AnonymousTag))
-                  }
-                  tlvReader.exitContainer()
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<UShort> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUShort(AnonymousTag))
                 }
-              } else {
-                null
+                tlvReader.exitContainer()
               }
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
@@ -903,7 +883,7 @@ class MicrowaveOvenControlCluster(
     }
   }
 
-  suspend fun readWattRatingAttribute(): WattRatingAttribute {
+  suspend fun readWattRatingAttribute(): UShort? {
     val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
@@ -930,24 +910,19 @@ class MicrowaveOvenControlCluster(
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: UShort? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUShort(AnonymousTag)
-        } else {
-          null
-        }
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return WattRatingAttribute(decodedValue)
+    return decodedValue
   }
 
   suspend fun subscribeWattRatingAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Flow<WattRatingAttributeSubscriptionState> {
+  ): Flow<UShortSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
       listOf(
@@ -966,7 +941,7 @@ class MicrowaveOvenControlCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            WattRatingAttributeSubscriptionState.Error(
+            UShortSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -984,21 +959,16 @@ class MicrowaveOvenControlCluster(
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: UShort? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUShort(AnonymousTag)
-              } else {
-                null
-              }
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(WattRatingAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(WattRatingAttributeSubscriptionState.SubscriptionEstablished)
+          emit(UShortSubscriptionState.SubscriptionEstablished)
         }
       }
     }

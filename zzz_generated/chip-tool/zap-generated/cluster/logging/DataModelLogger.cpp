@@ -11292,7 +11292,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PowerStep", 1, value);
         }
         case MicrowaveOvenControl::Attributes::SupportedWatts::Id: {
-            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint16_t>> value;
+            chip::app::DataModel::DecodableList<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedWatts", 1, value);
         }
@@ -11302,7 +11302,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SelectedWattIndex", 1, value);
         }
         case MicrowaveOvenControl::Attributes::WattRating::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WattRating", 1, value);
         }

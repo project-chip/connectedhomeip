@@ -18840,12 +18840,12 @@ void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCo
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "power-step", 0, UINT8_MAX, Attributes::PowerStep::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint16_t>>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
             Id, "supported-watts", Attributes::SupportedWatts::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "selected-watt-index", 0, UINT8_MAX, Attributes::SelectedWattIndex::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
-            Id, "watt-rating", 0, UINT16_MAX, Attributes::WattRating::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "watt-rating", 0, UINT16_MAX, Attributes::WattRating::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

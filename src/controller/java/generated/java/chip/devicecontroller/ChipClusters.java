@@ -25443,11 +25443,7 @@ public class ChipClusters {
     }
 
     public interface SupportedWattsAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable List<Integer> value);
-    }
-
-    public interface WattRatingAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable Integer value);
+      void onSuccess(List<Integer> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -25623,7 +25619,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, SUPPORTED_WATTS_ATTRIBUTE_ID, true);
@@ -25636,7 +25632,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, SUPPORTED_WATTS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
@@ -25667,26 +25663,26 @@ public class ChipClusters {
     }
 
     public void readWattRatingAttribute(
-        WattRatingAttributeCallback callback) {
+        IntegerAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WATT_RATING_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, WATT_RATING_ATTRIBUTE_ID, true);
     }
 
     public void subscribeWattRatingAttribute(
-        WattRatingAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WATT_RATING_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, WATT_RATING_ATTRIBUTE_ID, minInterval, maxInterval);
     }

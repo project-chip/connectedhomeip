@@ -18263,9 +18263,9 @@ struct TypeInfo
 namespace SupportedWatts {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint16_t>>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint16_t>>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint16_t>> &;
+    using Type             = chip::app::DataModel::List<const uint16_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedWatts::Id; }
@@ -18287,9 +18287,9 @@ struct TypeInfo
 namespace WattRating {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WattRating::Id; }
@@ -18349,7 +18349,7 @@ struct TypeInfo
         Attributes::PowerStep::TypeInfo::DecodableType powerStep       = static_cast<uint8_t>(0);
         Attributes::SupportedWatts::TypeInfo::DecodableType supportedWatts;
         Attributes::SelectedWattIndex::TypeInfo::DecodableType selectedWattIndex = static_cast<uint8_t>(0);
-        Attributes::WattRating::TypeInfo::DecodableType wattRating;
+        Attributes::WattRating::TypeInfo::DecodableType wattRating               = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
