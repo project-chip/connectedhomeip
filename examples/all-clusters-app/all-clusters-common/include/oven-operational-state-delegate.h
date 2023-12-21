@@ -27,10 +27,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-// class RvcDevice;
-
-// typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::GenericOperationalError & err);
-
 namespace OvenCavityOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
@@ -42,10 +38,6 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPreheating)),
-        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kPreheated)),
-        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kCoolingDown)),
-        // OperationalState::GenericOperationalState(to_underlying(Clusters::OvenCavityOperationalState::OperationalStateEnum::kSelfCleaning))
     };
 
     const Clusters::OperationalState::GenericOperationalPhase mOperationalPhaseList[1] = {
@@ -53,14 +45,9 @@ private:
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    // RvcDevice * mPauseRvcDeviceInstance;
-    // HandleOpStateCommand mPauseCallback;
-    // RvcDevice * mResumeRvcDeviceInstance;
-    // HandleOpStateCommand mResumeCallback;
-
 public:
     /**
-     * Get the countdown time. This attribute is not supported in our example RVC app.
+     * Get the countdown time. This attribute is not supported in our example app.
      * @return Null.
      */
     DataModel::Nullable<uint32_t> GetCountdownTime() override { return {}; };
@@ -119,18 +106,6 @@ public:
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
     };
-
-    // void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
-    // {
-    //     mPauseCallback          = aCallback;
-    //     mPauseRvcDeviceInstance = aInstance;
-    // };
-
-    // void SetResumeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
-    // {
-    //     mResumeCallback          = aCallback;
-    //     mResumeRvcDeviceInstance = aInstance;
-    // };
 };
 
 void Shutdown();

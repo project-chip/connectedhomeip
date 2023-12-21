@@ -77,13 +77,3 @@ OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
     operationalPhase = mOperationalPhaseList[index];
     return CHIP_NO_ERROR;
 }
-
-// void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
-// {
-//     (mPauseRvcDeviceInstance->*mPauseCallback)(err);
-// }
-
-// void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
-// {
-//     (mResumeRvcDeviceInstance->*mResumeCallback)(err);
-// }
