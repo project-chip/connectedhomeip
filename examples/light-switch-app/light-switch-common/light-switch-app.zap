@@ -4881,7 +4881,7 @@
           ]
         },
         {
-          "name": "Matter Scenes",
+          "name": "Scenes Management",
           "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",

@@ -2007,7 +2007,7 @@ cluster IcdManagement = 70 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-provisional cluster MatterScenes = 98 {
+provisional cluster ScenesManagement = 98 {
   revision 5;
 
   bitmap CopyModeBitmap : bitmap8 {
@@ -2905,7 +2905,7 @@ endpoint 1 {
 
   binding cluster Identify;
   binding cluster OnOff;
-  binding cluster MatterScenes;
+  binding cluster ScenesManagement;
   binding cluster ColorControl;
 
   server cluster Identify {
