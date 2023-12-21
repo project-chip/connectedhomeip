@@ -48,8 +48,8 @@ void SynchronizedReportSchedulerImpl::OnTransitionToIdle()
 {
     Timestamp now               = mTimerDelegate->GetCurrentMonotonicTimestamp();
     uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_SLEEP_TIME_JITTER_MS);
-    VerifyOrReturn(now >= mTestNextReportTimestamp);
-    if (((mTestNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
+    VerifyOrReturn(now >= mNextReportTimestamp);
+    if (((mNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
     {
         // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
         CancelReport();
@@ -67,7 +67,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
-    mTestNextReportTimestamp = now + timeout;
+    mNextReportTimestamp = now + timeout;
 
     return CHIP_NO_ERROR;
 }
@@ -182,6 +182,9 @@ void SynchronizedReportSchedulerImpl::TimerFired()
     Timestamp now   = mTimerDelegate->GetCurrentMonotonicTimestamp();
     bool firedEarly = true;
 
+    // If there are no handlers registered, no need to do anything.
+    VerifyOrReturn(mNodesPool.Allocated());
+
     mNodesPool.ForEachActiveObject([now, &firedEarly](ReadHandlerNode * node) {
         if (node->GetMinTimestamp() <= now)
         {
@@ -201,8 +204,7 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         return Loop::Continue;
     });
 
-    // If there are no handlers registers, no need to schedule the next report
-    if (mNodesPool.Allocated() && firedEarly)
+    if (firedEarly)
     {
         Timeout timeout = Milliseconds32(0);
         ReturnOnFailure(CalculateNextReportTimeout(timeout, nullptr, now));

@@ -248,7 +248,7 @@ executable("darwin-framework-tool") {
 
       # pics is needed by tests
       "${chip_root}/src/app/tests/suites/pics",
-      "${chip_root}/src/protocols:im_status",
+      "${chip_root}/src/protocols/interaction_model",
     ]
 
     defines = []
