@@ -140,8 +140,8 @@ tests:
 
     - label:
           "Step 5a: TH sends a AddScene command to DUT with the GroupID field
-          set to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
-          to 0x0014 (20s) and no extension field sets."
+          set to G1, the SceneID field set to 0x01, the TransitionTimeMS field
+          set to 0x0014 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
           ./chip-tool scenes add-scene 0x0001 0x1 0x0014 scene1 [] 1 1
@@ -194,8 +194,8 @@ tests:
     - label:
           "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
           command to DUT with the GroupID field set to G1, the SceneID field set
-          to 0x03, the TransitionTimeMS field set to 0x0014 (20s) and no extension
-          field sets. If RemainingCapacity is 0, continue to Step 8a."
+          to 0x03, the TransitionTimeMS field set to 0x0014 (20s) and no
+          extension field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
           ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1

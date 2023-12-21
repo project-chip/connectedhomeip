@@ -64,7 +64,6 @@ tests:
       response:
           saveAs: th1FabricIndex
 
-
     - label: "Read the FabricSceneInfo attribute (0x0007) "
       command: "readAttribute"
       attribute: "FabricSceneInfo"

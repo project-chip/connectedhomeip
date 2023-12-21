@@ -8321,6 +8321,16 @@
               - TestBatchHelperRequest
               - TestSecondBatchHelperRequest
       command fields:
+          Scenes:
+              AddScene:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTimeMS
+              ViewSceneResponse:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTimeMS
+              RecallScene:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTimeMS
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               AddOrUpdateWiFiNetwork:
@@ -8534,6 +8544,39 @@
           # getting renamed and getting a new cluster id, so just removing it
           # seems like the most sensible thing.
           - Scenes
+      bitmap values:
+          ScenesManagement:
+              Feature:
+                  # Targeting Spring 2024 Matter release
+                  - Explicit
+                  - TableSize
+                  - FabricScenes
+      attributes:
+          ScenesManagement:
+              # Targeting Spring 2024 Matter release
+              - SceneCount
+              - CurrentScene
+              - CurrentGroup
+              - SceneValid
+              - NameSupport
+      commands:
+          ScenesManagement:
+              # Targeting Spring 2024 Matter release
+              - EnhancedAddScene
+              - EnhancedAddSceneResponse
+              - EnhancedViewScene
+              - EnhancedViewSceneResponse
+      command fields:
+          ScenesManagement:
+              AddScene:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTime
+              ViewSceneResponse:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTime
+              RecallScene:
+                  # Targeting Spring 2024 Matter release
+                  - transitionTime
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time
