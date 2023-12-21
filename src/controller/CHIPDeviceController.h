@@ -220,7 +220,7 @@ public:
      * This function finds the device corresponding to deviceId, and establishes
      * a CASE session with it.
      *
-     * Once the CASE session is successfully established the `onConnectedDevice`
+     * Once the CASE session is successfully established the `onConnection`
      * callback is called. This can happen before GetConnectedDevice returns if
      * there is an existing CASE session.
      *
@@ -242,7 +242,7 @@ public:
      * This function finds the device corresponding to deviceId, and establishes
      * a CASE session with it.
      *
-     * Once the CASE session is successfully established the `onConnectedDevice`
+     * Once the CASE session is successfully established the `onConnection`
      * callback is called. This can happen before GetConnectedDevice returns if
      * there is an existing CASE session.
      *

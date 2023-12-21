@@ -142,6 +142,14 @@ private:
 
     Optional<SessionHandle> FindExistingSession(const ScopedNodeId & peerId) const;
 
+    void FindOrEstablishSessionHelper(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                      Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure,
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                      uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
+#endif
+    );
+
     CASESessionManagerConfig mConfig;
 };
 
