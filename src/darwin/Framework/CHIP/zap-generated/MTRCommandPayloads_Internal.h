@@ -994,7 +994,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
+@interface MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1007,12 +1013,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRValveConfigurationAndControlClusterCloseParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRValveConfigurationAndControlClusterSetLevelParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

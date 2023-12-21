@@ -25,10 +25,10 @@
 using ContentAppObserverDelegate = chip::app::Clusters::ContentAppObserver::Delegate;
 using ContentAppMessageResponse  = chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::Type;
 
-class ContentAppObserver : public ContentAppObserverDelegate
+class ContentAppObserverManager : public ContentAppObserverDelegate
 {
 public:
-    ContentAppObserver();
+    ContentAppObserverManager();
 
     void HandleContentAppMessage(chip::app::CommandResponseHelper<ContentAppMessageResponse> & helper,
                                  const chip::Optional<chip::CharSpan> & data, const chip::CharSpan & encodingHint) override;

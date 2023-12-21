@@ -462,6 +462,8 @@ void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounte
         return;
     }
 
+    mDeviceIsICD = true;
+
     ChipLogProgress(chipTool, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(nodeId));
     ChipLogProgress(chipTool,
                     "ICD Registration Complete for device " ChipLogFormatX64 " / Check-In NodeID: " ChipLogFormatX64

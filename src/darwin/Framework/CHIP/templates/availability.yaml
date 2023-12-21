@@ -7473,7 +7473,6 @@
           - PM25ConcentrationMeasurement
           - RadonConcentrationMeasurement
           - TotalVolatileOrganicCompoundsConcentrationMeasurement
-          - OperationalState
           - RefrigeratorAlarm
           - TemperatureControl
           - SmokeCOAlarm
@@ -7797,6 +7796,7 @@
           - RVCRunMode
           - RVCCleanMode
           - RVCOperationalState
+          - OperationalState
       attributes:
           RVCRunMode:
               - SupportedModes
@@ -7828,6 +7828,18 @@
               - AttributeList
               - FeatureMap
               - ClusterRevision
+          OperationalState:
+              - PhaseList
+              - CurrentPhase
+              - CountdownTime
+              - OperationalStateList
+              - OperationalState
+              - OperationalError
+              - GeneratedCommandList
+              - AcceptedCommandList
+              - AttributeList
+              - FeatureMap
+              - ClusterRevision
           PowerSource:
               - EndpointList
       commands:
@@ -7838,6 +7850,12 @@
               - ChangeToMode
               - ChangeToModeResponse
           RVCOperationalState:
+              - Pause
+              - Resume
+              - OperationalCommandResponse
+          OperationalState:
+              - Start
+              - Stop
               - Pause
               - Resume
               - OperationalCommandResponse
@@ -7857,6 +7875,9 @@
           RVCOperationalState:
               OperationalCommandResponse:
                   - commandResponseState
+          OperationalState:
+              OperationalCommandResponse:
+                  - commandResponseState
       structs:
           RVCOperationalState:
               - OperationalStateStruct
@@ -7867,6 +7888,9 @@
           RVCCleanMode:
               - ModeTagStruct
               - ModeOptionStruct
+          OperationalState:
+              - OperationalStateStruct
+              - ErrorStateStruct
           Thermostat:
               - WeeklyScheduleTransitionStruct
       struct fields:
@@ -7894,6 +7918,14 @@
                   - label
                   - mode
                   - modeTags
+          OperationalState:
+              OperationalStateStruct:
+                  - operationalStateID
+                  - operationalStateLabel
+              ErrorStateStruct:
+                  - errorStateID
+                  - errorStateLabel
+                  - errorStateDetails
           Thermostat:
               WeeklyScheduleTransitionStruct:
                   - transitionTime
@@ -7903,11 +7935,21 @@
           RVCOperationalState:
               - OperationalError
               - OperationCompletion
+          OperationalState:
+              - OperationalError
+              - OperationCompletion
       event fields:
           WiFiNetworkDiagnostics:
               AssociationFailure:
                   - associationFailureCause
           RVCOperationalState:
+              OperationalError:
+                  - errorState
+              OperationCompletion:
+                  - completionErrorCode
+                  - totalOperationalTime
+                  - pausedTime
+          OperationalState:
               OperationalError:
                   - errorState
               OperationCompletion:
@@ -7932,6 +7974,9 @@
           RVCCleanMode:
               - ModeTag
               - StatusCode
+          OperationalState:
+              - OperationalStateEnum
+              - ErrorStateEnum
           Thermostat:
               - ControlSequenceOfOperationEnum
               - SetpointRaiseLowerModeEnum
@@ -8081,6 +8126,17 @@
                   - Mop
               StatusCode:
                   - CleaningInProgress
+          OperationalState:
+              OperationalStateEnum:
+                  - Stopped
+                  - Running
+                  - Paused
+                  - Error
+              ErrorStateEnum:
+                  - NoError
+                  - UnableToStartOrResume
+                  - UnableToCompleteOperation
+                  - CommandInvalidInState
           Thermostat:
               ControlSequenceOfOperationEnum:
                   - CoolingOnly
@@ -8193,7 +8249,7 @@
           - MicrowaveOvenControl
           - MicrowaveOvenMode
           - DemandResponseLoadControl
-          - BooleanSensorConfiguration
+          - BooleanStateConfiguration
           - ValveConfigurationAndControl
           - Timer
           - OvenMode
@@ -8203,6 +8259,7 @@
           - ContentControl
           - ContentAppObserver
           - DeviceEnergyManagement
+          - ElectricalEnergyMeasurement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
