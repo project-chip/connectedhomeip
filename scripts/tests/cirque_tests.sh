@@ -62,7 +62,7 @@ function __cirquetest_start_flask() {
     # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
     # This is not expected. Start a new session to prevent it from receiving signals
     setsid bash -c 'FLASK_APP=cirque/restservice/service.py \
-        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/ \
+        PATH="'"$REPO_DIR"'"/third_party/openthread/repo/build/simulation/examples/apps/ncp/:"'"$PATH"'" \
         python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1' &
     FLASK_PID=$!
     echo "Flask running in backgroud with pid $FLASK_PID"
