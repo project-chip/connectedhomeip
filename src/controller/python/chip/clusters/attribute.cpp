@@ -27,6 +27,7 @@
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <lib/support/CodeUtils.h>
 
@@ -256,13 +257,10 @@ struct __attribute__((packed)) PyReadAttributeParams
     bool autoResubscribe;
 };
 
-// Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
-                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, size_t n, ...);
+                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData, size_t n);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
-                                                    size_t busyWaitMsSizeT, size_t n, ...);
-PyChipError pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
-                                             DeviceProxy * device, uint8_t * readParamsBuf, size_t n, size_t total, ...);
+                                                    size_t busyWaitMsSizeT, chip::python::PyWriteAttributeData * writeAttributesData, size_t n);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -337,7 +335,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 }
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
-                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, size_t n, ...)
+                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData, size_t n)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -352,35 +350,30 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback->GetChunkedCallback(),
         timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing());
 
-    va_list args;
-    va_start(args, n);
-
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
+    for (size_t i = 0; i < n; i++)
     {
-        for (size_t i = 0; i < n; i++)
+        void * path = writeAttributesData[i].mAttributePath;
+        void * tlv  = writeAttributesData[i].mTlvData;
+        size_t length  = writeAttributesData[i].mTlvLength;
+
+        python::AttributePath pathObj;
+        memcpy(&pathObj, path, sizeof(python::AttributePath));
+        uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
+
+        TLV::TLVReader reader;
+        reader.Init(tlvBuffer, static_cast<uint32_t>(length));
+        reader.Next();
+        Optional<DataVersion> dataVersion;
+        if (pathObj.hasDataVersion == 1)
         {
-            void * path = va_arg(args, void *);
-            void * tlv  = va_arg(args, void *);
-            int length  = va_arg(args, int);
-
-            python::AttributePath pathObj;
-            memcpy(&pathObj, path, sizeof(python::AttributePath));
-            uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
-
-            TLV::TLVReader reader;
-            reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-            reader.Next();
-            Optional<DataVersion> dataVersion;
-            if (pathObj.hasDataVersion == 1)
-            {
-                dataVersion.SetValue(pathObj.dataVersion);
-            }
-            SuccessOrExit(
-                err = client->PutPreencodedAttribute(
-                    chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId, dataVersion),
-                    reader));
+            dataVersion.SetValue(pathObj.dataVersion);
         }
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId, dataVersion),
+                reader));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
@@ -396,12 +389,11 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
     }
 
 exit:
-    va_end(args);
     return ToPyChipError(err);
 }
 
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
-                                                    size_t busyWaitMsSizeT, size_t n, ...)
+                                                    size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData, size_t n)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -417,34 +409,29 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */, Optional<uint16_t>::Missing());
 
-    va_list args;
-    va_start(args, n);
-
+    for (size_t i = 0; i < n; i++)
     {
-        for (size_t i = 0; i < n; i++)
+        void * path = writeAttributesData[i].mAttributePath;
+        void * tlv  = writeAttributesData[i].mTlvData;
+        size_t length  = writeAttributesData[i].mTlvLength;
+
+        python::AttributePath pathObj;
+        memcpy(&pathObj, path, sizeof(python::AttributePath));
+        uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
+
+        TLV::TLVReader reader;
+        reader.Init(tlvBuffer, static_cast<uint32_t>(length));
+        reader.Next();
+        Optional<DataVersion> dataVersion;
+        if (pathObj.hasDataVersion == 1)
         {
-            void * path = va_arg(args, void *);
-            void * tlv  = va_arg(args, void *);
-            int length  = va_arg(args, int);
-
-            python::AttributePath pathObj;
-            memcpy(&pathObj, path, sizeof(python::AttributePath));
-            uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
-
-            TLV::TLVReader reader;
-            reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-            reader.Next();
-            Optional<DataVersion> dataVersion;
-            if (pathObj.hasDataVersion == 1)
-            {
-                dataVersion.SetValue(pathObj.dataVersion);
-            }
-            // Using kInvalidEndpointId as that used when sending group write requests.
-            SuccessOrExit(
-                err = client->PutPreencodedAttribute(
-                    chip::app::ConcreteDataAttributePath(kInvalidEndpointId, pathObj.clusterId, pathObj.attributeId, dataVersion),
-                    reader));
+            dataVersion.SetValue(pathObj.dataVersion);
         }
+        // Using kInvalidEndpointId as that used when sending group write requests.
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(kInvalidEndpointId, pathObj.clusterId, pathObj.attributeId, dataVersion),
+                reader));
     }
 
     {
@@ -460,7 +447,6 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
     }
 
 exit:
-    va_end(args);
     return ToPyChipError(err);
 }
 
@@ -487,8 +473,8 @@ PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, ui
 }
 
 PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
-                                   DeviceProxy * device, uint8_t * readParamsBuf, size_t numAttributePaths,
-                                   size_t numDataversionFilters, size_t numEventPaths, uint64_t * eventNumberFilter, ...)
+                                   DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython, size_t numAttributePaths,
+                                   void ** dataversionFiltersFromPython, size_t numDataversionFilters, void ** eventPathsFromPython, size_t numEventPaths, uint64_t * eventNumberFilter)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     PyReadAttributeParams pyParams = {};
@@ -497,9 +483,6 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     std::unique_ptr<ReadClientCallback> callback = std::make_unique<ReadClientCallback>(appContext);
 
-    va_list args;
-    va_start(args, eventNumberFilter);
-
     std::unique_ptr<AttributePathParams[]> attributePaths(new AttributePathParams[numAttributePaths]);
     std::unique_ptr<chip::app::DataVersionFilter[]> dataVersionFilters(new chip::app::DataVersionFilter[numDataversionFilters]);
     std::unique_ptr<EventPathParams[]> eventPaths(new EventPathParams[numEventPaths]);
@@ -507,7 +490,7 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     for (size_t i = 0; i < numAttributePaths; i++)
     {
-        void * path = va_arg(args, void *);
+        void * path = attributePathsFromPython[i];
 
         python::AttributePath pathObj;
         memcpy(&pathObj, path, sizeof(python::AttributePath));
@@ -517,7 +500,7 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     for (size_t i = 0; i < numDataversionFilters; i++)
     {
-        void * filter = va_arg(args, void *);
+        void * filter = dataversionFiltersFromPython[i];
 
         python::DataVersionFilter filterObj;
         memcpy(&filterObj, filter, sizeof(python::DataVersionFilter));
@@ -527,7 +510,7 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
 
     for (size_t i = 0; i < numEventPaths; i++)
     {
-        void * path = va_arg(args, void *);
+        void * path = eventPathsFromPython[i];
 
         python::EventPath pathObj;
         memcpy(&pathObj, path, sizeof(python::EventPath));
@@ -599,7 +582,6 @@ PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient,
     callback.release();
 
 exit:
-    va_end(args);
     return ToPyChipError(err);
 }
 }

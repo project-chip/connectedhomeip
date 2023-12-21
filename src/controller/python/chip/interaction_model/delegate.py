@@ -134,6 +134,40 @@ class SessionParameters:
     maxPathsPerInvoke: int
 
 
+class PyInvokeRequestData(ctypes.Structure):
+    ''' InvokeRequest struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of InvokeRequest between Python and C++:
+
+    ```c
+    struct PyInvokeRequestData
+    {
+        void * mCommandPath;
+        void * mTlvData;
+        size_t mTlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('commandPath', ctypes.c_void_p), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
+class PyWriteAttributeData(ctypes.Structure):
+    ''' WriteAttribute struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of WriteAttributes between Python and C++:
+
+    ```c
+    struct PyWriteAttributeData
+    {
+        void * mAttributePath;
+        void * mTlvData;
+        size_t mTlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('attributePath', ctypes.c_void_p), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
 #                                                                                         void * commandStatusBuf);
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct)(uint64_t commandSenderPtr,

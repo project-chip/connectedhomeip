@@ -24,7 +24,7 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, cast, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -35,6 +35,7 @@ import chip.interaction_model
 import chip.tlv
 import construct
 from chip.native import ErrorSDKPart, PyChipError
+from chip.interaction_model import PyWriteAttributeData
 from rich.pretty import pprint
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
@@ -977,8 +978,10 @@ def WriteAttributes(future: Future, eventLoop, device,
                     interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
 
-    writeargs = []
-    for attr in attributes:
+    numberOfAttributes = len(attributes)
+    pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
+    pyWriteAttributes = pyWriteAttributesArrayType()
+    for idx, attr in enumerate(attributes):
         if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
         path = chip.interaction_model.AttributePathIBstruct.parse(
@@ -990,9 +993,10 @@ def WriteAttributes(future: Future, eventLoop, device,
         path.HasDataVersion = attr.HasDataVersion
         path = chip.interaction_model.AttributePathIBstruct.build(path)
         tlv = attr.Attribute.ToTLV(None, attr.Data)
-        writeargs.append(ctypes.c_char_p(path))
-        writeargs.append(ctypes.c_char_p(bytes(tlv)))
-        writeargs.append(ctypes.c_int(len(tlv)))
+
+        pyWriteAttributes[idx].attributePath = cast(ctypes.c_char_p(path), c_void_p)
+        pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
+        pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
 
     transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
@@ -1002,7 +1006,7 @@ def WriteAttributes(future: Future, eventLoop, device,
             ctypes.c_size_t(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
             ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            ctypes.c_size_t(len(attributes)), *writeargs)
+            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1012,8 +1016,10 @@ def WriteAttributes(future: Future, eventLoop, device,
 def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[AttributeWriteRequest], busyWaitMs: Union[None, int] = None) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
 
-    writeargs = []
-    for attr in attributes:
+    numberOfAttributes = len(attributes)
+    pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
+    pyWriteAttributes = pyWriteAttributesArrayType()
+    for idx, attr in enumerate(attributes):
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -1023,15 +1029,15 @@ def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[Attri
         path.HasDataVersion = attr.HasDataVersion
         path = chip.interaction_model.AttributePathIBstruct.build(path)
         tlv = attr.Attribute.ToTLV(None, attr.Data)
-        writeargs.append(ctypes.c_char_p(path))
-        writeargs.append(ctypes.c_char_p(bytes(tlv)))
-        writeargs.append(ctypes.c_int(len(tlv)))
+        pyWriteAttributes[idx].attributePath = cast(ctypes.c_char_p(path), c_void_p)
+        pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
+        pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
 
     return builtins.chipStack.Call(
         lambda: handle.pychip_WriteClient_WriteGroupAttributes(
             ctypes.c_size_t(groupId), devCtrl,
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            ctypes.c_size_t(len(attributes)), *writeargs)
+            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
     )
 
 
@@ -1059,10 +1065,12 @@ def Read(future: Future, eventLoop, device, devCtrl,
     transaction = AsyncReadTransaction(
         future, eventLoop, devCtrl, returnClusterObject)
 
-    readargs = []
-
+    attributePathsForCffi = None
     if attributes is not None:
-        for attr in attributes:
+        numberOfAttributePaths = len(attributes)
+        attributePathsForCffiArrayType = c_void_p * numberOfAttributePaths
+        attributePathsForCffi = attributePathsForCffiArrayType()
+        for idx, attr in enumerate(attributes):
             path = chip.interaction_model.AttributePathIBstruct.parse(
                 b'\xff' * chip.interaction_model.AttributePathIBstruct.sizeof())
             if attr.EndpointId is not None:
@@ -1072,10 +1080,14 @@ def Read(future: Future, eventLoop, device, devCtrl,
             if attr.AttributeId is not None:
                 path.AttributeId = attr.AttributeId
             path = chip.interaction_model.AttributePathIBstruct.build(path)
-            readargs.append(ctypes.c_char_p(path))
+            attributePathsForCffi[idx] = cast(ctypes.c_char_p(path), c_void_p)
 
+    dataVersionFiltersForCffi = None
     if dataVersionFilters is not None:
-        for f in dataVersionFilters:
+        numberOfDataVersionFilters = len(dataVersionFilters)
+        dataVersionFiltersForCffiArrayType = c_void_p * numberOfDataVersionFilters
+        dataVersionFiltersForCffi = dataVersionFiltersForCffiArrayType()
+        for idx, f in enumerate(dataVersionFilters):
             filter = chip.interaction_model.DataVersionFilterIBstruct.parse(
                 b'\xff' * chip.interaction_model.DataVersionFilterIBstruct.sizeof())
             if f.EndpointId is not None:
@@ -1095,10 +1107,14 @@ def Read(future: Future, eventLoop, device, devCtrl,
                     "DataVersionFilter must provide DataVersion.")
             filter = chip.interaction_model.DataVersionFilterIBstruct.build(
                 filter)
-            readargs.append(ctypes.c_char_p(filter))
+            dataVersionFiltersForCffi[idx] = cast(ctypes.c_char_p(filter), c_void_p)
 
+    eventPathsForCffi = None
     if events is not None:
-        for event in events:
+        numberOfEvents = len(events)
+        eventPathsForCffiArrayType = c_void_p * numberOfEvents
+        eventPathsForCffi = eventPathsForCffiArrayType()
+        for idx, event in enumerate(events):
             path = chip.interaction_model.EventPathIBstruct.parse(
                 b'\xff' * chip.interaction_model.EventPathIBstruct.sizeof())
             if event.EndpointId is not None:
@@ -1112,7 +1128,7 @@ def Read(future: Future, eventLoop, device, devCtrl,
             else:
                 path.Urgent = 0
             path = chip.interaction_model.EventPathIBstruct.build(path)
-            readargs.append(ctypes.c_char_p(path))
+            eventPathsForCffi[idx] = cast(ctypes.c_char_p(path), c_void_p)
 
     readClientObj = ctypes.POINTER(c_void_p)()
     readCallbackObj = ctypes.POINTER(c_void_p)()
@@ -1138,12 +1154,14 @@ def Read(future: Future, eventLoop, device, devCtrl,
             ctypes.byref(readCallbackObj),
             device,
             ctypes.c_char_p(params),
+            attributePathsForCffi,
             ctypes.c_size_t(0 if attributes is None else len(attributes)),
+            dataVersionFiltersForCffi,
             ctypes.c_size_t(
                 0 if dataVersionFilters is None else len(dataVersionFilters)),
+            eventPathsForCffi,
             ctypes.c_size_t(0 if events is None else len(events)),
-            eventNumberFilterPtr,
-            *readargs))
+            eventNumberFilterPtr))
 
     transaction.SetClientObjPointers(readClientObj, readCallbackObj)
 
@@ -1190,8 +1208,8 @@ def Init():
         # attribute information we want written using a vector. This possibility was not implemented at the
         # time where simply specified the argtypes, because of time constraints. This solution was quicker
         # to fix the crash on ARM64 Apple platforms without a refactor.
-        handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p, c_size_t, c_size_t, c_size_t, c_size_t]
-        handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [c_size_t, c_void_p, c_size_t, c_size_t]
+        handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p, c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
+        handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])

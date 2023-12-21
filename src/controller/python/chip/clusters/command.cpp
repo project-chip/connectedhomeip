@@ -41,7 +41,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
-                                                   size_t n, ...);
+                                                   chip::python::PyInvokeRequestData * batchCommandData, size_t length);
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
@@ -241,7 +241,7 @@ exit:
 
 PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
-                                                   size_t n, ...)
+                                                   python::PyInvokeRequestData * batchCommandData, size_t length)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -256,47 +256,41 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
 
-    // TODO(#30986): Move away from passing these command through variadic arguments.
-    va_list args;
-    va_start(args, n);
-
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
 
+    for (size_t i = 0; i < length; i++)
     {
-        for (size_t i = 0; i < n; i++)
+        void * commandPath = batchCommandData[i].mCommandPath;
+        void * tlv         = batchCommandData[i].mTlvData;
+        size_t tlvLength = batchCommandData[i].mTlvLength;
+
+        python::CommandPath invokeRequestInfoObj;
+        memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
+        const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
+
+        app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId,
+                                             invokeRequestInfoObj.commandId, (app::CommandPathFlags::kEndpointIdValid) };
+
+        CommandSender::AdditionalCommandParameters additionalParams;
+
+        SuccessOrExit(err = sender->PrepareCommand(cmdParams, additionalParams));
         {
-            void * commandPath = va_arg(args, void *);
-            void * tlv         = va_arg(args, void *);
-            int length         = va_arg(args, int);
-
-            python::CommandPath invokeRequestInfoObj;
-            memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
-            const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
-
-            app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId,
-                                                 invokeRequestInfoObj.commandId, (app::CommandPathFlags::kEndpointIdValid) };
-
-            CommandSender::AdditionalCommandParameters additionalParams;
-
-            SuccessOrExit(err = sender->PrepareCommand(cmdParams, additionalParams));
-            {
-                auto writer = sender->GetCommandDataIBTLVWriter();
-                VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-                TLV::TLVReader reader;
-                reader.Init(tlvBuffer, static_cast<uint32_t>(length));
-                reader.Next();
-                SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
-            }
-
-            SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                                 : Optional<uint16_t>::Missing(),
-                                                      additionalParams));
-
-            // CommandSender provides us with the CommandReference for this associated command. In order to match responses
-            // we have to add CommandRef to index lookup.
-            VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
+            auto writer = sender->GetCommandDataIBTLVWriter();
+            VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            TLV::TLVReader reader;
+            reader.Init(tlvBuffer, static_cast<uint32_t>(tlvLength));
+            reader.Next();
+            SuccessOrExit(err = writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
         }
+
+        SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
+                                                                             : Optional<uint16_t>::Missing(),
+                                                  additionalParams));
+
+        // CommandSender provides us with the CommandReference for this associated command. In order to match responses
+        // we have to add CommandRef to index lookup.
+        VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+        SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
     }
 
     SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(),
@@ -315,7 +309,6 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     }
 
 exit:
-    va_end(args);
     return ToPyChipError(err);
 }
 
