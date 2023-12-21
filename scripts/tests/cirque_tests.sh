@@ -123,6 +123,9 @@ function cirquetest_bootstrap() {
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
+
+    echo "OpenThread Version: $OPENTHREAD_CHECKOUT"
+    echo "ot-br-posix Version: $OT_BR_POSIX_CHECKOUT"
 }
 
 function cirquetest_run_test() {
