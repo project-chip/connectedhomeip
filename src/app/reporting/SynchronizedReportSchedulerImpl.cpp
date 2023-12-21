@@ -48,8 +48,8 @@ void SynchronizedReportSchedulerImpl::OnTransitionToIdle()
 {
     Timestamp now               = mTimerDelegate->GetCurrentMonotonicTimestamp();
     uint32_t targetIdleInterval = static_cast<uint32_t>(ICD_SLEEP_TIME_JITTER_MS);
-    VerifyOrReturn(now >= mTestNextReportTimestamp);
-    if (((mTestNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
+    VerifyOrReturn(now >= mNextReportTimestamp);
+    if (((mNextReportTimestamp - now) < Seconds16(targetIdleInterval)) && (now > mNextMinTimestamp))
     {
         // If the next report is due in less than the idle mode interval and we are past the min interval, we can just send it now
         CancelReport();
@@ -67,7 +67,7 @@ CHIP_ERROR SynchronizedReportSchedulerImpl::ScheduleReport(Timeout timeout, Read
         return CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(mTimerDelegate->StartTimer(this, timeout));
-    mTestNextReportTimestamp = now + timeout;
+    mNextReportTimestamp = now + timeout;
 
     return CHIP_NO_ERROR;
 }
