@@ -18234,11 +18234,14 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     ChipLogError(Zcl, "Could not find class ChipStructs$ScenesManagementClusterSceneInfoStruct");
                     return nullptr;
                 }
-                jmethodID sceneInfoStructStructCtor_1 =
-                    env->GetMethodID(sceneInfoStructStructClass_1, "<init>",
-                                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/"
-                                     "Integer;Ljava/lang/Integer;)V");
-                if (sceneInfoStructStructCtor_1 == nullptr)
+
+                jmethodID sceneInfoStructStructCtor_1;
+                err =
+                    chip::JniReferences::GetInstance().FindMethod(env, sceneInfoStructStructClass_1, "<init>",
+                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
+                                                                  "lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                  &sceneInfoStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || sceneInfoStructStructCtor_1 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$ScenesManagementClusterSceneInfoStruct constructor");
                     return nullptr;
