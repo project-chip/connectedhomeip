@@ -1950,7 +1950,13 @@ void DeviceCommissioner::ParseCommissioningInfo()
         err = ParseCommissioningInfo2(info);
     }
 
-    mAttributeCache = nullptr;
+    // Move ownership of mAttributeCache to the stack, but don't release it until this function returns.
+    // This way we don't have to make a copy while parsing commissioning info, and it won't
+    // affect future commissioning steps.
+    //
+    // The stack reference needs to survive until CommissioningStageComplete and OnReadCommissioningInfo
+    // return.
+    auto attributeCache = std::move(mAttributeCache);
 
     if (mPairingDelegate != nullptr)
     {
@@ -2265,21 +2271,24 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
 
 CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 {
+    using chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap;
+
     CHIP_ERROR err;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
+    bool hasUserActiveModeTrigger = false;
 
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
-        info.isLIT                  = true;
-        info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
+        info.icd.isLIT                  = !!(featureMap & to_underlying(IcdManagement::Feature::kLongIdleTimeSupport));
+        info.icd.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
+        hasUserActiveModeTrigger        = !!(featureMap & to_underlying(IcdManagement::Feature::kUserActiveModeTrigger));
     }
     else if (err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         // This key is optional so not an error
-        err        = CHIP_NO_ERROR;
-        info.isLIT = false;
-        err        = CHIP_NO_ERROR;
+        info.icd.isLIT = false;
+        err            = CHIP_NO_ERROR;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
@@ -2290,11 +2299,50 @@ CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
         {
             if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
             {
-                info.isLIT = false;
+                info.icd.isLIT = false;
             }
             else
             {
                 err = statusIB.ToChipError();
+            }
+        }
+    }
+
+    ReturnErrorOnFailure(err);
+
+    info.icd.userActiveModeTriggerHint.ClearAll();
+    info.icd.userActiveModeTriggerInstruction = CharSpan();
+    if (hasUserActiveModeTrigger)
+    {
+        // Intentionally ignore errors since they are not mandatory.
+        bool activeModeTriggerInstructionRequired = false;
+
+        err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerHint::TypeInfo>(
+            kRootEndpointId, info.icd.userActiveModeTriggerHint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "IcdManagement.UserActiveModeTriggerHint expected, but failed to read.");
+            return err;
+        }
+
+        activeModeTriggerInstructionRequired = info.icd.userActiveModeTriggerHint.HasAny(
+            UserActiveModeTriggerBitmap::kCustomInstruction, UserActiveModeTriggerBitmap::kActuateSensorSeconds,
+            UserActiveModeTriggerBitmap::kActuateSensorTimes, UserActiveModeTriggerBitmap::kActuateSensorLightsBlink,
+            UserActiveModeTriggerBitmap::kResetButtonLightsBlink, UserActiveModeTriggerBitmap::kResetButtonSeconds,
+            UserActiveModeTriggerBitmap::kResetButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonSeconds,
+            UserActiveModeTriggerBitmap::kSetupButtonTimes, UserActiveModeTriggerBitmap::kSetupButtonTimes,
+            UserActiveModeTriggerBitmap::kAppDefinedButton);
+
+        if (activeModeTriggerInstructionRequired)
+        {
+            err = mAttributeCache->Get<IcdManagement::Attributes::UserActiveModeTriggerInstruction::TypeInfo>(
+                kRootEndpointId, info.icd.userActiveModeTriggerInstruction);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller,
+                             "IcdManagement.UserActiveModeTriggerInstruction expected for given active mode trigger hint, but "
+                             "failed to read.");
+                return err;
             }
         }
     }
@@ -2565,7 +2613,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // This is done in a separate step since we've already used up all the available read paths in the previous read step
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
-        app::AttributePathParams readPaths[3];
+
+        // Currently, we have at most 5 attributes to read in this stage.
+        app::AttributePathParams readPaths[5];
 
         // Mandatory attribute
         readPaths[numberOfAttributes++] =
@@ -2584,6 +2634,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             readPaths[numberOfAttributes++] =
                 app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
         }
+        // Always read the active mode trigger hint attributes to notify users about it.
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerHint::Id);
+        readPaths[numberOfAttributes++] =
+            app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id);
 
         SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
