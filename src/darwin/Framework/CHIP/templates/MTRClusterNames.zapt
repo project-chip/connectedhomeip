@@ -4,9 +4,5 @@
 #import <Matter/MTRDefines.h>
 #import <stdint.h>
 
-NS_ASSUME_NONNULL_BEGIN
-@interface MTRClusterAttributeIDTypeToString : NSObject
-- (NSString *)formatMTRClusterIDTypeToString:(MTRClusterIDType)clusterID;
-- (NSString *)formatMTRAttributeIDTypeToString:(MTRClusterIDType)clusterID :(MTRAttributeIDType)attributeID;
-@end
-NS_ASSUME_NONNULL_END
+MTR_EXPORT MTR_NEWLY_AVAILABLE NSString * MTRClusterNameForID(MTRClusterIDType clusterID);
+MTR_EXPORT MTR_NEWLY_AVAILABLE NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);

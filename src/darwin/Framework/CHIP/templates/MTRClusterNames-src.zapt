@@ -5,11 +5,11 @@
 
 #import "MTRClusterNames.h"
 
-@implementation MTRClusterAttributeIDType
+// @implementation MTRClusterAttributeIDType
 
 #pragma mark - Clusters IDs
 
-- (NSString *)formatMTRClusterIDType:(MTRClusterIDType)clusterID
+NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
 {
     NSString * result = nil;
     
@@ -34,7 +34,7 @@
 
 #pragma mark - Attributes IDs
 
-- (NSString *)formatMTRAttributeIDTypeToString:(MTRClusterIDType)clusterID:(MTRAttributeIDType)attributeID
+NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID)
 {
     NSString * result = nil;
 
@@ -85,4 +85,4 @@
     return result;
 }
 
-@end
+// @end
