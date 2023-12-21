@@ -90,7 +90,7 @@ public:
     /**
      * Find an existing session for the given node ID or trigger a new session request.
      *
-     * The caller can optionally provide `onConnection` and `OnSetupFailure`
+     * The caller can optionally provide `onConnection` and `onSetupFailure`
      * callback objects. If provided, these will be used to inform the caller about successful or
      * failed connection establishment.
      *
