@@ -275,7 +275,6 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
     {
         ChipLogError(Zcl, "DEM: %s Failed to PowerAdjustRequest() args.", __FUNCTION__);
     }
-    return;
 }
 
 void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
@@ -300,8 +299,6 @@ void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
         ChipLogError(Zcl, "DEM: %s Failed to CancelPowerAdjustRequest()", __FUNCTION__);
         return;
     }
-
-    return;
 }
 
 void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
@@ -402,8 +399,6 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
                      static_cast<long unsigned int>(requestedStartTime));
         return;
     }
-
-    return;
 }
 
 void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseRequest::DecodableType & commandData)
@@ -478,8 +473,6 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         ChipLogError(Zcl, "DEM: %s - mDelegate.PauseRequest(%ld) FAILURE", __FUNCTION__, static_cast<long unsigned int>(duration));
         return;
     }
-
-    return;
 }
 
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
@@ -501,8 +494,6 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
         ChipLogError(Zcl, "DEM: %s - mDelegate.ResumeRequest() FAILURE", __FUNCTION__);
         return;
     }
-
-    return;
 }
 
 void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData)
