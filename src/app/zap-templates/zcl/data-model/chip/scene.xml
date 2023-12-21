@@ -48,7 +48,7 @@ limitations under the License.
 
   <domain name="CHIP"/>
   <cluster apiMaturity="provisional">
-    <name>Matter Scenes</name>
+    <name>Scenes Management</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>
     <code>0x0062</code>
