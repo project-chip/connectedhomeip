@@ -428,13 +428,6 @@ void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioning
     }
 }
 
-void PairingCommand::OnICDRegistrationInfoRequired()
-{
-    // Since we compute our ICD Registration info up front, we can call ICDRegistrationInfoReady() directly.
-    CurrentCommissioner().ICDRegistrationInfoReady();
-    mDeviceIsICD = true;
-}
-
 void PairingCommand::OnICDRegistrationComplete(NodeId nodeId, uint32_t icdCounter)
 {
     char icdSymmetricKeyHex[chip::Crypto::kAES_CCM128_Key_Length * 2 + 1];
