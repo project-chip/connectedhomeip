@@ -22,7 +22,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OvenCavityOperationalState;
 
-static OperationalState::Instance * gOvenCavityOperationalStateInstance  = nullptr;
+static OperationalState::Instance * gOvenCavityOperationalStateInstance         = nullptr;
 static OvenCavityOperationalStateDelegate * gOvenCavityOperationalStateDelegate = nullptr;
 
 void OvenCavityOperationalState::Shutdown()
@@ -44,18 +44,19 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOvenCavityOperationalStateInstance == nullptr && gOvenCavityOperationalStateDelegate == nullptr);
 
-    gOvenCavityOperationalStateDelegate        = new OvenCavityOperationalStateDelegate;
+    gOvenCavityOperationalStateDelegate = new OvenCavityOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gOvenCavityOperationalStateInstance        = new OvenCavityOperationalState::Instance(gOvenCavityOperationalStateDelegate, operationalStateEndpoint);
+    gOvenCavityOperationalStateInstance =
+        new OvenCavityOperationalState::Instance(gOvenCavityOperationalStateDelegate, operationalStateEndpoint);
 
     gOvenCavityOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
     gOvenCavityOperationalStateInstance->Init();
 }
 
-
-CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
-                                                                   OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR
+OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
+                                                               OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= ArraySize(mOperationalStateList))
     {
@@ -65,8 +66,9 @@ CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
-                                                                   OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR
+OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
+                                                               OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index >= ArraySize(mOperationalPhaseList))
     {
@@ -75,8 +77,6 @@ CHIP_ERROR OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t
     operationalPhase = mOperationalPhaseList[index];
     return CHIP_NO_ERROR;
 }
-
-
 
 // void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 // {

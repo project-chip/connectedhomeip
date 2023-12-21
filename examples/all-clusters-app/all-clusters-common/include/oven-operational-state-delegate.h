@@ -53,10 +53,10 @@ private:
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    //RvcDevice * mPauseRvcDeviceInstance;
-    //HandleOpStateCommand mPauseCallback;
-    //RvcDevice * mResumeRvcDeviceInstance;
-    //HandleOpStateCommand mResumeCallback;
+    // RvcDevice * mPauseRvcDeviceInstance;
+    // HandleOpStateCommand mPauseCallback;
+    // RvcDevice * mResumeRvcDeviceInstance;
+    // HandleOpStateCommand mResumeCallback;
 
 public:
     /**
