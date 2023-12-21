@@ -117,6 +117,30 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     );
 
+    /**
+     * Find an existing session for the given node ID or trigger a new session request.
+     *
+     * The caller can optionally provide `onConnection`
+     * callback objects. If provided, these will be used to inform the caller about successful connection establishment.
+     *
+     * If the connection is already established, the `onConnection` callback will be immediately called,
+     * before `FindOrEstablishSession` returns.
+     *
+     * The `attemptCount` parameter can be used to automatically retry multiple times if session setup is
+     * not successful.
+     *
+     * @param peerId The node ID to find or establish a session with.
+     * @param onConnection A callback to be called upon successful connection establishment.
+     * @param attemptCount The number of retry attempts if session setup fails (default is 1).
+     * @param onRetry A callback to be called on a retry attempt (enabled by a config flag).
+     */
+    void FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection, nullptr_t
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                ,
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    );
+
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();

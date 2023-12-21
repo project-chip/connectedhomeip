@@ -61,6 +61,22 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
     );
 }
 
+void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                                nullptr_t
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                ,
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
+#endif
+)
+{
+    FindOrEstablishSessionHelper(peerId, onConnection, nullptr, nullptr
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                 ,
+                                 attemptCount, onRetry
+#endif
+    );
+}
+
 void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerId,
                                                       Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
@@ -73,10 +89,6 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
 {
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),
                   ChipLogValueX64(peerId.GetNodeId()));
-
-    // Ensure that exactly one of onFailure or onSetupFailure is non-null
-    VerifyOrReturn((onFailure == nullptr) != (onSetupFailure == nullptr),
-                   ChipLogError(CASESessionManager, "Invalid callback parameters"));
 
     bool forAddressUpdate             = false;
     OperationalSessionSetup * session = FindExistingSessionSetup(peerId, forAddressUpdate);
@@ -91,7 +103,8 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
             {
                 onFailure->mCall(onFailure->mContext, peerId, CHIP_ERROR_NO_MEMORY);
             }
-            else if (onSetupFailure != nullptr)
+
+            if (onSetupFailure != nullptr)
             {
                 OperationalSessionSetup::ConnnectionFailureInfo failureInfo(peerId, CHIP_ERROR_NO_MEMORY,
                                                                             SessionEstablishmentStage::kUnknown);
@@ -113,12 +126,11 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     {
         session->Connect(onConnection, onFailure);
     }
-    else if (onSetupFailure != nullptr)
+
+    if (onSetupFailure != nullptr)
     {
         session->Connect(onConnection, onSetupFailure);
     }
-
-    return;
 }
 
 void CASESessionManager::ReleaseSessionsForFabric(FabricIndex fabricIndex)
