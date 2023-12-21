@@ -1208,8 +1208,10 @@ def Init():
         # attribute information we want written using a vector. This possibility was not implemented at the
         # time where simply specified the argtypes, because of time constraints. This solution was quicker
         # to fix the crash on ARM64 Apple platforms without a refactor.
-        handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p, c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
-        handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
+        handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p,
+                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
+        handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [
+            c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
