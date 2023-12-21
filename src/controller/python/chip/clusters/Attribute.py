@@ -24,7 +24,7 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, POINTER, cast, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -34,8 +34,8 @@ import chip.exceptions
 import chip.interaction_model
 import chip.tlv
 import construct
-from chip.native import ErrorSDKPart, PyChipError
 from chip.interaction_model import PyWriteAttributeData
+from chip.native import ErrorSDKPart, PyChipError
 from rich.pretty import pprint
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent

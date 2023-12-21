@@ -21,14 +21,14 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, POINTER, cast, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
 from dataclasses import dataclass
 from typing import List, Optional, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
-from chip.native import PyChipError
 from chip.interaction_model import PyInvokeRequestData
+from chip.native import PyChipError
 
 from .ClusterObjects import ClusterCommand
 
