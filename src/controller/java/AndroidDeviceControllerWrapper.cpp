@@ -471,8 +471,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
 
-    params.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-
     chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
     if (jCheckInNodeId != nullptr)
     {

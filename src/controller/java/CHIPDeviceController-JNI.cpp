@@ -657,6 +657,7 @@ JNI_METHOD(void, pairDevice)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
     if (icdRegistrationInfo != nullptr)
     {
         wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
@@ -706,6 +707,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
 
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
     if (icdRegistrationInfo != nullptr)
     {
         wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
@@ -760,6 +762,7 @@ JNI_METHOD(void, pairDeviceWithCode)
         wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     }
 
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
     if (icdRegistrationInfo != nullptr)
     {
         wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
