@@ -2525,6 +2525,13 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     return self;
 }
 
+- (NSString *)description
+{
+    return
+        [NSString stringWithFormat:@"<MTRCommandPath> endpoint %u cluster %lu command %lu", self.endpoint.unsignedShortValue,
+                  self.cluster.unsignedLongValue, _command.unsignedLongValue];
+}
+
 + (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
 {
     ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
