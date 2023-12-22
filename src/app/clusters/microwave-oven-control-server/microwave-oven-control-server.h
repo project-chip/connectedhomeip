@@ -73,7 +73,7 @@ public:
     /**
      * @brief Get the number of supported power level
      */
-    uint8_t GetSupportedPowerLevel() const;
+    uint8_t GetSupportedPowerLevels() const;
 
     /**
      * @brief define the get/set api for the mandatory attributes
@@ -90,7 +90,7 @@ private:
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
     uint32_t mCookTime           = kDefaultCookTime;
-    uint8_t mSupportedPowerLevel = 0;
+    uint8_t mSupportedPowerLevels = 0;
 
     /**
      * IM-level implementation of read
