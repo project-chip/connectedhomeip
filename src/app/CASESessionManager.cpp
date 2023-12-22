@@ -120,7 +120,7 @@ void CASESessionManager::FindOrEstablishSessionHelper(const ScopedNodeId & peerI
     {
         session->AddRetryHandler(onRetry);
     }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     if (onFailure != nullptr)
     {
