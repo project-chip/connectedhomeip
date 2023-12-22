@@ -33,6 +33,7 @@
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
+#include "sdkconfig.h"
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -230,7 +231,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
-#if !CONFIG_DISABLE_IPV4
+#ifndef CONFIG_DISABLE_IPV4
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);

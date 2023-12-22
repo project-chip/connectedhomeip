@@ -27,6 +27,8 @@
 
 #include <platform/CHIPDeviceEvent.h>
 
+#include <sdkconfig.h>
+
 #include <esp_event.h>
 #include <esp_netif_types.h>
 #include <esp_wifi_types.h>
@@ -44,7 +46,7 @@ enum
     kESPSystemEvent = kRange_PublicPlatformSpecific,
 };
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 /**
  * Enumerates ESP32 platform-specific event types that are internal to the Chip Device Layer.
  */
@@ -58,7 +60,7 @@ enum InternalPlatformSpecificEventTypes
     kPlatformESP32BLEIndicationReceived,
 };
 
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 } // namespace DeviceEventType
 
 /**
@@ -89,7 +91,7 @@ struct ChipDevicePlatformEvent final
                 wifi_event_ap_probe_req_rx_t WiFiApProbeReqRecved;
             } Data;
         } ESPSystemEvent;
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;
@@ -112,7 +114,7 @@ struct ChipDevicePlatformEvent final
             BLE_CONNECTION_OBJECT mConnection;
             chip::System::PacketBuffer * mData;
         } BLEIndicationReceived;
-#endif
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     };
 };
 

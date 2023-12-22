@@ -34,6 +34,7 @@
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
+#include "sdkconfig.h"
 
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
@@ -1107,7 +1108,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
-#if CONFIG_ENABLE_ROUTE_HOOK
+#ifdef CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
 #endif
 }

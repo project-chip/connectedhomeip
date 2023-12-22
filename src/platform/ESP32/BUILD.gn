@@ -196,5 +196,8 @@ static_library("ESP32") {
     ]
   }
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+    "-Wundef",
+  ]
 }

@@ -25,15 +25,18 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <sdkconfig.h>
+
 #include <lib/core/CHIPKeyIds.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/ESP32/CHIPDevicePlatformConfig.h>
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include "esp_mac.h"
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include "esp_ota_ops.h"
 #include "esp_phy_init.h"
 #include "esp_wifi.h"
@@ -232,7 +235,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersion(uint32_t & softwareVer)
 
 CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 {
-#if CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
+#ifdef CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
     uint32_t value = 0;
     CHIP_ERROR err = ReadConfigValue(ESP32Config::kConfigKey_LocationCapability, value);
 
@@ -246,7 +249,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 #else
     location       = static_cast<uint8_t>(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoor);
     return CHIP_NO_ERROR;
-#endif
+#endif // CONFIG_ENABLE_ESP32_LOCATIONCAPABILITY
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreCountryCode(const char * code, size_t codeLen)
@@ -288,7 +291,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryEthernetMACAddress(MutableByteSpa
     buf.reduce_size(ConfigurationManager::kPrimaryMACAddressLength);
     return MapConfigError(err);
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
