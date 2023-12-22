@@ -335,7 +335,7 @@ DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(PowerAdjustmentCapa
     if (powerAdjustmentCapability.IsNull())
     {
         mPowerAdjustmentCapability.SetNull();
-        ChipLogDetail(AppServer, "null src - %s", __FUNCTION__);
+        ChipLogDetail(AppServer, "DEM: PowerAdjustmentCapability is null");
     }
     else
     {
@@ -365,7 +365,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Struc
     if (forecast.IsNull())
     {
         mForecast.SetNull();
-        ChipLogDetail(AppServer, "null src - %s", __FUNCTION__);
+        ChipLogDetail(AppServer, "DEM: Forecast is null");
     }
     else
     {
@@ -383,7 +383,6 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Struc
         auto slots = src.slots;
         auto size  = slots.size();
         target.slots.reduce_size(0); // clear them
-        ChipLogDetail(AppServer, "src.slots.size() %d - %s", (int) size, __FUNCTION__);
 
         for (size_t i = 0; i < size; i++)
         {
