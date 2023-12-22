@@ -43,7 +43,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    return CopyCharSpanToMutableCharSpan(GenericOperationalStateDelegateImpl::mOperationalPhaseList[index], operationalPhase);
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)

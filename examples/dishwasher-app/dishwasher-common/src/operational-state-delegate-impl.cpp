@@ -38,7 +38,7 @@ CHIP_ERROR OperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, Mu
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    return CopyCharSpanToMutableCharSpan(OperationalStateDelegate::mOperationalPhaseList[index], operationalPhase);
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void OperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
