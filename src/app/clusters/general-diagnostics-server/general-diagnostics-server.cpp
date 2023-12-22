@@ -197,7 +197,8 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         return ReadIfSupported(&DiagnosticDataProvider::GetRebootCount, aEncoder);
     }
     case UpTime::Id: {
-        System::Clock::Seconds64 system_time_seconds = std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
+        System::Clock::Seconds64 system_time_seconds =
+            std::chrono::duration_cast<System::Clock::Seconds64>(Server::GetInstance().TimeSinceInit());
         return aEncoder.Encode(static_cast<uint64_t>(system_time_seconds.count()));
     }
     case TotalOperationalHours::Id: {
@@ -395,29 +396,33 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
 
     Commands::TimeSnapshotResponse::Type response;
 
-    System::Clock::Microseconds64 posix_time_us{0};
+    System::Clock::Microseconds64 posix_time_us{ 0 };
 
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     bool time_is_synced = false;
     using Clusters::TimeSynchronization::GranularityEnum;
     GranularityEnum granularity = Clusters::TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity();
-    time_is_synced = (granularity == GranularityEnum::kSecondsGranularity) || (granularity == GranularityEnum::kMillisecondsGranularity) || (granularity == GranularityEnum::kMicrosecondsGranularity);
+    time_is_synced              = (granularity == GranularityEnum::kSecondsGranularity) ||
+        (granularity == GranularityEnum::kMillisecondsGranularity) || (granularity == GranularityEnum::kMicrosecondsGranularity);
 
     if (time_is_synced)
     {
         CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
-        if (posix_time_err != CHIP_NO_ERROR) {
+        if (posix_time_err != CHIP_NO_ERROR)
+        {
             ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
-            posix_time_us = System::Clock::Microseconds64{0};
+            posix_time_us = System::Clock::Microseconds64{ 0 };
         }
     }
 #endif // TIME_SYNCHRONIZATION_CLUSTER
-    System::Clock::Milliseconds64 system_time_ms = std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
+    System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
 
     response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
     if (posix_time_us.count() != 0)
     {
-        response.posixTimeMs.SetNonNull(static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
+        response.posixTimeMs.SetNonNull(
+            static_cast<uint64_t>(std::chrono::duration_cast<System::Clock::Milliseconds64>(posix_time_us).count()));
     }
     commandObj->AddResponse(commandPath, response);
     return true;
