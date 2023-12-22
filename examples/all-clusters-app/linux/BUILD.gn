@@ -21,8 +21,6 @@ import("${chip_root}/src/platform/device.gni")
 
 source_set("chip-all-clusters-common") {
   sources = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseDelegateImpl.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
@@ -41,6 +39,8 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
     "WindowCoveringManager.cpp",
@@ -57,8 +57,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs =
-      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+  include_dirs = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+  ]
 
   cflags = [ "-Wconversion" ]
 
