@@ -175,8 +175,7 @@ public class ChipDeviceController {
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
-   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
-   *     {@link ICDRegistrationInfo}.
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value.
    */
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -232,8 +231,7 @@ public class ChipDeviceController {
    * @param pinCode the pincode for connecting device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
-   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
-   *     {@link ICDRegistrationInfo}.
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value.
    */
   public void pairDeviceWithAddress(
       long deviceId,
@@ -283,8 +281,7 @@ public class ChipDeviceController {
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
-   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
-   *     {@link ICDRegistrationInfo}.
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link CompletionListener.onICDRegistrationInfoRequired} is called to request the ICDRegistrationInfo value.
    */
   public void pairDeviceWithCode(
       long deviceId,
