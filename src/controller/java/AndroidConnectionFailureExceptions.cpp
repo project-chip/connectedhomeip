@@ -30,14 +30,13 @@ CHIP_ERROR AndroidConnectionFailureExceptions::CreateAndroidConnectionFailureExc
                                                                                        jthrowable & outEx)
 {
     jclass controllerExceptionCls;
-    CHIP_ERROR err =
-        JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ConnectionFailureException", controllerExceptionCls);
+    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ConnectionFailureException",
+                                                                   controllerExceptionCls);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-    JniClass controllerExceptionJniCls(controllerExceptionCls);
 
     jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(JILjava/lang/String;)V");
-    outEx = (jthrowable) env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode),
-                                        static_cast<jint>(state), env->NewStringUTF(message));
+    outEx = static_cast<jthrowable>(env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode),
+                                                   static_cast<jint>(state), env->NewStringUTF(message)));
     VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     return CHIP_NO_ERROR;
 }

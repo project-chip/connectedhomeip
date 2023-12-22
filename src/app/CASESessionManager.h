@@ -129,6 +129,9 @@ public:
      * The `attemptCount` parameter can be used to automatically retry multiple times if session setup is
      * not successful.
      *
+     * This function allows passing 'nullptr' for the error handler to compile, which is useful in scenarios where error
+     * handling is not needed.
+     *
      * @param peerId The node ID to find or establish a session with.
      * @param onConnection A callback to be called upon successful connection establishment.
      * @param attemptCount The number of retry attempts if session setup fails (default is 1).
