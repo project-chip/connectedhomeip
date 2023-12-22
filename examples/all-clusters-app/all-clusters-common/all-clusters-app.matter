@@ -7354,6 +7354,15 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
+
+    handle command GetTargetsResponse;
+    handle command Disable;
+    handle command EnableCharging;
+    handle command EnableDischarging;
+    handle command StartDiagnostics;
+    handle command SetTargets;
+    handle command GetTargets;
+    handle command ClearTargets;
   }
 
   server cluster WindowCovering {

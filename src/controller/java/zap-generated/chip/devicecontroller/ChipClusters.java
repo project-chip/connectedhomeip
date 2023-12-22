@@ -18114,10 +18114,10 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 
-  public static class BooleanSensorConfigurationCluster extends BaseChipCluster {
+  public static class BooleanStateConfigurationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 0x00000080L;
 
-    public BooleanSensorConfigurationCluster(long devicePtr, int endpointId) {
+    public BooleanStateConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
     }
 
@@ -40489,4 +40489,3 @@ public class ChipClusters {
 , int minInterval, int maxInterval);
   }
 }
-

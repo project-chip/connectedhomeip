@@ -78,6 +78,15 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
+## Energy Management example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+energy-management-app/**/README
+```
+
 ## Java matter controller example
 
 ```{toctree}
@@ -245,6 +254,15 @@ smoke-co-alarm-app/**/README
 :maxdepth: 1
 
 dishwasher-app/**/README
+```
+
+## Microwave oven example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+microwave-oven-app/**/README
 ```
 
 ## Temperature measurement example
