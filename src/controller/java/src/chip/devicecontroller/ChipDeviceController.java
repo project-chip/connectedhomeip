@@ -414,7 +414,7 @@ public class ChipDeviceController {
    * Update the ICD registration information held by the commissioner for the current commissioning
    * session.
    *
-   * Its expected that this method will be called in response the onICDRegistrationInfoRequired
+   * <p>Its expected that this method will be called in response the onICDRegistrationInfoRequired
    * callbacks.
    *
    * @param ICDRegistrationInfo the ICD registration information to use in commissioning
