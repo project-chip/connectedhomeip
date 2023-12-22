@@ -275,8 +275,9 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        VerifyOrExit(ServerClusterCommandExists(ConcreteCommandPath(
-                mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
+        VerifyOrExit(
+            ServerClusterCommandExists(
+                ConcreteCommandPath(mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
             status = Status::InvalidCommand;
             ChipLogError(
                 Zcl,
@@ -325,7 +326,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         reqWattSettingIndex = wattSettingIndex.ValueOr(mSupportedPowerLevel - 1);
-        VerifyOrExit((reqWattSettingIndex <= (mSupportedPowerLevel - 1)) && mSupportedPowerLevel > 0, status = Status::ConstraintError;
+        VerifyOrExit((reqWattSettingIndex <= (mSupportedPowerLevel - 1)) && mSupportedPowerLevel > 0,
+                     status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqWattSettingIndex, reqStartAfterSetting,
