@@ -8260,6 +8260,7 @@
           - ContentAppObserver
           - DeviceEnergyManagement
           - ElectricalEnergyMeasurement
+          - EnergyPreference
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
