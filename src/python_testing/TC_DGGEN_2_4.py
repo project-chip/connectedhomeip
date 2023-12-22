@@ -22,8 +22,8 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from matter_testing_support import matter_epoch_us_from_utc_datetime, utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms
+from matter_testing_support import (MatterBaseTest, async_test_body, default_matter_test_main, matter_epoch_us_from_utc_datetime,
+                                    utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms)
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
