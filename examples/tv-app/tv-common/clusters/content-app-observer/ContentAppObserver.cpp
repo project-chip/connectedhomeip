@@ -43,9 +43,8 @@ void ContentAppObserverManager::HandleContentAppMessage(chip::app::CommandRespon
 
     ContentAppMessageResponse response;
     // TODO: Insert code here
-    // TODO: optional and mandatory are swapped
-    response.data         = CharSpan::fromCharString("exampleData");
-    response.encodingHint = CharSpan::fromCharString(encodingHintString.c_str());
-    response.status       = chip::MakeOptional(StatusEnum::kSuccess);
+    response.data         = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.encodingHint = chip::MakeOptional(CharSpan::fromCharString(encodingHintString.c_str()));
+    response.status       = StatusEnum::kSuccess;
     helper.Success(response);
 }
