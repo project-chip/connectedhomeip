@@ -111,14 +111,14 @@ public:
     CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override;
 
     /**
-     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The GenericOperationalPhase is filled.
+     * @param operationalPhase  The MutableCharSpan is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
     /**
      * Handle Command Callback in application: Pause
@@ -220,14 +220,7 @@ private:
 
     const app::DataModel::List<const OperationalState::GenericOperationalState> mOperationalStateList =
         Span<const OperationalState::GenericOperationalState>(mOpStateList);
-
-    const OperationalState::GenericOperationalPhase mOpPhaseList[1] = {
-        // Phase List is null
-        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    };
-
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
-        Span<const OperationalState::GenericOperationalPhase>(mOpPhaseList);
+    const Span<const CharSpan> mOperationalPhaseList;
 };
 
 } // namespace Clusters

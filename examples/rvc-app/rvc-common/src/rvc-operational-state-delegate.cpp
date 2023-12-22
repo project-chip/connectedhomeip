@@ -34,14 +34,13 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
 }
 
 CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
-                                                                   OperationalState::GenericOperationalPhase & operationalPhase)
+                                                                   MutableCharSpan & operationalPhase)
 {
-    if (index >= ArraySize(mOperationalPhaseList))
+    if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
