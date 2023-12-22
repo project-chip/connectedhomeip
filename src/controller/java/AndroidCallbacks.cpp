@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "AndroidCallbacks.h"
+#include <controller/java/AndroidConnectionFailureExceptions.h>
 #include <controller/java/AndroidControllerExceptions.h>
 #ifdef USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
@@ -114,7 +115,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
+                                                             const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -135,15 +137,15 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     VerifyOrReturn(failureMethod != nullptr, ChipLogError(Controller, "Could not find onConnectionFailure method"));
 
     jthrowable exception;
-    CHIP_ERROR err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, ErrorStr(error),
-                                                                                                 error.AsInteger(), exception);
+    CHIP_ERROR err = AndroidConnectionFailureExceptions::GetInstance().CreateAndroidConnectionFailureException(
+        env, failureInfo.error.Format(), failureInfo.error.AsInteger(), failureInfo.sessionStage, exception);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         ChipLogError(Controller,
                      "Unable to create AndroidControllerException on GetConnectedDeviceCallback::OnDeviceConnectionFailureFn: %s",
                      ErrorStr(err)));
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
+    env->CallVoidMethod(javaCallback, failureMethod, failureInfo.peerId.GetNodeId(), exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
