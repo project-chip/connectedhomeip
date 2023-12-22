@@ -19,6 +19,8 @@
 #include <map>
 #include <string>
 
+#include <Python.h>
+
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <lib/core/CHIPError.h>
@@ -26,8 +28,6 @@
 
 using namespace chip;
 using namespace chip::Credentials;
-
-typedef void PyObject;
 
 using namespace chip;
 
@@ -58,6 +58,7 @@ void pychip_DeviceController_IssueNOCChainCallback(void * context, CHIP_ERROR st
         return;
     }
 
+    auto pythonContext = reinterpret_cast<PyObject *>(context);
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipNoc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipIcac;
     chip::Platform::ScopedMemoryBuffer<uint8_t> chipRcac;
@@ -87,13 +88,13 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(
-            context, ToPyChipError(err), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
+            pythonContext, ToPyChipError(err), chipNocSpan.data(), chipNocSpan.size(), chipIcacSpan.data(), chipIcacSpan.size(),
             chipRcacSpan.data(), chipRcacSpan.size(), ipk.HasValue() ? ipk.Value().data() : nullptr,
             ipk.HasValue() ? ipk.Value().size() : 0, adminSubject.ValueOr(kUndefinedNodeId));
     }
     else
     {
-        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(context, ToPyChipError(err), nullptr, 0, nullptr, 0,
+        pychip_DeviceController_IssueNOCChainCallbackPythonCallbackFunct(pythonContext, ToPyChipError(err), nullptr, 0, nullptr, 0,
                                                                          nullptr, 0, nullptr, 0, 0);
     }
 }
