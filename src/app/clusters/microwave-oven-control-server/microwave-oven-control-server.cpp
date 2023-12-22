@@ -76,7 +76,7 @@ CHIP_ERROR Instance::Init()
 
     if (HasFeature(to_underlying(MicrowaveOvenControl::Feature::kPowerInWatts)))
     {
-        mSupportWattsNum = GetSupportedWattsNum();
+        mSupportedPowerLevel = GetSupportedPowerLevel();
     }
     return CHIP_NO_ERROR;
 }
@@ -86,7 +86,7 @@ bool Instance::HasFeature(uint32_t feature) const
     return (mFeature & feature) != 0;
 }
 
-uint8_t Instance::GetSupportedWattsNum() const
+uint8_t Instance::GetSupportedPowerLevel() const
 {
     uint8_t wattIndex = 0;
     uint16_t watt     = 0;
@@ -275,9 +275,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
     if (startAfterSetting.HasValue())
     {
-        // TODO: ServerClusterCommandExists may always be returns true
-        VerifyOrExit(
-            chip::app::ServerClusterCommandExists(chip::app::ConcreteCommandPath(
+        VerifyOrExit(ServerClusterCommandExists(ConcreteCommandPath(
                 mEndpointId, OperationalState::Id, OperationalState::Commands::Start::Id)) == Status::Success,
             status = Status::InvalidCommand;
             ChipLogError(
@@ -326,8 +324,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             cookMode.HasValue() || cookTime.HasValue() || wattSettingIndex.HasValue(), status = Status::InvalidCommand;
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
-        reqWattSettingIndex = wattSettingIndex.ValueOr(mSupportWattsNum - 1);
-        VerifyOrExit((reqWattSettingIndex <= (mSupportWattsNum - 1)) && mSupportWattsNum > 0, status = Status::ConstraintError;
+        reqWattSettingIndex = wattSettingIndex.ValueOr(mSupportedPowerLevel - 1);
+        VerifyOrExit((reqWattSettingIndex <= (mSupportedPowerLevel - 1)) && mSupportedPowerLevel > 0, status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookMode, cookMode is not supported"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqWattSettingIndex, reqStartAfterSetting,
