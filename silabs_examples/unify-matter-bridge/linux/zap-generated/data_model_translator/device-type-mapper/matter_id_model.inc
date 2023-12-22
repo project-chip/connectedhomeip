@@ -2293,27 +2293,12 @@ namespace app {
         } // namespace AccessControl
         namespace Actions {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "InstantAction", InstantAction::Id },
-                    { "InstantActionWithTransition", InstantActionWithTransition::Id },
-                    { "StartAction", StartAction::Id },
-                    { "StartActionWithDuration", StartActionWithDuration::Id },
-                    { "StopAction", StopAction::Id },
-                    { "PauseAction", PauseAction::Id },
-                    { "PauseActionWithDuration", PauseActionWithDuration::Id },
-                    { "ResumeAction", ResumeAction::Id },
-                    { "EnableAction", EnableAction::Id },
-                    { "EnableActionWithDuration", EnableActionWithDuration::Id },
-                    { "DisableAction", DisableAction::Id },
-                    { "DisableActionWithDuration", DisableActionWithDuration::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace Actions
         namespace BasicInformation {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "MfgSpecificPing", MfgSpecificPing::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace BasicInformation
         namespace OtaSoftwareUpdateProvider {
@@ -2329,9 +2314,7 @@ namespace app {
         } // namespace OtaSoftwareUpdateProvider
         namespace OtaSoftwareUpdateRequestor {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "AnnounceOTAProvider", AnnounceOTAProvider::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace OtaSoftwareUpdateRequestor
         namespace LocalizationConfiguration {
@@ -2373,21 +2356,7 @@ namespace app {
         } // namespace GeneralCommissioning
         namespace NetworkCommissioning {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ScanNetworks", ScanNetworks::Id },
-                    { "ScanNetworksResponse", ScanNetworksResponse::Id },
-                    { "AddOrUpdateWiFiNetwork", AddOrUpdateWiFiNetwork::Id },
-                    { "AddOrUpdateThreadNetwork", AddOrUpdateThreadNetwork::Id },
-                    { "RemoveNetwork", RemoveNetwork::Id },
-                    { "NetworkConfigResponse", NetworkConfigResponse::Id },
-                    { "ConnectNetwork", ConnectNetwork::Id },
-                    { "ConnectNetworkResponse", ConnectNetworkResponse::Id },
-                    { "ReorderNetwork", ReorderNetwork::Id },
-                    { "QueryIdentity", QueryIdentity::Id },
-                    { "QueryIdentityResponse", QueryIdentityResponse::Id }
-                    { "QueryIdentity", QueryIdentity::Id },
-                    { "QueryIdentityResponse", QueryIdentityResponse::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace NetworkCommissioning
         namespace DiagnosticLogs {
@@ -2411,23 +2380,17 @@ namespace app {
         } // namespace GeneralDiagnostics
         namespace SoftwareDiagnostics {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetWatermarks", ResetWatermarks::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace SoftwareDiagnostics
         namespace ThreadNetworkDiagnostics {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetCounts", ResetCounts::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ThreadNetworkDiagnostics
         namespace WiFiNetworkDiagnostics {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetCounts", ResetCounts::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace WiFiNetworkDiagnostics
         namespace EthernetNetworkDiagnostics {
@@ -2441,11 +2404,6 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetUTCTime", SetUTCTime::Id },
-                    { "SetTrustedTimeSource", SetTrustedTimeSource::Id },
-                    { "SetTimeZone", SetTimeZone::Id },
-                    { "SetTimeZoneResponse", SetTimeZoneResponse::Id },
-                    { "SetDSTOffset", SetDSTOffset::Id },
-                    { "SetDefaultNTP", SetDefaultNTP::Id }
                 };
             } // namespace Commands
         } // namespace TimeSynchronization
@@ -2463,7 +2421,6 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "OpenCommissioningWindow", OpenCommissioningWindow::Id },
-                    { "OpenBasicCommissioningWindow", OpenBasicCommissioningWindow::Id },
                     { "RevokeCommissioning", RevokeCommissioning::Id }
                 };
             } // namespace Commands
@@ -2531,11 +2488,7 @@ namespace app {
         namespace IcdManagement {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "RegisterClient", RegisterClient::Id },
                     { "RegisterClientResponse", RegisterClientResponse::Id },
-                    { "UnregisterClient", UnregisterClient::Id },
-                    { "StayActiveRequest", StayActiveRequest::Id },
-                    { "StayActiveResponse", StayActiveResponse::Id }
                 };
             } // namespace Commands
         } // namespace IcdManagement
@@ -2543,9 +2496,7 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetTimer", SetTimer::Id },
-                    { "ResetTimer", ResetTimer::Id },
                     { "AddTime", AddTime::Id },
-                    { "ReduceTime", ReduceTime::Id }
                 };
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetTimer", SetTimer::Id },
@@ -2650,17 +2601,12 @@ namespace app {
         } // namespace AirQuality
         namespace SmokeCoAlarm {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "SelfTestRequest", SelfTestRequest::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace SmokeCoAlarm
         namespace DishwasherAlarm {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Reset", Reset::Id },
-                    { "ModifyEnabledAlarms", ModifyEnabledAlarms::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace DishwasherAlarm
         namespace MicrowaveOvenMode {
@@ -2672,7 +2618,6 @@ namespace app {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetCookingParameters", SetCookingParameters::Id },
-                    { "AddMoreTime", AddMoreTime::Id }
                 };
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetCookingParameters", SetCookingParameters::Id },
@@ -2682,23 +2627,12 @@ namespace app {
         } // namespace MicrowaveOvenControl
         namespace OperationalState {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Pause", Pause::Id },
-                    { "Stop", Stop::Id },
-                    { "Start", Start::Id },
-                    { "Resume", Resume::Id },
-                    { "OperationalCommandResponse", OperationalCommandResponse::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace OperationalState
         namespace RvcOperationalState {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Pause", Pause::Id },
-                    { "Resume", Resume::Id },
-                    { "OperationalCommandResponse", OperationalCommandResponse::Id },
-                    { "GoHome", GoHome::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace RvcOperationalState
         namespace ScenesManagement {
@@ -2724,16 +2658,12 @@ namespace app {
         } // namespace ScenesManagement
         namespace HepaFilterMonitoring {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetCondition", ResetCondition::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace HepaFilterMonitoring
         namespace ActivatedCarbonFilterMonitoring {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ResetCondition", ResetCondition::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ActivatedCarbonFilterMonitoring
         namespace DemandResponseLoadControl {
@@ -2743,7 +2673,6 @@ namespace app {
                     { "UnregisterLoadControlProgramRequest", UnregisterLoadControlProgramRequest::Id },
                     { "AddLoadControlEventRequest", AddLoadControlEventRequest::Id },
                     { "RemoveLoadControlEventRequest", RemoveLoadControlEventRequest::Id },
-                    { "ClearLoadControlEventsRequest", ClearLoadControlEventsRequest::Id }
                 };
             } // namespace Commands
         } // namespace DemandResponseLoadControl
@@ -2811,31 +2740,6 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "LockDoor", LockDoor::Id },
                     { "UnlockDoor", UnlockDoor::Id },
-                    { "UnlockWithTimeout", UnlockWithTimeout::Id },
-                    { "SetWeekDaySchedule", SetWeekDaySchedule::Id },
-                    { "GetWeekDaySchedule", GetWeekDaySchedule::Id },
-                    { "GetWeekDayScheduleResponse", GetWeekDayScheduleResponse::Id },
-                    { "ClearWeekDaySchedule", ClearWeekDaySchedule::Id },
-                    { "SetYearDaySchedule", SetYearDaySchedule::Id },
-                    { "GetYearDaySchedule", GetYearDaySchedule::Id },
-                    { "GetYearDayScheduleResponse", GetYearDayScheduleResponse::Id },
-                    { "ClearYearDaySchedule", ClearYearDaySchedule::Id },
-                    { "SetHolidaySchedule", SetHolidaySchedule::Id },
-                    { "GetHolidaySchedule", GetHolidaySchedule::Id },
-                    { "GetHolidayScheduleResponse", GetHolidayScheduleResponse::Id },
-                    { "ClearHolidaySchedule", ClearHolidaySchedule::Id },
-                    { "SetUser", SetUser::Id },
-                    { "GetUser", GetUser::Id },
-                    { "GetUserResponse", GetUserResponse::Id },
-                    { "ClearUser", ClearUser::Id },
-                    { "SetCredential", SetCredential::Id },
-                    { "SetCredentialResponse", SetCredentialResponse::Id },
-                    { "GetCredentialStatus", GetCredentialStatus::Id },
-                    { "GetCredentialStatusResponse", GetCredentialStatusResponse::Id },
-                    { "ClearCredential", ClearCredential::Id },
-                    { "UnboltDoor", UnboltDoor::Id },
-                    { "SetAliroReaderConfig", SetAliroReaderConfig::Id },
-                    { "ClearAliroReaderConfig", ClearAliroReaderConfig::Id }
                 };
             } // namespace Commands
         } // namespace DoorLock
@@ -2845,10 +2749,6 @@ namespace app {
                     { "UpOrOpen", UpOrOpen::Id },
                     { "DownOrClose", DownOrClose::Id },
                     { "StopMotion", StopMotion::Id },
-                    { "GoToLiftValue", GoToLiftValue::Id },
-                    { "GoToLiftPercentage", GoToLiftPercentage::Id },
-                    { "GoToTiltValue", GoToTiltValue::Id },
-                    { "GoToTiltPercentage", GoToTiltPercentage::Id }
                 };
             } // namespace Commands
         } // namespace WindowCovering
@@ -2870,24 +2770,12 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SetpointRaiseLower", SetpointRaiseLower::Id },
                     { "GetWeeklyScheduleResponse", GetWeeklyScheduleResponse::Id },
-                    { "SetWeeklySchedule", SetWeeklySchedule::Id },
-                    { "GetWeeklySchedule", GetWeeklySchedule::Id },
-                    { "ClearWeeklySchedule", ClearWeeklySchedule::Id },
-                    { "SetActiveScheduleRequest", SetActiveScheduleRequest::Id },
-                    { "SetActivePresetRequest", SetActivePresetRequest::Id },
-                    { "StartPresetsSchedulesEditRequest", StartPresetsSchedulesEditRequest::Id },
-                    { "CancelPresetsSchedulesEditRequest", CancelPresetsSchedulesEditRequest::Id },
-                    { "CommitPresetsSchedulesRequest", CommitPresetsSchedulesRequest::Id },
-                    { "CancelSetActivePresetRequest", CancelSetActivePresetRequest::Id },
-                    { "SetTemperatureSetpointHoldPolicy", SetTemperatureSetpointHoldPolicy::Id }
                 };
             } // namespace Commands
         } // namespace Thermostat
         namespace FanControl {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "Step", Step::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace FanControl
         namespace ThermostatUserInterfaceConfiguration {
@@ -3013,8 +2901,6 @@ namespace app {
         namespace Channel {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "ChangeChannel", ChangeChannel::Id },
-                    { "ChangeChannelResponse", ChangeChannelResponse::Id },
                     { "ChangeChannelByNumber", ChangeChannelByNumber::Id },
                     { "SkipChannel", SkipChannel::Id },
                     { "GetProgramGuide", GetProgramGuide::Id },
@@ -3038,18 +2924,7 @@ namespace app {
                     { "Play", Play::Id },
                     { "Pause", Pause::Id },
                     { "Stop", Stop::Id },
-                    { "StartOver", StartOver::Id },
-                    { "Previous", Previous::Id },
-                    { "Next", Next::Id },
-                    { "Rewind", Rewind::Id },
-                    { "FastForward", FastForward::Id },
-                    { "SkipForward", SkipForward::Id },
-                    { "SkipBackward", SkipBackward::Id },
                     { "PlaybackResponse", PlaybackResponse::Id },
-                    { "Seek", Seek::Id },
-                    { "ActivateAudioTrack", ActivateAudioTrack::Id },
-                    { "ActivateTextTrack", ActivateTextTrack::Id },
-                    { "DeactivateTextTrack", DeactivateTextTrack::Id }
                 };
             } // namespace Commands
         } // namespace MediaPlayback
@@ -3059,7 +2934,6 @@ namespace app {
                     { "SelectInput", SelectInput::Id },
                     { "ShowInputStatus", ShowInputStatus::Id },
                     { "HideInputStatus", HideInputStatus::Id },
-                    { "RenameInput", RenameInput::Id }
                 };
             } // namespace Commands
         } // namespace MediaInput
@@ -3080,18 +2954,13 @@ namespace app {
         } // namespace KeypadInput
         namespace ContentLauncher {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "LaunchContent", LaunchContent::Id },
-                    { "LaunchURL", LaunchURL::Id },
-                    { "LauncherResponse", LauncherResponse::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ContentLauncher
         namespace AudioOutput {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
                     { "SelectOutput", SelectOutput::Id },
-                    { "RenameOutput", RenameOutput::Id }
                 };
             } // namespace Commands
         } // namespace AudioOutput
@@ -3147,12 +3016,7 @@ namespace app {
         } // namespace ContentAppObserver
         namespace ElectricalMeasurement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
-                    { "GetProfileInfoResponseCommand", GetProfileInfoResponseCommand::Id },
-                    { "GetProfileInfoCommand", GetProfileInfoCommand::Id },
-                    { "GetMeasurementProfileResponseCommand", GetMeasurementProfileResponseCommand::Id },
-                    { "GetMeasurementProfileCommand", GetMeasurementProfileCommand::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ElectricalMeasurement
         namespace UnitTesting {
@@ -3164,39 +3028,6 @@ namespace app {
                     { "TestAddArgumentsResponse", TestAddArgumentsResponse::Id },
                     { "TestSpecific", TestSpecific::Id },
                     { "TestSimpleArgumentResponse", TestSimpleArgumentResponse::Id },
-                    { "TestUnknownCommand", TestUnknownCommand::Id },
-                    { "TestStructArrayArgumentResponse", TestStructArrayArgumentResponse::Id },
-                    { "TestAddArguments", TestAddArguments::Id },
-                    { "TestListInt8UReverseResponse", TestListInt8UReverseResponse::Id },
-                    { "TestSimpleArgumentRequest", TestSimpleArgumentRequest::Id },
-                    { "TestEnumsResponse", TestEnumsResponse::Id },
-                    { "TestStructArrayArgumentRequest", TestStructArrayArgumentRequest::Id },
-                    { "TestNullableOptionalResponse", TestNullableOptionalResponse::Id },
-                    { "TestStructArgumentRequest", TestStructArgumentRequest::Id },
-                    { "TestComplexNullableOptionalResponse", TestComplexNullableOptionalResponse::Id },
-                    { "TestNestedStructArgumentRequest", TestNestedStructArgumentRequest::Id },
-                    { "BooleanResponse", BooleanResponse::Id },
-                    { "TestListStructArgumentRequest", TestListStructArgumentRequest::Id },
-                    { "SimpleStructResponse", SimpleStructResponse::Id },
-                    { "TestListInt8UArgumentRequest", TestListInt8UArgumentRequest::Id },
-                    { "TestEmitTestEventResponse", TestEmitTestEventResponse::Id },
-                    { "TestNestedStructListArgumentRequest", TestNestedStructListArgumentRequest::Id },
-                    { "TestEmitTestFabricScopedEventResponse", TestEmitTestFabricScopedEventResponse::Id },
-                    { "TestListNestedStructListArgumentRequest", TestListNestedStructListArgumentRequest::Id },
-                    { "TestBatchHelperResponse", TestBatchHelperResponse::Id },
-                    { "TestListInt8UReverseRequest", TestListInt8UReverseRequest::Id },
-                    { "TestEnumsRequest", TestEnumsRequest::Id },
-                    { "TestNullableOptionalRequest", TestNullableOptionalRequest::Id },
-                    { "TestComplexNullableOptionalRequest", TestComplexNullableOptionalRequest::Id },
-                    { "SimpleStructEchoRequest", SimpleStructEchoRequest::Id },
-                    { "TimedInvokeRequest", TimedInvokeRequest::Id },
-                    { "TestSimpleOptionalArgumentRequest", TestSimpleOptionalArgumentRequest::Id },
-                    { "TestEmitTestEventRequest", TestEmitTestEventRequest::Id },
-                    { "TestEmitTestFabricScopedEventRequest", TestEmitTestFabricScopedEventRequest::Id },
-                    { "TestBatchHelperRequest", TestBatchHelperRequest::Id },
-                    { "TestSecondBatchHelperRequest", TestSecondBatchHelperRequest::Id },
-                    { "TestDifferentVendorMeiRequest", TestDifferentVendorMeiRequest::Id },
-                    { "TestDifferentVendorMeiResponse", TestDifferentVendorMeiResponse::Id }
                 };
             } // namespace Commands
         } // namespace UnitTesting

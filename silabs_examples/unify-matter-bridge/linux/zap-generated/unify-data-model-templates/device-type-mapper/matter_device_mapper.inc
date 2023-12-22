@@ -388,26 +388,6 @@ namespace app {
                     { "LockDoorResponse", LockDoor::Id },
                     { "UnlockDoor", UnlockDoor::Id },
                     { "UnlockDoorResponse", UnlockDoor::Id },
-                    { "UnlockWithTimeout", UnlockWithTimeout::Id },
-                    { "UnlockWithTimeoutResponse", UnlockWithTimeout::Id },
-                    { "SetWeekdaySchedule", SetWeekDaySchedule::Id },
-                    { "SetWeekdayScheduleResponse", SetWeekDaySchedule::Id },
-                    { "GetWeekdaySchedule", GetWeekDayScheduleResponse::Id },
-                    { "GetWeekdayScheduleResponse", GetWeekDayScheduleResponse::Id },
-                    { "ClearWeekdaySchedule", ClearWeekDaySchedule::Id },
-                    { "ClearWeekdayScheduleResponse", ClearWeekDaySchedule::Id },
-                    { "SetYearDaySchedule", SetYearDaySchedule::Id },
-                    { "SetYearDayScheduleResponse", SetYearDaySchedule::Id },
-                    { "GetYearDaySchedule", GetYearDayScheduleResponse::Id },
-                    { "GetYearDayScheduleResponse", GetYearDayScheduleResponse::Id },
-                    { "ClearYearDaySchedule", ClearYearDaySchedule::Id },
-                    { "ClearYearDayScheduleResponse", ClearYearDaySchedule::Id },
-                    { "SetHolidaySchedule", SetHolidaySchedule::Id },
-                    { "SetHolidayScheduleResponse", SetHolidaySchedule::Id },
-                    { "GetHolidaySchedule", GetHolidayScheduleResponse::Id },
-                    { "GetHolidayScheduleResponse", GetHolidayScheduleResponse::Id },
-                    { "ClearHolidaySchedule", ClearHolidaySchedule::Id },
-                    { "ClearHolidayScheduleResponse", ClearHolidaySchedule::Id },
                 };
             } // namespace Commands
         } // namespace DoorLock
@@ -422,12 +402,8 @@ namespace app {
         namespace Thermostat {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
-                    { "SetpointRaiseOrLower", GetWeeklyScheduleResponse::Id },
-                    { "GetWeeklyScheduleResponse", GetWeeklyScheduleResponse::Id },
-                    { "SetWeeklySchedule", SetWeeklySchedule::Id },
-                    { "GetRelayStatusLogResponse", SetWeeklySchedule::Id },
-                    { "GetWeeklySchedule", GetWeeklySchedule::Id },
-                    { "ClearWeeklySchedule", ClearWeeklySchedule::Id },
+                    { "SetpointRaiseOrLower", SetpointRaiseLower::Id },
+                    { "GetWeeklyScheduleResponse", SetpointRaiseLower::Id },
                 };
             } // namespace Commands
         } // namespace Thermostat
@@ -498,12 +474,7 @@ namespace app {
         } // namespace OccupancySensing
         namespace ElectricalMeasurement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
-                    { "GetProfileInfoResponse", GetProfileInfoCommand::Id },
-                    { "GetProfileInfo", GetProfileInfoCommand::Id },
-                    { "GetMeasurementProfileResponse", GetMeasurementProfileCommand::Id },
-                    { "GetMeasurementProfile", GetMeasurementProfileCommand::Id }
-                };
+                static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace ElectricalMeasurement
 

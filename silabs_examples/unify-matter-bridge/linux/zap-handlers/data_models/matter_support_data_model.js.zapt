@@ -2,14 +2,26 @@ exports.model = {
 {{#zcl_clusters}} 
   {{code}}: {
     name: "{{asUpperCamelCase label}}",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands: {
       {{#zcl_commands}}
-      {{code}} : {
-        name : "{{asUpperCamelCase label}}",
-        arguments : [
-          {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
-        ],
-      },
+        {{#if isOptional}}
+          {{#if (matterSupportedClusterFeatureCommands parent.label code)}}
+            {{code}} : {
+              name : "{{asUpperCamelCase label}}",
+                arguments : [
+                  {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
+                ],
+            },
+          {{/if}}
+        {{else}}
+          {{code}} : {
+            name : "{{asUpperCamelCase label}}",
+              arguments : [
+                {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
+              ],
+          },
+        {{/if}}
       {{/zcl_commands}}
     },
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/

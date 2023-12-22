@@ -1,4 +1,4 @@
-// This file will gives only the feature supported attributes
+// This file will gives UMB supported feature attributes and feature Commands
 const ClusterFeatureAttributesSupport = {
   "Color Control": {
     "0": true,        // Hue/Saturation feature support
@@ -114,4 +114,53 @@ function matterSupportedClusterFeatureAttributes(cluster_name, attribute_id) {
   return false;
 }
 
+//This will give the UMB supported feature mandatory Commands
+const ClusterFeatureCommandsSupport = {
+  "Color Control": {
+    "0": true,        // Hue/Saturation feature support     
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": true,
+    "5": true,
+    "6": true,
+    "7": true,        // XY feature support
+    "8": true,
+    "9": true,
+    "10": true,       // Color temperature feature support
+    "64": true,       // Enhanced Hue feature support        
+    "65": true,
+    "66": true,
+    "67": true,
+    "68": true,       // Color loop feature support
+    "71": true,       // Color temperature feature support       
+    "75": true,
+    "76": true,
+  },
+  "Level Control": {     
+    "8": true,          //Frequency feature support              
+  },
+  "On/Off": {
+    "64": true,         // Lighting feature support      
+    "65": true,
+    "66": true,
+  },
+  "Identify": {
+    "64": true,         //TriggerEffect command support    
+  },
+};
+
+// Function is to publish feature supported Commands
+function matterSupportedClusterFeatureCommands(cluster_name, command_id) {
+  if (ClusterFeatureCommandsSupport.hasOwnProperty(cluster_name)) {    
+    const cluster = ClusterFeatureCommandsSupport[cluster_name];
+    const commandid = String(command_id);
+
+    if (cluster.hasOwnProperty(commandid)) {
+      return true;
+    }
+  }
+  return false;
+}
 exports.matterSupportedClusterFeatureAttributes = matterSupportedClusterFeatureAttributes
+exports.matterSupportedClusterFeatureCommands =  matterSupportedClusterFeatureCommands

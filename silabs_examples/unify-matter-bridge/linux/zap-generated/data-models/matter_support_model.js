@@ -1,6 +1,7 @@
 exports.model = {
   3 : {
     name : "Identify",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Identify",
@@ -30,6 +31,7 @@ exports.model = {
   },
   4 : {
     name : "Groups",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "AddGroup",
@@ -112,6 +114,7 @@ exports.model = {
   },
   5 : {
     name : "Scenes",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "AddScene",
@@ -215,60 +218,6 @@ exports.model = {
           "SceneList",
         ],
       },
-      64 : {
-        name : "EnhancedAddScene",
-        arguments : [
-          "GroupID",
-          "SceneID",
-          "TransitionTime",
-          "SceneName",
-          "ExtensionFieldSets",
-        ],
-      },
-      64 : {
-        name : "EnhancedAddSceneResponse",
-        arguments : [
-          "Status",
-          "GroupID",
-          "SceneID",
-        ],
-      },
-      65 : {
-        name : "EnhancedViewScene",
-        arguments : [
-          "GroupID",
-          "SceneID",
-        ],
-      },
-      65 : {
-        name : "EnhancedViewSceneResponse",
-        arguments : [
-          "Status",
-          "GroupID",
-          "SceneID",
-          "TransitionTime",
-          "SceneName",
-          "ExtensionFieldSets",
-        ],
-      },
-      66 : {
-        name : "CopyScene",
-        arguments : [
-          "Mode",
-          "GroupIdentifierFrom",
-          "SceneIdentifierFrom",
-          "GroupIdentifierTo",
-          "SceneIdentifierTo",
-        ],
-      },
-      66 : {
-        name : "CopySceneResponse",
-        arguments : [
-          "Status",
-          "GroupIdentifierFrom",
-          "SceneIdentifierFrom",
-        ],
-      },
     },
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -289,6 +238,7 @@ exports.model = {
   },
   6 : {
     name : "OnOff",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Off",
@@ -347,6 +297,7 @@ exports.model = {
   },
   7 : {
     name : "OnOffSwitchConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -362,6 +313,7 @@ exports.model = {
   },
   8 : {
     name : "LevelControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "MoveToLevel",
@@ -466,6 +418,7 @@ exports.model = {
   },
   15 : {
     name : "BinaryInputBasic",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -482,6 +435,7 @@ exports.model = {
   },
   28 : {
     name : "PulseWidthModulation",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -495,6 +449,7 @@ exports.model = {
   },
   29 : {
     name : "Descriptor",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -512,6 +467,7 @@ exports.model = {
   },
   30 : {
     name : "Binding",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -526,6 +482,7 @@ exports.model = {
   },
   31 : {
     name : "AccessControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -543,97 +500,8 @@ exports.model = {
   },
   37 : {
     name : "Actions",
-    commands : {
-      0 : {
-        name : "InstantAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      1 : {
-        name : "InstantActionWithTransition",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-          "TransitionTime",
-        ],
-      },
-      2 : {
-        name : "StartAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      3 : {
-        name : "StartActionWithDuration",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-          "Duration",
-        ],
-      },
-      4 : {
-        name : "StopAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      5 : {
-        name : "PauseAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      6 : {
-        name : "PauseActionWithDuration",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-          "Duration",
-        ],
-      },
-      7 : {
-        name : "ResumeAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      8 : {
-        name : "EnableAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      9 : {
-        name : "EnableActionWithDuration",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-          "Duration",
-        ],
-      },
-      10 : {
-        name : "DisableAction",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-        ],
-      },
-      11 : {
-        name : "DisableActionWithDuration",
-        arguments : [
-          "ActionID",
-          "InvokeID",
-          "Duration",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "ActionList",
@@ -648,14 +516,8 @@ exports.model = {
   },
   40 : {
     name : "BasicInformation",
-    commands : {
-      0 : {
-        name : "MfgSpecificPing",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "DataModelRevision",
@@ -680,6 +542,7 @@ exports.model = {
   },
   41 : {
     name : "OtaSoftwareUpdateProvider",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "QueryImage",
@@ -741,18 +604,8 @@ exports.model = {
   },
   42 : {
     name : "OtaSoftwareUpdateRequestor",
-    commands : {
-      0 : {
-        name : "AnnounceOTAProvider",
-        arguments : [
-          "ProviderNodeID",
-          "VendorID",
-          "AnnouncementReason",
-          "MetadataForNode",
-          "Endpoint",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "DefaultOTAProviders",
@@ -769,6 +622,7 @@ exports.model = {
   },
   43 : {
     name : "LocalizationConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -784,6 +638,7 @@ exports.model = {
   },
   44 : {
     name : "TimeFormatLocalization",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -798,6 +653,7 @@ exports.model = {
   },
   45 : {
     name : "UnitLocalization",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -811,6 +667,7 @@ exports.model = {
   },
   46 : {
     name : "PowerSourceConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -825,6 +682,7 @@ exports.model = {
   },
   47 : {
     name : "PowerSource",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -842,6 +700,7 @@ exports.model = {
   },
   48 : {
     name : "GeneralCommissioning",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ArmFailSafe",
@@ -903,101 +762,8 @@ exports.model = {
   },
   49 : {
     name : "NetworkCommissioning",
-    commands : {
-      0 : {
-        name : "ScanNetworks",
-        arguments : [
-          "Ssid",
-          "Breadcrumb",
-        ],
-      },
-      1 : {
-        name : "ScanNetworksResponse",
-        arguments : [
-          "NetworkingStatus",
-          "DebugText",
-          "WiFiScanResults",
-          "ThreadScanResults",
-        ],
-      },
-      2 : {
-        name : "AddOrUpdateWiFiNetwork",
-        arguments : [
-          "Ssid",
-          "Credentials",
-          "Breadcrumb",
-          "NetworkIdentity",
-          "ClientIdentifier",
-          "PossessionNonce",
-          "NetworkIdentity",
-          "ClientIdentifier",
-          "PossessionNonce",
-        ],
-      },
-      3 : {
-        name : "AddOrUpdateThreadNetwork",
-        arguments : [
-          "OperationalDataset",
-          "Breadcrumb",
-        ],
-      },
-      4 : {
-        name : "RemoveNetwork",
-        arguments : [
-          "NetworkID",
-          "Breadcrumb",
-        ],
-      },
-      5 : {
-        name : "NetworkConfigResponse",
-        arguments : [
-          "NetworkingStatus",
-          "DebugText",
-          "NetworkIndex",
-          "ClientIdentity",
-          "PossessionSignature",
-          "ClientIdentity",
-          "PossessionSignature",
-        ],
-      },
-      6 : {
-        name : "ConnectNetwork",
-        arguments : [
-          "NetworkID",
-          "Breadcrumb",
-        ],
-      },
-      7 : {
-        name : "ConnectNetworkResponse",
-        arguments : [
-          "NetworkingStatus",
-          "DebugText",
-          "ErrorValue",
-        ],
-      },
-      8 : {
-        name : "ReorderNetwork",
-        arguments : [
-          "NetworkID",
-          "NetworkIndex",
-          "Breadcrumb",
-        ],
-      },
-      9 : {
-        name : "QueryIdentity",
-        arguments : [
-          "KeyIdentifier",
-          "PossessionNonce",
-        ],
-      },
-      10 : {
-        name : "QueryIdentityResponse",
-        arguments : [
-          "Identity",
-          "PossessionSignature",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "MaxNetworks",
@@ -1019,6 +785,7 @@ exports.model = {
   },
   50 : {
     name : "DiagnosticLogs",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "RetrieveLogsRequest",
@@ -1050,6 +817,7 @@ exports.model = {
   },
   51 : {
     name : "GeneralDiagnostics",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "TestEventTrigger",
@@ -1087,14 +855,8 @@ exports.model = {
   },
   52 : {
     name : "SoftwareDiagnostics",
-    commands : {
-      0 : {
-        name : "ResetWatermarks",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
@@ -1107,14 +869,8 @@ exports.model = {
   },
   53 : {
     name : "ThreadNetworkDiagnostics",
-    commands : {
-      0 : {
-        name : "ResetCounts",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Channel",
@@ -1144,14 +900,8 @@ exports.model = {
   },
   54 : {
     name : "WiFiNetworkDiagnostics",
-    commands : {
-      0 : {
-        name : "ResetCounts",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Bssid",
@@ -1169,6 +919,7 @@ exports.model = {
   },
   55 : {
     name : "EthernetNetworkDiagnostics",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ResetCounts",
@@ -1189,6 +940,7 @@ exports.model = {
   },
   56 : {
     name : "TimeSynchronization",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SetUTCTime",
@@ -1196,36 +948,6 @@ exports.model = {
           "UTCTime",
           "Granularity",
           "TimeSource",
-        ],
-      },
-      1 : {
-        name : "SetTrustedTimeSource",
-        arguments : [
-          "TrustedTimeSource",
-        ],
-      },
-      2 : {
-        name : "SetTimeZone",
-        arguments : [
-          "TimeZone",
-        ],
-      },
-      3 : {
-        name : "SetTimeZoneResponse",
-        arguments : [
-          "DSTOffsetRequired",
-        ],
-      },
-      4 : {
-        name : "SetDSTOffset",
-        arguments : [
-          "DSTOffset",
-        ],
-      },
-      5 : {
-        name : "SetDefaultNTP",
-        arguments : [
-          "DefaultNTP",
         ],
       },
     },
@@ -1243,6 +965,7 @@ exports.model = {
   },
   57 : {
     name : "BridgedDeviceBasicInformation",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1257,6 +980,7 @@ exports.model = {
   },
   59 : {
     name : "Switch",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1272,6 +996,7 @@ exports.model = {
   },
   60 : {
     name : "AdministratorCommissioning",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "OpenCommissioningWindow",
@@ -1281,12 +1006,6 @@ exports.model = {
           "Discriminator",
           "Iterations",
           "Salt",
-        ],
-      },
-      1 : {
-        name : "OpenBasicCommissioningWindow",
-        arguments : [
-          "CommissioningTimeout",
         ],
       },
       2 : {
@@ -1311,6 +1030,7 @@ exports.model = {
   },
   62 : {
     name : "OperationalCredentials",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "AttestationRequest",
@@ -1413,6 +1133,7 @@ exports.model = {
   },
   63 : {
     name : "GroupKeyManagement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "KeySetWrite",
@@ -1467,6 +1188,7 @@ exports.model = {
   },
   64 : {
     name : "FixedLabel",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1481,6 +1203,7 @@ exports.model = {
   },
   65 : {
     name : "UserLabel",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1495,6 +1218,7 @@ exports.model = {
   },
   66 : {
     name : "ProxyConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1508,6 +1232,7 @@ exports.model = {
   },
   67 : {
     name : "ProxyDiscovery",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1521,6 +1246,7 @@ exports.model = {
   },
   68 : {
     name : "ProxyValid",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1534,6 +1260,7 @@ exports.model = {
   },
   69 : {
     name : "BooleanState",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1548,33 +1275,12 @@ exports.model = {
   },
   70 : {
     name : "IcdManagement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
-      0 : {
-        name : "RegisterClient",
-        arguments : [
-          "CheckInNodeID",
-          "MonitoredSubject",
-          "Key",
-          "VerificationKey",
-        ],
-      },
       1 : {
         name : "RegisterClientResponse",
         arguments : [
           "ICDCounter",
-        ],
-      },
-      2 : {
-        name : "UnregisterClient",
-        arguments : [
-          "CheckInNodeID",
-          "VerificationKey",
-        ],
-      },
-      3 : {
-        name : "StayActiveRequest",
-        arguments : [
-
         ],
       },
     },
@@ -1595,6 +1301,7 @@ exports.model = {
   },
   71 : {
     name : "Timer",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SetTimer",
@@ -1602,22 +1309,10 @@ exports.model = {
           "NewTime",
         ],
       },
-      1 : {
-        name : "ResetTimer",
-        arguments : [
-
-        ],
-      },
       2 : {
         name : "AddTime",
         arguments : [
           "AdditionalTime",
-        ],
-      },
-      3 : {
-        name : "ReduceTime",
-        arguments : [
-          "TimeReduction",
         ],
       },
     },
@@ -1636,6 +1331,7 @@ exports.model = {
   },
   80 : {
     name : "ModeSelect",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1660,6 +1356,7 @@ exports.model = {
   },
   81 : {
     name : "LaundryWasherMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1689,6 +1386,7 @@ exports.model = {
   },
   82 : {
     name : "RefrigeratorAndTemperatureControlledCabinetMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1718,6 +1416,7 @@ exports.model = {
   },
   83 : {
     name : "LaundryWasherControls",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1731,6 +1430,7 @@ exports.model = {
   },
   84 : {
     name : "RvcRunMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1760,6 +1460,7 @@ exports.model = {
   },
   85 : {
     name : "RvcCleanMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1789,6 +1490,7 @@ exports.model = {
   },
   86 : {
     name : "TemperatureControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SetTemperature",
@@ -1810,6 +1512,7 @@ exports.model = {
   },
   87 : {
     name : "RefrigeratorAlarm",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1826,6 +1529,7 @@ exports.model = {
   },
   89 : {
     name : "DishwasherMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "ChangeToMode",
@@ -1855,6 +1559,7 @@ exports.model = {
   },
   91 : {
     name : "AirQuality",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1869,14 +1574,8 @@ exports.model = {
   },
   92 : {
     name : "SmokeCoAlarm",
-    commands : {
-      0 : {
-        name : "SelfTestRequest",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "ExpressedState",
@@ -1894,20 +1593,8 @@ exports.model = {
   },
   93 : {
     name : "DishwasherAlarm",
-    commands : {
-      0 : {
-        name : "Reset",
-        arguments : [
-          "Alarms",
-        ],
-      },
-      1 : {
-        name : "ModifyEnabledAlarms",
-        arguments : [
-          "Mask",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "Mask",
@@ -1923,6 +1610,7 @@ exports.model = {
   },
   94 : {
     name : "MicrowaveOvenMode",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -1938,6 +1626,7 @@ exports.model = {
   },
   95 : {
     name : "MicrowaveOvenControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SetCookingParameters",
@@ -1945,12 +1634,6 @@ exports.model = {
           "CookMode",
           "CookTime",
           "PowerSetting",
-        ],
-      },
-      1 : {
-        name : "AddMoreTime",
-        arguments : [
-          "TimeToAdd",
         ],
       },
     },
@@ -1968,38 +1651,8 @@ exports.model = {
   },
   96 : {
     name : "OperationalState",
-    commands : {
-      0 : {
-        name : "Pause",
-        arguments : [
-
-        ],
-      },
-      1 : {
-        name : "Stop",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "Start",
-        arguments : [
-
-        ],
-      },
-      3 : {
-        name : "Resume",
-        arguments : [
-
-        ],
-      },
-      4 : {
-        name : "OperationalCommandResponse",
-        arguments : [
-          "CommandResponseState",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "PhaseList",
@@ -2017,38 +1670,8 @@ exports.model = {
   },
   97 : {
     name : "RvcOperationalState",
-    commands : {
-      0 : {
-        name : "Pause",
-        arguments : [
-
-        ],
-      },
-      1 : {
-        name : "Stop",
-        arguments : [
-
-        ],
-      },
-      2 : {
-        name : "Start",
-        arguments : [
-
-        ],
-      },
-      3 : {
-        name : "Resume",
-        arguments : [
-
-        ],
-      },
-      4 : {
-        name : "OperationalCommandResponse",
-        arguments : [
-          "CommandResponseState",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "PhaseList",
@@ -2202,14 +1825,8 @@ exports.model = {
   },
   113 : {
     name : "HepaFilterMonitoring",
-    commands : {
-      0 : {
-        name : "ResetCondition",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       2 : "ChangeIndication",
@@ -2223,14 +1840,8 @@ exports.model = {
   },
   114 : {
     name : "ActivatedCarbonFilterMonitoring",
-    commands : {
-      0 : {
-        name : "ResetCondition",
-        arguments : [
-
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       2 : "ChangeIndication",
@@ -2244,6 +1855,7 @@ exports.model = {
   },
   150 : {
     name : "DemandResponseLoadControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "RegisterLoadControlProgramRequest",
@@ -2270,12 +1882,6 @@ exports.model = {
           "CancelControl",
         ],
       },
-      4 : {
-        name : "ClearLoadControlEventsRequest",
-        arguments : [
-
-        ],
-      },
     },
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -2298,6 +1904,7 @@ exports.model = {
   },
   257 : {
     name : "DoorLock",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "LockDoor",
@@ -2307,202 +1914,6 @@ exports.model = {
       },
       1 : {
         name : "UnlockDoor",
-        arguments : [
-          "PINCode",
-        ],
-      },
-      3 : {
-        name : "UnlockWithTimeout",
-        arguments : [
-          "Timeout",
-          "PINCode",
-        ],
-      },
-      11 : {
-        name : "SetWeekDaySchedule",
-        arguments : [
-          "WeekDayIndex",
-          "UserIndex",
-          "DaysMask",
-          "StartHour",
-          "StartMinute",
-          "EndHour",
-          "EndMinute",
-        ],
-      },
-      12 : {
-        name : "GetWeekDaySchedule",
-        arguments : [
-          "WeekDayIndex",
-          "UserIndex",
-        ],
-      },
-      12 : {
-        name : "GetWeekDayScheduleResponse",
-        arguments : [
-          "WeekDayIndex",
-          "UserIndex",
-          "Status",
-          "DaysMask",
-          "StartHour",
-          "StartMinute",
-          "EndHour",
-          "EndMinute",
-        ],
-      },
-      13 : {
-        name : "ClearWeekDaySchedule",
-        arguments : [
-          "WeekDayIndex",
-          "UserIndex",
-        ],
-      },
-      14 : {
-        name : "SetYearDaySchedule",
-        arguments : [
-          "YearDayIndex",
-          "UserIndex",
-          "LocalStartTime",
-          "LocalEndTime",
-        ],
-      },
-      15 : {
-        name : "GetYearDaySchedule",
-        arguments : [
-          "YearDayIndex",
-          "UserIndex",
-        ],
-      },
-      15 : {
-        name : "GetYearDayScheduleResponse",
-        arguments : [
-          "YearDayIndex",
-          "UserIndex",
-          "Status",
-          "LocalStartTime",
-          "LocalEndTime",
-        ],
-      },
-      16 : {
-        name : "ClearYearDaySchedule",
-        arguments : [
-          "YearDayIndex",
-          "UserIndex",
-        ],
-      },
-      17 : {
-        name : "SetHolidaySchedule",
-        arguments : [
-          "HolidayIndex",
-          "LocalStartTime",
-          "LocalEndTime",
-          "OperatingMode",
-        ],
-      },
-      18 : {
-        name : "GetHolidaySchedule",
-        arguments : [
-          "HolidayIndex",
-        ],
-      },
-      18 : {
-        name : "GetHolidayScheduleResponse",
-        arguments : [
-          "HolidayIndex",
-          "Status",
-          "LocalStartTime",
-          "LocalEndTime",
-          "OperatingMode",
-        ],
-      },
-      19 : {
-        name : "ClearHolidaySchedule",
-        arguments : [
-          "HolidayIndex",
-        ],
-      },
-      26 : {
-        name : "SetUser",
-        arguments : [
-          "OperationType",
-          "UserIndex",
-          "UserName",
-          "UserUniqueID",
-          "UserStatus",
-          "UserType",
-          "CredentialRule",
-        ],
-      },
-      27 : {
-        name : "GetUser",
-        arguments : [
-          "UserIndex",
-        ],
-      },
-      28 : {
-        name : "GetUserResponse",
-        arguments : [
-          "UserIndex",
-          "UserName",
-          "UserUniqueID",
-          "UserStatus",
-          "UserType",
-          "CredentialRule",
-          "Credentials",
-          "CreatorFabricIndex",
-          "LastModifiedFabricIndex",
-          "NextUserIndex",
-        ],
-      },
-      29 : {
-        name : "ClearUser",
-        arguments : [
-          "UserIndex",
-        ],
-      },
-      34 : {
-        name : "SetCredential",
-        arguments : [
-          "OperationType",
-          "Credential",
-          "CredentialData",
-          "UserIndex",
-          "UserStatus",
-          "UserType",
-        ],
-      },
-      35 : {
-        name : "SetCredentialResponse",
-        arguments : [
-          "Status",
-          "UserIndex",
-          "NextCredentialIndex",
-        ],
-      },
-      36 : {
-        name : "GetCredentialStatus",
-        arguments : [
-          "Credential",
-        ],
-      },
-      37 : {
-        name : "GetCredentialStatusResponse",
-        arguments : [
-          "CredentialExists",
-          "UserIndex",
-          "CreatorFabricIndex",
-          "LastModifiedFabricIndex",
-          "NextCredentialIndex",
-        ],
-      },
-      38 : {
-        name : "ClearCredential",
-        arguments : [
-          "Credential",
-        ],
-      },
-      39 : {
-        name : "UnboltDoor",
         arguments : [
           "PINCode",
         ],
@@ -2534,6 +1945,7 @@ exports.model = {
   },
   258 : {
     name : "WindowCovering",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "UpOrOpen",
@@ -2551,30 +1963,6 @@ exports.model = {
         name : "StopMotion",
         arguments : [
 
-        ],
-      },
-      4 : {
-        name : "GoToLiftValue",
-        arguments : [
-          "LiftValue",
-        ],
-      },
-      5 : {
-        name : "GoToLiftPercentage",
-        arguments : [
-          "LiftPercent100thsValue",
-        ],
-      },
-      7 : {
-        name : "GoToTiltValue",
-        arguments : [
-          "TiltValue",
-        ],
-      },
-      8 : {
-        name : "GoToTiltPercentage",
-        arguments : [
-          "TiltPercent100thsValue",
         ],
       },
     },
@@ -2595,6 +1983,7 @@ exports.model = {
   },
   259 : {
     name : "BarrierControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "BarrierControlGoToPercent",
@@ -2625,6 +2014,7 @@ exports.model = {
   },
   512 : {
     name : "PumpConfigurationAndControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -2645,43 +2035,13 @@ exports.model = {
   },
   513 : {
     name : "Thermostat",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SetpointRaiseLower",
         arguments : [
           "Mode",
           "Amount",
-        ],
-      },
-      0 : {
-        name : "GetWeeklyScheduleResponse",
-        arguments : [
-          "NumberOfTransitionsForSequence",
-          "DayOfWeekForSequence",
-          "ModeForSequence",
-          "Transitions",
-        ],
-      },
-      1 : {
-        name : "SetWeeklySchedule",
-        arguments : [
-          "NumberOfTransitionsForSequence",
-          "DayOfWeekForSequence",
-          "ModeForSequence",
-          "Transitions",
-        ],
-      },
-      2 : {
-        name : "GetWeeklySchedule",
-        arguments : [
-          "DaysToReturn",
-          "ModeToReturn",
-        ],
-      },
-      3 : {
-        name : "ClearWeeklySchedule",
-        arguments : [
-
         ],
       },
     },
@@ -2706,16 +2066,8 @@ exports.model = {
   },
   514 : {
     name : "FanControl",
-    commands : {
-      0 : {
-        name : "Step",
-        arguments : [
-          "Direction",
-          "Wrap",
-          "LowestOff",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       0 : "FanMode",
@@ -2732,6 +2084,7 @@ exports.model = {
   },
   516 : {
     name : "ThermostatUserInterfaceConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -2747,6 +2100,7 @@ exports.model = {
   },
   768 : {
     name : "ColorControl",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "MoveToHue",
@@ -2998,6 +2352,7 @@ exports.model = {
   },
   769 : {
     name : "BallastConfiguration",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3016,6 +2371,7 @@ exports.model = {
   },
   1024 : {
     name : "IlluminanceMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3034,6 +2390,7 @@ exports.model = {
   },
   1026 : {
     name : "TemperatureMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3051,6 +2408,7 @@ exports.model = {
   },
   1027 : {
     name : "PressureMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3073,6 +2431,7 @@ exports.model = {
   },
   1028 : {
     name : "FlowMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3090,6 +2449,7 @@ exports.model = {
   },
   1029 : {
     name : "RelativeHumidityMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3107,6 +2467,7 @@ exports.model = {
   },
   1030 : {
     name : "OccupancySensing",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3123,6 +2484,7 @@ exports.model = {
   },
   1036 : {
     name : "CarbonMonoxideConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3136,6 +2498,7 @@ exports.model = {
   },
   1037 : {
     name : "CarbonDioxideConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3149,6 +2512,7 @@ exports.model = {
   },
   1043 : {
     name : "NitrogenDioxideConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3162,6 +2526,7 @@ exports.model = {
   },
   1045 : {
     name : "OzoneConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3175,6 +2540,7 @@ exports.model = {
   },
   1066 : {
     name : "Pm25ConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3188,6 +2554,7 @@ exports.model = {
   },
   1067 : {
     name : "FormaldehydeConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3201,6 +2568,7 @@ exports.model = {
   },
   1068 : {
     name : "Pm1ConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3214,6 +2582,7 @@ exports.model = {
   },
   1069 : {
     name : "Pm10ConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3227,6 +2596,7 @@ exports.model = {
   },
   1070 : {
     name : "TotalVolatileOrganicCompoundsConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3240,6 +2610,7 @@ exports.model = {
   },
   1071 : {
     name : "RadonConcentrationMeasurement",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3253,6 +2624,7 @@ exports.model = {
   },
   1283 : {
     name : "WakeOnLan",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3266,20 +2638,8 @@ exports.model = {
   },
   1284 : {
     name : "Channel",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
-      0 : {
-        name : "ChangeChannel",
-        arguments : [
-          "Match",
-        ],
-      },
-      1 : {
-        name : "ChangeChannelResponse",
-        arguments : [
-          "Status",
-          "Data",
-        ],
-      },
       2 : {
         name : "ChangeChannelByNumber",
         arguments : [
@@ -3306,6 +2666,7 @@ exports.model = {
   },
   1285 : {
     name : "TargetNavigator",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "NavigateTarget",
@@ -3335,6 +2696,7 @@ exports.model = {
   },
   1286 : {
     name : "MediaPlayback",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Play",
@@ -3345,55 +2707,13 @@ exports.model = {
       1 : {
         name : "Pause",
         arguments : [
-
+          "AudioAdvanceUnmuted",
         ],
       },
       2 : {
         name : "Stop",
         arguments : [
-
-        ],
-      },
-      3 : {
-        name : "StartOver",
-        arguments : [
-
-        ],
-      },
-      4 : {
-        name : "Previous",
-        arguments : [
-
-        ],
-      },
-      5 : {
-        name : "Next",
-        arguments : [
-
-        ],
-      },
-      6 : {
-        name : "Rewind",
-        arguments : [
           "AudioAdvanceUnmuted",
-        ],
-      },
-      7 : {
-        name : "FastForward",
-        arguments : [
-          "AudioAdvanceUnmuted",
-        ],
-      },
-      8 : {
-        name : "SkipForward",
-        arguments : [
-          "DeltaPositionMilliseconds",
-        ],
-      },
-      9 : {
-        name : "SkipBackward",
-        arguments : [
-          "DeltaPositionMilliseconds",
         ],
       },
       10 : {
@@ -3401,12 +2721,6 @@ exports.model = {
         arguments : [
           "Status",
           "Data",
-        ],
-      },
-      11 : {
-        name : "Seek",
-        arguments : [
-          "Position",
         ],
       },
     },
@@ -3423,6 +2737,7 @@ exports.model = {
   },
   1287 : {
     name : "MediaInput",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SelectInput",
@@ -3442,13 +2757,6 @@ exports.model = {
 
         ],
       },
-      3 : {
-        name : "RenameInput",
-        arguments : [
-          "Index",
-          "Name",
-        ],
-      },
     },
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3464,6 +2772,7 @@ exports.model = {
   },
   1288 : {
     name : "LowPower",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Sleep",
@@ -3484,6 +2793,7 @@ exports.model = {
   },
   1289 : {
     name : "KeypadInput",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SendKey",
@@ -3510,33 +2820,8 @@ exports.model = {
   },
   1290 : {
     name : "ContentLauncher",
-    commands : {
-      0 : {
-        name : "LaunchContent",
-        arguments : [
-          "Search",
-          "AutoPlay",
-          "Data",
-          "PlaybackPreferences",
-          "UseCurrentContext",
-        ],
-      },
-      1 : {
-        name : "LaunchURL",
-        arguments : [
-          "ContentURL",
-          "DisplayString",
-          "BrandingInformation",
-        ],
-      },
-      2 : {
-        name : "LauncherResponse",
-        arguments : [
-          "Status",
-          "Data",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
@@ -3549,18 +2834,12 @@ exports.model = {
   },
   1291 : {
     name : "AudioOutput",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "SelectOutput",
         arguments : [
           "Index",
-        ],
-      },
-      1 : {
-        name : "RenameOutput",
-        arguments : [
-          "Index",
-          "Name",
         ],
       },
     },
@@ -3578,6 +2857,7 @@ exports.model = {
   },
   1292 : {
     name : "ApplicationLauncher",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "LaunchApp",
@@ -3618,6 +2898,7 @@ exports.model = {
   },
   1293 : {
     name : "ApplicationBasic",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
@@ -3636,6 +2917,7 @@ exports.model = {
   },
   1294 : {
     name : "AccountLogin",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "GetSetupPIN",
@@ -3676,42 +2958,8 @@ exports.model = {
   },
   2820 : {
     name : "ElectricalMeasurement",
-    commands : {
-      0 : {
-        name : "GetProfileInfoResponseCommand",
-        arguments : [
-          "ProfileCount",
-          "ProfileIntervalPeriod",
-          "MaxNumberOfIntervals",
-          "ListOfAttributes",
-        ],
-      },
-      0 : {
-        name : "GetProfileInfoCommand",
-        arguments : [
-
-        ],
-      },
-      1 : {
-        name : "GetMeasurementProfileResponseCommand",
-        arguments : [
-          "StartTime",
-          "Status",
-          "ProfileIntervalPeriod",
-          "NumberOfIntervalsDelivered",
-          "AttributeId",
-          "Intervals",
-        ],
-      },
-      1 : {
-        name : "GetMeasurementProfileCommand",
-        arguments : [
-          "AttributeId",
-          "StartTime",
-          "NumberOfIntervals",
-        ],
-      },
-    },
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
+    commands : {},
     /*currently we only support mandatory and feature mandatory attributes, hence only mapping of those as listed here.*/
     attributes : {
       65528 : "GeneratedCommandList",
@@ -3724,17 +2972,12 @@ exports.model = {
   },
   4294048773 : {
     name : "UnitTesting",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Test",
         arguments : [
 
-        ],
-      },
-      0 : {
-        name : "TestSpecificResponse",
-        arguments : [
-          "ReturnValue",
         ],
       },
       1 : {
@@ -3743,252 +2986,10 @@ exports.model = {
 
         ],
       },
-      1 : {
-        name : "TestAddArgumentsResponse",
-        arguments : [
-          "ReturnValue",
-        ],
-      },
       2 : {
         name : "TestSpecific",
         arguments : [
 
-        ],
-      },
-      2 : {
-        name : "TestSimpleArgumentResponse",
-        arguments : [
-          "ReturnValue",
-        ],
-      },
-      3 : {
-        name : "TestUnknownCommand",
-        arguments : [
-
-        ],
-      },
-      3 : {
-        name : "TestStructArrayArgumentResponse",
-        arguments : [
-          "Arg1",
-          "Arg2",
-          "Arg3",
-          "Arg4",
-          "Arg5",
-          "Arg6",
-        ],
-      },
-      4 : {
-        name : "TestAddArguments",
-        arguments : [
-          "Arg1",
-          "Arg2",
-        ],
-      },
-      4 : {
-        name : "TestListInt8UReverseResponse",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      5 : {
-        name : "TestSimpleArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      5 : {
-        name : "TestEnumsResponse",
-        arguments : [
-          "Arg1",
-          "Arg2",
-        ],
-      },
-      6 : {
-        name : "TestStructArrayArgumentRequest",
-        arguments : [
-          "Arg1",
-          "Arg2",
-          "Arg3",
-          "Arg4",
-          "Arg5",
-          "Arg6",
-        ],
-      },
-      6 : {
-        name : "TestNullableOptionalResponse",
-        arguments : [
-          "WasPresent",
-          "WasNull",
-          "Value",
-          "OriginalValue",
-        ],
-      },
-      7 : {
-        name : "TestStructArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      7 : {
-        name : "TestComplexNullableOptionalResponse",
-        arguments : [
-          "NullableIntWasNull",
-          "NullableIntValue",
-          "OptionalIntWasPresent",
-          "OptionalIntValue",
-          "NullableOptionalIntWasPresent",
-          "NullableOptionalIntWasNull",
-          "NullableOptionalIntValue",
-          "NullableStringWasNull",
-          "NullableStringValue",
-          "OptionalStringWasPresent",
-          "OptionalStringValue",
-          "NullableOptionalStringWasPresent",
-          "NullableOptionalStringWasNull",
-          "NullableOptionalStringValue",
-          "NullableStructWasNull",
-          "NullableStructValue",
-          "OptionalStructWasPresent",
-          "OptionalStructValue",
-          "NullableOptionalStructWasPresent",
-          "NullableOptionalStructWasNull",
-          "NullableOptionalStructValue",
-          "NullableListWasNull",
-          "NullableListValue",
-          "OptionalListWasPresent",
-          "OptionalListValue",
-          "NullableOptionalListWasPresent",
-          "NullableOptionalListWasNull",
-          "NullableOptionalListValue",
-        ],
-      },
-      8 : {
-        name : "TestNestedStructArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      8 : {
-        name : "BooleanResponse",
-        arguments : [
-          "Value",
-        ],
-      },
-      9 : {
-        name : "TestListStructArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      9 : {
-        name : "SimpleStructResponse",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      10 : {
-        name : "TestListInt8UArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      10 : {
-        name : "TestEmitTestEventResponse",
-        arguments : [
-          "Value",
-        ],
-      },
-      11 : {
-        name : "TestNestedStructListArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      11 : {
-        name : "TestEmitTestFabricScopedEventResponse",
-        arguments : [
-          "Value",
-        ],
-      },
-      12 : {
-        name : "TestListNestedStructListArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      12 : {
-        name : "TestBatchHelperResponse",
-        arguments : [
-          "Buffer",
-        ],
-      },
-      13 : {
-        name : "TestListInt8UReverseRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      14 : {
-        name : "TestEnumsRequest",
-        arguments : [
-          "Arg1",
-          "Arg2",
-        ],
-      },
-      15 : {
-        name : "TestNullableOptionalRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      16 : {
-        name : "TestComplexNullableOptionalRequest",
-        arguments : [
-          "NullableInt",
-          "OptionalInt",
-          "NullableOptionalInt",
-          "NullableString",
-          "OptionalString",
-          "NullableOptionalString",
-          "NullableStruct",
-          "OptionalStruct",
-          "NullableOptionalStruct",
-          "NullableList",
-          "OptionalList",
-          "NullableOptionalList",
-        ],
-      },
-      17 : {
-        name : "SimpleStructEchoRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      18 : {
-        name : "TimedInvokeRequest",
-        arguments : [
-
-        ],
-      },
-      19 : {
-        name : "TestSimpleOptionalArgumentRequest",
-        arguments : [
-          "Arg1",
-        ],
-      },
-      20 : {
-        name : "TestEmitTestEventRequest",
-        arguments : [
-          "Arg1",
-          "Arg2",
-          "Arg3",
-        ],
-      },
-      21 : {
-        name : "TestEmitTestFabricScopedEventRequest",
-        arguments : [
-          "Arg1",
         ],
       },
     },
@@ -4085,6 +3086,7 @@ exports.model = {
   },
   4294048774 : {
     name : "FaultInjection",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "FailAtFault",
@@ -4117,6 +3119,7 @@ exports.model = {
   },
   4294048800 : {
     name : "SampleMei",
+    /*currently we only support mandatory and feature mandatory commands, hence only mapping of those as listed here.*/
     commands : {
       0 : {
         name : "Ping",
@@ -4875,6 +3878,12 @@ exports.model = {
       "EnhancedCurrentHueAndCurrentSaturation",
     ], //
     "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
+    ], //
+    "ErrorStateEnum" : [
       "FailedToFindChargingDock",
       "Stuck",
       "DustBinMissing",
@@ -4883,12 +3892,6 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
-    ], //
-    "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -5265,15 +4268,15 @@ exports.model = {
       "Biometric",
     ], //
     "OperationalStateEnum" : [
-      "SeekingCharger",
-      "Charging",
-      "Docked",
-    ], //
-    "OperationalStateEnum" : [
       "Stopped",
       "Running",
       "Paused",
       "Error",
+    ], //
+    "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -5995,11 +4998,11 @@ exports.model = {
       1 : "CalendarFormat",
     },
     "Feature" : {
-      1 : "ApplicationPlatform",
-    },
-    "Feature" : {
       1 : "ChannelList",
       2 : "LineupInfo",
+    },
+    "Feature" : {
+      1 : "ApplicationPlatform",
     },
     "Feature" : {
       1 : "MultiSpeed",
@@ -6013,13 +5016,13 @@ exports.model = {
       1 : "NameUpdates",
     },
     "Feature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
-    },
-    "Feature" : {
       1 : "Condition",
       2 : "Warning",
       4 : "ReplacementProductList",
+    },
+    "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
     },
     "Feature" : {
       1 : "ContentSearch",
@@ -6052,9 +5055,6 @@ exports.model = {
       2 : "CoAlarm",
     },
     "Feature" : {
-      1 : "Basic",
-    },
-    "Feature" : {
       1 : "EnrollmentGroups",
       2 : "TemperatureOffset",
       4 : "TemperatureSetpoint",
@@ -6062,6 +5062,9 @@ exports.model = {
       16 : "DutyCycle",
       32 : "PowerSavings",
       64 : "HeatingSource",
+    },
+    "Feature" : {
+      1 : "Basic",
     },
     "Feature" : {
       1 : "CheckInProtocolSupport",
