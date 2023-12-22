@@ -33,8 +33,7 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
-                                                                   MutableCharSpan & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {

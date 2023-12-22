@@ -80,8 +80,7 @@ public:
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The MutableCharSpan is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index,
-                                          MutableCharSpan & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
     // command callback
     /**

@@ -305,7 +305,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         char buffer[kMaxPhaseNameLength];
         MutableCharSpan phase(buffer);
-        size_t index   = 0;
+        size_t index = 0;
 
         if (mDelegate->GetOperationalPhaseAtIndex(index, phase) == CHIP_ERROR_NOT_FOUND)
         {
