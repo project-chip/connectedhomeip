@@ -867,6 +867,15 @@ menu "CHIP Device Layer"
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
+        config ENABLE_SET_CERT_DECLARATION_API
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER || SEC_CERT_DAC_PROVIDER
+            bool "Enable Set CD API"
+            default n
+            help
+                By default, the implementation reads the Certification Declaration (CD) from the 'chip-factory'
+                NVS namespace. If this option is enabled, the application can use an API to set a CD,
+                the configured CD will be used for subsequent CD reads.
+
        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
