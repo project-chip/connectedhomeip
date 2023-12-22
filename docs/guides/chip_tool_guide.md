@@ -18,6 +18,10 @@ directory.
 > `/tmp/chip_tool_config.ini` file. Deleting this and other `.ini` files in the
 > `/tmp` directory can sometimes resolve issues related to stale configuration.
 
+> **Note:** To make the configuration persistent (since `/tmp` directory might
+> be flushed at each reboot) you can change the directory where CHIP Tool caches
+> its configuration by using the option `--storage-directory`
+
 <hr>
 
 ## Building and running the CHIP Tool
@@ -673,6 +677,30 @@ The following flags are available:
 
     Here, _<onoff\>_ is a `[0/1]` flag, which when set to `1` prints the trace
     data with automation logs to the console.
+
+<hr>
+
+##### Changing storage directory
+
+By default, CHIP Tool stores its configuration into the `/tmp` directory. You
+can change the storage directory by using the `--storage-directory` flag.
+
+Usage:
+
+```
+--storage-directory <directory>
+```
+
+Here, _<directory\>_ is the path to the directory where the configuration is
+stored.
+
+**Example of usage:**
+
+```
+$ ./chip-tool pairing ble-wifi <node_id> <ssid> <password> <pin_code> <discriminator> --storage-directory <directory>
+$ ./chip-tool temperaturemeasurement read measured-value <node_id> <endpoint_id> --storage-directory <directory>
+
+```
 
 <hr>
 

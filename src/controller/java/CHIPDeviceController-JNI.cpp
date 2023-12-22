@@ -627,7 +627,7 @@ exit:
 
 JNI_METHOD(void, pairDevice)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode, jbyteArray csrNonce,
- jobject networkCredentials)
+ jobject networkCredentials, jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -656,6 +656,13 @@ JNI_METHOD(void, pairDevice)
         JniByteArray jniCsrNonce(env, csrNonce);
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
+
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    if (icdRegistrationInfo != nullptr)
+    {
+        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    }
+
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
@@ -671,7 +678,7 @@ JNI_METHOD(void, pairDevice)
 
 JNI_METHOD(void, pairDeviceWithAddress)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jint discriminator, jlong pinCode,
- jbyteArray csrNonce)
+ jbyteArray csrNonce, jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -699,6 +706,13 @@ JNI_METHOD(void, pairDeviceWithAddress)
         JniByteArray jniCsrNonce(env, csrNonce);
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
+
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    if (icdRegistrationInfo != nullptr)
+    {
+        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    }
+
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
@@ -714,7 +728,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
 
 JNI_METHOD(void, pairDeviceWithCode)
 (JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring setUpCode, jboolean discoverOnce,
- jboolean useOnlyOnNetworkDiscovery, jbyteArray csrNonce, jobject networkCredentials)
+ jboolean useOnlyOnNetworkDiscovery, jbyteArray csrNonce, jobject networkCredentials, jobject icdRegistrationInfo)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -746,6 +760,12 @@ JNI_METHOD(void, pairDeviceWithCode)
     if (networkCredentials != nullptr)
     {
         wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    }
+
+    commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
+    if (icdRegistrationInfo != nullptr)
+    {
+        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
     }
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
@@ -894,6 +914,41 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "NetworkCredentialsReady failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+            JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        }
+    }
+}
+
+JNI_METHOD(void, updateCommissioningICDRegistrationInfo)
+(JNIEnv * env, jobject self, jlong handle, jobject icdRegistrationInfo)
+{
+    ChipLogProgress(Controller, "updateCommissioningICDRegistrationInfo() called");
+    chip::DeviceLayer::StackLock lock;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+    CHIP_ERROR err                              = wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ApplyICDRegistrationInfo failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return;
+    }
+    err = wrapper->UpdateCommissioningParameters(commissioningParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return;
+    }
+
+    // Only invoke ICDRegistrationInfoReady when called in ICDRegistartionInfo stage.
+    if (wrapper->Controller()->GetCommissioningStage() == CommissioningStage::kICDGetRegistrationInfo)
+    {
+        err = wrapper->Controller()->ICDRegistrationInfoReady();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "ICDRegistrationInfoReady failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
             JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
         }
     }

@@ -55,10 +55,10 @@ limitations under the License.
     <type id="0x42" description="Character String"         name="char_string"                 composite="true"/>
     <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
 
-    <type id="0xD9" description="Power milliwatts"         name="power_mw"          size="8"  analog="true"   />
-    <type id="0xDA" description="Amperage milliamps"       name="amperage_ma"       size="8"  analog="true"   />
-    <type id="0xDB" description="Voltage millivolts"       name="voltage_mv"        size="8"  analog="true"   />
-    <type id="0xDC" description="Energy milliwatt-hours"   name="energy_mwh"        size="8"  analog="true"   />
+    <type id="0xD9" description="Power milliwatts"         name="power_mw"          size="8"  analog="true"     signed="true"/>
+    <type id="0xDA" description="Amperage milliamps"       name="amperage_ma"       size="8"  analog="true"     signed="true"/>
+    <type id="0xDB" description="Voltage millivolts"       name="voltage_mv"        size="8"  analog="true"     signed="true"/>
+    <type id="0xDC" description="Energy milliwatt-hours"   name="energy_mwh"        size="8"  analog="true"     signed="true"/>
 
     <type id="0xE6" description="Percentage units 1%"      name="percent"           size="1"  analog="true"   />
     <type id="0xE7" description="Percentage units 0.01%"   name="percent100ths"     size="2"  analog="true"   />
