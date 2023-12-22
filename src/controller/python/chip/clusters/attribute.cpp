@@ -17,8 +17,11 @@
 
 #include "system/SystemClock.h"
 #include <cstdarg>
+#include <cstdio>
 #include <memory>
 #include <type_traits>
+
+#include <Python.h>
 
 #include <app/BufferedReadCallback.h>
 #include <app/ChunkedWriteCallback.h>
@@ -29,17 +32,12 @@
 #include <controller/CHIPDeviceController.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
-#include <lib/support/CodeUtils.h>
-
-#include <cstdio>
-#include <lib/support/logging/CHIPLogging.h>
-
 #include <lib/core/Optional.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
-
-using PyObject = void;
 
 namespace chip {
 namespace python {
@@ -257,7 +255,7 @@ struct __attribute__((packed)) PyReadAttributeParams
     bool autoResubscribe;
 };
 
-PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
+PyChipError pychip_WriteClient_WriteAttributes(PyObject * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                chip::python::PyWriteAttributeData * writeAttributesData,
                                                size_t attributeDataLength);
@@ -338,7 +336,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReportEndCallback               = onReportEndCallback;
 }
 
-PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
+PyChipError pychip_WriteClient_WriteAttributes(PyObject * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
                                                python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
 {
@@ -472,7 +470,7 @@ PyChipError pychip_ReadClient_GetReportingIntervals(ReadClient * pReadClient, ui
     return ToPyChipError(err);
 }
 
-PyChipError pychip_ReadClient_Read(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
+PyChipError pychip_ReadClient_Read(PyObject * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                    DeviceProxy * device, uint8_t * readParamsBuf, void ** attributePathsFromPython,
                                    size_t numAttributePaths, void ** dataversionFiltersFromPython, size_t numDataversionFilters,
                                    void ** eventPathsFromPython, size_t numEventPaths, uint64_t * eventNumberFilter)

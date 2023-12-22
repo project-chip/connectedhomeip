@@ -21,6 +21,8 @@
 #include <map>
 #include <string>
 
+#include <Python.h>
+
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 class PythonPersistentStorageDelegate;
@@ -41,8 +43,6 @@ private:
 };
 
 namespace Python {
-
-using PyObject = void;
 
 using SyncSetKeyValueCb    = void (*)(PyObject * appContext, const char * key, const void * value, uint16_t size);
 using SetGetKeyValueCb     = void (*)(PyObject * appContext, const char * key, char * value, uint16_t * size, bool * isFound);

@@ -15,36 +15,35 @@
  *    limitations under the License.
  */
 
+#include <cstdio>
 #include <memory>
 #include <type_traits>
 #include <unordered_map>
 
+#include <Python.h>
+
 #include <app/CommandSender.h>
 #include <app/DeviceProxy.h>
-#include <lib/support/CodeUtils.h>
-
 #include <controller/python/chip/interaction_model/Delegate.h>
 #include <controller/python/chip/native/PyChipError.h>
-#include <cstdio>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 
-using PyObject = void *;
-
 extern "C" {
-PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendCommand(PyObject * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
                                              uint16_t busyWaitMs, bool suppressResponse);
 
-PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendBatchCommands(PyObject * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                                    chip::python::PyInvokeRequestData * batchCommandData, size_t length);
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
-    void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
+    PyObject * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
     const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse);
 
 PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::Controller::DeviceCommissioner * devCtrl,
@@ -55,14 +54,14 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 namespace chip {
 namespace python {
 
-using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+using OnCommandSenderResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                  chip::CommandId commandId, size_t index,
                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
+using OnCommandSenderErrorCallback    = void (*)(PyObject * appContext,
                                               std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+using OnCommandSenderDoneCallback     = void (*)(PyObject * appContext);
 
 OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
 OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
@@ -71,7 +70,7 @@ OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
 class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
-    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
+    CommandSenderCallback(PyObject * appContext, bool isBatchedCommands) :
         mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
     {}
 
@@ -176,7 +175,7 @@ public:
     }
 
 private:
-    PyObject mAppContext = nullptr;
+    PyObject * mAppContext = nullptr;
     std::unordered_map<uint16_t, size_t> commandRefToIndex;
     bool mIsBatchedCommands;
 };
@@ -322,7 +321,7 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
     gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
 }
 
-PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendCommand(PyObject * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                              chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
                                              uint16_t busyWaitMs, bool suppressResponse)
@@ -373,7 +372,7 @@ exit:
     return ToPyChipError(err);
 }
 
-PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendBatchCommands(PyObject * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                                    uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                                    python::PyInvokeRequestData * batchCommandData, size_t length)
 {
@@ -397,7 +396,7 @@ PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, De
 }
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
-    void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
+    PyObject * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
     const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse)
 {
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
