@@ -273,7 +273,9 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]
         defines +=
-            [ "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
+            [ "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}",
+              "TIME_SYNCHRONIZATION_CLUSTER_INCLUDED=1"
+             ]
       } else if (cluster == "scenes-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",

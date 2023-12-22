@@ -17,9 +17,9 @@
 
 #include "general-diagnostics-server.h"
 
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#ifdef TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
 #include "app/clusters/time-synchronization-server/time-synchronization-server.h"
-#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#endif // TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
 
 #include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -398,6 +398,7 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
 
     System::Clock::Microseconds64 posix_time_us{ 0 };
 
+#ifdef TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     bool time_is_synced = false;
     using Clusters::TimeSynchronization::GranularityEnum;
@@ -414,7 +415,9 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
             posix_time_us = System::Clock::Microseconds64{ 0 };
         }
     }
-#endif // TIME_SYNCHRONIZATION_CLUSTER
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#endif // TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
+
     System::Clock::Milliseconds64 system_time_ms =
         std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
 
