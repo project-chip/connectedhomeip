@@ -17,7 +17,6 @@
 
 import asyncio
 import logging
-import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
