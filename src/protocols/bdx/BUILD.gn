@@ -24,6 +24,8 @@ static_library("bdx") {
     "BdxTransferSession.h",
     "BdxUri.cpp",
     "BdxUri.h",
+    "StatusCode.cpp",
+    "StatusCode.h",
     "TransferFacilitator.cpp",
     "TransferFacilitator.h",
   ]
