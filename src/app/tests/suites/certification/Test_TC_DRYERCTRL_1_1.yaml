@@ -45,7 +45,7 @@ tests:
       response:
           value: 0
           constraints:
-              type: int16u
+              type: bitmap32
 
     - label: "Step 4: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
