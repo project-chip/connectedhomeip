@@ -38419,11 +38419,11 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="channelPagingStruct", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="paging", Tag=0, Type=Channel.Structs.ChannelPagingStruct),
                         ClusterObjectFieldDescriptor(Label="programList", Tag=1, Type=typing.List[Channel.Structs.ProgramStruct]),
                     ])
 
-            channelPagingStruct: 'int' = 0
+            paging: 'Channel.Structs.ChannelPagingStruct' = field(default_factory=lambda: Channel.Structs.ChannelPagingStruct())
             programList: 'typing.List[Channel.Structs.ProgramStruct]' = field(default_factory=lambda: [])
 
         @dataclass
@@ -42160,14 +42160,14 @@ class ContentAppObserver(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=typing.Optional[ContentAppObserver.Enums.StatusEnum]),
-                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=2, Type=str),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentAppObserver.Enums.StatusEnum),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            status: 'typing.Optional[ContentAppObserver.Enums.StatusEnum]' = None
-            data: 'str' = ""
-            encodingHint: 'str' = ""
+            status: 'ContentAppObserver.Enums.StatusEnum' = 0
+            data: 'typing.Optional[str]' = None
+            encodingHint: 'typing.Optional[str]' = None
 
     class Attributes:
         @dataclass
