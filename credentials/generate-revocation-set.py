@@ -20,17 +20,15 @@
 # Usage:
 #     python ./credentials/generate-revocation-set.py --help
 
-import copy
-import os
-import re
+import base64
+import json
 import subprocess
 import sys
-import json
-import base64
 
 import click
 import requests
 from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
+from cryptography import x509
 
 PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"
@@ -39,20 +37,6 @@ TEST_NODE_URL_REST = "https://on.test-net.dcl.csa-iot.org"
 
 def use_dcld(dcld, production, cmdlist):
     return [dcld] + cmdlist + (['--node', PRODUCTION_NODE_URL] if production else [])
-
-
-def is_base64(sb):
-        try:
-                if isinstance(sb, str):
-                        # If there's any unicode here, an exception will be thrown and the function will return false
-                        sb_bytes = bytes(sb, 'ascii')
-                elif isinstance(sb, bytes):
-                        sb_bytes = sb
-                else:
-                        raise ValueError("Argument must be string or bytes")
-                return base64.b64encode(base64.b64decode(sb_bytes)) == sb_bytes
-        except Exception:
-                return False
 
 
 @click.command()
@@ -81,39 +65,42 @@ def main(use_main_net_dcld, use_test_net_dcld, use_main_net_http, use_test_net_h
     rest_node_url = PRODUCTION_NODE_URL_REST if production else TEST_NODE_URL_REST
 
     if use_rest:
-        revoked_cert_list = requests.get(f"{rest_node_url}/dcl/pki/revoked-certificates").json()["revokedCertificates"]
+        revocation_point_list = requests.get(f"{rest_node_url}/dcl/pki/revocation-points").json()["PkiRevocationDistributionPoint"]
     else:
         cmdlist = ['config', 'output', 'json']
         subprocess.Popen([dcld] + cmdlist)
 
-        cmdlist = ['query', 'pki', 'all-revoked-x509-certs']
+        cmdlist = ['query', 'pki', 'all-revocation-points']
 
         cmdpipe = subprocess.Popen(use_dcld(dcld, production, cmdlist), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        revoked_cert_list = json.loads(cmdpipe.stdout.read())["revokedCertificates"]
+        revocation_point_list = json.loads(cmdpipe.stdout.read())["PkiRevocationDistributionPoint"]
+
+    crl_list = []
+
+    # TODO: Use the following two lines for testing purposes. Remove them once DCL is populated with valid CRLs.
+    # r = requests.get("<crl url>")
+    # crl_list.append(x509.load_der_x509_crl(r.content))
+
+    for revocation_point in revocation_point_list:
+        r = requests.get(revocation_point["dataURL"])
+        crl_list.append(x509.load_der_x509_crl(r.content))
 
     revocation_set = []
 
-    for revoked_cert in revoked_cert_list:
+    for crl in crl_list:
         serialnumber_list = []
 
-        for certificate_info in revoked_cert["certs"]:
-            serialnumber_list.append(certificate_info["serialNumber"])
+        for r in crl:
+            serialnumber_list.append(bytes(str('{:02X}'.format(r.serial_number)), 'utf-8').decode('utf-8'))
 
-        subject_key_id = revoked_cert['subjectKeyId'].split(':')
-        for subject_key_id_idx in range(len(subject_key_id)):
-            if len(subject_key_id[subject_key_id_idx]) == 1:
-                subject_key_id[subject_key_id_idx] = '0' + subject_key_id[subject_key_id_idx]
+        authority_key_id = crl.extensions.get_extension_for_oid(x509.OID_AUTHORITY_KEY_IDENTIFIER).value.key_identifier
+        issuer_subject_key_id = ''.join('{:02X}'.format(x) for x in authority_key_id)
 
-        subject_key_id = ''.join(subject_key_id)
-
-        if is_base64(revoked_cert['subject']):
-            issuer_name = revoked_cert['subject']
-        else:
-            issuer_name = base64.b64encode(bytes(revoked_cert['subject'], 'utf-8')).decode('utf-8')
+        issuer_name = base64.b64encode(crl.issuer.public_bytes()).decode('utf-8')
 
         revocation_set.append({"type": "revocation_set",
-                               "issuer_subject_key_id": subject_key_id,
+                               "issuer_subject_key_id": issuer_subject_key_id,
                                "issuer_name": issuer_name,
                                "revoked_serial_numbers": serialnumber_list})
 
