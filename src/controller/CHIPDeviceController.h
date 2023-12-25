@@ -220,11 +220,11 @@ public:
      * This function finds the device corresponding to deviceId, and establishes
      * a CASE session with it.
      *
-     * Once the CASE session is successfully established the `onConnectedDevice`
+     * Once the CASE session is successfully established the `onConnection`
      * callback is called. This can happen before GetConnectedDevice returns if
      * there is an existing CASE session.
      *
-     * If a CASE sessions fails to be established, the `onError` callback will
+     * If a CASE sessions fails to be established, the `onFailure` callback will
      * be called.  This can also happen before GetConnectedDevice returns.
      *
      * An error return from this function means that neither callback has been
@@ -235,6 +235,30 @@ public:
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * This function finds the device corresponding to deviceId, and establishes
+     * a CASE session with it.
+     *
+     * Once the CASE session is successfully established the `onConnection`
+     * callback is called. This can happen before GetConnectedDevice returns if
+     * there is an existing CASE session.
+     *
+     * If a CASE sessions fails to be established, the `onSetupFailure` callback will
+     * be called.  This can also happen before GetConnectedDevice returns.
+     *
+     * An error return from this function means that neither callback has been
+     * called yet, and neither callback will be called in the future.
+     */
+    CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection,
+                                                               onSetupFailure);
         return CHIP_NO_ERROR;
     }
 
