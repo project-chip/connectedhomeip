@@ -243,7 +243,7 @@ private:
     uint8_t mPowerSetting        = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex   = 0;
     uint16_t mWattRatting        = 0;
-    uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
+    const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 
     // MicrowaveOvenMode types
     ModeTagStructType modeTagsNormal[1]  = { { .value = to_underlying(MicrowaveOvenMode::ModeTag::kNormal) } };
