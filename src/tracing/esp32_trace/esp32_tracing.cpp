@@ -66,13 +66,10 @@ uint32_t MurmurHash(const void * key)
  * are well known permitted entries.
  */
 
-HashValue gPermitList[kPermitListMaxSize] = {
-    MurmurHash("PASESession"),
-    MurmurHash("CASESession"),
-    MurmurHash("NetworkCommissioning"),
-    MurmurHash("GeneralCommissioning"),
-    MurmurHash("OperationalCredentials"),
-};
+HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"), MurmurHash("CASESession"),
+                                              MurmurHash("NetworkCommissioning"), MurmurHash("GeneralCommissioning"),
+                                              MurmurHash("OperationalCredentials"), MurmurHash("CASEServer");
+}; // namespace
 
 bool IsPermitted(HashValue hashValue)
 {
@@ -90,7 +87,7 @@ bool IsPermitted(HashValue hashValue)
     return false;
 }
 
-} // namespace
+} // namespace Insights
 
 namespace ESP32Filter {
 
@@ -170,6 +167,6 @@ void ESP32Backend::TraceInstant(const char * label, const char * group)
 {
     ESP_DIAG_EVENT("MTR_TRC", "Instant : %s -%s", label, group);
 }
-} // namespace Insights
 } // namespace Tracing
+} // namespace chip
 } // namespace chip
