@@ -16126,11 +16126,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer channelPagingStruct, ArrayList<ChipStructs.ChannelClusterProgramStruct> programList) {
+    public void onSuccess(ChipStructs.ChannelClusterChannelPagingStruct paging, ArrayList<ChipStructs.ChannelClusterProgramStruct> programList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo channelPagingStructResponseValue = new CommandResponseInfo("channelPagingStruct", "Integer");
-      responseValues.put(channelPagingStructResponseValue, channelPagingStruct);
+      // paging: Struct ChannelPagingStruct
+      // Conversion from this type to Java is not properly implemented yet
       // programList: ProgramStruct
       // Conversion from this type to Java is not properly implemented yet
 
@@ -17783,14 +17783,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Optional<Integer> status, String data, String encodingHint) {
+    public void onSuccess(Integer status, Optional<String> data, Optional<String> encodingHint) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Optional<Integer>");
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
-      CommandResponseInfo encodingHintResponseValue = new CommandResponseInfo("encodingHint", "String");
+      CommandResponseInfo encodingHintResponseValue = new CommandResponseInfo("encodingHint", "Optional<String>");
       responseValues.put(encodingHintResponseValue, encodingHint);
       callback.onSuccess(responseValues);
     }

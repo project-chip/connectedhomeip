@@ -33376,8 +33376,8 @@ public:
 namespace ProgramGuideResponse {
 enum class Fields : uint8_t
 {
-    kChannelPagingStruct = 0,
-    kProgramList         = 1,
+    kPaging      = 0,
+    kProgramList = 1,
 };
 
 struct Type
@@ -33387,7 +33387,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    int16_t channelPagingStruct = static_cast<int16_t>(0);
+    Structs::ChannelPagingStruct::Type paging;
     DataModel::List<const Structs::ProgramStruct::Type> programList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -33403,7 +33403,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    int16_t channelPagingStruct = static_cast<int16_t>(0);
+    Structs::ChannelPagingStruct::DecodableType paging;
     DataModel::DecodableList<Structs::ProgramStruct::DecodableType> programList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -37276,9 +37276,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 
-    Optional<StatusEnum> status;
-    chip::CharSpan data;
-    chip::CharSpan encodingHint;
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
+    Optional<chip::CharSpan> encodingHint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -37293,9 +37293,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 
-    Optional<StatusEnum> status;
-    chip::CharSpan data;
-    chip::CharSpan encodingHint;
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
+    Optional<chip::CharSpan> encodingHint;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ContentAppMessageResponse

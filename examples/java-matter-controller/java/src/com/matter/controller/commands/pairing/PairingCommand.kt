@@ -18,6 +18,7 @@
 package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.IPAddress
@@ -176,6 +177,19 @@ abstract class PairingCommand(
     for (i in csr.indices) {
       print(csr[i].toString() + " ")
     }
+  }
+
+  override fun onICDRegistrationInfoRequired() {
+    logger.log(Level.INFO, "onICDRegistrationInfoRequired")
+    currentCommissioner()
+      .updateCommissioningICDRegistrationInfo(ICDRegistrationInfo.newBuilder().build())
+  }
+
+  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+    logger.log(
+      Level.INFO,
+      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+    )
   }
 
   fun getNodeId(): Long {

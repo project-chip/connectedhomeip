@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DeviceAttestationDelegate
+import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -283,6 +284,17 @@ class DeviceProvisioningFragment : Fragment() {
 
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
+    }
+
+    override fun onICDRegistrationInfoRequired() {
+      Log.d(TAG, "onICDRegistrationInfoRequired")
+      deviceController.updateCommissioningICDRegistrationInfo(
+        ICDRegistrationInfo.newBuilder().build()
+      )
+    }
+
+    override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+      Log.d(TAG, "onICDRegistrationComplete - icdNodeId : $icdNodeId, icdCounter : $icdCounter")
     }
   }
 
