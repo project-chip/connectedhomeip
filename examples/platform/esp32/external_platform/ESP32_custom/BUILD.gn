@@ -53,6 +53,12 @@ buildconfig_header("custom_buildconfig") {
     "CHIP_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/CHIPPlatformConfig.h>",
     "INET_CONFIG_INCLUDE=<external_platform/ESP32_custom/InetPlatformConfig.h>",
     "SYSTEM_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/SystemPlatformConfig.h>",
+    "EXTERNAL_CONFIGURATIONMANAGERIMPL_HEADER=<external_platform/ESP32_custom/ConfigurationManagerImpl.h>",
+    "EXTERNAL_CHIPDEVICEPLATFORMEVENT_HEADER=<external_platform/ESP32_custom/CHIPDevicePlatformEvent.h>",
+    "EXTERNAL_CONNECTIVITYMANAGERIMPL_HEADER=<external_platform/ESP32_custom/ConnectivityManagerImpl.h>",
+    "EXTERNAL_BLEMANAGERIMPL_HEADER=<external_platform/ESP32_custom/BLEManagerImpl.h>",
+    "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=<external_platform/ESP32_custom/KeyValueStoreManagerImpl.h>",
+    "EXTERNAL_PLATFORMMANAGERIMPL_HEADER=<external_platform/ESP32_custom/PlatformManagerImpl.h>",
     "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
     "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}",
   ]
