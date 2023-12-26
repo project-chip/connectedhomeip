@@ -389,14 +389,12 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         return;
     }
 
-    ChipLogProgress(Zcl, "DEM: Good requestedStartTime %ld.",
-                    static_cast<long unsigned int>(requestedStartTime));
+    ChipLogProgress(Zcl, "DEM: Good requestedStartTime %ld.", static_cast<long unsigned int>(requestedStartTime));
     status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: StartTimeAdjustRequest(%ld) FAILURE",
-                     static_cast<long unsigned int>(requestedStartTime));
+        ChipLogError(Zcl, "DEM: StartTimeAdjustRequest(%ld) FAILURE", static_cast<long unsigned int>(requestedStartTime));
         return;
     }
 }
@@ -418,7 +416,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
 
     if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
     {
-        ChipLogError(Zcl, "DEM: %s - ESAState = kUserOptOut");
+        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
