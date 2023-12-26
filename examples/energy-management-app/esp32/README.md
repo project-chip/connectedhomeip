@@ -37,17 +37,13 @@ cp /path/to/auth/key.txt path/to/connectedhomeip/examples/energy-management-app/
 
 ### Cluster Control
 
--   After successful commissioning, use the OnOff cluster command to control the
-    OnOff attribute. This allows you to toggle a parameter implemented by the
-    device to be On or Off.
+-   After successful commissioning, use the Energy Electric Vehicle Supply
+    Equipment cluster command to disable/enable charging and discharging.
 
-        $ ./out/debug/chip-tool onoff on <NODE ID> 1
+```
+        $./out/debug/chip-tool energyevse disable <NODE ID> 1
+```
 
--   On
-    [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)
-    or
-    [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html)
-    board, there is an on-board RGB-LED. Use ColorControl cluster command to
-    control the color attributes:
-
-        $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 <NODE ID> 1
+```
+        $ ./out/debug/chip-tool energyevse enable-charging 0xFFFFFFFF 6000 32000 <NODE ID> 1 --timedInteractionTimeoutMs <Time>
+```

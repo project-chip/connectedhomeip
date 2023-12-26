@@ -118,7 +118,7 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 void ApplicationInit()
 {
-    if ((gDelegate == nullptr) && (gInstance == nullptr))
+    if ((gDelegate == nullptr) && (gInstance == nullptr) && (gEvseManufacturer == nullptr))
     {
         gDelegate = new EnergyEvseDelegate();
         if (gDelegate != nullptr)
