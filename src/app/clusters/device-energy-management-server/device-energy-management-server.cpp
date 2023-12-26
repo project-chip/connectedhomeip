@@ -87,6 +87,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
         return aEncoder.Encode(mDelegate.GetForecast());
+    /* FeatureMap - is held locally */
+    case FeatureMap::Id:
+        return aEncoder.Encode(mFeature);
     }
 
     /* Allow all other unhandled attributes to fall through to Ember */
