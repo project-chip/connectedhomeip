@@ -2785,6 +2785,28 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster supports remotely monitoring and controling the different typs of
+            functionality available to a drying device, such as a laundry dryer. */
+cluster LaundryDryerControls = 74 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum DrynessLevelEnum : enum8 {
+    kLow = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
+  readonly attribute DrynessLevelEnum supportedDrynessLevels[] = 0;
+  attribute nullable DrynessLevelEnum selectedDrynessLevel = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster ModeSelect = 80 {
   revision 2;
@@ -7034,6 +7056,17 @@ endpoint 1 {
 
   server cluster BooleanState {
     ram      attribute stateValue default = 0;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
+  server cluster LaundryDryerControls {
+    callback attribute supportedDrynessLevels;
+    ram      attribute selectedDrynessLevel;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
