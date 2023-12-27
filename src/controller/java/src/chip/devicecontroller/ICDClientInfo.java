@@ -17,7 +17,6 @@
  */
 package chip.devicecontroller;
 
-
 /** Class for holding ICD Client information. */
 public class ICDClientInfo {
   private final long nodeId;
