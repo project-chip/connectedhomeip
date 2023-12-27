@@ -22,6 +22,7 @@ import faulthandler
 import inspect
 import logging
 import os
+import paramiko
 import secrets
 import sys
 import threading
@@ -40,6 +41,9 @@ from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
+
+CHIP_REPO = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "..", "..", "..", "..", "..")
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -1316,3 +1320,271 @@ class BaseTestHelper:
             status = ex.status
 
         return status == IM.Status.UnsupportedAccess
+
+    def TestSubscriptionResumption(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int, remote_server_app: str):
+        desiredPath = None
+        receivedUpdate = False
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
+
+        def OnValueReport(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
+            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            if path.Path != desiredPath:
+                return
+
+            data = transaction.GetAttribute(path)
+            logger.info(
+                f"Received report from server: path: {path.Path}, value: {data}")
+            with updateLock:
+                receivedUpdate = True
+                updateCv.notify_all()
+
+        class _restartRemoteDevice(threading.Thread):
+            def __init__(self, remote_ip: str, ssh_port: int, remote_server_app: str):
+                super(_restartRemoteDevice, self).__init__()
+                self.remote_ip = remote_ip
+                self.ssh_port = ssh_port
+                self.remote_server_app = remote_server_app
+
+            def run(self):
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                try:
+                    client.connect(self.remote_ip, self.ssh_port, "root", "admin")
+                    client.exec_command(
+                        ("kill \"$(ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                         "awk \'{{print $2}}\')\"").format(self.remote_server_app))
+                    time.sleep(1)
+                    stdin, stdout, stderr = client.exec_command(
+                            ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                             "awk \'{{print $2}}\'").format(self.remote_server_app))
+                    if not stdout.read().decode().strip():
+                        logger.info(f"Succeed to kill remote process {self.remote_server_app}")
+                    else:
+                        logger.error(f"Failed to kill remote process {self.remote_server_app}")
+
+                    client.exec_command(
+                        ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
+                         "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator 3840").format(
+                             os.path.join(CHIP_REPO, "out/debug/standalone", self.remote_server_app)))
+
+                finally:
+                    client.close()
+
+        try:
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=1, ClusterId=6, AttributeId=0)
+            # OnOff Cluster, OnOff Attribute
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
+                "OnOff", "OnOff", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            subscription.SetAttributeUpdateCallback(OnValueReport)
+
+            self.logger.info("Restart remote deivce")
+            restartRemoteThread = _restartRemoteDevice(remote_ip, ssh_port, remote_server_app)
+            restartRemoteThread.start()
+            # After device restarts, the attribute will be set dirty so the subscription can receive
+            # the update
+            with updateCv:
+                while receivedUpdate is False:
+                    if not updateCv.wait(30.0):
+                        self.logger.error(
+                            "Failed to receive subscription resumption report")
+                        break
+
+            restartRemoteThread.join(30.0)
+
+            #
+            # Clean-up by shutting down the sub. Otherwise, we're going to get callbacks through
+            # OnValueChange on what will soon become an invalid execution context above.
+            #
+            subscription.Shutdown()
+
+            if restartRemoteThread.is_alive():
+                # Thread join timed out
+                self.logger.error("Failed to join change thread")
+                return False
+
+            return receivedUpdate
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True
+
+    def TestSubscriptionResumptionCapacity(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
+            remote_server_app: str, subscription_capacity: int):
+
+        class _restartRemoteDevice(threading.Thread):
+            def __init__(self, remote_ip: str, ssh_port: int, remote_server_app: str, subscription_capacity: int):
+                super(_restartRemoteDevice, self).__init__()
+                self.remote_ip = remote_ip
+                self.ssh_port = ssh_port
+                self.remote_server_app = remote_server_app
+                self.subscription_capacity = subscription_capacity
+
+            def run(self):
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                try:
+                    client.connect(self.remote_ip, self.ssh_port, "root", "admin")
+                    client.exec_command(
+                        ("kill \"$(ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                         "awk \'{{print $2}}\')\"").format(self.remote_server_app))
+                    time.sleep(1)
+                    stdin, stdout, stderr = client.exec_command(
+                            ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                             "awk \'{{print $2}}\'").format(self.remote_server_app))
+                    if not stdout.read().decode().strip():
+                        logger.info(f"Succeed to kill remote process {self.remote_server_app}")
+                    else:
+                        logger.error(f"Failed to kill remote process {self.remote_server_app}")
+
+                    client.exec_command("systemctl restart avahi-deamon.service")
+                    client.exec_command(
+                        ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
+                         "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator 3840 "
+                         "--subscription-capacity {}").format(
+                             os.path.join(CHIP_REPO, "out/debug/standalone", self.remote_server_app),
+                             self.subscription_capacity))
+
+                finally:
+                    client.close()
+
+        try:
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=1, ClusterId=6, AttributeId=0)
+            # OnOff Cluster, OnOff Attribute
+            for i in range(subscription_capacity):
+                self.devCtrl.ZCLSubscribeAttribute(
+                    "OnOff", "OnOff", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+
+            self.logger.info("Shutdown Controller 1")
+            self.devCtrl.Shutdown()
+
+            self.logger.info("Restart remote deivce")
+            restartRemoteThread = _restartRemoteDevice(remote_ip, ssh_port, remote_server_app, subscription_capacity)
+            restartRemoteThread.start()
+            time.sleep(6)
+
+            self.logger.info("Send a new subscription request from the second controller")
+            # Close previous session so that the controller 2 will res-establish the session to the remote device
+            self.devCtrl2.CloseSession(nodeid)
+            self.devCtrl2.ZCLSubscribeAttribute(
+                "OnOff", "OnOff", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            restartRemoteThread.join(10.0)
+
+            if restartRemoteThread.is_alive():
+                # Thread join timed out
+                self.logger.error("Failed to join change thread")
+                return False
+
+            return True
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True
+
+    def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, subscription_capacity: int):
+
+        try:
+            # OnOff Cluster, OnOff Attribute
+            for i in range(subscription_capacity):
+                self.devCtrl.ZCLSubscribeAttribute(
+                    "OnOff", "OnOff", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+
+            logger.info("Send OpenBasicCommissioningWindow command on fist controller")
+            asyncio.run(
+                self.devCtrl.SendCommand(
+                    nodeid,
+                    0,
+                    Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
+                    timedRequestTimeoutMs=10000
+                ))
+            return True
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True
+
+    def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
+            remote_server_app: str, subscription_capacity: int):
+        remoteDeviceRestarted = False
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
+
+        class _restartRemoteDevice(threading.Thread):
+            def __init__(self, remote_ip: str, ssh_port: int, remote_server_app: str, subscription_capacity: int):
+                super(_restartRemoteDevice, self).__init__()
+                self.remote_ip = remote_ip
+                self.ssh_port = ssh_port
+                self.remote_server_app = remote_server_app
+                self.subscription_capacity = subscription_capacity
+
+            def run(self):
+                client = paramiko.SSHClient()
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                try:
+                    client.connect(self.remote_ip, self.ssh_port, "root", "admin")
+                    client.exec_command(
+                        ("kill \"$(ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                         "awk \'{{print $2}}\')\"").format(self.remote_server_app))
+                    time.sleep(1)
+                    stdin, stdout, stderr = client.exec_command(
+                            ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                             "awk \'{{print $2}}\'").format(self.remote_server_app))
+                    if not stdout.read().decode().strip():
+                        logger.info(f"Succeed to kill remote process {self.remote_server_app}")
+                    else:
+                        logger.error(f"Failed to kill remote process {self.remote_server_app}")
+
+                    client.exec_command("systemctl restart avahi-deamon.service")
+                    client.exec_command(
+                        ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
+                         "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator 3840 "
+                         "--subscription-capacity {}").format(
+                             os.path.join(CHIP_REPO, "out/debug/standalone", self.remote_server_app),
+                             self.subscription_capacity))
+                    with updateLock:
+                        remoteDeviceRestarted = True
+                        updateCv.notifyAll()
+
+                finally:
+                    client.close()
+
+        try:
+            self.logger.info("Restart remote deivce")
+            restartRemoteThread = _restartRemoteDevice(remote_ip, ssh_port, remote_server_app, subscription_capacity)
+            restartRemoteThread.start()
+            with updateCv:
+                while remoteDeviceRestarted is False:
+                    if not updateCv.wait(8.0):
+                        self.logger.error(
+                            "Failed to restart the remote device")
+                        break
+            # Wait for some time so that the device will be resolving the address of the first controller
+            time.sleep(3)
+
+            self.logger.info("Send a new subscription request from the second controller")
+            # Close previous session so that the second controller will res-establish the session with the remote device
+            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.ZCLSubscribeAttribute(
+                "OnOff", "OnOff", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            restartRemoteThread.join(10.0)
+
+            if restartRemoteThread.is_alive():
+                # Thread join timed out
+                self.logger.error("Failed to join change thread")
+                return False
+
+            return True
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True

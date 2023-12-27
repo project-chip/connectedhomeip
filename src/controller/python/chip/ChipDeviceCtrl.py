@@ -1417,7 +1417,8 @@ class ChipDeviceControllerBase():
 
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
 
-    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
+    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True,
+            keepSubscriptions=False, autoResubscribe=True):
         ''' Wrapper over ReadAttribute for a single attribute
             Returns a SubscriptionTransaction. See ReadAttribute for more information.
         '''
@@ -1428,7 +1429,8 @@ class ChipDeviceControllerBase():
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except BaseException:
             raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval),
+            keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe))
 
     def ZCLCommandList(self):
         self.CheckIsActive()
