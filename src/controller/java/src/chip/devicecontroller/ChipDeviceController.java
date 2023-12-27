@@ -712,7 +712,6 @@ public class ChipDeviceController {
     return getFabricIndex(deviceControllerPtr);
   }
 
-
   public List<ICDClientInfo> getICDClientInfo() {
     return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
   }

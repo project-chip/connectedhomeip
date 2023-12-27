@@ -17,7 +17,6 @@
  */
 package chip.devicecontroller;
 
-import javax.annotation.Nullable;
 
 /** Class for holding ICD Client information. */
 public class ICDClientInfo {
@@ -28,7 +27,13 @@ public class ICDClientInfo {
   private final byte[] icdAesKey;
   private final byte[] icdHmacKey;
 
-  public ICDClientInfo(long nodeId, long startCounter, long offset, long monitoredSubject, byte[] icdAesKey, byte[] icdHmacKey) {
+  public ICDClientInfo(
+      long nodeId,
+      long startCounter,
+      long offset,
+      long monitoredSubject,
+      byte[] icdAesKey,
+      byte[] icdHmacKey) {
     this.nodeId = nodeId;
     this.startCounter = startCounter;
     this.offset = offset;
@@ -70,31 +75,31 @@ public class ICDClientInfo {
   @Override
   public String toString() {
     return "ICDClientInfo{"
-    + "\n\tnodeId="
-    + nodeId
-    + "\n\t, startCounter="
-    + startCounter
-    + "\n\t, offset="
-    + offset
-    + "\n\t, monitoredSubject="
-    + monitoredSubject
-    + "\n\t, icdAesKey='"
-    + bytesToHex(icdAesKey)
-    + '\''
-    + "\n\t, icdHmacKey='"
-    + bytesToHex(icdHmacKey)
-    + '\''
-    + "\n}";
+        + "\n\tnodeId="
+        + nodeId
+        + "\n\t, startCounter="
+        + startCounter
+        + "\n\t, offset="
+        + offset
+        + "\n\t, monitoredSubject="
+        + monitoredSubject
+        + "\n\t, icdAesKey='"
+        + bytesToHex(icdAesKey)
+        + '\''
+        + "\n\t, icdHmacKey='"
+        + bytesToHex(icdHmacKey)
+        + '\''
+        + "\n}";
   }
 
   private static String bytesToHex(byte[] bytes) {
     StringBuilder hexString = new StringBuilder();
     for (byte b : bytes) {
-        String hex = Integer.toHexString(0xFF & b);
-        if (hex.length() == 1) {
-            hexString.append('0');
-        }
-        hexString.append(hex);
+      String hex = Integer.toHexString(0xFF & b);
+      if (hex.length() == 1) {
+        hexString.append('0');
+      }
+      hexString.append(hex);
     }
     return hexString.toString();
   }
