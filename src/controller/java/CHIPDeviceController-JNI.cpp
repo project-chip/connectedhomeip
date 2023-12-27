@@ -2158,7 +2158,8 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
     VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
 
     err = JniReferences::GetInstance().CreateArrayList(jInfo);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
 
     auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
 
@@ -2167,15 +2168,16 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
 
     err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
     JniClass icdClientInfoClass(infoClass);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->ExceptionClear();
     constructor = env->GetMethodID(infoClass, "<init>", "(JJJJ[B[B)V");
     VerifyOrReturnValue(constructor != nullptr, nullptr, ChipLogError(Controller, "Find GetMethodID error!"));
 
-    while(iter->Next(info))
+    while (iter->Next(info))
     {
-        jbyteArray jIcdAesKey = nullptr;
+        jbyteArray jIcdAesKey  = nullptr;
         jbyteArray jIcdHmacKey = nullptr;
         jobject jICDClientInfo = nullptr;
 
@@ -2184,16 +2186,23 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
             continue;
         }
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(), chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()), static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset), static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
+        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
+                                                  static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset),
+                                                  static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
 
         err = JniReferences::GetInstance().AddToList(jInfo, jICDClientInfo);
-        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
     }
 
     iter->Release();

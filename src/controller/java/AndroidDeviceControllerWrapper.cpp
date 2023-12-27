@@ -930,14 +930,16 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     else
     {
         mICDClientStorage.RemoveKey(clientInfo);
-        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId), err.AsString());
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId),
+                     err.AsString());
     }
 
     mDeviceIsICD = true;
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationCompleteMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ)V", &onICDRegistrationCompleteMethod);
+    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ)V",
+                                                  &onICDRegistrationCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jlong>(icdNodeId),
