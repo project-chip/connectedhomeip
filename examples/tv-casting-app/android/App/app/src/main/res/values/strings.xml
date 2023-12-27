@@ -31,6 +31,6 @@
     <string name="matter_stop_discovery_button_text">Stop Discovery"</string>
     <string name="matter_clear_results_button_text">Clear Results"</string>
     <string name="matter_discovery_message_initializing_text">Initializing</string>
-    <string name="matter_discovery_message_discovering_text">Discovering Casting Players on-network</string>
+    <string name="matter_discovery_message_discovering_text">Casting Players on-network:</string>
     <string name="matter_discovery_message_stopped_text">Discovery Stopped</string>
 </resources>

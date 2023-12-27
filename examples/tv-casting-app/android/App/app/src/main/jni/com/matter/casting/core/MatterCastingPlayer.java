@@ -16,14 +16,17 @@
  */
 package com.matter.casting.core;
 
-import android.util.Log;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
 
-/** The Matter Commissioner (e.g. TV) discovered using Matter Commissioner discovery. */
+/**
+ * A Matter Casting Player represents a Matter commissioner that is able to play media to a physical
+ * output or to a display screen which is part of the device (e.g. TV). It is discovered on the
+ * local network using Matter Commissioner discovery over DNS. It contains all the information about
+ * the service discovered/resolved.
+ */
 public class MatterCastingPlayer implements CastingPlayer {
-  private static final String TAG = MatterCastingPlayer.class.getSimpleName();
   private boolean connected;
   private String deviceId;
   private String deviceName;
@@ -48,8 +51,6 @@ public class MatterCastingPlayer implements CastingPlayer {
       int productId,
       int vendorId,
       int deviceType) {
-    Log.d(TAG, "MatterCastingPlayer() constructor, building player with deviceId: " + deviceId);
-    Log.d(TAG, "MatterCastingPlayer() constructor, building player with deviceName: " + deviceName);
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
@@ -63,11 +64,19 @@ public class MatterCastingPlayer implements CastingPlayer {
     this.deviceType = deviceType;
   }
 
+  /**
+   * @return a boolean indicating whether a Casting Player instance is connected to the TV Casting
+   *     App.
+   */
   @Override
   public boolean isConnected() {
     return this.connected;
   }
 
+  /**
+   * @return a String representing the Casting Player device ID which is a concatenation of the
+   *     device's IP address and port number.
+   */
   @Override
   public String getDeviceId() {
     return this.deviceId;
@@ -88,11 +97,13 @@ public class MatterCastingPlayer implements CastingPlayer {
     return this.instanceName;
   }
 
+  /** @return an int, corresponding to the number of valid IP addresses for this Casting PLayer. */
   @Override
   public int getNumberIPs() {
     return this.numberIPs;
   }
 
+  /** @return a list of valid IP addresses for this Casting PLayer. */
   @Override
   public List<InetAddress> getIpAddresses() {
     return this.ipAddresses;
@@ -119,10 +130,20 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
-  public boolean discoveredCastingPlayerHasSameSource(Object o) {
+  public String toString() {
+    return this.deviceId;
+  }
+
+  @Override
+  public int hashCode() {
+    return this.deviceId.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     MatterCastingPlayer that = (MatterCastingPlayer) o;
-    return Objects.equals(deviceId, that.deviceId) && vendorId == that.vendorId;
+    return Objects.equals(this.deviceId, that.deviceId);
   }
 }

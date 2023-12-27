@@ -19,6 +19,12 @@ package com.matter.casting.core;
 import java.net.InetAddress;
 import java.util.List;
 
+/**
+ * The CastingPlayer interface defines a Matter commissioner that is able to play media to a
+ * physical output or to a display screen which is part of the device (e.g. TV). It is discovered on
+ * the local network using Matter Commissioner discovery over DNS. It contains all the information
+ * about the service discovered/resolved.
+ */
 public interface CastingPlayer {
   boolean isConnected();
 
@@ -42,7 +48,11 @@ public interface CastingPlayer {
 
   int getDeviceType();
 
-  boolean discoveredCastingPlayerHasSameSource(Object o);
+  String toString();
+
+  boolean equals(Object o);
+
+  int hashCode();
 
   // TODO: Implement in following PRs. Related to player connection implementation.
   //    List<Endpoint> getEndpoints();

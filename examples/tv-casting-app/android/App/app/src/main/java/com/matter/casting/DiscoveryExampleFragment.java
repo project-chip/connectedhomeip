@@ -31,7 +31,6 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.R;
-import com.chip.casting.SuccessCallback;
 import com.matter.casting.core.CastingPlayer;
 import com.matter.casting.core.CastingPlayerDiscovery;
 import com.matter.casting.core.MatterCastingPlayerDiscovery;
@@ -42,19 +41,18 @@ import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 public class DiscoveryExampleFragment extends Fragment {
   private static final String TAG = DiscoveryExampleFragment.class.getSimpleName();
-  private boolean discovering = false;
+  // 35 represents device type of Matter Casting Player
+  private static final int DISCOVERY_TARGET_DEVICE_TYPE = 35;
+  private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;
-  private int discoveryAttempt = 0;
   private static final ScheduledExecutorService executorService =
       Executors.newSingleThreadScheduledExecutor();
   private ScheduledFuture scheduledFutureTask;
   private static final List<CastingPlayer> castingPlayerList = new ArrayList<>();
-  // private FailureCallback failureCallback;
-  private static SuccessCallback<CastingPlayer> discoverySuccessCallback;
+  private static ArrayAdapter<CastingPlayer> arrayAdapter;
 
   // Get a singleton instance of the MatterCastingPlayerDiscovery
   private static final CastingPlayerDiscovery matterCastingPlayerDiscovery =
@@ -77,15 +75,26 @@ public class DiscoveryExampleFragment extends Fragment {
                     TAG,
                     "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
                 // Display CastingPlayer info on the screen
-                if (discoverySuccessCallback != null) {
-                  discoverySuccessCallback.handle(castingPlayer);
-                } else {
-                  Log.e(
-                      TAG,
-                      "onAdded() Warning: DiscoveryExampleFragment UX discoverySuccessCallback not set");
-                }
+                new Handler(Looper.getMainLooper())
+                    .post(
+                        () -> {
+                          final Optional<CastingPlayer> playerInList =
+                              castingPlayerList
+                                  .stream()
+                                  .filter(node -> castingPlayer.equals(node))
+                                  .findFirst();
+                          if (playerInList.isPresent()) {
+                            Log.d(
+                                TAG,
+                                "onAdded() Replacing existing CastingPlayer entry "
+                                    + playerInList.get().getDeviceId()
+                                    + " in castingPlayerList list");
+                            arrayAdapter.remove(playerInList.get());
+                          }
+                          arrayAdapter.add(castingPlayer);
+                        });
               } else {
-                Log.d(TAG, "onAdded()");
+                Log.d(TAG, "onAdded() CastingPlayer is null");
                 // Attempt to invoke interface method on a null object reference will throw an error
                 Log.d(
                     TAG,
@@ -96,20 +105,63 @@ public class DiscoveryExampleFragment extends Fragment {
 
             @Override
             public void onChanged(CastingPlayer castingPlayer) {
-              Log.i(
-                  TAG,
-                  "onChanged() Discovered changes to CastingPlayer with deviceId: "
-                      + castingPlayer.getDeviceId());
-              // TODO: In following PRs. Consume changes to the provided CastingPlayer.
+              if (castingPlayer != null) {
+                Log.i(
+                    TAG,
+                    "onChanged() Discovered changes to CastingPlayer with deviceId: "
+                        + castingPlayer.getDeviceId());
+                // Update the CastingPlayer on the screen
+                new Handler(Looper.getMainLooper())
+                    .post(
+                        () -> {
+                          final Optional<CastingPlayer> playerInList =
+                              castingPlayerList
+                                  .stream()
+                                  .filter(node -> castingPlayer.equals(node))
+                                  .findFirst();
+                          if (playerInList.isPresent()) {
+                            Log.d(
+                                TAG,
+                                "onChanged() Updating existing CastingPlayer entry "
+                                    + playerInList.get().getDeviceId()
+                                    + " in castingPlayerList list");
+                            arrayAdapter.remove(playerInList.get());
+                          }
+                          arrayAdapter.add(castingPlayer);
+                        });
+              } else {
+                Log.d(TAG, "onChanged() CastingPlayer is null");
+              }
             }
 
             @Override
             public void onRemoved(CastingPlayer castingPlayer) {
-              Log.i(
-                  TAG,
-                  "onRemoved() Removed CastingPlayer with deviceId: "
-                      + castingPlayer.getDeviceId());
-              // TODO: In following PRs. Consume CastingPlayer removed or lost from the network.
+              if (castingPlayer != null) {
+                Log.i(
+                    TAG,
+                    "onRemoved() Removed CastingPlayer with deviceId: "
+                        + castingPlayer.getDeviceId());
+                // Remove CastingPlayer from the screen
+                new Handler(Looper.getMainLooper())
+                    .post(
+                        () -> {
+                          final Optional<CastingPlayer> playerInList =
+                              castingPlayerList
+                                  .stream()
+                                  .filter(node -> castingPlayer.equals(node))
+                                  .findFirst();
+                          if (playerInList.isPresent()) {
+                            Log.d(
+                                TAG,
+                                "onRemoved() Removing existing CastingPlayer entry "
+                                    + playerInList.get().getDeviceId()
+                                    + " in castingPlayerList list");
+                            arrayAdapter.remove(playerInList.get());
+                          }
+                        });
+              } else {
+                Log.d(TAG, "onRemoved() CastingPlayer is null");
+              }
             }
           };
 
@@ -142,49 +194,22 @@ public class DiscoveryExampleFragment extends Fragment {
     matterDiscoveryMessageTextView.setText(
         getString(R.string.matter_discovery_message_initializing_text));
 
-    ArrayAdapter<CastingPlayer> arrayAdapter =
-        new CastingPlayerCommissionerAdapter(getActivity(), castingPlayerList);
+    arrayAdapter = new CastingPlayerArrayAdapter(getActivity(), castingPlayerList);
     final ListView list = getActivity().findViewById(R.id.castingPlayerList);
     list.setAdapter(arrayAdapter);
 
     Log.d(TAG, "onViewCreated() creating callbacks");
 
-    this.discoverySuccessCallback =
-        new SuccessCallback<CastingPlayer>() {
-          @Override
-          public void handle(CastingPlayer castingPlayer) {
-            Log.d(
-                TAG,
-                "SuccessCallback handle() CastingPlayer deviceId: " + castingPlayer.getDeviceId());
-            new Handler(Looper.getMainLooper())
-                .post(
-                    () -> {
-                      final Optional<CastingPlayer> playerInList =
-                          castingPlayerList
-                              .stream()
-                              .filter(
-                                  node -> castingPlayer.discoveredCastingPlayerHasSameSource(node))
-                              .findFirst();
-                      if (playerInList.isPresent()) {
-                        Log.d(
-                            TAG,
-                            "Replacing existing CastingPlayer entry "
-                                + playerInList.get().getDeviceId()
-                                + " in castingPlayerList list");
-                        arrayAdapter.remove(playerInList.get());
-                      }
-                      arrayAdapter.add(castingPlayer);
-                    });
-          }
-        };
-
+    // TODO: In following PRs. Enable startDiscoveryButton and stopDiscoveryButton when
+    //  stopDiscovery is implemented in the core Matter SKD DNS-SD API. Enable in
+    //  fragment_matter_discovery_example.xml
     Button startDiscoveryButton = getView().findViewById(R.id.startDiscoveryButton);
     startDiscoveryButton.setOnClickListener(
         v -> {
           Log.i(
               TAG, "onViewCreated() startDiscoveryButton button clicked. Calling startDiscovery()");
-          arrayAdapter.clear();
-          if (!startDiscovery(15)) {
+          // arrayAdapter.clear();
+          if (!startDiscovery()) {
             Log.e(TAG, "onViewCreated() startDiscovery() call Failed");
           }
         });
@@ -211,7 +236,7 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onResume() {
     super.onResume();
     Log.i(TAG, "onResume() called. Calling startDiscovery()");
-    if (!startDiscovery(15)) {
+    if (!startDiscovery()) {
       Log.e(TAG, "onResume() Warning: startDiscovery() call Failed");
     }
   }
@@ -220,8 +245,11 @@ public class DiscoveryExampleFragment extends Fragment {
   public void onPause() {
     super.onPause();
     Log.i(TAG, "onPause() called");
-    stopDiscovery();
-    scheduledFutureTask.cancel(true);
+    // stopDiscovery();
+    // Don't crash the app
+    if (scheduledFutureTask != null) {
+      scheduledFutureTask.cancel(true);
+    }
   }
 
   /** Interface for notifying the host. */
@@ -231,31 +259,26 @@ public class DiscoveryExampleFragment extends Fragment {
     void handleConnectionButtonClicked(CastingPlayer castingPlayer);
   }
 
-  private boolean startDiscovery(int discoveryDuration) {
-    Log.i(TAG, "startDiscovery() called, discoveryDuration: " + discoveryDuration + " seconds");
-    if (discovering) {
-      Log.e(TAG, "startDiscovery() Warning: already discovering, stop before starting");
-      return false;
-    }
+  private boolean startDiscovery() {
+    Log.i(TAG, "startDiscovery() called");
+
     // Add the implemented CastingPlayerChangeListener to listen to changes in the discovered
     // CastingPlayers
-    MatterError errAdd =
+    MatterError err =
         matterCastingPlayerDiscovery.addCastingPlayerChangeListener(castingPlayerChangeListener);
-    if (errAdd.hasError()) {
-      Log.e(TAG, "startDiscovery() addCastingPlayerChangeListener() called, errAdd: " + errAdd);
+    if (err.hasError()) {
+      Log.e(TAG, "startDiscovery() addCastingPlayerChangeListener() called, err Add: " + err);
       return false;
     }
     // Start discovery
     Log.i(TAG, "startDiscovery() calling startDiscovery()");
-    MatterError errStart = matterCastingPlayerDiscovery.startDiscovery();
-    if (errStart.hasError()) {
-      Log.e(TAG, "startDiscovery() startDiscovery() called, errStart: " + errStart);
+    err = matterCastingPlayerDiscovery.startDiscovery(DISCOVERY_TARGET_DEVICE_TYPE);
+    if (err.hasError()) {
+      Log.e(TAG, "startDiscovery() startDiscovery() called, err Start: " + err);
       return false;
     }
 
-    discovering = true;
-    discoveryAttempt++;
-    Log.i(TAG, "startDiscovery() started discovery attempt #" + discoveryAttempt);
+    Log.i(TAG, "startDiscovery() started discovery");
 
     matterDiscoveryMessageTextView.setText(
         getString(R.string.matter_discovery_message_discovering_text));
@@ -264,45 +287,38 @@ public class DiscoveryExampleFragment extends Fragment {
         "startDiscovery() text set to: "
             + getString(R.string.matter_discovery_message_discovering_text));
 
+    // TODO: In following PRs. Enable this to auto-stop discovery after stopDiscovery is
+    //  implemented in the core Matter SKD DNS-SD API.
     // Schedule a service to stop discovery and remove the CastingPlayerChangeListener
     // Safe to call if discovery is not running
-    scheduledFutureTask =
-        executorService.schedule(
-            () -> {
-              Log.i(
-                  TAG,
-                  "startDiscovery() executorService "
-                      + discoveryDuration
-                      + " seconds timer expired. Calling stopDiscovery() on attempt #"
-                      + discoveryAttempt);
-              stopDiscovery();
-            },
-            discoveryDuration,
-            TimeUnit.SECONDS);
+    //    scheduledFutureTask =
+    //        executorService.schedule(
+    //            () -> {
+    //              Log.i(
+    //                  TAG,
+    //                  "startDiscovery() executorService "
+    //                      + DISCOVERY_RUNTIME_SEC
+    //                      + " seconds timer expired. Auto-calling stopDiscovery()");
+    //              stopDiscovery();
+    //            },
+    //            DISCOVERY_RUNTIME_SEC,
+    //            TimeUnit.SECONDS);
 
     return true;
   }
 
   private void stopDiscovery() {
-    Log.i(TAG, "stopDiscovery() called on attempt #" + discoveryAttempt);
-    boolean stopDiscoverySuccess = true;
-    if (!discovering) {
-      Log.e(TAG, "stopDiscovery() not discovering");
-      return;
-    }
+    Log.i(TAG, "stopDiscovery() called");
 
     // Stop discovery
-    MatterError errStop = matterCastingPlayerDiscovery.stopDiscovery();
-    if (errStop.hasError()) {
+    MatterError err = matterCastingPlayerDiscovery.stopDiscovery();
+    if (err.hasError()) {
       Log.e(
           TAG,
-          "stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, errStop: "
-              + errStop);
-      stopDiscoverySuccess = false;
+          "stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() called, err Stop: " + err);
     } else {
       // TODO: In following PRs. Implement stop discovery in the Android core API.
       Log.d(TAG, "stopDiscovery() MatterCastingPlayerDiscovery.stopDiscovery() success");
-      discovering = false;
     }
 
     matterDiscoveryMessageTextView.setText(
@@ -314,31 +330,26 @@ public class DiscoveryExampleFragment extends Fragment {
 
     // Remove the CastingPlayerChangeListener
     Log.i(TAG, "stopDiscovery() removing CastingPlayerChangeListener");
-    MatterError errRemove =
+    err =
         matterCastingPlayerDiscovery.removeCastingPlayerChangeListener(castingPlayerChangeListener);
-    if (errRemove.hasError()) {
+    if (err.hasError()) {
       Log.e(
           TAG,
-          "stopDiscovery() matterCastingPlayerDiscovery.removeCastingPlayerChangeListener() called, errRemove: "
-              + errRemove);
-      stopDiscoverySuccess = false;
-    }
-
-    if (!stopDiscoverySuccess) {
-      Log.e(TAG, "stopDiscovery() Warning: complete with errors! Discovering: " + discovering);
+          "stopDiscovery() matterCastingPlayerDiscovery.removeCastingPlayerChangeListener() called, err Remove: "
+              + err);
     }
   }
 }
 
-class CastingPlayerCommissionerAdapter extends ArrayAdapter<CastingPlayer> {
+class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
   private final List<CastingPlayer> playerList;
   private final Context context;
   private LayoutInflater inflater;
-  private static final String TAG = CastingPlayerCommissionerAdapter.class.getSimpleName();
+  private static final String TAG = CastingPlayerArrayAdapter.class.getSimpleName();
 
-  public CastingPlayerCommissionerAdapter(Context context, List<CastingPlayer> playerList) {
+  public CastingPlayerArrayAdapter(Context context, List<CastingPlayer> playerList) {
     super(context, 0, playerList);
-    Log.i(TAG, "CastingPlayerCommissionerAdapter() constructor called");
+    Log.i(TAG, "CastingPlayerArrayAdapter() constructor called");
     this.context = context;
     this.playerList = playerList;
     inflater = (LayoutInflater.from(context));
@@ -381,10 +392,9 @@ class CastingPlayerCommissionerAdapter extends ArrayAdapter<CastingPlayer> {
         player.getDeviceType() > 0
             ? (aux.isEmpty() ? "" : ", ") + "Device Type: " + player.getDeviceType()
             : "";
-    aux = aux.isEmpty() ? aux : "\n" + aux;
+    aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP: " + (player.getNumberIPs() > 0);
 
-    // String preCommissioned = commissioner.isPreCommissioned() ? " (Pre-commissioned)" : "";
-    // return main + aux + preCommissioned;
+    aux = aux.isEmpty() ? aux : "\n" + aux;
     return main + aux;
   }
 }

@@ -15,12 +15,14 @@
         android:padding="10sp">
 
         <Button
+            android:enabled="false"
             android:id="@+id/startDiscoveryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/matter_start_discovery_button_text" />
 
         <Button
+            android:enabled="false"
             android:id="@+id/stopDiscoveryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -52,17 +52,7 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
     }
 
     // Convert the CastingPlayer fields to MatterCastingPlayer Java types
-    bool connected = false;
-    if (player->IsConnected())
-    {
-        connected = true;
-    }
-    jboolean connectedJavaBoolean  = static_cast<jboolean>(connected);
-    jstring idJavaString           = env->NewStringUTF(player->GetId());
-    jstring deviceNameJavaString   = env->NewStringUTF(player->GetDeviceName());
-    jstring hostNameJavaString     = env->NewStringUTF(player->GetHostName());
-    jstring instanceNameJavaString = env->NewStringUTF(player->GetInstanceName());
-    jint numIPsJavaInt             = (jint) (player->GetNumIPs());
+    bool connected = player->IsConnected() ? true : false;
 
     jobject ipAddressListJavaObject           = nullptr;
     const chip::Inet::IPAddress * ipAddresses = player->GetIPAddresses();
@@ -84,17 +74,14 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
         }
     }
 
-    jint portJavaInt       = (jint) (player->GetPort());
-    jint productIdJavaInt  = (jint) (player->GetProductId());
-    jint vendorIdJavaInt   = (jint) (player->GetVendorId());
-    jint deviceTypeJavaInt = (jint) (player->GetDeviceType());
-
     // Create a new instance of the MatterCastingPlayer Java class
     jobject matterCastingPlayerJavaObject = nullptr;
     matterCastingPlayerJavaObject =
-        env->NewObject(matterCastingPlayerJavaClass, constructor, connectedJavaBoolean, idJavaString, hostNameJavaString,
-                       deviceNameJavaString, instanceNameJavaString, numIPsJavaInt, ipAddressListJavaObject, portJavaInt,
-                       productIdJavaInt, vendorIdJavaInt, deviceTypeJavaInt);
+        env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(connected),
+                       env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
+                       env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
+                       (jint) (player->GetNumIPs()), ipAddressListJavaObject, (jint) (player->GetPort()),
+                       (jint) (player->GetProductId()), (jint) (player->GetVendorId()), (jint) (player->GetDeviceType()));
     if (matterCastingPlayerJavaObject == nullptr)
     {
         ChipLogError(AppServer,

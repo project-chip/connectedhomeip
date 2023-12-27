@@ -16,36 +16,72 @@
  */
 package com.matter.casting.core;
 
-import android.util.Log;
+import com.matter.casting.support.MatterError;
 import java.util.List;
 
+/**
+ * MatterCastingPlayerDiscovery provides an API to control Matter Casting Player discovery over
+ * DNS-SD, and to collect discovery results. Discovery is centrally managed by the native C++ layer
+ * in the Matter SDK. This class exposes native functions to add and remove a
+ * CastingPlayerChangeListener, which contains the C++ to Java callbacks for when Casting Players
+ * are discovered, updated, or lost from the network. This class is a singleton.
+ */
 public final class MatterCastingPlayerDiscovery implements CastingPlayerDiscovery {
   private static final String TAG = MatterCastingPlayerDiscovery.class.getSimpleName();
   private static MatterCastingPlayerDiscovery matterCastingPlayerDiscoveryInstance;
 
   // Methods:
   public static MatterCastingPlayerDiscovery getInstance() {
-    Log.d(TAG, "MatterCastingPlayerDiscovery.getInstance() called");
     if (matterCastingPlayerDiscoveryInstance == null) {
       matterCastingPlayerDiscoveryInstance = new MatterCastingPlayerDiscovery();
     }
     return matterCastingPlayerDiscoveryInstance;
   };
 
+  /**
+   * @return a list of Casting Players discovered during the current discovery session. This list is
+   *     cleared when discovery stops.
+   */
   @Override
   public native List<CastingPlayer> getCastingPlayers();
 
+  /**
+   * Starts Casting Players discovery or returns an error.
+   *
+   * @param discoveryTargetDeviceType the target device type to be discovered using DNS-SD. 35
+   *     represents device type of Matter Casting Player.
+   * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
+   */
   @Override
-  public native com.matter.casting.support.MatterError startDiscovery();
+  public native MatterError startDiscovery(int discoveryTargetDeviceType);
 
+  /**
+   * Stops Casting Players discovery or returns an error.
+   *
+   * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
+   */
   @Override
-  public native com.matter.casting.support.MatterError stopDiscovery();
+  public native MatterError stopDiscovery();
 
+  /**
+   * Adds a CastingPlayerChangeListener instance to be used during discovery. The
+   * CastingPlayerChangeListener contains the C++ to Java callbacks for when Casting Players are
+   * discovered, updated, or lost from the network. Should be called prior to calling
+   * MatterCastingPlayerDiscovery.startDiscovery().
+   *
+   * @param listener an instance of the CastingPlayerChangeListener to be implemented by the APIs
+   *     consumer.
+   * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
+   */
   @Override
-  public native com.matter.casting.support.MatterError addCastingPlayerChangeListener(
-      CastingPlayerChangeListener listener);
+  public native MatterError addCastingPlayerChangeListener(CastingPlayerChangeListener listener);
 
+  /**
+   * Removes CastingPlayerChangeListener from the native layer.
+   *
+   * @param listener the specific instance of CastingPlayerChangeListener to be removed.
+   * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
+   */
   @Override
-  public native com.matter.casting.support.MatterError removeCastingPlayerChangeListener(
-      CastingPlayerChangeListener listener);
+  public native MatterError removeCastingPlayerChangeListener(CastingPlayerChangeListener listener);
 }

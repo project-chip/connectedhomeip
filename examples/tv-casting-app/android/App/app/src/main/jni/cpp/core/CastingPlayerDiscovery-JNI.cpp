@@ -41,7 +41,7 @@ namespace casting {
 namespace core {
 
 /**
- * @brief React to CastingPlayer discovery results with this sigleton
+ * @brief React to CastingPlayer discovery results with this singleton
  */
 class DiscoveryDelegateImpl : public DiscoveryDelegate
 {
@@ -59,11 +59,8 @@ public:
 
     static DiscoveryDelegateImpl * GetInstance()
     {
-        ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::GetInstance() called");
         if (DiscoveryDelegateImpl::discoveryDelegateImplSingletonInstance == nullptr)
         {
-            ChipLogProgress(AppServer,
-                            "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::GetInstance() creating new singleton instance");
             DiscoveryDelegateImpl::discoveryDelegateImplSingletonInstance = new DiscoveryDelegateImpl();
         }
         return DiscoveryDelegateImpl::discoveryDelegateImplSingletonInstance;
@@ -71,91 +68,80 @@ public:
 
     void HandleOnAdded(matter::casting::memory::Strong<CastingPlayer> player) override
     {
-        ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() called with CastingPlayer:");
-        player->LogDetail();
+        ChipLogProgress(AppServer,
+                        "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() called with CastingPlayer, ID: %s",
+                        player->GetId());
 
-        if (castingPlayerChangeListenerJavaObject == nullptr || onAddedCallbackJavaMethodID == nullptr)
-        {
-            ChipLogError(AppServer,
-                         "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not specified, "
-                         "CastingPlayerChangeListener == nullptr");
-        }
-        else
-        {
-            JNIEnv * env                          = JniReferences::GetInstance().GetEnvForCurrentThread();
-            jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
-            if (matterCastingPlayerJavaObject == nullptr)
-            {
-                ChipLogError(AppServer,
-                             "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Could not create "
-                             "CastingPlayer jobject");
-            }
-            else
-            {
-                env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onAddedCallbackJavaMethodID,
-                                    matterCastingPlayerJavaObject);
-            }
-        }
+        VerifyOrReturn(castingPlayerChangeListenerJavaObject != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
+                                    "CastingPlayerChangeListener == nullptr"));
+        VerifyOrReturn(onAddedCallbackJavaMethodID != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
+                                    "onAddedCallbackJavaMethodID == nullptr"));
+
+        jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
+        VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Could not create "
+                                    "CastingPlayer jobject"));
+
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onAddedCallbackJavaMethodID, matterCastingPlayerJavaObject);
     }
 
     void HandleOnUpdated(matter::casting::memory::Strong<CastingPlayer> player) override
     {
         ChipLogProgress(AppServer,
-                        "CastingPlayerDiscovery-JNI DiscoveryDelegateImpl::HandleOnUpdated() called with CastingPlayer:");
-        player->LogDetail();
+                        "CastingPlayerDiscovery-JNI DiscoveryDelegateImpl::HandleOnUpdated() called with CastingPlayer, ID: %s",
+                        player->GetId());
 
-        if (castingPlayerChangeListenerJavaObject == nullptr || onChangedCallbackJavaMethodID == nullptr)
-        {
-            ChipLogError(AppServer,
-                         "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not specified, "
-                         "CastingPlayerChangeListener == nullptr");
-        }
-        else
-        {
-            JNIEnv * env                          = JniReferences::GetInstance().GetEnvForCurrentThread();
-            jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
-            if (matterCastingPlayerJavaObject == nullptr)
-            {
-                ChipLogError(AppServer,
-                             "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Could not create "
-                             "CastingPlayer jobject");
-            }
-            else
-            {
-                env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onChangedCallbackJavaMethodID,
-                                    matterCastingPlayerJavaObject);
-            }
-        }
+        VerifyOrReturn(castingPlayerChangeListenerJavaObject != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
+                                    "CastingPlayerChangeListener == nullptr"));
+        VerifyOrReturn(onChangedCallbackJavaMethodID != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
+                                    "onChangedCallbackJavaMethodID == nullptr"));
+
+        jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
+        VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
+                       ChipLogError(AppServer,
+                                    "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Could not "
+                                    "create CastingPlayer jobject"));
+
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onChangedCallbackJavaMethodID, matterCastingPlayerJavaObject);
     }
 
     // TODO: In following PRs. Implement HandleOnRemoved after implemented in tv-casting-commom CastingPlayerDiscovery.h/cpp
     // void HandleOnRemoved(matter::casting::memory::Strong<CastingPlayer> player) override
     // {
     //     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI DiscoveryDelegateImpl::HandleOnRemoved() called with
-    //     CastingPlayer:"); player->LogDetail();
+    //     CastingPlayer, ID: %s", player->GetId());
     // }
 };
 
 // Initialize the static instance to nullptr
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::discoveryDelegateImplSingletonInstance = nullptr;
 
-JNI_METHOD(jobject, startDiscovery)(JNIEnv * env, jobject)
+JNI_METHOD(jobject, startDiscovery)(JNIEnv * env, jobject, jint discoveryTargetDeviceType)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::startDiscovery() called");
-    DiscoveryDelegateImpl * delegate = DiscoveryDelegateImpl::GetInstance();
-    CastingPlayerDiscovery::GetInstance()->SetDelegate(delegate);
+    ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::startDiscovery() called with discoveryTargetDeviceType: %lu",
+                    (uint64_t) discoveryTargetDeviceType);
+    CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
 
-    // Start CastingPlayer discovery
-    const uint64_t kTargetPlayerDeviceType = 35; // 35 represents device type of Matter Video Player
-    CHIP_ERROR err                         = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
+    // Start CastingPlayer discovery, 35 represents device type of Matter Casting Player
+    CHIP_ERROR err = CastingPlayerDiscovery::GetInstance()->StartDiscovery((uint64_t) discoveryTargetDeviceType);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayerDiscovery-JNI startDiscovery() err: %" CHIP_ERROR_FORMAT, err.Format());
+        return support::createJMatterError(err);
     }
 
-    // TODO: Verify error returned?
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
     return support::createJMatterError(CHIP_NO_ERROR);
 }
 
@@ -169,9 +155,9 @@ JNI_METHOD(jobject, stopDiscovery)(JNIEnv * env, jobject)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayerDiscovery-JNI::StopDiscovery() err: %" CHIP_ERROR_FORMAT, err.Format());
+        return support::createJMatterError(err);
     }
 
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
     return support::createJMatterError(CHIP_NO_ERROR);
 }
 
@@ -181,8 +167,7 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() called");
     VerifyOrReturnValue(castingPlayerChangeListenerJavaObject != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
 
-    DiscoveryDelegateImpl * delegate = DiscoveryDelegateImpl::GetInstance();
-    if (delegate->castingPlayerChangeListenerJavaObject != nullptr)
+    if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject != nullptr)
     {
         ChipLogError(AppServer,
                      "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() Warning: Call removeCastingPlayerChangeListener "
@@ -205,10 +190,11 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     // support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
 
     // Set Java callbacks in the DiscoveryDelegateImpl Singleton
-    delegate->castingPlayerChangeListenerJavaObject = env->NewGlobalRef(castingPlayerChangeListenerJavaObject);
-    delegate->onAddedCallbackJavaMethodID           = onAddedJavaMethodID;
-    delegate->onChangedCallbackJavaMethodID         = onChangedJavaMethodID;
-    // delegate->onRemovedCallbackJavaMethodID = onRemovedJavaMethodID;
+    DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject =
+        env->NewGlobalRef(castingPlayerChangeListenerJavaObject);
+    DiscoveryDelegateImpl::GetInstance()->onAddedCallbackJavaMethodID   = onAddedJavaMethodID;
+    DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = onChangedJavaMethodID;
+    // DiscoveryDelegateImpl::GetInstance()->onRemovedCallbackJavaMethodID = onRemovedJavaMethodID;
 
     return support::createJMatterError(CHIP_NO_ERROR);
 }
@@ -218,24 +204,20 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() called");
 
-    // Remove the Java callbacks in the DiscoveryDelegateImpl Singleton
-    DiscoveryDelegateImpl * delegate = DiscoveryDelegateImpl::GetInstance();
-
     // Check if the passed object is the same as the one added in addCastingPlayerChangeListener() JNI method
-    jboolean isSameObject =
-        env->IsSameObject(castingPlayerChangeListenerJavaObject, delegate->castingPlayerChangeListenerJavaObject);
+    jboolean isSameObject = env->IsSameObject(castingPlayerChangeListenerJavaObject,
+                                              DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject);
 
     if ((bool) isSameObject)
     {
-        ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() removing listener");
-
         // Delete the global reference to the Java object
-        env->DeleteGlobalRef(delegate->castingPlayerChangeListenerJavaObject);
-        delegate->castingPlayerChangeListenerJavaObject = nullptr;
+        env->DeleteGlobalRef(DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject);
+        // Remove the Java callbacks in the DiscoveryDelegateImpl Singleton
+        DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject = nullptr;
         // No explicit cleanup required
-        delegate->onAddedCallbackJavaMethodID   = nullptr;
-        delegate->onChangedCallbackJavaMethodID = nullptr;
-        // delegate->onRemovedCallbackJavaMethodID = nullptr;
+        DiscoveryDelegateImpl::GetInstance()->onAddedCallbackJavaMethodID   = nullptr;
+        DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = nullptr;
+        // DiscoveryDelegateImpl::GetInstance()->onRemovedCallbackJavaMethodID = nullptr;
 
         return support::createJMatterError(CHIP_NO_ERROR);
     }
@@ -267,12 +249,7 @@ JNI_METHOD(jobject, getCastingPlayers)(JNIEnv * env, jobject)
         if (matterCastingPlayerJavaObject != nullptr)
         {
             jboolean added = env->CallBooleanMethod(arrayList, addMethod, matterCastingPlayerJavaObject);
-            if ((bool) added)
-            {
-                ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::getCastingPlayers() added CastingPlayer with ID: %s",
-                                player->GetId());
-            }
-            else
+            if (!((bool) added))
             {
                 ChipLogError(AppServer,
                              "CastingPlayerDiscovery-JNI::getCastingPlayers() Warning: Unable to add CastingPlayer with ID: %s",
