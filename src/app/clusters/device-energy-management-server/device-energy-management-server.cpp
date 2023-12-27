@@ -346,7 +346,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     if (forecast.Value().earliestStartTime.Value().IsNull())
     {
         System::Clock::Milliseconds64 cTMs;
-        CHIP_ERROR chipError = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
+        CHIP_ERROR chipError = System::SystemClock().GetClock_RealTimeMS(cTMs);
         if (chipError != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - error=%ld (%s)]",
@@ -355,9 +355,9 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
             return;
         }
 
-        auto unixEpoch     = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
+        auto unixEpoch     = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
         uint32_t chipEpoch = 0;
-        if (!chip::UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+        if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
         {
             ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
