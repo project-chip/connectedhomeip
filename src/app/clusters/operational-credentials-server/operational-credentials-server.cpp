@@ -354,6 +354,7 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+        MATTER_TRACE_COUNTER("FabricRemoved", "OperationalCredentials");
 
         // We need to withdraw the advertisement for the now-removed fabric, so need
         // to restart advertising altogether.
@@ -365,11 +366,16 @@ public:
     }
 
     // Gets called when a fabric is added/updated, but not necessarily committed to storage
-    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override { NotifyFabricTableChanged(); }
+    void OnFabricUpdated(const FabricTable & fabricTable, FabricIndex fabricIndex) override
+    {
+        MATTER_TRACE_COUNTER("FabricUpdated", "OperationalCredentials");
+        NotifyFabricTableChanged();
+    }
 
     // Gets called when a fabric in FabricTable is persisted to storage
     void OnFabricCommitted(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
+        MATTER_TRACE_COUNTER("FabricCommitted", "OperationalCredentials");
         const FabricInfo * fabric = fabricTable.FindFabricWithIndex(fabricIndex);
         // Safety check, but should not happen by the code paths involved
         VerifyOrReturn(fabric != nullptr);

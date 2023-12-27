@@ -29,7 +29,7 @@ namespace Tracing {
 namespace Insights {
 namespace {
 
-constexpr size_t kPermitListMaxSize = 10;
+constexpr size_t kPermitListMaxSize = 20;
 using HashValue                     = uint32_t;
 
 // Implements a murmurhash with 0 seed.
@@ -71,7 +71,8 @@ HashValue gPermitList[kPermitListMaxSize] = { MurmurHash("PASESession"),
                                               MurmurHash("NetworkCommissioning"),
                                               MurmurHash("GeneralCommissioning"),
                                               MurmurHash("OperationalCredentials"),
-                                              MurmurHash("CASEServer") }; // namespace
+                                              MurmurHash("CASEServer"),
+                                              MurmurHash("Fabric") }; // namespace
 
 bool IsPermitted(HashValue hashValue)
 {
