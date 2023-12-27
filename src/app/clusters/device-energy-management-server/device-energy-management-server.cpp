@@ -96,11 +96,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED; // Nothing writable in this cluster !
-}
-
 // CommandHandlerInterface
 CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)
 {

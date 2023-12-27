@@ -195,7 +195,7 @@ private:
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    // NOTE there are no writable attributes
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & handlerContext) override;
