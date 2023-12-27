@@ -346,11 +346,10 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     if (forecast.Value().earliestStartTime.Value().IsNull())
     {
         System::Clock::Milliseconds64 cTMs;
-        CHIP_ERROR chipError = System::SystemClock().GetClock_RealTimeMS(cTMs);
-        if (chipError != CHIP_NO_ERROR)
+        CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+        if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "DEM: Unable to get current time - error=%ld (%s)]",
-                         static_cast<long unsigned int>(chipError.AsInteger()), chipError.AsString());
+            ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
             return;
         }
