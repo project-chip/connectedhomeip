@@ -51,20 +51,12 @@ class ICDListCommand(val controller: ChipDeviceController, credsIssuer: Credenti
         i.offset,
         i.monitoredSubject
       )
-      System.out.format("  | %-10s : %62s |\n", "aes key", bytesToHex(i.icdAesKey))
-      System.out.format("  | %-10s : %62s |\n", "hamc key", bytesToHex(i.icdHmacKey))
+      System.out.format("  | %-10s : %62s |\n", "aes key", i.icdAesKey.toHex())
+      System.out.format("  | %-10s : %62s |\n", "hamc key", i.icdHmacKey.toHex())
     }
     println("  +-----------------------------------------------------------------------------+")
   }
 
-  private fun bytesToHex(bytes: ByteArray): String {
-    val hexArray = "0123456789ABCDEF".toCharArray()
-    val hexChars = CharArray(bytes.size * 2)
-    for (i in bytes.indices) {
-      val v = bytes[i].toInt() and 0xFF
-      hexChars[i * 2] = hexArray[v ushr 4]
-      hexChars[i * 2 + 1] = hexArray[v and 0x0F]
-    }
-    return String(hexChars)
-  }
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 }

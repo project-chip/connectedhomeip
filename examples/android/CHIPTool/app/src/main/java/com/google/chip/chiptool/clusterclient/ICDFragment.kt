@@ -1,7 +1,6 @@
 package com.google.chip.chiptool.clusterclient
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.ICDFragmentBinding
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 
 class ICDFragment : Fragment() {
   private val deviceController: ChipDeviceController
@@ -57,8 +56,6 @@ class ICDFragment : Fragment() {
   }
 
   companion object {
-    private const val TAG = "ICDFragment"
-
     fun newInstance(): ICDFragment = ICDFragment()
   }
 }
