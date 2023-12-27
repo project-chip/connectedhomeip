@@ -32,6 +32,51 @@ namespace Clusters {
 namespace EnergyEvse {
 
 /**
+ * Helper class to handle all of the session related info
+ */
+class EvseSession
+{
+public:
+    /**
+     * @brief This function samples the start-time, and energy meter to hold the session info
+     *
+     * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+     * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+     */
+    void StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue);
+
+    /**
+     * @brief This function updates the session Duration to allow read attributes to return latest values
+     */
+    void RecalculateSessionDuration();
+
+    /**
+     * @brief This function updates the EnergyCharged meter value
+     *
+     * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
+     */
+    void UpdateEnergyCharged(int64_t chargingMeterValue);
+
+    /**
+     * @brief This function updates the EnergyDischarged meter value
+     *
+     * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
+     */
+    void UpdateEnergyDischarged(int64_t dischargingMeterValue);
+
+    /* Public members - represent attributes in the cluster */
+    DataModel::Nullable<uint32_t> mSessionID;
+    DataModel::Nullable<uint32_t> mSessionDuration;
+    DataModel::Nullable<int64_t> mSessionEnergyCharged;
+    DataModel::Nullable<int64_t> mSessionEnergyDischarged;
+
+private:
+    uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
+    int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
+    int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
+};
+
+/**
  * The application delegate.
  */
 
@@ -193,11 +238,8 @@ private:
     /* PNC attributes*/
     DataModel::Nullable<CharSpan> mVehicleID;
 
-    /* Session SESS attributes */
-    DataModel::Nullable<uint32_t> mSessionID;
-    DataModel::Nullable<uint32_t> mSessionDuration;
-    DataModel::Nullable<int64_t> mSessionEnergyCharged;
-    DataModel::Nullable<int64_t> mSessionEnergyDischarged;
+    /* Session Object */
+    EvseSession mSession;
 };
 
 } // namespace EnergyEvse

@@ -831,17 +831,127 @@ DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID()
 /* Session SESS attributes */
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionID()
 {
-    return mSessionID;
+    return mSession.mSessionID;
 }
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetSessionDuration()
 {
-    return mSessionDuration;
+    mSession.RecalculateSessionDuration();
+    return mSession.mSessionDuration;
 }
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyCharged()
 {
-    return mSessionEnergyCharged;
+    return mSession.mSessionEnergyCharged;
 }
 DataModel::Nullable<int64_t> EnergyEvseDelegate::GetSessionEnergyDischarged()
 {
-    return mSessionEnergyDischarged;
+    return mSession.mSessionEnergyDischarged;
+}
+
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
+{
+    chipEpoch = 0;
+
+    System::Clock::Milliseconds64 cTMs;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
+        return err;
+    }
+
+    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
+    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
+    {
+        ChipLogError(Zcl, "EVSE: unable to convert Unix Epoch time to Matter Epoch Time");
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/**
+ * @brief This function samples the start-time, and energy meter to hold the session info
+ *
+ * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+ * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+ */
+void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue)
+{
+    /* Get Timestamp */
+    uint32_t chipEpoch = 0;
+    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: Failed to get timestamp when starting session");
+        return;
+    }
+    mStartTime = chipEpoch;
+
+    mSessionEnergyChargedAtStart    = chargingMeterValue;
+    mSessionEnergyDischargedAtStart = dischargingMeterValue;
+
+    if (mSessionID.IsNull())
+    {
+        mSessionID = MakeNullable(static_cast<uint32_t>(0));
+    }
+    else
+    {
+        mSessionID = MakeNullable(mSessionID.Value()++);
+    }
+
+    /* Reset other session values */
+    mSessionDuration         = MakeNullable(static_cast<uint32_t>(0));
+    mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
+    mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
+
+    // TODO persist mSessionID
+    // TODO persist mStartTime
+    // TODO persist mSessionEnergyChargedAtStart
+    // TODO persist mSessionEnergyDischargedAtStart
+
+    // TODO call MatterReportingAttributeChangeCallback
+}
+
+/**
+ * @brief This function updates the session attrs to allow read attributes to return latest values
+ */
+void EvseSession::RecalculateSessionDuration()
+{
+    /* Get Timestamp */
+    uint32_t chipEpoch = 0;
+    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: Failed to get timestamp when updating session duration");
+        return;
+    }
+
+    uint32_t duration = chipEpoch - mStartTime;
+    mSessionDuration  = MakeNullable(duration);
+    // TODO call MatterReportingAttributeChangeCallback
+}
+
+/**
+ * @brief This function updates the EnergyCharged meter value
+ *
+ * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
+ */
+void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
+{
+    mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
+    // TODO call MatterReportingAttributeChangeCallback
+}
+
+/**
+ * @brief This function updates the EnergyDischarged meter value
+ *
+ * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
+ */
+void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
+{
+    mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
+    // TODO call MatterReportingAttributeChangeCallback
 }
