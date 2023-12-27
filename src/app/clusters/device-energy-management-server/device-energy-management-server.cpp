@@ -307,15 +307,15 @@ void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
 void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
                                             const Commands::StartTimeAdjustRequest::DecodableType & commandData)
 {
-    Status status                                               = Status::Success;
-    uint32_t earliestStartTime                                  = 0;
-    uint32_t latestEndTime                                      = 0;
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
-
+    Status status                    = Status::Success;
+    uint32_t earliestStartTimeEpoch  = 0;
+    uint32_t latestEndTimeEpoch      = 0;
+    uint32_t requestedStartTimeEpoch = commandData.requestedStartTime;
     uint32_t duration;
-    uint32_t requestedStartTime = commandData.requestedStartTime;
 
-    if (forecast.IsNull())
+    DataModel::Nullable<Structs::ForecastStruct::Type> forecastNullable = mDelegate.GetForecast();
+
+    if (forecastNullable.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
@@ -329,21 +329,30 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         return;
     }
 
-    /* If the RequestedStartTime value resulted in a time shift which is
+    /* Temporary variable to save calling .Value() on forecastNullable */
+    auto & forecast = forecastNullable.Value();
+
+    /**
+     * If the RequestedStartTime value resulted in a time shift which is
      * outside the time constraints of EarliestStartTime and
      * LatestEndTime, then the command SHALL be rejected with CONSTRAINT_ERROR;
-     * otherwise the command SHALL be rejected with FAILURE
+     * in other failure scenarios the command SHALL be rejected with FAILURE
      */
-    /* earliestStartTime is optional based on the FA (ForecastAdjust) feature AND is nullable */
-    if (forecast.Value().earliestStartTime.HasValue() || forecast.Value().latestEndTime.HasValue())
+    /* earliestStartTime is optional based on the StartTimeAdjust (STA) feature AND is nullable */
+    if (!(forecast.earliestStartTime.HasValue()) || !(forecast.latestEndTime.HasValue()))
     {
-        /* These Should not be NULL since this command requires FA feature and these are mandatory for that */
-        ChipLogError(Zcl, "DEM: EarliestStartTime / LatestEndTime not valid");
+        /* These should not be NULL since this command requires STA feature and these are mandatory for that */
+        ChipLogError(Zcl, "DEM: EarliestStartTime / LatestEndTime do not have values");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
-    if (forecast.Value().earliestStartTime.Value().IsNull())
+    /* Temporary variable to save keep calling .Value() on the Optional element */
+    auto & earliestStartTimeOptional = forecast.earliestStartTime.Value();
+    /* Latest End Time is optional & cannot be null - unlike earliestStartTime! */
+    latestEndTimeEpoch = forecast.latestEndTime.Value();
+
+    if (earliestStartTimeOptional.IsNull())
     {
         System::Clock::Milliseconds64 cTMs;
         CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
@@ -364,39 +373,38 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         }
 
         /* Null means - We can start immediately */
-        earliestStartTime = chipEpoch; /* NOW */
+        earliestStartTimeEpoch = chipEpoch; /* NOW */
     }
     else
     {
-        earliestStartTime = forecast.Value().earliestStartTime.Value().Value();
+        earliestStartTimeEpoch = earliestStartTimeOptional.Value();
     }
-    /* Latest End Time is optional & cannot be null - unlike earliestStartTime! */
-    latestEndTime = forecast.Value().latestEndTime.Value();
 
-    duration = forecast.Value().endTime - forecast.Value().startTime; // the current entire forecast duration
-
-    if (requestedStartTime < earliestStartTime)
+    duration = forecast.endTime - forecast.startTime; // the current entire forecast duration
+    if (requestedStartTimeEpoch < earliestStartTimeEpoch)
     {
         ChipLogError(Zcl, "DEM: Bad requestedStartTime %ld, earlier than earliestStartTime %ld.",
-                     static_cast<long unsigned int>(requestedStartTime), static_cast<long unsigned int>(earliestStartTime));
+                     static_cast<long unsigned int>(requestedStartTimeEpoch),
+                     static_cast<long unsigned int>(earliestStartTimeEpoch));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if ((requestedStartTime + duration) > latestEndTime)
+    if ((requestedStartTimeEpoch + duration) > latestEndTimeEpoch)
     {
-        ChipLogError(Zcl, "DEM: Bad requestedStartTime + duration %ld, later than latestEndTime %ld.",
-                     static_cast<long unsigned int>(requestedStartTime + duration), static_cast<long unsigned int>(latestEndTime));
+        ChipLogError(Zcl, "DEM: Bad requestedStartTimeEpoch + duration %ld, later than latestEndTime %ld.",
+                     static_cast<long unsigned int>(requestedStartTimeEpoch + duration),
+                     static_cast<long unsigned int>(latestEndTimeEpoch));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    ChipLogProgress(Zcl, "DEM: Good requestedStartTime %ld.", static_cast<long unsigned int>(requestedStartTime));
-    status = mDelegate.StartTimeAdjustRequest(requestedStartTime);
+    ChipLogProgress(Zcl, "DEM: Good requestedStartTimeEpoch %ld.", static_cast<long unsigned int>(requestedStartTimeEpoch));
+    status = mDelegate.StartTimeAdjustRequest(requestedStartTimeEpoch);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: StartTimeAdjustRequest(%ld) FAILURE", static_cast<long unsigned int>(requestedStartTime));
+        ChipLogError(Zcl, "DEM: StartTimeAdjustRequest(%ld) FAILURE", static_cast<long unsigned int>(requestedStartTimeEpoch));
         return;
     }
 }
