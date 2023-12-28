@@ -49,6 +49,8 @@ public:
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
 private:
+    int64_t mLastChargingEnergyMeter    = 0;
+    int64_t mLastDischargingEnergyMeter = 0;
 };
 
 } // namespace EnergyEvse

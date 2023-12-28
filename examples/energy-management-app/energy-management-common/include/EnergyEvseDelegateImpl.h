@@ -37,6 +37,7 @@ namespace EnergyEvse {
 class EvseSession
 {
 public:
+    EvseSession(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     /**
      * @brief This function samples the start-time, and energy meter to hold the session info
      *
@@ -71,6 +72,8 @@ public:
     DataModel::Nullable<int64_t> mSessionEnergyDischarged;
 
 private:
+    EndpointId mEndpointId = 0;
+
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
@@ -128,6 +131,11 @@ public:
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
     Status HwSetVehicleID(const CharSpan & vehID);
+
+    Status SendEVConnectedEvent();
+    Status SendEVNotDetectedEvent();
+    Status SendEnergyTransferStartedEvent();
+    Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason);
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -204,6 +212,7 @@ private:
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
     Status NotifyApplicationStateChange();
+    Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
 
     /**
      * @brief Helper function to work out the charge limit based on conditions and settings
@@ -239,7 +248,10 @@ private:
     DataModel::Nullable<CharSpan> mVehicleID;
 
     /* Session Object */
-    EvseSession mSession;
+    EvseSession mSession = EvseSession(mEndpointId);
+
+    /* Helper variable to hold meter val since last EnergyTransferStarted event */
+    int64_t mMeterValueAtEnergyTransferStart;
 };
 
 } // namespace EnergyEvse

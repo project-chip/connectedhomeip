@@ -309,36 +309,95 @@ Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
     return this->ComputeMaxChargeCurrentLimit();
 }
 
+bool IsEvPluggedIn(StateEnum state)
+{
+    if ((state == StateEnum::kNotPluggedIn) || (state == StateEnum::kFault) || (state == StateEnum::kSessionEnding))
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+bool IsEvTransferringEnergy(StateEnum state)
+{
+    if ((state == StateEnum::kPluggedInCharging) || (state == StateEnum::kPluggedInDischarging))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 /**
  * @brief    Called by EVSE Hardware to indicate if EV is detected
  *
- * The only allowed states that the EVSE hardware can set are:
+ * The only allowed states that the EVSE hardware can tell us about are:
  *  kNotPluggedIn
  *  kPluggedInNoDemand
  *  kPluggedInDemand
  *
+ * The actual overall state is more complex and includes faults,
+ * enable & disable charging or discharging etc.
+ *
  * @param    StateEnum - the state of the EV being plugged in and asking for demand etc
  */
-Status EnergyEvseDelegate::HwSetState(StateEnum state)
+Status EnergyEvseDelegate::HwSetState(StateEnum newState)
 {
-    switch (state)
+    switch (newState)
     {
     case StateEnum::kNotPluggedIn:
-        // TODO - work out logic here
-        mHwState = state;
+        if (IsEvPluggedIn(mState))
+        {
+            /* EV was plugged in, but no longer is */
+            mSession.RecalculateSessionDuration();
+            if (IsEvTransferringEnergy(mState))
+            {
+                /*
+                 * EV was transferring current - unusual to get to this case without
+                 * first having the state set to kPluggedInNoDemand or kPluggedInDemand
+                 */
+                mSession.RecalculateSessionDuration();
+                SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
+            }
+
+            SendEVNotDetectedEvent();
+            SetState(newState);
+        }
         break;
-    case StateEnum::kPluggedInNoDemand:
-        // TODO - work out logic here
-        mHwState = state;
-        break;
+
+    case StateEnum::kPluggedInNoDemand: /* deliberate fall-thru */
     case StateEnum::kPluggedInDemand:
-        // TODO - work out logic here
-        mHwState = state;
+        if (IsEvPluggedIn(mState))
+        {
+            /* EV was already plugged in before */
+            if (IsEvTransferringEnergy(mState))
+            {
+                mSession.RecalculateSessionDuration();
+                SendEnergyTransferStoppedEvent(newState == StateEnum::kPluggedInNoDemand
+                                                   ? EnergyTransferStoppedReasonEnum::kEVStopped
+                                                   : EnergyTransferStoppedReasonEnum::kEVSEStopped);
+            }
+            SetState(newState);
+        }
+        else
+        {
+            /* EV was not plugged in - start a new session */
+            // TODO get energy meter readings
+            mSession.StartSession(0, 0);
+            SendEVConnectedEvent();
+
+            /* If*/
+
+            SetState(newState);
+        }
         break;
 
     default:
         /* All other states should be managed by the Delegate */
-        // TODO (assert?)
         break;
     }
 
@@ -504,6 +563,153 @@ Status EnergyEvseDelegate::NotifyApplicationStateChange()
         mCallbacks.handler(&cbInfo, mCallbacks.arg);
     }
 
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue)
+{
+    EVSECbInfo cbInfo;
+
+    cbInfo.type = EVSECallbackType::EnergyMeterReadingRequested;
+
+    cbInfo.EnergyMeterReadingRequest.meterType           = meterType;
+    cbInfo.EnergyMeterReadingRequest.energyMeterValuePtr = &aMeterValue;
+
+    if (mCallbacks.handler != nullptr)
+    {
+        mCallbacks.handler(&cbInfo, mCallbacks.arg);
+    }
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SendEVConnectedEvent()
+{
+    Events::EVConnected::Type event;
+    EventNumber eventNumber;
+
+    if (mSession.mSessionID.IsNull())
+    {
+        ChipLogError(AppServer, "SessionID is Null");
+        return Status::Failure;
+    }
+
+    event.sessionID = mSession.mSessionID.Value();
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SendEVNotDetectedEvent()
+{
+    Events::EVNotDetected::Type event;
+    EventNumber eventNumber;
+
+    if (mSession.mSessionID.IsNull())
+    {
+        ChipLogError(AppServer, "SessionID is Null");
+        return Status::Failure;
+    }
+
+    event.sessionID               = mSession.mSessionID.Value();
+    event.state                   = mState;
+    event.sessionDuration         = mSession.mSessionDuration.Value();
+    event.sessionEnergyCharged    = mSession.mSessionEnergyCharged.Value();
+    event.sessionEnergyDischarged = MakeOptional(mSession.mSessionEnergyDischarged.Value());
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
+{
+    Events::EnergyTransferStarted::Type event;
+    EventNumber eventNumber;
+
+    if (mSession.mSessionID.IsNull())
+    {
+        ChipLogError(AppServer, "SessionID is Null");
+        return Status::Failure;
+    }
+
+    event.sessionID = mSession.mSessionID.Value();
+    event.state     = mState;
+    /**
+     * A positive value indicates the EV has been enabled for charging and the value is
+     * taken directly from the MaximumChargeCurrent attribute.
+     * A negative value indicates that the EV has been enabled for discharging and the value can be taken
+     * from the MaximumDischargeCurrent attribute with its sign inverted.
+     */
+
+    if (mState == StateEnum::kPluggedInCharging)
+    {
+        /* Sample the energy meter for charging */
+        GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, mMeterValueAtEnergyTransferStart);
+        event.maximumCurrent = mMaximumChargeCurrent;
+    }
+    else if (mState == StateEnum::kPluggedInDischarging)
+    {
+        /* Sample the energy meter for discharging */
+        GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, mMeterValueAtEnergyTransferStart);
+
+        /* discharging should have a negative current  */
+        event.maximumCurrent = -mMaximumDischargeCurrent;
+    }
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
+    return Status::Success;
+}
+Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason)
+{
+    Events::EnergyTransferStopped::Type event;
+    EventNumber eventNumber;
+
+    if (mSession.mSessionID.IsNull())
+    {
+        ChipLogError(AppServer, "SessionID is Null");
+        return Status::Failure;
+    }
+
+    event.sessionID       = mSession.mSessionID.Value();
+    event.state           = mState;
+    event.reason          = reason;
+    int64_t meterValueNow = 0;
+
+    if (mState == StateEnum::kPluggedInCharging)
+    {
+        GetEVSEEnergyMeterValue(ChargingDischargingType::kCharging, meterValueNow);
+        event.energyTransferred = meterValueNow - mMeterValueAtEnergyTransferStart;
+    }
+    else if (mState == StateEnum::kPluggedInDischarging)
+    {
+        GetEVSEEnergyMeterValue(ChargingDischargingType::kDischarging, meterValueNow);
+
+        /* discharging should have a negative value */
+        event.energyTransferred = mMeterValueAtEnergyTransferStart - meterValueNow;
+    }
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
     return Status::Success;
 }
 
@@ -908,12 +1114,15 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     mSessionEnergyCharged    = MakeNullable(static_cast<int64_t>(0));
     mSessionEnergyDischarged = MakeNullable(static_cast<int64_t>(0));
 
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionID::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
+
     // TODO persist mSessionID
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
     // TODO persist mSessionEnergyDischargedAtStart
-
-    // TODO call MatterReportingAttributeChangeCallback
 }
 
 /**
@@ -931,7 +1140,7 @@ void EvseSession::RecalculateSessionDuration()
 
     uint32_t duration = chipEpoch - mStartTime;
     mSessionDuration  = MakeNullable(duration);
-    // TODO call MatterReportingAttributeChangeCallback
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionDuration::Id);
 }
 
 /**
@@ -942,7 +1151,7 @@ void EvseSession::RecalculateSessionDuration()
 void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
 {
     mSessionEnergyCharged = MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart);
-    // TODO call MatterReportingAttributeChangeCallback
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
 }
 
 /**
@@ -953,5 +1162,5 @@ void EvseSession::UpdateEnergyCharged(int64_t chargingMeterValue)
 void EvseSession::UpdateEnergyDischarged(int64_t dischargingMeterValue)
 {
     mSessionEnergyDischarged = MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart);
-    // TODO call MatterReportingAttributeChangeCallback
+    MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 }

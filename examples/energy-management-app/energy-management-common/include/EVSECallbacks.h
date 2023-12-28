@@ -45,9 +45,19 @@ enum EVSECallbackType
      */
     ChargingPreferencesChanged,
     /*
+     * Energy Meter Reading requested
+     */
+    EnergyMeterReadingRequested,
+    /*
      * DeviceEnergyManagement has changed
      */
     DeviceEnergyManagementChanged,
+};
+
+enum ChargingDischargingType
+{
+    kCharging,
+    kDischarging
 };
 
 struct EVSECbInfo
@@ -68,6 +78,13 @@ struct EVSECbInfo
         {
             int64_t maximumChargeCurrent;
         } ChargingCurrent;
+
+        /* for type = EnergyMeterReadingRequested */
+        struct
+        {
+            ChargingDischargingType meterType;
+            int64_t * energyMeterValuePtr;
+        } EnergyMeterReadingRequest;
     };
 };
 

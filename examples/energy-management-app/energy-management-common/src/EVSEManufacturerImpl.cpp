@@ -35,7 +35,7 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(nullptr));
+    dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
     /* Set the EVSE Hardware Maximum current limit */
     // For Manufacturer to specify the hardware capability in mA
@@ -78,6 +78,8 @@ CHIP_ERROR EVSEManufacturer::Shutdown(EnergyEvseManager * aInstance)
  */
 void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg)
 {
+    EVSEManufacturer * pClass = reinterpret_cast<EVSEManufacturer *>(arg);
+
     switch (cb->type)
     {
     case EVSECallbackType::StateChanged:
@@ -87,7 +89,19 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
         ChipLogProgress(AppServer, "EVSE callback - maxChargeCurrent changed to %ld",
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
         break;
+    case EVSECallbackType::EnergyMeterReadingRequested:
+        ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");
+        if (cb->EnergyMeterReadingRequest.meterType == ChargingDischargingType::kCharging)
+        {
+            *(cb->EnergyMeterReadingRequest.energyMeterValuePtr) = pClass->mLastChargingEnergyMeter;
+        }
+        else
+        {
+            *(cb->EnergyMeterReadingRequest.energyMeterValuePtr) = pClass->mLastDischargingEnergyMeter;
+        }
+        break;
+
     default:
-        ChipLogError(AppServer, "Unhandler EVSE Callback type %d", static_cast<int>(cb->type));
+        ChipLogError(AppServer, "Unhandled EVSE Callback type %d", static_cast<int>(cb->type));
     }
 }
