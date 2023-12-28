@@ -30,6 +30,7 @@ if(NOT CHIP_ROOT)
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/factory.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
@@ -545,6 +546,11 @@ if(CONFIG_ENABLE_PW_RPC)
     foreach(func ${WRAP_FUNCTIONS})
         target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
     endforeach()
+endif()
+
+if(CONFIG_ENABLE_BUILD_TIME_PARTITION_SCRIPT)
+    generate_build_time_partition(fctry esp_secure_cert ${CHIP_ROOT} FLASH_IN_PROJECT)
+    add_dependencies(build_time_partition app)
 endif()
 
 # Build Matter OTA image

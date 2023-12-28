@@ -951,7 +951,7 @@ menu "CHIP Device Layer"
                 NVS namespace. If this option is enabled, the application can use an API to set a CD,
                 the configured CD will be used for subsequent CD reads.
 
-       config ENABLE_ESP_INSIGHTS_TRACE
+        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
            default y
@@ -960,7 +960,7 @@ menu "CHIP Device Layer"
                Enabling the above option will enable the esp32 specific tracing functionality and report the
                diagnostic information to the insights cloud.
 
-      config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+        config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
            bool "Enable System Stats for insights"
            depends on ESP_INSIGHTS_ENABLED
            default n
@@ -975,6 +975,13 @@ menu "CHIP Device Layer"
            help
                Maximum number of group entries that can be included in the permit list for reporting
                the traces to insights.
+        config ENABLE_BUILD_TIME_PARTITION_SCRIPT
+            bool "Enable script to build fctry and esp_secure_cert partition in during build time."
+            default n
+            help
+                Enables the cmake script to generate and map the factory parition bin and esp-secure-cert
+                partition bin to their corresponding addresses specified in partitions.csv and flash the partitons
+                in a single idf.py flash command.
 
     endmenu
 
