@@ -42,7 +42,7 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
     // Get the constructor for the com/matter/casting/core/MatterCastingPlayer Java class
     jmethodID constructor =
         env->GetMethodID(matterCastingPlayerJavaClass, "<init>",
-                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/util/List;IIII)V");
+                         "(ZLjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/List;IIIJ)V");
     if (constructor == nullptr)
     {
         ChipLogError(
@@ -52,13 +52,11 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
     }
 
     // Convert the CastingPlayer fields to MatterCastingPlayer Java types
-    bool connected = player->IsConnected() ? true : false;
-
-    jobject ipAddressListJavaObject           = nullptr;
+    jobject jIpAddressList                    = nullptr;
     const chip::Inet::IPAddress * ipAddresses = player->GetIPAddresses();
     if (ipAddresses != nullptr)
     {
-        chip::JniReferences::GetInstance().CreateArrayList(ipAddressListJavaObject);
+        chip::JniReferences::GetInstance().CreateArrayList(jIpAddressList);
         for (size_t i = 0; i < player->GetNumIPs() && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
             char addrCString[chip::Inet::IPAddress::kMaxStringLength];
@@ -70,24 +68,23 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
                 env->GetStaticMethodID(jIPAddressClass, "getByName", "(Ljava/lang/String;)Ljava/net/InetAddress;");
             jobject jIPAddress = env->CallStaticObjectMethod(jIPAddressClass, jGetByNameMid, jIPAddressStr);
 
-            chip::JniReferences::GetInstance().AddToList(ipAddressListJavaObject, jIPAddress);
+            chip::JniReferences::GetInstance().AddToList(jIpAddressList, jIPAddress);
         }
     }
 
     // Create a new instance of the MatterCastingPlayer Java class
-    jobject matterCastingPlayerJavaObject = nullptr;
-    matterCastingPlayerJavaObject =
-        env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(connected),
-                       env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
-                       env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
-                       (jint) (player->GetNumIPs()), ipAddressListJavaObject, (jint) (player->GetPort()),
-                       (jint) (player->GetProductId()), (jint) (player->GetVendorId()), (jint) (player->GetDeviceType()));
-    if (matterCastingPlayerJavaObject == nullptr)
+    jobject jMatterCastingPlayer = nullptr;
+    jMatterCastingPlayer = env->NewObject(matterCastingPlayerJavaClass, constructor, static_cast<jboolean>(player->IsConnected()),
+                                          env->NewStringUTF(player->GetId()), env->NewStringUTF(player->GetHostName()),
+                                          env->NewStringUTF(player->GetDeviceName()), env->NewStringUTF(player->GetInstanceName()),
+                                          jIpAddressList, (jint) (player->GetPort()), (jint) (player->GetProductId()),
+                                          (jint) (player->GetVendorId()), (jlong) (player->GetDeviceType()));
+    if (jMatterCastingPlayer == nullptr)
     {
         ChipLogError(AppServer,
                      "CastingPlayerConverter-JNI.createJCastingPlayer() Warning: Could not create MatterCastingPlayer Java object");
     }
-    return matterCastingPlayerJavaObject;
+    return jMatterCastingPlayer;
 }
 
 }; // namespace support

@@ -36,8 +36,6 @@ public interface CastingPlayer {
 
   String getInstanceName();
 
-  int getNumberIPs();
-
   List<InetAddress> getIpAddresses();
 
   int getPort();
@@ -46,12 +44,15 @@ public interface CastingPlayer {
 
   int getProductId();
 
-  int getDeviceType();
+  long getDeviceType();
 
+  @Override
   String toString();
 
+  @Override
   boolean equals(Object o);
 
+  @Override
   int hashCode();
 
   // TODO: Implement in following PRs. Related to player connection implementation.

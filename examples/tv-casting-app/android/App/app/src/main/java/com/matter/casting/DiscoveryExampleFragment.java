@@ -45,7 +45,7 @@ import java.util.concurrent.ScheduledFuture;
 public class DiscoveryExampleFragment extends Fragment {
   private static final String TAG = DiscoveryExampleFragment.class.getSimpleName();
   // 35 represents device type of Matter Casting Player
-  private static final int DISCOVERY_TARGET_DEVICE_TYPE = 35;
+  private static final Long DISCOVERY_TARGET_DEVICE_TYPE = 35L;
   private static final int DISCOVERY_RUNTIME_SEC = 15;
   private TextView matterDiscoveryMessageTextView;
   private static final ScheduledExecutorService executorService =
@@ -70,98 +70,68 @@ public class DiscoveryExampleFragment extends Fragment {
 
             @Override
             public void onAdded(CastingPlayer castingPlayer) {
-              if (castingPlayer != null) {
-                Log.i(
-                    TAG,
-                    "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
-                // Display CastingPlayer info on the screen
-                new Handler(Looper.getMainLooper())
-                    .post(
-                        () -> {
-                          final Optional<CastingPlayer> playerInList =
-                              castingPlayerList
-                                  .stream()
-                                  .filter(node -> castingPlayer.equals(node))
-                                  .findFirst();
-                          if (playerInList.isPresent()) {
-                            Log.d(
-                                TAG,
-                                "onAdded() Replacing existing CastingPlayer entry "
-                                    + playerInList.get().getDeviceId()
-                                    + " in castingPlayerList list");
-                            arrayAdapter.remove(playerInList.get());
-                          }
-                          arrayAdapter.add(castingPlayer);
-                        });
-              } else {
-                Log.d(TAG, "onAdded() CastingPlayer is null");
-                // Attempt to invoke interface method on a null object reference will throw an error
-                Log.d(
-                    TAG,
-                    "onAdded() Discovered CastingPlayer with deviceId: "
-                        + castingPlayer.getDeviceId());
-              }
+              Log.i(
+                  TAG,
+                  "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+              // Display CastingPlayer info on the screen
+              new Handler(Looper.getMainLooper())
+                  .post(
+                      () -> {
+                        arrayAdapter.add(castingPlayer);
+                      });
             }
 
             @Override
             public void onChanged(CastingPlayer castingPlayer) {
-              if (castingPlayer != null) {
-                Log.i(
-                    TAG,
-                    "onChanged() Discovered changes to CastingPlayer with deviceId: "
-                        + castingPlayer.getDeviceId());
-                // Update the CastingPlayer on the screen
-                new Handler(Looper.getMainLooper())
-                    .post(
-                        () -> {
-                          final Optional<CastingPlayer> playerInList =
-                              castingPlayerList
-                                  .stream()
-                                  .filter(node -> castingPlayer.equals(node))
-                                  .findFirst();
-                          if (playerInList.isPresent()) {
-                            Log.d(
-                                TAG,
-                                "onChanged() Updating existing CastingPlayer entry "
-                                    + playerInList.get().getDeviceId()
-                                    + " in castingPlayerList list");
-                            arrayAdapter.remove(playerInList.get());
-                          }
-                          arrayAdapter.add(castingPlayer);
-                        });
-              } else {
-                Log.d(TAG, "onChanged() CastingPlayer is null");
-              }
+              Log.i(
+                  TAG,
+                  "onChanged() Discovered changes to CastingPlayer with deviceId: "
+                      + castingPlayer.getDeviceId());
+              // Update the CastingPlayer on the screen
+              new Handler(Looper.getMainLooper())
+                  .post(
+                      () -> {
+                        final Optional<CastingPlayer> playerInList =
+                            castingPlayerList
+                                .stream()
+                                .filter(node -> castingPlayer.equals(node))
+                                .findFirst();
+                        if (playerInList.isPresent()) {
+                          Log.d(
+                              TAG,
+                              "onChanged() Updating existing CastingPlayer entry "
+                                  + playerInList.get().getDeviceId()
+                                  + " in castingPlayerList list");
+                          arrayAdapter.remove(playerInList.get());
+                        }
+                        arrayAdapter.add(castingPlayer);
+                      });
             }
 
             @Override
             public void onRemoved(CastingPlayer castingPlayer) {
-              if (castingPlayer != null) {
-                Log.i(
-                    TAG,
-                    "onRemoved() Removed CastingPlayer with deviceId: "
-                        + castingPlayer.getDeviceId());
-                // Remove CastingPlayer from the screen
-                new Handler(Looper.getMainLooper())
-                    .post(
-                        () -> {
-                          final Optional<CastingPlayer> playerInList =
-                              castingPlayerList
-                                  .stream()
-                                  .filter(node -> castingPlayer.equals(node))
-                                  .findFirst();
-                          if (playerInList.isPresent()) {
-                            Log.d(
-                                TAG,
-                                "onRemoved() Removing existing CastingPlayer entry "
-                                    + playerInList.get().getDeviceId()
-                                    + " in castingPlayerList list");
-                            arrayAdapter.remove(playerInList.get());
-                          }
-                        });
-              } else {
-                Log.d(TAG, "onRemoved() CastingPlayer is null");
-              }
+              Log.i(
+                  TAG,
+                  "onRemoved() Removed CastingPlayer with deviceId: "
+                      + castingPlayer.getDeviceId());
+              // Remove CastingPlayer from the screen
+              new Handler(Looper.getMainLooper())
+                  .post(
+                      () -> {
+                        final Optional<CastingPlayer> playerInList =
+                            castingPlayerList
+                                .stream()
+                                .filter(node -> castingPlayer.equals(node))
+                                .findFirst();
+                        if (playerInList.isPresent()) {
+                          Log.d(
+                              TAG,
+                              "onRemoved() Removing existing CastingPlayer entry "
+                                  + playerInList.get().getDeviceId()
+                                  + " in castingPlayerList list");
+                          arrayAdapter.remove(playerInList.get());
+                        }
+                      });
             }
           };
 
@@ -201,14 +171,13 @@ public class DiscoveryExampleFragment extends Fragment {
     Log.d(TAG, "onViewCreated() creating callbacks");
 
     // TODO: In following PRs. Enable startDiscoveryButton and stopDiscoveryButton when
-    //  stopDiscovery is implemented in the core Matter SKD DNS-SD API. Enable in
+    //  stopDiscovery is implemented in the core Matter SDK DNS-SD API. Enable in
     //  fragment_matter_discovery_example.xml
     Button startDiscoveryButton = getView().findViewById(R.id.startDiscoveryButton);
     startDiscoveryButton.setOnClickListener(
         v -> {
           Log.i(
               TAG, "onViewCreated() startDiscoveryButton button clicked. Calling startDiscovery()");
-          // arrayAdapter.clear();
           if (!startDiscovery()) {
             Log.e(TAG, "onViewCreated() startDiscovery() call Failed");
           }
@@ -262,6 +231,8 @@ public class DiscoveryExampleFragment extends Fragment {
   private boolean startDiscovery() {
     Log.i(TAG, "startDiscovery() called");
 
+    arrayAdapter.clear();
+
     // Add the implemented CastingPlayerChangeListener to listen to changes in the discovered
     // CastingPlayers
     MatterError err =
@@ -271,7 +242,7 @@ public class DiscoveryExampleFragment extends Fragment {
       return false;
     }
     // Start discovery
-    Log.i(TAG, "startDiscovery() calling startDiscovery()");
+    Log.i(TAG, "startDiscovery() calling CastingPlayerDiscovery.startDiscovery()");
     err = matterCastingPlayerDiscovery.startDiscovery(DISCOVERY_TARGET_DEVICE_TYPE);
     if (err.hasError()) {
       Log.e(TAG, "startDiscovery() startDiscovery() called, err Start: " + err);
@@ -392,7 +363,7 @@ class CastingPlayerArrayAdapter extends ArrayAdapter<CastingPlayer> {
         player.getDeviceType() > 0
             ? (aux.isEmpty() ? "" : ", ") + "Device Type: " + player.getDeviceType()
             : "";
-    aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP: " + (player.getNumberIPs() > 0);
+    aux += (aux.isEmpty() ? "" : ", ") + "Resolved IP?: " + (player.getIpAddresses().size() > 0);
 
     aux = aux.isEmpty() ? aux : "\n" + aux;
     return main + aux;

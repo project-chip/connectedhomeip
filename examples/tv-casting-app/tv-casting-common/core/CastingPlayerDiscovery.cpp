@@ -40,7 +40,7 @@ CastingPlayerDiscovery * CastingPlayerDiscovery::GetInstance()
     return _castingPlayerDiscovery;
 }
 
-CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint64_t deviceTypeFilter)
+CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 {
     ChipLogProgress(Discovery, "CastingPlayerDiscovery::StartDiscovery() called");
     VerifyOrReturnError(mState == DISCOVERY_READY, CHIP_ERROR_INCORRECT_STATE);

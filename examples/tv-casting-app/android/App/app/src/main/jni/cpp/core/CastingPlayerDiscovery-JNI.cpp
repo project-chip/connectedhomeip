@@ -127,15 +127,32 @@ public:
 // Initialize the static instance to nullptr
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::discoveryDelegateImplSingletonInstance = nullptr;
 
-JNI_METHOD(jobject, startDiscovery)(JNIEnv * env, jobject, jint discoveryTargetDeviceType)
+JNI_METHOD(jobject, startDiscovery)(JNIEnv * env, jobject, jobject targetDeviceTypeLong = nullptr)
 {
     chip::DeviceLayer::StackLock lock;
-    ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::startDiscovery() called with discoveryTargetDeviceType: %lu",
-                    (uint64_t) discoveryTargetDeviceType);
+    ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::startDiscovery() called");
     CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
 
-    // Start CastingPlayer discovery, 35 represents device type of Matter Casting Player
-    CHIP_ERROR err = CastingPlayerDiscovery::GetInstance()->StartDiscovery((uint64_t) discoveryTargetDeviceType);
+    // Start CastingPlayer discovery
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (targetDeviceTypeLong == nullptr)
+    {
+        ChipLogProgress(AppServer,
+                        "CastingPlayerDiscovery-JNI::startDiscovery() received null target device type. Using default type.");
+        err = CastingPlayerDiscovery::GetInstance()->StartDiscovery();
+    }
+    else
+    {
+        // Get the long value from the Java Long object
+        jclass longClass          = env->GetObjectClass(targetDeviceTypeLong);
+        jmethodID longValueMethod = env->GetMethodID(longClass, "longValue", "()J");
+        jlong jTargetDeviceType   = env->CallLongMethod(targetDeviceTypeLong, longValueMethod);
+        env->DeleteLocalRef(longClass);
+
+        ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::startDiscovery() discovery target device type: %u",
+                        static_cast<uint32_t>(jTargetDeviceType));
+        err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(static_cast<uint32_t>(jTargetDeviceType));
+    }
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayerDiscovery-JNI startDiscovery() err: %" CHIP_ERROR_FORMAT, err.Format());

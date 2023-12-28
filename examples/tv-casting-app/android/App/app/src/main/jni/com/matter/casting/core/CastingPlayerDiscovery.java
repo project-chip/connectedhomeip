@@ -21,11 +21,11 @@ import com.matter.casting.support.MatterError;
 import java.util.List;
 
 /**
- * The CastingPlayerDiscovery interface defines the API to control Matter Casting Player discovery
- * over DNS-SD, and to collect discovery results. Discovery is centrally managed by the native C++
- * layer in the Matter SDK. This class exposes native functions to add and remove a
- * CastingPlayerChangeListener, which contains the C++ to Java callbacks for when Casting Players
- * are discovered, updated, or lost from the network. This class is a singleton.
+ * The CastingPlayerDiscovery interface defines the client API to control Matter Casting Player
+ * discovery over DNS-SD, and to collect discovery results. This interface defines the methods to
+ * add and remove a CastingPlayerChangeListener. It also defines the CastingPlayerChangeListener
+ * handler class which must be implemented by the API client. The handler contains the methods
+ * called when Casting Players are discovered, updated, or lost from the network.
  */
 public interface CastingPlayerDiscovery {
 
@@ -38,11 +38,12 @@ public interface CastingPlayerDiscovery {
   /**
    * Starts Casting Players discovery or returns an error.
    *
-   * @param discoveryTargetDeviceType the target device type to be discovered using DNS-SD. 35
-   *     represents device type of Matter Casting Player.
+   * @param discoveryTargetDeviceType the target device type to be discovered using DNS-SD. For
+   *     example: 35 represents device type of Matter Casting Video Player. If "null" is passed in,
+   *     discovery will default to all "_matterd._udp" device types.
    * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
    */
-  MatterError startDiscovery(int discoveryTargetDeviceType);
+  MatterError startDiscovery(Long discoveryTargetDeviceType);
 
   /**
    * Stops Casting Players discovery or returns an error.
@@ -53,7 +54,7 @@ public interface CastingPlayerDiscovery {
 
   /**
    * Adds a CastingPlayerChangeListener instance to be used during discovery. The
-   * CastingPlayerChangeListener contains the C++ to Java callbacks for when Casting Players are
+   * CastingPlayerChangeListener defines the handler methods for when Casting Players are
    * discovered, updated, or lost from the network. Should be called prior to calling
    * MatterCastingPlayerDiscovery.startDiscovery().
    *
@@ -64,7 +65,7 @@ public interface CastingPlayerDiscovery {
   MatterError addCastingPlayerChangeListener(CastingPlayerChangeListener listener);
 
   /**
-   * Removes CastingPlayerChangeListener from the native layer.
+   * Removes CastingPlayerChangeListener added by addCastingPlayerChangeListener().
    *
    * @param listener the specific instance of CastingPlayerChangeListener to be removed.
    * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
@@ -72,38 +73,38 @@ public interface CastingPlayerDiscovery {
   MatterError removeCastingPlayerChangeListener(CastingPlayerChangeListener listener);
 
   /**
-   * The CastingPlayerChangeListener can discover CastingPlayers by implementing the onAdded,
-   * onChanged and onRemoved callbacks which are called as CastingPlayers, are discovered, updated,
-   * or lost from the network. The onAdded(), onChanged() and onRemoved() callbacks must be
-   * implemented by the APIs client.
+   * The CastingPlayerChangeListener can discover CastingPlayers by implementing the onAdded(),
+   * onChanged() and onRemoved() callbacks which are called as CastingPlayers, are discovered,
+   * updated, or lost from the network. The onAdded(), onChanged() and onRemoved() handlers must
+   * be implemented by the API client.
    */
   abstract class CastingPlayerChangeListener {
     static final String TAG = CastingPlayerChangeListener.class.getSimpleName();
 
     /**
-     * Called by the native C++ layer when a Casting Player is added to the local network.
+     * This handler is called when a Casting Player is added to the network.
      *
      * @param castingPlayer the Casting Player added.
      */
     public abstract void onAdded(CastingPlayer castingPlayer);
 
     /**
-     * Called by the native C++ layer when a Casting Player on the local network is changed.
+     * This handler is called when a Casting Player previously detected on the network is changed.
      *
      * @param castingPlayer the Casting Player changed.
      */
     public abstract void onChanged(CastingPlayer castingPlayer);
 
     /**
-     * Called by the native C++ layer when a Casting Player is removed from the local network.
+     * This handler is called when a Casting Player previously detected on the network is removed.
      *
      * @param castingPlayer the Casting Player removed.
      */
     public abstract void onRemoved(CastingPlayer castingPlayer);
 
     /**
-     * The following methods are used to catch possible exceptions thrown by the methods above, when
-     * not implemented correctly.
+     * The following methods are used to catch possible exceptions thrown by the methods above
+     * (onAdded(), onChanged() and onRemoved()), when not implemented correctly by the client.
      */
     protected final void _onAdded(CastingPlayer castingPlayer) {
       try {

@@ -32,12 +32,11 @@ public class MatterCastingPlayer implements CastingPlayer {
   private String deviceName;
   private String hostName;
   private String instanceName;
-  private int numberIPs;
   private List<InetAddress> ipAddresses;
   private int port;
   private int productId;
   private int vendorId;
-  private int deviceType;
+  private long deviceType;
 
   public MatterCastingPlayer(
       boolean connected,
@@ -45,18 +44,16 @@ public class MatterCastingPlayer implements CastingPlayer {
       String hostName,
       String deviceName,
       String instanceName,
-      int numberIPs,
       List<InetAddress> ipAddresses,
       int port,
       int productId,
       int vendorId,
-      int deviceType) {
+      long deviceType) {
     this.connected = connected;
     this.deviceId = deviceId;
     this.hostName = hostName;
     this.deviceName = deviceName;
     this.instanceName = instanceName;
-    this.numberIPs = numberIPs;
     this.ipAddresses = ipAddresses;
     this.port = port;
     this.productId = productId;
@@ -97,12 +94,6 @@ public class MatterCastingPlayer implements CastingPlayer {
     return this.instanceName;
   }
 
-  /** @return an int, corresponding to the number of valid IP addresses for this Casting PLayer. */
-  @Override
-  public int getNumberIPs() {
-    return this.numberIPs;
-  }
-
   /** @return a list of valid IP addresses for this Casting PLayer. */
   @Override
   public List<InetAddress> getIpAddresses() {
@@ -125,7 +116,7 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
-  public int getDeviceType() {
+  public long getDeviceType() {
     return this.deviceType;
   }
 

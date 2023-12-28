@@ -21,10 +21,9 @@ import java.util.List;
 
 /**
  * MatterCastingPlayerDiscovery provides an API to control Matter Casting Player discovery over
- * DNS-SD, and to collect discovery results. Discovery is centrally managed by the native C++ layer
- * in the Matter SDK. This class exposes native functions to add and remove a
- * CastingPlayerChangeListener, which contains the C++ to Java callbacks for when Casting Players
- * are discovered, updated, or lost from the network. This class is a singleton.
+ * DNS-SD, and to collect discovery results. This class provides methods to add and remove a
+ * CastingPlayerChangeListener, which contains the handlers for when Casting Players are discovered,
+ * updated, or lost from the network. This class is a singleton.
  */
 public final class MatterCastingPlayerDiscovery implements CastingPlayerDiscovery {
   private static final String TAG = MatterCastingPlayerDiscovery.class.getSimpleName();
@@ -48,12 +47,13 @@ public final class MatterCastingPlayerDiscovery implements CastingPlayerDiscover
   /**
    * Starts Casting Players discovery or returns an error.
    *
-   * @param discoveryTargetDeviceType the target device type to be discovered using DNS-SD. 35
-   *     represents device type of Matter Casting Player.
+   * @param discoveryTargetDeviceType the target device type to be discovered using DNS-SD. For
+   *     example: 35 represents device type of Matter Casting Video Player. If "null" is passed in,
+   *     discovery will default to all "_matterd._udp" device types.
    * @return a specific MatterError if the the operation failed or NO_ERROR if succeeded.
    */
   @Override
-  public native MatterError startDiscovery(int discoveryTargetDeviceType);
+  public native MatterError startDiscovery(Long discoveryTargetDeviceType);
 
   /**
    * Stops Casting Players discovery or returns an error.
@@ -65,7 +65,7 @@ public final class MatterCastingPlayerDiscovery implements CastingPlayerDiscover
 
   /**
    * Adds a CastingPlayerChangeListener instance to be used during discovery. The
-   * CastingPlayerChangeListener contains the C++ to Java callbacks for when Casting Players are
+   * CastingPlayerChangeListener defines the handler methods for when Casting Players are
    * discovered, updated, or lost from the network. Should be called prior to calling
    * MatterCastingPlayerDiscovery.startDiscovery().
    *
