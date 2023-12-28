@@ -160,10 +160,11 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BASE_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_DTC_OVERLAY_FILE};${MARS_BOOT_DTC_OVERLAY_FILE}"
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
+    message(STATUS "MCUBOOT DTC_OVERLAY_FILE is set to: " ${DTC_OVERLAY_FILE})
 
     add_custom_target(merge_mcuboot ALL
         COMMAND
@@ -224,16 +225,8 @@ function(set_overlays)
   set(BASE_BOARD ${BASE_BOARD} CACHE STRING "" FORCE)
   message(STATUS "SET BASE BOARD:" ${BASE_BOARD} ", BOARD:" ${BOARD})
 
-  if(${TLNK_MARS_BOARD} MATCHES y)
-    if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_mars_boot.overlay")
-      set(MARS_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_mars_boot.overlay")
-    else()
-      unset(MARS_BOOT_DTC_OVERLAY_FILE)
-    endif()
-  endif()
-
   if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
-      set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+      set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay" CACHE STRING "" FORCE)
       message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
   else()
       set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay" CACHE STRING "" FORCE)
@@ -249,7 +242,7 @@ function(set_overlays)
     unset(GLOBAL_DTC_OVERLAY_FILE)
   endif()
 
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} CACHE STRING "" FORCE)
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} CACHE STRING "" FORCE)
   message(STATUS "DTC_OVERLAY_FILE is set to: " ${DTC_OVERLAY_FILE})
 
 endfunction() # set_overlays

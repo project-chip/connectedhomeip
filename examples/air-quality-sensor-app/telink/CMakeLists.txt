@@ -19,8 +19,6 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
-set(ignoreMe "${TLNK_MARS_BOARD}")
-
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
   set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay" CACHE STRING "" FORCE)
 else()
@@ -28,9 +26,9 @@ else()
 endif()
 
 include( ${CHIP_ROOT}/config/telink/chip-module/CMakeLists.txt OPTIONAL)
-set_overlays() # call from config/telink/chip-module/CMakeLists.txt
+set_overlays() # from config/telink/chip-module/CMakeLists.txt
 
-set(CONF_FILE ${MARS_CONF_OVERLAY_FILE} prj.conf)
+set(CONF_FILE ${CONF_OVERLAY_FILE} prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
