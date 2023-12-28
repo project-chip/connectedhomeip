@@ -107,8 +107,7 @@ AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId cluster
     return (EMBER_ZCL_STATUS_FAILURE);
 }
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
-                                             const Span<DataVersion> & dataVersionStorage,
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, Span<DataVersion> && dataVersionStorage,
                                              const Span<const EmberAfDeviceType> & deviceTypeList)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();
@@ -165,8 +164,7 @@ EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointTy
     return kNoCurrentEndpointId;
 }
 
-EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
-                                             const Span<DataVersion> & dataVersionStorage,
+EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, Span<DataVersion> && dataVersionStorage,
                                              const Span<const EmberAfDeviceType> & deviceTypeList, EndpointId desiredEndpointId)
 {
     CatalogVendorApp vendorApp = app->GetApplicationBasicDelegate()->GetCatalogVendorApp();

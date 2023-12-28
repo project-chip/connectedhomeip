@@ -251,7 +251,7 @@ DataVersion gComposedTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters
 // ---------------------------------------------------------------------------
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
+                      Span<DataVersion> && dataVersionStorage, chip::EndpointId parentEndpointId = chip::kInvalidEndpointId)
 {
     uint8_t index = 0;
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)

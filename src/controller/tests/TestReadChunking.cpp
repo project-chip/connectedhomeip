@@ -497,7 +497,8 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -560,7 +561,8 @@ void TestReadChunking::TestListChunking(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, dataVersionSpan);
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -665,7 +667,8 @@ void TestReadChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpoint3Clusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, dataVersionSpan);
 
     app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::UnitTesting::Id, kTestBadAttribute);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -730,7 +733,8 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
                                    app::ReadClient::InteractionType::Subscribe);
         // Enable the new endpoint
-        emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+        Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+        emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
         NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
@@ -739,7 +743,7 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablished);
         readCallback.mAttributeCount = 0;
 
-        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
+        emberAfSetDynamicEndpoint(0, kTestEndpointId4, &testEndpoint4, dataVersionSpan);
 
         ctx.DrainAndServiceIO();
 
@@ -924,8 +928,10 @@ void TestReadChunking::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * a
     gMutableAttrAccess.Reset();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage1));
-    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, Span<DataVersion>(dataVersionStorage5));
+    Span<DataVersion> dataVersionSpan1 = Span<DataVersion>(dataVersionStorage1);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan1);
+    Span<DataVersion> dataVersionSpan5 = Span<DataVersion>(dataVersionStorage5);
+    emberAfSetDynamicEndpoint(1, kTestEndpointId5, &testEndpoint5, dataVersionSpan5);
 
     {
         app::AttributePathParams attributePath;

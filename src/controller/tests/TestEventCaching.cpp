@@ -176,7 +176,8 @@ void TestReadEvents::TestBasicCaching(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;

@@ -317,7 +317,8 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -384,7 +385,8 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;
@@ -461,7 +463,8 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint4, dataVersionSpan);
 
     chip::EventNumber firstEventNumber;
     chip::EventNumber lastEventNumber;

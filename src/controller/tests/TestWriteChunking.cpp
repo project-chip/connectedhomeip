@@ -197,7 +197,8 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -272,7 +273,8 @@ void TestWriteChunking::TestBadChunking(nlTestSuite * apSuite, void * apContext)
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -353,7 +355,8 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -430,7 +433,8 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
@@ -613,7 +617,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
+    Span<DataVersion> dataVersionSpan = Span<DataVersion>(dataVersionStorage);
+    emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, dataVersionSpan);
 
     // Register our fake attribute access interface.
     registerAttributeAccessOverride(&testServer);
