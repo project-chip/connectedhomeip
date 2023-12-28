@@ -58,7 +58,7 @@ tests:
       attribute: "SelectedDrynessLevel"
       response:
           constraints:
-              type: int8u
+              type: enum8
               minValue: 0
               maxValue: 15
 
