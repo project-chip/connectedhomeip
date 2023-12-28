@@ -75,8 +75,8 @@ public interface CastingPlayerDiscovery {
   /**
    * The CastingPlayerChangeListener can discover CastingPlayers by implementing the onAdded(),
    * onChanged() and onRemoved() callbacks which are called as CastingPlayers, are discovered,
-   * updated, or lost from the network. The onAdded(), onChanged() and onRemoved() handlers must
-   * be implemented by the API client.
+   * updated, or lost from the network. The onAdded(), onChanged() and onRemoved() handlers must be
+   * implemented by the API client.
    */
   abstract class CastingPlayerChangeListener {
     static final String TAG = CastingPlayerChangeListener.class.getSimpleName();
