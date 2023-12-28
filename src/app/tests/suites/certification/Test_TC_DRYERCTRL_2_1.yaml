@@ -88,7 +88,7 @@ tests:
       response:
           value: SupportedDrynessLevel
           constraints:
-              type: int8u
+              type: enum8
 
     - label:
           "Step 6: TH writes an unsupported SelectedDrynessLevel attribute that
