@@ -17,8 +17,16 @@ Please refer
 [Building and Commissioning](../../../docs/guides/stm32_getting_started_guide.md#building-the-example-application)
 guides to get started
 
+Note: the following command from the original repository is not correct. The correct one is as followed.
 ```
+// this command is not working, -lighting shall be -light
 ./scripts/build/build_examples.py --target stm32-$stm32_BOARD-lighting build
+```
+The working command is
+./scripts/build/build_examples.py --target stm32-stm32wb5mm-dk-light build
+```
+// this is the working command
+
 ```
 
 ## Cluster Control
