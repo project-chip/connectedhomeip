@@ -47,5 +47,6 @@ source_set("handler") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/messaging",
     "${chip_root}/src/protocols",
+    "${chip_root}/src/app",
   ]
 }

@@ -51,7 +51,7 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
 chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
-chip::app::CheckInMessageHandler CHIPCommand::sCheckInHandler;
+chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {
 

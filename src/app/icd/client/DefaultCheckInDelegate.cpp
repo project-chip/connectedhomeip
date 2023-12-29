@@ -20,6 +20,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <memory>
 
 namespace chip {
 namespace app {
@@ -32,19 +33,31 @@ CHIP_ERROR DefaultCheckInDelegate::Init(ICDClientStorage * storage)
     return CHIP_NO_ERROR;
 }
 
-void DefaultCheckInDelegate::OnCheckInComplete(ICDClientInfo & clientInfo)
+void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 {
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
-void DefaultCheckInDelegate::OnRefreshKey(ByteSpan & keyData)
+void DefaultCheckInDelegate::OnRefreshKeyGenerate(const ICDClientInfo & clientInfo, uint8_t * keyData, uint8_t keyLength)
 {
-    uint8_t randomGeneratedSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
-    chip::Crypto::DRBG_get_bytes(randomGeneratedSymmetricKey, sizeof(randomGeneratedSymmetricKey));
-    keyData = ByteSpan(randomGeneratedSymmetricKey);
+    chip::Crypto::DRBG_get_bytes(keyData, keyLength);
+    ICDRefreshKeyInfo refreshKeyInfo;
+    refreshKeyInfo.clientInfo = clientInfo;
+    memcpy(&refreshKeyInfo.newKey, keyData, keyLength);
+    icdRefreshKeyMap.insert(make_pair(clientInfo.peer_node, refreshKeyInfo));
 }
+
+CHIP_ERROR DefaultCheckInDelegate::OnRefreshKeyRetrieve(const ScopedNodeId & nodeId, ICDRefreshKeyInfo & refreshKeyInfo)
+{
+    // Todo : Check if CHIP_ERROR_KEY_NOT_FOUND can be used here
+    VerifyOrReturnError(icdRefreshKeyMap.find(nodeId) != icdRefreshKeyMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    refreshKeyInfo = icdRefreshKeyMap.at(nodeId);
+    return CHIP_NO_ERROR;
+}
+
+void DefaultCheckInDelegate::OnRegistrationComplete(const ICDClientInfo & clientInfo) {}
 
 } // namespace app
 } // namespace chip

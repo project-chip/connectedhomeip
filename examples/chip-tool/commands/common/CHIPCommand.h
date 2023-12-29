@@ -129,7 +129,10 @@ protected:
 
     // Shut down the command.  After a Shutdown call the command object is ready
     // to be used for another command invocation.
-    virtual void Shutdown() { ResetArguments(); }
+    virtual void Shutdown()
+    {
+        ResetArguments();
+    }
 
     // Clean up any resources allocated by the command.  Some commands may hold
     // on to resources after Shutdown(), but Cleanup() will guarantee those are
@@ -140,12 +143,18 @@ protected:
     // can keep doing work as needed.  Cleanup() will be called when quitting
     // interactive mode.  This method will be called before Shutdown, so it can
     // use member values that Shutdown will normally reset.
-    virtual bool DeferInteractiveCleanup() { return false; }
+    virtual bool DeferInteractiveCleanup()
+    {
+        return false;
+    }
 
     // If true, the controller will be created with server capabilities enabled,
     // such as advertising operational nodes over DNS-SD and accepting incoming
     // CASE sessions.
-    virtual bool NeedsOperationalAdvertising() { return mAdvertiseOperational; }
+    virtual bool NeedsOperationalAdvertising()
+    {
+        return mAdvertiseOperational;
+    }
 
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     static void ExecuteDeferredCleanups(intptr_t ignored);
@@ -163,7 +172,7 @@ protected:
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
     static chip::app::DefaultCheckInDelegate sCheckInDelegate;
-    static chip::app::CheckInMessageHandler sCheckInHandler;
+    static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();

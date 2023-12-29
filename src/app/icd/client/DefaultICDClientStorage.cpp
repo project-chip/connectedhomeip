@@ -465,10 +465,6 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
 CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
                                                           CounterType & counter)
 {
-    /*appDataBuffer is the working buffer that will be used to retrieve data from the payload.
-     *counter to retrieve - 4 bytes
-     *appData to retrieve - 2 bytes(activeModeThreshold)
-     */
     uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();

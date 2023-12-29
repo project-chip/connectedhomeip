@@ -22,8 +22,10 @@
  *
  */
 
+#include <app/InteractionModelTimeout.h>
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/ICDRefreshKeyInfo.h>
 
 #include <cinttypes>
 
@@ -32,6 +34,9 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 
+#include "controller/InvokeInteraction.h"
+#include <app/InteractionModelEngine.h>
+#include <app/OperationalSessionSetup.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -40,8 +45,12 @@ namespace app {
 inline constexpr uint64_t kCheckInCounterMax = (1ULL << 32);
 inline constexpr uint32_t kKeyRefreshLimit   = (1U << 31);
 
-CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
-                                       CheckInDelegate * delegate)
+CheckInHandler::CheckInHandler() :
+    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+{}
+
+CHIP_ERROR CheckInHandler::Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage,
+                                CheckInDelegate * delegate)
 {
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(clientStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -55,9 +64,10 @@ CHIP_ERROR CheckInMessageHandler::Init(Messaging::ExchangeManager * exchangeMana
     return mpExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn, this);
 }
 
-void CheckInMessageHandler::Shutdown()
+void CheckInHandler::Shutdown()
 {
     mpICDClientStorage = nullptr;
+    mpCheckInDelegate  = nullptr;
     if (mpExchangeManager)
     {
         mpExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::ICD_CheckIn);
@@ -65,7 +75,7 @@ void CheckInMessageHandler::Shutdown()
     }
 }
 
-CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
+CHIP_ERROR CheckInHandler::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate)
 {
     // Return error for wrong message type
     VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn),
@@ -75,8 +85,8 @@ CHIP_ERROR CheckInMessageHandler::OnUnsolicitedMessageReceived(const PayloadHead
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                    System::PacketBufferHandle && payload)
+CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                             System::PacketBufferHandle && payload)
 {
     // If the message type is not ICD_CheckIn, return CHIP_NO_ERROR and exit
     VerifyOrReturnError(payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::ICD_CheckIn), CHIP_NO_ERROR);
@@ -84,15 +94,15 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
     ByteSpan payloadByteSpan{ payload->Start(), payload->DataLength() };
     ICDClientInfo clientInfo;
     CounterType counter = 0;
-    // If the CheckIn message processing fails, return CHIP_NO_ERROR and exit.
+    // If the check-in message processing fails, return CHIP_NO_ERROR and exit.
     VerifyOrReturnError(CHIP_NO_ERROR == mpICDClientStorage->ProcessCheckInPayload(payloadByteSpan, clientInfo, counter),
                         CHIP_NO_ERROR);
     CounterType receivedCheckInCounterOffset = (counter - clientInfo.start_icd_counter) % kCheckInCounterMax;
 
-    // Detect duplicate CheckIn messages and return CHIP_NO_ERROR on receiving a duplicate message
+    // Detect duplicate check-in messages and return CHIP_NO_ERROR on receiving a duplicate message
     if (receivedCheckInCounterOffset <= clientInfo.offset)
     {
-        ChipLogError(ICD, "A duplicate CheckIn message was received and discarded");
+        ChipLogError(ICD, "A duplicate check-in message was received and discarded");
         return CHIP_NO_ERROR;
     }
 
@@ -101,20 +111,66 @@ CHIP_ERROR CheckInMessageHandler::OnMessageReceived(Messaging::ExchangeContext *
 
     if (refreshKey)
     {
-        ByteSpan newKeyData;
-        mpCheckInDelegate->OnRefreshKey(newKeyData);
-        RegisterClientWithNewKey(clientInfo, newKeyData);
+        uint8_t newKeyData[chip::Crypto::kAES_CCM128_Key_Length];
+        mpCheckInDelegate->OnRefreshKeyGenerate(clientInfo, newKeyData, chip::Crypto::kAES_CCM128_Key_Length);
+        // A new session should be established to re-register the client using the new key. The registration will happen in
+        // mOnDeviceConnected callback
+        EstablishSessionToPeer(clientInfo.peer_node);
     }
-    mpCheckInDelegate->OnCheckInComplete(clientInfo);
+    else
+    {
+        mpCheckInDelegate->OnCheckInComplete(clientInfo);
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CheckInMessageHandler::RegisterClientWithNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData)
+CHIP_ERROR CheckInHandler::RegisterClientWithNewKey(ICDClientInfo & clientInfo, ByteSpan newKey,
+                                                    Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    // TODO - Register the client. On successful registration, update the clientInfo with the new key and store the clientInfo
+    Clusters::IcdManagement::Commands::RegisterClient::Type request;
+    request.checkInNodeID    = clientInfo.peer_node.GetNodeId();
+    request.monitoredSubject = clientInfo.monitored_subject;
+    request.key              = newKey;
+    // TODO1 : We don't have plain data for the old key
+    // TODO2 : Find  the right way to send the registration command. Both the success and failure callbacks for registration should
+    // call OnCheckInComplete
+
     return CHIP_NO_ERROR;
 }
-void CheckInMessageHandler::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
+
+void CheckInHandler::EstablishSessionToPeer(ScopedNodeId peerId)
+{
+    ChipLogProgress(ICD, "Trying to establish a CASE session for re-registering an ICD client");
+    auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
+    VerifyOrReturn(caseSessionManager != nullptr);
+    caseSessionManager->FindOrEstablishSession(peerId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+}
+
+void CheckInHandler::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                           const SessionHandle & sessionHandle)
+{
+    CheckInHandler * const _this = static_cast<CheckInHandler *>(context);
+    VerifyOrDie(_this != nullptr);
+    ICDRefreshKeyInfo refreshKeyInfo;
+    if (CHIP_NO_ERROR !=
+        _this->mpCheckInDelegate->OnRefreshKeyRetrieve(sessionHandle->AsSecureSession()->GetPeer(), refreshKeyInfo))
+    {
+        ChipLogError(ICD, "Failed to retrieve a new key for re-registration of the ICD client");
+    }
+    ByteSpan newKey(refreshKeyInfo.newKey);
+    _this->RegisterClientWithNewKey(refreshKeyInfo.clientInfo, newKey, exchangeMgr, sessionHandle);
+}
+
+void CheckInHandler::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+{
+    CheckInHandler * const _this = static_cast<CheckInHandler *>(context);
+    VerifyOrDie(_this != nullptr);
+
+    ChipLogError(ICD, "Failed to establish CASE for re-registration with error '%" CHIP_ERROR_FORMAT "'", err.Format());
+}
+
+void CheckInHandler::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
 
 } // namespace app
 } // namespace chip

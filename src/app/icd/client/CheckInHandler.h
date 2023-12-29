@@ -18,13 +18,15 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP CheckInMessage unsolicited
+ *      This file defines objects for a CHIP check-in message unsolicited
  *      handler
  *
  */
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/OperationalSessionSetup.h>
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -33,19 +35,27 @@
 
 namespace chip {
 namespace app {
-class CheckInMessageHandler : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
+
+class CheckInHandler : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
 
 public:
     CHIP_ERROR Init(Messaging::ExchangeManager * exchangeManager, ICDClientStorage * clientStorage, CheckInDelegate * delegate);
     void Shutdown();
 
-    virtual ~CheckInMessageHandler() = default;
+    CheckInHandler();
+
+    virtual ~CheckInHandler() = default;
+
+    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                      const SessionHandle & sessionHandle);
+    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
 
 protected:
     // ExchangeDelegate
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
+    CHIP_ERROR
+    OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                      System::PacketBufferHandle && payload) override;
 
     // UnsolicitedMessageHandler
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
@@ -62,7 +72,20 @@ private:
      * @param[in] clientInfo clientInfo object
      * @param[in] keyData New key data to use to re-register the client with the server
      */
-    CHIP_ERROR RegisterClientWithNewKey(ICDClientInfo & clientInfo, const ByteSpan keyData);
+    CHIP_ERROR RegisterClientWithNewKey(ICDClientInfo & clientInfo, ByteSpan newKey, Messaging::ExchangeManager & exchangeMgr,
+                                        const SessionHandle & sessionHandle);
+
+    /**
+     * @brief Sets up a CASE session to the peer, if we can locate a
+     * CASESessionManager.  Returns error if we did not even manage to kick off
+     * a CASE attempt.
+     *
+     * @param[in] peerId Node ID of the peer
+     */
+    void EstablishSessionToPeer(ScopedNodeId peerId);
+
+    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     class CheckInExchangeDispatch : public Messaging::ExchangeMessageDispatch
     {
@@ -86,8 +109,7 @@ private:
 
     Messaging::ExchangeManager * mpExchangeManager = nullptr;
     CheckInDelegate * mpCheckInDelegate            = nullptr;
-    Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeManager; }
-    ICDClientStorage * mpICDClientStorage = nullptr;
+    ICDClientStorage * mpICDClientStorage          = nullptr;
 };
 
 } // namespace app

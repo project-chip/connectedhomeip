@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/icd/client/ICDClientInfo.h>
+#include <app/icd/client/ICDRefreshKeyInfo.h>
 
 namespace chip {
 namespace app {
@@ -26,9 +27,6 @@ namespace app {
 /// Callbacks for check in protocol
 /**
  * @brief The application implementing an ICD client should inherit the CheckInDelegate and implement the listed callbacks
- * OnCheckInComplete will be called on successful processing of a received checkIn message from the server
- * OnRefreshKey will be called when the key needs to be refreshed to avoid check in counter roll over problems. On receiving
- * OnRefreshKey callback, the application needs to generate a new key.
  */
 class DLL_EXPORT CheckInDelegate
 {
@@ -36,21 +34,48 @@ public:
     virtual ~CheckInDelegate() {}
 
     /**
-     * @brief Callback used to let the application know that a checkin message was received and validated.
+     * @brief Callback used to let the application know that a check-in message was received and validated.
      *
-     * @param[in] clientInfo - ClientInfo object of the peer node
+     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
+                               node that sent the check-in message.
      */
-    virtual void OnCheckInComplete(ICDClientInfo & clientInfo) = 0;
+    virtual void OnCheckInComplete(const ICDClientInfo & clientInfo) = 0;
 
     /**
      * @brief Callback used to let the application know that a key refresh is
-     * needed to avoid counter roolover problems.
+     * needed to avoid counter rollover problems.
      *
-     * The implementer of this function should generate a new key
+     * The implementer of this function should generate a new key and store it in a map with peer nodeID as the key and
+     * ICDRefreshKeyInfo as the value.
      *
-     * @param[out] keyData - new key generated
+     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
+                               node that sent the check-in message. The callee can use the clientInfo to determine the type of key
+                               to generate.
+     * @param[out] keyData - pointer to the keyData buffer of size keyDataLength. The implementer of this callback should generate a
+                             new key of size keyLength and copy it to the keyData buffer
+     * @param[in] keyLength - length of the new key to be generated
      */
-    virtual void OnRefreshKey(ByteSpan & keyData) = 0;
+    virtual void OnRefreshKeyGenerate(const ICDClientInfo & clientInfo, uint8_t * keyData, uint8_t keyLength) = 0;
+
+    /**
+     * @brief Callback used to retrieve the refresh key information from the application after establishing a new secure session for
+     * re-registration. The application should maintain a map to store the corresponding ICDRefreshKeyInfo for every peer node.
+     * Please refer to ICDRefreshKeyInfo.h for details.
+     *
+     * @param[in] nodeId - node ID of the peer with whom the client needs to re-register with a new key to avoid rollover problems.
+     * @param[out] refreshKeyInfo - stored refreshKeyInfo for the corresponding nodeId from the ICDRefreshKeyMap
+     */
+    virtual CHIP_ERROR OnRefreshKeyRetrieve(const ScopedNodeId & nodeId, ICDRefreshKeyInfo & refreshKeyInfo) = 0;
+
+    /**
+ * @brief Callback used to let the application know that the re-registration with the new key was successful and provides the
+ * updated ICDClientInfo
+ *
+ * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
+                           node that sent the check-in message. This will have the new key used for registration and the updated icd
+                           counter.
+ */
+    virtual void OnRegistrationComplete(const ICDClientInfo & clientInfo) = 0;
 };
 
 } // namespace app
