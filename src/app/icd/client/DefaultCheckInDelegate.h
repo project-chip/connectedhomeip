@@ -21,7 +21,7 @@
 #include "ICDRefreshKeyInfo.h"
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-#include <unordered_map>   TODO: update check_includes_config.py
+#include <unordered_map> //TODO: update check_includes_config.py
 
 namespace chip {
 namespace app {
