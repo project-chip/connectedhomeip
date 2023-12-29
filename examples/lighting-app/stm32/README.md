@@ -22,11 +22,11 @@ Note: the following command from the original repository is not correct. The cor
 // this command is not working, -lighting shall be -light
 ./scripts/build/build_examples.py --target stm32-$stm32_BOARD-lighting build
 ```
+
 The working command is
-./scripts/build/build_examples.py --target stm32-stm32wb5mm-dk-light build
 ```
 // this is the working command
-
+./scripts/build/build_examples.py --target stm32-stm32wb5mm-dk-light build
 ```
 
 ## Cluster Control
