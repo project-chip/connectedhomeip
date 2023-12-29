@@ -18,7 +18,9 @@
 
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h>
 
+using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
@@ -104,4 +106,37 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     default:
         ChipLogError(AppServer, "Unhandled EVSE Callback type %d", static_cast<int>(cb->type));
     }
+}
+
+bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
+{
+    EnergyEvseTrigger trigger = static_cast<EnergyEvseTrigger>(eventTrigger);
+
+    switch (trigger)
+    {
+    case EnergyEvseTrigger::kBasicFunctionality:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality install");
+        break;
+    case EnergyEvseTrigger::kBasicFunctionalityClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality clear");
+        break;
+    case EnergyEvseTrigger::kEVPluggedIn:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV plugged in");
+        break;
+    case EnergyEvseTrigger::kEVPluggedInClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV unplugged");
+        break;
+    case EnergyEvseTrigger::kEVChargeDemand:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge Demand");
+        break;
+    case EnergyEvseTrigger::kEVChargeDemandClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge NoDemand");
+        break;
+
+    default:
+
+        return false;
+    }
+
+    return true;
 }
