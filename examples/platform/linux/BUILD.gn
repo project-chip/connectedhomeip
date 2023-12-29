@@ -65,6 +65,7 @@ source_set("app-main") {
 
   public_deps = [
     ":smco-test-event-trigger",
+    ":energy-evse-test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:force_stdio",
   ]
