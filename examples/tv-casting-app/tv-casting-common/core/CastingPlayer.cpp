@@ -221,7 +221,7 @@ void CastingPlayer::LogDetail() const
     }
     if (strlen(mAttributes.deviceName) != 0)
     {
-        ChipLogDetail(AppServer, "\tName: %s", mAttributes.deviceName);
+        ChipLogDetail(AppServer, "\tDevice Name: %s", mAttributes.deviceName);
     }
     if (strlen(mAttributes.hostName) != 0)
     {
