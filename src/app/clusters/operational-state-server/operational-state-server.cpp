@@ -26,6 +26,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;

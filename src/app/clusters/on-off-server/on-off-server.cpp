@@ -24,6 +24,7 @@
 #include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <app/util/util.h>
+#include <tracing/macros.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes-server/scenes-server.h>
@@ -341,6 +342,7 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
  */
 EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::CommandId command, bool initiatedByLevelChange)
 {
+    MATTER_TRACE_SCOPE("setOnOffValue", "OnOff");
     EmberAfStatus status;
     bool currentValue, newValue;
 
@@ -567,6 +569,7 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
 
 bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
+    MATTER_TRACE_SCOPE("OffCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Off::Id, false);
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
@@ -575,6 +578,7 @@ bool OnOffServer::offCommand(app::CommandHandler * commandObj, const app::Concre
 
 bool OnOffServer::onCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
+    MATTER_TRACE_SCOPE("OnCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::On::Id, false);
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
@@ -583,6 +587,7 @@ bool OnOffServer::onCommand(app::CommandHandler * commandObj, const app::Concret
 
 bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
+    MATTER_TRACE_SCOPE("ToggleCommand", "OnOff");
     EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Toggle::Id, false);
 
     commandObj->AddStatus(commandPath, app::ToInteractionModelStatus(status));
@@ -592,6 +597,7 @@ bool OnOffServer::toggleCommand(app::CommandHandler * commandObj, const app::Con
 bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::OffWithEffect::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("offWithEffectCommand", "OnOff");
     auto effectId             = commandData.effectIdentifier;
     auto effectVariant        = commandData.effectVariant;
     chip::EndpointId endpoint = commandPath.mEndpointId;
@@ -648,6 +654,7 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 
 bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath)
 {
+    MATTER_TRACE_SCOPE("OnWithRecallGlobalSceneCommand", "OnOff");
     chip::EndpointId endpoint = commandPath.mEndpointId;
 
     if (!SupportsLightingApplications(endpoint))
@@ -709,6 +716,7 @@ uint32_t OnOffServer::calculateNextWaitTimeMS()
 bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("OnWithTimedOffCommand", "OnOff");
     BitFlags<OnOffControlBitmap> onOffControl = commandData.onOffControl;
     uint16_t onTime                           = commandData.onTime;
     uint16_t offWaitTime                      = commandData.offWaitTime;
