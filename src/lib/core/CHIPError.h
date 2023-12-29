@@ -618,7 +618,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
 
-
 // AVAILABLE: 0x16
 
 /**
