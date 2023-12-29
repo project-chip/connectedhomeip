@@ -51,6 +51,6 @@ sl_status_t mpc_attribute_parser_init()
 {
     sl_status_t status = 0;
     status |= mpc_attribute_parser_register(chip::app::Clusters::Descriptor::Id, &mpc_descriptor_cluster_parser);
-    status |= mpc_attribute_parser_register(chip::app::Clusters::OnOff::Id, mpc_onoff_cluster_parser);
+    status |= mpc_attribute_parser_register(chip::app::Clusters::OnOff::Id, mpc_on_off_cluster_parser);
     return status;
 }

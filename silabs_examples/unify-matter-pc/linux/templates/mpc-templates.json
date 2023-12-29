@@ -22,6 +22,16 @@
             "path": "dotdot_mqtt_to_matter.hpp.zapt",
             "name": "Header",
             "output": "dotdot_mqtt_to_matter.hpp"
+        },
+        {
+            "path": "mpc_attribute_cluster_parser.h.zapt",
+            "name": "Header",
+            "output": "mpc_attribute_cluster_parser.h"
+        },
+        {
+            "path": "mpc_attribute_cluster_parser.cpp.zapt",
+            "name": "Header",
+            "output": "mpc_attribute_cluster_parser.cpp"
         }
     ]
 }

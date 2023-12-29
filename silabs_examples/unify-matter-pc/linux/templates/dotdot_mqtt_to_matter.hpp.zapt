@@ -20,7 +20,9 @@
 
 {{#zcl_clusters}}
 {{#if (supportedClusterByMpc code)}}
+{{#if (isCommandHandlingRequired code)}}
 sl_status_t mpc_{{clusterInitName this}} ();
+{{/if}}
 {{/if}}
 {{/zcl_clusters}}
 

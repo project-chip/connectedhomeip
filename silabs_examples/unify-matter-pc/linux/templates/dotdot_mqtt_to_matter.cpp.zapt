@@ -55,6 +55,7 @@ static sl_status_t check_cluster_support_for_node(const dotdot_unid_t unid, dotd
 
 {{#zcl_clusters}}
 {{#if (supportedClusterByMpc code)}}
+{{#if (isCommandHandlingRequired code)}}
 // Callbacks used by the {{asSnakeCaseLower label}} cluster
 {{#zcl_commands}}
 static sl_status_t mpc_{{commandCbFnName this}} (
@@ -97,5 +98,6 @@ sl_status_t mpc_{{clusterInitName this}} ()
 
   return SL_STATUS_OK;
 }
+{{/if}}
 {{/if}}
 {{/zcl_clusters}}

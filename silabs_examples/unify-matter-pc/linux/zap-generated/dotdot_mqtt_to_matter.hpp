@@ -18,6 +18,5 @@
 #include "sl_status.h"
 
 sl_status_t mpc_on_off_cluster_mapper_init();
-sl_status_t mpc_level_cluster_mapper_init();
 
 #endif // DOTDOT_MQTT_TO_MATTER_HPP

@@ -5,8 +5,50 @@ function supportedClusterByMpc(code)
   switch (code) {
   case 6:
     return true // Cluster OnOff
-    case 8: return true // Cluster Level
+    // case 8: return true // Cluster Level
+  case 29:
+    return true
         default: return false
+  }
+}
+
+const supportedAttributesByMpc = {
+  "On/Off": [
+    "0",
+    "16384",
+    "16385",
+    "16386",
+    "16387",
+    "65531",
+    "65532",
+    "65533",
+    "65529",
+    "65528"
+  ],
+  "Descriptor": [
+    "0",
+    "1",
+    "2",
+    "3"
+  ],
+}
+
+const AttributeProcessRequired = {
+  "On/Off": {
+    "65531" : true,
+    "65529" : true,
+  },
+  "Descriptor": {
+    "1" : true,
+    "3" : true,
+  }
+}
+
+function isCommandHandlingRequired(code)
+{
+  switch (code) {
+    case 29: return false
+    default: return true
   }
 }
 
@@ -84,6 +126,43 @@ function commandCbFnName(zclCommand)
     else return asSnakeCaseLower(zclCommand.parent.label) + "_cluster_" + asSnakeCaseLower(zclCommand.label) + "_command"
 }
 
+function supportedAttributes(cluster_name, attribute_id) {
+  if (supportedAttributesByMpc.hasOwnProperty(cluster_name)) {
+    const cluster = supportedAttributesByMpc[cluster_name];
+    const attributeid = String(attribute_id);
+
+    if (cluster.includes(attributeid)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isDefaultNull(zclAttribute){
+  if(zclAttribute.isNullable == true){
+    return true;
+  }
+  return false;
+}
+
+function isEntryTypeNotNull(value){
+  if (value == null){
+    return false;
+  }
+  return true;
+}
+
+function isProcessingRequired(cluster_name, attribute_id){
+  if (AttributeProcessRequired.hasOwnProperty(cluster_name)){
+    const cluster = AttributeProcessRequired[cluster_name];
+    const attributeid = String(attribute_id);
+    if(cluster.hasOwnProperty(attributeid)){
+      return true;
+    }
+  }
+  return false;
+}
+
 exports.isUnifyEnumNameDifferent = isUnifyEnumNameDifferent
 exports.clusterNameWithoutSlash  = clusterNameWithoutSlash
 exports.unifyEnumName            = unifyEnumName
@@ -92,3 +171,8 @@ exports.listComma                = listComma
 exports.commandCbFnName          = commandCbFnName
 exports.asSnakeCaseLower         = asSnakeCaseLower
 exports.supportedClusterByMpc    = supportedClusterByMpc
+exports.supportedAttributes      = supportedAttributes
+exports.isDefaultNull            = isDefaultNull
+exports.isEntryTypeNotNull       = isEntryTypeNotNull
+exports.isProcessingRequired     = isProcessingRequired
+exports.isCommandHandlingRequired= isCommandHandlingRequired

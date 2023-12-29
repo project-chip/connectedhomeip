@@ -38,10 +38,10 @@ using namespace chip::app;
  * @returns sl_status_t SL_STATUS_OK if the attribute parsed successfully.
  *                      SL_STATUS_Fail in case of any failure.
  */
-sl_status_t mpc_onoff_cluster_parser(const ConcreteDataAttributePath & path, TLV::TLVReader * data, attribute_store_node_t mNode);
+sl_status_t mpc_on_off_cluster_parser(const ConcreteDataAttributePath& path, TLV::TLVReader* data, attribute_store_node_t mNode);
 
 /**
- * @brief function that the MPC descriptor cluster parse the attributes
+ * @brief function that the MPC Descriptor cluster parse the attributes
  *
  * @param path          Concrete Data Attribute Path
  * @param * data        Pointer of data to be parse.
@@ -49,8 +49,8 @@ sl_status_t mpc_onoff_cluster_parser(const ConcreteDataAttributePath & path, TLV
  * @returns sl_status_t SL_STATUS_OK if the attribute parsed successfully.
  *                      SL_STATUS_Fail in case of any failure.
  */
-sl_status_t mpc_descriptor_cluster_parser(const ConcreteDataAttributePath & path, TLV::TLVReader * data,
-                                          attribute_store_node_t mNode);
+sl_status_t mpc_descriptor_cluster_parser(const ConcreteDataAttributePath& path, TLV::TLVReader* data,
+    attribute_store_node_t mNode);
 
 /**
  * @brief checks if MPC supports the given cluster
@@ -60,6 +60,5 @@ sl_status_t mpc_descriptor_cluster_parser(const ConcreteDataAttributePath & path
  * @returns true if cluster is supported, false if it is not
  */
 bool is_cluster_supported(chip::ClusterId clusterId);
-
 #endif // MPC_ATTRIBUTE_CLUSTER_PARSER_H
 /** @} end mpc_attribute_cluster_parser */

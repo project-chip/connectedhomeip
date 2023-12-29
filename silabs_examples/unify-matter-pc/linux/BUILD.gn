@@ -34,6 +34,7 @@ config("unify-config") {
     "src/components/mpc_config/include",
     "src/components/mpc_application_monitoring/include",
     "src/components/mpc_attribute_resolver/include",
+    "src/components/mpc_attribute_resolver/src",
     "src/components/mpc_nw_monitor/include",
     "src/components/mpc_attribute_store/include",
     "src",
@@ -59,7 +60,6 @@ config("coverage") {
 static_library("unify-matter-pc-lib") {
   sources = [
     "src/components/mpc_application_monitoring/src/mpc_application_monitoring.c",
-    "src/components/mpc_attribute_resolver/src/mpc_attribute_cluster_parser.cpp",
     "src/components/mpc_attribute_resolver/src/mpc_attribute_parser_fwk.cpp",
     "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver.cpp",
     "src/components/mpc_attribute_resolver/src/mpc_attribute_resolver_callbacks.cpp",
@@ -76,6 +76,7 @@ static_library("unify-matter-pc-lib") {
     "src/mpc_cli.cpp",
     "src/mpc_command_sender.cpp",
     "zap-generated/dotdot_mqtt_to_matter.cpp",
+    "zap-generated/mpc_attribute_cluster_parser.cpp",
   ]
 
   public_deps = [
