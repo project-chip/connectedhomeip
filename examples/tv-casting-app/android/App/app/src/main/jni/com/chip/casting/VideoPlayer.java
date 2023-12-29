@@ -38,6 +38,11 @@ public class VideoPlayer {
   private int numIPs;
   private List<InetAddress> ipAddresses;
   private String hostName;
+  private String instanceName;
+  private long lastDiscoveredMs;
+  private String MACAddress;
+  private boolean isAsleep = false;
+  private int port;
 
   private boolean isInitialized = false;
 
@@ -52,6 +57,11 @@ public class VideoPlayer {
       int numIPs,
       List<InetAddress> ipAddresses,
       String hostName,
+      String instanceName,
+      int port,
+      long lastDiscoveredMs,
+      String MACAddress,
+      boolean isAsleep,
       boolean isConnected) {
     this.nodeId = nodeId;
     this.fabricIndex = fabricIndex;
@@ -64,6 +74,11 @@ public class VideoPlayer {
     this.numIPs = numIPs;
     this.ipAddresses = ipAddresses;
     this.hostName = hostName;
+    this.MACAddress = MACAddress;
+    this.lastDiscoveredMs = lastDiscoveredMs;
+    this.instanceName = instanceName;
+    this.port = port;
+    this.isAsleep = isAsleep;
     this.isInitialized = true;
   }
 
@@ -116,8 +131,8 @@ public class VideoPlayer {
     return Objects.hash(super.hashCode(), nodeId, fabricIndex);
   }
 
-  @java.lang.Override
-  public java.lang.String toString() {
+  @Override
+  public String toString() {
     return "VideoPlayer{"
         + "nodeId="
         + nodeId
@@ -140,10 +155,22 @@ public class VideoPlayer {
         + numIPs
         + ", ipAddresses="
         + ipAddresses
-        + ", isInitialized="
         + ", hostName='"
         + hostName
         + '\''
+        + ", instanceName='"
+        + instanceName
+        + '\''
+        + ", lastDiscoveredMs="
+        + lastDiscoveredMs
+        + ", MACAddress='"
+        + MACAddress
+        + '\''
+        + ", isAsleep="
+        + isAsleep
+        + ", port="
+        + port
+        + ", isInitialized="
         + isInitialized
         + '}';
   }
@@ -178,6 +205,46 @@ public class VideoPlayer {
 
   public int getDeviceType() {
     return deviceType;
+  }
+
+  public int getNumIPs() {
+    return numIPs;
+  }
+
+  public List<InetAddress> getIpAddresses() {
+    return ipAddresses;
+  }
+
+  public String getHostName() {
+    return hostName;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public long getLastDiscoveredMs() {
+    return lastDiscoveredMs;
+  }
+
+  public void setLastDiscoveredMs(long lastDiscoveredMs) {
+    this.lastDiscoveredMs = lastDiscoveredMs;
+  }
+
+  public String getMACAddress() {
+    return MACAddress;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setIsAsleep(boolean asleep) {
+    isAsleep = asleep;
+  }
+
+  public boolean isAsleep() {
+    return isAsleep;
   }
 
   public boolean isInitialized() {

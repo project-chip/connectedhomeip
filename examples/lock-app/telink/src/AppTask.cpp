@@ -17,13 +17,20 @@
  */
 
 #include "AppTask.h"
-#include "BoltLockManager.h"
-
+#include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/data-model/Nullable.h>
+#include <app/server/Server.h>
+#include <credentials/FabricTable.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip::app::Clusters::DoorLock;
+using namespace chip;
+using namespace chip::app;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
+using namespace TelinkDoorLock::LockInitParams;
 
 namespace {
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
@@ -42,10 +49,82 @@ CHIP_ERROR AppTask::Init(void)
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     sLockLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
-    sLockLED.Set(BoltLockMgr().IsLocked());
+    sLockLED.Set(LockMgr().IsLocked());
 #endif
 
-    BoltLockMgr().Init(LockStateChanged);
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state;
+    chip::EndpointId endpointId{ kExampleEndpointId };
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+    chip::app::Clusters::DoorLock::Attributes::LockState::Get(endpointId, state);
+
+    uint8_t numberOfCredentialsPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfCredentialsSupportedPerUser(endpointId, numberOfCredentialsPerUser))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of credentials supported per user when initializing lock endpoint, defaulting to %d "
+                     "[endpointId=%d]",
+                     APP_DEFAULT_CREDENTIAL_COUNT, endpointId);
+        numberOfCredentialsPerUser = APP_DEFAULT_CREDENTIAL_COUNT;
+    }
+
+    uint16_t numberOfUsers = 0;
+    if (!DoorLockServer::Instance().GetNumberOfUserSupported(endpointId, numberOfUsers))
+    {
+        ChipLogError(Zcl,
+                     "Unable to get number of supported users when initializing lock endpoint, defaulting to %d [endpointId=%d]",
+                     APP_DEFAULT_USERS_COUNT, endpointId);
+        numberOfUsers = APP_DEFAULT_USERS_COUNT;
+    }
+
+    uint8_t numberOfWeekdaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfWeekDaySchedulesPerUserSupported(endpointId, numberOfWeekdaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported weekday schedules when initializing lock endpoint, defaulting to %d [endpointId=%d]",
+            APP_DEFAULT_WEEKDAY_SCHEDULE_PER_USER_COUNT, endpointId);
+        numberOfWeekdaySchedulesPerUser = APP_DEFAULT_WEEKDAY_SCHEDULE_PER_USER_COUNT;
+    }
+
+    uint8_t numberOfYeardaySchedulesPerUser = 0;
+    if (!DoorLockServer::Instance().GetNumberOfYearDaySchedulesPerUserSupported(endpointId, numberOfYeardaySchedulesPerUser))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported yearday schedules when initializing lock endpoint, defaulting to %d [endpointId=%d]",
+            APP_DEFAULT_YEARDAY_SCHEDULE_PER_USER_COUNT, endpointId);
+        numberOfYeardaySchedulesPerUser = APP_DEFAULT_YEARDAY_SCHEDULE_PER_USER_COUNT;
+    }
+
+    uint8_t numberOfHolidaySchedules = 0;
+    if (!DoorLockServer::Instance().GetNumberOfHolidaySchedulesSupported(endpointId, numberOfHolidaySchedules))
+    {
+        ChipLogError(
+            Zcl,
+            "Unable to get number of supported holiday schedules when initializing lock endpoint, defaulting to %d [endpointId=%d]",
+            APP_DEFAULT_HOLYDAY_SCHEDULE_PER_USER_COUNT, endpointId);
+        numberOfHolidaySchedules = APP_DEFAULT_HOLYDAY_SCHEDULE_PER_USER_COUNT;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = LockMgr().Init(state,
+                         ParamBuilder()
+                             .SetNumberOfUsers(numberOfUsers)
+                             .SetNumberOfCredentialsPerUser(numberOfCredentialsPerUser)
+                             .SetNumberOfWeekdaySchedulesPerUser(numberOfWeekdaySchedulesPerUser)
+                             .SetNumberOfYeardaySchedulesPerUser(numberOfYeardaySchedulesPerUser)
+                             .SetNumberOfHolidaySchedules(numberOfHolidaySchedules)
+                             .GetLockParam(),
+                         LockStateChanged);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("LockMgr().Init() failed");
+        return err;
+    }
 
     // Disable auto-relock time feature.
     DoorLockServer::Instance().SetAutoRelockTime(kExampleEndpointId, 0);
@@ -53,86 +132,71 @@ CHIP_ERROR AppTask::Init(void)
     return CHIP_NO_ERROR;
 }
 
+/* This is a button handler only */
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    if (BoltLockMgr().IsLocked())
+    switch (LockMgr().getLockState())
     {
-        BoltLockMgr().Unlock(BoltLockManager::OperationSource::kButton);
-    }
-    else
-    {
-        BoltLockMgr().Lock(BoltLockManager::OperationSource::kButton);
+    case LockManager::kState_NotFulyLocked:
+    case LockManager::kState_LockCompleted:
+        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::UNLOCK_ACTION, LockManager::OperationSource::kButton,
+                             kExampleEndpointId);
+        break;
+    case LockManager::kState_UnlockCompleted:
+        LockMgr().LockAction(AppEvent::kEventType_Lock, LockManager::LOCK_ACTION, LockManager::OperationSource::kButton,
+                             kExampleEndpointId);
+        break;
+    default:
+        LOG_INF("Lock is in intermediate state, ignoring button");
+        break;
     }
 }
 
-void AppTask::LockStateChanged(BoltLockManager::State state, BoltLockManager::OperationSource source)
+void AppTask::LockStateChanged(LockManager::State_t state)
 {
     switch (state)
     {
-    case BoltLockManager::State::kLockingInitiated:
-        LOG_INF("Lock action initiated");
+    case LockManager::State_t::kState_LockInitiated:
+        LOG_INF("Callback: Lock action initiated");
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Blink(50, 50);
 #endif
         break;
-    case BoltLockManager::State::kLockingCompleted:
-        LOG_INF("Lock action completed");
+    case LockManager::State_t::kState_LockCompleted:
+        LOG_INF("Callback: Lock action completed");
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Set(true);
 #endif
         break;
-    case BoltLockManager::State::kUnlockingInitiated:
-        LOG_INF("Unlock action initiated");
+    case LockManager::State_t::kState_UnlockInitiated:
+        LOG_INF("Callback: Unlock action initiated");
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Blink(50, 50);
 #endif
         break;
-    case BoltLockManager::State::kUnlockingCompleted:
-        LOG_INF("Unlock action completed");
+    case LockManager::State_t::kState_UnlockCompleted:
+        LOG_INF("Callback: Unlock action completed");
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Set(false);
 #endif
         break;
-    }
-
-    // Handle changing attribute state in the application
-    sAppTask.UpdateClusterState(state, source);
-}
-
-void AppTask::UpdateClusterState(BoltLockManager::State state, BoltLockManager::OperationSource source)
-{
-    DlLockState newLockState;
-
-    switch (state)
-    {
-    case BoltLockManager::State::kLockingCompleted:
-        newLockState = DlLockState::kLocked;
+    case LockManager::State_t::kState_UnlatchInitiated:
+        LOG_INF("Callback: Unbolt action initiated");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+        sLockLED.Blink(75, 25);
+#endif
         break;
-    case BoltLockManager::State::kUnlockingCompleted:
-        newLockState = DlLockState::kUnlocked;
+    case LockManager::State_t::kState_UnlatchCompleted:
+        LOG_INF("Callback: Unbolt action completed");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+        sLockLED.Blink(25, 75);
+#endif
         break;
-    default:
-        newLockState = DlLockState::kNotFullyLocked;
+    case LockManager::State_t::kState_NotFulyLocked:
+        LOG_INF("Callback: Lock not fully locked. Unexpected state");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+        sLockLED.Blink(10, 90);
+#endif
         break;
     }
-
-    SystemLayer().ScheduleLambda([newLockState, source] {
-        chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> currentLockState;
-        chip::app::Clusters::DoorLock::Attributes::LockState::Get(kExampleEndpointId, currentLockState);
-
-        if (currentLockState.IsNull())
-        {
-            // Initialize lock state with start value, but not invoke lock/unlock.
-            chip::app::Clusters::DoorLock::Attributes::LockState::Set(kExampleEndpointId, newLockState);
-        }
-        else
-        {
-            LOG_INF("Updating LockState attribute");
-
-            if (!DoorLockServer::Instance().SetLockState(kExampleEndpointId, newLockState, source))
-            {
-                LOG_ERR("Failed to update LockState attribute");
-            }
-        }
-    });
 }

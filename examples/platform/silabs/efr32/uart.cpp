@@ -32,11 +32,11 @@ extern "C" {
 #include "sl_board_control.h"
 #endif
 #include "sl_uartdrv_instances.h"
+#if SL_WIFI
+#include "spi_multiplex.h"
+#endif // SL_WIFI
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-#include "spi_multiplex.h"
-#endif /* EFR32MG24 && WF200_WIFI */
 #endif
 #ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
@@ -474,18 +474,21 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
-
+#if SL_UARTCTRL_MUX
+    sl_wfx_host_pre_uart_transfer();
+#endif // SL_UARTCTRL_MUX
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
-    sl_wfx_host_pre_uart_transfer();
     UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
-    sl_wfx_host_post_uart_transfer();
 #else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 #endif /* EFR32MG24 && WF200_WIFI */
+#if SL_UARTCTRL_MUX
+    sl_wfx_host_post_uart_transfer();
+#endif // SL_UARTCTRL_MUX
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);

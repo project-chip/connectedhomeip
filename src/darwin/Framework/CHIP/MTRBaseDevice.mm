@@ -86,6 +86,7 @@ NSString * const MTREventPriorityKey = @"eventPriority";
 NSString * const MTREventTimeTypeKey = @"eventTimeType";
 NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
 NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
+NSString * const MTREventIsHistoricalKey = @"eventIsHistorical";
 
 class MTRDataValueDictionaryCallbackBridge;
 
@@ -1141,8 +1142,8 @@ private:
             //
             callback->AdoptReadClient(std::move(readClient));
             callback.release();
-            attributePathParamsList.Release();
-            eventPathParamsList.Release();
+            IgnoreUnusedVariable(attributePathParamsList.Release());
+            IgnoreUnusedVariable(eventPathParamsList.Release());
             return err;
         });
     std::move(*bridge).DispatchAction(self);
@@ -2743,12 +2744,10 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 
 @end
 
-@interface MTREventReport () {
+@implementation MTREventReport {
     NSNumber * _timestampValue;
 }
-@end
 
-@implementation MTREventReport
 + (void)initialize
 {
     // One of our init methods ends up doing Platform::MemoryAlloc.

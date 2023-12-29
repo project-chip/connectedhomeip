@@ -218,7 +218,7 @@ class TLVWriter(object):
             self.putBytes(tag, val)
         elif isinstance(val, Mapping):
             self.startStructure(tag)
-            if type(val) == dict:
+            if type(val) is dict:
                 val = OrderedDict(
                     sorted(val.items(),
                            key=lambda item: tlvTagToSortKey(item[0]))

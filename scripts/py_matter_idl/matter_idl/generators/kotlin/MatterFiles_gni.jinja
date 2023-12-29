@@ -1,0 +1,31 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+matter_structs_sources = [
+{%- for cluster in clientClusters | sort(attribute='name') %}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+{%- for struct in cluster.structs | sort(attribute='name') %}
+{%- if not struct.tag %}
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/structs/{{cluster.name}}Cluster{{struct.name}}.kt",
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+]
+
+matter_eventstructs_sources = [
+{%- for cluster in clientClusters | sort(attribute='name') %}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+{%- for event in cluster.events | sort(attribute='name') %}
+{%- if event.fields %}
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/{{cluster.name}}Cluster{{event.name}}Event.kt",
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+]
+
+matter_clusters_sources = [
+{%- for cluster in clientClusters | sort(attribute='name') %}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/{{cluster.name}}Cluster.kt",
+{%- endfor %}
+]

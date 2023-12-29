@@ -61,15 +61,12 @@
 #define GENERATED_DEFAULTS_COUNT (2)
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 4
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 3
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                              \
-        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* HourFormat */                                                       \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: On/Off (server) */                                                                            \
-            { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                \
+        /* Endpoint: 1, Cluster: On/Off (server) */                                                                                \
+        { (uint16_t) 0xFF, (uint16_t) 0x0, (uint16_t) 0x2 }, /* StartUpOnOff */                                                    \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* Options */                                                      \
@@ -154,7 +151,7 @@
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(SINGLETON) },                       /* UniqueID */         \
             { ZAP_EMPTY_DEFAULT(), 0x00000013, 0, ZAP_TYPE(STRUCT), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* CapabilityMinima */ \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },                                /* FeatureMap */       \
-            { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(SINGLETON) },      /* ClusterRevision */  \
+            { ZAP_SIMPLE_DEFAULT(2), 0x0000FFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(SINGLETON) },      /* ClusterRevision */  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                     \
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                                                                 \
@@ -173,8 +170,8 @@
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                          \
-            { ZAP_MIN_MAX_DEFAULTS_INDEX(0), 0x00000000, 1, ZAP_TYPE(ENUM8),                                                       \
-              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* HourFormat */        \
+            { ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(ENUM8),                                                               \
+              ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* HourFormat */                                      \
             { ZAP_SIMPLE_DEFAULT(0), 0x00000001, 1, ZAP_TYPE(ENUM8),                                                               \
               ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* ActiveCalendarType */                              \
             { ZAP_EMPTY_DEFAULT(), 0x00000002, 0, ZAP_TYPE(ARRAY),                                                                 \
@@ -254,11 +251,11 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000008, 0, ZAP_TYPE(ARRAY), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) },  /* RouteTable */       \
             { ZAP_EMPTY_DEFAULT(), 0x00000009, 4, ZAP_TYPE(INT32U),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* PartitionId */                             \
-            { ZAP_EMPTY_DEFAULT(), 0x0000000A, 1, ZAP_TYPE(INT8U),                                                                 \
+            { ZAP_EMPTY_DEFAULT(), 0x0000000A, 2, ZAP_TYPE(INT16U),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* Weighting */                               \
-            { ZAP_EMPTY_DEFAULT(), 0x0000000B, 1, ZAP_TYPE(INT8U),                                                                 \
+            { ZAP_EMPTY_DEFAULT(), 0x0000000B, 2, ZAP_TYPE(INT16U),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* DataVersion */                             \
-            { ZAP_EMPTY_DEFAULT(), 0x0000000C, 1, ZAP_TYPE(INT8U),                                                                 \
+            { ZAP_EMPTY_DEFAULT(), 0x0000000C, 2, ZAP_TYPE(INT16U),                                                                \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* StableDataVersion */                       \
             { ZAP_EMPTY_DEFAULT(), 0x0000000D, 1, ZAP_TYPE(INT8U),                                                                 \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* LeaderRouterId */                          \
@@ -393,7 +390,7 @@
             { ZAP_EMPTY_DEFAULT(), 0x00000000, 1, ZAP_TYPE(ENUM8), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) }, /* WindowStatus */      \
             { ZAP_EMPTY_DEFAULT(), 0x00000001, 1, ZAP_TYPE(FABRIC_IDX),                                                            \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* AdminFabricIndex */                        \
-            { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(INT16U),                                                                \
+            { ZAP_EMPTY_DEFAULT(), 0x00000002, 2, ZAP_TYPE(VENDOR_ID),                                                             \
               ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* AdminVendorId */                           \
             { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },         /* FeatureMap */                              \
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },           /* ClusterRevision */                         \
@@ -449,7 +446,7 @@
             { ZAP_SIMPLE_DEFAULT(0x01), 0x00004000, 1, ZAP_TYPE(BOOLEAN), 0 },                            /* GlobalSceneControl */ \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00004001, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OnTime */            \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00004002, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OffWaitTime */       \
-            { ZAP_MIN_MAX_DEFAULTS_INDEX(1), 0x00004003, 1, ZAP_TYPE(ENUM8),                                                       \
+            { ZAP_MIN_MAX_DEFAULTS_INDEX(0), 0x00004003, 1, ZAP_TYPE(ENUM8),                                                       \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                          \
                   ZAP_ATTRIBUTE_MASK(NULLABLE) },                            /* StartUpOnOff */                                    \
             { ZAP_SIMPLE_DEFAULT(1), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
@@ -464,7 +461,7 @@
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000004, 2, ZAP_TYPE(INT16U), 0 }, /* CurrentFrequency */                             \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000005, 2, ZAP_TYPE(INT16U), 0 }, /* MinFrequency */                                 \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000006, 2, ZAP_TYPE(INT16U), 0 }, /* MaxFrequency */                                 \
-            { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x0000000F, 1, ZAP_TYPE(BITMAP8),                                                     \
+            { ZAP_MIN_MAX_DEFAULTS_INDEX(1), 0x0000000F, 1, ZAP_TYPE(BITMAP8),                                                     \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* Options */                                          \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000010, 2, ZAP_TYPE(INT16U),                                                         \
               ZAP_ATTRIBUTE_MASK(WRITABLE) }, /* OnOffTransitionTime */                                                            \
@@ -511,7 +508,7 @@
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x0000400B, 2, ZAP_TYPE(INT16U), 0 }, /* ColorTempPhysicalMinMireds */                   \
             { ZAP_SIMPLE_DEFAULT(0xFEFF), 0x0000400C, 2, ZAP_TYPE(INT16U), 0 }, /* ColorTempPhysicalMaxMireds */                   \
             { ZAP_EMPTY_DEFAULT(), 0x0000400D, 2, ZAP_TYPE(INT16U), 0 },        /* CoupleColorTempToLevelMinMireds */              \
-            { ZAP_MIN_MAX_DEFAULTS_INDEX(3), 0x00004010, 2, ZAP_TYPE(INT16U),                                                      \
+            { ZAP_MIN_MAX_DEFAULTS_INDEX(2), 0x00004010, 2, ZAP_TYPE(INT16U),                                                      \
               ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE) |                                                         \
                   ZAP_ATTRIBUTE_MASK(NULLABLE) },                               /* StartUpColorTemperatureMireds */                \
             { ZAP_SIMPLE_DEFAULT(0x1F), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                   \
@@ -1186,9 +1183,9 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 // Array of device types
 #define FIXED_DEVICE_TYPES                                                                                                         \
     {                                                                                                                              \
-        { 0x0016, 1 },                                                                                                             \
+        { 0x00000016, 1 },                                                                                                         \
         {                                                                                                                          \
-            0x0101, 1                                                                                                              \
+            0x00000101, 1                                                                                                          \
         }                                                                                                                          \
     }
 

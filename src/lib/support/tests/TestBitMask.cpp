@@ -98,10 +98,26 @@ void TestBitMaskInvalid(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mask.Raw() == 0x1234);
 }
 
+void TestClear(nlTestSuite * inSuite, void * inContext)
+{
+    BitMask<TestEnum> mask1;
+    BitMask<TestEnum> mask2;
+
+    mask1.Set(TestEnum::kBit_0);
+    mask1.Set(TestEnum::kBits_1_2);
+    mask1.Set(TestEnum::kBits_High8);
+
+    mask2.Set(TestEnum::kBits_1_2);
+    mask1.Clear(mask2);
+
+    NL_TEST_ASSERT(inSuite, mask1.Raw() == 0xFF01);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("BitMask operations", TestBitMaskOperations), //
     NL_TEST_DEF("BitFields logic", TestBitFieldLogic),        //
     NL_TEST_DEF("Invalid operations", TestBitMaskInvalid),    //
+    NL_TEST_DEF("Clear operations", TestClear),               //
     NL_TEST_SENTINEL()                                        //
 };
 
@@ -111,7 +127,7 @@ int TestBitMask()
 {
     nlTestSuite theSuite = { "BitMask tests", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

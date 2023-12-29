@@ -124,7 +124,7 @@ EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
         // Delete volatile keys, since nobody else can after we drop the key ID.
         if (!mIsPersistent)
         {
-            Delete();
+            DestroyKey();
         }
 
         MemoryFree(mContext);
@@ -145,7 +145,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId opaque_id)
     // If the object contains a volatile key, clean it up before reusing the object storage
     if (mHasKey && !mIsPersistent)
     {
-        Delete();
+        DestroyKey();
     }
 
     key_id = psa_key_id_from_opaque(opaque_id);
@@ -342,7 +342,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR EFR32OpaqueKeypair::Delete()
+CHIP_ERROR EFR32OpaqueKeypair::DestroyKey()
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_status_t status = PSA_ERROR_BAD_STATE;

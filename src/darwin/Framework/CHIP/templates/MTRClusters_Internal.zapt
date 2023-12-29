@@ -6,12 +6,5 @@
 #import "MTRDevice.h"
 #import "MTRDevice_Internal.h"
 
-{{#zcl_clusters}}
-
-{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
-@interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
-@property (nonatomic, readonly) MTRDevice *device;
-@end
-{{/if}}
-
-{{/zcl_clusters}}
+// Nothing here for now, but leaving this file in place in case we need to add
+// something.

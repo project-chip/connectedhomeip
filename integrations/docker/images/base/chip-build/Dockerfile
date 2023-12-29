@@ -80,7 +80,6 @@ RUN set -x \
     meson \
     net-tools \
     ninja-build \
-    openjdk-8-jdk \
     pkg-config \
     python-is-python3 \
     python3.9 \
@@ -172,8 +171,9 @@ RUN set -x \
     && git clone https://github.com/google/bloaty.git \
     && mkdir -p bloaty/build \
     && cd bloaty/build \
-    && cmake ../ \
+    && cmake -DCMAKE_BUILD_TYPE=MinSizeRel ../ \
     && make -j8 \
+    && strip bloaty \
     && make install \
     && cd ../.. \
     && rm -rf bloaty \
@@ -188,8 +188,9 @@ RUN set -x \
     && git clone --depth=1 --branch=clang_12 https://github.com/include-what-you-use/include-what-you-use.git \
     && mkdir -p include-what-you-use/build \
     && cd include-what-you-use/build \
-    && cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
+    && cmake -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/usr/lib/llvm-12 -DIWYU_LINK_CLANG_DYLIB=OFF .. \
     && make -j8 \
+    && strip bin/include-what-you-use \
     && make install \
     # Save clang-12 files, so we can restore them after build dependencies cleanup
     && tar -cf clang-12-files.tar $(dpkg -L libclang-common-12-dev |grep /include) /usr/lib/llvm-12/lib/libLLVM-12.so.1 \
@@ -259,3 +260,12 @@ RUN case ${TARGETPLATFORM} in \
     && cd .. \
     && rm -rf node_js \
     && : # last line
+
+# Some things that save space
+# Protoc goes from 108M to 4.6M
+RUN strip /usr/local/bin/protoc*
+
+# CMake documentation not needed, saves 34MB
+# /usr/local/man contains cmake documentation
+RUN rm -rf /usr/local/doc/cmake
+RUN rm -rf /usr/local/man

@@ -15,11 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Project configuration for Matter Controller.
- *
- */
 #ifndef CHIPPROJECTCONFIG_H
 #define CHIPPROJECTCONFIG_H
 

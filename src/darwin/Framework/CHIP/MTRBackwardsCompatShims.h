@@ -59,111 +59,104 @@ typedef NS_OPTIONS(uint8_t, MTRFanControlWindSettingMask) {
  * intermediate names.
  */
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAApplyUpdateAction) {
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionProceed")
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionProceed", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionAwaitNextAction")
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionAwaitNextAction
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionAwaitNextAction", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue")
+    MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateAction");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateAction", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTADownloadProtocol) {
-    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous")
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXSynchronous
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolBDXAsynchronous")
+    MTROTASoftwareUpdateProviderOTADownloadProtocolBDXAsynchronous
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolBDXAsynchronous", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolHTTPS")
+    MTROTASoftwareUpdateProviderOTADownloadProtocolHTTPS
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolHTTPS", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolVendorSpecific")
+    MTROTASoftwareUpdateProviderOTADownloadProtocolVendorSpecific
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolVendorSpecific", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x03,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocol");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocol", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAQueryStatus) {
-    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusUpdateAvailable")
+    MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusUpdateAvailable", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateProviderOTAQueryStatusBusy MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusBusy")
+    MTROTASoftwareUpdateProviderOTAQueryStatusBusy
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusBusy", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusNotAvailable")
+    MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusNotAvailable", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4),
-        tvos(16.4)) MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusDownloadProtocolNotSupported")
+    MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusDownloadProtocolNotSupported", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x03,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatus");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatus", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAAnnouncementReason) {
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4),
-        tvos(16.4)) MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement")
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4),
-        tvos(16.4)) MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonUpdateAvailable")
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUpdateAvailable
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonUpdateAvailable", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4),
-        tvos(16.4)) MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonUrgentUpdateAvailable")
+    MTROTASoftwareUpdateRequestorOTAAnnouncementReasonUrgentUpdateAvailable
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonUrgentUpdateAvailable", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReason");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReason", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAChangeReason) {
-    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonUnknown")
+    MTROTASoftwareUpdateRequestorOTAChangeReasonUnknown
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonUnknown", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonSuccess")
+    MTROTASoftwareUpdateRequestorOTAChangeReasonSuccess
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonSuccess", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonFailure")
+    MTROTASoftwareUpdateRequestorOTAChangeReasonFailure
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonFailure", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonTimeOut")
+    MTROTASoftwareUpdateRequestorOTAChangeReasonTimeOut
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonTimeOut", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x03,
-    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonDelayByProvider")
+    MTROTASoftwareUpdateRequestorOTAChangeReasonDelayByProvider
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonDelayByProvider", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x04,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReason");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReason", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorOTAUpdateState) {
-    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateUnknown")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateUnknown
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateUnknown", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x00,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateIdle")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateIdle
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateIdle", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x01,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateQuerying")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateQuerying
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateQuerying", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x02,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnQuery")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnQuery
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnQuery", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x03,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDownloading")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDownloading
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDownloading", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x04,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateApplying")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateApplying
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateApplying", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x05,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnApply")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnApply
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnApply", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x06,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateRollingBack")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateRollingBack
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateRollingBack", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x07,
-    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnUserConsent")
+    MTROTASoftwareUpdateRequestorOTAUpdateStateDelayedOnUserConsent
+        MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateDelayedOnUserConsent", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2))
     = 0x08,
-} MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    MTR_NEWLY_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateState");
+} MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateState", ios(16.4, 17.2), macos(13.3, 14.2), watchos(9.4, 10.2), tvos(16.4, 17.2));
 
 NS_ASSUME_NONNULL_END

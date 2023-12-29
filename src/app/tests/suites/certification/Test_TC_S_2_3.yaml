@@ -23,9 +23,8 @@ config:
     cluster: "Scenes"
     endpoint: 1
     G1:
-        type: int16u
+        type: group_id
         defaultValue: 0x0101
-    GroupKeyManagement.Endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -45,11 +44,41 @@ tests:
               - name: "SceneTableSize"
                 saveAs: maxScenes
 
+    - label: "Arithmetic operation to get the maxScenes - 1"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenes - 1
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: maxScenesMinusOne
+                value: maxScenes - 1
+
+    - label: "Arithmetic operation to get the fabric Capacity"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenesMinusOne / 2
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: fabricCapacity
+                value: maxScenesMinusOne / 2
+
     - label:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -70,7 +99,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -97,7 +126,7 @@ tests:
 
     - label: "Install ACLs"
       cluster: "Access Control"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -150,7 +179,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: maxScenes / 2
+                value: fabricCapacity
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -506,7 +535,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 1
+                value: fabricCapacity - 1
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -560,14 +589,14 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Wait 1s"
+    - label: "Wait 1+ s"
       PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1050
+                value: 1250
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
@@ -633,7 +662,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 2
+                value: fabricCapacity - 2
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -644,7 +673,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:

@@ -265,8 +265,35 @@ void SecureSessionTable::DefaultEvictionPolicy(EvictionPolicyContext & evictionC
             return a.mNumMatchingOnPeer > b.mNumMatchingOnPeer;
         }
 
-        int doesAMatchSessionHint = a.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
-        int doesBMatchSessionHint = b.mSession->GetPeer() == evictionContext.GetSessionEvictionHint();
+        // We have an evicton hint in two cases:
+        //
+        // 1) When we just established CASE as a responder, the hint is the node
+        //    we just established CASE to.
+        // 2) When starting to establish CASE as an initiator, the hint is the
+        //    node we are going to establish CASE to.
+        //
+        // In case 2, we should not end up here if there is an active session to
+        // the peer at all (because that session should have been used instead
+        // of establishing a new one).
+        //
+        // In case 1, we know we have a session matching the hint, but we don't
+        // want to pick that one for eviction, because we just established it.
+        // So we should not consider a session as matching a hint if it's active
+        // and is the only session to our peer.
+        //
+        // Checking for the "active" state in addition to the "only session to
+        // peer" state allows us to prioritize evicting defuct sessions that
+        // match the hint against other defunct sessions.
+        auto sessionMatchesEvictionHint = [&evictionContext](const SortableSession & session) -> int {
+            if (session.mSession->GetPeer() != evictionContext.GetSessionEvictionHint())
+            {
+                return false;
+            }
+            bool isOnlyActiveSessionToPeer = session.mSession->IsActiveSession() && session.mNumMatchingOnPeer == 0;
+            return !isOnlyActiveSessionToPeer;
+        };
+        int doesAMatchSessionHint = sessionMatchesEvictionHint(a);
+        int doesBMatchSessionHint = sessionMatchesEvictionHint(b);
 
         //
         // Sorting on Key4

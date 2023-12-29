@@ -35,6 +35,9 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -57,6 +60,18 @@ tests:
 
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
       identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1: TH_CR1 commissioned with DUT_CE"
+      identity: "alpha"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -74,9 +89,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Step 2a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -115,9 +131,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Step 4a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -200,29 +217,16 @@ tests:
       response:
           error: FAILURE
 
-    #Issue https://github.com/project-chip/connectedhomeip/issues/21999
     - label:
           "Step 8b: TH_CR2 reads the Basic Information Clusters NodeLabel
           mandatory attribute of DUT_CE"
-      PICS: BINFO.S.A0005 && PICS_USER_PROMPT
-      verification: |
-          Using TH_CR2 read attribute
-
-          Verify read command fail as expected since the DUT_CE is no longer on the network on TH_CR2 (chip-tool) log
-
-          ./chip-tool  basicinformation read node-label 2 0  --commissioner-name beta
-
-          [1678876803.495007][714337:714339] CHIP:SC: Received error (protocol code 1) during pairing process: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root
-          [1678876803.495018][714337:714339] CHIP:IN: SecureSession[0x7f2764026220]: Released - Type:2 LSID:16528
-          [1678876803.495040][714337:714339] CHIP:-: ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1727: CHIP Error 0x000000C9: No shared trusted root at ../../commands/clusters/ModelCommand.cpp:62
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: BINFO.S.A0005
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "NodeLabel"
+      response:
+          error: FAILURE
 
     - label: "Step 9: TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
@@ -232,13 +236,13 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value:
-              [
-                  { Label: "", FabricIndex: 1, NodeID: nodeId },
-                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
-              ]
           constraints:
               type: list
+              contains:
+                  [
+                      { Label: "", FabricIndex: 1, NodeID: nodeId },
+                      { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+                  ]
 
     - label: "Step 11: TH_CR1 opens a commissioning window on DUT_CE using BCM"
       identity: "alpha"
@@ -249,9 +253,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Step 11a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -299,14 +304,14 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value:
-              [
-                  { Label: "", FabricIndex: 1, NodeID: nodeId },
-                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
-                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
-              ]
           constraints:
               type: list
+              contains:
+                  [
+                      { Label: "", FabricIndex: 1, NodeID: nodeId },
+                      { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                      { Label: "", FabricIndex: 3, NodeID: nodeId3 },
+                  ]
 
     - label: "Step 13a: Remove TH2 FabricIndex"
       PICS: OPCREDS.S.C0a.Rsp && CADMIN.S

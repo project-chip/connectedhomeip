@@ -24,8 +24,6 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#include <messaging/ReliableMessageMgr.h>
-
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
@@ -35,11 +33,12 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h>  // nogncheck
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/ICDNotifier.h>          // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -89,9 +88,10 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         ChipLogDetail(ExchangeManager,
-                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter " NextRetransTimeCtr:%" PRIu64,
+                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
+                      " NextRetransTimeCtr: 0x" ChipLogFormatX64,
                       ChipLogValueExchange(&entry->ec.Get()), entry->retainedBuf.GetMessageCounter(),
-                      entry->nextRetransTime.count());
+                      ChipLogValueX64(entry->nextRetransTime.count()));
         return Loop::Continue;
     });
 #endif
@@ -102,7 +102,7 @@ void ReliableMessageMgr::ExecuteActions()
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at %" PRIu64 "ms", now.count());
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at 0x" ChipLogFormatX64 "ms", ChipLogValueX64(now.count()));
 #endif
 
     ExecuteForAllContext([&](ReliableMessageContext * rc) {
@@ -168,10 +168,7 @@ void ReliableMessageMgr::ExecuteActions()
                         " Send Cnt %d",
                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
 
-        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-        System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-        entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
+        CalculateNextRetransTime(*entry);
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -262,7 +259,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // Implement:
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
-    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+    mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
@@ -272,10 +269,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-    System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-    System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-    entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    CalculateNextRetransTime(*entry);
     StartTimer();
 }
 
@@ -403,8 +397,10 @@ void ReliableMessageMgr::StartTimer()
         const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
 
 #if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer at %" PRIu64 "ms wake at %" PRIu64 "ms (in %" PRIu64 "ms)",
-                      now.count(), nextWakeTime.count(), nextWakeDelay.count());
+        ChipLogDetail(ExchangeManager,
+                      "ReliableMessageMgr::StartTimer at 0x" ChipLogFormatX64 "ms wake at 0x" ChipLogFormatX64
+                      "ms (in 0x" ChipLogFormatX64 "ms)",
+                      ChipLogValueX64(now.count()), ChipLogValueX64(nextWakeTime.count()), ChipLogValueX64(nextWakeDelay.count()));
 #endif
         VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }
@@ -454,6 +450,27 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
     }
 
     return error;
+}
+
+void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
+{
+    System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
+
+    // Check if we have received at least one application-level message
+    if (entry.ec->HasReceivedAtLeastOneMessage())
+    {
+        // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
+        baseTimeout = entry.ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;
+    }
+    else
+    {
+        // If we haven't received at least one message
+        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
+        baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
+    }
+
+    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry.sendCount);
+    entry.nextRetransTime            = System::SystemClock().GetMonotonicTimestamp() + backoff;
 }
 
 #if CHIP_CONFIG_TEST

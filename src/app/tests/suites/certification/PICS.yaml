@@ -891,7 +891,7 @@ PICS:
     - label:
           "Can the StateValue attribute be changed by manual operation at the
           DUT?"
-      id: BOOL.M.ManuallyControlled
+      id: BOOL.S.M.ManuallyControlled
 
     #
     # client / manually
@@ -5707,7 +5707,7 @@ PICS:
     - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0006
 
-    - label: "Does the device implement the RemainingCapacity attribute?"
+    - label: "Does the device implement the FabricSceneInfo attribute?"
       id: S.S.A0007
 
     #
@@ -6066,10 +6066,10 @@ PICS:
     #
     - label:
           "Does the DUT support reading attribute to get switch state (polling)?"
-      id: SWTCH.C.M.RA
+      id: SWTCH.C.M.SwitchStatePolling
 
     - label: "Does the DUT support eventing to get switch state changes?"
-      id: SWTCH.C.M.EV
+      id: SWTCH.C.M.SwitchStateEventing
 
     - label: "Write all supported optional attributes"
       id: SWTCH.C.AO-WRITE
@@ -7133,6 +7133,12 @@ PICS:
     - label: "Does the DUT (Client) support 24 Hr Hour Format ?"
       id: LTIME.C.A0000.24HR
 
+    #Features
+    - label:
+          "Can the device be configured to use different calendar formats when
+          conveying values to a user ?"
+      id: LTIME.S.F00
+
     # Unit Localization Cluster Test Plan
     - label: "Does the device implement the Unit Localization as a server?"
       id: LUNIT.S
@@ -7311,7 +7317,7 @@ PICS:
           "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
-      id: DGWIFI.S.C00.Tx
+      id: DGWIFI.C.C00.Tx
 
     # Window Covering Cluster Test Plan
     - label:
@@ -7583,36 +7589,6 @@ PICS:
           "Does the DUT(client) have access privileges for the SafetyStatus
           attribute implemented on the server ?"
       id: WNCV.C.A001a
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF8)
-          GeneratedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff8
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF9)
-          AcceptedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff9
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFA)
-          EventList attribute implemented on the server ?"
-      id: WNCV.C.Afffa
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFB)
-          AttributeList attribute implemented on the server ?"
-      id: WNCV.C.Afffb
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFC)
-          FeatureMap attribute implemented on the server ?"
-      id: WNCV.C.Afffc
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFD)
-          ClusterRevision attribute implemented on the server ?"
-      id: WNCV.C.Afffd
 
     #
     # client / commandsGenerated
@@ -8578,10 +8554,10 @@ PICS:
     #
     # Server Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.S.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.S.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"
@@ -8600,10 +8576,10 @@ PICS:
     #
     # Client Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.C.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.C.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"

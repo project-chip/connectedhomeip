@@ -57,3 +57,6 @@
     _Pragma("clang diagnostic pop")
 typedef struct {} variable_hidden_by_mtr_hide;
 // clang-format on
+
+// Default timed interaction timeout, in ms, if another one is not provided.
+#define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000

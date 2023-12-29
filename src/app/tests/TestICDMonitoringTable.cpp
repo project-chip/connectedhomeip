@@ -60,8 +60,39 @@ constexpr uint8_t kKeyBuffer2b[] = {
 constexpr uint8_t kKeyBuffer3a[] = {
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
-// constexpr uint8_t kKeyBuffer3b[] = { 0xf3, 0xe3, 0xd3, 0xc3, 0xb3, 0xa3, 0x93, 0x83, 0x73, 0x63, 0x53, 0x14, 0x33, 0x23, 0x13,
-// 0x03 };
+
+void TestEntryAssignationOverload(nlTestSuite * aSuite, void * aContext)
+{
+    TestSessionKeystoreImpl keystore;
+    ICDMonitoringEntry entry(&keystore);
+
+    // Test Setting Key
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
+
+    entry.fabricIndex = 2;
+
+    NL_TEST_ASSERT(aSuite, !entry.IsValid());
+
+    entry.checkInNodeID    = 34;
+    entry.monitoredSubject = 32;
+
+    // Entry should be valid now
+    NL_TEST_ASSERT(aSuite, entry.IsValid());
+
+    ICDMonitoringEntry entry2;
+
+    NL_TEST_ASSERT(aSuite, !entry2.IsValid());
+
+    entry2 = entry;
+
+    NL_TEST_ASSERT(aSuite, entry2.IsValid());
+
+    NL_TEST_ASSERT(aSuite, entry2.fabricIndex == entry.fabricIndex);
+    NL_TEST_ASSERT(aSuite, entry2.checkInNodeID == entry.checkInNodeID);
+    NL_TEST_ASSERT(aSuite, entry2.monitoredSubject == entry.monitoredSubject);
+
+    NL_TEST_ASSERT(aSuite, entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+}
 
 void TestEntryKeyFunctions(nlTestSuite * aSuite, void * aContext)
 {
@@ -70,6 +101,12 @@ void TestEntryKeyFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Test Setting Key
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
+
+    // Test Setting Key again
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INTERNAL == entry.SetKey(ByteSpan(kKeyBuffer1b)));
+
+    // Test Key Deletion
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.DeleteKey());
 
     // Test Setting Key again
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1b)));
@@ -93,37 +130,41 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     CHIP_ERROR err;
 
     // Insert first entry
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = saving.Set(0, entry);
+    ICDMonitoringEntry entry1(&keystore);
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = saving.Set(0, entry1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert second entry
-    entry.checkInNodeID    = kClientNodeId12;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2a)));
-    err = saving.Set(1, entry);
+    ICDMonitoringEntry entry2(&keystore);
+    entry2.checkInNodeID    = kClientNodeId12;
+    entry2.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry2.SetKey(ByteSpan(kKeyBuffer2a)));
+    err = saving.Set(1, entry2);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert one too many
-    entry.checkInNodeID    = kClientNodeId13;
-    entry.monitoredSubject = kClientNodeId13;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer3a)));
-    err = saving.Set(2, entry);
+    ICDMonitoringEntry entry3(&keystore);
+    entry3.checkInNodeID    = kClientNodeId13;
+    entry3.monitoredSubject = kClientNodeId13;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry3.SetKey(ByteSpan(kKeyBuffer3a)));
+    err = saving.Set(2, entry3);
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Retrieve first entry
     err = loading.Get(0, entry);
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve second entry
     err = loading.Get(1, entry);
@@ -131,47 +172,50 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // No more entries
     err = loading.Get(2, entry);
     NL_TEST_ASSERT(aSuite, 2 == loading.Limit());
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == err);
 
-    // Overwrite first entry
-    entry.checkInNodeID    = kClientNodeId13;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1b)));
-    err = saving.Set(0, entry);
+    // Remove first entry
+    saving.Remove(0);
+
+    ICDMonitoringEntry entry4(&keystore);
+    entry4.checkInNodeID    = kClientNodeId13;
+    entry4.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry4.SetKey(ByteSpan(kKeyBuffer1b)));
+    err = saving.Set(1, entry4);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
-    // Retrieve first entry (modified)
+    // Retrieve first entry (not modified but shifted)
     err = loading.Get(0, entry);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
-    NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
-    NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
-    NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1b, sizeof(kKeyBuffer1b)));
-#endif
-
-    // Retrieve second entry (not modified)
-    err = loading.Get(1, entry);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    // Retrieve second entry
+    err = loading.Get(1, entry);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
+    NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
+    NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
+    NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry4.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 }
 
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
@@ -179,39 +223,47 @@ void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
     ICDMonitoringTable table(storage, kTestFabricIndex1, kMaxTestClients1, &keystore);
-    ICDMonitoringEntry entry(&keystore);
     CHIP_ERROR err;
 
     // Invalid checkInNodeID
-    entry.checkInNodeID    = kUndefinedNodeId;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = table.Set(0, entry);
+    ICDMonitoringEntry entry1(&keystore);
+    entry1.checkInNodeID    = kUndefinedNodeId;
+    entry1.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = table.Set(0, entry1);
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Invalid monitoredSubject
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kUndefinedNodeId;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = table.Set(0, entry);
+    ICDMonitoringEntry entry2(&keystore);
+    entry2.checkInNodeID    = kClientNodeId11;
+    entry2.monitoredSubject = kUndefinedNodeId;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry2.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = table.Set(0, entry2);
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Invalid key (empty)
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry.SetKey(ByteSpan()));
-    err = table.Set(0, entry);
+    ICDMonitoringEntry entry3(&keystore);
+    entry3.checkInNodeID    = kClientNodeId11;
+    entry3.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry3.SetKey(ByteSpan()));
+    err = table.Set(0, entry3);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     // Invalid key (too short)
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry.SetKey(ByteSpan(kKeyBuffer0a)));
+    ICDMonitoringEntry entry4(&keystore);
+    entry4.checkInNodeID    = kClientNodeId11;
+    entry4.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry4.SetKey(ByteSpan(kKeyBuffer0a)));
+    err = table.Set(0, entry4);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Invalid key (too long)
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry.SetKey(ByteSpan(kKeyBuffer0b)));
+    ICDMonitoringEntry entry5(&keystore);
+    entry5.checkInNodeID    = kClientNodeId11;
+    entry5.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == entry5.SetKey(ByteSpan(kKeyBuffer0b)));
+    err = table.Set(0, entry5);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 }
 
 void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void * aContext)
@@ -224,31 +276,35 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     CHIP_ERROR err;
 
     // Insert in first fabric
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = table1.Set(0, entry);
+    ICDMonitoringEntry entry1(&keystore);
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = table1.Set(0, entry1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert in first fabric
-    entry.checkInNodeID    = kClientNodeId12;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1b)));
-    err = table1.Set(1, entry);
+    ICDMonitoringEntry entry2(&keystore);
+    entry2.checkInNodeID    = kClientNodeId12;
+    entry2.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry2.SetKey(ByteSpan(kKeyBuffer1b)));
+    err = table1.Set(1, entry2);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert in second fabric
-    entry.checkInNodeID    = kClientNodeId21;
-    entry.monitoredSubject = kClientNodeId22;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2a)));
-    err = table2.Set(0, entry);
+    ICDMonitoringEntry entry3(&keystore);
+    entry3.checkInNodeID    = kClientNodeId21;
+    entry3.monitoredSubject = kClientNodeId22;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry3.SetKey(ByteSpan(kKeyBuffer2a)));
+    err = table2.Set(0, entry3);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert in second fabric (one too many)
-    entry.checkInNodeID    = kClientNodeId22;
-    entry.monitoredSubject = kClientNodeId21;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2b)));
-    err = table2.Set(1, entry);
+    ICDMonitoringEntry entry4(&keystore);
+    entry4.checkInNodeID    = kClientNodeId22;
+    entry4.monitoredSubject = kClientNodeId21;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry4.SetKey(ByteSpan(kKeyBuffer2b)));
+    err = table2.Set(1, entry4);
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Retrieve fabric1, first entry
@@ -257,21 +313,23 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
-
-    // Retrieve fabric2, second entry
+    // Retrieve fabric1, second entry
     err = table1.Get(1, entry);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1b, sizeof(kKeyBuffer1b)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -279,10 +337,11 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 }
 
 void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
@@ -294,25 +353,28 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     ICDMonitoringEntry entry(&keystore);
     CHIP_ERROR err;
 
-    // Insert first entry
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = table1.Set(0, entry);
+    // Insert in first fabric
+    ICDMonitoringEntry entry1(&keystore);
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = table1.Set(0, entry1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
-    // Insert second entry
-    entry.checkInNodeID    = kClientNodeId12;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2a)));
-    err = table1.Set(1, entry);
+    // Insert in first fabric
+    ICDMonitoringEntry entry2(&keystore);
+    entry2.checkInNodeID    = kClientNodeId12;
+    entry2.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry2.SetKey(ByteSpan(kKeyBuffer2a)));
+    err = table1.Set(1, entry2);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert in second fabric
-    entry.checkInNodeID    = kClientNodeId21;
-    entry.monitoredSubject = kClientNodeId22;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2a)));
-    err = table2.Set(0, entry);
+    ICDMonitoringEntry entry3(&keystore);
+    entry3.checkInNodeID    = kClientNodeId21;
+    entry3.monitoredSubject = kClientNodeId22;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry3.SetKey(ByteSpan(kKeyBuffer1b)));
+    err = table2.Set(0, entry3);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Remove (invalid)
@@ -325,10 +387,11 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve second entry (not modified)
     err = table1.Get(1, entry);
@@ -336,10 +399,11 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove (existing)
     err = table1.Remove(0);
@@ -354,10 +418,11 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -365,10 +430,11 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove all (fabric 1)
     err = table1.RemoveAll();
@@ -383,10 +449,11 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite,
+                   memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                          sizeof(Crypto::Symmetric128BitsKeyByteArray)) == 0);
 
     // Remove all (fabric 2)
     err = table2.RemoveAll();
@@ -409,6 +476,7 @@ int Test_Setup(void * inContext)
 int TestClientMonitoringRegistrationTable()
 {
     static nlTest sTests[] = { NL_TEST_DEF("TestEntryKeyFunctions", TestEntryKeyFunctions),
+                               NL_TEST_DEF("TestEntryAssignationOverload", TestEntryAssignationOverload),
                                NL_TEST_DEF("TestSaveAndLoadRegistrationValue", TestSaveAndLoadRegistrationValue),
                                NL_TEST_DEF("TestSaveAllInvalidRegistrationValues", TestSaveAllInvalidRegistrationValues),
                                NL_TEST_DEF("TestSaveLoadRegistrationValueForMultipleFabrics",

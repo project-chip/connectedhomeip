@@ -117,7 +117,6 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
         ReturnErrorOnFailure(mDNSResolver.Init(chip::DeviceLayer::UDPEndPointManager()));
         mReady = true;
     }
-    mDNSResolver.SetOperationalDelegate(this);
     mDNSResolver.SetCommissioningDelegate(this);
     return CHIP_NO_ERROR;
 }
@@ -125,7 +124,6 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
 CHIP_ERROR DiscoveryCommands::TearDownDiscoveryCommands()
 {
     mDNSResolver.StopDiscovery();
-    mDNSResolver.SetOperationalDelegate(nullptr);
     mDNSResolver.SetCommissioningDelegate(nullptr);
     return CHIP_NO_ERROR;
 }
@@ -173,6 +171,16 @@ void DiscoveryCommands::OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData &
     if (nodeData.resolutionData.mrpRetryIntervalActive.HasValue())
     {
         data.mrpRetryIntervalActive.SetValue(nodeData.resolutionData.mrpRetryIntervalActive.Value().count());
+    }
+
+    if (nodeData.resolutionData.mrpRetryActiveThreshold.HasValue())
+    {
+        data.mrpRetryActiveThreshold.SetValue(nodeData.resolutionData.mrpRetryActiveThreshold.Value().count());
+    }
+
+    if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+    {
+        data.isICDOperatingAsLIT.SetValue(nodeData.resolutionData.isICDOperatingAsLIT.Value());
     }
 
     chip::app::StatusIB status;

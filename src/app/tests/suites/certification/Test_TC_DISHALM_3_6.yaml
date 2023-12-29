@@ -18,7 +18,7 @@ name:
 
 PICS:
     - DISHALM.S
-    - PIXIT.DISHALM.WaterLevelAlarmSupported
+    - DISHALM.S.M.WaterLevelAlarmSupported
 
 config:
     nodeId: 0x12344321
@@ -168,7 +168,7 @@ tests:
           Alarms set to 1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       verification: |
-          dishwasheralarm reset  1 1 1
+          dishwasheralarm reset  32 1 1
           Verify the success response on TH(chip-tool)
           [1690974433.649056][3934:3936] CHIP:DMG:         ],
           [1690974433.649084][3934:3936] CHIP:DMG:

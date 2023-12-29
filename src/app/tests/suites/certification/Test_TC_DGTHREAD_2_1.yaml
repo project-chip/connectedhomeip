@@ -519,7 +519,8 @@ tests:
                 value: "y"
 
     #issue #18145
-    - label: "Step 30: TH reads ActiveNetworkFaults attribute value from DUT"
+    - label:
+          "Step 30: TH reads ActiveNetworkFaultsList attribute value from DUT"
       PICS: DGTHREAD.S.A003e
       command: "readAttribute"
       attribute: "ActiveNetworkFaultsList"

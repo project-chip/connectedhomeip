@@ -34,6 +34,8 @@ public:
 
     CHIP_ERROR PurgeVideoPlayerCache();
 
+    CHIP_ERROR DeleteVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo);
+
 private:
     CHIP_ERROR WriteAllVideoPlayers(TargetVideoPlayerInfo videoPlayers[]);
 
@@ -55,6 +57,10 @@ private:
         kVideoPlayerNumIPsTag,
         kVideoPlayerIPAddressTag,
         kIpAddressesContainerTag,
+        kVideoPlayerLastDiscoveredTag,
+        kVideoPlayerMACAddressTag,
+        kVideoPlayerInstanceNameTag,
+        kVideoPlayerPortTag,
 
         kContextTagMaxNum = UINT8_MAX
     };

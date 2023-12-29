@@ -62,13 +62,13 @@ MTR_DIRECT_MEMBERS
 
 - (NSDate *)notBefore
 {
-    return ChipEpochSecondsAsDate(_data.mNotBeforeTime);
+    return MatterEpochSecondsAsDate(_data.mNotBeforeTime);
 }
 
 - (NSDate *)notAfter
 {
     // "no expiry" is encoded as kNullCertTime (see ChipEpochToASN1Time)
-    return (_data.mNotAfterTime != kNullCertTime) ? ChipEpochSecondsAsDate(_data.mNotAfterTime) : NSDate.distantFuture;
+    return (_data.mNotAfterTime != kNullCertTime) ? MatterEpochSecondsAsDate(_data.mNotAfterTime) : NSDate.distantFuture;
 }
 
 - (id)copyWithZone:(nullable NSZone *)zone

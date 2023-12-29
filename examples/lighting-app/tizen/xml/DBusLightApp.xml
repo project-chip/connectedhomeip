@@ -1,0 +1,17 @@
+<node>
+	<interface name="org.tizen.matter.example.lighting.Identify">
+		<signal name="Identify">
+			<arg name="identifyTime" type="q" />
+		</signal>
+	</interface>
+	<interface name="org.tizen.matter.example.lighting.OnOff">
+		<property name="onOff" type="b" access="readwrite" />
+	</interface>
+	<interface name="org.tizen.matter.example.lighting.LevelControl">
+		<property name="currentLevel" type="y" access="readwrite" />
+	</interface>
+	<interface name="org.tizen.matter.example.lighting.ColorControl">
+		<property name="colorMode" type="y" access="read" />
+		<property name="colorTemperatureMireds" type="q" access="readwrite" />
+	</interface>
+</node>

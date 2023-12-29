@@ -5,12 +5,5 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-{{#zcl_clusters}}
-
-{{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
-@interface MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@end
-{{/if}}
-
-{{/zcl_clusters}}
+// Nothing here for now, but leaving this file in place in case we need to add
+// something.

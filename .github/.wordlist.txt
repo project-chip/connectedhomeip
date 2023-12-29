@@ -477,6 +477,7 @@ edaf
 edc
 EDR
 ee
+eea
 EEE
 eef
 ef
@@ -791,6 +792,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+lladdr
+LLADDR
 LocalConfigDisabled
 localedef
 localhost

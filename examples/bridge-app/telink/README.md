@@ -64,7 +64,7 @@ defined:
     application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
-`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
 -   These three macros are used to declare a list of clusters for use within a
@@ -100,7 +100,7 @@ defined:
 2. Activate the build environment:
 
     ```bash
-    $ source ./scripts/activate.sh
+    $ source ./scripts/activate.sh -p all,telink
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for

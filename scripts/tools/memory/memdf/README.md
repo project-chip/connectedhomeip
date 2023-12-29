@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 This package contains routines to to collect, aggregate, and report memory
 usage, using Pandas `DataFrame` as the primary representation.
 

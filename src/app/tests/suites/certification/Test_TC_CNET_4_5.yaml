@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     12.4.5. [TC-CNET-4.5] [Wi-Fi] FAILSAFE_REQUIRED message Validation
@@ -22,27 +21,50 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Network Commissioning"
+    #PIXIT.CNET.ENDPOINT_WIFI
     endpoint: 0
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:7A6967626565686F6D65"
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS:
+        type: octet_string
+        defaultValue: "hex:70617373776f7264313233"
 
 tests:
-    - label: "Preconditions"
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Precondition: Commission TH and DUT on WiFi network"
       verification: |
-          1.Commission TH and DUT over BLE to setup the Wi-Fi
+          ./chip-tool pairing ble-wifi 0x12344321 <ssid> <password> <setup-pin-code> <discriminator>
 
-          2.The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute
+          [1698912271.738597][32363:32366] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698912271.738606][32363:32366] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698912271.738613][32363:32366] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698912271.738617][32363:32366] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698912271.738622][32363:32366] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698912271.738639][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: MarkForEviction Type:1 LSID:50170
+          [1698912271.738642][32363:32366] CHIP:SC: SecureSession[0x7fbb04014a50, LSID:50170]: State change 'kActive' --> 'kPendingEviction'
+          [1698912271.738666][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: Released - Type:1 LSID:50170
+          [1698912271.738672][32363:32366] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698912271.738677][32363:32366] CHIP:TOO: Device commissioning completed with success
+          [1698912271.738691][32363:32366] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
-          3.The FeatureMap attribute value is 1
-
-          ./chip-tool networkcommissioning read feature-map 1 0
-
-          Via the TH (chip-tool), verify that FeatureMap attribute value as 1 for WiFiNetworkInterface.
-
-          [1653474932.055513][29920:29925] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 1600858167
-          [1653474932.055578][29920:29925] CHIP:TOO:   FeatureMap: 1
-          [1653474932.055675][29920:29925] CHIP:EM: Sending Standalone Ack for MessageCounter:1494059 on exchange 5482i"
-      disabled: true
+    - label: "Precondition: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
 
     - label:
           "Step 1: TH sends the AddOrUpdateWiFiNetwork command to the DUT with
@@ -50,54 +72,44 @@ tests:
           T_ACCESSPOINT_SSI D 2. Credentials field set to PIXIT.CNET.WIFI_1S
           T_ACCESSPOINT_CRE DENTIALS 3. Breadcrumb field set to 1"
       PICS: CNET.S.C02.Rsp
-      verification: |
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network  hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
-
-          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateWiFiNetwork command.
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      command: "AddOrUpdateWiFiNetwork"
+      arguments:
+          values:
+              - name: "SSID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Credentials"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS
+              - name: "breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
 
     - label:
           "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
           field set to 1"
-      PICS: CNET.S.C02.Rsp
-      verification: |
-          ./chip-tool networkcommissioning remove hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
-
-          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      PICS: CNET.S.C04.Rsp
+      command: "RemoveNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED
 
     - label:
           "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
           field set to 1"
-      PICS: CNET.S.C02.Rsp
-      verification: |
-          ./chip-tool networkcommissioning connect hex:<your network id in hex> 1 0
-
-          Below is an example:
-
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
-
-          Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
-
-          [1657619600.364023][2056:2061] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0031 Command=0x0000_0003 Status=0xca
-          [1657619600.364102][2056:2061] CHIP:TOO: Error: IM Error 0x000005CA: General error: 0xca (FAILSAFE_REQUIRED)
-          [1657619600.364186][2056:2061] CHIP:DMG: ICR moving to [AwaitingDe]
-      disabled: true
+      PICS: CNET.S.C06.Rsp
+      command: "ConnectNetwork"
+      arguments:
+          values:
+              - name: "NetworkID"
+                value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+              - name: "Breadcrumb"
+                value: 1
+      response:
+          error: FAILSAFE_REQUIRED

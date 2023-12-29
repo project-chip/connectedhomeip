@@ -448,6 +448,39 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @end
 
+typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
+
+@interface MTRXPCDeviceTestDelegate : NSObject <MTRDeviceDelegate>
+@property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
+@end
+
+@implementation MTRXPCDeviceTestDelegate
+- (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
+{
+}
+
+- (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    if (self.onAttributeDataReceived != nil) {
+        self.onAttributeDataReceived(attributeReport);
+    }
+}
+
+- (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+}
+
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device
+{
+    return NO;
+}
+
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device
+{
+    return YES;
+}
+@end
+
 @interface MTRXPCListenerSampleTests : XCTestCase
 
 @end
@@ -465,7 +498,7 @@ static BOOL sNeedsStackShutdown = YES;
         // we're running only one of our test methods (using
         // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
         // we did not run test999_TearDown.
-        [self shutdownStack];
+        //        [self shutdownStack];
     }
 }
 
@@ -1565,7 +1598,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               }];
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 
-#if 0 // The above attribute isn't for timed interaction. Hence, no verification till we have a capable attribute.
+#if 0
+    // The above attribute isn't for timed interaction. Hence, no verification till we have a capable attribute.
     // subscribe, which should get the new value at the timeout
     expectation = [self expectationWithDescription:@"Subscribed"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error);
@@ -1682,27 +1716,49 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:mDeviceController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
+    __auto_type * delegate = [[MTRXPCDeviceTestDelegate alloc] init];
+    [device setDelegate:delegate queue:queue];
+
     __auto_type * endpoint = @(1);
 
     __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:endpoint queue:queue];
 
-    // Since we have no subscription, reads don't really work right.  We need to
-    // poll for values instead.
-    __auto_type pollForValue = ^(NSNumber * attributeID, NSDictionary<NSString *, id> * (^readBlock)(void), NSNumber * value) {
-        XCTestExpectation * expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Polling for on/off=%@", value]];
+    // The previous tests have left us in a not-so-great state where the device
+    // is (1) on and (2) in the middle of a level move.  Reset to a known state
+    // where the device is off, the level is midway, so it's not doing either on
+    // or off due to the level move, and there is no level move going on.
+    XCTestExpectation * initialOffExpectation = [self expectationWithDescription:@"Turning off to reset to base state"];
+    [onOffCluster offWithParams:nil expectedValues:nil expectedValueInterval:nil completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [initialOffExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ initialOffExpectation ] timeout:kTimeoutInSeconds];
+
+    __auto_type * levelCluster = [[MTRClusterLevelControl alloc] initWithDevice:device endpointID:endpoint queue:queue];
+    XCTestExpectation * initialLevelExpectation = [self expectationWithDescription:@"Setting midpoint level"];
+    __auto_type * params = [[MTRLevelControlClusterMoveToLevelParams alloc] init];
+    params.level = @(128);
+    params.transitionTime = @(0);
+    params.optionsMask = @(MTRLevelControlOptionsExecuteIfOff);
+    params.optionsOverride = @(MTRLevelControlOptionsExecuteIfOff);
+    [levelCluster moveToLevelWithParams:params expectedValues:nil expectedValueInterval:nil completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [initialLevelExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ initialLevelExpectation ] timeout:kTimeoutInSeconds];
+
+    // Since we have no subscription, sync reads don't really work right.  After doing
+    // them, if we get a value that does not match expectation we need to wait for our
+    // delegate to be notified about the attribute.
+    __auto_type waitForValue = ^(NSNumber * attributeID, NSDictionary<NSString *, id> * (^readBlock)(void), NSNumber * value) {
+        XCTestExpectation * expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Waiting for attribute %@=%@", attributeID, value]];
         __auto_type * path = [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeOnOffID) attributeID:attributeID];
 
-        __block dispatch_block_t poller = ^{
-            __auto_type * attrValue = readBlock();
-            if (attrValue == nil) {
-                dispatch_async(queue, poller);
-                return;
+        __block __auto_type checkValue = ^(NSDictionary<NSString *, id> * responseValue) {
+            if (![path isEqual:responseValue[MTRAttributePathKey]]) {
+                // Not our attribute.
+                return NO;
             }
-
-            __auto_type * responseValue = @{
-                MTRAttributePathKey : path,
-                MTRDataKey : attrValue,
-            };
 
             NSError * error;
             __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:&error];
@@ -1712,24 +1768,51 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             XCTAssertNotNil(report.value);
 
             if ([report.value isEqual:value]) {
-                // Break cycle.
-                poller = nil;
+                delegate.onAttributeDataReceived = nil;
                 [expectation fulfill];
-                return;
+                return YES;
             }
 
-            dispatch_async(queue, poller);
+            // Keep waiting.
+            return NO;
         };
 
-        dispatch_async(queue, poller);
-        [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds + 5];
+        delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * responseValues) {
+            for (NSDictionary<NSString *, id> * responseValue in responseValues) {
+                if (checkValue(responseValue)) {
+                    return;
+                }
+            }
+        };
+
+        __auto_type * attrValue = readBlock();
+        if (attrValue != nil) {
+            __auto_type * responseValue = @{
+                MTRAttributePathKey : path,
+                MTRDataKey : attrValue,
+            };
+
+            checkValue(responseValue);
+        }
+
+        [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
     };
 
-    pollForValue(
+    // Wait until the OnOff value is read.  But issue reads for multiple
+    // attributes, so that we test what happens if multiple reads are issued in
+    // a row.  The attribute we care about should be last, so it gets batched
+    // with the others, and we do more than 2 reads so that even if the first
+    // one is dispatched immediately the others batch.  Make sure none of the
+    // other reads involve attributes we care about later in this test.
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
+            [onOffCluster readAttributeOffWaitTimeWithParams:nil];
+            [onOffCluster readAttributeGlobalSceneControlWithParams:nil];
+            [onOffCluster readAttributeStartUpOnOffWithParams:nil];
             return [onOffCluster readAttributeOnOffWithParams:nil];
         }, @(NO));
-    pollForValue(
+
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
             return [onOffCluster readAttributeOnTimeWithParams:nil];
         }, @(0));
@@ -1741,14 +1824,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
                           expectedValueInterval:@(0)];
 
-    // Wait until the expected value is removed.
-    pollForValue(
-        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
-            return [onOffCluster readAttributeOnTimeWithParams:nil];
-        }, @(0));
-
-    // Now wait until the new value is read.
-    pollForValue(
+    // Wait until the new value is read.
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
             return [onOffCluster readAttributeOnTimeWithParams:nil];
         }, @(100));
@@ -1759,17 +1836,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }
                           expectedValueInterval:@(0)];
 
-    // Wait until the expected value is removed.
-    pollForValue(
-        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
-            return [onOffCluster readAttributeOnTimeWithParams:nil];
-        }, @(100));
-
     // Now wait until the new value is read.
-    pollForValue(
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
             return [onOffCluster readAttributeOnTimeWithParams:nil];
-        }, @(00));
+        }, @(0));
 
     // Test that invokes work.
     XCTestExpectation * onExpectation = [self expectationWithDescription:@"Turning on"];
@@ -1779,7 +1850,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
     [self waitForExpectations:@[ onExpectation ] timeout:kTimeoutInSeconds];
 
-    pollForValue(
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
             return [onOffCluster readAttributeOnOffWithParams:nil];
         }, @(YES));
@@ -1791,7 +1862,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
     [self waitForExpectations:@[ offExpectation ] timeout:kTimeoutInSeconds];
 
-    pollForValue(
+    waitForValue(
         @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
             return [onOffCluster readAttributeOnOffWithParams:nil];
         }, @(NO));

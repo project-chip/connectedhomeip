@@ -3,7 +3,7 @@
 
 #include "asr_route_hook.h"
 #include "asr_route_table.h"
-
+#include "lega_rtos_api.h"
 #include "lwip/icmp6.h"
 #include "lwip/mld6.h"
 #include "lwip/netif.h"
@@ -166,7 +166,7 @@ int8_t asr_route_hook_init()
         return -1;
     }
 
-    for (asr_route_hook_t * iter = s_hooks; iter != NULL; iter++)
+    for (asr_route_hook_t * iter = s_hooks; iter != NULL; iter = iter->next)
     {
         if (iter->netif == lwip_netif)
         {
@@ -175,7 +175,7 @@ int8_t asr_route_hook_init()
         }
     }
 
-    hook = (asr_route_hook_t *) malloc(sizeof(asr_route_hook_t));
+    hook = (asr_route_hook_t *) lega_rtos_malloc(sizeof(asr_route_hook_t));
     if (hook == NULL)
     {
         ASR_LOG("Cannot allocate hook");
@@ -203,7 +203,7 @@ int8_t asr_route_hook_init()
 exit:
     if (ret != 0 && hook != NULL)
     {
-        free(hook);
+        lega_rtos_free(hook);
     }
     return ret;
 }

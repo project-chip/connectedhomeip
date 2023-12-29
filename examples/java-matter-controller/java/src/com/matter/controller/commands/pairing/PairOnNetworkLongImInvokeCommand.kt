@@ -21,13 +21,13 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
 import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.model.InvokeElement
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
 import kotlin.UShort
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvWriter
 
 class PairOnNetworkLongImInvokeCommand(
   controller: ChipDeviceController,
@@ -129,7 +129,7 @@ class PairOnNetworkLongImInvokeCommand(
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),

@@ -86,7 +86,7 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * (for commissionable lookup) under the NSBonjourServices key in the
      * application's Info.plist.
      */
-    MTRErrorCodeDNSSDUnauthorized MTR_NEWLY_AVAILABLE = 15,
+    MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
 };
 // clang-format on
 

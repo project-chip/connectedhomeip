@@ -1,0 +1,139 @@
+{% macro render_field(field) -%}{#
+ Macro for the output of a single field entry such as:
+
+ int16u identifyTime = 0;
+ optional int16u transitionTime = 3;
+ optional nullable int16u transitionTime = 2;
+ optional ExtensionFieldSet extensionFieldSets[] = 5;
+#}
+
+{%- if field.qualities %}{{field.qualities | idltxt}} {% endif -%}
+{{field.data_type.name}}
+{%- if field.data_type.max_length -%} <{{field.data_type.max_length}}> {%- endif -%}
+{##} {{field.name}}
+{%- if field.is_list %}[]{% endif -%}
+{##} = {{field.code}};
+{%- endmacro -%}
+
+{% macro render_struct(s) -%}{#
+ Macro for the output of a complete struct
+#}
+  {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
+  {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
+  struct {{s.name}} {##}
+  {%- if s.code is not none %}= {{s.code}} {% endif -%}
+  {
+    {% for field in s.fields %}
+    {{render_field(field)}}
+    {% endfor %}
+  }
+{%- endmacro -%}
+
+
+// This IDL was auto-generated from a parsed data structure
+
+{%  for cluster in idl.clusters %}
+{% if cluster.description %}/** {{cluster.description}} */
+{% endif %}
+{{cluster.api_maturity | idltxt}}cluster {{cluster.name}} = {{cluster.code}} {
+  revision {{cluster.revision}};
+
+  {% for enum in cluster.enums %}
+  enum {{enum.name}} : {{ enum.base_type}} {
+    {% for entry in enum.entries %}
+    {{entry.name}} = {{entry.code}};
+    {% endfor %}
+  }
+
+  {% endfor %}
+
+  {%- for bitmap in cluster.bitmaps %}
+  bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
+    {% for entry in bitmap.entries %}
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}};
+    {% endfor %}
+  }
+
+  {% endfor %}
+
+  {%- for s in cluster.structs | rejectattr("tag") %}
+  {{render_struct(s)}}
+
+  {% endfor %}
+
+  {%- for e in cluster.events %}
+  {##}  {##}{% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
+  {{e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
+    {% for field in e.fields %}
+    {{render_field(field)}}
+    {% endfor %}
+  }
+
+  {% endfor %}
+
+  {%- for a in cluster.attributes %}
+  {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
+  {% endfor %}
+
+  {%- for s in cluster.structs | selectattr("tag") %}
+
+  {{render_struct(s)}}
+  {% endfor %}
+
+  {%- for c in cluster.commands %}
+  {% if loop.first %}
+
+  {% endif %}
+  {% if c.description %}
+  /** {{c.description}} */
+  {% endif %}
+  {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
+     {%- if c.input_param %}{{c.input_param}}{% endif -%}
+  ): {{c.output_param}} = {{c.code}};
+  {% endfor %}
+}
+
+{% endfor %}
+
+{%- if idl.endpoints %}
+{%- for endpoint in idl.endpoints %}
+endpoint {{endpoint.number}} {
+  {% for t in endpoint.device_types %}
+  device type {{t.name}} = {{t.code}}, version {{t.version}};
+  {% endfor%}
+
+  {%-for b in endpoint.client_bindings %}
+  {% if loop.first %}
+
+  {% endif %}
+  binding cluster {{b}};
+  {% endfor %}
+
+  {%-for c in endpoint.server_clusters %}
+
+  server cluster {{c.name}} {
+    {% for e in c.events_emitted %}
+    emits event {{e}};
+    {% if loop.last %}
+
+    {% endif %}
+    {% endfor %}
+    {% for a in c.attributes %}
+    {{"%-8s" | format(a.storage|idltxt) }} attribute {{a.name}}
+    {%- if a.default is not none %} default = {{a.default|render_default}} {%- endif %};
+    {% endfor %}
+    {% for cmd in c.commands %}
+    {% if loop.first %}
+
+    {% endif %}
+    handle command {{cmd.name}};
+    {% endfor %}
+  }
+  {% endfor %}
+
+}
+{% if not loop.last %}
+
+{% endif %}
+{%  endfor %}
+{%  endif %}

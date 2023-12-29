@@ -372,7 +372,7 @@ jobject SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject(
     chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType responseData)
 {
     ChipLogProgress(AppServer, "SupportedStreamingProtocolsSuccessHandlerJNI::ConvertToJObject called");
-    return ConvertToIntegerJObject(responseData);
+    return ConvertToIntegerJObject(responseData.Raw());
 }
 
 // APPLICATION BASIC

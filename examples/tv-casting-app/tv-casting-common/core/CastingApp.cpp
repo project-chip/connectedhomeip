@@ -18,6 +18,8 @@
 
 #include "CastingApp.h"
 
+#include "support/ChipDeviceEventHandler.h"
+
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -109,8 +111,8 @@ CHIP_ERROR CastingApp::PostStartRegistrations()
     // TODO: Set FabricDelegate
     // chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
 
-    // TODO: Add DeviceEvent Handler
-    // ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
+    // Register DeviceEvent Handler
+    ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(ChipDeviceEventHandler::Handle, 0));
 
     mState = CASTING_APP_RUNNING; // CastingApp started successfully, set state to RUNNING
     return CHIP_NO_ERROR;

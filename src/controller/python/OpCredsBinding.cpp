@@ -160,7 +160,7 @@ public:
                 mCompletionError = err;
             }
         }
-        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo)
+        if (report.stageCompleted == chip::Controller::CommissioningStage::kReadCommissioningInfo2)
         {
             mReadCommissioningInfo = report.Get<chip::Controller::ReadCommissioningInfo>();
         }
@@ -311,8 +311,6 @@ private:
     {
         switch (stage)
         {
-        case chip::Controller::CommissioningStage::kCheckForMatchingFabric:
-            return mParams.GetCheckForMatchingFabric();
         case chip::Controller::CommissioningStage::kWiFiNetworkEnable:
         case chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable:
         case chip::Controller::CommissioningStage::kWiFiNetworkSetup:

@@ -66,7 +66,12 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES=${chip_config_minmdns_max_parallel_resolves}",
     "CHIP_CONFIG_CANCELABLE_HAS_INFO_STRING_FIELD=${chip_config_cancelable_has_info_string_field}",
     "CHIP_CONFIG_BIG_ENDIAN_TARGET=${chip_target_is_big_endian}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_WRITE=${chip_tlv_validate_char_string_on_write}",
+    "CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ=${chip_tlv_validate_char_string_on_read}",
+    "CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED=${chip_enable_sending_batch_commands}",
   ]
+
+  visibility = [ ":chip_config_header" ]
 }
 
 source_set("chip_config_header") {
@@ -75,11 +80,12 @@ source_set("chip_config_header") {
   public_configs = [ "${chip_root}/src:includes" ]
 
   public_deps = [
-    ":chip_buildconfig",
     "${chip_root}/src/ble:ble_config_header",
     "${chip_root}/src/inet:inet_config_header",
     "${chip_root}/src/system:system_config_header",
   ]
+
+  deps = [ ":chip_buildconfig" ]
 
   allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
 }

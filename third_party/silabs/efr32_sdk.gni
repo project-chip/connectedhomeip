@@ -21,16 +21,13 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-if (use_rs9116) {
-  wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-} else if (use_SiWx917) {
-  wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
-}
-
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+  wiseconnect_sdk_root =
+      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+  wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 
   # Build openthread with prebuilt silabs lib
   use_silabs_thread_lib = false
@@ -72,14 +69,23 @@ declare_args() {
   # Use SLC generated files
   slc_reuse_files = false
 }
+examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+silabs_plat_efr32_wifi_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+
+if (use_rs9116) {
+  assert(wiseconnect_sdk_root != "", "wiseconnect_sdk_root must be specified")
+}
+
+if (use_SiWx917) {
+  assert(wifi_sdk_root != "", "wifi_sdk_root must be specified")
+}
 
 declare_args() {
   sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
   sl_ot_platform_abstraction =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
-  sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
 
   # board related pre-generated files path (default)
   sl_pre_gen_path =
@@ -229,7 +235,7 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       if (use_rs9116) {
-        _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+        _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
       } else {
         _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
       }
@@ -270,6 +276,13 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (!(use_silabs_thread_lib || use_silabs_thread_lib)) {
+      #Enabling this config temporarly to fix a build issue until
+      #official fix is pushed
+
+      defines += [ "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1" ]
+    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
@@ -367,7 +380,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/segger/systemview/profiles/freertos_v10/",
       ]
 
-      defines += [ "SL_SYSTEM_VIEW=1" ]
+      defines += [ "SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT=1" ]
     }
 
     defines += board_defines
@@ -744,10 +757,10 @@ template("efr32_sdk") {
     if (chip_enable_ble_rs911x) {
       if (use_rs9116) {
         sources += [
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-          "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+          "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
         ]
       } else {
         sources += [

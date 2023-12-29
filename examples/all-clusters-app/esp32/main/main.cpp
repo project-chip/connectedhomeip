@@ -72,7 +72,7 @@ using namespace ::chip::Credentials;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG = "all-clusters-app";
+extern const char TAG[] = "all-clusters-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -119,23 +119,36 @@ static void InitServer(intptr_t context)
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
 
-    CHIP_ERROR err = GetAppTask().LockInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_ERROR_FORMAT, err.Format());
-    }
-
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-    err = app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
-        FIXED_ENDPOINT_COUNT);
+    CHIP_ERROR err =
+        app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+            FIXED_ENDPOINT_COUNT);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
     }
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+}
+
+// #include <laundry-washer-controls-server/laundry-washer-controls-server.h>
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-dryer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
+using namespace chip::app::Clusters::LaundryDryerControls;
+void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
 extern "C" void app_main()

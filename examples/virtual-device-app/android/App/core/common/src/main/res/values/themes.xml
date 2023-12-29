@@ -19,9 +19,4 @@
         <item name="android:navigationBarColor">@color/color_background_secondary</item>
     </style>
 
-    <style name="Theme.CollapsingToolbar" parent="Theme.App">
-        <item name="statusBarScrim">@android:color/transparent</item>
-        <item name="android:background">@color/action_bar_background_color_light</item>
-        <item name="colorControlNormal">@color/toolbar_button_color</item>
-    </style>
 </resources>

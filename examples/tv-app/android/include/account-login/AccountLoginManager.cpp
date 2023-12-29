@@ -32,7 +32,8 @@ AccountLoginManager::AccountLoginManager(ContentAppCommandDelegate * commandDele
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
+                                      const chip::Optional<chip::NodeId> & nodeId)
 {
     ChipLogProgress(DeviceLayer, "AccountLoginManager::HandleLogin called for endpoint %d", mEndpointId);
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
@@ -50,7 +51,7 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
     }
 }
 
-bool AccountLoginManager::HandleLogout()
+bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
     // TODO: Insert your code here to send logout request
     return true;

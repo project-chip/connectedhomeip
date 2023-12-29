@@ -174,7 +174,7 @@ void init_asrPlatform(void)
     lega_recovery_phy_fsm_config();
 #endif
     asr_security_engine_init();
-#if !CONFIG_ENABLE_CHIP_SHELL
+#ifndef CONFIG_ENABLE_CHIP_SHELL
     lega_at_init();
 #endif
     lega_at_cmd_register_all();

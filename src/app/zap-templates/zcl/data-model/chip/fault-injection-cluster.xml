@@ -24,7 +24,7 @@ limitations under the License.
     <item name="ChipFault" value="0x03"/>
     <item name="CertFault" value="0x04"/>    
   </enum>  
-  <cluster>
+  <cluster apiMaturity="internal">
     <domain>CHIP</domain>
     <name>Fault Injection</name>
     <code>0xFFF1FC06</code>

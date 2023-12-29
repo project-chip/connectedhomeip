@@ -77,8 +77,18 @@ JNIEnv * JniReferences::GetEnvForCurrentThread()
 
 CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     jclass cls     = nullptr;
+    CHIP_ERROR err = GetLocalClassRef(env, clsType, cls);
+    ReturnErrorOnFailure(err);
+    outCls = (jclass) env->NewGlobalRef((jobject) cls);
+    VerifyOrReturnError(outCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    return err;
+}
+
+CHIP_ERROR JniReferences::GetLocalClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
+{
+    jclass cls = nullptr;
 
     // Try `j$/util/Optional` when enabling Java8.
     if (strcmp(clsType, "java/util/Optional") == 0)
@@ -100,10 +110,8 @@ CHIP_ERROR JniReferences::GetClassRef(JNIEnv * env, const char * clsType, jclass
         VerifyOrReturnError(cls != nullptr && env->ExceptionCheck() != JNI_TRUE, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     }
 
-    outCls = (jclass) env->NewGlobalRef((jobject) cls);
-    VerifyOrReturnError(outCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-    return err;
+    outCls = cls;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR JniReferences::N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, jsize inArrayLen, jbyteArray & outArray)

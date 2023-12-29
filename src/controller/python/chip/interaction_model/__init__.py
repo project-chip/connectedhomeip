@@ -26,10 +26,12 @@ import enum
 
 from chip.exceptions import ChipStackException
 
-from .delegate import AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
+from .delegate import (AttributePath, AttributePathIBstruct, CommandPathIBStruct, DataVersionFilterIBstruct, EventPath,
+                       EventPathIBstruct, SessionParameters, SessionParametersStruct)
 
-__all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
-           "EventPath", "EventPathIBstruct", "Status", "InteractionModelError"]
+__all__ = ["AttributePath", "AttributePathIBstruct", "CommandPathIBStruct",
+           "DataVersionFilterIBstruct", "EventPath", "EventPathIBstruct",
+           "InteractionModelError", "SessionParameters", "SessionParametersStruct", "Status"]
 
 
 # defined src/controller/python/chip/interaction_model/Delegate.h
@@ -81,6 +83,8 @@ class Status(enum.IntEnum):
     PathsExhausted = 0xc8
     TimedRequestMismatch = 0xc9
     FailsafeRequired = 0xca
+    InvalidInState = 0xcb
+    NoCommandResponse = 0xcc
 
 
 class InteractionModelError(ChipStackException):

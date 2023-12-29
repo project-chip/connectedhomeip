@@ -40,7 +40,7 @@ public:
 
     void OnTransitionToIdle() override;
 
-    bool IsReportScheduled();
+    bool IsReportScheduled(ReadHandler * ReadHandler) override;
 
     void TimerFired() override;
 
@@ -58,8 +58,9 @@ private:
     Timestamp mNextMaxTimestamp = Milliseconds64(0);
     Timestamp mNextMinTimestamp = Milliseconds64(0);
 
-    // Timestamp of the next report to be scheduled, only used for testing
-    Timestamp mTestNextReportTimestamp = Milliseconds64(0);
+    // Timestamp of the next report to be scheduled, used by OnTransitionToIdle to determine whether we should emit a report before
+    // the device goes to idle mode
+    Timestamp mNextReportTimestamp = Milliseconds64(0);
 };
 
 } // namespace reporting

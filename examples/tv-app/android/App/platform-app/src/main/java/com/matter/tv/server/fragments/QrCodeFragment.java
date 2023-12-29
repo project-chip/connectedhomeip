@@ -9,14 +9,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
-import chip.onboardingpayload.DiscoveryCapability;
-import chip.onboardingpayload.OnboardingPayload;
-import chip.onboardingpayload.OnboardingPayloadException;
-import chip.onboardingpayload.OnboardingPayloadParser;
 import com.matter.tv.server.QRUtils;
 import com.matter.tv.server.R;
 import com.matter.tv.server.service.MatterServant;
 import java.util.HashSet;
+import matter.onboardingpayload.DiscoveryCapability;
+import matter.onboardingpayload.OnboardingPayload;
+import matter.onboardingpayload.OnboardingPayloadException;
+import matter.onboardingpayload.OnboardingPayloadParser;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link QrCodeFragment#newInstance} factory method to

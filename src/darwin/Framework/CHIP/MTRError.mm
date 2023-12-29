@@ -232,6 +232,11 @@ MTR_HIDDEN
     return [NSError errorWithDomain:MTRInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
 }
 
++ (NSError *)errorForIMStatusCode:(chip::Protocols::InteractionModel::Status)status
+{
+    return [self errorForIMStatus:chip::app::StatusIB(status)];
+}
+
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
     if (error == nil) {

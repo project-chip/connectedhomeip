@@ -69,11 +69,8 @@ transition to mode 2", set the `RvcRunMode` to 0.
 
 #### TC 3.2
 
-PIXIT: `PIXIT_ENDPOINT:1`  
-Example command:
-`./scripts/tests/run_python_test.py --script src/python_testing/TC_RVCCLEANM_3_2.py --script-args "--storage-path admin_storage.json --PICS examples/rvc-app/rvc-common/pics/RVC_App_Test_Plan.txt --int-arg PIXIT_ENDPOINT:1"`
-
-When asked "Physically power cycle the device", do so.
+This is not applicable because this RVC device does not support the
+`StartUpMode` attribute.
 
 ### RVC Run Mode cluster
 

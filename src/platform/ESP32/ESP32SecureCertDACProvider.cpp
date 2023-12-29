@@ -55,11 +55,15 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P
 
 CHIP_ERROR ESP32SecureCertDACProvider ::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
+#ifdef CONFIG_ENABLE_SET_CERT_DECLARATION_API
+    return CopySpanToMutableSpan(mCD, outBuffer);
+#else
     size_t certSize;
     ReturnErrorOnFailure(
         ESP32Config::ReadConfigValueBin(ESP32Config::kConfigKey_CertDeclaration, outBuffer.data(), outBuffer.size(), certSize));
     outBuffer.reduce_size(certSize);
     return CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_SET_CERT_DECLARATION_API
 }
 
 CHIP_ERROR ESP32SecureCertDACProvider ::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -79,8 +83,8 @@ CHIP_ERROR ESP32SecureCertDACProvider ::GetDeviceAttestationCert(MutableByteSpan
     {
         ESP_FAULT_ASSERT(err == ESP_OK && dac_cert != NULL && dac_len != 0);
         VerifyOrReturnError(dac_len <= kMaxDERCertLength, CHIP_ERROR_UNSUPPORTED_CERT_FORMAT,
-                            esp_secure_cert_free_ca_cert(dac_cert));
-        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_ca_cert(dac_cert));
+                            esp_secure_cert_free_device_cert(dac_cert));
+        VerifyOrReturnError(dac_len <= outBuffer.size(), CHIP_ERROR_BUFFER_TOO_SMALL, esp_secure_cert_free_device_cert(dac_cert));
         memcpy(outBuffer.data(), dac_cert, outBuffer.size());
         outBuffer.reduce_size(dac_len);
         esp_secure_cert_free_device_cert(dac_cert);

@@ -304,12 +304,15 @@ tests:
     - label:
           "Step 16: Manually put the DUT into a state wherein it cannot receive
           a Start Command"
+      PICS: OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
       verification: |
           Manually put the DUT into a state wherein it cannot receive a Start Command
       disabled: true
 
     - label: "Step 17: TH sends Start command to the DUT"
-      PICS: OPSTATE.S.C02.Rsp && OPSTATE.S.C04.Tx
+      PICS:
+          OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OPSTATE.S.C02.Rsp &&
+          OPSTATE.S.C04.Tx
       verification: |
           ./chip-tool operationalstate start 1 1
 
