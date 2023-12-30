@@ -315,10 +315,7 @@ bool IsEvPluggedIn(StateEnum state)
     {
         return false;
     }
-    else
-    {
-        return true;
-    }
+    return true;
 }
 
 bool IsEvTransferringEnergy(StateEnum state)
@@ -327,10 +324,7 @@ bool IsEvTransferringEnergy(StateEnum state)
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 /**
  * @brief    Called by EVSE Hardware to indicate if EV is detected
