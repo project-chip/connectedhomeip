@@ -25,12 +25,15 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
+/* Function prototype - this should be implemented somewhere in main.cpp or similar */
+EVSEManufacturer * GetEvseManufacturer();
+
+CHIP_ERROR EVSEManufacturer::Init()
 {
     /* Manufacturers should modify this to do any custom initialisation */
 
     /* Register callbacks */
-    EnergyEvseDelegate * dg = aInstance->GetDelegate();
+    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
     if (dg == nullptr)
     {
         ChipLogError(AppServer, "Delegate is not initialized");
@@ -39,34 +42,28 @@ CHIP_ERROR EVSEManufacturer::Init(EnergyEvseManager * aInstance)
 
     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
-    /* Set the EVSE Hardware Maximum current limit */
     // For Manufacturer to specify the hardware capability in mA
-    dg->HwSetMaxHardwareCurrentLimit(32000);
+    // dg->HwSetMaxHardwareCurrentLimit(32000);
 
     // For Manufacturer to specify the CircuitCapacity (e.g. from DIP switches)
-    dg->HwSetCircuitCapacity(20000);
+    // dg->HwSetCircuitCapacity(20000);
 
-    /* For now let's pretend the EV is plugged in, and asking for demand */
-    dg->HwSetState(StateEnum::kPluggedInDemand);
-    dg->HwSetCableAssemblyLimit(63000);
+    // For now let's pretend the EV is plugged in, and asking for demand
+    // dg->HwSetState(StateEnum::kPluggedInDemand);
+    // dg->HwSetCableAssemblyLimit(63000);
 
-    /* For now let's pretend the vehicle ID is set */
-    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
-    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_9876543210"));
+    // For now let's pretend the vehicle ID is set
+    // dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
 
-    /* This next one will fail because it is too long */
-    dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_9876543210TOOOOOOOOOOOOOOOOOOO"));
-
-    /* For now let's pretend the RFID sensor was triggered - send an event */
-    uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
-    dg->HwSetRFID(ByteSpan(uid));
+    // For now let's pretend the RFID sensor was triggered - send an event
+    // uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
+    // dg->HwSetRFID(ByteSpan(uid));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EVSEManufacturer::Shutdown(EnergyEvseManager * aInstance)
+CHIP_ERROR EVSEManufacturer::Shutdown()
 {
-
     return CHIP_NO_ERROR;
 }
 
@@ -108,6 +105,35 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     }
 }
 
+void SetTestEventTrigger_BasicFunctionality()
+{
+    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+
+    // TODO save the values so we can restore them in the clear event
+    dg->HwSetCircuitCapacity(32000);
+    dg->SetUserMaximumChargeCurrent(32000);
+    dg->HwSetState(StateEnum::kNotPluggedIn);
+}
+void SetTestEventTrigger_BasicFunctionalityClear() {}
+
+void SetTestEventTrigger_EVPluggedIn()
+{
+    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+
+    // TODO save the values so we can restore them in the clear event
+    dg->HwSetState(StateEnum::kPluggedInNoDemand);
+}
+void SetTestEventTrigger_EVPluggedInClear() {}
+
+void SetTestEventTrigger_EVChargeDemand()
+{
+    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+
+    // TODO save the values so we can restore them in the clear event
+    dg->HwSetState(StateEnum::kPluggedInDemand);
+}
+void SetTestEventTrigger_EVChargeDemandClear() {}
+
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
     EnergyEvseTrigger trigger = static_cast<EnergyEvseTrigger>(eventTrigger);
@@ -116,21 +142,27 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
     {
     case EnergyEvseTrigger::kBasicFunctionality:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality install");
+        SetTestEventTrigger_BasicFunctionality();
         break;
     case EnergyEvseTrigger::kBasicFunctionalityClear:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality clear");
+        SetTestEventTrigger_BasicFunctionalityClear();
         break;
     case EnergyEvseTrigger::kEVPluggedIn:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV plugged in");
+        SetTestEventTrigger_EVPluggedIn();
         break;
     case EnergyEvseTrigger::kEVPluggedInClear:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV unplugged");
+        SetTestEventTrigger_EVPluggedInClear();
         break;
     case EnergyEvseTrigger::kEVChargeDemand:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge Demand");
+        SetTestEventTrigger_EVChargeDemand();
         break;
     case EnergyEvseTrigger::kEVChargeDemandClear:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge NoDemand");
+        SetTestEventTrigger_EVChargeDemandClear();
         break;
 
     default:

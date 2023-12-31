@@ -33,15 +33,26 @@ namespace EnergyEvse {
 class EVSEManufacturer
 {
 public:
+    EVSEManufacturer(EnergyEvseManager * aInstance) { mInstance = aInstance; }
+    EnergyEvseManager * GetInstance() { return mInstance; }
+    EnergyEvseDelegate * GetDelegate()
+    {
+        if (mInstance)
+        {
+            return mInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init(EnergyEvseManager * aInstance);
+    CHIP_ERROR Init();
 
     /**
      * @brief   Called at shutdown
      */
-    CHIP_ERROR Shutdown(EnergyEvseManager * aInstance);
+    CHIP_ERROR Shutdown();
 
     /**
      * @brief   Main Callback handler from delegate to user code
@@ -49,6 +60,8 @@ public:
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
 private:
+    EnergyEvseManager * mInstance;
+
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;
 };

@@ -39,6 +39,11 @@ static EnergyEvseDelegate * gDelegate       = nullptr;
 static EnergyEvseManager * gInstance        = nullptr;
 static EVSEManufacturer * gEvseManufacturer = nullptr;
 
+EVSEManufacturer * GetEvseManufacturer()
+{
+    return gEvseManufacturer;
+}
+
 void ApplicationInit()
 {
     CHIP_ERROR err;
@@ -87,7 +92,7 @@ void ApplicationInit()
     }
 
     /* Now create EVSEManufacturer*/
-    gEvseManufacturer = new EVSEManufacturer();
+    gEvseManufacturer = new EVSEManufacturer(gInstance);
     if (gEvseManufacturer == nullptr)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
@@ -99,7 +104,7 @@ void ApplicationInit()
     }
 
     /* Call Manufacturer specific init */
-    err = gEvseManufacturer->Init(gInstance);
+    err = gEvseManufacturer->Init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gEvseManufacturer");
@@ -118,7 +123,7 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     /* Shutdown the EVSEManufacturer*/
-    gEvseManufacturer->Shutdown(gInstance);
+    gEvseManufacturer->Shutdown();
 
     /* Shutdown the Instance - deregister attribute & command handler */
     gInstance->Shutdown();
