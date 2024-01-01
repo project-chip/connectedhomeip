@@ -33,6 +33,14 @@ class TC_EEVSE_2_2(MatterBaseTest):
         cluster = Clusters.Objects.EnergyEvse
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
+    async def check_evse_attribute(self, attribute, expected_value):
+        value = await self.read_evse_attribute_expect_success(endpoint=1, attribute=attribute)
+        asserts.assert_equal(value, expected_value,
+                             f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
+
+    async def get_supported_energy_evse_attributes(self, endpoint):
+        return await self.read_evse_attribute_expect_success(endpoint, "AttributeList")
+
     async def write_user_max_charge(self, endpoint, user_max_charge):
         result = await self.default_controller.WriteAttribute(self.dut_node_id,
                                                               [(endpoint,
@@ -74,6 +82,48 @@ class TC_EEVSE_2_2(MatterBaseTest):
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster. Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event"),
             TestStep("3a", "After a few seconds TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("3b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
+            TestStep("3c", "TH reads from the DUT the FaultState attribute. Verify value is 0x00 (NoError)"),
+            TestStep("3d", "TH reads from the DUT the SessionID attribute"),
+            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event. Verify Event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("4a", "TH reads from the DUT the State attribute. Verify value is 0x01 (PluggedInNoDemand)"),
+            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=2 minutes in the future, minimumChargeCurrent=6000, maximumChargeCurrent=60000"),
+            TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event. Verify Event EEVSE.S.E02(EnergyTransferStarted) sent."),
+            TestStep("6a", "TH reads from the DUT the State attribute. Verify value is 0x3 (PluggedInCharging)"),
+            TestStep("6b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x1 (ChargingEnabled)"),
+            TestStep("6c", "TH reads from the DUT the ChargingEnabledUntil attribute. Verify value is the commanded value"),
+            TestStep("6d", "TH reads from the DUT the MinimumChargeCurrent attribute. Verify value is the commanded value (6000)"),
+            TestStep("6e", "TH reads from the DUT the MaximumChargeCurrent attribute. Verify value is the min(command value (60000), CircuitCapacity)"),
+            TestStep("7", "Wait 2 minutes. Verify Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvseStopped"),
+            TestStep("7a", "TH reads from the DUT the State attribute. Verify value is 0x02 (PluggedInDemand)"),
+            TestStep("7b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
+            TestStep("8", "TH sends command EnableCharging with ChargingEnabledUntil=NULL, minimumChargeCurrent = 6000, maximumChargeCurrent=12000"),
+            TestStep("8a", "TH reads from the DUT the State attribute. Verify value is 0x03 (PluggedInCharging)"),
+            TestStep("8b", "TH reads from the DUT the SupplyState attribute. Verify value is 1 (ChargingEnabled)"),
+            TestStep("8c", "TH reads from the DUT the ChargingEnabledUntil attribute. Verify value is the commanded value (NULL)"),
+            TestStep("8d", "TH reads from the DUT the MinimumChargeCurrent attribute. Verify value is the commanded value (6000)"),
+            TestStep("8d", "TH reads from the DUT the MaximumChargeCurrent attribute. Verify value is the MIN(command value (60000), CircuitCapacity)"),
+            TestStep("9", "If the optional attribute is supported TH writes to the DUT UserMaximumChargeCurrent=6000"),
+            TestStep("9a", "After a few seconds TH reads from the DUT the MaximumChargeCurrent. Verify value is UserMaximumChargeCurrent value (6000)"),
+            TestStep("10", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear. Verify Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvStopped"),
+            TestStep("10a", "TH reads from the DUT the State attribute. Verify value is 0x02 (PluggedInDemand)"),
+            TestStep("11", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event. Verify Event EEVSE.S.E02(EnergyTransferStarted) sent."),
+            TestStep("11a", "TH reads from the DUT the State attribute. Verify value is 0x02 (PluggedInDemand)"),
+            TestStep("12", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear. Verify Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvStopped"),
+            TestStep("12a", "TH reads from the DUT the State attribute. Verify value is 0x02 (PluggedInDemand)"),
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear. Verify Event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("13a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
+            TestStep("13b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x01 (ChargingEnabled)"),
+            TestStep("13c", "TH reads from the DUT the SessionID attribute. Verify value is the same value noted in 5c"),
+            TestStep("13d", "TH reads from the DUT the SessionDuration attribute. Verify value is greater than 120 (and match the time taken for the tests from step 4 to step 13)"),
+            TestStep("14", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event. Verify  Event EEVSE.S.E00(EVConnected) sent"),
+            TestStep("14a", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event. Verify Event EEVSE.S.E02(EnergyTransferStarted) sent."),
+            TestStep("14b", "TH reads from the DUT the SessionID attribute. Verify value is 1 more than the value noted in 5c"),
+            TestStep("15", "TH sends command Disable. Verify Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvseStopped"),
+            TestStep("15a", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event Clear."),
+            TestStep("17", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event Clear. Verify Event EEVSE.S.E01(EVNotDetected) sent"),
+            TestStep("18", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear."),
         ]
 
         return steps
@@ -90,163 +140,207 @@ class TC_EEVSE_2_2(MatterBaseTest):
             asserts.fail(f"Unexpected error returned - {e.status}")
 
     # TC_EEVSE_2_2 tests steps
-    async def steps_2_check_test_event_triggers_enabled(self):
+    async def check_test_event_triggers_enabled(self):
         full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
         cluster = Clusters.Objects.GeneralDiagnostics
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
-    async def steps_3_send_test_event_triggers(self):
+    async def send_test_event_trigger_basic(self):
         await self.send_test_event_triggers(eventTrigger=0x0099000000000000)
+
+    async def send_test_event_trigger_basic_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000001)
+
+    async def send_test_event_trigger_pluggedin(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000002)
+
+    async def send_test_event_trigger_pluggedin_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000003)
+
+    async def send_test_event_trigger_charge_demand(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000004)
+
+    async def send_test_event_trigger_charge_demand_clear(self):
+        await self.send_test_event_triggers(eventTrigger=0x0099000000000005)
 
     @async_test_body
     async def test_TC_EEVSE_2_2(self):
-        print_steps = True
-
-        # Part 1
         self.step("1")
+        # Commission DUT - already done
 
-        # Part 2
         self.step("2")
-        await self.steps_2_check_test_event_triggers_enabled()
+        await self.check_test_event_triggers_enabled()
 
-        # Part 3
         self.step("3")
-        await self.steps_3_send_test_event_triggers()
-        self.step("3a")
-        state = await self.read_evse_attribute_expect_success(endpoint=1, attribute="State")
-        asserts.assert_equal(state, Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn,
-                             f"Unexpected State value - expected kNotPluggedIn (0), was {state}")
-        self.step("3b")
-        self.step("3c")
-        self.step("3d")
-        self.print_step("3b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)")
-        self.print_step("3c", "TH reads from the DUT the FaultState attribute. Verify value is 0x00 (NoError)")
-        self.print_step("3d", "TH reads from the DUT the SessionID attribute")
+        await self.send_test_event_trigger_basic()
 
-        # Part 4
-        self.print_step("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Plugged-in Test Event")
-        self.print_step("4", "Verify Event EEVSE.S.E00(EVConnected) sent")
-
-        self.print_step("4a", "TH reads from the DUT the State attribute. Verify value is 0x01 (PluggedInNoDemand)")
-
-        # Part 5
-        self.print_step(
-            "5", "TH sends command EnableCharging with ChargingEnabledUntil=2 minutes in the future, minimumChargeCurrent=6000, maximumChargeCurrent=60000")
-        # get epoch time for ChargeUntil variable (2 minutes from now)
-        utc_time_2_mins = datetime.datetime.now(pytz.utc) + datetime.timedelta(minutes=2)
-        epoch_time = (utc_time_2_mins - datetime.datetime(2000, 1, 1, tzinfo=pytz.utc)).total_seconds()
-        await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=6000, max_charge=60000)
-
-        # Part 6
-        self.print_step("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event")
-        self.print_step("6", "Verify Event EEVSE.S.E02(EnergyTransferStarted) sent")
-
-        self.print_step('6a', 'TH reads from the DUT the State attribute. Verify it is 3 (PluggedinCharging)')
-        current_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='State')
-        asserts.assert_equal(current_state, 3, f'State should be 3, but is actually {current_state}')
-
-        self.print_step('6b', 'TH reads from the DUT the SupplyState attribute. Verify it is 1 (ChargingEnabled)')
-        current_supply_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='SupplyState')
-        asserts.assert_equal(current_supply_state, 1, f'SupplyState should be 1, but is actually {current_supply_state}')
-
-        self.print_step('6c', f'TH reads from the DUT the ChargingEnabledUntil attribute. Verify it is the {epoch_time}')
-        charge_until_time = await self.read_evse_attribute_expect_success(endpoint=1, attribute='ChargingEnabledUntil')
-        asserts.assert_equal(charge_until_time, epoch_time,
-                             f'ChargingEnabledUntil should be {epoch_time}, but is actually {charge_until_time}')
-
-        self.print_step('6d', 'TH reads from the DUT the MinimumChargeCurrent attribute. Verify it is the commanded value (6000)')
-        minimum_charge_value = await self.read_evse_attribute_expect_success(endpoint=1, attribute='MinimumChargeCurrent')
-        asserts.assert_equal(minimum_charge_value, 6000,
-                             f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
-
-        self.print_step(
-            '6e', 'TH reads from the DUT the MaximumChargeCurrent attribute. Verify it is the MIN(command value (60000), CircuitCapacity)')
-        maximum_charge_value = await self.read_evse_attribute_expect_success(endpoint=1, attribute='MinimumChargeCurrent')
-        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute='CircuitCapacity')
-        expected_max_charge = min(6000, circuit_capacity)
-        asserts.assert_equal(maximum_charge_value, expected_max_charge,
-                             f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
-
-        # Part 7
-        self.print_step(7, 'Wait for 2 minutes')
-        time.sleep(120)
-
-        self.print_step('7a', 'TH reads from the DUT the State attribute. Verify it is 2 (PluggedinDemand)')
-        current_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='State')
-        asserts.assert_equal(current_state, 2, f'State should be 2, but is actually {current_state}')
-
-        self.print_step('7b', 'TH reads from the DUT the SupplyState attribute. Verify it is 0 (Disabled)')
-        current_supply_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='SupplyState')
-        asserts.assert_equal(current_supply_state, 0, f'SupplyState should be 0, but is actually {current_supply_state}')
-
-        # Part 8
-        self.print_step(
-            8, 'TH sends command EnableCharging with ChargingEnabledUntil=NULL, minimumChargeCurrent = 6000, maximumChargeCurrent=12000')
-        await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=6000, max_charge=12000)
-
-        self.print_step('8a', 'TH reads from the DUT the State attribute. Verify it is 3 (PluggedinCharging)')
-        current_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='State')
-        asserts.assert_equal(current_state, 3, f'State should be 3, but is actually {current_state}')
-
-        self.print_step('8b', 'TH reads from the DUT the SupplyState attribute. Verify it is 1 (ChargingEnabled)')
-        current_supply_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='SupplyState')
-        asserts.assert_equal(current_supply_state, 1, f'SupplyState should be 1, but is actually {current_supply_state}')
-
-        self.print_step('8c', f'TH reads from the DUT the ChargingEnabledUntil attribute. Verify it is the {epoch_time}')
-        charge_until_time = await self.read_evse_attribute_expect_success(endpoint=1, attribute='ChargingEnabledUntil')
-        asserts.assert_equal(charge_until_time, epoch_time,
-                             f'ChargingEnabledUntil should be {epoch_time}, but is actually {charge_until_time}')
-
-        self.print_step('8d', 'TH reads from the DUT the MinimumChargeCurrent attribute. Verify it is the commanded value (6000)')
-        minimum_charge_value = await self.read_evse_attribute_expect_success(endpoint=1, attribute='MinimumChargeCurrent')
-        asserts.assert_equal(minimum_charge_value, 6000,
-                             f'MinimumChargeValue should be 6000, but is actually {minimum_charge_value}')
-
-        self.print_step(
-            '8e', 'TH reads from the DUT the MaximumChargeCurrent attribute. Verify it is the MIN(command value (60000), CircuitCapacity)')
-        maximum_charge_value = await self.read_evse_attribute_expect_success(endpoint=1, attribute='MaximumChargeCurrent')
-        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute='CircuitCapacity')
-        expected_max_charge = min(12000, circuit_capacity)
-        asserts.assert_equal(maximum_charge_value, expected_max_charge,
-                             f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
-
-        # Part 9
-        # This may not work as the optional attribute may not be currently supported.
-        self.print_step(9, 'If the optional attribute is supported TH writes to the DUT UserMaximumChargeCurrent=6000')
-        self.write_user_max_charge(1, user_max_charge=6000)
-
-        self.print_step('9a', 'After a few seconds TH reads from the DUT the MaximumChargeCurrent')
+        # After a few seconds...
         time.sleep(3)
-        maximum_charge_value = await self.read_evse_attribute_expect_success(endpoint=1, attribute='MaximumChargeCurrent')
-        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute='CircuitCapacity')
-        expected_max_charge = min(maximum_charge_value, circuit_capacity)
-        asserts.assert_equal(maximum_charge_value, expected_max_charge,
-                             f'MaximumChargeValue should be {expected_max_charge}, but is actually {maximum_charge_value}')
 
-        # Part 10 - TODO Requires Test Event Triggers
+        self.step("3a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
 
-        # Part 11 - TODO Requires Test Event Triggers
+        self.step("3b")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
 
-        # Part 12 - TODO Requires Test Event Triggers
+        self.step("3c")
+        await self.check_evse_attribute("FaultState", Clusters.EnergyEvse.Enums.FaultStateEnum.kNoError)
 
-        # Part 13
-        self.print_step(13, 'TH sends a Disable command')
-        await self.send_disable_command(endpoint=1)
+        self.step("3d")
+        # Save Session ID - it may be NULL at this point
+        session_id = await self.read_evse_attribute_expect_success(endpoint=1, attribute="SessionID")
 
-        self.print_step('13a', 'TH reads from the DUT the State attribute. Verify it is 2 (PluggedinDemand)')
-        current_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='State')
-        asserts.assert_equal(current_state, 2, f'State should be 2, but is actually {current_state}')
+        self.step("4")
+        await self.send_test_event_trigger_pluggedin()
+        # TODO check PluggedIn Event
 
-        self.print_step('13b', 'TH reads from the DUT the SupplyState attribute. Verify it is 0 (Disabled)')
-        current_supply_state = await self.read_evse_attribute_expect_success(endpoint=1, attribute='SupplyState')
-        asserts.assert_equal(current_supply_state, 0, f'SupplyState should be 0, but is actually {current_supply_state}')
+        self.step("4a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
 
-        # Part 14 - TODO Requires Test Event Triggers
+        self.step("5")
+        charging_duration = 5  # TODO test plan spec says 120s - reduced for now
+        min_charge_current = 6000
+        max_charge_current = 60000
+        # get epoch time for ChargeUntil variable (2 minutes from now)
+        utc_time_charging_end = datetime.datetime.now(pytz.utc) + datetime.timedelta(seconds=charging_duration)
+        epoch_time = (utc_time_charging_end - datetime.datetime(2000, 1, 1, tzinfo=pytz.utc)).total_seconds()
+        await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
 
-        # Part 15 - TODO Requires Test Event Triggers
+        self.step("6")
+        await self.send_test_event_trigger_charge_demand()
+        # TODO check EnergyTransferStarted Event
 
-        # Part 16 - TODO Requires Test Event Triggers
+        self.step("6a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
+
+        self.step("6b")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kChargingEnabled)
+
+        self.step("6c")
+        await self.check_evse_attribute("ChargingEnabledUntil", epoch_time)
+
+        self.step("6d")
+        await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
+
+        self.step("6e")
+        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute="CircuitCapacity")
+        expected_max_charge = min(max_charge_current, circuit_capacity)
+        await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
+
+        self.step("7")
+        # Sleep for the charging duration plus a couple of seconds to check it has stopped
+        time.sleep(charging_duration + 2)
+        # TODO check EnergyTransferredStoped (EvseStopped)
+
+        self.step("7a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInDemand)
+
+        self.step("7b")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
+
+        self.step("8")
+        charge_until = None
+        min_charge_current = 6000
+        max_charge_current = 12000
+
+        await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
+
+        self.step("8a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
+
+        self.step("8b")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kChargingEnabled)
+
+        self.step("8c")
+        await self.check_evse_attribute("ChargingEnabledUntil", charge_until)
+
+        self.step("8d")
+        await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
+
+        self.step("8e")
+        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute="CircuitCapacity")
+        expected_max_charge = min(max_charge_current, circuit_capacity)
+        await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
+
+        self.step("9")
+        # This will only work if the optional UserMaximumChargeCurrent attribute is supported
+        if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in self.get_supported_energy_evse_attributes():
+            logging.info("UserMaximumChargeCurrent is supported...")
+            user_max_charge_current = 6000
+            self.write_user_max_charge(1, user_max_charge_current)
+
+            self.step("9a")
+            time.sleep(3)
+
+            expected_max_charge = min(user_max_charge_current, circuit_capacity)
+            await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
+        else:
+            logging.info("UserMaximumChargeCurrent is NOT supported... skipping.")
+
+        self.step("10")
+        await self.send_test_event_trigger_charge_demand_clear()
+        # TODO Verify Event EEVSE.S.E03(EnergyTransferStopped) sent with reason EvStopped
+
+        self.step("10a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
+
+        self.step("11")
+        await self.send_test_event_trigger_charge_demand()
+        # TODO Verify Event EEVSE.S.E03(EnergyTransferStarted) sent
+
+        self.step("12")
+        await self.send_test_event_trigger_charge_demand_clear()
+        # TODO Verify Event EEVSE.S.E03(EnergyTransferStopped with reason EvStopped) sent
+
+        self.step("12a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInNoDemand)
+
+        self.step("13")
+        await self.send_test_event_trigger_pluggedin_clear()
+        # TODO Verify EVNotDetected sent
+
+        self.step("13a")
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)
+
+        self.step("13b")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kChargingEnabled)
+
+        self.step("13c")
+        await self.check_evse_attribute("SessionID", session_id)
+
+        self.step("13d")
+        session_duration = await self.read_evse_attribute_expect_success(endpoint=1, attribute="SessionDuration")
+        asserts.assert_greater_equal(session_duration, charging_duration,
+                                     f"Unexpected 'SessionDuration' value - expected >= {charging_duration}, was {session_duration}")
+
+        self.step("14")
+        await self.send_test_event_trigger_pluggedin()
+        # TODO check PluggedIn Event
+
+        self.step("14a")
+        await self.send_test_event_trigger_charge_demand()
+        # TODO check EnergyTransferStarted Event
+
+        self.step("14b")
+        await self.check_evse_attribute("SessionID", session_id + 1)
+
+        self.step("15")
+        await self.send_disable_command()
+        # TODO Verify Event EEVSE.S.E03(EnergyTransferStopped with reason EvseStopped) sent
+
+        self.step("15a")
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
+
+        self.step("16")
+        await self.send_test_event_trigger_charge_demand_clear()
+
+        self.step("17")
+        await self.send_test_event_trigger_pluggedin_clear()
+        # TODO Verify EVNotDetected sent
+
+        self.step("18")
+        await self.send_test_event_trigger_basic_clear()
 
 
 if __name__ == "__main__":
