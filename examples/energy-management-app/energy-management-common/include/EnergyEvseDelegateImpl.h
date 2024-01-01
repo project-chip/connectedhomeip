@@ -128,6 +128,7 @@ public:
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
     Status HwSetState(StateEnum state);
+    StateEnum HwGetState() { return mHwState; };
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
     Status HwSetVehicleID(const CharSpan & vehID);

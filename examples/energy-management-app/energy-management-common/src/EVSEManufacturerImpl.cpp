@@ -105,34 +105,72 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
     }
 }
 
+struct EVSETestEventSaveData
+{
+    int64_t mOldCircuitCapacity;
+    int64_t mOldUserMaximumChargeCurrent;
+    StateEnum mOldHwStateBasic;           /* For storing hwState before Basic Func event */
+    StateEnum mOldHwStatePluggedIn;       /* For storing hwState before PluggedIn event */
+    StateEnum mOldHwStatePluggedInDemand; /* For storing hwState before PluggedInDemand event */
+};
+
+static EVSETestEventSaveData sEVSETestEventSaveData;
+
+EnergyEvseDelegate * GetEvseDelegate()
+{
+    EVSEManufacturer * mn = GetEvseManufacturer();
+    VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
+    EnergyEvseDelegate * dg = mn->GetDelegate();
+    VerifyOrDieWithMsg(dg != nullptr, AppServer, "EVSE Delegate is null");
+
+    return dg;
+}
+
 void SetTestEventTrigger_BasicFunctionality()
 {
-    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+    EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    // TODO save the values so we can restore them in the clear event
+    sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
+    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
+    sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
     dg->HwSetCircuitCapacity(32000);
     dg->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
 }
-void SetTestEventTrigger_BasicFunctionalityClear() {}
+void SetTestEventTrigger_BasicFunctionalityClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
 
+    dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
+    dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
+    dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
+}
 void SetTestEventTrigger_EVPluggedIn()
 {
-    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+    EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    // TODO save the values so we can restore them in the clear event
+    sEVSETestEventSaveData.mOldHwStatePluggedIn = dg->HwGetState();
     dg->HwSetState(StateEnum::kPluggedInNoDemand);
 }
-void SetTestEventTrigger_EVPluggedInClear() {}
+void SetTestEventTrigger_EVPluggedInClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedIn);
+}
 
 void SetTestEventTrigger_EVChargeDemand()
 {
-    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+    EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    // TODO save the values so we can restore them in the clear event
+    sEVSETestEventSaveData.mOldHwStatePluggedInDemand = dg->HwGetState();
     dg->HwSetState(StateEnum::kPluggedInDemand);
 }
-void SetTestEventTrigger_EVChargeDemandClear() {}
+void SetTestEventTrigger_EVChargeDemandClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedInDemand);
+}
 
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
