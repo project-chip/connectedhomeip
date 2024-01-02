@@ -655,7 +655,6 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
         ReturnErrorOnFailure(commandData.Ref(mRefForResponse.Value()));
     }
 
-    auto * tlvWriter = mInvokeResponseBuilder.GetWriter();
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB());
     MoveToState(State::AddedCommand);
@@ -761,6 +760,8 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
 CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    auto * tlvWriter = mInvokeResponseBuilder.GetWriter();
     ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeResponseBuilder.GetInvokeResponses().GetSizeToEndInvokeResponses()));
     ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeResponseBuilder.GetSizeToEndInvokeResponseMessage()));
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
