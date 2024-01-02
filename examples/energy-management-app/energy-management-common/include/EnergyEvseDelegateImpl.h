@@ -139,8 +139,10 @@ public:
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
+    int64_t HwGetMaxHardwareCurrentLimit() { return mMaxHardwareCurrentLimit; }
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
+    int64_t HwGetCableAssemblyLimit() { return mCableAssemblyCurrentLimit; }
     Status HwSetState(StateEnum state);
     StateEnum HwGetState() { return mHwState; };
     Status HwSetFault(FaultStateEnum fault);

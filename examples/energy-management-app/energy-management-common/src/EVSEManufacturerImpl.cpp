@@ -107,8 +107,10 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
 
 struct EVSETestEventSaveData
 {
+    int64_t mOldMaxHardwareCurrentLimit;
     int64_t mOldCircuitCapacity;
     int64_t mOldUserMaximumChargeCurrent;
+    int64_t mOldCableAssemblyLimit;
     StateEnum mOldHwStateBasic;           /* For storing hwState before Basic Func event */
     StateEnum mOldHwStatePluggedIn;       /* For storing hwState before PluggedIn event */
     StateEnum mOldHwStatePluggedInDemand; /* For storing hwState before PluggedInDemand event */
@@ -130,9 +132,12 @@ void SetTestEventTrigger_BasicFunctionality()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
+    sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit  = dg->HwGetMaxHardwareCurrentLimit();
     sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
     sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
     sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
+
+    dg->HwSetMaxHardwareCurrentLimit(32000);
     dg->HwSetCircuitCapacity(32000);
     dg->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
@@ -141,6 +146,7 @@ void SetTestEventTrigger_BasicFunctionalityClear()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
+    dg->HwSetMaxHardwareCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit);
     dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
     dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
@@ -149,12 +155,16 @@ void SetTestEventTrigger_EVPluggedIn()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    sEVSETestEventSaveData.mOldHwStatePluggedIn = dg->HwGetState();
+    sEVSETestEventSaveData.mOldCableAssemblyLimit = dg->HwGetCableAssemblyLimit();
+    sEVSETestEventSaveData.mOldHwStatePluggedIn   = dg->HwGetState();
+
+    dg->HwSetCableAssemblyLimit(63000);
     dg->HwSetState(StateEnum::kPluggedInNoDemand);
 }
 void SetTestEventTrigger_EVPluggedInClear()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetCableAssemblyLimit(sEVSETestEventSaveData.mOldCableAssemblyLimit);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedIn);
 }
 

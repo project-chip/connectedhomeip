@@ -192,7 +192,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
     /* there is no attribute to store this so store in private variable */
     mMaxHardwareCurrentLimit = currentmA;
 
-    return this->ComputeMaxChargeCurrentLimit();
+    return ComputeMaxChargeCurrentLimit();
 }
 
 /**
@@ -214,7 +214,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
     mCircuitCapacity = currentmA;
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, CircuitCapacity::Id);
 
-    return this->ComputeMaxChargeCurrentLimit();
+    return ComputeMaxChargeCurrentLimit();
 }
 
 /**
@@ -239,7 +239,7 @@ Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
     /* there is no attribute to store this so store in private variable */
     mCableAssemblyCurrentLimit = currentmA;
 
-    return this->ComputeMaxChargeCurrentLimit();
+    return ComputeMaxChargeCurrentLimit();
 }
 
 bool IsEvPluggedIn(StateEnum state)
@@ -525,10 +525,12 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     switch (mSupplyState)
     {
     case SupplyStateEnum::kChargingEnabled:
+        ComputeMaxChargeCurrentLimit();
         SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
         break;
     case SupplyStateEnum::kDischargingEnabled:
+        // TODO ComputeMaxDischargeCurrentLimit() - Needs to be implemented
         SetState(StateEnum::kPluggedInDischarging);
         SendEnergyTransferStartedEvent();
         break;
@@ -559,6 +561,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
     case StateEnum::kPluggedInNoDemand:
         break;
     case StateEnum::kPluggedInDemand:
+        ComputeMaxChargeCurrentLimit();
         SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
         break;
@@ -568,6 +571,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         /* Switched from discharging to charging */
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
 
+        ComputeMaxChargeCurrentLimit();
         SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
         break;
@@ -590,6 +594,7 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     case StateEnum::kPluggedInNoDemand:
         break;
     case StateEnum::kPluggedInDemand:
+        // TODO call ComputeMaxDischargeCurrentLimit()
         SetState(StateEnum::kPluggedInDischarging);
         SendEnergyTransferStartedEvent();
         break;
@@ -597,6 +602,7 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
         /* Switched from charging to discharging */
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
 
+        // TODO call ComputeMaxDischargeCurrentLimit()
         SetState(StateEnum::kPluggedInDischarging);
         SendEnergyTransferStartedEvent();
         break;
