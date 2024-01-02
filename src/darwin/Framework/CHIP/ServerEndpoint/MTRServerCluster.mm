@@ -23,12 +23,40 @@
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRServerCluster.h>
 
+#import "NSDataSpanConversion.h"
+
+#include <app/AttributeAccessInterface.h>
 #include <app/clusters/descriptor/descriptor.h>
+#include <app/data-model/PreEncodedValue.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+// TODO: These attribute-*.h bits are a hack that should eventually go away.
+#include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app;
+
+class MTRServerAttributeAccessInterface : public AttributeAccessInterface {
+public:
+    MTRServerAttributeAccessInterface(EndpointId aEndpointID, ClusterId aClusterID, NSArray<MTRServerAttribute *> * aAttributes,
+        NSNumber * aClusterRevision)
+        : AttributeAccessInterface(MakeOptional(aEndpointID), aClusterID)
+        , mAttributes(aAttributes)
+        , mClusterRevision(aClusterRevision)
+    {
+    }
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    NSArray<MTRServerAttribute *> * mAttributes;
+    NSNumber * mClusterRevision;
+};
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerCluster {
@@ -39,6 +67,34 @@ MTR_DIRECT_MEMBERS
     NSMutableSet<MTRAccessGrant *> * _accessGrants;
     NSMutableArray<MTRServerAttribute *> * _attributes;
     MTRDeviceController * __weak _deviceController;
+
+    std::unique_ptr<MTRServerAttributeAccessInterface> _attributeAccessInterface;
+    // We can't use something like std::unique_ptr<EmberAfAttributeMetadata[]>
+    // because EmberAfAttributeMetadata does not have a default constructor, so
+    // we can't alloc and then initializer later.  And we need a contiguous
+    // buffer for all the attribute metadata, so we need to do this by hand.
+    EmberAfAttributeMetadata * _matterAttributeMetadata;
+    size_t _matterAttributeMetadataCount;
+
+    std::unique_ptr<CommandId[]> _matterAcceptedCommandList;
+    std::unique_ptr<CommandId[]> _matterGeneratedCommandList;
+}
+
+- (void)dealloc
+{
+    [self deallocateAttributeMetadata];
+}
+
+- (void)deallocateAttributeMetadata
+{
+    if (_matterAttributeMetadata != nullptr) {
+        for (size_t i = 0; i < _matterAttributeMetadataCount; ++i) {
+            _matterAttributeMetadata[i].~EmberAfAttributeMetadata();
+        }
+        free(_matterAttributeMetadata);
+        _matterAttributeMetadata = nullptr;
+    }
+    _matterAttributeMetadataCount = 0;
 }
 
 - (nullable instancetype)initWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision
@@ -71,7 +127,7 @@ MTR_DIRECT_MEMBERS
 
 + (MTRServerCluster *)newDescriptorCluster
 {
-    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(app::Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
 - (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
@@ -165,11 +221,23 @@ MTR_DIRECT_MEMBERS
     }
 
     [_attributes addObject:attribute];
-    attribute.parentCluster = app::ConcreteClusterPath(_parentEndpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
+    attribute.parentCluster = ConcreteClusterPath(_parentEndpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
     return YES;
 }
 
-- (BOOL)associateWithController:(MTRDeviceController *)controller
+#define MTR_DECLARE_LIST_ATTRIBUTE(attrID) \
+    DECLARE_DYNAMIC_ATTRIBUTE(attrID, ARRAY, 0, 0)
+
+static constexpr EmberAfAttributeMetadata sDescriptorAttributesMetadata[] = {
+    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID),
+    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeServerListID),
+    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributeClientListID),
+    MTR_DECLARE_LIST_ATTRIBUTE(MTRAttributeIDTypeClusterDescriptorAttributePartsListID),
+};
+
+#undef MTR_DECLARE_LIST_ATTRIBUTE
+
+- (BOOL)associateWithController:(nullable MTRDeviceController *)controller
 {
     MTRDeviceController * existingController = _deviceController;
     if (existingController != nil) {
@@ -191,6 +259,93 @@ MTR_DIRECT_MEMBERS
     // Snapshot _matterAccessGrants now; after this point it will only be
     // updated on the Matter queue.
     _matterAccessGrants = [_accessGrants copy];
+
+    // _attributes shouldn't be able to change anymore, so we can now construct
+    // our EmberAfAttributeMetadata array.
+    size_t attributeCount = _attributes.count;
+
+    // Figure out whether we need to synthesize a FeatureMap attribute.
+    bool needsFeatureMap = true;
+    for (MTRServerAttribute * attr in _attributes) {
+        if ([attr.attributeID isEqual:@(MTRClusterGlobalAttributeFeatureMapID)]) {
+            needsFeatureMap = false;
+            break;
+        }
+    }
+
+    bool needsDescriptorAttributes = [_clusterID isEqual:@(MTRClusterIDTypeDescriptorID)];
+
+    if (needsFeatureMap) {
+        ++attributeCount;
+    }
+
+    if (needsDescriptorAttributes) {
+        attributeCount += ArraySize(sDescriptorAttributesMetadata);
+    }
+
+    // And add one for ClusterRevision
+    ++attributeCount;
+
+    if (attributeCount >= UINT16_MAX) {
+        MTR_LOG_ERROR("Unable to have %llu attributes in a single cluster (clusterID: " ChipLogFormatMEI ")",
+            static_cast<unsigned long long>(attributeCount), ChipLogValueMEI(_clusterID.unsignedLongLongValue));
+        return NO;
+    }
+
+    _matterAttributeMetadata = static_cast<EmberAfAttributeMetadata *>(calloc(attributeCount, sizeof(EmberAfAttributeMetadata)));
+    if (_matterAttributeMetadata == nullptr) {
+        return NO;
+    }
+
+    _matterAttributeMetadataCount = attributeCount;
+
+    size_t attrIndex = 0;
+    for (; attrIndex < _attributes.count; ++attrIndex) {
+        auto * attr = _attributes[attrIndex];
+        // Placement-new into the right slot.
+        new (&_matterAttributeMetadata[attrIndex])
+            EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(static_cast<AttributeId>(attr.attributeID.unsignedLongLongValue),
+                // The type does not actually matter, since we plan to
+                // handle this entirely via AttributeAccessInterface.
+                // Claim Array because that one will keep random IM
+                // code from trying to do things with the attribute
+                // store.
+                ARRAY,
+                // Size in bytes does not matter, since we plan to
+                // handle this entirely via AttributeAccessInterface.
+                0,
+                // ATTRIBUTE_MASK_NULLABLE is not relevant because we
+                // are handling this all via AttributeAccessInterface.
+                0));
+    }
+
+    if (needsFeatureMap) {
+        new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+            BITMAP32, 4, 0));
+        ++attrIndex;
+    }
+
+    if (needsDescriptorAttributes) {
+        for (auto & data : sDescriptorAttributesMetadata) {
+            new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(data);
+            ++attrIndex;
+        }
+    }
+
+    // Add our ClusterRevision bit.
+    new (&_matterAttributeMetadata[attrIndex]) EmberAfAttributeMetadata(DECLARE_DYNAMIC_ATTRIBUTE(MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+        INT16U, 2, 0));
+    ++attrIndex;
+
+    _attributeAccessInterface = std::make_unique<MTRServerAttributeAccessInterface>(_parentEndpoint,
+        static_cast<ClusterId>(_clusterID.unsignedLongLongValue),
+        _attributes,
+        _clusterRevision);
+    // _attributeAccessInterface needs to be registered on the Matter queue; that will happen later.
+
+    _matterAcceptedCommandList = [MTRServerCluster makeMatterCommandList:_acceptedCommands];
+    _matterGeneratedCommandList = [MTRServerCluster makeMatterCommandList:_generatedCommands];
+
     _deviceController = controller;
 
     return YES;
@@ -198,11 +353,42 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
+    // Undo any work associateWithController did.
     for (MTRServerAttribute * attr in _attributes) {
         [attr invalidate];
     }
 
+    // We generally promise to only touch _matterAccessGrants on the Matter
+    // queue after associateWithController succeeds, but we are no longer being
+    // looked at from that queue, so it's safe to reset it here.
+    _matterAccessGrants = [NSSet set];
+    [self deallocateAttributeMetadata];
+    _attributeAccessInterface.reset();
+    _matterAcceptedCommandList.reset();
+    _matterGeneratedCommandList.reset();
+
     _deviceController = nil;
+}
+
+- (void)registerMatterCluster
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (!registerAttributeAccessOverride(_attributeAccessInterface.get())) {
+        // This should only happen if we somehow managed to register an
+        // AttributeAccessInterface for the same (endpoint, cluster) pair.
+        MTR_LOG_ERROR("Could not register AttributeAccessInterface for endpoint %u, cluster 0x%llx",
+            _parentEndpoint, _clusterID.unsignedLongLongValue);
+    }
+}
+
+- (void)unregisterMatterCluster
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (_attributeAccessInterface != nullptr) {
+        unregisterAttributeAccessOverride(_attributeAccessInterface.get());
+    }
 }
 
 - (NSArray<MTRAccessGrant *> *)accessGrants
@@ -221,8 +407,85 @@ MTR_DIRECT_MEMBERS
     // Update it on all the attributes, in case the attributes were added to us
     // before we were added to the endpoint.
     for (MTRServerAttribute * attr in _attributes) {
-        attr.parentCluster = app::ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
+        attr.parentCluster = ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
     }
 }
 
+- (Span<const EmberAfAttributeMetadata>)matterAttributeMetadata
+{
+    return Span<const EmberAfAttributeMetadata>(_matterAttributeMetadata, _matterAttributeMetadataCount);
+}
+
+- (CommandId *)matterAcceptedCommands
+{
+    return _matterAcceptedCommandList.get();
+}
+
+- (CommandId *)matterGeneratedCommands
+{
+    return _matterGeneratedCommandList.get();
+}
+
++ (std::unique_ptr<CommandId[]>)makeMatterCommandList:(NSArray<NSNumber *> * _Nullable)commandList
+{
+    if (commandList.count == 0) {
+        return nullptr;
+    }
+
+    // Lists of accepted/generated commands are terminated by kInvalidClusterId.
+    auto matterCommandList = std::make_unique<CommandId[]>(commandList.count + 1);
+    for (size_t index = 0; index < commandList.count; ++index) {
+        matterCommandList[index] = static_cast<CommandId>(commandList[index].unsignedLongLongValue);
+    }
+    matterCommandList[commandList.count] = kInvalidClusterId;
+    return matterCommandList;
+}
+
 @end
+
+CHIP_ERROR MTRServerAttributeAccessInterface::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    using DataModel::PreEncodedValue;
+
+    // Find the right attribute in our list.
+    MTRServerAttribute * foundAttr = nil;
+    for (MTRServerAttribute * attr in mAttributes) {
+        if ([attr.attributeID isEqual:@(aPath.mAttributeId)]) {
+            foundAttr = attr;
+            break;
+        }
+    }
+
+    if (foundAttr) {
+        id value = foundAttr.serializedValue;
+        if (![value isKindOfClass:NSArray.class]) {
+            // It's a single value, so NSData.
+            NSData * data = value;
+            return aEncoder.Encode(PreEncodedValue(AsByteSpan(data)));
+        }
+
+        // It's a list of data values.
+        NSArray<NSData *> * dataList = value;
+        return aEncoder.EncodeList([dataList](const auto & itemEncoder) {
+            for (NSData * item in dataList) {
+                ReturnErrorOnFailure(itemEncoder.Encode(PreEncodedValue(AsByteSpan(item))));
+            }
+            return CHIP_NO_ERROR;
+        });
+    }
+
+    // This must be the FeatureMap attribute we synthesized.
+    if (aPath.mAttributeId == MTRAttributeIDTypeGlobalAttributeFeatureMapID) {
+        // Feature map defaults to 0.
+        constexpr uint32_t defaultFeatureMap = 0;
+        return aEncoder.Encode(defaultFeatureMap);
+    }
+
+    if (aPath.mAttributeId == MTRAttributeIDTypeGlobalAttributeClusterRevisionID) {
+        return aEncoder.Encode(mClusterRevision.unsignedLongLongValue);
+    }
+
+    // Note: This code is not reached for the descriptor cluster, which uses its own AttributeAccessInterface.
+
+    return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+}

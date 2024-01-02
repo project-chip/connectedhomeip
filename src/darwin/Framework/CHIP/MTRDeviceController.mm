@@ -41,6 +41,7 @@
 #import "MTROperationalCredentialsDelegate.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
@@ -121,6 +122,9 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     os_unfair_lock _deviceMapLock; // protects nodeIDToDeviceMap
     MTRCommissionableBrowser * _commissionableBrowser;
     MTRAttestationTrustStoreBridge * _attestationTrustStoreBridge;
+
+    // _serverEndpoints is only touched on the Matter queue.
+    NSMutableArray<MTRServerEndpoint *> * _serverEndpoints;
 }
 
 - (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters error:(NSError * __autoreleasing *)error
@@ -221,6 +225,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         _factory = factory;
         _deviceMapLock = OS_UNFAIR_LOCK_INIT;
         _nodeIDToDeviceMap = [NSMutableDictionary dictionary];
+        _serverEndpoints = [[NSMutableArray alloc] init];
         _commissionableBrowser = nil;
 
         _deviceControllerDelegateBridge = new MTRDeviceControllerDelegateBridge();
@@ -284,6 +289,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 - (void)shutDownCppController
 {
     assertChipStackLockedByCurrentThread();
+
+    // Shut down all our endpoints.
+    for (MTRServerEndpoint * endpoint in [_serverEndpoints copy]) {
+        [self removeServerEndpointOnMatterQueue:endpoint];
+    }
 
     if (_cppCommissioner) {
         auto * commissionerToShutDown = _cppCommissioner;
@@ -947,6 +957,57 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return [self syncRunOnWorkQueueWithReturnValue:block error:nil];
 }
 
+- (BOOL)addServerEndpoint:(MTRServerEndpoint *)endpoint
+{
+    VerifyOrReturnValue([self checkIsRunning], NO);
+
+    if (![_factory addServerEndpoint:endpoint]) {
+        return NO;
+    }
+
+    if (![endpoint associateWithController:self]) {
+        MTR_LOG_ERROR("Failed to associate MTRServerEndpoint with MTRDeviceController");
+        [_factory removeServerEndpoint:endpoint];
+        return NO;
+    }
+
+    [self asyncDispatchToMatterQueue:^() {
+        [self->_serverEndpoints addObject:endpoint];
+        [endpoint registerMatterEndpoint];
+    }
+        errorHandler:^(NSError * error) {
+            MTR_LOG_ERROR("Unexpected failure dispatching to Matter queue on running controller in addServerEndpoint");
+        }];
+    return YES;
+}
+
+- (void)removeServerEndpoint:(MTRServerEndpoint *)endpoint queue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion MTR_NEWLY_AVAILABLE
+{
+    VerifyOrReturn([self checkIsRunning]);
+
+    // We need to unhook the endpoint from the Matter side before we can start
+    // tearing it down.
+    [self asyncDispatchToMatterQueue:^() {
+        [self removeServerEndpointOnMatterQueue:endpoint];
+        dispatch_async(queue, completion);
+    }
+        errorHandler:^(NSError * error) {
+            // Error means we got shut down, so the endpoint is removed now.
+            dispatch_async(queue, completion);
+        }];
+}
+
+- (void)removeServerEndpointOnMatterQueue:(MTRServerEndpoint *)endpoint
+{
+    assertChipStackLockedByCurrentThread();
+
+    [endpoint unregisterMatterEndpoint];
+    [_serverEndpoints removeObject:endpoint];
+    [endpoint invalidate];
+
+    [_factory removeServerEndpoint:endpoint];
+}
+
 - (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
 {
     if (condition) {
@@ -1228,6 +1289,43 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                                 timeout:timeout
                                   queue:queue
                              completion:completion];
+}
+
+- (NSArray<MTRAccessGrant *> *)accessGrantsForClusterPath:(MTRClusterPath *)clusterPath
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
+        if ([clusterPath.endpoint isEqual:endpoint.endpointID]) {
+            return [endpoint matterAccessGrantsForCluster:clusterPath.cluster];
+        }
+    }
+
+    // Nothing matched, no grants.
+    return @[];
+}
+
+- (nullable NSNumber *)neededReadPrivilegeForClusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID
+{
+    assertChipStackLockedByCurrentThread();
+
+    for (MTRServerEndpoint * endpoint in _serverEndpoints) {
+        for (MTRServerCluster * cluster in endpoint.serverClusters) {
+            if (![cluster.clusterID isEqual:clusterID]) {
+                continue;
+            }
+
+            for (MTRServerAttribute * attr in cluster.attributes) {
+                if (![attr.attributeID isEqual:attributeID]) {
+                    continue;
+                }
+
+                return @(attr.requiredReadPrivilege);
+            }
+        }
+    }
+
+    return nil;
 }
 
 @end
