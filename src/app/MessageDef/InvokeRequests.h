@@ -62,9 +62,9 @@ public:
     CHIP_ERROR EndOfInvokeRequests();
 
     /**
-     *  @brief Get number of bytes required to call EndOfInvokeRequests()
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeRequests()
      *
-     *  @return Expected number of bytes required to call EndOfInvokeRequests()
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeRequests()
      */
     uint32_t GetSizeToEndInvokeRequests();
 

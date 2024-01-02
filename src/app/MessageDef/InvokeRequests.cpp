@@ -81,6 +81,9 @@ CommandDataIB::Builder & InvokeRequests::Builder::CreateCommandData()
 
 CHIP_ERROR InvokeRequests::Builder::EndOfInvokeRequests()
 {
+    // If any changes are made to how we end the invoke requests that involves how many bytes are
+    // needed, a corresponding change to GetSizeToEndInvokeRequests indicating the new size that
+    // will be required.
     EndOfContainer();
     return GetError();
 }

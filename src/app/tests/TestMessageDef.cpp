@@ -2077,8 +2077,8 @@ void InvokeRequestMessageEndOfMessageReservationTest(nlTestSuite * apSuite, void
     err = invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t remianingLengthAfterEndingInvokeRequestMessage = writer.GetRemainingFreeLength();
-    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeRequestMessage);
+    uint32_t remainingLengthAfterEndingInvokeRequestMessage = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remainingLengthAfterEndingInvokeRequestMessage);
 }
 
 void InvokeRequestsEndOfRequestReservationTest(nlTestSuite * apSuite, void * apContext)

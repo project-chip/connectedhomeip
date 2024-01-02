@@ -142,6 +142,9 @@ InvokeRequests::Builder & InvokeRequestMessage::Builder::CreateInvokeRequests()
 
 CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 {
+    // If any changes are made to how we end the invoke request message that involves how many
+    // bytes are needed, a corresponding change to GetSizeToEndInvokeRequestMessage indicating
+    // the new size that will be required.
     if (mError == CHIP_NO_ERROR)
     {
         mError = MessageBuilder::EncodeInteractionModelRevision();
@@ -155,7 +158,8 @@ CHIP_ERROR InvokeRequestMessage::Builder::EndOfInvokeRequestMessage()
 
 uint32_t InvokeRequestMessage::Builder::GetSizeToEndInvokeRequestMessage()
 {
-    // This encodes uint8_t into Tag 0xFF. This means 1 bytes for tag, 1 byte for length, 1 byte for value
+    // EncodeInteractionModelRevision() encodes a uint8_t with context tag 0xFF. This means 1 control byte,
+    // 1 byte for the tag, 1 byte for the value.
     uint32_t kEncodeInteractionModelSize = 1 + 1 + 1;
     uint32_t kEndOfContainerSize         = 1;
 

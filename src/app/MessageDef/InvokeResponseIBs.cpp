@@ -81,6 +81,9 @@ InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
 
 CHIP_ERROR InvokeResponseIBs::Builder::EndOfInvokeResponses()
 {
+    // If any changes are made to how we end the invoke responses that involves how many bytes are
+    // needed, a corresponding change to GetSizeToEndInvokeResponses indicating the new size that
+    // will be required.
     EndOfContainer();
     return GetError();
 }
