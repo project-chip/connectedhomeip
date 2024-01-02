@@ -139,7 +139,6 @@ function cirquetest_run_test() {
     CHIP_CIRQUE_BASE_IMAGE="ghcr.io/project-chip/chip-cirque-device-base" "$TEST_DIR/$CURRENT_TEST.py" "$@"
     exitcode=$?
     __cirquetest_clean_flask
-    cat /var/log/messages > "$LOG_DIR/$CURRENT_TEST"/syslog
     # TODO: Do docker system prune, we cannot filter which container
     # is created by cirque now. This will be implemented later. Currently, only do this on CI
 
