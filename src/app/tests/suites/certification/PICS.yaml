@@ -5686,29 +5686,14 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the SceneCount attribute?"
+    - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0000
 
-    - label: "Does the device implement the CurrentScene attribute?"
+    - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0001
 
-    - label: "Does the device implement the CurrentGroup attribute?"
-      id: S.S.A0002
-
-    - label: "Does the device implement the SceneValid attribute?"
-      id: S.S.A0003
-
-    - label: "Does the device implement the NameSupport attribute?"
-      id: S.S.A0004
-
-    - label: "Does the device implement the LastConfiguredBy attribute?"
-      id: S.S.A0005
-
-    - label: "Does the device implement the SceneTableSize attribute?"
-      id: S.S.A0006
-
     - label: "Does the device implement the FabricSceneInfo attribute?"
-      id: S.S.A0007
+      id: S.S.A0002
 
     #
     # server / commandsReceived
@@ -5735,30 +5720,14 @@ PICS:
           "Does the device implement receiving the GetSceneMembership command?"
       id: S.S.C06.Rsp
 
-    - label: "Does the device implement receiving the EnhancedAddScene command?"
-      id: S.S.C40.Rsp
-
-    - label:
-          "Does the device implement receiving the EnhancedViewScene command?"
-      id: S.S.C41.Rsp
-
     - label: "Does the device implement receiving the CopyScene command?"
-      id: S.S.C42.Rsp
+      id: S.S.C40.Rsp
 
     #
     # server / features
     #
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
-
-    - label: "Does the device implement the Scene Explicit feature?"
-      id: S.S.F01
-
-    - label: "Does the device implement the Scene TableSize feature?"
-      id: S.S.F02
-
-    - label: "Does the device implement the Scene FabricScenes feature?"
-      id: S.S.F03
 
     #
     # server / manually
@@ -5793,19 +5762,13 @@ PICS:
     - label: "Does the device implement sending the GetSceneMembership command?"
       id: S.C.C06.Tx
 
-    - label: "Does the device implement sending the EnhancedAddScene command?"
-      id: S.C.C40.Tx
-
-    - label: "Does the device implement sending the EnhancedViewScene command?"
-      id: S.C.C41.Tx
-
     - label: "Does the device implement sending the CopyScene command?"
-      id: S.C.C42.Tx
+      id: S.C.C40.Tx
 
     - label:
           "Does the device process the TransitionTime parameter of the
           RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
 
     #
     # client / manually
