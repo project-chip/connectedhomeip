@@ -19,18 +19,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "category": "matter",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -220,6 +219,7 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -428,6 +428,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -562,6 +563,7 @@
           "define": "BINARY_INPUT_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -2980,7 +2982,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "vendor_id",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4832,6 +4834,7 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -4985,7 +4988,8 @@
           "mfgCode": null,
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 1
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Thermostat User Interface Configuration",
@@ -5200,6 +5204,7 @@
           "define": "BALLAST_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -6454,6 +6459,7 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -6480,6 +6486,7 @@
           "define": "UNIT_TESTING_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "Test",

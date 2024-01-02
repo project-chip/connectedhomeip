@@ -98,7 +98,7 @@ private:
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
 /// - SceneTableSize
-/// - RemainingCapacity
+/// - FabricSceneInfo
 /// - GeneratedCommandList
 /// - AcceptedCommandList
 /// - EventList
@@ -233,6 +233,9 @@ private:
 // Skipping Boolean State
 // Skipping ICD Management
 // Skipping Timer
+// Skipping Oven Cavity Operational State
+// Skipping Oven Mode
+// Skipping Laundry Dryer Controls
 // Skipping Mode Select
 // Skipping Laundry Washer Mode
 // Skipping Refrigerator And Temperature Controlled Cabinet Mode
@@ -251,7 +254,13 @@ private:
 // Skipping RVC Operational State
 // Skipping HEPA Filter Monitoring
 // Skipping Activated Carbon Filter Monitoring
+// Skipping Boolean State Configuration
+// Skipping Valve Configuration and Control
+// Skipping Electrical Energy Measurement
 // Skipping Demand Response Load Control
+// Skipping Device Energy Management
+// Skipping Energy EVSE
+// Skipping Energy Preference
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Door Lock cluster
@@ -710,6 +719,8 @@ private:
 // Skipping Application Launcher
 // Skipping Application Basic
 // Skipping Account Login
+// Skipping Content Control
+// Skipping Content App Observer
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Electrical Measurement cluster

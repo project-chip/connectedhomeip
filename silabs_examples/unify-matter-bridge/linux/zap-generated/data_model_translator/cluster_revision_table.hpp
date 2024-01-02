@@ -42,7 +42,7 @@ const std::map<int, int> zap_cluster_revisions = {
         37,
         0,
     },
-    { 40, 2 },
+    { 40, 3 },
     {
         41,
         0,
@@ -77,10 +77,7 @@ const std::map<int, int> zap_cluster_revisions = {
         50,
         0,
     },
-    {
-        51,
-        0,
-    },
+    { 51, 2 },
     {
         52,
         0,
@@ -98,7 +95,7 @@ const std::map<int, int> zap_cluster_revisions = {
         0,
     },
     { 56, 2 },
-    { 57, 2 },
+    { 57, 3 },
     {
         59,
         0,
@@ -139,6 +136,12 @@ const std::map<int, int> zap_cluster_revisions = {
     { 70, 2 },
     {
         71,
+        0,
+    },
+    { 72, 1 },
+    { 73, 1 },
+    {
+        74,
         0,
     },
     { 80, 2 },
@@ -189,7 +192,22 @@ const std::map<int, int> zap_cluster_revisions = {
         114,
         0,
     },
+    { 128, 1 },
+    { 129, 1 },
+    { 145, 1 },
     { 150, 4 },
+    {
+        152,
+        0,
+    },
+    {
+        153,
+        0,
+    },
+    {
+        155,
+        0,
+    },
     { 257, 7 },
     { 258, 5 },
     {
@@ -252,10 +270,7 @@ const std::map<int, int> zap_cluster_revisions = {
         1289,
         0,
     },
-    {
-        1290,
-        0,
-    },
+    { 1290, 1 },
     {
         1291,
         0,
@@ -270,6 +285,14 @@ const std::map<int, int> zap_cluster_revisions = {
     },
     {
         1294,
+        0,
+    },
+    {
+        1295,
+        0,
+    },
+    {
+        1296,
         0,
     },
     { 2820, 3 },

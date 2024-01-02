@@ -75,6 +75,9 @@ namespace app {
             { "BooleanState", BooleanState::Id },
             { "IcdManagement", IcdManagement::Id },
             { "Timer", Timer::Id },
+            { "OvenCavityOperationalState", OvenCavityOperationalState::Id },
+            { "OvenMode", OvenMode::Id },
+            { "LaundryDryerControls", LaundryDryerControls::Id },
             { "ModeSelect", ModeSelect::Id },
             { "LaundryWasherMode", LaundryWasherMode::Id },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Id },
@@ -93,7 +96,13 @@ namespace app {
             { "RvcOperationalState", RvcOperationalState::Id },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Id },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Id },
+            { "BooleanStateConfiguration", BooleanStateConfiguration::Id },
+            { "ValveConfigurationAndControl", ValveConfigurationAndControl::Id },
+            { "ElectricalEnergyMeasurement", ElectricalEnergyMeasurement::Id },
             { "DemandResponseLoadControl", DemandResponseLoadControl::Id },
+            { "DeviceEnergyManagement", DeviceEnergyManagement::Id },
+            { "EnergyEvse", EnergyEvse::Id },
+            { "EnergyPreference", EnergyPreference::Id },
             { "DoorLock", DoorLock::Id },
             { "WindowCovering", WindowCovering::Id },
             { "BarrierControl", BarrierControl::Id },
@@ -131,6 +140,8 @@ namespace app {
             { "ApplicationLauncher", ApplicationLauncher::Id },
             { "ApplicationBasic", ApplicationBasic::Id },
             { "AccountLogin", AccountLogin::Id },
+            { "ContentControl", ContentControl::Id },
+            { "ContentAppObserver", ContentAppObserver::Id },
             { "ElectricalMeasurement", ElectricalMeasurement::Id },
             { "UnitTesting", UnitTesting::Id },
             { "FaultInjection", FaultInjection::Id },
@@ -176,7 +187,7 @@ namespace app {
                     { "NameSupport", NameSupport::Id },
                     { "LastConfiguredBy", LastConfiguredBy::Id },
                     { "SceneTableSize", SceneTableSize::Id },
-                    { "RemainingCapacity", RemainingCapacity::Id },
+                    { "FabricSceneInfo", FabricSceneInfo::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -920,6 +931,21 @@ namespace app {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
             } // namespace Attributes
         } // namespace Timer
+        namespace OvenCavityOperationalState {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OvenCavityOperationalState
+        namespace OvenMode {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace OvenMode
+        namespace LaundryDryerControls {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace LaundryDryerControls
         namespace ModeSelect {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -1201,11 +1227,41 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace ActivatedCarbonFilterMonitoring
+        namespace BooleanStateConfiguration {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace BooleanStateConfiguration
+        namespace ValveConfigurationAndControl {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ValveConfigurationAndControl
+        namespace ElectricalEnergyMeasurement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ElectricalEnergyMeasurement
         namespace DemandResponseLoadControl {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
             } // namespace Attributes
         } // namespace DemandResponseLoadControl
+        namespace DeviceEnergyManagement {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace DeviceEnergyManagement
+        namespace EnergyEvse {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace EnergyEvse
+        namespace EnergyPreference {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace EnergyPreference
         namespace DoorLock {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -2048,6 +2104,16 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace AccountLogin
+        namespace ContentControl {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ContentControl
+        namespace ContentAppObserver {
+            namespace Attributes {
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+            } // namespace Attributes
+        } // namespace ContentAppObserver
         namespace ElectricalMeasurement {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
@@ -2344,6 +2410,9 @@ namespace app {
             { "BooleanState", BooleanState::Attributes::matter_attribute_id_cluster_map },
             { "IcdManagement", IcdManagement::Attributes::matter_attribute_id_cluster_map },
             { "Timer", Timer::Attributes::matter_attribute_id_cluster_map },
+            { "OvenCavityOperationalState", OvenCavityOperationalState::Attributes::matter_attribute_id_cluster_map },
+            { "OvenMode", OvenMode::Attributes::matter_attribute_id_cluster_map },
+            { "LaundryDryerControls", LaundryDryerControls::Attributes::matter_attribute_id_cluster_map },
             { "ModeSelect", ModeSelect::Attributes::matter_attribute_id_cluster_map },
             { "LaundryWasherMode", LaundryWasherMode::Attributes::matter_attribute_id_cluster_map },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Attributes::matter_attribute_id_cluster_map },
@@ -2362,7 +2431,13 @@ namespace app {
             { "RvcOperationalState", RvcOperationalState::Attributes::matter_attribute_id_cluster_map },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Attributes::matter_attribute_id_cluster_map },
+            { "BooleanStateConfiguration", BooleanStateConfiguration::Attributes::matter_attribute_id_cluster_map },
+            { "ValveConfigurationAndControl", ValveConfigurationAndControl::Attributes::matter_attribute_id_cluster_map },
+            { "ElectricalEnergyMeasurement", ElectricalEnergyMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "DemandResponseLoadControl", DemandResponseLoadControl::Attributes::matter_attribute_id_cluster_map },
+            { "DeviceEnergyManagement", DeviceEnergyManagement::Attributes::matter_attribute_id_cluster_map },
+            { "EnergyEvse", EnergyEvse::Attributes::matter_attribute_id_cluster_map },
+            { "EnergyPreference", EnergyPreference::Attributes::matter_attribute_id_cluster_map },
             { "DoorLock", DoorLock::Attributes::matter_attribute_id_cluster_map },
             { "WindowCovering", WindowCovering::Attributes::matter_attribute_id_cluster_map },
             { "BarrierControl", BarrierControl::Attributes::matter_attribute_id_cluster_map },
@@ -2400,6 +2475,8 @@ namespace app {
             { "ApplicationLauncher", ApplicationLauncher::Attributes::matter_attribute_id_cluster_map },
             { "ApplicationBasic", ApplicationBasic::Attributes::matter_attribute_id_cluster_map },
             { "AccountLogin", AccountLogin::Attributes::matter_attribute_id_cluster_map },
+            { "ContentControl", ContentControl::Attributes::matter_attribute_id_cluster_map },
+            { "ContentAppObserver", ContentAppObserver::Attributes::matter_attribute_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Attributes::matter_attribute_id_cluster_map },
             { "UnitTesting", UnitTesting::Attributes::matter_attribute_id_cluster_map },
             { "FaultInjection", FaultInjection::Attributes::matter_attribute_id_cluster_map },
@@ -2749,7 +2826,7 @@ namespace app {
                     { "RegisterClient", RegisterClient::Id },
                     { "RegisterClientResponse", RegisterClientResponse::Id },
                     { "UnregisterClient", UnregisterClient::Id },
-                    { "StayActiveRequest", StayActiveRequest::Id }
+                    { "StayActiveRequest", StayActiveRequest::Id },
                 };
             } // namespace Commands
         } // namespace IcdManagement
@@ -2758,6 +2835,21 @@ namespace app {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace Timer
+        namespace OvenCavityOperationalState {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OvenCavityOperationalState
+        namespace OvenMode {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace OvenMode
+        namespace LaundryDryerControls {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace LaundryDryerControls
         namespace ModeSelect {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -2888,11 +2980,41 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace ActivatedCarbonFilterMonitoring
+        namespace BooleanStateConfiguration {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace BooleanStateConfiguration
+        namespace ValveConfigurationAndControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ValveConfigurationAndControl
+        namespace ElectricalEnergyMeasurement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ElectricalEnergyMeasurement
         namespace DemandResponseLoadControl {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
             } // namespace Commands
         } // namespace DemandResponseLoadControl
+        namespace DeviceEnergyManagement {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace DeviceEnergyManagement
+        namespace EnergyEvse {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace EnergyEvse
+        namespace EnergyPreference {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace EnergyPreference
         namespace DoorLock {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -3094,7 +3216,7 @@ namespace app {
                     { "ChangeChannel", ChangeChannel::Id },
                     { "ChangeChannelResponse", ChangeChannelResponse::Id },
                     { "ChangeChannelByNumber", ChangeChannelByNumber::Id },
-                    { "SkipChannel", SkipChannel::Id }
+                    { "SkipChannel", SkipChannel::Id },
                 };
             } // namespace Commands
         } // namespace Channel
@@ -3120,7 +3242,7 @@ namespace app {
                     { "SkipForward", SkipForward::Id },
                     { "SkipBackward", SkipBackward::Id },
                     { "PlaybackResponse", PlaybackResponse::Id },
-                    { "Seek", Seek::Id }
+                    { "Seek", Seek::Id },
                 };
             } // namespace Commands
         } // namespace MediaPlayback
@@ -3191,6 +3313,16 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace AccountLogin
+        namespace ContentControl {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ContentControl
+        namespace ContentAppObserver {
+            namespace Commands {
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+            } // namespace Commands
+        } // namespace ContentAppObserver
         namespace ElectricalMeasurement {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
@@ -3299,6 +3431,9 @@ namespace app {
             { "BooleanState", BooleanState::Commands::matter_command_id_cluster_map },
             { "IcdManagement", IcdManagement::Commands::matter_command_id_cluster_map },
             { "Timer", Timer::Commands::matter_command_id_cluster_map },
+            { "OvenCavityOperationalState", OvenCavityOperationalState::Commands::matter_command_id_cluster_map },
+            { "OvenMode", OvenMode::Commands::matter_command_id_cluster_map },
+            { "LaundryDryerControls", LaundryDryerControls::Commands::matter_command_id_cluster_map },
             { "ModeSelect", ModeSelect::Commands::matter_command_id_cluster_map },
             { "LaundryWasherMode", LaundryWasherMode::Commands::matter_command_id_cluster_map },
             { "RefrigeratorAndTemperatureControlledCabinetMode", RefrigeratorAndTemperatureControlledCabinetMode::Commands::matter_command_id_cluster_map },
@@ -3317,7 +3452,13 @@ namespace app {
             { "RvcOperationalState", RvcOperationalState::Commands::matter_command_id_cluster_map },
             { "HepaFilterMonitoring", HepaFilterMonitoring::Commands::matter_command_id_cluster_map },
             { "ActivatedCarbonFilterMonitoring", ActivatedCarbonFilterMonitoring::Commands::matter_command_id_cluster_map },
+            { "BooleanStateConfiguration", BooleanStateConfiguration::Commands::matter_command_id_cluster_map },
+            { "ValveConfigurationAndControl", ValveConfigurationAndControl::Commands::matter_command_id_cluster_map },
+            { "ElectricalEnergyMeasurement", ElectricalEnergyMeasurement::Commands::matter_command_id_cluster_map },
             { "DemandResponseLoadControl", DemandResponseLoadControl::Commands::matter_command_id_cluster_map },
+            { "DeviceEnergyManagement", DeviceEnergyManagement::Commands::matter_command_id_cluster_map },
+            { "EnergyEvse", EnergyEvse::Commands::matter_command_id_cluster_map },
+            { "EnergyPreference", EnergyPreference::Commands::matter_command_id_cluster_map },
             { "DoorLock", DoorLock::Commands::matter_command_id_cluster_map },
             { "WindowCovering", WindowCovering::Commands::matter_command_id_cluster_map },
             { "BarrierControl", BarrierControl::Commands::matter_command_id_cluster_map },
@@ -3355,6 +3496,8 @@ namespace app {
             { "ApplicationLauncher", ApplicationLauncher::Commands::matter_command_id_cluster_map },
             { "ApplicationBasic", ApplicationBasic::Commands::matter_command_id_cluster_map },
             { "AccountLogin", AccountLogin::Commands::matter_command_id_cluster_map },
+            { "ContentControl", ContentControl::Commands::matter_command_id_cluster_map },
+            { "ContentAppObserver", ContentAppObserver::Commands::matter_command_id_cluster_map },
             { "ElectricalMeasurement", ElectricalMeasurement::Commands::matter_command_id_cluster_map },
             { "UnitTesting", UnitTesting::Commands::matter_command_id_cluster_map },
             { "FaultInjection", FaultInjection::Commands::matter_command_id_cluster_map },

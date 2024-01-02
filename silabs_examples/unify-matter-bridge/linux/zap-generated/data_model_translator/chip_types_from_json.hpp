@@ -872,17 +872,14 @@ inline std::optional<chip::BitMask<BarrierControl::BarrierControlSafetyStatus>> 
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Thermostat::DayOfWeek>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<Thermostat::ACErrorCodeBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<Thermostat::DayOfWeek> r;
-    r.SetField(Thermostat::DayOfWeek::kSunday, obj.value("Sunday", false));
-    r.SetField(Thermostat::DayOfWeek::kMonday, obj.value("Monday", false));
-    r.SetField(Thermostat::DayOfWeek::kTuesday, obj.value("Tuesday", false));
-    r.SetField(Thermostat::DayOfWeek::kWednesday, obj.value("Wednesday", false));
-    r.SetField(Thermostat::DayOfWeek::kThursday, obj.value("Thursday", false));
-    r.SetField(Thermostat::DayOfWeek::kFriday, obj.value("Friday", false));
-    r.SetField(Thermostat::DayOfWeek::kSaturday, obj.value("Saturday", false));
-    r.SetField(Thermostat::DayOfWeek::kAway, obj.value("AwayOrVacation", false));
+    chip::BitMask<Thermostat::ACErrorCodeBitmap> r;
+    r.SetField(Thermostat::ACErrorCodeBitmap::kCompressorFail, obj.value("CompressorFail", false));
+    r.SetField(Thermostat::ACErrorCodeBitmap::kRoomSensorFail, obj.value("RoomSensorFail", false));
+    r.SetField(Thermostat::ACErrorCodeBitmap::kOutdoorSensorFail, obj.value("OutdoorSensorFail", false));
+    r.SetField(Thermostat::ACErrorCodeBitmap::kCoilSensorFail, obj.value("CoilSensorFail", false));
+    r.SetField(Thermostat::ACErrorCodeBitmap::kFanFail, obj.value("FanFail", false));
     return r;
 }
 template <>
@@ -899,21 +896,74 @@ inline std::optional<chip::BitMask<Thermostat::Feature>> from_json(const nlohman
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<Thermostat::ModeForSequence>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<Thermostat::HVACSystemTypeBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<Thermostat::ModeForSequence> r;
-    r.SetField(Thermostat::ModeForSequence::kHeatSetpointPresent, obj.value("Heat", false));
-    r.SetField(Thermostat::ModeForSequence::kCoolSetpointPresent, obj.value("Cool", false));
+    chip::BitMask<Thermostat::HVACSystemTypeBitmap> r;
+    r.SetField(Thermostat::HVACSystemTypeBitmap::kCoolingStage, obj.value("CoolingStage", false));
+    r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingStage, obj.value("HeatingStage", false));
+    r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingIsHeatPump, obj.value("HeatingIsHeatPump", false));
+    r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingUsesFuel, obj.value("HeatingUsesFuel", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::ProgrammingOperationModeBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::ProgrammingOperationModeBitmap> r;
+    r.SetField(Thermostat::ProgrammingOperationModeBitmap::kScheduleActive, obj.value("ScheduleActive", false));
+    r.SetField(Thermostat::ProgrammingOperationModeBitmap::kAutoRecovery, obj.value("AutoRecovery", false));
+    r.SetField(Thermostat::ProgrammingOperationModeBitmap::kEconomy, obj.value("Economy", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::RelayStateBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::RelayStateBitmap> r;
+    r.SetField(Thermostat::RelayStateBitmap::kHeat, obj.value("Heat", false));
+    r.SetField(Thermostat::RelayStateBitmap::kCool, obj.value("Cool", false));
+    r.SetField(Thermostat::RelayStateBitmap::kFan, obj.value("Fan", false));
+    r.SetField(Thermostat::RelayStateBitmap::kHeatStage2, obj.value("HeatStage2", false));
+    r.SetField(Thermostat::RelayStateBitmap::kCoolStage2, obj.value("CoolStage2", false));
+    r.SetField(Thermostat::RelayStateBitmap::kFanStage2, obj.value("FanStage2", false));
+    r.SetField(Thermostat::RelayStateBitmap::kFanStage3, obj.value("FanStage3", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::RemoteSensingBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::RemoteSensingBitmap> r;
+    r.SetField(Thermostat::RemoteSensingBitmap::kLocalTemperature, obj.value("LocalTemperature", false));
+    r.SetField(Thermostat::RemoteSensingBitmap::kOutdoorTemperature, obj.value("OutdoorTemperature", false));
+    r.SetField(Thermostat::RemoteSensingBitmap::kOccupancy, obj.value("Occupancy", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::ScheduleDayOfWeekBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::ScheduleDayOfWeekBitmap> r;
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kSunday, obj.value("Sunday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kMonday, obj.value("Monday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kTuesday, obj.value("Tuesday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kWednesday, obj.value("Wednesday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kThursday, obj.value("Thursday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kFriday, obj.value("Friday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kSaturday, obj.value("Saturday", false));
+    r.SetField(Thermostat::ScheduleDayOfWeekBitmap::kAway, obj.value("Away", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::ScheduleModeBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::ScheduleModeBitmap> r;
+    r.SetField(Thermostat::ScheduleModeBitmap::kHeatSetpointPresent, obj.value("HeatSetpointPresent", false));
+    r.SetField(Thermostat::ScheduleModeBitmap::kCoolSetpointPresent, obj.value("CoolSetpointPresent", false));
     return r;
 }
 
 template <>
-inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::json& value)
+inline std::optional<Thermostat::ACCapacityFormatEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Thermostat::SetpointAdjustMode> table = {
-        { "Heat", Thermostat::SetpointAdjustMode::kHeat },
-        { "Cool", Thermostat::SetpointAdjustMode::kCool },
-        { "Both", Thermostat::SetpointAdjustMode::kBoth },
+    const std::map<std::string, Thermostat::ACCapacityFormatEnum> table = {
+        { "BTUh", Thermostat::ACCapacityFormatEnum::kBTUh },
     };
 
     auto i = table.find(value);
@@ -924,15 +974,13 @@ inline std::optional<Thermostat::SetpointAdjustMode> from_json(const nlohmann::j
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nlohmann::json& value)
+inline std::optional<Thermostat::ACCompressorTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Thermostat::ThermostatControlSequence> table = {
-        { "CoolingOnly", Thermostat::ThermostatControlSequence::kCoolingOnly },
-        { "CoolingWithReheat", Thermostat::ThermostatControlSequence::kCoolingWithReheat },
-        { "HeatingOnly", Thermostat::ThermostatControlSequence::kHeatingOnly },
-        { "HeatingWithReheat", Thermostat::ThermostatControlSequence::kHeatingWithReheat },
-        { "CoolingAndHeating4Pipes", Thermostat::ThermostatControlSequence::kCoolingAndHeating },
-        { "CoolingAndHeating4PipesWithReheat", Thermostat::ThermostatControlSequence::kCoolingAndHeatingWithReheat },
+    const std::map<std::string, Thermostat::ACCompressorTypeEnum> table = {
+        { "Unknown", Thermostat::ACCompressorTypeEnum::kUnknown },
+        { "T1", Thermostat::ACCompressorTypeEnum::kT1 },
+        { "T2", Thermostat::ACCompressorTypeEnum::kT2 },
+        { "T3", Thermostat::ACCompressorTypeEnum::kT3 },
     };
 
     auto i = table.find(value);
@@ -943,12 +991,14 @@ inline std::optional<Thermostat::ThermostatControlSequence> from_json(const nloh
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann::json& value)
+inline std::optional<Thermostat::ACLouverPositionEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Thermostat::ThermostatRunningMode> table = {
-        { "Off", Thermostat::ThermostatRunningMode::kOff },
-        { "Cool", Thermostat::ThermostatRunningMode::kCool },
-        { "Heat", Thermostat::ThermostatRunningMode::kHeat },
+    const std::map<std::string, Thermostat::ACLouverPositionEnum> table = {
+        { "Closed", Thermostat::ACLouverPositionEnum::kClosed },
+        { "Open", Thermostat::ACLouverPositionEnum::kOpen },
+        { "Quarter", Thermostat::ACLouverPositionEnum::kQuarter },
+        { "Half", Thermostat::ACLouverPositionEnum::kHalf },
+        { "ThreeQuarters", Thermostat::ACLouverPositionEnum::kThreeQuarters },
     };
 
     auto i = table.find(value);
@@ -959,18 +1009,155 @@ inline std::optional<Thermostat::ThermostatRunningMode> from_json(const nlohmann
     }
 }
 template <>
-inline std::optional<Thermostat::ThermostatSystemMode> from_json(const nlohmann::json& value)
+inline std::optional<Thermostat::ACRefrigerantTypeEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, Thermostat::ThermostatSystemMode> table = {
-        { "Off", Thermostat::ThermostatSystemMode::kOff },
-        { "Auto", Thermostat::ThermostatSystemMode::kAuto },
-        { "Cool", Thermostat::ThermostatSystemMode::kCool },
-        { "Heat", Thermostat::ThermostatSystemMode::kHeat },
-        { "EmergencyHeating", Thermostat::ThermostatSystemMode::kEmergencyHeat },
-        { "Precooling", Thermostat::ThermostatSystemMode::kPrecooling },
-        { "FanOnly", Thermostat::ThermostatSystemMode::kFanOnly },
-        { "Dry", Thermostat::ThermostatSystemMode::kDry },
-        { "Sleep", Thermostat::ThermostatSystemMode::kSleep },
+    const std::map<std::string, Thermostat::ACRefrigerantTypeEnum> table = {
+        { "Unknown", Thermostat::ACRefrigerantTypeEnum::kUnknown },
+        { "R22", Thermostat::ACRefrigerantTypeEnum::kR22 },
+        { "R410a", Thermostat::ACRefrigerantTypeEnum::kR410a },
+        { "R407c", Thermostat::ACRefrigerantTypeEnum::kR407c },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::ACTypeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::ACTypeEnum> table = {
+        { "Unknown", Thermostat::ACTypeEnum::kUnknown },
+        { "CoolingFixed", Thermostat::ACTypeEnum::kCoolingFixed },
+        { "HeatPumpFixed", Thermostat::ACTypeEnum::kHeatPumpFixed },
+        { "CoolingInverter", Thermostat::ACTypeEnum::kCoolingInverter },
+        { "HeatPumpInverter", Thermostat::ACTypeEnum::kHeatPumpInverter },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::ControlSequenceOfOperationEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::ControlSequenceOfOperationEnum> table = {
+        { "CoolingOnly", Thermostat::ControlSequenceOfOperationEnum::kCoolingOnly },
+        { "CoolingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingWithReheat },
+        { "HeatingOnly", Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly },
+        { "HeatingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kHeatingWithReheat },
+        { "CoolingAndHeating", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating },
+        { "CoolingAndHeatingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::SetpointChangeSourceEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::SetpointChangeSourceEnum> table = {
+        { "Manual", Thermostat::SetpointChangeSourceEnum::kManual },
+        { "Schedule", Thermostat::SetpointChangeSourceEnum::kSchedule },
+        { "External", Thermostat::SetpointChangeSourceEnum::kExternal },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::SetpointRaiseLowerModeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::SetpointRaiseLowerModeEnum> table = {
+        { "Heat", Thermostat::SetpointRaiseLowerModeEnum::kHeat },
+        { "Cool", Thermostat::SetpointRaiseLowerModeEnum::kCool },
+        { "Both", Thermostat::SetpointRaiseLowerModeEnum::kBoth },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::StartOfWeekEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::StartOfWeekEnum> table = {
+        { "Sunday", Thermostat::StartOfWeekEnum::kSunday },
+        { "Monday", Thermostat::StartOfWeekEnum::kMonday },
+        { "Tuesday", Thermostat::StartOfWeekEnum::kTuesday },
+        { "Wednesday", Thermostat::StartOfWeekEnum::kWednesday },
+        { "Thursday", Thermostat::StartOfWeekEnum::kThursday },
+        { "Friday", Thermostat::StartOfWeekEnum::kFriday },
+        { "Saturday", Thermostat::StartOfWeekEnum::kSaturday },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::SystemModeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::SystemModeEnum> table = {
+        { "Off", Thermostat::SystemModeEnum::kOff },
+        { "Auto", Thermostat::SystemModeEnum::kAuto },
+        { "Cool", Thermostat::SystemModeEnum::kCool },
+        { "Heat", Thermostat::SystemModeEnum::kHeat },
+        { "EmergencyHeat", Thermostat::SystemModeEnum::kEmergencyHeat },
+        { "Precooling", Thermostat::SystemModeEnum::kPrecooling },
+        { "FanOnly", Thermostat::SystemModeEnum::kFanOnly },
+        { "Dry", Thermostat::SystemModeEnum::kDry },
+        { "Sleep", Thermostat::SystemModeEnum::kSleep },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::TemperatureSetpointHoldEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::TemperatureSetpointHoldEnum> table = {
+        { "SetpointHoldOff", Thermostat::TemperatureSetpointHoldEnum::kSetpointHoldOff },
+        { "SetpointHoldOn", Thermostat::TemperatureSetpointHoldEnum::kSetpointHoldOn },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::ThermostatRunningModeEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::ThermostatRunningModeEnum> table = {
+        { "Off", Thermostat::ThermostatRunningModeEnum::kOff },
+        { "Cool", Thermostat::ThermostatRunningModeEnum::kCool },
+        { "Heat", Thermostat::ThermostatRunningModeEnum::kHeat },
     };
 
     auto i = table.find(value);

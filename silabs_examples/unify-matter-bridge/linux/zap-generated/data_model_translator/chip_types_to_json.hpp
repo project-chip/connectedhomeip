@@ -953,18 +953,15 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::BarrierCo
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::DayOfWeek>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ACErrorCodeBitmap>& value)
 {
     using namespace chip::app::Clusters::Thermostat;
     nlohmann::json obj;
-    obj["Sunday"] = static_cast<bool>(value.GetField(DayOfWeek::kSunday));
-    obj["Monday"] = static_cast<bool>(value.GetField(DayOfWeek::kMonday));
-    obj["Tuesday"] = static_cast<bool>(value.GetField(DayOfWeek::kTuesday));
-    obj["Wednesday"] = static_cast<bool>(value.GetField(DayOfWeek::kWednesday));
-    obj["Thursday"] = static_cast<bool>(value.GetField(DayOfWeek::kThursday));
-    obj["Friday"] = static_cast<bool>(value.GetField(DayOfWeek::kFriday));
-    obj["Saturday"] = static_cast<bool>(value.GetField(DayOfWeek::kSaturday));
-    obj["AwayOrVacation"] = static_cast<bool>(value.GetField(DayOfWeek::kAway));
+    obj["CompressorFail"] = static_cast<bool>(value.GetField(ACErrorCodeBitmap::kCompressorFail));
+    obj["RoomSensorFail"] = static_cast<bool>(value.GetField(ACErrorCodeBitmap::kRoomSensorFail));
+    obj["OutdoorSensorFail"] = static_cast<bool>(value.GetField(ACErrorCodeBitmap::kOutdoorSensorFail));
+    obj["CoilSensorFail"] = static_cast<bool>(value.GetField(ACErrorCodeBitmap::kCoilSensorFail));
+    obj["FanFail"] = static_cast<bool>(value.GetField(ACErrorCodeBitmap::kFanFail));
     return obj;
 }
 template <>
@@ -982,89 +979,283 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ModeForSequence>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::HVACSystemTypeBitmap>& value)
 {
     using namespace chip::app::Clusters::Thermostat;
     nlohmann::json obj;
-    obj["Heat"] = static_cast<bool>(value.GetField(ModeForSequence::kHeatSetpointPresent));
-    obj["Cool"] = static_cast<bool>(value.GetField(ModeForSequence::kCoolSetpointPresent));
+    obj["CoolingStage"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kCoolingStage));
+    obj["HeatingStage"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingStage));
+    obj["HeatingIsHeatPump"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingIsHeatPump));
+    obj["HeatingUsesFuel"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingUsesFuel));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ProgrammingOperationModeBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["ScheduleActive"] = static_cast<bool>(value.GetField(ProgrammingOperationModeBitmap::kScheduleActive));
+    obj["AutoRecovery"] = static_cast<bool>(value.GetField(ProgrammingOperationModeBitmap::kAutoRecovery));
+    obj["Economy"] = static_cast<bool>(value.GetField(ProgrammingOperationModeBitmap::kEconomy));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::RelayStateBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["Heat"] = static_cast<bool>(value.GetField(RelayStateBitmap::kHeat));
+    obj["Cool"] = static_cast<bool>(value.GetField(RelayStateBitmap::kCool));
+    obj["Fan"] = static_cast<bool>(value.GetField(RelayStateBitmap::kFan));
+    obj["HeatStage2"] = static_cast<bool>(value.GetField(RelayStateBitmap::kHeatStage2));
+    obj["CoolStage2"] = static_cast<bool>(value.GetField(RelayStateBitmap::kCoolStage2));
+    obj["FanStage2"] = static_cast<bool>(value.GetField(RelayStateBitmap::kFanStage2));
+    obj["FanStage3"] = static_cast<bool>(value.GetField(RelayStateBitmap::kFanStage3));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::RemoteSensingBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["LocalTemperature"] = static_cast<bool>(value.GetField(RemoteSensingBitmap::kLocalTemperature));
+    obj["OutdoorTemperature"] = static_cast<bool>(value.GetField(RemoteSensingBitmap::kOutdoorTemperature));
+    obj["Occupancy"] = static_cast<bool>(value.GetField(RemoteSensingBitmap::kOccupancy));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ScheduleDayOfWeekBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["Sunday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kSunday));
+    obj["Monday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kMonday));
+    obj["Tuesday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kTuesday));
+    obj["Wednesday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kWednesday));
+    obj["Thursday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kThursday));
+    obj["Friday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kFriday));
+    obj["Saturday"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kSaturday));
+    obj["Away"] = static_cast<bool>(value.GetField(ScheduleDayOfWeekBitmap::kAway));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ScheduleModeBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["HeatSetpointPresent"] = static_cast<bool>(value.GetField(ScheduleModeBitmap::kHeatSetpointPresent));
+    obj["CoolSetpointPresent"] = static_cast<bool>(value.GetField(ScheduleModeBitmap::kCoolSetpointPresent));
     return obj;
 }
 
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::SetpointAdjustMode& value)
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ACCapacityFormatEnum& value)
 {
     using namespace chip::app::Clusters::Thermostat;
     switch (value) {
-    case SetpointAdjustMode::kHeat:
+    case ACCapacityFormatEnum::kBTUh:
+        return "BTUh";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ACCompressorTypeEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ACCompressorTypeEnum::kUnknown:
+        return "Unknown";
+    case ACCompressorTypeEnum::kT1:
+        return "T1";
+    case ACCompressorTypeEnum::kT2:
+        return "T2";
+    case ACCompressorTypeEnum::kT3:
+        return "T3";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ACLouverPositionEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ACLouverPositionEnum::kClosed:
+        return "Closed";
+    case ACLouverPositionEnum::kOpen:
+        return "Open";
+    case ACLouverPositionEnum::kQuarter:
+        return "Quarter";
+    case ACLouverPositionEnum::kHalf:
+        return "Half";
+    case ACLouverPositionEnum::kThreeQuarters:
+        return "ThreeQuarters";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ACRefrigerantTypeEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ACRefrigerantTypeEnum::kUnknown:
+        return "Unknown";
+    case ACRefrigerantTypeEnum::kR22:
+        return "R22";
+    case ACRefrigerantTypeEnum::kR410a:
+        return "R410a";
+    case ACRefrigerantTypeEnum::kR407c:
+        return "R407c";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ACTypeEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ACTypeEnum::kUnknown:
+        return "Unknown";
+    case ACTypeEnum::kCoolingFixed:
+        return "CoolingFixed";
+    case ACTypeEnum::kHeatPumpFixed:
+        return "HeatPumpFixed";
+    case ACTypeEnum::kCoolingInverter:
+        return "CoolingInverter";
+    case ACTypeEnum::kHeatPumpInverter:
+        return "HeatPumpInverter";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ControlSequenceOfOperationEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ControlSequenceOfOperationEnum::kCoolingOnly:
+        return "CoolingOnly";
+    case ControlSequenceOfOperationEnum::kCoolingWithReheat:
+        return "CoolingWithReheat";
+    case ControlSequenceOfOperationEnum::kHeatingOnly:
+        return "HeatingOnly";
+    case ControlSequenceOfOperationEnum::kHeatingWithReheat:
+        return "HeatingWithReheat";
+    case ControlSequenceOfOperationEnum::kCoolingAndHeating:
+        return "CoolingAndHeating";
+    case ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat:
+        return "CoolingAndHeatingWithReheat";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::SetpointChangeSourceEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case SetpointChangeSourceEnum::kManual:
+        return "Manual";
+    case SetpointChangeSourceEnum::kSchedule:
+        return "Schedule";
+    case SetpointChangeSourceEnum::kExternal:
+        return "External";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::SetpointRaiseLowerModeEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case SetpointRaiseLowerModeEnum::kHeat:
         return "Heat";
-    case SetpointAdjustMode::kCool:
+    case SetpointRaiseLowerModeEnum::kCool:
         return "Cool";
-    case SetpointAdjustMode::kBoth:
+    case SetpointRaiseLowerModeEnum::kBoth:
         return "Both";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ThermostatControlSequence& value)
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::StartOfWeekEnum& value)
 {
     using namespace chip::app::Clusters::Thermostat;
     switch (value) {
-    case ThermostatControlSequence::kCoolingOnly:
-        return "CoolingOnly";
-    case ThermostatControlSequence::kCoolingWithReheat:
-        return "CoolingWithReheat";
-    case ThermostatControlSequence::kHeatingOnly:
-        return "HeatingOnly";
-    case ThermostatControlSequence::kHeatingWithReheat:
-        return "HeatingWithReheat";
-    case ThermostatControlSequence::kCoolingAndHeating:
-        return "CoolingAndHeating4Pipes";
-    case ThermostatControlSequence::kCoolingAndHeatingWithReheat:
-        return "CoolingAndHeating4PipesWithReheat";
+    case StartOfWeekEnum::kSunday:
+        return "Sunday";
+    case StartOfWeekEnum::kMonday:
+        return "Monday";
+    case StartOfWeekEnum::kTuesday:
+        return "Tuesday";
+    case StartOfWeekEnum::kWednesday:
+        return "Wednesday";
+    case StartOfWeekEnum::kThursday:
+        return "Thursday";
+    case StartOfWeekEnum::kFriday:
+        return "Friday";
+    case StartOfWeekEnum::kSaturday:
+        return "Saturday";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ThermostatRunningMode& value)
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::SystemModeEnum& value)
 {
     using namespace chip::app::Clusters::Thermostat;
     switch (value) {
-    case ThermostatRunningMode::kOff:
+    case SystemModeEnum::kOff:
         return "Off";
-    case ThermostatRunningMode::kCool:
-        return "Cool";
-    case ThermostatRunningMode::kHeat:
-        return "Heat";
-    default:
-        return "{}";
-    }
-}
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ThermostatSystemMode& value)
-{
-    using namespace chip::app::Clusters::Thermostat;
-    switch (value) {
-    case ThermostatSystemMode::kOff:
-        return "Off";
-    case ThermostatSystemMode::kAuto:
+    case SystemModeEnum::kAuto:
         return "Auto";
-    case ThermostatSystemMode::kCool:
+    case SystemModeEnum::kCool:
         return "Cool";
-    case ThermostatSystemMode::kHeat:
+    case SystemModeEnum::kHeat:
         return "Heat";
-    case ThermostatSystemMode::kEmergencyHeat:
-        return "EmergencyHeating";
-    case ThermostatSystemMode::kPrecooling:
+    case SystemModeEnum::kEmergencyHeat:
+        return "EmergencyHeat";
+    case SystemModeEnum::kPrecooling:
         return "Precooling";
-    case ThermostatSystemMode::kFanOnly:
+    case SystemModeEnum::kFanOnly:
         return "FanOnly";
-    case ThermostatSystemMode::kDry:
+    case SystemModeEnum::kDry:
         return "Dry";
-    case ThermostatSystemMode::kSleep:
+    case SystemModeEnum::kSleep:
         return "Sleep";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::TemperatureSetpointHoldEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case TemperatureSetpointHoldEnum::kSetpointHoldOff:
+        return "SetpointHoldOff";
+    case TemperatureSetpointHoldEnum::kSetpointHoldOn:
+        return "SetpointHoldOn";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ThermostatRunningModeEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case ThermostatRunningModeEnum::kOff:
+        return "Off";
+    case ThermostatRunningModeEnum::kCool:
+        return "Cool";
+    case ThermostatRunningModeEnum::kHeat:
+        return "Heat";
     default:
         return "{}";
     }

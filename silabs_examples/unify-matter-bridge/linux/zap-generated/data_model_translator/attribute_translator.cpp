@@ -383,13 +383,6 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
             }
             break;
         }
-        case MN::RemainingCapacity::Id: { // type is int8u
-            MN::RemainingCapacity::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
@@ -441,7 +434,7 @@ CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, 
         // NameSupport is not supported by UCL
         // LastConfiguredBy is not supported by UCL
         // SceneTableSize is not supported by UCL
-        // RemainingCapacity is not supported by UCL
+        // FabricSceneInfo is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
         // EventList is not supported by UCL
@@ -2472,14 +2465,14 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::LocalTemperature::Id: { // type is int16s
+        case MN::LocalTemperature::Id: { // type is temperature
             MN::LocalTemperature::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::OutdoorTemperature::Id: { // type is int16s
+        case MN::OutdoorTemperature::Id: { // type is temperature
             MN::OutdoorTemperature::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2493,28 +2486,28 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::AbsMinHeatSetpointLimit::Id: { // type is int16s
+        case MN::AbsMinHeatSetpointLimit::Id: { // type is temperature
             MN::AbsMinHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::AbsMaxHeatSetpointLimit::Id: { // type is int16s
+        case MN::AbsMaxHeatSetpointLimit::Id: { // type is temperature
             MN::AbsMaxHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::AbsMinCoolSetpointLimit::Id: { // type is int16s
+        case MN::AbsMinCoolSetpointLimit::Id: { // type is temperature
             MN::AbsMinCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::AbsMaxCoolSetpointLimit::Id: { // type is int16s
+        case MN::AbsMaxCoolSetpointLimit::Id: { // type is temperature
             MN::AbsMaxCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2612,35 +2605,35 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::RemoteSensing::Id: { // type is bitmap8
+        case MN::RemoteSensing::Id: { // type is RemoteSensingBitmap
             MN::RemoteSensing::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ControlSequenceOfOperation::Id: { // type is ThermostatControlSequence
+        case MN::ControlSequenceOfOperation::Id: { // type is ControlSequenceOfOperationEnum
             MN::ControlSequenceOfOperation::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::SystemMode::Id: { // type is enum8
+        case MN::SystemMode::Id: { // type is SystemModeEnum
             MN::SystemMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ThermostatRunningMode::Id: { // type is enum8
+        case MN::ThermostatRunningMode::Id: { // type is ThermostatRunningModeEnum
             MN::ThermostatRunningMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::StartOfWeek::Id: { // type is enum8
+        case MN::StartOfWeek::Id: { // type is StartOfWeekEnum
             MN::StartOfWeek::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2661,7 +2654,7 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::TemperatureSetpointHold::Id: { // type is enum8
+        case MN::TemperatureSetpointHold::Id: { // type is TemperatureSetpointHoldEnum
             MN::TemperatureSetpointHold::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2675,21 +2668,21 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::ThermostatProgrammingOperationMode::Id: { // type is bitmap8
+        case MN::ThermostatProgrammingOperationMode::Id: { // type is ProgrammingOperationModeBitmap
             MN::ThermostatProgrammingOperationMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ThermostatRunningState::Id: { // type is bitmap16
+        case MN::ThermostatRunningState::Id: { // type is RelayStateBitmap
             MN::ThermostatRunningState::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::SetpointChangeSource::Id: { // type is enum8
+        case MN::SetpointChangeSource::Id: { // type is SetpointChangeSourceEnum
             MN::SetpointChangeSource::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2759,7 +2752,7 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::ACType::Id: { // type is enum8
+        case MN::ACType::Id: { // type is ACTypeEnum
             MN::ACType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -2773,42 +2766,42 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::ACRefrigerantType::Id: { // type is enum8
+        case MN::ACRefrigerantType::Id: { // type is ACRefrigerantTypeEnum
             MN::ACRefrigerantType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ACCompressorType::Id: { // type is enum8
+        case MN::ACCompressorType::Id: { // type is ACCompressorTypeEnum
             MN::ACCompressorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ACErrorCode::Id: { // type is bitmap32
+        case MN::ACErrorCode::Id: { // type is ACErrorCodeBitmap
             MN::ACErrorCode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ACLouverPosition::Id: { // type is enum8
+        case MN::ACLouverPosition::Id: { // type is ACLouverPositionEnum
             MN::ACLouverPosition::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ACCoilTemperature::Id: { // type is int16s
+        case MN::ACCoilTemperature::Id: { // type is temperature
             MN::ACCoilTemperature::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::ACCapacityformat::Id: { // type is enum8
+        case MN::ACCapacityformat::Id: { // type is ACCapacityFormatEnum
             MN::ACCapacityformat::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -3110,7 +3103,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Thermostat::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is int16s
+    // type is temperature
     case MN::LocalTemperature::Id: {
         using T = MN::LocalTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3122,7 +3115,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::OutdoorTemperature::Id: {
         using T = MN::OutdoorTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3146,7 +3139,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::AbsMinHeatSetpointLimit::Id: {
         using T = MN::AbsMinHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3158,7 +3151,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::AbsMaxHeatSetpointLimit::Id: {
         using T = MN::AbsMaxHeatSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3170,7 +3163,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::AbsMinCoolSetpointLimit::Id: {
         using T = MN::AbsMinCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3182,7 +3175,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::AbsMaxCoolSetpointLimit::Id: {
         using T = MN::AbsMaxCoolSetpointLimit::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3354,7 +3347,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is bitmap8
+        // type is RemoteSensingBitmap
     case MN::RemoteSensing::Id: {
         using T = MN::RemoteSensing::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3366,7 +3359,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is ThermostatControlSequence
+        // type is ControlSequenceOfOperationEnum
     case MN::ControlSequenceOfOperation::Id: {
         using T = MN::ControlSequenceOfOperation::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3379,7 +3372,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is SystemModeEnum
     case MN::SystemMode::Id: {
         using T = MN::SystemMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3391,7 +3384,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ThermostatRunningModeEnum
     case MN::ThermostatRunningMode::Id: {
         using T = MN::ThermostatRunningMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3403,7 +3396,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is StartOfWeekEnum
     case MN::StartOfWeek::Id: {
         using T = MN::StartOfWeek::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3441,7 +3434,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is TemperatureSetpointHoldEnum
     case MN::TemperatureSetpointHold::Id: {
         using T = MN::TemperatureSetpointHold::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3466,7 +3459,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is bitmap8
+        // type is ProgrammingOperationModeBitmap
     case MN::ThermostatProgrammingOperationMode::Id: {
         using T = MN::ThermostatProgrammingOperationMode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3479,7 +3472,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is bitmap16
+        // type is RelayStateBitmap
     case MN::ThermostatRunningState::Id: {
         using T = MN::ThermostatRunningState::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3491,7 +3484,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is SetpointChangeSourceEnum
     case MN::SetpointChangeSource::Id: {
         using T = MN::SetpointChangeSource::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3612,7 +3605,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ACTypeEnum
     case MN::ACType::Id: {
         using T = MN::ACType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3636,7 +3629,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ACRefrigerantTypeEnum
     case MN::ACRefrigerantType::Id: {
         using T = MN::ACRefrigerantType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3648,7 +3641,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ACCompressorTypeEnum
     case MN::ACCompressorType::Id: {
         using T = MN::ACCompressorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3660,7 +3653,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is bitmap32
+        // type is ACErrorCodeBitmap
     case MN::ACErrorCode::Id: {
         using T = MN::ACErrorCode::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3672,7 +3665,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ACLouverPositionEnum
     case MN::ACLouverPosition::Id: {
         using T = MN::ACLouverPosition::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3684,7 +3677,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is int16s
+        // type is temperature
     case MN::ACCoilTemperature::Id: {
         using T = MN::ACCoilTemperature::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -3696,7 +3689,7 @@ void ThermostatAttributeAccess::reported_updated(const bridged_endpoint* ep, con
         }
         break;
     }
-        // type is enum8
+        // type is ACCapacityFormatEnum
     case MN::ACCapacityformat::Id: {
         using T = MN::ACCapacityformat::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

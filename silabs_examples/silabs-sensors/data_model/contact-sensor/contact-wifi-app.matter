@@ -2,7 +2,9 @@
 // It is for view/code review purposes only.
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
-server cluster Identify = 3 {
+cluster Identify = 3 {
+  revision 4;
+
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
@@ -43,12 +45,16 @@ server cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
+  /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 /** Attributes and commands for group configuration and manipulation. */
-server cluster Groups = 4 {
+cluster Groups = 4 {
+  revision 4;
+
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
   }
@@ -70,26 +76,13 @@ server cluster Groups = 4 {
     char_string<16> groupName = 1;
   }
 
-  request struct ViewGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct GetGroupMembershipRequest {
-    group_id groupList[] = 0;
-  }
-
-  request struct RemoveGroupRequest {
-    group_id groupID = 0;
-  }
-
-  request struct AddGroupIfIdentifyingRequest {
-    group_id groupID = 0;
-    char_string<16> groupName = 1;
-  }
-
   response struct AddGroupResponse = 0 {
     enum8 status = 0;
     group_id groupID = 1;
+  }
+
+  request struct ViewGroupRequest {
+    group_id groupID = 0;
   }
 
   response struct ViewGroupResponse = 1 {
@@ -98,9 +91,17 @@ server cluster Groups = 4 {
     char_string<16> groupName = 2;
   }
 
+  request struct GetGroupMembershipRequest {
+    group_id groupList[] = 0;
+  }
+
   response struct GetGroupMembershipResponse = 2 {
     nullable int8u capacity = 0;
     group_id groupList[] = 1;
+  }
+
+  request struct RemoveGroupRequest {
+    group_id groupID = 0;
   }
 
   response struct RemoveGroupResponse = 3 {
@@ -108,16 +109,29 @@ server cluster Groups = 4 {
     group_id groupID = 1;
   }
 
+  request struct AddGroupIfIdentifyingRequest {
+    group_id groupID = 0;
+    char_string<16> groupName = 1;
+  }
+
+  /** Command description for AddGroup */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  /** Command description for ViewGroup */
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  /** Command description for GetGroupMembership */
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  /** Command description for RemoveGroup */
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  /** Command description for RemoveAllGroups */
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  /** Command description for AddGroupIfIdentifying */
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
-server cluster Descriptor = 29 {
+cluster Descriptor = 29 {
+  revision 2;
+
   bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
@@ -138,6 +152,7 @@ server cluster Descriptor = 29 {
   readonly attribute cluster_id serverList[] = 1;
   readonly attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
+  readonly attribute optional SemanticTagStruct tagList[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -150,7 +165,9 @@ server cluster Descriptor = 29 {
       Node's Access Control List (ACL), which codifies the rules used to manage
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
-server cluster AccessControl = 31 {
+cluster AccessControl = 31 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
@@ -207,7 +224,7 @@ server cluster AccessControl = 31 {
   }
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
+  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
@@ -222,7 +239,9 @@ server cluster AccessControl = 31 {
 /** This cluster provides attributes and events for determining basic information about Nodes, which supports both
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
-server cluster BasicInformation = 40 {
+cluster BasicInformation = 40 {
+  revision 3;
+
   enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
@@ -292,25 +311,32 @@ server cluster BasicInformation = 40 {
   readonly attribute char_string<64> hardwareVersionString = 8;
   readonly attribute int32u softwareVersion = 9;
   readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute char_string<16> manufacturingDate = 11;
-  readonly attribute char_string<32> partNumber = 12;
-  readonly attribute long_char_string<256> productURL = 13;
-  readonly attribute char_string<64> productLabel = 14;
-  readonly attribute char_string<32> serialNumber = 15;
-  attribute access(write: manage) boolean localConfigDisabled = 16;
-  readonly attribute boolean reachable = 17;
-  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute optional char_string<16> manufacturingDate = 11;
+  readonly attribute optional char_string<32> partNumber = 12;
+  readonly attribute optional long_char_string<256> productURL = 13;
+  readonly attribute optional char_string<64> productLabel = 14;
+  readonly attribute optional char_string<32> serialNumber = 15;
+  attribute access(write: manage) optional boolean localConfigDisabled = 16;
+  readonly attribute optional boolean reachable = 17;
+  readonly attribute optional char_string<32> uniqueID = 18;
   readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly attribute int32u specificationVersion = 21;
+  readonly attribute int16u maxPathsPerInvoke = 22;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 /** Provides an interface for providing OTA software updates */
-client cluster OtaSoftwareUpdateProvider = 41 {
+cluster OtaSoftwareUpdateProvider = 41 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
@@ -384,7 +410,9 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 }
 
 /** Provides an interface for downloading and applying OTA software updates */
-server cluster OtaSoftwareUpdateRequestor = 42 {
+cluster OtaSoftwareUpdateRequestor = 42 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
@@ -436,7 +464,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -446,13 +474,26 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct AnnounceOTAProviderRequest {
+    node_id providerNodeID = 0;
+    vendor_id vendorID = 1;
+    AnnouncementReasonEnum announcementReason = 2;
+    optional octet_string<512> metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  /** Announce the presence of an OTA Provider */
+  command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
 /** Nodes should be expected to be deployed to any and all regions of the world. These global regions
       may have differing common languages, units of measurements, and numerical formatting
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
-server cluster LocalizationConfiguration = 43 {
+cluster LocalizationConfiguration = 43 {
+  revision 1; // NOTE: Default/not specifically set
+
   attribute access(write: manage) char_string<35> activeLocale = 0;
   readonly attribute char_string supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -467,7 +508,9 @@ server cluster LocalizationConfiguration = 43 {
       may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
-server cluster TimeFormatLocalization = 44 {
+cluster TimeFormatLocalization = 44 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CalendarTypeEnum : enum8 {
     kBuddhist = 0;
     kChinese = 1;
@@ -481,11 +524,13 @@ server cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -493,8 +538,8 @@ server cluster TimeFormatLocalization = 44 {
   }
 
   attribute access(write: manage) HourFormatEnum hourFormat = 0;
-  attribute access(write: manage) CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
+  attribute access(write: manage) optional CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -504,7 +549,9 @@ server cluster TimeFormatLocalization = 44 {
 }
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
-server cluster GeneralCommissioning = 48 {
+cluster GeneralCommissioning = 48 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
@@ -541,15 +588,15 @@ server cluster GeneralCommissioning = 48 {
     int64u breadcrumb = 1;
   }
 
+  response struct ArmFailSafeResponse = 1 {
+    CommissioningErrorEnum errorCode = 0;
+    char_string<128> debugText = 1;
+  }
+
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationTypeEnum newRegulatoryConfig = 0;
     char_string<2> countryCode = 1;
     int64u breadcrumb = 2;
-  }
-
-  response struct ArmFailSafeResponse = 1 {
-    CommissioningErrorEnum errorCode = 0;
-    char_string<128> debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse = 3 {
@@ -562,13 +609,18 @@ server cluster GeneralCommissioning = 48 {
     char_string debugText = 1;
   }
 
+  /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  /** Set the regulatory configuration to be used during commissioning */
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  /** Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
-server cluster NetworkCommissioning = 49 {
+cluster NetworkCommissioning = 49 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
@@ -647,12 +699,15 @@ server cluster NetworkCommissioning = 49 {
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute int8u scanMaxTimeSeconds = 2;
-  readonly attribute int8u connectMaxTimeSeconds = 3;
+  readonly attribute optional int8u scanMaxTimeSeconds = 2;
+  readonly attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
+  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -665,27 +720,30 @@ server cluster NetworkCommissioning = 49 {
     optional int64u breadcrumb = 1;
   }
 
-  request struct RemoveNetworkRequest {
-    octet_string<32> networkID = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  request struct ConnectNetworkRequest {
-    octet_string<32> networkID = 0;
-    optional int64u breadcrumb = 1;
-  }
-
-  request struct ReorderNetworkRequest {
-    octet_string<32> networkID = 0;
-    int8u networkIndex = 1;
-    optional int64u breadcrumb = 2;
-  }
-
   response struct ScanNetworksResponse = 1 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string debugText = 1;
     optional WiFiInterfaceScanResultStruct wiFiScanResults[] = 2;
     optional ThreadInterfaceScanResultStruct threadScanResults[] = 3;
+  }
+
+  request struct AddOrUpdateWiFiNetworkRequest {
+    octet_string<32> ssid = 0;
+    octet_string<64> credentials = 1;
+    optional int64u breadcrumb = 2;
+    optional octet_string<140> networkIdentity = 3;
+    optional octet_string<20> clientIdentifier = 4;
+    optional octet_string<32> possessionNonce = 5;
+  }
+
+  request struct AddOrUpdateThreadNetworkRequest {
+    octet_string<254> operationalDataset = 0;
+    optional int64u breadcrumb = 1;
+  }
+
+  request struct RemoveNetworkRequest {
+    octet_string<32> networkID = 0;
+    optional int64u breadcrumb = 1;
   }
 
   response struct NetworkConfigResponse = 5 {
@@ -696,20 +754,53 @@ server cluster NetworkCommissioning = 49 {
     optional octet_string<64> possessionSignature = 4;
   }
 
+  request struct ConnectNetworkRequest {
+    octet_string<32> networkID = 0;
+    optional int64u breadcrumb = 1;
+  }
+
   response struct ConnectNetworkResponse = 7 {
     NetworkCommissioningStatusEnum networkingStatus = 0;
     optional char_string debugText = 1;
     nullable int32s errorValue = 2;
   }
 
+  request struct ReorderNetworkRequest {
+    octet_string<32> networkID = 0;
+    int8u networkIndex = 1;
+    optional int64u breadcrumb = 2;
+  }
+
+  request struct QueryIdentityRequest {
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
+  }
+
+  response struct QueryIdentityResponse = 10 {
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
+  }
+
+  /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  /** Add or update the credentials for a given Wi-Fi network. */
+  command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  /** Add or update the credentials for a given Thread network. */
+  command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  /** Remove the definition of a given network (including its credentials). */
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  /** Connect to the specified network, using previously-defined credentials. */
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  /** Modify the order in which networks will be presented in the Networks attribute. */
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  /** Retrieve details about and optionally proof of possession of a network client identity. */
+  command access(invoke: administer) QueryIdentity(QueryIdentityRequest): QueryIdentityResponse = 9;
 }
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
-server cluster DiagnosticLogs = 50 {
+cluster DiagnosticLogs = 50 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
@@ -742,11 +833,21 @@ server cluster DiagnosticLogs = 50 {
     optional char_string<32> transferFileDesignator = 2;
   }
 
+  response struct RetrieveLogsResponse = 1 {
+    StatusEnum status = 0;
+    long_octet_string logContent = 1;
+    optional epoch_us UTCTimeStamp = 2;
+    optional systime_us timeSinceBoot = 3;
+  }
+
+  /** Retrieving diagnostic logs from a Node */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster GeneralDiagnostics = 51 {
+cluster GeneralDiagnostics = 51 {
+  revision 2;
+
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
@@ -828,12 +929,12 @@ server cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-  readonly attribute int64u upTime = 2;
-  readonly attribute int32u totalOperationalHours = 3;
-  readonly attribute BootReasonEnum bootReason = 4;
-  readonly attribute HardwareFaultEnum activeHardwareFaults[] = 5;
-  readonly attribute RadioFaultEnum activeRadioFaults[] = 6;
-  readonly attribute NetworkFaultEnum activeNetworkFaults[] = 7;
+  readonly attribute optional int64u upTime = 2;
+  readonly attribute optional int32u totalOperationalHours = 3;
+  readonly attribute optional BootReasonEnum bootReason = 4;
+  readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;
+  readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
+  readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -847,11 +948,21 @@ server cluster GeneralDiagnostics = 51 {
     int64u eventTrigger = 1;
   }
 
+  response struct TimeSnapshotResponse = 2 {
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
+  }
+
+  /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
+  /** Take a snapshot of system time and epoch time. */
+  command TimeSnapshot(): TimeSnapshotResponse = 1;
 }
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster SoftwareDiagnostics = 52 {
+cluster SoftwareDiagnostics = 52 {
+  revision 1; // NOTE: Default/not specifically set
+
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
   }
@@ -870,20 +981,25 @@ server cluster SoftwareDiagnostics = 52 {
     optional octet_string faultRecording = 2;
   }
 
-  readonly attribute ThreadMetricsStruct threadMetrics[] = 0;
-  readonly attribute int64u currentHeapFree = 1;
-  readonly attribute int64u currentHeapUsed = 2;
-  readonly attribute int64u currentHeapHighWatermark = 3;
+  readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
+  readonly attribute optional int64u currentHeapFree = 1;
+  readonly attribute optional int64u currentHeapUsed = 2;
+  readonly attribute optional int64u currentHeapHighWatermark = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
+  command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
-server cluster WiFiNetworkDiagnostics = 54 {
+cluster WiFiNetworkDiagnostics = 54 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
@@ -938,24 +1054,29 @@ server cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
   readonly attribute nullable int16u channelNumber = 3;
   readonly attribute nullable int8s rssi = 4;
-  readonly attribute nullable int32u beaconLostCount = 5;
-  readonly attribute nullable int32u beaconRxCount = 6;
-  readonly attribute nullable int32u packetMulticastRxCount = 7;
-  readonly attribute nullable int32u packetMulticastTxCount = 8;
-  readonly attribute nullable int32u packetUnicastRxCount = 9;
-  readonly attribute nullable int32u packetUnicastTxCount = 10;
-  readonly attribute nullable int64u currentMaxRate = 11;
-  readonly attribute nullable int64u overrunCount = 12;
+  readonly attribute optional nullable int32u beaconLostCount = 5;
+  readonly attribute optional nullable int32u beaconRxCount = 6;
+  readonly attribute optional nullable int32u packetMulticastRxCount = 7;
+  readonly attribute optional nullable int32u packetMulticastTxCount = 8;
+  readonly attribute optional nullable int32u packetUnicastRxCount = 9;
+  readonly attribute optional nullable int32u packetUnicastTxCount = 10;
+  readonly attribute optional nullable int64u currentMaxRate = 11;
+  readonly attribute optional nullable int64u overrunCount = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
-server cluster AdministratorCommissioning = 60 {
+cluster AdministratorCommissioning = 60 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
@@ -994,13 +1115,18 @@ server cluster AdministratorCommissioning = 60 {
     int16u commissioningTimeout = 0;
   }
 
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
-server cluster OperationalCredentials = 62 {
+cluster OperationalCredentials = 62 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
@@ -1051,13 +1177,27 @@ server cluster OperationalCredentials = 62 {
     octet_string<32> attestationNonce = 0;
   }
 
+  response struct AttestationResponse = 1 {
+    octet_string<900> attestationElements = 0;
+    octet_string<64> attestationSignature = 1;
+  }
+
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+  }
+
+  response struct CertificateChainResponse = 3 {
+    octet_string<600> certificate = 0;
   }
 
   request struct CSRRequestRequest {
     octet_string<32> CSRNonce = 0;
     optional boolean isForUpdateNOC = 1;
+  }
+
+  response struct CSRResponse = 5 {
+    octet_string NOCSRElements = 0;
+    octet_string attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
@@ -1073,6 +1213,12 @@ server cluster OperationalCredentials = 62 {
     optional octet_string ICACValue = 1;
   }
 
+  response struct NOCResponse = 8 {
+    NodeOperationalCertStatusEnum statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional char_string<128> debugText = 2;
+  }
+
   request struct UpdateFabricLabelRequest {
     char_string<32> label = 0;
   }
@@ -1085,38 +1231,28 @@ server cluster OperationalCredentials = 62 {
     octet_string rootCACertificate = 0;
   }
 
-  response struct AttestationResponse = 1 {
-    octet_string<900> attestationElements = 0;
-    octet_string<64> attestationSignature = 1;
-  }
-
-  response struct CertificateChainResponse = 3 {
-    octet_string<600> certificate = 0;
-  }
-
-  response struct CSRResponse = 5 {
-    octet_string NOCSRElements = 0;
-    octet_string attestationSignature = 1;
-  }
-
-  response struct NOCResponse = 8 {
-    NodeOperationalCertStatusEnum statusCode = 0;
-    optional fabric_idx fabricIndex = 1;
-    optional char_string<128> debugText = 2;
-  }
-
+  /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  /** Sender is requesting a device attestation certificate from the receiver. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  /** Sender is requesting to add the new node operational certificates. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
+  /** Sender is requesting to update the node operational certificates. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
-server cluster GroupKeyManagement = 63 {
+cluster GroupKeyManagement = 63 {
+  revision 1; // NOTE: Default/not specifically set
+
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1169,27 +1305,33 @@ server cluster GroupKeyManagement = 63 {
     int16u groupKeySetID = 0;
   }
 
-  request struct KeySetRemoveRequest {
-    int16u groupKeySetID = 0;
-  }
-
   response struct KeySetReadResponse = 2 {
     GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    int16u groupKeySetID = 0;
   }
 
   response struct KeySetReadAllIndicesResponse = 5 {
     int16u groupKeySetIDs[] = 0;
   }
 
+  /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  /** Read the keys for a given key set id. */
   fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  /** Revoke a Root Key from a Group */
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
-server cluster FixedLabel = 64 {
+cluster FixedLabel = 64 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1205,7 +1347,9 @@ server cluster FixedLabel = 64 {
 }
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
-server cluster UserLabel = 65 {
+cluster UserLabel = 65 {
+  revision 1; // NOTE: Default/not specifically set
+
   struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -1221,7 +1365,9 @@ server cluster UserLabel = 65 {
 }
 
 /** This cluster provides an interface to a boolean state called StateValue. */
-server cluster BooleanState = 69 {
+cluster BooleanState = 69 {
+  revision 1;
+
   info event StateChange = 0 {
     boolean stateValue = 0;
   }
