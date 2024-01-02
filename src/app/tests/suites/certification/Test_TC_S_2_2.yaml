@@ -39,7 +39,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
-      PICS: S.S.A0006
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -272,7 +272,6 @@ tests:
                 value: 0x01
 
     - label: "Step 3c: TH reads attribute SceneTableSize from DUT."
-      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -281,30 +280,7 @@ tests:
               type: int16u
 
     - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
-      verification: |
-          DUT provides FabricSceneInfo containing (for the current fabric) following fields:
-
-          SceneCount has the value (PIXIT.S.SceneTableEntriesOnFactoryNew + 1)
-
-          CurrentScene has the value 0x01
-
-          CurrentGroup has the value G1
-
-          SceneValid has the value TRUE.
-
-          if S.S.F02(TS), RemainingCapacity has the value fabricCapacity - 1
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && S.S.F03 && S.S.F02
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter y after success"
-              - name: "expectedValue"
-                value: "y"
-
-    - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
-      PICS: PICS_SDK_CI_ONLY && S.S.F03 && S.S.F02
+      PICS: PICS_SDK_CI_ONLY
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:

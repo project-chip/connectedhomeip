@@ -35,8 +35,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
-      PICS: S.S.A0006
+    - label: "TH reads from the DUT the (0x0001) SceneTableSize attribute"
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -467,7 +467,7 @@ tests:
           to 0x00, the group identifier from field set to G1, the scene
           identifier from field set to 0x01, the group identifier to field set
           to G1 and the scene identifier to field set to 0x02."
-      PICS: S.S.C42.Rsp
+      PICS: S.S.C40.Rsp
       command: "CopyScene"
       arguments:
           values:

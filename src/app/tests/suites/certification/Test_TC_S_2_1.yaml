@@ -36,7 +36,7 @@ tests:
 
     - label:
           "Step 2: TH reads from the DUT the LastConfiguredBy attribute"
-      PICS: S.S.A0005
+      PICS: S.S.A0000
       command: "readAttribute"
       attribute: "LastConfiguredBy"
       response:
@@ -45,7 +45,7 @@ tests:
 
     - label:
           "Step 3: TH reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0006
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -54,7 +54,7 @@ tests:
 
     - label:
           "Step 4: TH reads from the DUT the FabricSceneInfo attribute"
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       command: "readAttribute"
       attribute: "FabricSceneInfo"
       response:

@@ -378,10 +378,6 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         return;
     }
 
-    auto fieldSetIter = req.extensionFieldSets.begin();
-
-    uint8_t EFSCount = 0;
-
     uint32_t featureMap = 0;
     ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
@@ -391,6 +387,8 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         storageData.SetName(req.sceneName);
     }
 
+    auto fieldSetIter = req.extensionFieldSets.begin();
+    uint8_t EFSCount  = 0;
     // Goes through all EFS in command
     while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
     {
