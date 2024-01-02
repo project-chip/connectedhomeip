@@ -33,6 +33,8 @@ limitations under the License.
     <cluster code="0x0054"/>
     <item value="0x4000" name="Idle"/>
     <item value="0x4001" name="Cleaning"/>
+    <item value="0x4002" name="Mapping"/>
+    <item value="0x4003" name="GoHome"/>
   </enum>
 
   <cluster>
