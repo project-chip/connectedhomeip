@@ -46,7 +46,7 @@ class ICDListCommand(val controller: ChipDeviceController, credsIssuer: Credenti
       println("  +-----------------------------------------------------------------------------+")
       System.out.format(
         "  | %20d | %15d | %15d | %16d |\n",
-        i.nodeId,
+        i.peerNodeId,
         i.startCounter,
         i.offset,
         i.monitoredSubject

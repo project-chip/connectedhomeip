@@ -654,7 +654,7 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
         CHIP_ERROR deleteEntryError = mICDClientStorage.DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
         if (deleteEntryError != CHIP_NO_ERROR)
         {
-            ChipLogError(chipTool, "Failed to delete ICD entry: %s", ErrorStr(error));
+            ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
         }
     }
 
