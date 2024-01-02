@@ -105,11 +105,16 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
     mGoneAsync = true;
 }
 
-CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader & invokeRequestsReader)
+CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     size_t commandCount     = 0;
     bool commandRefExpected = false;
+    InvokeRequests::Parser invokeRequests;
+
+    ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
+    TLV::TLVReader invokeRequestsReader;
+    invokeRequests.GetReader(&invokeRequestsReader);
 
     ReturnErrorOnFailure(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */));
 
@@ -166,6 +171,8 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader
     {
         err = CHIP_NO_ERROR;
     }
+    ReturnErrorOnFailure(invokeRequestMessage.ExitContainer());
+
     return err;
 }
 
@@ -191,9 +198,8 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
 
     {
-        TLV::TLVReader validationInvokeRequestsReader;
-        invokeRequests.GetReader(&validationInvokeRequestsReader);
-        VerifyOrReturnError(ValidateInvokeRequestsAndBuildRegistry(validationInvokeRequestsReader) == CHIP_NO_ERROR,
+        InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
+        VerifyOrReturnError(ValidateInvokeRequestMessageAndBuildRegistry(validationInvokeRequestMessage) == CHIP_NO_ERROR,
                             Status::InvalidAction);
     }
 
