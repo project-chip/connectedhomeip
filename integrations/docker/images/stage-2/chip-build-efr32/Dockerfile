@@ -13,8 +13,8 @@ RUN set -x \
     && : # last line
 
 
-# Clone Gecko SDK 4.3.2 (1228a95)
-RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.3.2/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
+# Clone Gecko SDK 4.4.0 (124fa19)
+RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.4.0/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
     && unzip /tmp/gecko_sdk.zip -d /tmp/gecko_sdk \
     && rm -rf /tmp/gecko_sdk.zip \
     # Deleting files that are not needed to save space
@@ -30,8 +30,8 @@ RUN git clone --depth=1 --single-branch --branch=2.8.2 https://github.com/Silico
     rm -rf .git \
     && : # last line
 
-# Clone WiSeConnect SDK 3.1.0 (58a2404)
-RUN git clone --depth=1 --single-branch --branch=v3.1.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK 3.1.1 (b2c1cd0)
+RUN git clone --depth=1 --single-branch --branch=v3.1.1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git \
     && : # last line
@@ -41,6 +41,12 @@ RUN git clone --depth=1 --single-branch --branch=v3.1.0 https://github.com/Silic
 RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
     unzip ./slc_cli_linux.zip -d /tmp && \
     rm ./slc_cli_linux.zip \
+    && : # last line
+
+# Commander install
+RUN wget https://www.silabs.com/documents/login/software/SimplicityCommander-Linux.zip && \
+    unzip ./SimplicityCommander-Linux.zip -d /tmp && \
+    rm ./SimplicityCommander-Linux.zip \
     && : # last line
 
 # Final SDK container for compiling using Silabs SDK
@@ -66,9 +72,10 @@ RUN set -x \
 ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk/
-ENV PATH="${PATH}:/opt/silabs/slc_cli/"
+ENV PATH="${PATH}:/opt/silabs/slc_cli/:/opt/commander"
 
 COPY --from=build /tmp/gecko_sdk /opt/silabs/gecko_sdk
 COPY --from=build /tmp/wiseconnect-wifi-bt-sdk/ /opt/silabs/wiseconnect-wifi-bt-sdk/
 COPY --from=build /tmp/wifi_sdk /opt/silabs/wifi_sdk
 COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli
+COPY --from=build /tmp/commander /opt/silabs/commander
