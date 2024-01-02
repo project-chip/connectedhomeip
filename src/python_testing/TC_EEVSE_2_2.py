@@ -204,7 +204,7 @@ class TC_EEVSE_2_2(MatterBaseTest):
         max_charge_current = 60000
         # get epoch time for ChargeUntil variable (2 minutes from now)
         utc_time_charging_end = datetime.datetime.now(pytz.utc) + datetime.timedelta(seconds=charging_duration)
-        epoch_time = (utc_time_charging_end - datetime.datetime(2000, 1, 1, tzinfo=pytz.utc)).total_seconds()
+        epoch_time = int((utc_time_charging_end - datetime.datetime(2000, 1, 1, tzinfo=pytz.utc)).total_seconds())
         await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("6")

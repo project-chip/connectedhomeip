@@ -48,30 +48,6 @@ Status EnergyEvseDelegate::Disable()
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Disable()");
 
-    /* Update State */
-    switch (mHwState)
-    {
-    case StateEnum::kNotPluggedIn:
-        SetState(StateEnum::kNotPluggedIn);
-        break;
-
-    case StateEnum::kPluggedInNoDemand:
-        SetState(StateEnum::kPluggedInNoDemand);
-        break;
-
-    case StateEnum::kPluggedInDemand:
-        SetState(StateEnum::kPluggedInDemand);
-        break;
-
-    default:
-        ChipLogError(AppServer, "Unexpected EVSE hardware state");
-        SetState(StateEnum::kFault);
-        break;
-    }
-
-    /* update SupplyState */
-    SetSupplyState(SupplyStateEnum::kDisabled);
-
     /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 */
     SetChargingEnabledUntil(0);
     SetDischargingEnabledUntil(0);
@@ -83,10 +59,7 @@ Status EnergyEvseDelegate::Disable()
     /* update MaximumDischargeCurrent to 0 */
     SetMaximumDischargeCurrent(0);
 
-    NotifyApplicationStateChange();
-    // TODO: Generate events
-
-    return Status::Success;
+    return HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
 }
 
 /**
@@ -128,51 +101,19 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
     {
         /* check chargingEnabledUntil is in the future */
         ChipLogError(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
-        // TODO
+        SetChargingEnabledUntil(chargingEnabledUntil.Value());
+        // TODO start a timer to disable charging later
         // if (checkChargingEnabled)
     }
-
-    /* Check current state isn't already enabled */
-
-    /* If charging is already enabled, check that the parameters may have
-       changed, these may override an existing charging command */
-    switch (mHwState)
-    {
-    case StateEnum::kNotPluggedIn:
-        // TODO handle errors here
-        SetState(StateEnum::kNotPluggedIn);
-        break;
-
-    case StateEnum::kPluggedInNoDemand:
-        // TODO handle errors here
-        //  TODO REFACTOR per Andrei's comment in PR30857 - can we collapse this switch statement?
-        SetState(StateEnum::kPluggedInNoDemand);
-        break;
-
-    case StateEnum::kPluggedInDemand:
-        /* If the EVSE is asking for demand then enable charging */
-        SetState(StateEnum::kPluggedInCharging);
-        break;
-
-    default:
-        ChipLogError(AppServer, "Unexpected EVSE hardware state");
-        SetState(StateEnum::kFault);
-        break;
-    }
-
-    /* update SupplyState to say that charging is now enabled */
-    SetSupplyState(SupplyStateEnum::kChargingEnabled);
 
     /* If it looks ok, store the min & max charging current */
     mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
     SetMinimumChargeCurrent(minimumChargeCurrent);
     // TODO persist these to KVS
 
-    // TODO: Generate events
+    ComputeMaxChargeCurrentLimit();
 
-    NotifyApplicationStateChange();
-
-    return this->ComputeMaxChargeCurrentLimit();
+    return HandleStateMachineEvent(EVSEStateMachineEvent::ChargingEnabledEvent);
 }
 
 /**
@@ -186,14 +127,10 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
 
-    /* update SupplyState */
-    SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+    // TODO save the maxDischarging Current
+    // TODO Do something with timestamp
 
-    // TODO: Generate events
-
-    NotifyApplicationStateChange();
-
-    return Status::Success;
+    return HandleStateMachineEvent(EVSEStateMachineEvent::DischargingEnabledEvent);
 }
 
 /**
@@ -208,10 +145,6 @@ Status EnergyEvseDelegate::StartDiagnostics()
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
     // TODO: Generate events
-
-    // TODO: Notify Application to implement Diagnostics
-
-    NotifyApplicationStateChange();
 
     return Status::Success;
 }
@@ -344,54 +277,47 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
     switch (newState)
     {
     case StateEnum::kNotPluggedIn:
-        if (IsEvPluggedIn(mState))
+        if (mHwState == StateEnum::kPluggedInNoDemand || mHwState == StateEnum::kPluggedInDemand)
         {
-            /* EV was plugged in, but no longer is */
-            mSession.RecalculateSessionDuration();
-            if (IsEvTransferringEnergy(mState))
-            {
-                /*
-                 * EV was transferring current - unusual to get to this case without
-                 * first having the state set to kPluggedInNoDemand or kPluggedInDemand
-                 */
-                mSession.RecalculateSessionDuration();
-                SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
-            }
-
-            SendEVNotDetectedEvent();
-            SetState(newState);
+            /* EVSE has been unplugged now */
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVNotDetectedEvent);
         }
         break;
 
-    case StateEnum::kPluggedInNoDemand: /* deliberate fall-thru */
-    case StateEnum::kPluggedInDemand:
-        if (IsEvPluggedIn(mState))
+    case StateEnum::kPluggedInNoDemand:
+        if (mHwState == StateEnum::kNotPluggedIn)
         {
-            /* EV was already plugged in before */
-            if (IsEvTransferringEnergy(mState))
-            {
-                mSession.RecalculateSessionDuration();
-                SendEnergyTransferStoppedEvent(newState == StateEnum::kPluggedInNoDemand
-                                                   ? EnergyTransferStoppedReasonEnum::kEVStopped
-                                                   : EnergyTransferStoppedReasonEnum::kEVSEStopped);
-            }
-            SetState(newState);
+            /* EV was unplugged, now is plugged in */
+            mHwState = newState;
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVPluggedInEvent);
         }
-        else
+        else if (mHwState == StateEnum::kPluggedInDemand)
         {
-            /* EV was not plugged in - start a new session */
-            // TODO get energy meter readings
-            mSession.StartSession(0, 0);
-            SendEVConnectedEvent();
-
-            /* If*/
-
-            SetState(newState);
+            /* EV was plugged in and wanted demand, now doesn't want demand */
+            mHwState = newState;
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
+        }
+        break;
+    case StateEnum::kPluggedInDemand:
+        if (mHwState == StateEnum::kNotPluggedIn)
+        {
+            /* EV was unplugged, now is plugged in and wants demand */
+            mHwState = newState;
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVPluggedInEvent);
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
+        }
+        else if (mHwState == StateEnum::kPluggedInNoDemand)
+        {
+            /* EV was plugged in and didn't want demand, now does want demand */
+            mHwState = newState;
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
         }
         break;
 
     default:
         /* All other states should be managed by the Delegate */
+        ChipLogError(AppServer, "HwSetState received invalid enum from caller");
+        return Status::Failure;
         break;
     }
 
@@ -492,6 +418,228 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 /* ---------------------------------------------------------------------------
  * Functions below are private helper functions internal to the delegate
  */
+
+/**
+ * @brief   Main EVSE state machine
+ *
+ * This routine handles state transition events to determine behaviour
+ *
+ *
+ */
+Status EnergyEvseDelegate::HandleStateMachineEvent(EVSEStateMachineEvent event)
+{
+    switch (event)
+    {
+    case EVSEStateMachineEvent::EVPluggedInEvent:
+        ChipLogDetail(AppServer, "EVSE: EV PluggedIn event");
+        return HandleEVPluggedInEvent();
+        break;
+    case EVSEStateMachineEvent::EVNotDetectedEvent:
+        ChipLogDetail(AppServer, "EVSE: EV NotDetected event");
+        return HandleEVNotDetectedEvent();
+        break;
+    case EVSEStateMachineEvent::EVNoDemandEvent:
+        ChipLogDetail(AppServer, "EVSE: EV NoDemand event");
+        return HandleEVNoDemandEvent();
+        break;
+    case EVSEStateMachineEvent::EVDemandEvent:
+        ChipLogDetail(AppServer, "EVSE: EV Demand event");
+        return HandleEVDemandEvent();
+        break;
+    case EVSEStateMachineEvent::ChargingEnabledEvent:
+        ChipLogDetail(AppServer, "EVSE: ChargingEnabled event");
+        return HandleChargingEnabledEvent();
+        break;
+    case EVSEStateMachineEvent::DischargingEnabledEvent:
+        ChipLogDetail(AppServer, "EVSE: DischargingEnabled event");
+        return HandleDischargingEnabledEvent();
+        break;
+    case EVSEStateMachineEvent::DisabledEvent:
+        ChipLogDetail(AppServer, "EVSE: Disabled event");
+        return HandleDisabledEvent();
+        break;
+    case EVSEStateMachineEvent::FaultRaised:
+        ChipLogDetail(AppServer, "EVSE: FaultRaised event");
+        return HandleFaultRaised();
+        break;
+    case EVSEStateMachineEvent::FaultCleared:
+        ChipLogDetail(AppServer, "EVSE: FaultCleared event");
+        return HandleFaultCleared();
+        break;
+    default:
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HandleEVPluggedInEvent()
+{
+    /* check if we are already plugged in or not */
+    if (mState == StateEnum::kNotPluggedIn)
+    {
+        /* EV was not plugged in - start a new session */
+        // TODO get energy meter readings
+        mSession.StartSession(0, 0);
+        SendEVConnectedEvent();
+
+        /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
+        SetState(mHwState);
+    }
+    // else we are already plugged in - ignore
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
+{
+    if (mState == StateEnum::kPluggedInCharging || mState == StateEnum::kPluggedInDischarging)
+    {
+        /*
+         * EV was transferring current - unusual to get to this case without
+         * first having the state set to kPluggedInNoDemand or kPluggedInDemand
+         */
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
+    }
+
+    SendEVNotDetectedEvent();
+    SetState(StateEnum::kNotPluggedIn);
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HandleEVNoDemandEvent()
+{
+    if (mState == StateEnum::kPluggedInCharging || mState == StateEnum::kPluggedInDischarging)
+    {
+        /*
+         * EV was transferring current - EV decided to stop
+         */
+        mSession.RecalculateSessionDuration();
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
+    }
+    /* We must still be plugged in to get here - so no need to check if we are plugged in! */
+    SetState(StateEnum::kPluggedInNoDemand);
+    return Status::Success;
+}
+Status EnergyEvseDelegate::HandleEVDemandEvent()
+{
+    /* Check to see if the supply is enabled for charging / discharging*/
+    switch (mSupplyState)
+    {
+    case SupplyStateEnum::kChargingEnabled:
+        SetState(StateEnum::kPluggedInCharging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
+        SetState(StateEnum::kPluggedInDischarging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case SupplyStateEnum::kDisabled:
+    case SupplyStateEnum::kDisabledError:
+    case SupplyStateEnum::kDisabledDiagnostics:
+        /* We must be plugged in, and the event is asking for demand
+         * but we can't charge or discharge now - leave it as kPluggedInDemand */
+        SetState(StateEnum::kPluggedInDemand);
+        break;
+    default:
+        break;
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HandleChargingEnabledEvent()
+{
+    /* Check there is no Fault or Diagnostics condition */
+    // TODO -!
+
+    /* update SupplyState to say that charging is now enabled */
+    SetSupplyState(SupplyStateEnum::kChargingEnabled);
+
+    switch (mState)
+    {
+    case StateEnum::kNotPluggedIn:
+    case StateEnum::kPluggedInNoDemand:
+        break;
+    case StateEnum::kPluggedInDemand:
+        SetState(StateEnum::kPluggedInCharging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case StateEnum::kPluggedInCharging:
+        break;
+    case StateEnum::kPluggedInDischarging:
+        /* Switched from discharging to charging */
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
+
+        SetState(StateEnum::kPluggedInCharging);
+        SendEnergyTransferStartedEvent();
+        break;
+    default:
+        break;
+    }
+    return Status::Success;
+}
+Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
+{
+    /* Check there is no Fault or Diagnostics condition */
+    // TODO -!
+
+    /* update SupplyState to say that charging is now enabled */
+    SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+
+    switch (mState)
+    {
+    case StateEnum::kNotPluggedIn:
+    case StateEnum::kPluggedInNoDemand:
+        break;
+    case StateEnum::kPluggedInDemand:
+        SetState(StateEnum::kPluggedInDischarging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case StateEnum::kPluggedInCharging:
+        /* Switched from charging to discharging */
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
+
+        SetState(StateEnum::kPluggedInDischarging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case StateEnum::kPluggedInDischarging:
+    default:
+        break;
+    }
+    return Status::Success;
+}
+Status EnergyEvseDelegate::HandleDisabledEvent()
+{
+    /* Check there is no Fault or Diagnostics condition */
+    // TODO -!
+
+    /* update SupplyState to say that charging is now enabled */
+    SetSupplyState(SupplyStateEnum::kDisabled);
+
+    switch (mState)
+    {
+    case StateEnum::kNotPluggedIn:
+    case StateEnum::kPluggedInNoDemand:
+    case StateEnum::kPluggedInDemand:
+        break;
+    case StateEnum::kPluggedInCharging:
+    case StateEnum::kPluggedInDischarging:
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
+        SetState(mHwState);
+        break;
+    default:
+        break;
+    }
+
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::HandleFaultRaised()
+{
+    return Status::Success;
+}
+Status EnergyEvseDelegate::HandleFaultCleared()
+{
+    return Status::Success;
+}
 
 /**
  *  @brief   Called to compute the safe charging current limit
@@ -729,6 +877,7 @@ CHIP_ERROR EnergyEvseDelegate::SetState(StateEnum newValue)
     {
         ChipLogDetail(AppServer, "State updated to %d", static_cast<int>(mState));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, State::Id);
+        NotifyApplicationStateChange();
     }
 
     return CHIP_NO_ERROR;
@@ -754,6 +903,7 @@ CHIP_ERROR EnergyEvseDelegate::SetSupplyState(SupplyStateEnum newValue)
     {
         ChipLogDetail(AppServer, "SupplyState updated to %d", static_cast<int>(mSupplyState));
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SupplyState::Id);
+        NotifyApplicationStateChange();
     }
     return CHIP_NO_ERROR;
 }

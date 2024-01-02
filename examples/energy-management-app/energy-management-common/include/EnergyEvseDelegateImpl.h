@@ -31,6 +31,20 @@ namespace app {
 namespace Clusters {
 namespace EnergyEvse {
 
+/* Local state machine Events to allow simpler handling of state transitions */
+enum EVSEStateMachineEvent
+{
+    EVPluggedInEvent,        /* EV has been plugged in */
+    EVNotDetectedEvent,      /* EV has been unplugged or detected as not connected */
+    EVNoDemandEvent,         /* EV has stopped asking for demand */
+    EVDemandEvent,           /* EV has asked for demand*/
+    ChargingEnabledEvent,    /* Charging has been enabled */
+    DischargingEnabledEvent, /* Discharging has been enabled */
+    DisabledEvent,           /* EVSE has been disabled */
+    FaultRaised,             /* Fault has been raised */
+    FaultCleared,            /* Fault has been cleared */
+};
+
 /**
  * Helper class to handle all of the session related info
  */
@@ -214,6 +228,18 @@ private:
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
     Status NotifyApplicationStateChange();
     Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
+
+    /* Local State machine handling */
+    Status HandleStateMachineEvent(EVSEStateMachineEvent event);
+    Status HandleEVPluggedInEvent();
+    Status HandleEVNotDetectedEvent();
+    Status HandleEVNoDemandEvent();
+    Status HandleEVDemandEvent();
+    Status HandleChargingEnabledEvent();
+    Status HandleDischargingEnabledEvent();
+    Status HandleDisabledEvent();
+    Status HandleFaultRaised();
+    Status HandleFaultCleared();
 
     /**
      * @brief Helper function to work out the charge limit based on conditions and settings
