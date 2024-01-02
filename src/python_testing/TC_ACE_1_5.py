@@ -77,7 +77,7 @@ class TC_ACE_1_5(MatterBaseTest):
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-        params = self.openCommissioningWindow(self.th1, TH1_nodeid, self.matter_test_config.discriminators[0])
+        params = self.openCommissioningWindow(self.th1, self.dut_node_id, self.matter_test_config.discriminators[0])
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
         errcode = self.th2.CommissionOnNetwork(
