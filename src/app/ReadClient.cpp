@@ -445,7 +445,7 @@ void ReadClient::OnActiveModeNotification()
     VerifyOrReturn(IsInactiveICDSubscription());
 
     MoveToState(ClientState::Idle);
-    // When we reach here, the subscription definitely exceeds the liveness timeout. Just continue the unfinished resubscription
+    // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
 }
