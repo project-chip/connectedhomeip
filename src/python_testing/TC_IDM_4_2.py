@@ -65,11 +65,11 @@ class TC_IDM_4_2(MatterBaseTest):
 
     def get_typed_attribute_path(self, attribute, ep=0):
         return TypedAttributePath(
-                Path=AttributePath(
-                    EndpointId=ep,
-                    Attribute=attribute
-                )
+            Path=AttributePath(
+                EndpointId=ep,
+                Attribute=attribute
             )
+        )
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
@@ -89,7 +89,8 @@ class TC_IDM_4_2(MatterBaseTest):
         # Check if ep0_servers contains the ICD Management cluster ID (0x0046)
         if Clusters.IcdManagement.id in ep0_servers:
             # Read the IdleModeDuration attribute value from the DUT
-            logging.info("CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = IdleModeDuration")
+            logging.info(
+                "CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = IdleModeDuration")
 
             idleModeDuration = await self.get_idle_mode_duration(CR1)
 
@@ -133,7 +134,8 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_true(self.is_uint32(sub_cr1_step1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
-        asserts.assert_true(sub_cr1_step1_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
+        asserts.assert_true(sub_cr1_step1_max_interval_ceiling_sec <= max_interval_ceiling_sec,
+                            "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
         sub_cr1_step1.Shutdown()
 
@@ -170,7 +172,8 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_true(self.is_uint32(sub_cr1_step2_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
-        asserts.assert_true(sub_cr1_step2_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
+        asserts.assert_true(sub_cr1_step2_max_interval_ceiling_sec <= max_interval_ceiling_sec,
+                            "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
         sub_cr1_step2.Shutdown()
 
@@ -287,7 +290,8 @@ class TC_IDM_4_2(MatterBaseTest):
         Step 9
         ##########
         '''
-        self.print_step(9, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
+        self.print_step(
+            9, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
 
         # Subscribe to attribute with invalid reportInterval arguments, expect and exception
         sub_cr1_invalid_intervals = None
