@@ -50,7 +50,7 @@ public:
      * Get the countdown time. This attribute is not supported in our example app.
      * @return Null.
      */
-    DataModel::Nullable<uint32_t> GetCountdownTime() override { return {}; };
+    DataModel::Nullable<uint32_t> GetCountdownTime() override { return DataModel::NullNullable; };
 
     /**
      * Fills in the provided GenericOperationalState with the state at index `index` if there is one,
@@ -81,6 +81,7 @@ public:
      */
     void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
 
     /**
@@ -89,6 +90,7 @@ public:
      */
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
 
     /**
@@ -97,6 +99,7 @@ public:
      */
     void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
 
     /**
@@ -105,6 +108,7 @@ public:
      */
     void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
         // This command in not supported.
+        err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
 };
 

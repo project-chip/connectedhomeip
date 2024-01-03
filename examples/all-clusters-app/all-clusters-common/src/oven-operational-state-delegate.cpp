@@ -70,10 +70,5 @@ CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
                                                                OperationalState::GenericOperationalPhase & operationalPhase)
 {
-    if (index >= ArraySize(mOperationalPhaseList))
-    {
-        return CHIP_ERROR_NOT_FOUND;
-    }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_FOUND;
 }
