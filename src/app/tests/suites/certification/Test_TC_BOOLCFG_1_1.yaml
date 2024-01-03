@@ -48,7 +48,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: 
+    - label:
           "Step 3b: Given BOOLCFG.S.F00(TS) ensure featuremap has the correct
           bit set"
       command: "readAttribute"
@@ -61,7 +61,7 @@ tests:
 
     - label:
           "Step 3c: Given BOOLCFG.S.F01(LVL) ensure featuremap has the correct
-           bit set"
+          bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: BOOLCFG.S.F01
