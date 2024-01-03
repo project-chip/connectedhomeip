@@ -294,7 +294,6 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     ReturnErrorCodeIf(!mFactoryData.hw_ver.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
