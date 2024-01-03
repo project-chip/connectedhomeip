@@ -69,6 +69,12 @@ public:
         (void) csrNonce;
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
+    AttestationVerificationResult IsCertificateRevoked(bool isPaa, Crypto::AttestationCertVidPid vidPidUnderTest, ByteSpan issuer,
+                                                       ByteSpan authorityKeyId, ByteSpan serialNumber) override
+    {
+        return AttestationVerificationResult::kNotImplemented;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

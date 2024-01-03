@@ -69,6 +69,9 @@ public:
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
         Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
     {
+        AddArgument(
+            "revocation-set-path", &mRevocationSetPath,
+            "Path to file holding a list of Revoked Certificates. Can be absolute or relative to the current working directory.");
         AddArgument("paa-trust-store-path", &mPaaTrustStorePath,
                     "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
                     "directory.");
@@ -218,6 +221,7 @@ private:
     chip::Optional<chip::NodeId> mCommissionerNodeId;
     chip::Optional<chip::VendorId> mCommissionerVendorId;
     chip::Optional<uint16_t> mBleAdapterId;
+    chip::Optional<char *> mRevocationSetPath;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<char *> mCDTrustStorePath;
     chip::Optional<bool> mUseMaxSizedCerts;
@@ -226,6 +230,7 @@ private:
     // Cached trust store so commands other than the original startup command
     // can spin up commissioners as needed.
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
+    static const chip::Credentials::RevocationSet * sRevocationSet;
 
     static void RunQueuedCommand(intptr_t commandArg);
     typedef decltype(RunQueuedCommand) MatterWorkCallback;
