@@ -303,10 +303,10 @@ class DeviceProvisioningFragment : Fragment() {
         "onICDRegistrationComplete - icdNodeId : $icdNodeId, icdCounter : $icdCounter, symmetricKey : ${symmetricKey.toHex()}"
       )
     }
-
-    private fun ByteArray.toHex(): String =
-      joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {
