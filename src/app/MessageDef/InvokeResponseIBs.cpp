@@ -70,6 +70,14 @@ CHIP_ERROR InvokeResponseIBs::Parser::PrettyPrint() const
 }
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
+CHIP_ERROR InvokeResponseIBs::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
+{
+    ReturnErrorOnFailure(Init(apWriter, aContextTagToUse));
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeToEndInvokeResponses()));
+    mIsEndBufferReserved = true;
+    return CHIP_NO_ERROR;
+}
+
 InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
 {
     if (mError == CHIP_NO_ERROR)
@@ -84,6 +92,11 @@ CHIP_ERROR InvokeResponseIBs::Builder::EndOfInvokeResponses()
     // If any changes are made to how we end the invoke responses that involves how many bytes are
     // needed, a corresponding change to GetSizeToEndInvokeResponses indicating the new size that
     // will be required.
+    if (mIsEndBufferReserved)
+    {
+        ReturnErrorOnFailure(GetWriter()->UnreserveBuffer(GetSizeToEndInvokeResponses()));
+        mIsEndBufferReserved = false;
+    }
     EndOfContainer();
     return GetError();
 }

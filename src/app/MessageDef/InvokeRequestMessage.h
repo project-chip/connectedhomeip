@@ -76,6 +76,12 @@ class Builder : public MessageBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeRequestMessage() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter);
+
+    /**
      *  @brief when sets to true, it means do not send a response to this action
      */
     InvokeRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
@@ -90,7 +96,7 @@ public:
      *
      *  @return A reference to InvokeRequests::Builder
      */
-    InvokeRequests::Builder & CreateInvokeRequests();
+    InvokeRequests::Builder & CreateInvokeRequests(const bool aReserveEndBuffer = false);
 
     /**
      *  @brief Get reference to InvokeRequests::Builder
@@ -115,6 +121,7 @@ public:
 
 private:
     InvokeRequests::Builder mInvokeRequests;
+    bool mIsEndBufferReserved = false;
 };
 } // namespace InvokeRequestMessage
 } // namespace app

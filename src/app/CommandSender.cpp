@@ -83,17 +83,13 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
-        ReturnErrorOnFailure(mInvokeRequestBuilder.Init(&mCommandMessageWriter));
+        ReturnErrorOnFailure(mInvokeRequestBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
 
         mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
-        mInvokeRequestBuilder.CreateInvokeRequests();
+        mInvokeRequestBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
-
-        auto * tlvWriter = mInvokeRequestBuilder.GetWriter();
-        ReturnErrorOnFailure(tlvWriter->ReserveBuffer(mInvokeRequestBuilder.GetInvokeRequests().GetSizeToEndInvokeRequests()));
-        ReturnErrorOnFailure(tlvWriter->ReserveBuffer(mInvokeRequestBuilder.GetSizeToEndInvokeRequestMessage()));
 
         mBufferAllocated = true;
     }
@@ -512,11 +508,6 @@ CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeT
 CHIP_ERROR CommandSender::Finalize(System::PacketBufferHandle & commandPacket)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-
-    auto * tlvWriter = mInvokeRequestBuilder.GetWriter();
-    ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeRequestBuilder.GetInvokeRequests().GetSizeToEndInvokeRequests()));
-    ReturnErrorOnFailure(tlvWriter->UnreserveBuffer(mInvokeRequestBuilder.GetSizeToEndInvokeRequestMessage()));
-
     ReturnErrorOnFailure(mInvokeRequestBuilder.GetInvokeRequests().EndOfInvokeRequests());
     ReturnErrorOnFailure(mInvokeRequestBuilder.EndOfInvokeRequestMessage());
     return mCommandMessageWriter.Finalize(&commandPacket);

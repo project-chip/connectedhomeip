@@ -2064,45 +2064,41 @@ void InvokeRequestMessageEndOfMessageReservationTest(nlTestSuite * apSuite, void
     InvokeRequestMessage::Builder invokeRequestMessageBuilder;
     const uint32_t kSmallBufferSize = 100;
     writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
-    err = invokeRequestMessageBuilder.Init(&writer);
+    err = invokeRequestMessageBuilder.InitWithEndBufferReserved(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t sizeToReserve = invokeRequestMessageBuilder.GetSizeToEndInvokeRequestMessage();
-    err                    = writer.ReserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
+    uint32_t remainingLengthAfterInitWithReservation = writer.GetRemainingFreeLength();
 
-    err = writer.UnreserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = invokeRequestMessageBuilder.EndOfInvokeRequestMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t remainingLengthAfterEndingInvokeRequestMessage = writer.GetRemainingFreeLength();
-    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remainingLengthAfterEndingInvokeRequestMessage);
+    NL_TEST_ASSERT(apSuite, remainingLengthAfterInitWithReservation == remainingLengthAfterEndingInvokeRequestMessage);
 }
 
 void InvokeRequestsEndOfRequestReservationTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
-    InvokeRequests::Builder invokeRequestsBuilder;
+    InvokeRequestMessage::Builder invokeRequestMessageBuilder;
     const uint32_t kSmallBufferSize = 100;
     writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
-    err = invokeRequestsBuilder.Init(&writer);
+    err = invokeRequestMessageBuilder.InitWithEndBufferReserved(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t sizeToReserve = invokeRequestsBuilder.GetSizeToEndInvokeRequests();
-    err                    = writer.ReserveBuffer(sizeToReserve);
+    invokeRequestMessageBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
+    InvokeRequests::Builder & invokeRequestsBuilder = invokeRequestMessageBuilder.GetInvokeRequests();
+    err                                             = invokeRequestsBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
 
-    err = writer.UnreserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    auto * invokeRequestsWriter                      = invokeRequestsBuilder.GetWriter();
+    uint32_t remainingLengthAfterInitWithReservation = invokeRequestsWriter->GetRemainingFreeLength();
+
     err = invokeRequestsBuilder.EndOfInvokeRequests();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t remianingLengthAfterEndingInvokeRequests = writer.GetRemainingFreeLength();
-    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeRequests);
+    uint32_t remainingLengthAfterEndingInvokeRequests = invokeRequestsWriter->GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remainingLengthAfterInitWithReservation == remainingLengthAfterEndingInvokeRequests);
 }
 
 void InvokeInvokeResponseMessageTest(nlTestSuite * apSuite, void * apContext)
@@ -2129,45 +2125,39 @@ void InvokeResponseMessageEndOfMessageReservationTest(nlTestSuite * apSuite, voi
     InvokeResponseMessage::Builder invokeResponseMessageBuilder;
     const uint32_t kSmallBufferSize = 100;
     writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
-    err = invokeResponseMessageBuilder.Init(&writer);
+    err = invokeResponseMessageBuilder.InitWithEndBufferReserved(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t sizeToReserve = invokeResponseMessageBuilder.GetSizeToEndInvokeResponseMessage();
-    err                    = writer.ReserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
-
-    err = writer.UnreserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    uint32_t remainingLengthAfterInitWithReservation = writer.GetRemainingFreeLength();
     err = invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t remianingLengthAfterEndingInvokeResponseMessage = writer.GetRemainingFreeLength();
-    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeResponseMessage);
+    uint32_t remainingLengthAfterEndingInvokeResponseMessage = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remainingLengthAfterInitWithReservation == remainingLengthAfterEndingInvokeResponseMessage);
 }
 
 void InvokeResponsesEndOfResponseReservationTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::System::PacketBufferTLVWriter writer;
-    InvokeResponseIBs::Builder invokeResponsesBuilder;
+    InvokeResponseMessage::Builder invokeResponseMessageBuilder;
     const uint32_t kSmallBufferSize = 100;
     writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
-    err = invokeResponsesBuilder.Init(&writer);
+    err = invokeResponseMessageBuilder.InitWithEndBufferReserved(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t sizeToReserve = invokeResponsesBuilder.GetSizeToEndInvokeResponses();
-    err                    = writer.ReserveBuffer(sizeToReserve);
+    invokeResponseMessageBuilder.CreateInvokeResponses(/* aReserveEndBuffer = */ true);
+    InvokeResponseIBs::Builder & invokeResponsesBuilder = invokeResponseMessageBuilder.GetInvokeResponses();
+    err                                                 = invokeResponsesBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    uint32_t remianingLengthAfterReservation = writer.GetRemainingFreeLength();
 
-    err = writer.UnreserveBuffer(sizeToReserve);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    auto * invokeResponsesWriter                     = invokeResponsesBuilder.GetWriter();
+    uint32_t remainingLengthAfterInitWithReservation = invokeResponsesWriter->GetRemainingFreeLength();
     err = invokeResponsesBuilder.EndOfInvokeResponses();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint32_t remianingLengthAfterEndingInvokeResponses = writer.GetRemainingFreeLength();
-    NL_TEST_ASSERT(apSuite, remianingLengthAfterReservation == remianingLengthAfterEndingInvokeResponses);
+    uint32_t remainingLengthAfterEndingInvokeResponses = invokeResponsesWriter->GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remainingLengthAfterInitWithReservation == remainingLengthAfterEndingInvokeResponses);
 }
 
 void ReportDataMessageTest(nlTestSuite * apSuite, void * apContext)
