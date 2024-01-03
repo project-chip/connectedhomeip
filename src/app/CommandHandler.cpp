@@ -67,7 +67,7 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         mInvokeResponseBuilder.SuppressResponse(mSuppressResponse);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
-        mInvokeResponseBuilder.CreateInvokeResponses(/*aReserveEndBuffer =*/true);
+        mInvokeResponseBuilder.CreateInvokeResponses(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
         mBufferAllocated = true;
