@@ -919,7 +919,6 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     if (_this->mIsPeerLIT)
     {
-
         // If a LIT ICD device enters an inactive state, the associated subscription is marked as `InactiveICDSubscription`.
         // The ReadClient consumer then determines whether to initiate resubscription through the `OnResubscriptionNeeded` callback.
         // This decision process is triggered by either a liveness timeout or the arrival of a check-in message.
