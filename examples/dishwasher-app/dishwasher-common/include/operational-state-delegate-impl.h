@@ -52,6 +52,8 @@ public:
      * Get the list of supported operational phases.
      * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     * If fills in the provided MutableCharSpan with the phase at index `0` and returns CHIP_ERROR_NOT_FOUND,
+     * it represents PhaseList attribute is an empty list, the SDK will set PhaseList attribute value to null.
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The MutableCharSpan is filled.
      */
