@@ -15,14 +15,16 @@
 #    limitations under the License.
 #
 
-import queue
+import time;
+import random;
 import logging
 import chip.clusters as Clusters
-from chip.interaction_model import Status, InteractionModelError
+from chip.exceptions import ChipStackError
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClustersObjects
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath, AttributePath, AttributeCache
+from chip.clusters.Attribute import TypedAttributePath, AttributePath
 from mobly import asserts
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 
@@ -53,7 +55,7 @@ class TC_IDM_4_2(MatterBaseTest):
     async def test_TC_IDM_4_2(self):
         
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
-        CR1 = self.default_controller # Is admin by default
+        CR1: ChipDeviceController = self.default_controller # Is admin by default
         icd_mgmt_cluster = Clusters.Objects.IcdManagement
         idle_mode_duration_attr = icd_mgmt_cluster.Attributes.IdleModeDuration
         
@@ -238,6 +240,77 @@ class TC_IDM_4_2(MatterBaseTest):
         
         # Verify that the subscription is activated between CR1 and DUT
         asserts.assert_true(sub_cr1.subscriptionId, "Subscription not activated")
+        
+        sub_cr1.Shutdown()
+        
+        ''' 
+        ##########
+        Step 8
+        ##########
+        '''
+        self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the Subscription between CR1 and DUT. Modify the attribute which has been subscribed to on the DUT.")
+        read_contents = [
+            Clusters.BasicInformation.Attributes.NodeLabel
+        ]
+        read_paths = [(0, attrib) for attrib in read_contents]
+        min_max_interval_sec = 3
+        
+        # Subscribe to attribute with empty dataVersionFilters
+        sub_cr1 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=read_paths,
+            reportInterval=(min_max_interval_sec, min_max_interval_sec),
+            keepSubscriptions=False
+        )        
+
+        # Modify attribute value
+        new_node_label_write = "NewNodeLabel_" + str(random.randint(1000, 9999))
+        await CR1.WriteAttribute(
+            self.dut_node_id, 
+            [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=new_node_label_write))]
+        )
+
+        # Wait MinIntervalFloor seconds before reading updated attribute value
+        time.sleep(min_max_interval_sec)
+        new_node_label_read = sub_cr1.GetAttribute(
+            TypedAttributePath(
+                Path=AttributePath(
+                    EndpointId=0, 
+                    Attribute=Clusters.BasicInformation.Attributes.NodeLabel
+                )
+            )
+        )
+
+        # Verify new attribute value after MinIntervalFloor time
+        asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
+
+        sub_cr1.Shutdown()
+        
+        ''' 
+        ##########
+        Step 9
+        ##########
+        '''
+        self.print_step(9, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
+        read_contents = [
+            Clusters.BasicInformation.Attributes.NodeLabel
+        ]
+        read_paths = [(0, attrib) for attrib in read_contents]
+        
+        # Subscribe to attribute with invalid reportInterval arguments, expect and exception
+        sub_cr1_invalid_intervals = None
+        try:
+            sub_cr1_invalid_intervals = await CR1.ReadAttribute(
+                nodeid=self.dut_node_id,
+                attributes=read_paths,
+                reportInterval=(20, 10),
+                keepSubscriptions=False
+            )
+        except ChipStackError as e:
+            # Verify no subscription is established
+            with asserts.assert_raises(AttributeError):
+                sub_cr1_invalid_intervals.subscriptionId
+
         
         
         
