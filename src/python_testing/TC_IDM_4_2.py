@@ -45,25 +45,6 @@ class TC_IDM_4_2(MatterBaseTest):
         attribute = Clusters.BasicInformation.Attributes.VendorID
         return await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-        
-    # async def read_single_attribute_expect_error(
-    #         self, cluster: object, attribute: object,
-    #         error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
-    #     if dev_ctrl is None:
-    #         dev_ctrl = self.default_controller
-    #     if node_id is None:
-    #         node_id = self.dut_node_id
-    #     if endpoint is None:
-    #         endpoint = self.matter_test_config.endpoint
-
-    #     result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
-    #     attr_ret = result[endpoint][cluster][attribute]
-    #     err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-    #     asserts.assert_true(attr_ret is not None, err_msg)
-    #     asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
-    #     asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
-    #     asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
-    #     return attr_ret
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
@@ -72,16 +53,9 @@ class TC_IDM_4_2(MatterBaseTest):
     async def test_TC_IDM_4_2(self):
         
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
-        CR1: ChipDeviceController = self.default_controller # Is admin by default
+        CR1 = self.default_controller # Is admin by default
         icd_mgmt_cluster = Clusters.Objects.IcdManagement
         idle_mode_duration_attr = icd_mgmt_cluster.Attributes.IdleModeDuration
-        node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
-        typed_attribute_path: TypedAttributePath = TypedAttributePath(
-            Path=AttributePath(
-                EndpointId=0,
-                Attribute=node_label_attr
-            )
-        )
         
         # Read ServerList attribute
         self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
@@ -249,11 +223,11 @@ class TC_IDM_4_2(MatterBaseTest):
             asserts.assert_true(Clusters.Attribute.DataVersion in sub_cr1[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
 
-        # Get DataVersion and generate a dataVersionFilters type
+        # Get DataVersion
         data_version = sub_cr1[0][Clusters.Objects.BasicInformation][Clusters.Attribute.DataVersion]
         data_version_filter = [(0, Clusters.BasicInformation, data_version)]
 
-        # Subscribe to attribute with provided dataVersionFilters
+        # Subscribe to attribute with provided DataVersion
         sub_cr1 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
@@ -264,11 +238,6 @@ class TC_IDM_4_2(MatterBaseTest):
         
         # Verify that the subscription is activated between CR1 and DUT
         asserts.assert_true(sub_cr1.subscriptionId, "Subscription not activated")
-        
-        
-        
-        
-        
         
         
         
