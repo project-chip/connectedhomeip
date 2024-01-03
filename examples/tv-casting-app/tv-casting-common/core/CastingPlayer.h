@@ -131,6 +131,23 @@ public:
                                      EndpointFilter desiredEndpointFilter                 = EndpointFilter());
 
     /**
+     * @brief Find an existing session for this CastingPlayer, or trigger a new session
+     * request.
+     *
+     * The caller can optionally provide `onDeviceConnected` and `onDeviceConnectionFailure` callback
+     * objects. If provided, these will be used to inform the caller about
+     * successful or failed connection establishment.
+     *
+     * If the connection is already established, the `onDeviceConnected` callback
+     * will be immediately called, before FindOrEstablishSession returns.
+     *
+     * The `onDeviceConnectionFailure` callback may be called before the FindOrEstablishSession
+     * call returns, for error cases that are detected synchronously.
+     */
+    void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
+                                chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
+
+    /**
      * @brief Register an endpoint on this CastingPlayer. If the provided endpoint was already registered, its information will be
      * updated in the registry.
      */
@@ -190,23 +207,6 @@ private:
      */
     chip::Inet::IPAddress * GetIpAddressForUDCRequest();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
-
-    /**
-     * @brief Find an existing session for this CastingPlayer, or trigger a new session
-     * request.
-     *
-     * The caller can optionally provide `onDeviceConnected` and `onDeviceConnectionFailure` callback
-     * objects. If provided, these will be used to inform the caller about
-     * successful or failed connection establishment.
-     *
-     * If the connection is already established, the `onDeviceConnected` callback
-     * will be immediately called, before FindOrEstablishSession returns.
-     *
-     * The `onDeviceConnectionFailure` callback may be called before the FindOrEstablishSession
-     * call returns, for error cases that are detected synchronously.
-     */
-    void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
-                                chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
 
     /**
      * @brief Checks if the cachedCastingPlayer contains an Endpoint that matches the description of the desiredEndpointFilter

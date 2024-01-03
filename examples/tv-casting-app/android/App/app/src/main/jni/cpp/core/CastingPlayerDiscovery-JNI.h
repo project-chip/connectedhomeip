@@ -18,37 +18,24 @@
 
 #pragma once
 
-#include "Endpoint.h"
-#include "Types.h"
-
-#include "lib/support/logging/CHIPLogging.h"
+#include <jni.h>
 
 namespace matter {
 namespace casting {
 namespace core {
 
-class Endpoint;
-
-// Base cluster class
-class BaseCluster
+class CastingPlayerDiscoveryJNI
 {
-private:
-protected:
-    memory::Weak<Endpoint> mEndpoint;
-
 public:
-    BaseCluster(memory::Weak<Endpoint> endpoint) { this->mEndpoint = endpoint; }
-
-    virtual ~BaseCluster() {}
-
-    BaseCluster()                       = delete;
-    BaseCluster(BaseCluster & other)    = delete;
-    void operator=(const BaseCluster &) = delete;
-
-protected:
-    memory::Weak<Endpoint> GetEndpoint() const { return mEndpoint.lock(); }
+private:
+    friend CastingPlayerDiscoveryJNI & CastingAppJNIMgr();
+    static CastingPlayerDiscoveryJNI sInstance;
 };
 
+inline class CastingPlayerDiscoveryJNI & CastingAppJNIMgr()
+{
+    return CastingPlayerDiscoveryJNI::sInstance;
+}
 }; // namespace core
 }; // namespace casting
 }; // namespace matter

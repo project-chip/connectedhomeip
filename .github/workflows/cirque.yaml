@@ -90,7 +90,10 @@ jobs:
                     --env GITHUB_ACTION_RUN=1 \
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
-                    -- scripts/tests/cirque_tests.sh bootstrap
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/tests/cirque_tests.sh bootstrap \
+                      "
 
             - name: Artifact suffix
               id: outsuffix
