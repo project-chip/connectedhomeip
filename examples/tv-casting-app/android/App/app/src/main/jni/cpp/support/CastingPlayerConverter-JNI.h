@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +14,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "core/Endpoint.h"
-#include "core/Types.h"
+#include "core/CastingPlayer.h"
 
-#include "lib/support/logging/CHIPLogging.h"
+#include <lib/core/CHIPError.h>
+
+#include <jni.h>
 
 namespace matter {
 namespace casting {
-namespace clusters {
+namespace support {
 
-class TargetNavigatorCluster : public core::BaseCluster
-{
-private:
-protected:
-public:
-    TargetNavigatorCluster(memory::Weak<core::Endpoint> endpoint) : core::BaseCluster(endpoint) {}
+/**
+ * @brief Convertes a native CastingPlayer into a MatterCastingPlayer jobject
+ *
+ * @param CastingPlayer represents a Matter commissioner that is able to play media to a physical
+ * output or to a display screen which is part of the device.
+ *
+ * @return pointer to the CastingPlayer jobject if created successfully, nullptr otherwise.
+ */
+jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer> player);
 
-    // TODO: add commands
-};
-
-}; // namespace clusters
+}; // namespace support
 }; // namespace casting
 }; // namespace matter

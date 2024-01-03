@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import com.R;
 import com.chip.casting.ContentApp;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
