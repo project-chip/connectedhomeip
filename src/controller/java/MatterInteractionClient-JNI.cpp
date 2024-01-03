@@ -80,7 +80,6 @@ using namespace chip::Credentials;
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
 
-static CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue);
 static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
                                          std::vector<app::AttributePathParams> & outAttributePathParamsList);
 CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
@@ -92,12 +91,58 @@ CHIP_ERROR ParseDataVersionFilter(jobject dataVersionFilter, EndpointId & outEnd
                                   DataVersion & outDataVersion);
 static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
                                              std::vector<app::DataVersionFilter> & outDataVersionFilterList);
-static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
+
+CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
+CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
+CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs, jint imTimeoutMs);
+CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs, jint imTimeoutMs);
 
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
  jint imTimeoutMs, jobject eventMin)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
+}
+
+JNI_METHOD(void, read)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, isFabricFiltered, imTimeoutMs, eventMin));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+JNI_METHOD(void, write)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = write(env, handle, callbackHandle, devicePtr, attributeList, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+JNI_METHOD(void, invoke)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = invoke(env, handle, callbackHandle, devicePtr, invokeElement, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -110,7 +155,7 @@ JNI_METHOD(void, subscribe)
     if (device == nullptr)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
-        return;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
     app::ReadPrepareParams params(device->GetSecureSession().Value());
@@ -208,6 +253,7 @@ JNI_METHOD(void, subscribe)
     SuccessOrExit(err = readClient->SendAutoResubscribeRequest(std::move(params)));
     callback->mReadClient = readClient;
 
+    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -227,15 +273,19 @@ exit:
             Platform::Delete(callback);
         }
     }
+    return err;
 }
 
-CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, std::vector<app::AttributePathParams> &attributePathParamsList, std::vector<app::EventPathParams> &eventPathParamsList, std::vector<app::DataVersionFilter> &versionList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
 
-    app::ReadClient * readClient = nullptr;
     auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
+    std::vector<app::AttributePathParams> attributePathParamsList;
+    std::vector<app::EventPathParams> eventPathParamsList;
+    std::vector<app::DataVersionFilter> versionList;
+    app::ReadClient * readClient = nullptr;
     DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
     {
@@ -245,6 +295,9 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
 
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
+    SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
+    SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
+    SuccessOrExit(err = ParseDataVersionFilterList(dataVersionFilterList, versionList));
     VerifyOrExit(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
@@ -295,26 +348,6 @@ exit:
     return err;
 }
 
-JNI_METHOD(void, read)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    std::vector<app::AttributePathParams> attributePathParamsList;
-    std::vector<app::EventPathParams> eventPathParamsList;
-    std::vector<app::DataVersionFilter> versionList;
-
-    SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
-    SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
-    SuccessOrExit(err = ParseDataVersionFilterList(dataVersionFilterList, versionList));
-
-    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathParamsList, eventPathParamsList, versionList, isFabricFiltered, imTimeoutMs, eventMin));
-    return;
-exit:
-    ChipLogError(Controller, "JNI IM Read Error: %s", err.AsString());
-}
-
 // Convert Json to Tlv, and remove the outer structure
 CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSpan & data)
 {
@@ -345,9 +378,7 @@ CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::Conc
     return writeClient.PutPreencodedAttribute(path, reader);
 }
 
-JNI_METHOD(void, write)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
- jint imTimeoutMs)
+CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                          = CHIP_NO_ERROR;
@@ -371,9 +402,6 @@ JNI_METHOD(void, write)
     for (uint8_t i = 0; i < listSize; i++)
     {
         jobject attributeItem             = nullptr;
-        uint32_t endpointId               = 0;
-        uint32_t clusterId                = 0;
-        uint32_t attributeId              = 0;
         jmethodID getEndpointIdMethod     = nullptr;
         jmethodID getClusterIdMethod      = nullptr;
         jmethodID getAttributeIdMethod    = nullptr;
@@ -381,9 +409,9 @@ JNI_METHOD(void, write)
         jmethodID getDataVersionMethod    = nullptr;
         jmethodID getTlvByteArrayMethod   = nullptr;
         jmethodID getJsonStringMethod     = nullptr;
-        jobject endpointIdObj             = nullptr;
-        jobject clusterIdObj              = nullptr;
-        jobject attributeIdObj            = nullptr;
+        jlong endpointIdObj             = 0;
+        jlong clusterIdObj              = 0;
+        jlong attributeIdObj            = 0;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
         Optional<DataVersion> dataVersion = Optional<DataVersion>();
@@ -391,13 +419,9 @@ JNI_METHOD(void, write)
         bool isGroupSession = false;
 
         SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(
-                          env, attributeItem, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(
-                          env, attributeItem, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getAttributeId",
-                                                                    "()Lchip/devicecontroller/model/ChipPathId;",
-                                                                    &getAttributeIdMethod));
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getEndpointId", "(J)J", &getEndpointIdMethod));
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getClusterId", "(J)J", &getClusterIdMethod));
+        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getAttributeId","(J)J", &getAttributeIdMethod));
         SuccessOrExit(
             err = JniReferences::GetInstance().FindMethod(env, attributeItem, "hasDataVersion", "()Z", &hasDataVersionMethod));
         SuccessOrExit(
@@ -409,27 +433,19 @@ JNI_METHOD(void, write)
 
         if (isGroupSession)
         {
-            endpointId = kInvalidEndpointId;
+            endpointIdObj = static_cast<jlong>(kInvalidEndpointId);
         }
         else
         {
-            endpointIdObj = env->CallObjectMethod(attributeItem, getEndpointIdMethod);
+            endpointIdObj = env->CallLongMethod(attributeItem, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-            VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-            SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
         }
 
-        clusterIdObj = env->CallObjectMethod(attributeItem, getClusterIdMethod);
+        clusterIdObj = env->CallLongMethod(attributeItem, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(clusterIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        attributeIdObj = env->CallObjectMethod(attributeItem, getAttributeIdMethod);
+        attributeIdObj = env->CallLongMethod(attributeItem, getAttributeIdMethod, static_cast<jlong>(kInvalidAttributeId));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(attributeIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
-        SuccessOrExit(err = GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId));
 
         hasDataVersion = static_cast<bool>(env->CallBooleanMethod(attributeItem, hasDataVersionMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
@@ -442,8 +458,8 @@ JNI_METHOD(void, write)
 
         tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        app::ConcreteDataAttributePath path(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
-                                            static_cast<AttributeId>(attributeId), dataVersion);
+        app::ConcreteDataAttributePath path(static_cast<EndpointId>(endpointIdObj), static_cast<ClusterId>(clusterIdObj),
+                                            static_cast<AttributeId>(attributeIdObj), dataVersion);
         if (tlvBytesObj != nullptr)
         {
             JniByteArray tlvByteArray(env, tlvBytesObj);
@@ -477,6 +493,7 @@ JNI_METHOD(void, write)
     SuccessOrExit(err);
     callback->mWriteClient = writeClient;
 
+    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -496,6 +513,7 @@ exit:
             Platform::Delete(callback);
         }
     }
+    return err;
 }
 
 CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::CommandPathParams & path, const ByteSpan & data)
@@ -511,17 +529,12 @@ CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::C
     return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
 }
 
-JNI_METHOD(void, invoke)
-(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
- jint imTimeoutMs)
+CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     auto callback                           = reinterpret_cast<InvokeCallback *>(callbackHandle);
     app::CommandSender * commandSender      = nullptr;
-    uint32_t endpointId                     = 0;
-    uint32_t clusterId                      = 0;
-    uint32_t commandId                      = 0;
     uint16_t groupId                        = 0;
     bool isEndpointIdValid                  = false;
     bool isGroupIdValid                     = false;
@@ -533,9 +546,9 @@ JNI_METHOD(void, invoke)
     jmethodID getJsonStringMethod           = nullptr;
     jmethodID isEndpointIdValidMethod       = nullptr;
     jmethodID isGroupIdValidMethod          = nullptr;
-    jobject endpointIdObj                   = nullptr;
-    jobject clusterIdObj                    = nullptr;
-    jobject commandIdObj                    = nullptr;
+    jlong endpointIdObj                   = 0;
+    jlong clusterIdObj                    = 0;
+    jlong commandIdObj                    = 0;
     jobject groupIdObj                      = nullptr;
     jbyteArray tlvBytesObj                  = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
@@ -547,12 +560,9 @@ JNI_METHOD(void, invoke)
 
     commandSender = Platform::New<app::CommandSender>(callback, device->GetExchangeManager(), timedRequestTimeoutMs != 0);
 
-    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(
-                      env, invokeElement, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
-    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId",
-                                                                "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
-    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId",
-                                                                "()Lchip/devicecontroller/model/ChipPathId;", &getCommandIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getClusterId", "(J)J", &getClusterIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId", "(J)J", &getCommandIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getGroupId", "()Ljava/util/Optional;",
                                                                 &getGroupIdMethod));
     SuccessOrExit(
@@ -567,11 +577,8 @@ JNI_METHOD(void, invoke)
 
     if (isEndpointIdValid)
     {
-        endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
+        endpointIdObj = env->CallLongMethod(invokeElement, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
     }
 
     if (isGroupIdValid)
@@ -588,24 +595,19 @@ JNI_METHOD(void, invoke)
         groupId = static_cast<uint16_t>(JniReferences::GetInstance().IntegerToPrimitive(boxedGroupId));
     }
 
-    clusterIdObj = env->CallObjectMethod(invokeElement, getClusterIdMethod);
+    clusterIdObj = env->CallLongMethod(invokeElement, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(clusterIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    commandIdObj = env->CallObjectMethod(invokeElement, getCommandIdMethod);
+    commandIdObj = env->CallLongMethod(invokeElement, getCommandIdMethod, static_cast<jlong>(kInvalidCommandId));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(commandIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
-    SuccessOrExit(err = GetChipPathIdValue(commandIdObj, kInvalidCommandId, commandId));
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     {
-        uint16_t id = isEndpointIdValid ? static_cast<uint16_t>(endpointId) : groupId;
+        uint16_t id = isEndpointIdValid ? static_cast<uint16_t>(endpointIdObj) : groupId;
         app::CommandPathFlags flag =
             isEndpointIdValid ? app::CommandPathFlags::kEndpointIdValid : app::CommandPathFlags::kGroupIdValid;
-        app::CommandPathParams path(id, static_cast<ClusterId>(clusterId), static_cast<CommandId>(commandId), flag);
+        app::CommandPathParams path(id, static_cast<ClusterId>(clusterIdObj), static_cast<CommandId>(commandIdObj), flag);
         if (tlvBytesObj != nullptr)
         {
             JniByteArray tlvBytesObjBytes(env, tlvBytesObj);
@@ -639,6 +641,7 @@ JNI_METHOD(void, invoke)
 
     callback->mCommandSender = commandSender;
 
+    return CHIP_NO_ERROR;
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -658,6 +661,7 @@ exit:
             Platform::Delete(callback);
         }
     }
+    return err;
 }
 
 /**
@@ -697,30 +701,17 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     jmethodID getEndpointIdMethod  = nullptr;
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getAttributeIdMethod = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, attributePath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, attributePath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, attributePath, "getAttributeId", "()Lchip/devicecontroller/model/ChipPathId;", &getAttributeIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getClusterId", "(J)J", &getClusterIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getAttributeId", "(J)J", &getAttributeIdMethod));
 
-    jobject endpointIdObj = env->CallObjectMethod(attributePath, getEndpointIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    jobject clusterIdObj = env->CallObjectMethod(attributePath, getClusterIdMethod);
-    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    jobject attributeIdObj = env->CallObjectMethod(attributePath, getAttributeIdMethod);
-    VerifyOrReturnError(attributeIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    jlong endpointIdObj = env->CallLongMethod(attributePath, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
+    jlong clusterIdObj = env->CallLongMethod(attributePath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    jlong attributeIdObj = env->CallLongMethod(attributePath, getAttributeIdMethod, static_cast<jlong>(kInvalidAttributeId));
 
-    uint32_t endpointId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
-    uint32_t clusterId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
-    uint32_t attributeId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId));
-
-    outEndpointId  = static_cast<EndpointId>(endpointId);
-    outClusterId   = static_cast<ClusterId>(clusterId);
-    outAttributeId = static_cast<AttributeId>(attributeId);
+    outEndpointId  = static_cast<EndpointId>(endpointIdObj);
+    outClusterId   = static_cast<ClusterId>(clusterIdObj);
+    outAttributeId = static_cast<AttributeId>(attributeIdObj);
 
     return CHIP_NO_ERROR;
 }
@@ -765,32 +756,19 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     jmethodID getEventIdMethod    = nullptr;
     jmethodID isUrgentMethod      = nullptr;
 
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, eventPath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, eventPath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId",
-                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getClusterId", "(J)J", &getClusterIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId", "(J)J", &getEventIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "isUrgent", "()Z", &isUrgentMethod));
 
-    jobject endpointIdObj = env->CallObjectMethod(eventPath, getEndpointIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    jobject clusterIdObj = env->CallObjectMethod(eventPath, getClusterIdMethod);
-    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    jobject eventIdObj = env->CallObjectMethod(eventPath, getEventIdMethod);
-    VerifyOrReturnError(eventIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    jlong endpointIdObj = env->CallLongMethod(eventPath, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
+    jlong clusterIdObj = env->CallLongMethod(eventPath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    jlong eventIdObj = env->CallLongMethod(eventPath, getEventIdMethod, static_cast<jlong>(kInvalidEventId));
     jboolean isUrgent = env->CallBooleanMethod(eventPath, isUrgentMethod);
 
-    uint32_t endpointId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
-    uint32_t clusterId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
-    uint32_t eventId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(eventIdObj, kInvalidEventId, eventId));
-
-    outEndpointId = static_cast<EndpointId>(endpointId);
-    outClusterId  = static_cast<ClusterId>(clusterId);
-    outEventId    = static_cast<EventId>(eventId);
+    outEndpointId = static_cast<EndpointId>(endpointIdObj);
+    outClusterId  = static_cast<ClusterId>(clusterIdObj);
+    outEventId    = static_cast<EventId>(eventIdObj);
     outIsUrgent   = (isUrgent == JNI_TRUE);
 
     return CHIP_NO_ERROR;
@@ -834,70 +812,16 @@ CHIP_ERROR ParseDataVersionFilter(jobject versionFilter, EndpointId & outEndpoin
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getDataVersionMethod = nullptr;
 
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, versionFilter, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, versionFilter, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, versionFilter, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, versionFilter, "getClusterId", "(J)J", &getClusterIdMethod));
     ReturnErrorOnFailure(
         JniReferences::GetInstance().FindMethod(env, versionFilter, "getDataVersion", "()J", &getDataVersionMethod));
 
-    jobject endpointIdObj = env->CallObjectMethod(versionFilter, getEndpointIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    uint32_t endpointId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
-    outEndpointId        = static_cast<EndpointId>(endpointId);
-    jobject clusterIdObj = env->CallObjectMethod(versionFilter, getClusterIdMethod);
-    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    uint32_t clusterId = 0;
-    ReturnErrorOnFailure(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
-    outClusterId = static_cast<ClusterId>(clusterId);
+    jlong endpointIdObj = env->CallLongMethod(versionFilter, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
+    outEndpointId        = static_cast<EndpointId>(endpointIdObj);
+    jlong clusterIdObj = env->CallLongMethod(versionFilter, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    outClusterId = static_cast<ClusterId>(clusterIdObj);
 
     outDataVersion = static_cast<DataVersion>(env->CallLongMethod(versionFilter, getDataVersionMethod));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR GetChipPathIdValue(jobject chipPathId, uint32_t wildcardValue, uint32_t & outValue)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    bool idIsWildcard = false;
-    ReturnErrorOnFailure(IsWildcardChipPathId(chipPathId, idIsWildcard));
-
-    if (idIsWildcard)
-    {
-        outValue = wildcardValue;
-        return CHIP_NO_ERROR;
-    }
-
-    jmethodID getIdMethod = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, chipPathId, "getId", "()J", &getIdMethod));
-    outValue = static_cast<uint32_t>(env->CallLongMethod(chipPathId, getIdMethod));
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
-{
-    JNIEnv * env            = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jmethodID getTypeMethod = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, chipPathId, "getType", "()Lchip/devicecontroller/model/ChipPathId$IdType;", &getTypeMethod));
-
-    jobject idType = env->CallObjectMethod(chipPathId, getTypeMethod);
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-
-    jmethodID nameMethod = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod));
-
-    jstring typeNameString = static_cast<jstring>(env->CallObjectMethod(idType, nameMethod));
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrReturnError(typeNameString != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-
-    JniUtfString typeNameJniString(env, typeNameString);
-
-    isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;
-
     return CHIP_NO_ERROR;
 }

@@ -42,6 +42,19 @@ public class ChipAttributePath {
     return attributeId;
   }
 
+  // For use in JNI.
+  long getEndpointId(long wildcardValue) {
+    return endpointId.getId(wildcardValue);
+  }
+
+  long getClusterId(long wildcardValue) {
+    return clusterId.getId(wildcardValue);
+  }
+
+  long getAttributeId(long wildcardValue) {
+    return attributeId.getId(wildcardValue);
+  }
+
   @Override
   public boolean equals(Object object) {
     if (object instanceof ChipAttributePath) {

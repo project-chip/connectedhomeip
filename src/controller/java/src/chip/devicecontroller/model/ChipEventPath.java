@@ -45,6 +45,19 @@ public class ChipEventPath {
     return eventId;
   }
 
+  // For use in JNI.
+  long getEndpointId(long wildcardValue) {
+    return endpointId.getId(wildcardValue);
+  }
+
+  long getClusterId(long wildcardValue) {
+    return clusterId.getId(wildcardValue);
+  }
+
+  long getEventId(long wildcardValue) {
+    return eventId.getId(wildcardValue);
+  }
+
   public boolean isUrgent() {
     return isUrgent;
   }
