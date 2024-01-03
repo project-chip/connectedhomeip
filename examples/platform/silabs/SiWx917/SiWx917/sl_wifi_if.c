@@ -748,41 +748,6 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
-#if !EXP_BOARD
-/*
- * WARNING - Taken from RSI and broken up
- * This is my own RSI stuff for not copying code and allocating an extra
- * level of indirection - when using LWIP buffers
- * see also: int32_t rsi_wlan_send_data_xx(uint8_t *buffer, uint32_t length)
- */
-/********************************************************************************************
- * @fn   void *wfx_rsi_alloc_pkt()
- * @brief
- *       Allocate packet to send data
- * @param[in] None
- * @return
- *        None
- **********************************************************************************************/
-void * wfx_rsi_alloc_pkt(uint16_t data_length)
-{
-    sl_wifi_buffer_t * buffer;
-    sl_si91x_packet_t * packet;
-    sl_status_t status = SL_STATUS_OK;
-
-    /* Confirm if packet is allocated */
-
-    status = sl_si91x_allocate_command_buffer(&buffer, (void **) &packet, sizeof(sl_si91x_packet_t) + data_length,
-                                              SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
-    if ((packet == NULL) || (status != SL_STATUS_OK))
-    {
-        return SL_STATUS_ALLOCATION_FAILED;
-        SILABS_LOG("packet allocation failed: %d", status);
-        return (void *) SL_STATUS_ALLOCATION_FAILED;
-    }
-    return (void *) packet;
-}
-#endif
-
 /********************************************************************************************
  * @fn   void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off)
  * @brief
