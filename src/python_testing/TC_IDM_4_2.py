@@ -18,12 +18,14 @@
 import queue
 import logging
 import chip.clusters as Clusters
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters import ClusterObjects as ClustersObjects
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath, AttributePath
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath, AttributePath, AttributeCache
 from mobly import asserts
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+
 
 class TC_IDM_4_2(MatterBaseTest):
     
@@ -43,6 +45,25 @@ class TC_IDM_4_2(MatterBaseTest):
         attribute = Clusters.BasicInformation.Attributes.VendorID
         return await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
+        
+    # async def read_single_attribute_expect_error(
+    #         self, cluster: object, attribute: object,
+    #         error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
+    #     if dev_ctrl is None:
+    #         dev_ctrl = self.default_controller
+    #     if node_id is None:
+    #         node_id = self.dut_node_id
+    #     if endpoint is None:
+    #         endpoint = self.matter_test_config.endpoint
+
+    #     result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+    #     attr_ret = result[endpoint][cluster][attribute]
+    #     err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
+    #     asserts.assert_true(attr_ret is not None, err_msg)
+    #     asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+    #     asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
+    #     asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+    #     return attr_ret
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
@@ -52,7 +73,7 @@ class TC_IDM_4_2(MatterBaseTest):
         
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
         CR1: ChipDeviceController = self.default_controller # Is admin by default
-        icd_mgmt_cluster = Clusters.IcdManagement
+        icd_mgmt_cluster = Clusters.Objects.IcdManagement
         idle_mode_duration_attr = icd_mgmt_cluster.Attributes.IdleModeDuration
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         typed_attribute_path: TypedAttributePath = TypedAttributePath(
@@ -86,29 +107,43 @@ class TC_IDM_4_2(MatterBaseTest):
             logging.info("Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins")
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 3600
         
-        # Step 1
+        ''' 
+        ##########
+        Step 1
+        ##########
+        '''        
         self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 60
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT + 60
         
+        read_contents = [
+            Clusters.BasicInformation.Attributes.VendorName,
+            Clusters.BasicInformation.Attributes.ProductName,
+            Clusters.BasicInformation.Attributes.NodeLabel,
+        ]
+        read_paths = [(0, attrib) for attrib in read_contents]
+
         # Subscribe to attribute
         sub_cr1 = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(0, node_label_attr)],
+            attributes=read_paths,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
         
-        # TODO: Correct way to get data of the attribute requested in the subscription and compare
-        # Get data of the attribute requested in the subscription
-        sub_cr1_attr = sub_cr1.GetAttribute(typed_attribute_path)
-        logging.info("debux - Attribute data: " + str(sub_cr1_attr))
-        # asserts.assert_equal( node_label_attr, sub_cr1_attr, "Report data action attribute mismatch or missing")
-        
-        # Verify uint32 type
+        sub_cr1_requested_attributes = sub_cr1.GetAttributes()
+
+        # Verify attribute data came back
+        asserts.assert_true(0 in sub_cr1_requested_attributes, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1_requested_attributes[0], "Must have read Basic Information cluster data")
+        for attribute in read_contents:
+            asserts.assert_true(attribute in sub_cr1_requested_attributes[0][Clusters.BasicInformation],
+                                "Must have read back attribute %s" % (attribute.__name__))
+
+        # Verify subscriptionId is of uint32 type
         asserts.assert_true(self.is_uint32(sub_cr1.subscriptionId), "subscriptionId is not of uint32 type.")
         
-        # Verify uint32 type
+        # Verify MaxInterval is of uint32 type
         sub_cr1_intervals = sub_cr1.GetReportingIntervalsSeconds()
         sub_cr1_min_interval_floor_sec, sub_cr1_max_interval_ceiling_sec = sub_cr1_intervals
         asserts.assert_true(self.is_uint32(sub_cr1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
@@ -116,99 +151,129 @@ class TC_IDM_4_2(MatterBaseTest):
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
         asserts.assert_true(sub_cr1_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
+        sub_cr1.Shutdown()
 
+        ''' 
+        ##########
+        Step 2
+        ##########
+        '''
+        self.print_step(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
+        min_interval_floor_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 60
+        max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 30
         
+        # Subscribe to attribute
+        sub_cr1 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=read_paths,
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
+            keepSubscriptions=False
+        )
         
-        
-        
-        
-        
-        
-        
+        sub_cr1_requested_attributes = sub_cr1.GetAttributes()
 
-            
+        # Verify attribute data came back
+        asserts.assert_true(0 in sub_cr1_requested_attributes, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1_requested_attributes[0], "Must have read Basic Information cluster data")
+        for attribute in read_contents:
+            asserts.assert_true(attribute in sub_cr1_requested_attributes[0][Clusters.BasicInformation],
+                                "Must have read back attribute %s" % (attribute.__name__))
         
-      
+        # Verify subscriptionId is of uint32 type
+        asserts.assert_true(self.is_uint32(sub_cr1.subscriptionId), "subscriptionId is not of uint32 type.")
         
-     
+        # Verify MaxInterval is of uint32 type
+        sub_cr1_intervals = sub_cr1.GetReportingIntervalsSeconds()
+        sub_cr1_min_interval_floor_sec, sub_cr1_max_interval_ceiling_sec = sub_cr1_intervals
+        asserts.assert_true(self.is_uint32(sub_cr1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
+
+        # Verify MaxInterval is less than or equal to MaxIntervalCeiling
+        asserts.assert_true(sub_cr1_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
+
+        sub_cr1.Shutdown()
         
-
-
-        # data = sub.GetAttributes()
-        # if data:
-        #     attributes = sub.GetAttributes()[0]
-        #     basic_information = (sub.GetAttributes()[0])[Clusters.Objects.BasicInformation]
-        # else:
-
+        ''' 
+        ##########
+        Step 3 - 6
+        ##########
+        '''
+        # # TODO: How to trigger desired Status responses
         
-        
-        # if node_label_attr in sub_basic_information[Clusters.Objects.BasicInformation]
-        
-        
-        # logging.info("debux - sub_intervals: " + str(sub_intervals))
-        # logging.info("debux - sub_1_attr: " + str(sub_1_attr))
-        # logging.info("debux - sub_basic_information_attribute: " + str(sub_basic_information_attribute))
-        # logging.info("debux - sub_subscription_id: " + str(sub_subscription_id))
-
-        
-        
-        # data = {
-        #     0: {
-        #         clusters.Objects.BasicInformation: {
-        #             clusters.Attribute.DataVersion: 2884903808, 
-        #             clusters.Objects.BasicInformation.Attributes.NodeLabel: ''
-        #         }
-        #     }
-        # }
-
-        # # Assuming 'chip' module is already imported and classes are available
-
-        # # Iterate through the first level of the dictionary
-        # for key, value in data.items():
-        #     logging.info(f"debux - Key: {key}")
-            
-        #     # 'value' is another dictionary, so iterate through it
-        #     for class_key, inner_dict in value.items():
-        #         logging.info(f"debux -   Class Key: {class_key.__name__}")
-
-        #         # 'inner_dict' is also a dictionary, iterate through it to log each item
-        #         for class_attr_key, attr_value in inner_dict.items():
-        #             logging.info(f"debux -     Attribute Key: {class_attr_key.__name__}, Value: {attr_value}")
-
-        
-        
-        
-        
-        # output_queue = queue.Queue()
-        # attribute_handler = AttributeChangeAccumulator(
-        #     name=CR1.name, 
-        #     expected_attribute=Clusters.BasicInformation.Attributes.NodeLabel, 
-        #     output=output_queue)
-        
-        # sub.SetAttributeUpdateCallback(attribute_handler)
-
-
-
-
-
-
-
-
-
-    
-        # Controller 2 Setup
+        # # Controller 2 Setup
         # fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-
         # CR2_nodeid = self.matter_test_config.controller_node_id + 1
-        # CR2 = fabric_admin.NewController(nodeId=CR2_nodeid,
-        #                                  paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
-        
+        # CR2 = fabric_admin.NewController(
+        #     nodeId=CR2_nodeid,
+        #     paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+        # )
+
         # CR2_limited_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
         #     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
         #     subjects=[CR2_nodeid],
-        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=0, cluster=Clusters.AccessControl.id)])        
+        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.Thermostat.id)]
+        # )
+        # await self.write_acl([CR2_limited_acl])
+        # cluster = Clusters.Objects.Descriptor
+        # attribute = Clusters.Descriptor.Attributes.DeviceTypeList
+        # await self.read_single_attribute_expect_error(
+        #     dev_ctrl=CR2,
+        #     endpoint=0, 
+        #     cluster=cluster, 
+        #     attribute=attribute, 
+        #     error=Status.InvalidAction
+        # )
         
+        ''' 
+        ##########
+        Step 7
+        ##########
+        '''
+        self.print_step(7, "CR1 sends a subscription request action for an attribute with an empty DataVersionFilters field. DUT sends a report data action with the data of the attribute along with the data version. Tear down the subscription for that attribute. Start another subscription with the DataVersionFilter field set to the data version received above.")
+        read_contents = [
+            Clusters.BasicInformation.Attributes.ProductName
+        ]
+        read_paths = [(0, attrib) for attrib in read_contents]
+        
+        # Subscribe to attribute with empty dataVersionFilters
+        sub_cr1 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=read_paths,
+            keepSubscriptions=False
+        )
+
+        # Verify attribute data came back
+        asserts.assert_true(0 in sub_cr1, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1[0], "Must have read Basic Information cluster data")
+        for attribute in read_contents:
+            asserts.assert_true(Clusters.Attribute.DataVersion in sub_cr1[0][Clusters.BasicInformation],
+                                "Must have read back attribute %s" % (attribute.__name__))
+
+        # Get DataVersion and generate a dataVersionFilters type
+        data_version = sub_cr1[0][Clusters.Objects.BasicInformation][Clusters.Attribute.DataVersion]
+        data_version_filter = [(0, Clusters.BasicInformation, data_version)]
+
+        # Subscribe to attribute with provided dataVersionFilters
+        sub_cr1 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=read_paths,
+            reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
+            keepSubscriptions=False,
+            dataVersionFilters=data_version_filter
+        )
+        
+        # Verify that the subscription is activated between CR1 and DUT
+        asserts.assert_true(sub_cr1.subscriptionId, "Subscription not activated")
+        
+        
+        
+        
+        
+        
+        
+        
+
+
         logging.info("debux - test_TC_IDM_4_2 end")
 
 if __name__ == "__main__":
