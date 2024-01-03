@@ -297,20 +297,29 @@ static_library("support") {
   }
 }
 
+source_set("test_utils") {
+  deps = [ "${chip_root}/src/platform" ]
+
+  sources = [
+    "UnitTestUtils.cpp",
+    "UnitTestUtils.h",
+  ]
+}
+
 static_library("testing") {
   output_name = "libSupportTesting"
   output_dir = "${root_out_dir}/lib"
+  complete_static_lib = true
 
   sources = [
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
-    "UnitTestUtils.cpp",
-    "UnitTestUtils.h",
   ]
 
   public_deps = [
     ":support",
+    ":test_utils",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
     "${nlassert_root}:nlassert",
