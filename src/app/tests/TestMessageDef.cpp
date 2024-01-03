@@ -2129,7 +2129,7 @@ void InvokeResponseMessageEndOfMessageReservationTest(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t remainingLengthAfterInitWithReservation = writer.GetRemainingFreeLength();
-    err = invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
+    err                                              = invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t remainingLengthAfterEndingInvokeResponseMessage = writer.GetRemainingFreeLength();
@@ -2153,7 +2153,7 @@ void InvokeResponsesEndOfResponseReservationTest(nlTestSuite * apSuite, void * a
 
     auto * invokeResponsesWriter                     = invokeResponsesBuilder.GetWriter();
     uint32_t remainingLengthAfterInitWithReservation = invokeResponsesWriter->GetRemainingFreeLength();
-    err = invokeResponsesBuilder.EndOfInvokeResponses();
+    err                                              = invokeResponsesBuilder.EndOfInvokeResponses();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t remainingLengthAfterEndingInvokeResponses = invokeResponsesWriter->GetRemainingFreeLength();
