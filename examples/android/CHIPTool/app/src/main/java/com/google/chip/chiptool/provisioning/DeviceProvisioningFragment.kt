@@ -293,9 +293,19 @@ class DeviceProvisioningFragment : Fragment() {
       )
     }
 
-    override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
-      Log.d(TAG, "onICDRegistrationComplete - icdNodeId : $icdNodeId, icdCounter : $icdCounter")
+    override fun onICDRegistrationComplete(
+      icdNodeId: Long,
+      icdCounter: Long,
+      symmetricKey: ByteArray
+    ) {
+      Log.d(
+        TAG,
+        "onICDRegistrationComplete - icdNodeId : $icdNodeId, icdCounter : $icdCounter, symmetricKey : ${symmetricKey.toHex()}"
+      )
     }
+
+    private fun ByteArray.toHex(): String =
+      joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
   }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */

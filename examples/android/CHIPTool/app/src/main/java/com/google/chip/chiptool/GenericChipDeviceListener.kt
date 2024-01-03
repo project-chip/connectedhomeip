@@ -56,7 +56,11 @@ open class GenericChipDeviceListener : ChipDeviceController.CompletionListener {
     // No op
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(
+    icdNodeId: Long,
+    icdCounter: Long,
+    symmetricKey: ByteArray
+  ) {
     // No op
   }
 }

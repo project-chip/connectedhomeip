@@ -917,7 +917,9 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
     clientInfo.start_icd_counter = icdCounter;
 
-    err = mICDClientStorage.SetKey(clientInfo, mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value());
+    ByteSpan symmetricKey = mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value();
+
+    err = mICDClientStorage.SetKey(clientInfo, symmetricKey);
     if (err == CHIP_NO_ERROR)
     {
         err = mICDClientStorage.StoreEntry(clientInfo);
@@ -938,12 +940,16 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationCompleteMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ)V",
+    jbyteArray jSymmetricKey = nullptr;
+    err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ[B)V",
                                                   &onICDRegistrationCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
+    err = JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<uint32_t>(symmetricKey.size()), jSymmetricKey);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, err.Format()));
+
     env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jlong>(icdNodeId),
-                        static_cast<jlong>(icdCounter));
+                        static_cast<jlong>(icdCounter), jSymmetricKey);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

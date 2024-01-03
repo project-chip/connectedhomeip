@@ -185,10 +185,14 @@ abstract class PairingCommand(
       .updateCommissioningICDRegistrationInfo(ICDRegistrationInfo.newBuilder().build())
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(
+    icdNodeId: Long,
+    icdCounter: Long,
+    symmetricKey: ByteArray
+  ) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${symmetricKey.toHex()}"
     )
   }
 
@@ -243,6 +247,9 @@ abstract class PairingCommand(
   fun getUseOnlyOnNetworkDiscovery(): Boolean {
     return useOnlyOnNetworkDiscovery.get()
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   companion object {
     private val logger = Logger.getLogger(PairingCommand::class.java.name)
