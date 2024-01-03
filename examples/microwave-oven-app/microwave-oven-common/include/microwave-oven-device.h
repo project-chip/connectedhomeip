@@ -44,9 +44,6 @@ constexpr uint8_t kDefaultPowerSetting = 100u;
 constexpr uint8_t ModeNormal  = 0;
 constexpr uint8_t ModeDefrost = 1;
 
-constexpr uint32_t kFeaturePowerAsNumber = 0x01;
-constexpr uint32_t kFeaturePowerInWatts  = 0x02;
-
 constexpr uint16_t kExampleWatt1 = 100u;
 constexpr uint16_t kExampleWatt2 = 300u;
 constexpr uint16_t kExampleWatt3 = 500u;
@@ -67,7 +64,7 @@ public:
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, kFeaturePowerAsNumber,
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, MicrowaveOvenControl::Feature::kPowerInWatts,
                                       mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
@@ -81,8 +78,9 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           uint8_t powerSetting, bool startAfterSetting,
-                                                                           uint32_t feature) override;
+                                                                           bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                                           Optional<uint8_t> powerSetting, 
+                                                                           Optional<uint8_t> wattSettingIndex) override;
 
     /**
      * handle command for microwave oven control: add more time

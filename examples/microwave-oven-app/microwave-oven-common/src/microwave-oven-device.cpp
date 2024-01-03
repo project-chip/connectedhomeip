@@ -37,9 +37,9 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     mMicrowaveOvenControlInstance.Init();
 
     // set default value for attribute SelectedWattIndex and WattRatting
-    if (mMicrowaveOvenControlInstance.HasFeature(to_underlying(MicrowaveOvenControl::Feature::kPowerInWatts)))
+    if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
-        mSelectedWattIndex = sizeof(mWattSettingList) / sizeof(uint16_t) - 1;
+        mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
         mWattRatting       = mWattSettingList[mSelectedWattIndex];
     }
     else
@@ -52,8 +52,10 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  * MicrowaveOvenControl cluster
  */
 Protocols::InteractionModel::Status
-ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, uint8_t powerSetting,
-                                                               bool startAfterSetting, uint32_t feature)
+ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
+                                                            bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                            Optional<uint8_t> powerSetting, 
+                                                            Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
     Status status;
@@ -67,13 +69,15 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
 
     // set powerSetting if power is in number
-    if (feature == to_underlying(MicrowaveOvenControl::Feature::kPowerAsANumber))
+    if (feature == MicrowaveOvenControl::Feature::kPowerAsANumber && powerSetting.HasValue())
     {
-        mPowerSetting = powerSetting;
+        mPowerSetting = powerSetting.Value();
     }
-    else // set wattRatting and selectedWattIndex if power is in watt
+
+    // set wattRatting and selectedWattIndex if power is in watt
+    if(feature == MicrowaveOvenControl::Feature::kPowerInWatts && wattSettingIndex.HasValue())
     {
-        mSelectedWattIndex = powerSetting;
+        mSelectedWattIndex = wattSettingIndex.Value();
         mWattRatting       = mWattSettingList[mSelectedWattIndex];
     }
 
@@ -94,7 +98,7 @@ Protocols::InteractionModel::Status ExampleMicrowaveOvenDevice::HandleModifyCook
 CHIP_ERROR ExampleMicrowaveOvenDevice::GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting)
 {
     // placeholder implementation
-    if (index > (sizeof(mWattSettingList) / sizeof(uint16_t) - 1))
+    if (index > (ArraySize(mWattSettingList) - 1))
     {
         return CHIP_ERROR_NOT_FOUND;
     }

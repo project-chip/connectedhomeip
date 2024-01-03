@@ -51,7 +51,7 @@ public:
      * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
      * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, uint32_t aFeature,
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<MicrowaveOvenControl::Feature> aFeature,
              Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
 
     ~Instance() override;
@@ -68,12 +68,12 @@ public:
      * Returns true if the feature is supported.
      * @param feature the feature to check.
      */
-    bool HasFeature(uint32_t feature) const;
+    bool HasFeature(MicrowaveOvenControl::Feature feature) const;
 
     /**
-     * @brief Get the number of supported power level
+     * @brief Get the count of supported power level
      */
-    uint8_t GetSupportedPowerLevels() const;
+    uint8_t GetCountOfSupportedPowerLevels() const;
 
     /**
      * @brief define the get/set api for the mandatory attributes
@@ -85,7 +85,7 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    uint32_t mFeature;
+    BitMask<MicrowaveOvenControl::Feature> mFeature;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
@@ -135,14 +135,15 @@ public:
      *   @return Returns the Interaction Model status code which was user determined in the business logic.
      *   @param  cookMode: the user defined modes which from the Microwave Oven Mode application level.
      *   @param  cookTime: the input cook time value.
-     *   @param  powerSetting: the input power setting value.
-     *   Note: if using power in watt, this parameter is expressed as WattSettingIndex.
      *   @param  startAfterSetting: the flag to indicate if start for the operation after handling the command.
-     *   @param  feature: featureMap value of Microwave Oven Control.
+     *   @param  feature: featureMap bits value of Microwave Oven Control.
+     *   @param  powerSetting: the input power setting value. Set NullOptional if the feature does not support this field.
+     *   @param  wattSettingIndex: the input watts setting index. Set NullOptional if the feature does not support this field.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                   uint8_t powerSetting, bool startAfterSetting,
-                                                                                   uint32_t feature) = 0;
+                                                                                   bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                                                   Optional<uint8_t> powerSetting, 
+                                                                                   Optional<uint8_t> wattSettingIndex) = 0;
 
     /**
      *   @brief Handle Command Callback in application: AddMoreTime.
