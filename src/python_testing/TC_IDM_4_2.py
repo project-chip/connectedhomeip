@@ -27,6 +27,7 @@ from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import TypedAttributePath, AttributePath
 from mobly import asserts
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from global_attribute_ids import GlobalAttributeIds
 
 
 class TC_IDM_4_2(MatterBaseTest):
@@ -100,34 +101,34 @@ class TC_IDM_4_2(MatterBaseTest):
         read_paths = [(0, attrib) for attrib in read_contents]
 
         # Subscribe to attribute
-        sub_cr1 = await CR1.ReadAttribute(
+        sub_cr1_max_greater_than_sub = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
         
-        sub_cr1_requested_attributes = sub_cr1.GetAttributes()
+        sub_cr1_max_greater_than_sub_requested_attributes = sub_cr1_max_greater_than_sub.GetAttributes()
 
         # Verify attribute data came back
-        asserts.assert_true(0 in sub_cr1_requested_attributes, "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.BasicInformation in sub_cr1_requested_attributes[0], "Must have read Basic Information cluster data")
+        asserts.assert_true(0 in sub_cr1_max_greater_than_sub_requested_attributes, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1_max_greater_than_sub_requested_attributes[0], "Must have read Basic Information cluster data")
         for attribute in read_contents:
-            asserts.assert_true(attribute in sub_cr1_requested_attributes[0][Clusters.BasicInformation],
+            asserts.assert_true(attribute in sub_cr1_max_greater_than_sub_requested_attributes[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
 
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_uint32(sub_cr1.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(self.is_uint32(sub_cr1_max_greater_than_sub.subscriptionId), "subscriptionId is not of uint32 type.")
         
         # Verify MaxInterval is of uint32 type
-        sub_cr1_intervals = sub_cr1.GetReportingIntervalsSeconds()
-        sub_cr1_min_interval_floor_sec, sub_cr1_max_interval_ceiling_sec = sub_cr1_intervals
-        asserts.assert_true(self.is_uint32(sub_cr1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
+        sub_cr1_max_greater_than_sub_intervals = sub_cr1_max_greater_than_sub.GetReportingIntervalsSeconds()
+        sub_cr1_max_greater_than_sub_min_interval_floor_sec, sub_cr1_max_greater_than_sub_max_interval_ceiling_sec = sub_cr1_max_greater_than_sub_intervals
+        asserts.assert_true(self.is_uint32(sub_cr1_max_greater_than_sub_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
-        asserts.assert_true(sub_cr1_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
+        asserts.assert_true(sub_cr1_max_greater_than_sub_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
-        sub_cr1.Shutdown()
+        sub_cr1_max_greater_than_sub.Shutdown()
 
         ''' 
         ##########
@@ -139,34 +140,34 @@ class TC_IDM_4_2(MatterBaseTest):
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 30
         
         # Subscribe to attribute
-        sub_cr1 = await CR1.ReadAttribute(
+        sub_cr1_max_less_than_subs = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             keepSubscriptions=False
         )
         
-        sub_cr1_requested_attributes = sub_cr1.GetAttributes()
+        sub_cr1_max_less_than_subs_requested_attributes = sub_cr1_max_less_than_subs.GetAttributes()
 
         # Verify attribute data came back
-        asserts.assert_true(0 in sub_cr1_requested_attributes, "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.BasicInformation in sub_cr1_requested_attributes[0], "Must have read Basic Information cluster data")
+        asserts.assert_true(0 in sub_cr1_max_less_than_subs_requested_attributes, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1_max_less_than_subs_requested_attributes[0], "Must have read Basic Information cluster data")
         for attribute in read_contents:
-            asserts.assert_true(attribute in sub_cr1_requested_attributes[0][Clusters.BasicInformation],
+            asserts.assert_true(attribute in sub_cr1_max_less_than_subs_requested_attributes[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
         
         # Verify subscriptionId is of uint32 type
-        asserts.assert_true(self.is_uint32(sub_cr1.subscriptionId), "subscriptionId is not of uint32 type.")
+        asserts.assert_true(self.is_uint32(sub_cr1_max_less_than_subs.subscriptionId), "subscriptionId is not of uint32 type.")
         
         # Verify MaxInterval is of uint32 type
-        sub_cr1_intervals = sub_cr1.GetReportingIntervalsSeconds()
-        sub_cr1_min_interval_floor_sec, sub_cr1_max_interval_ceiling_sec = sub_cr1_intervals
-        asserts.assert_true(self.is_uint32(sub_cr1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
+        sub_cr1_max_less_than_subs_intervals = sub_cr1_max_less_than_subs.GetReportingIntervalsSeconds()
+        sub_cr1_max_less_than_subs_min_interval_floor_sec, sub_cr1_max_less_than_subs_max_interval_ceiling_sec = sub_cr1_max_less_than_subs_intervals
+        asserts.assert_true(self.is_uint32(sub_cr1_max_less_than_subs_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
-        asserts.assert_true(sub_cr1_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
+        asserts.assert_true(sub_cr1_max_less_than_subs_max_interval_ceiling_sec <= max_interval_ceiling_sec, "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
-        sub_cr1.Shutdown()
+        sub_cr1_max_less_than_subs.Shutdown()
         
         ''' 
         ##########
@@ -212,25 +213,25 @@ class TC_IDM_4_2(MatterBaseTest):
         read_paths = [(0, attrib) for attrib in read_contents]
         
         # Subscribe to attribute with empty dataVersionFilters
-        sub_cr1 = await CR1.ReadAttribute(
+        sub_cr1_empty_dvf = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
             keepSubscriptions=False
         )
 
         # Verify attribute data came back
-        asserts.assert_true(0 in sub_cr1, "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.BasicInformation in sub_cr1[0], "Must have read Basic Information cluster data")
+        asserts.assert_true(0 in sub_cr1_empty_dvf, "Must have read endpoint 0 data")
+        asserts.assert_true(Clusters.BasicInformation in sub_cr1_empty_dvf[0], "Must have read Basic Information cluster data")
         for attribute in read_contents:
-            asserts.assert_true(Clusters.Attribute.DataVersion in sub_cr1[0][Clusters.BasicInformation],
+            asserts.assert_true(Clusters.Attribute.DataVersion in sub_cr1_empty_dvf[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
 
         # Get DataVersion
-        data_version = sub_cr1[0][Clusters.Objects.BasicInformation][Clusters.Attribute.DataVersion]
+        data_version = sub_cr1_empty_dvf[0][Clusters.Objects.BasicInformation][Clusters.Attribute.DataVersion]
         data_version_filter = [(0, Clusters.BasicInformation, data_version)]
-
+        
         # Subscribe to attribute with provided DataVersion
-        sub_cr1 = await CR1.ReadAttribute(
+        sub_cr1_provided_dvf = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
             reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
@@ -239,9 +240,9 @@ class TC_IDM_4_2(MatterBaseTest):
         )
         
         # Verify that the subscription is activated between CR1 and DUT
-        asserts.assert_true(sub_cr1.subscriptionId, "Subscription not activated")
+        asserts.assert_true(sub_cr1_provided_dvf.subscriptionId, "Subscription not activated")
         
-        sub_cr1.Shutdown()
+        sub_cr1_provided_dvf.Shutdown()
         
         ''' 
         ##########
@@ -255,8 +256,8 @@ class TC_IDM_4_2(MatterBaseTest):
         read_paths = [(0, attrib) for attrib in read_contents]
         min_max_interval_sec = 3
         
-        # Subscribe to attribute with empty dataVersionFilters
-        sub_cr1 = await CR1.ReadAttribute(
+        # Subscribe to attribute
+        sub_cr1_update_value = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=read_paths,
             reportInterval=(min_max_interval_sec, min_max_interval_sec),
@@ -272,7 +273,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Wait MinIntervalFloor seconds before reading updated attribute value
         time.sleep(min_max_interval_sec)
-        new_node_label_read = sub_cr1.GetAttribute(
+        new_node_label_read = sub_cr1_update_value.GetAttribute(
             TypedAttributePath(
                 Path=AttributePath(
                     EndpointId=0, 
@@ -284,7 +285,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Verify new attribute value after MinIntervalFloor time
         asserts.assert_equal(new_node_label_read, new_node_label_write, "Attribute value not updated after write operation.")
 
-        sub_cr1.Shutdown()
+        sub_cr1_update_value.Shutdown()
         
         ''' 
         ##########
@@ -311,8 +312,26 @@ class TC_IDM_4_2(MatterBaseTest):
             with asserts.assert_raises(AttributeError):
                 sub_cr1_invalid_intervals.subscriptionId
 
+        ''' 
+        ##########
+        Step 10 - 12
+        ##########
+        '''
+        # TODO: How to subscribe to global attributes
+        # TODO: How to subscribe with both AttributeRequests and EventRequests as empty
+        # self.print_step(10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
+        # read_contents = [
+        #     Clusters.BasicInformation.Attributes.NodeLabel
+        # ]
+        # read_paths = [(0, attrib) for attrib in read_contents]
         
-        
+        # # Subscribe to global attribute
+        # sub_cr1_invalid_intervals = await CR1.ReadAttribute(
+        #     nodeid=self.dut_node_id,
+        #     attributes=read_paths,
+        #     reportInterval=(10, 10),
+        #     keepSubscriptions=False,
+        # )  
         
 
 
