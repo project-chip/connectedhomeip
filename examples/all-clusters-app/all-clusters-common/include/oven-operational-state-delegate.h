@@ -79,7 +79,8 @@ public:
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
      */
-    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
+    void HandlePauseStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
+    {
         // This command in not supported.
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
@@ -88,7 +89,8 @@ public:
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
      */
-    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
+    void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
+    {
         // This command in not supported.
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
@@ -97,7 +99,8 @@ public:
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
+    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
+    {
         // This command in not supported.
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
@@ -106,7 +109,8 @@ public:
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
      */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
+    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override
+    {
         // This command in not supported.
         err.Set(to_underlying(ErrorStateEnum::kCommandInvalidInState));
     };
