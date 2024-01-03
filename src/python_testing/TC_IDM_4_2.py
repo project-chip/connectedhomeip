@@ -15,16 +15,17 @@
 #    limitations under the License.
 #
 
-import time
-import random
 import logging
+import random
+import time
+
 import chip.clusters as Clusters
-from mobly import asserts
+from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters.Attribute import TypedAttributePath, AttributePath
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from mobly import asserts
 
 
 class TC_IDM_4_2(MatterBaseTest):
