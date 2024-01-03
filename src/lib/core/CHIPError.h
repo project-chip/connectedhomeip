@@ -625,7 +625,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *    Subscription timeout caused by LIT ICD device inactive mode
  *
  */
-#define CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT                     CHIP_CORE_ERROR(0x16)
+#define CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT              CHIP_CORE_ERROR(0x16)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE
