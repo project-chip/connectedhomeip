@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".chip.casting.app.CommissionerDiscoveryFragment">
+    tools:context=".matter.casting.DiscoveryExampleFragment">
 
     <LinearLayout
-        android:id="@+id/castingCommissioners"
+        android:id="@+id/castingPlayers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -15,31 +15,35 @@
         android:padding="10sp">
 
         <Button
-            android:id="@+id/purgeCacheButton"
+            android:enabled="false"
+            android:id="@+id/startDiscoveryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Purge Cache" />
+            android:text="@string/matter_start_discovery_button_text" />
 
         <Button
-            android:id="@+id/manualCommissioningButton"
+            android:enabled="false"
+            android:id="@+id/stopDiscoveryButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Skip to manual commissioning >>" />
+            android:text="@string/matter_stop_discovery_button_text" />
 
         <Button
-            android:id="@+id/discoverButton"
+            android:id="@+id/clearDiscoveryResultsButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Discover>" />
+            android:text="@string/matter_clear_results_button_text" />
 
         <TextView
+            android:id="@+id/matterDiscoveryMessageTextView"
+            android:text="string/matter_discovery_message_default_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/discovery_message_text"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
         <ListView
-            android:id = "@+id/commissionerList"
+            android:id = "@+id/castingPlayerList"
             android:layout_width = "match_parent"
             android:layout_height = "wrap_content"
             android:fadeScrollbars = "false" />
