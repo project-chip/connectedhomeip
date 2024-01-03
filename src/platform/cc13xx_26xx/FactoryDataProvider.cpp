@@ -165,25 +165,22 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     // Extract public key from DAC cert.
     uint8_t dacBuf[600] = { 0 };
     MutableByteSpan dacCertSpan(dacBuf);
+    ReturnErrorCodeIf(dacCertSpan.size() < mFactoryData.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(dacCertSpan.data(), mFactoryData.dac_cert.data, mFactoryData.dac_cert.len);
     dacCertSpan.reduce_size(mFactoryData.dac_cert.len);
     chip::Crypto::P256PublicKey dacPublicKey;
 
     ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
 
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
-    // MutableByteSpan privKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t *>(mFactoryData.dac_priv_key.data)),
-    // mFactoryData.dac_priv_key.len}; MutableByteSpan pubKeySpan{const_cast<uint8_t*>(reinterpret_cast< const uint8_t
-    // *>(dacPublicKey.Bytes())), dacPublicKey.Length()};
-
     uint8_t privKeyBuf[600] = { 0 };
     MutableByteSpan privKeySpan(privKeyBuf);
+    ReturnErrorCodeIf(privKeySpan.size() < mFactoryData.priv_key.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(privKeySpan.data(), mFactoryData.dac_priv_key.data, mFactoryData.dac_priv_key.len);
     privKeySpan.reduce_size(mFactoryData.dac_priv_key.len);
 
     uint8_t pubKeyBuf[600] = { 0 };
     MutableByteSpan pubKeySpan(pubKeyBuf);
+    ReturnErrorCodeIf(pubKeySpan.size() < dacPublicKey.Length(), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(pubKeySpan.data(), dacPublicKey.Bytes(), dacPublicKey.Length());
     pubKeySpan.reduce_size(dacPublicKey.Length());
 
@@ -286,8 +283,6 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-// #pragma GCC push_options
-// #pragma GCC optimize("O0")
 CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     ReturnErrorCodeIf(!mFactoryData.manufacturing_date.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -298,7 +293,7 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     day   = ((tmp[8] - 0x30) * 10) + (tmp[9] - 0x30);
     return CHIP_NO_ERROR;
 }
-// #pragma GCC pop_options
+
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
