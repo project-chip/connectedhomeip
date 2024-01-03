@@ -25,7 +25,6 @@ from chip.interaction_model import Status
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import TypedAttributePath, AttributePath
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from global_attribute_ids import GlobalAttributeIds
 
 
 class TC_IDM_4_2(MatterBaseTest):
@@ -93,7 +92,7 @@ class TC_IDM_4_2(MatterBaseTest):
             logging.info("CR1 reads from the DUT the IdleModeDuration attribute and sets SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = IdleModeDuration")
 
             idleModeDuration = await self.get_idle_mode_duration(CR1)
-            
+
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = idleModeDuration
             logging.info("SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT: " + idleModeDuration + " sec")
         else:
@@ -325,6 +324,6 @@ class TC_IDM_4_2(MatterBaseTest):
         #     keepSubscriptions=False,
         # )
 
+
 if __name__ == "__main__":
-    
     default_matter_test_main()
