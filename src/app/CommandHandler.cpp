@@ -171,9 +171,8 @@ CHIP_ERROR CommandHandler::ValidateInvokeRequestMessageAndBuildRegistry(InvokeRe
     {
         err = CHIP_NO_ERROR;
     }
-    ReturnErrorOnFailure(invokeRequestMessage.ExitContainer());
-
-    return err;
+    ReturnErrorOnFailure(err);
+    return invokeRequestMessage.ExitContainer();
 }
 
 Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
