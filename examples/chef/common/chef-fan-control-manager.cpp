@@ -82,8 +82,8 @@ CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEnco
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
 {
-    ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleStep aDirection %d, aWrap %d, aLowestOff %d", to_underlying(aDirection),
-                    aWrap, aLowestOff);
+    ChipLogProgress(NotSpecified, "ChefFanControlManager::HandleStep aDirection %d, aWrap %d, aLowestOff %d",
+                    to_underlying(aDirection), aWrap, aLowestOff);
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
