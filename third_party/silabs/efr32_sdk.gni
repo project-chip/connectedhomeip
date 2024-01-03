@@ -483,10 +483,10 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ 
+        libs += [
           "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg12_gcc_release.a",
           "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg12_gcc_release.a",
-          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg12_gcc_release.a", 
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg12_gcc_release.a",
         ]
       }
 
@@ -509,10 +509,10 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [ 
+        libs += [
           "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
           "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
-          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a", 
+          "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a",
         ]
       }
 
@@ -536,7 +536,7 @@ template("efr32_sdk") {
       libs += [
         "${sdk_support_root}/protocol/bluetooth/bgcommon/lib/libbgcommon_efr32xg24_gcc_release.a",
         "${sdk_support_root}/protocol/bluetooth/bgstack/ll/lib/libbluetooth_controller_efr32xg24_gcc_release.a",
-        "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a", 
+        "${sdk_support_root}/protocol/bluetooth/lib/libbluetooth_host_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
         "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
@@ -682,6 +682,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/asn1write.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/base64.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/bignum_core.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ccm.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/cipher_wrap.c",
@@ -707,7 +708,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_aead.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_cipher.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_client.c",
-      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_driver_wrappers_no_static.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_ecp.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_hash.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_mac.c",
@@ -715,6 +716,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_se.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_slot_management.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_crypto_storage.c",
+      "${efr32_sdk_root}/util/third_party/mbedtls/library/psa_util.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/sha256.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_cache.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/ssl_ciphersuites.c",
