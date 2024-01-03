@@ -199,11 +199,7 @@ void SynchronizedReportSchedulerImpl::TimerFired()
         return Loop::Continue;
     });
 
-<<<<<<< HEAD
     if (firedEarly)
-=======
-    if (mNodesPool.Allocated() && firedEarly)
->>>>>>> 1d1639fb5d (Documented the ReportScheduler base class and its implementations)
     {
         // If we fired the timer early, we need to recalculate the next report timeout and reschedule the report
         Timeout timeout = Milliseconds32(0);

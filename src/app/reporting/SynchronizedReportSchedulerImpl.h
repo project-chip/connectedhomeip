@@ -35,7 +35,7 @@ using TimerDelegate   = ReportScheduler::TimerDelegate;
  *
  * @brief This class extends ReportSchedulerImpl and overrides it's scheduling logic.
  *
- * It only overrides Observers method where thhe scheduling logic make it necessary, the others are kept as is.
+ * It only overrides Observers method where the scheduling logic make it necessary, the others are kept as is.
  *
  * It inherits from TimerContext so that it can be used as a TimerDelegate instead on relying on the nodes to schedule themselves.
  *
@@ -55,7 +55,7 @@ using TimerDelegate   = ReportScheduler::TimerDelegate;
  *
  * - The Synchronized Scheduler keeps track of the next min and max interval timestamps. It updates in CalculateNextReportTimeout
  *
- * - The nex max interval is calculated as the earliest max interval of all the registered ReadHandlersNodes.
+ * - The next max interval is calculated as the earliest max interval of all the registered ReadHandlersNodes.
  *
  * - The next min interval is calculated as the latest min interval of the registered ReadHandlersNodes that:
  *     * Have a min timestamp greater than the current time
@@ -92,7 +92,7 @@ public:
      * While looping, it checks if any handler is reportable now. If not, we recalculate the next report timeout and reschedule the
      * report.
      *
-     * If a Readhangler is reportable now, we an engine run is scheduled.
+     * If a Readhangler is reportable now, an engine run is scheduled.
      *
      * If the timer expires after all nodes were unregistered, no action is taken.
      */
@@ -123,7 +123,7 @@ private:
      *
      * @param[in] now The current system timestamp, set by the event that triggered the call of this method.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_LIST_LENGTH if the list is empty
+     * @return CHIP_ERROR on success or CHIP_ERROR_INVALID_LIST_LENGTH if the list is empty
      */
     CHIP_ERROR FindNextMinInterval(const Timestamp & now);
 
@@ -132,7 +132,7 @@ private:
      *
      * @param[in] now The current system timestamp, set by the event that triggered the call of this method.
      *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success or CHIP_ERROR_INVALID_LIST_LENGTH if the list is empty
+     * @return CHIP_ERROR on success or CHIP_ERROR_INVALID_LIST_LENGTH if the list is empty
      */
     CHIP_ERROR FindNextMaxInterval(const Timestamp & now);
 

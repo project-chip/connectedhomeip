@@ -46,12 +46,12 @@ public:
  * This class holds a pool of ReadHandlerNodes that are used to keep track of the minimum and maximum timestamps for a report to be
  * emitted based on the reporting intervals of the ReadHandlers associated with the node.
  *
- * The ReportScheduler also holds a pointer a TimerDelegate that is used to start and cancel timers for the ReadHandlers depending
+ * The ReportScheduler also holds a TimerDelegate pointer that is used to start and cancel timers for the ReadHandlers depending
  * on the reporting logic of the Scheduler.
  *
  * It inherits the ReadHandler::Observer class to be notified of reportability changes in the ReadHandlers.
  * It inherits the ICDStateObserver class to allow the implementation to generate reports based on the changes in ICD devices state,
- * such as going from iddle to active and vice-versa.
+ * such as going from idle to active and vice-versa.
  *
  * @note The logic for how and when to schedule reports is implemented in the subclasses of ReportScheduler, such as
  * ReportSchedulerImpl and SyncronizedReportSchedulerImpl.

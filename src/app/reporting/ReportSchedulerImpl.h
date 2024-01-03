@@ -32,16 +32,17 @@ namespace reporting {
  * It is reponsible for implementing the ReadHandler and ICD observers callbacks to the Scheduler can take actions whenever a
  * ReadHandler event occurs or the ICD changes modes.
  *
- * All ReadHandlers Observers callbacks relie on the node pool to create or find the node associated to the ReadHandler that
+ * All ReadHandlers Observers callbacks rely on the node pool to create or find the node associated to the ReadHandler that
  * triggered the callback and will use the FindReadHandlerNode() method to do so.
  *
  * ## Scheduling Logic
  *
- * This class implements a scheduling logic that Calculate the next report timeout based on the
+ * This class implements a scheduling logic that calculates the next report timeout based on the current system timestamp, the state
+ * of the ReadHandlers associated with the scheduler nodes and the min and max intervals of the ReadHandlers.
  *
- * @note This class mimics original scheduling in which the ReadHandlers would  schedule themselves. The key difference is that this
- * implementation only relies on a single timer from the scheduling moment rather than having a timer expiring on the min interval
- * that would trigger the start of a second timer expiring on the max interval.
+ * @note This class mimics the original scheduling in which the ReadHandlers would  schedule themselves. The key difference is that
+ * this implementation only relies on a single timer from the scheduling moment rather than having a timer expiring on the min
+ * interval that would trigger the start of a second timer expiring on the max interval.
  */
 class ReportSchedulerImpl : public ReportScheduler
 {
@@ -84,14 +85,14 @@ public:
     void OnSubscriptionEstablished(ReadHandler * aReadHandler) final;
 
     /**
-     * @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
+     * @brief When a ReadHandler becomes reportable, recalculate and reschedule the report.
      *
      * @note This method sets a now Timestamp that is used to calculate the next report timeout.
      */
     void OnBecameReportable(ReadHandler * aReadHandler) final;
 
     /**
-     * @brief When a ReadHandler report is sent, schedule, recalculate and reschedule the report.
+     * @brief When a ReadHandler report is sent, recalculate and reschedule the report.
      *
      * @note This method is called after the report is sent, so the ReadHandler is no longer reportable, and thus CanBeSynced and
      * EngineRunScheduled of the node associated to the ReadHandler are set to false in this method.
@@ -141,7 +142,7 @@ private:
      * The logic is as follows:
      * - If the ReadHandler is reportable now, the timeout is 0.
      * - If the ReadHandler is reportable, but the current timestamp is earlier thant the next min interval's timestamp, the timeout
-     * is the difference between the next min interval and now.
+     * is the delta between the next min interval and now.
      * - If the ReadHandler is not reportable, the timeout is the difference between the next max interval and now.
      */
     virtual CHIP_ERROR CalculateNextReportTimeout(Timeout & timeout, ReadHandlerNode * aNode, const Timestamp & now);
