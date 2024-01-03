@@ -101,11 +101,11 @@ class TC_IDM_4_2(MatterBaseTest):
             logging.info("Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 60 mins")
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 3600
 
-        ''' 
+        '''
         ##########
         Step 1
         ##########
-        '''        
+        '''
         self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT - 60
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT + 60
@@ -138,7 +138,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step1.Shutdown()
 
-        ''' 
+        '''
         ##########
         Step 2
         ##########
@@ -175,7 +175,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step2.Shutdown()
 
-        ''' 
+        '''
         ##########
         Step 3 - 6
         ##########
@@ -201,13 +201,13 @@ class TC_IDM_4_2(MatterBaseTest):
         # attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         # await self.read_single_attribute_expect_error(
         #     dev_ctrl=CR2,
-        #     endpoint=0, 
-        #     cluster=cluster, 
-        #     attribute=attribute, 
+        #     endpoint=0,
+        #     cluster=cluster,
+        #     attribute=attribute,
         #     error=Status.InvalidAction
         # )
 
-        ''' 
+        '''
         ##########
         Step 7
         ##########
@@ -231,7 +231,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Get DataVersion
         data_version = self.get_attribute_from_sub_dict(
             sub=sub_cr1_empty_dvf,
-            cluster=Clusters.BasicInformation, 
+            cluster=Clusters.BasicInformation,
             attribute=Clusters.Attribute.DataVersion
         )
         data_version_filter = [(0, Clusters.BasicInformation, data_version)]
@@ -250,7 +250,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_provided_dvf.Shutdown()
 
-        ''' 
+        '''
         ##########
         Step 8
         ##########
@@ -264,7 +264,7 @@ class TC_IDM_4_2(MatterBaseTest):
             attributes=node_label_attr_path,
             reportInterval=(min_max_interval_sec, min_max_interval_sec),
             keepSubscriptions=False
-        )        
+        )
 
         # Modify attribute value
         new_node_label_write = "NewNodeLabel_" + str(random.randint(1000, 9999))
@@ -283,7 +283,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_update_value.Shutdown()
 
-        ''' 
+        '''
         ##########
         Step 9
         ##########
@@ -304,7 +304,7 @@ class TC_IDM_4_2(MatterBaseTest):
             with asserts.assert_raises(AttributeError):
                 sub_cr1_invalid_intervals.subscriptionId
 
-        ''' 
+        '''
         ##########
         Step 10 - 12
         ##########
@@ -326,4 +326,5 @@ class TC_IDM_4_2(MatterBaseTest):
         # )
 
 if __name__ == "__main__":
+    
     default_matter_test_main()
