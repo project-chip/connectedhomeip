@@ -16743,6 +16743,7 @@ typedef NS_OPTIONS(uint32_t, MTRLaundryWasherControlsFeature) {
 typedef NS_ENUM(uint16_t, MTRRVCRunModeModeTag) {
     MTRRVCRunModeModeTagIdle MTR_NEWLY_AVAILABLE = 0x4000,
     MTRRVCRunModeModeTagCleaning MTR_NEWLY_AVAILABLE = 0x4001,
+    MTRRVCRunModeModeTagMapping MTR_PROVISIONALLY_AVAILABLE = 0x4002,
 } MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
