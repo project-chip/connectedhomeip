@@ -56,8 +56,10 @@ public:
     /**
      * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
-     * If fills in the provided MutableCharSpan with the phase at index `0` and returns CHIP_ERROR_NOT_FOUND,
-     * it represents PhaseList attribute is an empty list, the SDK will set PhaseList attribute value to null.
+     *
+     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
+     * (there are no phases defined at all).
+     *
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
