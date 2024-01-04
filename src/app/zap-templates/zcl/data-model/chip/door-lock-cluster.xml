@@ -830,8 +830,8 @@ limitations under the License.
         <field name="Year Day Access Schedules" mask="0x400" />
         <field name="Holiday Schedules" mask="0x800" />
         <field name="Unbolt" mask="0x1000" />
-        <field name="ALIRO" mask="0x2000" />
-        <field name="ALBU" mask="0x4000" />
+        <field name="AliroProvisioning" mask="0x2000" />
+        <field name="AliroBLEUWB" mask="0x4000" />
     </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="enum8">
