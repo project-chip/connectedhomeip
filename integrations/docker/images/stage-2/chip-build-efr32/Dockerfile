@@ -30,8 +30,8 @@ RUN git clone --depth=1 --single-branch --branch=2.8.2 https://github.com/Silico
     rm -rf .git \
     && : # last line
 
-# Clone WiSeConnect SDK 3.1.1 (b2c1cd0)
-RUN git clone --depth=1 --single-branch --branch=v3.1.1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone WiSeConnect SDK 3.1.0 (58a2404)
+RUN git clone --depth=1 --single-branch --branch=v3.1.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git \
     && : # last line
