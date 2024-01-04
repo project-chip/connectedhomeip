@@ -465,10 +465,11 @@ template("efr32_sdk") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG12P/Include",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg1x",
-        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg1x/config",
         "${efr32_sdk_root}/platform/service/device_init/config/s1/",
         "${efr32_sdk_root}/platform/emdrv/spidrv/inc",
+        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/inc",
+        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F",
       ]
 
       if (silabs_board == "BRD4304A") {
@@ -660,7 +661,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_hal_s2.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-      "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
@@ -897,6 +897,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
+        "${efr32_sdk_root}/protocol/bluetooth/bgcommon/src/sl_bt_mbedtls_context.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/ctr_drbg.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/entropy.c",
@@ -959,6 +960,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
