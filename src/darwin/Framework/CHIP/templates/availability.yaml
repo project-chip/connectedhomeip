@@ -7803,7 +7803,7 @@
               Feature:
                   DeadFrontBehavior: DeadFront
 
-- release: "Winter 2024"
+- release: "Early 2024"
   versions:
       iOS: "17.4"
       macOS: "14.4"

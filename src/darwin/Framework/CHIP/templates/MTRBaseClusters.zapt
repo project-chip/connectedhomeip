@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (isInConfigList
        (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
        "LegacyCommandsWithOnlyOptionalArguments")}}
-{{availability cluster command=command minimalRelease="Winter 2024"}};
+{{availability cluster command=command minimalRelease="Early 2024"}};
 {{else}}
 {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{/if}}
