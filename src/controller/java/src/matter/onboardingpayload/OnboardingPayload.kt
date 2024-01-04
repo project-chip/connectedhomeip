@@ -67,13 +67,13 @@ const val kSetupPINCodeUndefinedValue = 0L
 
 const val kTotalPayloadDataSizeInBits: Int =
   kVersionFieldLengthInBits +
-    kVendorIDFieldLengthInBits +
-    kProductIDFieldLengthInBits +
-    kCommissioningFlowFieldLengthInBits +
-    kRendezvousInfoFieldLengthInBits +
-    kPayloadDiscriminatorFieldLengthInBits +
-    kSetupPINCodeFieldLengthInBits +
-    kPaddingFieldLengthInBits
+      kVendorIDFieldLengthInBits +
+      kProductIDFieldLengthInBits +
+      kCommissioningFlowFieldLengthInBits +
+      kRendezvousInfoFieldLengthInBits +
+      kPayloadDiscriminatorFieldLengthInBits +
+      kSetupPINCodeFieldLengthInBits +
+      kPaddingFieldLengthInBits
 
 const val kTotalPayloadDataSizeInBytes: Int = kTotalPayloadDataSizeInBits / 8
 
@@ -142,28 +142,28 @@ class OnboardingPayload(
     if (other !is OnboardingPayload) return false
 
     return version == other.version &&
-      vendorId == other.vendorId &&
-      productId == other.productId &&
-      commissioningFlow == other.commissioningFlow &&
-      discoveryCapabilities == other.discoveryCapabilities &&
-      discriminator == other.discriminator &&
-      hasShortDiscriminator == other.hasShortDiscriminator &&
-      setupPinCode == other.setupPinCode
+        vendorId == other.vendorId &&
+        productId == other.productId &&
+        commissioningFlow == other.commissioningFlow &&
+        discoveryCapabilities == other.discoveryCapabilities &&
+        discriminator == other.discriminator &&
+        hasShortDiscriminator == other.hasShortDiscriminator &&
+        setupPinCode == other.setupPinCode
   }
 
   override fun toString(): String {
     return "OnboardingPayload(" +
-      "version=$version, " +
-      "vendorId=$vendorId, " +
-      "productId=$productId, " +
-      "commissioningFlow=$commissioningFlow, " +
-      "discoveryCapabilities=$discoveryCapabilities, " +
-      "discriminator=$discriminator, " +
-      "hasShortDiscriminator=$hasShortDiscriminator, " +
-      "setupPinCode=$setupPinCode, " +
-      "optionalVendorData=$optionalVendorData, " +
-      "optionalExtensionData=$optionalExtensionData" +
-      ")"
+        "version=$version, " +
+        "vendorId=$vendorId, " +
+        "productId=$productId, " +
+        "commissioningFlow=$commissioningFlow, " +
+        "discoveryCapabilities=$discoveryCapabilities, " +
+        "discriminator=$discriminator, " +
+        "hasShortDiscriminator=$hasShortDiscriminator, " +
+        "setupPinCode=$setupPinCode, " +
+        "optionalVendorData=$optionalVendorData, " +
+        "optionalExtensionData=$optionalExtensionData" +
+        ")"
   }
 
   fun isValidManualCode(): Boolean {
@@ -194,8 +194,8 @@ class OnboardingPayload(
     // 3: Reserved
     if (
       commissioningFlow != CommissioningFlow.STANDARD.value &&
-        commissioningFlow != CommissioningFlow.USER_ACTION_REQUIRED.value &&
-        commissioningFlow != CommissioningFlow.CUSTOM.value
+      commissioningFlow != CommissioningFlow.USER_ACTION_REQUIRED.value &&
+      commissioningFlow != CommissioningFlow.CUSTOM.value
     ) {
       return false
     }
@@ -538,17 +538,17 @@ class OnboardingPayload(
       // decimal),
       // excluding the invalid Passcode values.
       return (setupPIN != kSetupPINCodeUndefinedValue &&
-        setupPIN <= kSetupPINCodeMaximumValue &&
-        setupPIN != 11111111L &&
-        setupPIN != 22222222L &&
-        setupPIN != 33333333L &&
-        setupPIN != 44444444L &&
-        setupPIN != 55555555L &&
-        setupPIN != 66666666L &&
-        setupPIN != 77777777L &&
-        setupPIN != 88888888L &&
-        setupPIN != 12345678L &&
-        setupPIN != 87654321L)
+          setupPIN <= kSetupPINCodeMaximumValue &&
+          setupPIN != 11111111L &&
+          setupPIN != 22222222L &&
+          setupPIN != 33333333L &&
+          setupPIN != 44444444L &&
+          setupPIN != 55555555L &&
+          setupPIN != 66666666L &&
+          setupPIN != 77777777L &&
+          setupPIN != 88888888L &&
+          setupPIN != 12345678L &&
+          setupPIN != 87654321L)
     }
 
     private fun longToShortValue(longValue: Int): Int {
