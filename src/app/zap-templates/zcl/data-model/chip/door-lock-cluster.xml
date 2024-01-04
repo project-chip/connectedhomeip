@@ -218,7 +218,7 @@ limitations under the License.
             <access op="read" privilege="administer" />
         </attribute>
         <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="131" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="octet_string" array="true" length="2" writable="false" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="131" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="octet_string" array="true" length="16" writable="false" optional="true" apiMaturity="provisional">
             <description>AliroExpeditedTransactionSupportedProtocolVersions</description>
             <access op="read" privilege="administer" />
         </attribute>
