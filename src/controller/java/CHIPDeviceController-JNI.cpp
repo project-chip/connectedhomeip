@@ -772,7 +772,8 @@ JNI_METHOD(void, pairDeviceWithCode)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(), commissioningParams, discoveryType);
+    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(), commissioningParams,
+                                            discoveryType);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -2085,8 +2086,8 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(
-        env, attestationChallenge.data(), static_cast<jsize>(attestationChallenge.size()), attestationChallengeJbytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(),
+                                                     static_cast<jsize>(attestationChallenge.size()), attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
@@ -2159,9 +2160,9 @@ JNI_METHOD(void, subscribe)
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     app::ReadClient * readClient = nullptr;
-    size_t numAttributePaths       = 0;
-    size_t numEventPaths           = 0;
-    size_t numDataVersionFilters   = 0;
+    size_t numAttributePaths     = 0;
+    size_t numEventPaths         = 0;
+    size_t numDataVersionFilters = 0;
     auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
     DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
@@ -2670,7 +2671,8 @@ JNI_METHOD(void, invoke)
             // The invoke does not support chunk, kMaxSecureSduLengthBytes should be enough for command json blob
             uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
             MutableByteSpan tlvEncodingLocal{ tlvBytes };
-            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), static_cast<size_t>(jsonUtfJniString.size())), tlvEncodingLocal));
+            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), static_cast<size_t>(jsonUtfJniString.size())),
+                                          tlvEncodingLocal));
             SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvEncodingLocal));
         }
     }
