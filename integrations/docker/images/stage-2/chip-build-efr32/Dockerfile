@@ -43,12 +43,6 @@ RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
     rm ./slc_cli_linux.zip \
     && : # last line
 
-# Commander install
-RUN wget https://www.silabs.com/documents/login/software/SimplicityCommander-Linux.zip && \
-    unzip ./SimplicityCommander-Linux.zip -d /tmp && \
-    rm ./SimplicityCommander-Linux.zip \
-    && : # last line
-
 # Final SDK container for compiling using Silabs SDK
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
@@ -72,10 +66,9 @@ RUN set -x \
 ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
 ENV WISECONNECT_SDK_ROOT=/opt/silabs/wiseconnect-wifi-bt-sdk/
 ENV WIFI_SDK_ROOT=/opt/silabs/wifi_sdk/
-ENV PATH="${PATH}:/opt/silabs/slc_cli/:/opt/commander"
+ENV PATH="${PATH}:/opt/silabs/slc_cli/"
 
 COPY --from=build /tmp/gecko_sdk /opt/silabs/gecko_sdk
 COPY --from=build /tmp/wiseconnect-wifi-bt-sdk/ /opt/silabs/wiseconnect-wifi-bt-sdk/
 COPY --from=build /tmp/wifi_sdk /opt/silabs/wifi_sdk
 COPY --from=build /tmp/slc_cli /opt/silabs/slc_cli
-COPY --from=build /tmp/commander /opt/silabs/commander
