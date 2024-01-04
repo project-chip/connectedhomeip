@@ -375,7 +375,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Verify that the subscription is activated between CR1 and DUT
         asserts.assert_true(sub_cr1_step11.subscriptionId, "Subscription not activated")
-        
+
         # Verify attribute data came back
         self.verify_attribute_data(
             sub=sub_cr1_step11,
@@ -416,7 +416,7 @@ class TC_IDM_4_2(MatterBaseTest):
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
                 sub_cr1_step12.subscriptionId
-                
+
         # TODO: INVALID_ACTION shows up in the logs, but not in the exception
 
 
