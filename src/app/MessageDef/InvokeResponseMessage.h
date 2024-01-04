@@ -78,6 +78,12 @@ class Builder : public MessageBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeResponseMessage() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter);
+
+    /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies
      * 'false' as a value.
      */
@@ -88,7 +94,7 @@ public:
      *
      *  @return A reference to InvokeResponseIBs::Builder
      */
-    InvokeResponseIBs::Builder & CreateInvokeResponses();
+    InvokeResponseIBs::Builder & CreateInvokeResponses(const bool aReserveEndBuffer = false);
 
     /**
      *  @brief Get reference to InvokeResponseIBs::Builder
@@ -111,8 +117,16 @@ public:
      */
     CHIP_ERROR EndOfInvokeResponseMessage();
 
+    /**
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeResponseMessage()
+     *
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeResponseMessage()
+     */
+    uint32_t GetSizeToEndInvokeResponseMessage();
+
 private:
     InvokeResponseIBs::Builder mInvokeResponses;
+    bool mIsEndBufferReserved = false;
 };
 } // namespace InvokeResponseMessage
 } // namespace app

@@ -83,12 +83,12 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
         mCommandMessageWriter.Init(std::move(commandPacket));
-        ReturnErrorOnFailure(mInvokeRequestBuilder.Init(&mCommandMessageWriter));
+        ReturnErrorOnFailure(mInvokeRequestBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
 
         mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
-        mInvokeRequestBuilder.CreateInvokeRequests();
+        mInvokeRequestBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
         mBufferAllocated = true;
