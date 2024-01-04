@@ -33,15 +33,15 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
 
 
     fun populatePayload(): OnboardingPayload {
-        var indexToReadFrom: AtomicInteger = AtomicInteger(0)
-        var outPayload: OnboardingPayload = OnboardingPayload()
+        val indexToReadFrom = AtomicInteger(0)
+        val outPayload = OnboardingPayload()
 
         val payload = extractPayload(mBase38Representation)
-        if (payload.length == 0) {
+        if (payload.isEmpty()) {
             throw UnrecognizedQrCodeException("Invalid argument")
         }
 
-        var buf = base38Decode(payload)
+        val buf = base38Decode(payload)
         var dest = readBits(buf, indexToReadFrom, kVersionFieldLengthInBits)
         outPayload.version = dest.toInt()
 
@@ -97,9 +97,13 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
                 break
             }
             val info = OptionalQRCodeInfoExtension()
+
+            //update tag
             if (element.tag is ContextSpecificTag) {
                 info.tag = element.tag.tagNumber
             }
+
+            //update values
             if (element.value is IntValue) {
                 info.int32 = element.value.value.toInt()
                 info.type = OptionalQRCodeInfoType.TYPE_INT32
@@ -112,7 +116,8 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
                 info.data = element.value.value
                 info.type = OptionalQRCodeInfoType.TYPE_STRING
             }
-            if(info.tag < 0x80) {
+
+            if (info.tag < 0x80) {
                 payload.addOptionalExtensionData(info)
             } else {
                 payload.addOptionalVendorData(info)

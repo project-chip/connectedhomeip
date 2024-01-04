@@ -386,6 +386,9 @@ class QRCodeTest {
 
     /*
     * Test QRCode with optional data
+    *
+    * matches iOS test
+    * https://github.com/project-chip/connectedhomeip/blob/927962863180270091c1694d4b1ce2e9ea16b8b5/src/darwin/Framework/CHIPTests/MTRSetupPayloadParserTests.m#L155
     */
     @Test
     fun testQRCodeWithOptionalData() {
