@@ -2888,6 +2888,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     XCTAssertFalse([attributePath1 isEqual:eventPath1]);
     XCTAssertFalse([eventPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
 }
 
 - (void)test999_TearDown

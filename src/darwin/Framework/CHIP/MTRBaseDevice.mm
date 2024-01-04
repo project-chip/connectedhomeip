@@ -2248,7 +2248,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToAttributeRequestPath:object];
@@ -2320,7 +2320,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToEventRequestPath:object];
@@ -2389,7 +2389,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToClusterPath:object];
@@ -2441,7 +2441,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToAttributePath:object];
@@ -2504,7 +2504,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToEventPath:object];
@@ -2558,7 +2558,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToCommandPath:object];
