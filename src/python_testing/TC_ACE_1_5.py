@@ -16,11 +16,9 @@
 #
 
 import logging
-import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -77,12 +75,12 @@ class TC_ACE_1_5(MatterBaseTest):
         self.th2 = new_fabric_admin.NewController(nodeId=TH2_nodeid,
                                                   paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path))
 
-        params = self.openCommissioningWindow(self.th1, self.dut_node_id, self.matter_test_config.discriminators[0])
+        params = self.openCommissioningWindow(self.th1, self.dut_node_id)
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
         errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminators[0])
+            nodeId=self.dut_node_id, setupPinCode=params[0].setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params[1]["random_discriminator"])
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
 

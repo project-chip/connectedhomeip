@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import random
 import argparse
 import asyncio
 import builtins
@@ -708,15 +709,18 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip().upper()
         return pics_key in picsd and picsd[pics_key]
 
-    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int, discriminator) -> CommissioningParameters:
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
         try:
-            params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
-                                                      discriminator=discriminator, option=1)
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            discriminator_dict = {"random_discriminator": rnd_discriminator}
+            params = (commissioning_params, discriminator_dict)
+
             return params
 
         except Exception as e:
-            logging.info('Error running open commissioning window %s', e)
-            asserts.fail('Failed to open commissioning window')
+            asserts.fail('Failed to open commissioning window: %s', e)
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
