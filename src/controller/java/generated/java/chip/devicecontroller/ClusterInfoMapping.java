@@ -22781,6 +22781,18 @@ public class ClusterInfoMapping {
       );
     rvcOperationalStateClusterInteractionInfoMap.put("resume", rvcOperationalStateresumeInteractionInfo);
 
+    Map<String, CommandParameterInfo> rvcOperationalStategoHomeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo rvcOperationalStategoHomeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.RvcOperationalStateCluster) cluster)
+          .goHome((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
+            );
+        },
+        () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
+        rvcOperationalStategoHomeCommandParams
+      );
+    rvcOperationalStateClusterInteractionInfoMap.put("goHome", rvcOperationalStategoHomeInteractionInfo);
+
     commandMap.put("rvcOperationalState", rvcOperationalStateClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> hepaFilterMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();

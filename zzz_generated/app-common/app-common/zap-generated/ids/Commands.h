@@ -890,6 +890,10 @@ namespace OperationalCommandResponse {
 static constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
 
+namespace GoHome {
+static constexpr CommandId Id = 0x00000080;
+} // namespace GoHome
+
 } // namespace Commands
 } // namespace RvcOperationalState
 
