@@ -75,10 +75,12 @@ class TC_DISHM_1_2(MatterBaseTest):
                           0x9: 'Day'}
 
             # kUnknownEnumValue may not be defined
+            # modeTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
+            #             if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
             try:
                 modeTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
-                           if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
-            except:
+                            if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
+            except AttributeError:
                 modeTags = Clusters.DishwasherMode.Enums.ModeTag
 
             for m in supported_modes:
