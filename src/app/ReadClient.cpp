@@ -67,14 +67,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
-    // When a ReadClient is waiting to resubscribe with a LIT ICD Device while in the `InactiveICDSubscription` state,
-    // it attempts to call `OnActiveModeNotification` upon receiving a check-in message. To determine if resubscription
-    // should proceed, the client checks whether its current state is inactiveICDSubscription. As a result, moving the device to the
-    // `Idle` state at this point would interfere with the resubscription logic and is therefore not permissible.
-    if (IsInactiveICDSubscription())
-    {
-        return;
-    }
+
     MoveToState(ClientState::Idle);
 }
 
@@ -195,6 +188,12 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
             if (allowResubscription &&
                 (mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0))
             {
+                if (aError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
+                {
+                    ChipLogProgress(DataManagement, "ICD device is inactive mark subscription as InactiveICDSubscription");
+                    MoveToState(ClientState::InactiveICDSubscription);
+                }
+
                 aError = mpCallback.OnResubscriptionNeeded(this, aError);
                 if (aError == CHIP_NO_ERROR)
                 {
@@ -444,7 +443,6 @@ void ReadClient::OnActiveModeNotification()
     // If we are not in InactiveICDSubscription state, that means the liveness timeout has not been reached. Simply do nothing.
     VerifyOrReturn(IsInactiveICDSubscription());
 
-    MoveToState(ClientState::Idle);
     // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
     // logic in `OnLivenessTimeoutCallback`.
     TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
@@ -906,6 +904,10 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 {
     ReadClient * const _this = reinterpret_cast<ReadClient *>(apAppState);
 
+    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
+    // response timeouts).
+    CHIP_ERROR subscriptionTerminationCause = CHIP_ERROR_TIMEOUT;
+
     //
     // Might as well try to see if this instance exists in the tracked list in the IM.
     // This might blow-up if either the client has since been free'ed (use-after-free), or if the engine has since
@@ -919,26 +921,10 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     if (_this->mIsPeerLIT)
     {
-        // If a LIT ICD device enters an inactive state, the associated subscription is marked as `InactiveICDSubscription`.
-        // The ReadClient consumer then determines whether to initiate resubscription through the `OnResubscriptionNeeded` callback.
-        // This decision process is triggered by either a liveness timeout or the arrival of a check-in message.
-        // In the case of a liveness timeout, CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT is passed to application and indicate LIT
-        // ICD device is inactive. In the case of a check-in message, the `OnActiveModeNotification` callback is invoked and
-        // the `InactiveICDSubscription` state is specifically checked. Note that the liveness timeout duration always exceeds
-        // the maximum interval time (and hence the idle duration). Therefore, transitioning the device to `InactiveICDSubscription`
-        // upon reaching the liveness timeout is safe and consistent.
-        ChipLogProgress(DataManagement, "Peer is not active now, mark the subscription as InactiveICDSubscription.");
-        _this->MoveToState(ClientState::InactiveICDSubscription);
-
-        // Mark defunct immediately as usual flow does
-        _this->TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
-
-        // Return early here since the peer is idle and cannot receive any messages. The resubscription will be deferred until
-        // `OnActiveModeNotification` is invoked.
-        return;
+        subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
     }
 
-    _this->TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+    _this->TriggerResubscriptionForLivenessTimeout(subscriptionTerminationCause);
 }
 
 void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
@@ -965,8 +951,6 @@ void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
         });
     }
 
-    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
-    // response timeouts).
     Close(aReason);
 }
 

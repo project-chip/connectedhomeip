@@ -156,6 +156,9 @@ public:
          * ReadClient::DefaultResubscribePolicy is broken down into its constituent methods that are publicly available for
          * applications to call and sequence.
          *
+         * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
+         * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT.
+         *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
          *
