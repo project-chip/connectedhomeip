@@ -96,7 +96,7 @@
 #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif
+#endif // (SIWX_917 | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (2)
 #else
@@ -106,10 +106,10 @@
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
 #else
 #define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif
+#endif // (SIWX_917 | EXP_BOARD)
 
 #define RSI_BLE_NUM_CONN_EVENTS (20)
-#endif
+#endif // (defined(RSI_M4_INTERFACE) || defined(SLI_SI91X_MCU_INTERFACE))
 
 #define RSI_BLE_MAX_NBR_ATT_SERV (10)
 

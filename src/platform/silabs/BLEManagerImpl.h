@@ -30,24 +30,24 @@
 #define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
 #define BLE_SLAVE_LATENCY_MS 0
 #define BLE_TIMEOUT_MS 400
-#endif // RSI_BLE_ENABLE
+#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #include "FreeRTOS.h"
 #include "timers.h"
 #if (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 #include <rsi_ble.h>
 #include <rsi_ble_apis.h>
 #include <rsi_bt_common.h>
 #ifdef __cplusplus
 }
-#endif
+#endif // __cplusplus
 #else
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#endif // RSI_BLE_ENABLE
+#endif // (SLI_SI91X_ENABLE_BLE || RSI_BLE_ENABLE)
 
 namespace chip {
 namespace DeviceLayer {
