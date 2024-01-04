@@ -108,11 +108,9 @@ class TC_DISHM_2_1(MatterBaseTest):
             is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_IN_MODE.value) or is_mfg_code
             asserts.assert_true(
                 is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modeFail))
-            # Status text is an optional string which may not always be included
-            if ret.statusText:
-                logging.info("Status Text: %s" % (ret.statusText))
-                st_text_len = len(ret.statusText)
-                asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
+            logging.info("Status Text: %s" % (ret.statusText))
+            st_text_len = len(ret.statusText)
+            asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
             self.print_step(8, "Read CurrentMode attribute")
             current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)

@@ -74,13 +74,18 @@ class TC_DISHM_1_2(MatterBaseTest):
                           0x8: 'Night',
                           0x9: 'Day'}
 
-            runTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
-                       if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
+            # kUnknownEnumValue may not be defined
+            try:
+                modeTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
+                           if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
+            except:
+                modeTags = Clusters.DishwasherMode.Enums.ModeTag
 
             for m in supported_modes:
                 for t in m.modeTags:
                     is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                    asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
+                    asserts.assert_true(t.value <= 0xFFFF, "Tag value is > 16 bits")
+                    asserts.assert_true(t.value in commonTags.keys() or t.value in modeTags or is_mfg,
                                         "Found a SupportedModes entry with invalid mode tag value!")
 
                     asserts.assert_true(type(m.label) is str and len(m.label) in range(1, 65),
