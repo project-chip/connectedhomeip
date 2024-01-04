@@ -23,7 +23,7 @@ import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
-from chip.interaction_model import Status, InteractionModelError
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -65,9 +65,9 @@ class TC_IDM_4_2(MatterBaseTest):
 
     def get_typed_attribute_path(self, attribute, ep=0):
         return TypedAttributePath(
-           Path=AttributePath(
-               EndpointId=ep,
-               Attribute=attribute
+            Path=AttributePath(
+                EndpointId=ep,
+                Attribute=attribute
             )
         )
 
@@ -321,7 +321,8 @@ class TC_IDM_4_2(MatterBaseTest):
         Step 10
         ##########
         '''
-        self.print_step(10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
+        self.print_step(
+            10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
 
         # Omitting endpoint to indicate endpoint wildcard
         cluster_rev_attr_path = [(cluster_rev_attr)]
@@ -391,7 +392,7 @@ class TC_IDM_4_2(MatterBaseTest):
         asserts.assert_true(self.is_uint16(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
 
         # Verify valid ClusterRevision value
-        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")        
+        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
 
         sub_cr1_step11.Shutdown()
 
@@ -413,7 +414,8 @@ class TC_IDM_4_2(MatterBaseTest):
             )
         except ChipStackError as e:
             # Verify that the DUT sends back a Status Response Action with the INVALID_ACTION Status Code
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE, "Incorrect error response for subscription with empty AttributeRequests and EventRequests")
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+                                 "Incorrect error response for subscription with empty AttributeRequests and EventRequests")
 
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
