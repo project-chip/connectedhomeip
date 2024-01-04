@@ -65,7 +65,7 @@ interface MatterController : Closeable, InteractionClient {
     fun onICDRegistrationInfoRequired()
 
     /** Notifies when the registration flow for the ICD completes. */
-    fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long)
+    fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long, symmetricKey: ByteArray)
   }
 
   /**

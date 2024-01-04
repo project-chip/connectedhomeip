@@ -177,10 +177,10 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onICDRegistrationInfoRequired")
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long, symmetricKey: ByteArray) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${symmetricKey.toHex()}"
     )
   }
 
@@ -211,6 +211,9 @@ abstract class PairingCommand(
   fun getOnboardingPayload(): String {
     return onboardingPayload.toString()
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   private fun String.hexToByteArray(): ByteArray {
     return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
