@@ -33,7 +33,6 @@ class TC_IDM_4_2(MatterBaseTest):
     async def write_acl(self, acl):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-        print(result)
 
     async def get_descriptor_server_list(self, ctrl):
         return await self.read_single_attribute_check_success(
@@ -74,10 +73,10 @@ class TC_IDM_4_2(MatterBaseTest):
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
-    
+
     def is_uint16(self, var):
         return isinstance(var, int) and 0 <= var <= 65535
-    
+
     @async_test_body
     async def test_TC_IDM_4_2(self):
 
@@ -88,7 +87,8 @@ class TC_IDM_4_2(MatterBaseTest):
         node_label_attr_path = [(0, node_label_attr)]
         node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
-        
+        INVALID_ACTION_ERROR_CODE = 0x580
+
         # Controller 1 setup
         CR1: ChipDeviceController = self.default_controller
 
@@ -322,7 +322,7 @@ class TC_IDM_4_2(MatterBaseTest):
         ##########
         '''
         self.print_step(10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
-        
+
         # Omitting endpoint to indicate endpoint wildcard
         cluster_rev_attr_path = [(cluster_rev_attr)]
 
@@ -336,7 +336,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Verify that the subscription is activated between CR1 and DUT
         asserts.assert_true(sub_cr1_step10.subscriptionId, "Subscription not activated")
-        
+
         # Verify attribute data came back
         self.verify_attribute_data(
             sub=sub_cr1_step10,
@@ -402,7 +402,7 @@ class TC_IDM_4_2(MatterBaseTest):
         '''
         self.print_step(12, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
 
-        # Attempt to subscribe with both AttributeRequests and EventRequests as empty
+        # Attempt a subscription with both AttributeRequests and EventRequests as empty
         sub_cr1_step12 = None
         try:
             sub_cr1_step12 = await CR1.Read(
@@ -412,12 +412,12 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(3, 3)
             )
         except ChipStackError as e:
-            print("ChipStackError: " + str(e))
+            # Verify that the DUT sends back a Status Response Action with the INVALID_ACTION Status Code
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE, "Incorrect error response for subscription with empty AttributeRequests and EventRequests")
+
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
                 sub_cr1_step12.subscriptionId
-
-        # TODO: INVALID_ACTION shows up in the logs, but not in the exception
 
 
 if __name__ == "__main__":
