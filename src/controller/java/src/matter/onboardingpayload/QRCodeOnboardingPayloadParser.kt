@@ -17,6 +17,15 @@
 
 package matter.onboardingpayload
 
+import matter.tlv.BooleanValue
+import matter.tlv.ContextSpecificTag
+import matter.tlv.IntValue
+import matter.tlv.TlvReader
+import matter.tlv.UnsignedIntValue
+import matter.tlv.Utf8StringValue
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -24,73 +33,120 @@ import java.util.concurrent.atomic.AtomicInteger
  *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
-  fun populatePayload(): OnboardingPayload {
-    var indexToReadFrom: AtomicInteger = AtomicInteger(0)
-    var outPayload: OnboardingPayload = OnboardingPayload()
 
-    val payload = extractPayload(mBase38Representation)
-    if (payload.length == 0) {
-      throw UnrecognizedQrCodeException("Invalid argument")
-    }
 
-    var buf = base38Decode(payload)
-    var dest = readBits(buf, indexToReadFrom, kVersionFieldLengthInBits)
-    outPayload.version = dest.toInt()
+    fun populatePayload(): OnboardingPayload {
+        var indexToReadFrom: AtomicInteger = AtomicInteger(0)
+        var outPayload: OnboardingPayload = OnboardingPayload()
 
-    dest = readBits(buf, indexToReadFrom, kVendorIDFieldLengthInBits)
-    outPayload.vendorId = dest.toInt()
-
-    dest = readBits(buf, indexToReadFrom, kProductIDFieldLengthInBits)
-    outPayload.productId = dest.toInt()
-
-    dest = readBits(buf, indexToReadFrom, kCommissioningFlowFieldLengthInBits)
-    outPayload.commissioningFlow = dest.toInt()
-
-    dest = readBits(buf, indexToReadFrom, kRendezvousInfoFieldLengthInBits)
-    outPayload.setRendezvousInformation(dest)
-
-    dest = readBits(buf, indexToReadFrom, kPayloadDiscriminatorFieldLengthInBits)
-    outPayload.discriminator = dest.toInt()
-
-    dest = readBits(buf, indexToReadFrom, kSetupPINCodeFieldLengthInBits)
-    outPayload.setupPinCode = dest
-
-    dest = readBits(buf, indexToReadFrom, kPaddingFieldLengthInBits)
-    if (dest != 0L) {
-      throw UnrecognizedQrCodeException("Invalid argument")
-    }
-
-    // TODO: populate TLV optional fields
-
-    return outPayload
-  }
-
-  companion object {
-    // Populate numberOfBits into dest from buf starting at startIndex
-    fun readBits(buf: ArrayList<Byte>, index: AtomicInteger, numberOfBitsToRead: Int): Long {
-      var dest: Long = 0
-      if (index.get() + numberOfBitsToRead > buf.size * 8 || numberOfBitsToRead > Long.SIZE_BITS) {
-        throw UnrecognizedQrCodeException("Invalid argument")
-      }
-
-      var currentIndex = index.get()
-      for (bitsRead in 0 until numberOfBitsToRead) {
-        if (buf[currentIndex / 8].toInt() and (1 shl (currentIndex % 8)) != 0) {
-          dest = dest or (1L shl bitsRead)
+        val payload = extractPayload(mBase38Representation)
+        if (payload.length == 0) {
+            throw UnrecognizedQrCodeException("Invalid argument")
         }
-        currentIndex++
-      }
-      index.addAndGet(numberOfBitsToRead)
-      return dest
+
+        var buf = base38Decode(payload)
+        var dest = readBits(buf, indexToReadFrom, kVersionFieldLengthInBits)
+        outPayload.version = dest.toInt()
+
+        dest = readBits(buf, indexToReadFrom, kVendorIDFieldLengthInBits)
+        outPayload.vendorId = dest.toInt()
+
+        dest = readBits(buf, indexToReadFrom, kProductIDFieldLengthInBits)
+        outPayload.productId = dest.toInt()
+
+        dest = readBits(buf, indexToReadFrom, kCommissioningFlowFieldLengthInBits)
+        outPayload.commissioningFlow = dest.toInt()
+
+        dest = readBits(buf, indexToReadFrom, kRendezvousInfoFieldLengthInBits)
+        outPayload.setRendezvousInformation(dest)
+
+        dest = readBits(buf, indexToReadFrom, kPayloadDiscriminatorFieldLengthInBits)
+        outPayload.discriminator = dest.toInt()
+
+        dest = readBits(buf, indexToReadFrom, kSetupPINCodeFieldLengthInBits)
+        outPayload.setupPinCode = dest
+
+        dest = readBits(buf, indexToReadFrom, kPaddingFieldLengthInBits)
+        if (dest != 0L) {
+            throw UnrecognizedQrCodeException("Invalid argument")
+        }
+
+        populateTLV(outPayload, buf, indexToReadFrom)
+
+        return outPayload
     }
 
-    fun extractPayload(inString: String?): String {
-      return inString
-        ?.split('%')
-        ?.filter { s -> s.startsWith(kQRCodePrefix) }
-        ?.firstOrNull()
-        ?.substring(kQRCodePrefix.length)
-        ?: ""
+    private fun populateTLV(
+        payload: OnboardingPayload,
+        payloadData: ArrayList<Byte>,
+        index: AtomicInteger
+    ) {
+        val bitsLeftToRead = (payloadData.count() * 8) - index.get()
+        val tlvBytesLength = (bitsLeftToRead + 7) / 8
+
+        if (tlvBytesLength == 0) {
+            return
+        }
+        val byteBuffer = ByteBuffer.allocate(tlvBytesLength)
+        for (i in 0 until tlvBytesLength) {
+            val value = readBits(payloadData, index, 8)
+            byteBuffer.put(value.toByte())
+        }
+
+        val reader = TlvReader(byteBuffer.array())
+        while (true) {
+            val element = reader.nextElement()
+            if (reader.isEndOfTlv()) {
+                break
+            }
+            val info = OptionalQRCodeInfoExtension()
+            if (element.tag is ContextSpecificTag) {
+                info.tag = element.tag.tagNumber
+            }
+            if (element.value is IntValue) {
+                info.int32 = element.value.value.toInt()
+                info.type = OptionalQRCodeInfoType.TYPE_INT32
+            }
+            if (element.value is UnsignedIntValue) {
+                info.uint32 = element.value.value
+                info.type = OptionalQRCodeInfoType.TYPE_UINT32
+            }
+            if (element.value is Utf8StringValue) {
+                info.data = element.value.value
+                info.type = OptionalQRCodeInfoType.TYPE_STRING
+            }
+
+            payload.addOptionalQRCodeInfo(info)
+        }
+
     }
-  }
+
+    companion object {
+        // Populate numberOfBits into dest from buf starting at startIndex
+        fun readBits(buf: ArrayList<Byte>, index: AtomicInteger, numberOfBitsToRead: Int): Long {
+            var dest: Long = 0
+            if (index.get() + numberOfBitsToRead > buf.size * 8 || numberOfBitsToRead > Long.SIZE_BITS) {
+                throw UnrecognizedQrCodeException("Invalid argument")
+            }
+
+            var currentIndex = index.get()
+            for (bitsRead in 0 until numberOfBitsToRead) {
+                if (buf[currentIndex / 8].toInt() and (1 shl (currentIndex % 8)) != 0) {
+                    dest = dest or (1L shl bitsRead)
+                }
+                currentIndex++
+            }
+            index.addAndGet(numberOfBitsToRead)
+            return dest
+        }
+
+        fun extractPayload(inString: String?): String {
+            return inString
+                ?.split('%')
+                ?.filter { s -> s.startsWith(kQRCodePrefix) }
+                ?.firstOrNull()
+                ?.substring(kQRCodePrefix.length)
+                ?: ""
+        }
+    }
 }

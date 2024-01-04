@@ -18,23 +18,50 @@
 package matter.onboardingpayload
 
 enum class OptionalQRCodeInfoType {
-  TYPE_UNKNOWN,
-  TYPE_STRING,
-  TYPE_INT32,
-  TYPE_INT64,
-  TYPE_UINT32,
-  TYPE_UINT64
+    TYPE_UNKNOWN,
+    TYPE_STRING,
+    TYPE_INT32,
+    TYPE_INT64,
+    TYPE_UINT32,
+    TYPE_UINT64
 }
 
 open class OptionalQRCodeInfo {
-  var tag: Int = 0
-  var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
-  var data: String? = null
-  var int32: Int = 0
+    var tag: Int = 0
+    var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
+    var data: String? = null
+    var int32: Int = 0
 }
 
 class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
-  var int64: Long = 0
-  var uint32: Long = 0
-  var uint64: Long = 0
+    var int64: Long = 0
+    var uint32: Long = 0
+    var uint64: Long = 0
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OptionalQRCodeInfoExtension) return false
+
+        return tag == other.tag &&
+                type == other.type &&
+                data == other.data &&
+                int32 == other.int32 &&
+                int64 == other.int64 &&
+                uint32 == other.uint32 &&
+                uint64 == other.uint64
+    }
+
+
+    override fun toString(): String {
+        return "OptionalQRCodeInfoExtension(" +
+                "tag=$tag, " +
+                "type=$type, " +
+                "data=$data, " +
+                "int32=$int32, " +
+                "int64=$int64, " +
+                "uint32=$uint32, " +
+                "uint64=$uint64" +
+                ")"
+    }
+
 }
