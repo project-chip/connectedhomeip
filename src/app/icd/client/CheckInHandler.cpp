@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/CommandPathParams.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/CheckInHandler.h>
@@ -34,7 +35,6 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 
-#include "controller/InvokeInteraction.h"
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <protocols/secure_channel/Constants.h>
@@ -128,13 +128,25 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 CHIP_ERROR CheckInHandler::RegisterClientWithNewKey(ICDClientInfo & clientInfo, ByteSpan newKey,
                                                     Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
-    Clusters::IcdManagement::Commands::RegisterClient::Type request;
-    request.checkInNodeID    = clientInfo.peer_node.GetNodeId();
-    request.monitoredSubject = clientInfo.monitored_subject;
-    request.key              = newKey;
-    // TODO1 : We don't have plain data for the old key
-    // TODO2 : Find  the right way to send the registration command. Both the success and failure callbacks for registration should
-    // call OnCheckInComplete
+    // using namespace Clusters::IcdManagement;
+    // TODO : Determine if using an Objectpool of commandSenders is the best approach here
+    //  app::CommandSender registerCommandSender(&registerCommandSenderDelegate, &exchangeMgr);
+
+    // auto commandPathParams = CommandPathParams(0, 0, Id, Commands::RegisterClient::Id, (CommandPathFlags::kEndpointIdValid));
+    // ReturnErrorOnFailure(registerCommandSender.PrepareCommand(commandPathParams));
+
+    // chip::TLV::TLVWriter * writer = registerCommandSender.GetCommandDataIBTLVWriter();
+
+    // ReturnErrorOnFailure(
+    //     writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kCheckInNodeID), clientInfo.peer_node.GetNodeId()));
+    // ReturnErrorOnFailure(
+    //     writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kMonitoredSubject), clientInfo.monitored_subject));
+    // ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kKey), newKey));
+
+    // // TODO : We don't have plain data for the old key
+
+    // ReturnErrorOnFailure(registerCommandSender.FinishCommand());
+    // ReturnErrorOnFailure(registerCommandSender.SendCommandRequest(sessionHandle));
 
     return CHIP_NO_ERROR;
 }
@@ -159,7 +171,10 @@ void CheckInHandler::HandleDeviceConnected(void * context, Messaging::ExchangeMa
         ChipLogError(ICD, "Failed to retrieve a new key for re-registration of the ICD client");
     }
     ByteSpan newKey(refreshKeyInfo.newKey);
-    _this->RegisterClientWithNewKey(refreshKeyInfo.clientInfo, newKey, exchangeMgr, sessionHandle);
+    if (CHIP_NO_ERROR != _this->RegisterClientWithNewKey(refreshKeyInfo.clientInfo, newKey, exchangeMgr, sessionHandle))
+    {
+        ChipLogError(ICD, "Failed to send register client command");
+    }
 }
 
 void CheckInHandler::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)

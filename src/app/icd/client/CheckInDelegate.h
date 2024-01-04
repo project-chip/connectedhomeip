@@ -59,8 +59,8 @@ public:
 
     /**
      * @brief Callback used to retrieve the refresh key information from the application after establishing a new secure session for
-     * re-registration. The application should maintain a map to store the corresponding ICDRefreshKeyInfo for every peer node.
-     * Please refer to ICDRefreshKeyInfo.h for details.
+     * re-registration. The application should be able to store the corresponding ICDRefreshKeyInfo for every peer node. The
+     * application can determine the best way to do this. Please refer to ICDRefreshKeyInfo.h for details.
      *
      * @param[in] nodeId - node ID of the peer with whom the client needs to re-register with a new key to avoid rollover problems.
      * @param[out] refreshKeyInfo - stored refreshKeyInfo for the corresponding nodeId from the ICDRefreshKeyMap

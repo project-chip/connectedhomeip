@@ -26,6 +26,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandSender.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/DefaultICDClientStorage.h>
@@ -47,9 +48,37 @@ public:
 
     virtual ~CheckInHandler() = default;
 
+    /**
+     * @brief Callback received on successfully establishing a CASE session in order to re-register the client with the peer node
+     * using a new key to avoid counter rollover problems.
+     *
+     * @param[in] context context of the client establishing the CASE session
+     * @param[in] exchangeMgr exchange manager to use for the re-registration
+     * @param[in] sessionHandle session handle to use for the re-registration
+     */
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                       const SessionHandle & sessionHandle);
+    /**
+     * @brief Callback received on failure to establish a CASE session in order to re-register the client with the peer node using a
+     * new key to avoid counter rollover problems.
+     *
+     * @param[in] context context of the client establishing the CASE session
+     * @param[in] peerId Node ID of the peer node
+     * @param[in] err failure reason
+     */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
+
+    class RegisterCommandSenderCallback : public CommandSender::Callback
+    {
+    public:
+        void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+                        const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData) override
+        {}
+        void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mError = aError; }
+        void OnDone(chip::app::CommandSender * apCommandSender) override {}
+
+        CHIP_ERROR mError = CHIP_NO_ERROR;
+    } registerCommandSenderDelegate;
 
 protected:
     // ExchangeDelegate
@@ -71,14 +100,15 @@ private:
      *
      * @param[in] clientInfo clientInfo object
      * @param[in] keyData New key data to use to re-register the client with the server
+     * @param[in] exchangeMgr exchange manager to use for the re-registration
+     * @param[in] sessionHandle session handle to use for the re-registration
      */
     CHIP_ERROR RegisterClientWithNewKey(ICDClientInfo & clientInfo, ByteSpan newKey, Messaging::ExchangeManager & exchangeMgr,
                                         const SessionHandle & sessionHandle);
 
     /**
-     * @brief Sets up a CASE session to the peer, if we can locate a
-     * CASESessionManager.  Returns error if we did not even manage to kick off
-     * a CASE attempt.
+     * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
+     * ICD counter rollover. Returns error if we did not even manage to kick off a CASE attempt.
      *
      * @param[in] peerId Node ID of the peer
      */
