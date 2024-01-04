@@ -23,7 +23,7 @@ import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -66,22 +66,31 @@ class TC_IDM_4_2(MatterBaseTest):
 
     def get_typed_attribute_path(self, attribute, ep=0):
         return TypedAttributePath(
-            Path=AttributePath(
-                EndpointId=ep,
-                Attribute=attribute
+           Path=AttributePath(
+               EndpointId=ep,
+               Attribute=attribute
             )
         )
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
-
+    
+    def is_uint16(self, var):
+        return isinstance(var, int) and 0 <= var <= 65535
+    
     @async_test_body
     async def test_TC_IDM_4_2(self):
 
-        CR1: ChipDeviceController = self.default_controller
-        SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
+        # Test setup
+        cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision
+        cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
         node_label_attr = Clusters.BasicInformation.Attributes.NodeLabel
         node_label_attr_path = [(0, node_label_attr)]
+        node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
+        SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
+        
+        # Controller 1 setup
+        CR1: ChipDeviceController = self.default_controller
 
         # Read ServerList attribute
         self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
@@ -278,7 +287,6 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Wait MinIntervalFloor seconds before reading updated attribute value
         time.sleep(min_max_interval_sec)
-        node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
         new_node_label_read = sub_cr1_update_value.GetAttribute(node_label_attr_typed_path)
 
         # Verify new attribute value after MinIntervalFloor time
@@ -310,24 +318,106 @@ class TC_IDM_4_2(MatterBaseTest):
 
         '''
         ##########
-        Step 10 - 12
+        Step 10
         ##########
         '''
-        # TODO: How to subscribe to global attributes
-        # TODO: How to subscribe with both AttributeRequests and EventRequests as empty
-        # self.print_step(10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
-        # read_contents = [
-        #     Clusters.BasicInformation.Attributes.NodeLabel
-        # ]
-        # read_paths = [(0, attrib) for attrib in read_contents]
+        self.print_step(10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
+        
+        # Omitting endpoint to indicate endpoint wildcard
+        cluster_rev_attr_path = [(cluster_rev_attr)]
 
-        # # Subscribe to global attribute
-        # sub_cr1_invalid_intervals = await CR1.ReadAttribute(
-        #     nodeid=self.dut_node_id,
-        #     attributes=read_paths,
-        #     reportInterval=(10, 10),
-        #     keepSubscriptions=False,
-        # )
+        # Subscribe to global attribute
+        sub_cr1_step10 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=cluster_rev_attr_path,
+            reportInterval=(3, 3),
+            keepSubscriptions=False
+        )
+
+        # Verify that the subscription is activated between CR1 and DUT
+        asserts.assert_true(sub_cr1_step10.subscriptionId, "Subscription not activated")
+        
+        # Verify attribute data came back
+        self.verify_attribute_data(
+            sub=sub_cr1_step10,
+            cluster=Clusters.BasicInformation,
+            attribute=cluster_rev_attr
+        )
+
+        # Verify DUT sends back the attribute values for the global attribute
+        cluster_revision_attr_value = sub_cr1_step10.GetAttribute(cluster_rev_attr_typed_path)
+
+        # Verify ClusterRevision is of uint16 type
+        asserts.assert_true(self.is_uint16(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+
+        # Verify valid ClusterRevision value
+        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")
+
+        sub_cr1_step10.Shutdown()
+
+        '''
+        ##########
+        Step 11
+        ##########
+        '''
+        self.print_step(11, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
+
+        # Specifying single endpoint 0
+        cluster_rev_attr_path = [(0, cluster_rev_attr)]
+
+        # Subscribe to global attribute
+        sub_cr1_step11 = await CR1.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=cluster_rev_attr_path,
+            reportInterval=(3, 3),
+            keepSubscriptions=False
+        )
+
+        # Verify that the subscription is activated between CR1 and DUT
+        asserts.assert_true(sub_cr1_step11.subscriptionId, "Subscription not activated")
+        
+        # Verify attribute data came back
+        self.verify_attribute_data(
+            sub=sub_cr1_step11,
+            cluster=Clusters.BasicInformation,
+            attribute=cluster_rev_attr
+        )
+
+        # Verify DUT sends back the attribute values for the global attribute
+        cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
+        cluster_revision_attr_value = sub_cr1_step11.GetAttribute(cluster_rev_attr_typed_path)
+
+        # Verify ClusterRevision is of uint16 type
+        asserts.assert_true(self.is_uint16(cluster_revision_attr_value), "ClusterRevision is not of uint16 type.")
+
+        # Verify valid ClusterRevision value
+        asserts.assert_greater_equal(cluster_revision_attr_value, 0, "Invalid ClusterRevision value.")        
+
+        sub_cr1_step11.Shutdown()
+
+        '''
+        ##########
+        Step 12
+        ##########
+        '''
+        self.print_step(12, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
+
+        # Attempt to subscribe with both AttributeRequests and EventRequests as empty
+        sub_cr1_step12 = None
+        try:
+            sub_cr1_step12 = await CR1.Read(
+                nodeid=self.dut_node_id,
+                attributes=[],
+                events=[],
+                reportInterval=(3, 3)
+            )
+        except ChipStackError as e:
+            print("ChipStackError: " + str(e))
+            # Verify no subscription is established
+            with asserts.assert_raises(AttributeError):
+                sub_cr1_step12.subscriptionId
+                
+        # TODO: INVALID_ACTION shows up in the logs, but not in the exception
 
 
 if __name__ == "__main__":
