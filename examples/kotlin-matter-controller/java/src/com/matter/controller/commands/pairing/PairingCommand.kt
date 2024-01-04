@@ -177,7 +177,11 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onICDRegistrationInfoRequired")
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long, symmetricKey: ByteArray) {
+  override fun onICDRegistrationComplete(
+    icdNodeId: Long,
+    icdCounter: Long,
+    symmetricKey: ByteArray
+  ) {
     logger.log(
       Level.INFO,
       "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${symmetricKey.toHex()}"
