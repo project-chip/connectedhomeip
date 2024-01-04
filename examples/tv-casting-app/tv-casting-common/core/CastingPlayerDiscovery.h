@@ -101,7 +101,7 @@ public:
      * with CastingPlayers whose deviceType matches filterBydeviceType
      * @return CHIP_ERROR - CHIP_NO_ERROR if discovery for CastingPlayers started successfully, specific error code otherwise.
      */
-    CHIP_ERROR StartDiscovery(uint64_t filterBydeviceType = 0);
+    CHIP_ERROR StartDiscovery(uint32_t filterBydeviceType = 0);
 
     /**
      * @brief Stop the discovery for CastingPlayers
@@ -112,6 +112,7 @@ public:
 
     void SetDelegate(DiscoveryDelegate * clientDelegate)
     {
+        ChipLogProgress(Discovery, "CastingPlayerDiscovery::SetDelegate() called");
         if (clientDelegate == nullptr)
         {
             mState = DISCOVERY_NOT_READY;

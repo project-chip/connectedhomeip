@@ -72,6 +72,11 @@ public:
      */
     bool isRunning() { return mState == CASTING_APP_RUNNING; }
 
+    /**
+     * @brief Tears down all active subscriptions.
+     */
+    CHIP_ERROR ShutdownAllSubscriptions();
+
 private:
     CastingApp();
     static CastingApp * _castingApp;

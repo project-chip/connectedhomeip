@@ -2862,10 +2862,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("TargetTime", indent + 1, value.targetTime);
+        CHIP_ERROR err = LogValue("TargetTimeMinutesPastMidnight", indent + 1, value.targetTimeMinutesPastMidnight);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetTime'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TargetTimeMinutesPastMidnight'");
             return err;
         }
     }
@@ -2882,6 +2882,31 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AddedEnergy'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Step", indent + 1, value.step);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Step'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
             return err;
         }
     }
@@ -5481,7 +5506,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BooleanSensorConfiguration::Events::AlarmsStateChanged::DecodableType & value)
+                                     const BooleanStateConfiguration::Events::AlarmsStateChanged::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -5505,9 +5530,17 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const BooleanSensorConfiguration::Events::SensorFault::DecodableType & value)
+                                     const BooleanStateConfiguration::Events::SensorFault::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("SensorFault", indent + 1, value.sensorFault);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'SensorFault'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5521,6 +5554,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ValveState'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ValveLevel", indent + 1, value.valveLevel);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ValveLevel'");
             return err;
         }
     }
@@ -6751,8 +6792,8 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("systemTimeUs", indent + 1, value.systemTimeUs));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("UTCTimeUs", indent + 1, value.UTCTimeUs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("systemTimeMs", indent + 1, value.systemTimeMs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("posixTimeMs", indent + 1, value.posixTimeMs));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -7023,7 +7064,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Channel::Commands::ProgramGuideResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("channelPagingStruct", indent + 1, value.channelPagingStruct));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("paging", indent + 1, value.paging));
     ReturnErrorOnFailure(DataModelLogger::LogValue("programList", indent + 1, value.programList));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -11550,55 +11591,75 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case BooleanSensorConfiguration::Id: {
+    case BooleanStateConfiguration::Id: {
         switch (path.mAttributeId)
         {
-        case BooleanSensorConfiguration::Attributes::SensitivityLevel::Id: {
-            chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum value;
+        case BooleanStateConfiguration::Attributes::CurrentSensitivityLevel::Id: {
+            uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SensitivityLevel", 1, value);
+            return DataModelLogger::LogValue("CurrentSensitivityLevel", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::AlarmsActive::Id: {
-            chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value;
+        case BooleanStateConfiguration::Attributes::SupportedSensitivityLevels::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedSensitivityLevels", 1, value);
+        }
+        case BooleanStateConfiguration::Attributes::DefaultSensitivityLevel::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultSensitivityLevel", 1, value);
+        }
+        case BooleanStateConfiguration::Attributes::AlarmsActive::Id: {
+            chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmsActive", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::AlarmsSuppressed::Id: {
-            chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value;
+        case BooleanStateConfiguration::Attributes::AlarmsSuppressed::Id: {
+            chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmsSuppressed", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::AlarmsEnabled::Id: {
-            chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap> value;
+        case BooleanStateConfiguration::Attributes::AlarmsEnabled::Id: {
+            chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmsEnabled", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::GeneratedCommandList::Id: {
+        case BooleanStateConfiguration::Attributes::AlarmsSupported::Id: {
+            chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AlarmsSupported", 1, value);
+        }
+        case BooleanStateConfiguration::Attributes::SensorFault::Id: {
+            chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SensorFault", 1, value);
+        }
+        case BooleanStateConfiguration::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::AcceptedCommandList::Id: {
+        case BooleanStateConfiguration::Attributes::AcceptedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::EventList::Id: {
+        case BooleanStateConfiguration::Attributes::EventList::Id: {
             chip::app::DataModel::DecodableList<chip::EventId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EventList", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::AttributeList::Id: {
+        case BooleanStateConfiguration::Attributes::AttributeList::Id: {
             chip::app::DataModel::DecodableList<chip::AttributeId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AttributeList", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::FeatureMap::Id: {
+        case BooleanStateConfiguration::Attributes::FeatureMap::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
-        case BooleanSensorConfiguration::Attributes::ClusterRevision::Id: {
+        case BooleanStateConfiguration::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -11613,6 +11674,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OpenDuration", 1, value);
+        }
+        case ValveConfigurationAndControl::Attributes::DefaultOpenDuration::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("DefaultOpenDuration", 1, value);
         }
         case ValveConfigurationAndControl::Attributes::AutoCloseTime::Id: {
             chip::app::DataModel::Nullable<uint64_t> value;
@@ -11634,11 +11700,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TargetState", 1, value);
         }
-        case ValveConfigurationAndControl::Attributes::StartUpState::Id: {
-            chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpState", 1, value);
-        }
         case ValveConfigurationAndControl::Attributes::CurrentLevel::Id: {
             chip::app::DataModel::Nullable<chip::Percent> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11649,10 +11710,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TargetLevel", 1, value);
         }
-        case ValveConfigurationAndControl::Attributes::OpenLevel::Id: {
-            chip::app::DataModel::Nullable<chip::Percent> value;
+        case ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id: {
+            chip::Percent value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OpenLevel", 1, value);
+            return DataModelLogger::LogValue("DefaultOpenLevel", 1, value);
         }
         case ValveConfigurationAndControl::Attributes::ValveFault::Id: {
             chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value;
@@ -12031,17 +12092,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("SessionID", 1, value);
         }
         case EnergyEvse::Attributes::SessionDuration::Id: {
-            uint32_t value;
+            chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SessionDuration", 1, value);
         }
         case EnergyEvse::Attributes::SessionEnergyCharged::Id: {
-            int64_t value;
+            chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SessionEnergyCharged", 1, value);
         }
         case EnergyEvse::Attributes::SessionEnergyDischarged::Id: {
-            int64_t value;
+            chip::app::DataModel::Nullable<int64_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SessionEnergyDischarged", 1, value);
         }
@@ -12071,6 +12132,67 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case EnergyEvse::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case EnergyPreference::Id: {
+        switch (path.mAttributeId)
+        {
+        case EnergyPreference::Attributes::EnergyBalances::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnergyBalances", 1, value);
+        }
+        case EnergyPreference::Attributes::CurrentEnergyBalance::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentEnergyBalance", 1, value);
+        }
+        case EnergyPreference::Attributes::EnergyPriorities::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::EnergyPriorityEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EnergyPriorities", 1, value);
+        }
+        case EnergyPreference::Attributes::LowPowerModeSensitivities::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LowPowerModeSensitivities", 1, value);
+        }
+        case EnergyPreference::Attributes::CurrentLowPowerModeSensitivity::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentLowPowerModeSensitivity", 1, value);
+        }
+        case EnergyPreference::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case EnergyPreference::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case EnergyPreference::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case EnergyPreference::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case EnergyPreference::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case EnergyPreference::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -17796,16 +17918,16 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
-    case BooleanSensorConfiguration::Id: {
+    case BooleanStateConfiguration::Id: {
         switch (header.mPath.mEventId)
         {
-        case BooleanSensorConfiguration::Events::AlarmsStateChanged::Id: {
-            chip::app::Clusters::BooleanSensorConfiguration::Events::AlarmsStateChanged::DecodableType value;
+        case BooleanStateConfiguration::Events::AlarmsStateChanged::Id: {
+            chip::app::Clusters::BooleanStateConfiguration::Events::AlarmsStateChanged::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AlarmsStateChanged", 1, value);
         }
-        case BooleanSensorConfiguration::Events::SensorFault::Id: {
-            chip::app::Clusters::BooleanSensorConfiguration::Events::SensorFault::DecodableType value;
+        case BooleanStateConfiguration::Events::SensorFault::Id: {
+            chip::app::Clusters::BooleanStateConfiguration::Events::SensorFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SensorFault", 1, value);
         }

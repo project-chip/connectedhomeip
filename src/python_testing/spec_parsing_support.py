@@ -68,7 +68,9 @@ class XmlCluster:
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
-    features: dict[str, XmlFeature]
+    # mask to XmlFeature
+    features: dict[uint, XmlFeature]
+    # IDs to class
     attributes: dict[uint, XmlAttribute]
     accepted_commands: dict[uint, XmlCommand]
     generated_commands: dict[uint, XmlCommand]

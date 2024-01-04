@@ -428,6 +428,7 @@
           "define": "ON_OFF_SWITCH_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -562,6 +563,7 @@
           "define": "BINARY_INPUT_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -3484,6 +3486,7 @@
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -5108,6 +5111,7 @@
           "define": "ELECTRICAL_MEASUREMENT_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "deprecated",
           "attributes": [
             {
               "name": "ClusterRevision",

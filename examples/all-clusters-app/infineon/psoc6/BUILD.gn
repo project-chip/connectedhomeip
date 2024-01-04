@@ -110,11 +110,14 @@ psoc6_executable("clusters_app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/init_psoc6Platform.cpp",
     "src/AppTask.cpp",
@@ -138,6 +141,7 @@ psoc6_executable("clusters_app") {
     "${examples_plat_dir}",
     "${psoc6_project_dir}/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
   ]
 
   defines = []

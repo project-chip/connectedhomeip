@@ -20,11 +20,20 @@ package matter.controller.cluster.clusters
 import java.time.Duration
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
+import matter.controller.BooleanSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
+import matter.controller.SubscribeRequest
+import matter.controller.SubscriptionState
+import matter.controller.UByteSubscriptionState
+import matter.controller.UIntSubscriptionState
+import matter.controller.ULongSubscriptionState
+import matter.controller.UShortSubscriptionState
 import matter.controller.WriteRequest
 import matter.controller.WriteRequests
 import matter.controller.WriteResponse
@@ -50,22 +59,61 @@ class GeneralCommissioningCluster(
     val value: GeneralCommissioningClusterBasicCommissioningInfo
   )
 
+  sealed class BasicCommissioningInfoAttributeSubscriptionState {
+    data class Success(val value: GeneralCommissioningClusterBasicCommissioningInfo) :
+      BasicCommissioningInfoAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : BasicCommissioningInfoAttributeSubscriptionState()
+
+    object SubscriptionEstablished : BasicCommissioningInfoAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  sealed class GeneratedCommandListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
+  }
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
 
+  sealed class AcceptedCommandListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
+  }
+
   class EventListAttribute(val value: List<UInt>)
 
+  sealed class EventListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : EventListAttributeSubscriptionState()
+  }
+
   class AttributeListAttribute(val value: List<UInt>)
+
+  sealed class AttributeListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : AttributeListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
+  }
 
   suspend fun armFailSafe(
     expiryLengthSeconds: UShort,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): ArmFailSafeResponse {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -81,7 +129,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -105,7 +153,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -127,11 +174,9 @@ class GeneralCommissioningCluster(
     newRegulatoryConfig: UByte,
     countryCode: String,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): SetRegulatoryConfigResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -150,7 +195,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -174,7 +219,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -193,11 +237,9 @@ class GeneralCommissioningCluster(
   }
 
   suspend fun commissioningComplete(
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): CommissioningCompleteResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -207,7 +249,7 @@ class GeneralCommissioningCluster(
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -231,7 +273,6 @@ class GeneralCommissioningCluster(
       if (tag == ContextSpecificTag(TAG_DEBUG_TEXT)) {
         debugText_decoded = tlvReader.getString(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -280,10 +321,8 @@ class GeneralCommissioningCluster(
     return decodedValue
   }
 
-  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -298,7 +337,7 @@ class GeneralCommissioningCluster(
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -318,6 +357,56 @@ class GeneralCommissioningCluster(
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBreadcrumbAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 0u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Breadcrumb attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -354,6 +443,59 @@ class GeneralCommissioningCluster(
     return BasicCommissioningInfoAttribute(decodedValue)
   }
 
+  suspend fun subscribeBasicCommissioningInfoAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BasicCommissioningInfoAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 1u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BasicCommissioningInfoAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Basiccommissioninginfo attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: GeneralCommissioningClusterBasicCommissioningInfo =
+            GeneralCommissioningClusterBasicCommissioningInfo.fromTlv(AnonymousTag, tlvReader)
+
+          emit(BasicCommissioningInfoAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BasicCommissioningInfoAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readRegulatoryConfigAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 2u
 
@@ -383,6 +525,58 @@ class GeneralCommissioningCluster(
     val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
+  }
+
+  suspend fun subscribeRegulatoryConfigAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 2u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Regulatoryconfig attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   suspend fun readLocationCapabilityAttribute(): UByte {
@@ -416,6 +610,58 @@ class GeneralCommissioningCluster(
     return decodedValue
   }
 
+  suspend fun subscribeLocationCapabilityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 3u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Locationcapability attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readSupportsConcurrentConnectionAttribute(): Boolean {
     val ATTRIBUTE_ID: UInt = 4u
 
@@ -445,6 +691,58 @@ class GeneralCommissioningCluster(
     val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
 
     return decodedValue
+  }
+
+  suspend fun subscribeSupportsConcurrentConnectionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 4u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Supportsconcurrentconnection attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+          emit(BooleanSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
@@ -485,6 +783,65 @@ class GeneralCommissioningCluster(
     return GeneratedCommandListAttribute(decodedValue)
   }
 
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<GeneratedCommandListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65528u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            GeneratedCommandListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Generatedcommandlist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(GeneratedCommandListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(GeneratedCommandListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65529u
 
@@ -521,6 +878,65 @@ class GeneralCommissioningCluster(
       }
 
     return AcceptedCommandListAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AcceptedCommandListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65529u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AcceptedCommandListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Acceptedcommandlist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(AcceptedCommandListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
@@ -561,6 +977,63 @@ class GeneralCommissioningCluster(
     return EventListAttribute(decodedValue)
   }
 
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<EventListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65530u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            EventListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(EventListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
@@ -599,6 +1072,63 @@ class GeneralCommissioningCluster(
     return AttributeListAttribute(decodedValue)
   }
 
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AttributeListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65531u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AttributeListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(AttributeListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AttributeListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readFeatureMapAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 65532u
 
@@ -630,6 +1160,56 @@ class GeneralCommissioningCluster(
     return decodedValue
   }
 
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65532u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readClusterRevisionAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 65533u
 
@@ -659,6 +1239,58 @@ class GeneralCommissioningCluster(
     val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
     return decodedValue
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65533u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Clusterrevision attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   companion object {

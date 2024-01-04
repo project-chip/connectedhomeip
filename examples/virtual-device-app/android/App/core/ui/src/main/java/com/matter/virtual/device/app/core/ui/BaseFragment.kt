@@ -15,7 +15,6 @@ import androidx.fragment.app.activityViewModels
 import com.matter.virtual.device.app.core.common.EventObserver
 import com.matter.virtual.device.app.core.common.MatterSettings
 import com.matter.virtual.device.app.core.ui.databinding.LayoutAppbarBinding
-import kotlin.math.abs
 import timber.log.Timber
 
 abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel>(
@@ -49,16 +48,6 @@ abstract class BaseFragment<T : ViewDataBinding, V : BaseViewModel>(
     val layoutAppBarBinding = setupAppbar()
     (activity as AppCompatActivity).setSupportActionBar(layoutAppBarBinding.toolbar)
     (activity as AppCompatActivity).supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-    layoutAppBarBinding.appBarLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
-      var ratio = 0F
-      if (abs(verticalOffset) != 0) {
-        ratio = abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat()
-      }
-
-      layoutAppBarBinding.collapseTitle.alpha = 1f - ratio * 2f + 0.1f
-      layoutAppBarBinding.toolbarTitle.alpha = (ratio - 0.5f) * 2f + 0.1f
-    }
 
     layoutAppBarBinding.toolbarMoreMenuButton.setOnClickListener {
       Timber.d("More")

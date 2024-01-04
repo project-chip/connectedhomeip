@@ -175,7 +175,7 @@ int TestMemString()
 {
     nlTestSuite theSuite = { "CHIP Memory Allocation tests", &sTests[0], TestMemString_Setup, TestMemString_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
