@@ -43,8 +43,8 @@ tests:
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: 
-        ( !BOOLCFG.S.F00 && !BOOLCFG.S.F01 && !BOOLCFG.S.F02 && !BOOLCFG.S.F03
-        )
+          ( !BOOLCFG.S.F00 && !BOOLCFG.S.F01 && !BOOLCFG.S.F02 && !BOOLCFG.S.F03
+          )
       response:
           value: 0
           constraints:
@@ -73,8 +73,8 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "Step 3d: Given BOOLCFG.S.F02(SPRS) ensure featuremap has the
-          correct bit set"
+          "Step 3d: Given BOOLCFG.S.F02(SPRS) ensure featuremap has the correct
+          bit set"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: BOOLCFG.S.F02
@@ -201,7 +201,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4e: TH reads optional (SensorFault) attribute in AttributeList"
+          "Step 4j: TH reads optional (SensorFault) attribute in AttributeList"
       PICS: BOOLCFG.S.A0007
       command: "readAttribute"
       attribute: "AttributeList"
@@ -212,8 +212,8 @@ tests:
 
     - label: "Step 5a: Read the global attribute: EventList"
       PICS:
-        PICS_EVENT_LIST_ENABLED && !BOOLCFG.S.F00 && !BOOLCFG.S.F01 &&
-        !BOOLCFG.S.E01
+          PICS_EVENT_LIST_ENABLED && !BOOLCFG.S.F00 && !BOOLCFG.S.F01 &&
+          !BOOLCFG.S.E01
       command: "readAttribute"
       attribute: "EventList"
       response:
@@ -264,7 +264,7 @@ tests:
     - label:
           "Step 6b: Read the feature dependent(BOOLCFG.S.F02) (SuppressAlarm)
           command in AcceptedCommandList"
-      PICS:  BOOLCFG.S.F02
+      PICS: BOOLCFG.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -275,7 +275,7 @@ tests:
     - label:
           "Step 6c: Read the feature dependent(BOOLCFG.S.F00)
           (EnableDisableAlarm) command in AcceptedCommandList"
-      PICS:  BOOLCFG.S.F00
+      PICS: BOOLCFG.S.F00
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -286,7 +286,7 @@ tests:
     - label:
           "Step 6d: Read the feature dependent(BOOLCFG.S.F01)
           (EnableDisableAlarm) command in AcceptedCommandList"
-      PICS:  BOOLCFG.S.F01
+      PICS: BOOLCFG.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
