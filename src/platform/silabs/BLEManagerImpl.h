@@ -157,7 +157,7 @@ private:
     enum
     {
         kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
-        kMaxDeviceNameLength = 27,
+        kMaxDeviceNameLength = 21,
         kUnusedIndex         = 0xFF,
     };
 
