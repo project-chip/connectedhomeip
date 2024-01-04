@@ -228,7 +228,7 @@ limitations under the License.
             <access op="read" privilege="administer" />
         </attribute>
         <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
-        <attribute side="server" code="133" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="octet_string" array="true" length="2" writable="false" optional="true" apiMaturity="provisional">
+        <attribute side="server" code="133" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="octet_string" array="true" length="16" writable="false" optional="true" apiMaturity="provisional">
             <description>AliroSupportedBLEUWBProtocolVersions</description>
             <access op="read" privilege="administer" />
         </attribute>
