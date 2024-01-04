@@ -19,7 +19,7 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   # By default use default/example implementation of CommissionableDataProvider,
-  # DeviceAttestationCredentialsProvider and DeviceInstanceInforProvider
+  # DeviceAttestationCredentialsProvider and DeviceInstanceInfoProvider
   chip_use_transitional_commissionable_data_provider = true
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
