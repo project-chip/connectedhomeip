@@ -30,7 +30,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_BOOLCFG_3_1(self) -> str:
-        return "[TC-BOOLCFG-3.1] Attributes with DUT as Server"
+        return "[TC-BOOLCFG-3.1] SensitivityLevel with DUT as Server"
 
     def steps_TC_BOOLCFG_3_1(self) -> list[TestStep]:
         steps = [
