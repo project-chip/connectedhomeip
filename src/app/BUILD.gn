@@ -226,6 +226,13 @@ static_library("app") {
     ]
   }
 
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
+
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",

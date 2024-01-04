@@ -41,6 +41,18 @@
 namespace chip {
 namespace app {
 
+class AutoReleaseSubscriptionInfoIterator
+{
+public:
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
+
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
+
+private:
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * mIterator;
+};
+
 using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
@@ -1835,7 +1847,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     bool resumedSubscriptions                  = false;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
+    AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -1853,31 +1865,24 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             continue;
         }
 
-        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
-        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
-        if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount,
-                                                     requestedEventPathCount))
+        auto subscriptionResumptionSessionEstablisher = Platform::MakeUnique<SubscriptionResumptionSessionEstablisher>();
+        if (subscriptionResumptionSessionEstablisher == nullptr)
         {
-            ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
-            iterator->Release();
+            ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionSessionEstablisher");
             return;
         }
 
-        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
-        if (handler == nullptr)
+        if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) !=
+            CHIP_NO_ERROR)
         {
-            ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
-            iterator->Release();
+            ChipLogProgress(InteractionModel, "Failed to ResumeSubscription 0x%" PRIx32, subscriptionInfo.mSubscriptionId);
             return;
         }
-
-        ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
-        handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
+        subscriptionResumptionSessionEstablisher.release();
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         resumedSubscriptions = true;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
-    iterator->Release();
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // If no persisted subscriptions needed resumption then all resumption retries are done
