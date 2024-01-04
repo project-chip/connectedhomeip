@@ -243,10 +243,7 @@ limitations under the License.
             <access op="read" privilege="view" />
         </attribute>
         <!-- Conformance feature [ALIRO] - optional -->
-        <attribute side="server" code="136" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">
-            <description>NumberOfAliroEndpointKeysSupported</description>
-            <access op="read" privilege="view" />
-        </attribute>
+        <attribute side="server" code="136" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">NumberOfAliroEndpointKeysSupported</attribute>
 
         <!-- Commands -->
         <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
