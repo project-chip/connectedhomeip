@@ -25556,8 +25556,8 @@ class DoorLock(Cluster):
             kYearDayAccessSchedules = 0x400
             kHolidaySchedules = 0x800
             kUnbolt = 0x1000
-            kAliro = 0x2000
-            kAlbu = 0x4000
+            kAliroProvisioning = 0x2000
+            kAliroBLEUWB = 0x4000
 
     class Structs:
         @dataclass

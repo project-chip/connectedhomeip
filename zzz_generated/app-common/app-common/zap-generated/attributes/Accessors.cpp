@@ -13271,7 +13271,7 @@ namespace AliroExpeditedTransactionSupportedProtocolVersions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
-    uint8_t zclString[2 + 1];
+    uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
@@ -13280,16 +13280,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 2, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
-    memcpy(value.data(), &zclString[1], 2);
+    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    static_assert(2 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 2, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    uint8_t zclString[2 + 1];
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
@@ -13351,7 +13351,7 @@ namespace AliroSupportedBLEUWBProtocolVersions {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
 {
-    uint8_t zclString[2 + 1];
+    uint8_t zclString[16 + 1];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
@@ -13360,16 +13360,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value)
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 2, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
-    memcpy(value.data(), &zclString[1], 2);
+    VerifyOrReturnError(value.size() == 16, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 16);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
 {
-    static_assert(2 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 2, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    uint8_t zclString[2 + 1];
+    static_assert(16 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 16, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[16 + 1];
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());

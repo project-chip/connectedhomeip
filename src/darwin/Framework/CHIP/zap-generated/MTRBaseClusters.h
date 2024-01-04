@@ -17752,8 +17752,8 @@ typedef NS_OPTIONS(uint32_t, MTRDoorLockFeature) {
     MTRDoorLockFeatureYearDaySchedules MTR_DEPRECATED("Please use MTRDoorLockFeatureYearDayAccessSchedules", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x400,
     MTRDoorLockFeatureHolidaySchedules MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x800,
     MTRDoorLockFeatureUnbolt MTR_PROVISIONALLY_AVAILABLE = 0x1000,
-    MTRDoorLockFeatureALIRO MTR_PROVISIONALLY_AVAILABLE = 0x2000,
-    MTRDoorLockFeatureALBU MTR_PROVISIONALLY_AVAILABLE = 0x4000,
+    MTRDoorLockFeatureAliroProvisioning MTR_PROVISIONALLY_AVAILABLE = 0x2000,
+    MTRDoorLockFeatureAliroBLEUWB MTR_PROVISIONALLY_AVAILABLE = 0x4000,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRWindowCoveringEndProductType) {

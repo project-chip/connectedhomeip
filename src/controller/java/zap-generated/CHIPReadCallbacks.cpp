@@ -35099,7 +35099,7 @@ void CHIPDoorLockAliroReaderVerificationKeyAttributeCallback::CallbackFn(
         reinterpret_cast<CHIPDoorLockAliroReaderVerificationKeyAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -35166,7 +35166,7 @@ void CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback::CallbackFn(
         reinterpret_cast<CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
@@ -35232,7 +35232,7 @@ void CHIPDoorLockAliroGroupResolvingKeyAttributeCallback::CallbackFn(void * cont
         reinterpret_cast<CHIPDoorLockAliroGroupResolvingKeyAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr,
                    ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 

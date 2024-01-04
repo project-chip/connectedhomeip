@@ -1634,8 +1634,8 @@ cluster DoorLock = 257 {
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
     kUnbolt = 0x1000;
-    kALIRO = 0x2000;
-    kALBU = 0x4000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
   }
 
   struct CredentialStruct {
@@ -1719,9 +1719,9 @@ cluster DoorLock = 257 {
   readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
   readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
   readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
-  readonly attribute access(read: administer) optional octet_string<2> aliroExpeditedTransactionSupportedProtocolVersions = 131;
+  readonly attribute access(read: administer) optional octet_string<16> aliroExpeditedTransactionSupportedProtocolVersions = 131;
   readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
-  readonly attribute access(read: administer) optional octet_string<2> aliroSupportedBLEUWBProtocolVersions = 133;
+  readonly attribute access(read: administer) optional octet_string<16> aliroSupportedBLEUWBProtocolVersions = 133;
   readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
   readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
   readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
