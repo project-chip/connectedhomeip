@@ -22,6 +22,13 @@
 
 namespace chip {
 
+/*
+ * These Test EventTrigger values are specified in the TC_EEVSE test plan
+ * and are defined conditions used in test events.
+ *
+ * They are sent along with the enableKey (manufacturer defined secret)
+ * in the General Diagnostic cluster TestEventTrigger command
+ */
 enum class EnergyEvseTrigger : uint64_t
 {
     // Scenarios
@@ -33,7 +40,6 @@ enum class EnergyEvseTrigger : uint64_t
     kEVPluggedInClear    = 0x0099000000000003,     // EV Plugged-in Test Event Clear | Simulate unplugging the EV
     kEVChargeDemand      = 0x0099000000000004, // EV Charge Demand Test Event | Simulate the EV presenting charge demand to the EVSE
     kEVChargeDemandClear = 0x0099000000000005, // EV Charge Demand Test Event Clear | Simulate the EV becoming fully charged
-
 };
 
 class EnergyEvseTestEventTriggerDelegate : public TestEventTriggerDelegate
