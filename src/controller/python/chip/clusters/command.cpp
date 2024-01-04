@@ -255,7 +255,7 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     // function is cert test script. To implement pychip_CommandSender_TestOnlySendBatchCommands in a clean way
     // we need to move away from the variadic arguments.
     // config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
-    (void) remoteSessionParameters;  // Still want to get remoteSessionParameters, just wont use it right now.
+    (void) remoteSessionParameters; // Still want to get remoteSessionParameters, just wont use it right now.
     config.SetRemoteMaxPathsPerInvoke(std::numeric_limits<uint16_t>::max());
 
     std::unique_ptr<CommandSenderCallback> callback =
