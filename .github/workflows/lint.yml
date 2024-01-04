@@ -90,6 +90,7 @@ jobs:
                      --skip-dir platform/webos \
                      --skip-dir platform/Zephyr \
                      --skip-dir test_driver \
+                     --skip-dir platform/NuttX \
                      --known-failure app/app-platform/ContentApp.cpp \
                      --known-failure app/app-platform/ContentApp.h \
                      --known-failure app/app-platform/ContentAppPlatform.cpp \
@@ -205,7 +206,7 @@ jobs:
                   # TODO: TLVDebug should ideally not be excluded here.
                   # TODO: protocol_decoder.cpp should ideally not be excluded here.
                   # TODO: PersistentStorageMacros.h should ideally not be excluded here.
-                  git grep -I -n "PRI.64" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)examples/chip-tool' ':(exclude)examples/tv-casting-app' ':(exclude)src/app/MessageDef/MessageDefHelper.cpp' ':(exclude)src/app/tests/integration/chip_im_initiator.cpp' ':(exclude)src/lib/core/TLVDebug.cpp' ':(exclude)src/lib/dnssd/tests/TestTxtFields.cpp' ':(exclude)src/lib/format/protocol_decoder.cpp' ':(exclude)src/lib/support/PersistentStorageMacros.h' ':(exclude)src/messaging/tests/echo/echo_requester.cpp' ':(exclude)src/platform/Linux' ':(exclude)src/platform/Ameba' ':(exclude)src/platform/ESP32' ':(exclude)src/platform/Darwin' ':(exclude)src/darwin' ':(exclude)src/platform/webos' ':(exclude)zzz_generated/chip-tool' ':(exclude)src/tools/chip-cert/Cmd_PrintCert.cpp' && exit 1 || exit 0
+                  git grep -I -n "PRI.64" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)examples/chip-tool' ':(exclude)examples/tv-casting-app' ':(exclude)src/app/MessageDef/MessageDefHelper.cpp' ':(exclude)src/app/tests/integration/chip_im_initiator.cpp' ':(exclude)src/lib/core/TLVDebug.cpp' ':(exclude)src/lib/dnssd/tests/TestTxtFields.cpp' ':(exclude)src/lib/format/protocol_decoder.cpp' ':(exclude)src/lib/support/PersistentStorageMacros.h' ':(exclude)src/messaging/tests/echo/echo_requester.cpp' ':(exclude)src/platform/Linux' ':(exclude)src/platform/Ameba' ':(exclude)src/platform/ESP32' ':(exclude)src/platform/Darwin' ':(exclude)src/darwin' ':(exclude)src/platform/webos' ':(exclude)zzz_generated/chip-tool' ':(exclude)src/tools/chip-cert/Cmd_PrintCert.cpp' ':(exclude)src/platform/NuttX' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
