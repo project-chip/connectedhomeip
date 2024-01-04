@@ -180,6 +180,14 @@ protected:
      */
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; };
 
+    /**
+     * Handles the invocation of derived cluster commands.
+     * If a derived cluster defines its own commands, this method SHALL be implemented by the derived cluster's class
+     * to handle the derived cluster's specific commands.
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
+
 private:
     Delegate * mDelegate;
 
