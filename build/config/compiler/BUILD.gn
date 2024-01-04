@@ -271,6 +271,11 @@ config("strict_warnings") {
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
+  if (current_os == "nuttx") {
+    cflags -= [ "-Wshadow" ]
+    cflags_cc -= [ "-Wnon-virtual-dtor" ]
+  }
+
   configs = []
   ldflags = []
 

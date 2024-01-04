@@ -955,6 +955,7 @@ NTP
 nullable
 nullptr
 NUM
+NuttX
 NVM
 NVS
 nwdiag

@@ -28,6 +28,7 @@ from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder, OpenIotSdkCryptoBackend
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.rw61x import RW61XApp, RW61XBuilder
@@ -316,6 +317,22 @@ def BuildNrfTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+
+    return target
+
+
+def BuildNuttXTarget():
+    target = BuildTarget('nuttx', NuttXBuilder)
+
+    # Boards
+    target.AppendFixedTargets([
+        TargetPart('x64', board=NuttXBoard.SIM),
+    ])
+
+    # Apps
+    target.AppendFixedTargets([
+        TargetPart('light', app=NuttXApp.LIGHT),
+    ])
 
     return target
 
@@ -809,6 +826,7 @@ BUILD_TARGETS = [
     BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
+    BuildNuttXTarget(),
     BuildQorvoTarget(),
     BuildStm32Target(),
     BuildTizenTarget(),

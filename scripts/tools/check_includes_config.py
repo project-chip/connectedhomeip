@@ -53,6 +53,7 @@ IGNORE: Set[str] = {
     '/platform/webos/',
     '/platform/mt793x/',
     '/platform/ASR/',
+    '/platform/NuttX/',
     r'POSIX\.h$',
 }
 
