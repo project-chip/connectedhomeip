@@ -115,15 +115,8 @@ class OnboardingPayload(
    */
   var setupPinCode: Long = 0
 ) {
-  var optionalQRCodeInfo: HashMap<Int, OptionalQRCodeInfo>
-  private val optionalVendorData: HashMap<Int, OptionalQRCodeInfo>
-  private val optionalExtensionData: HashMap<Int, OptionalQRCodeInfoExtension>
-
-  init {
-    optionalQRCodeInfo = HashMap()
-    optionalVendorData = HashMap()
-    optionalExtensionData = HashMap()
-  }
+  val optionalVendorData: HashMap<Int, OptionalQRCodeInfo> = HashMap()
+  val optionalExtensionData: HashMap<Int, OptionalQRCodeInfoExtension> = HashMap()
 
   constructor(
     version: Int,
@@ -168,14 +161,9 @@ class OnboardingPayload(
       "discriminator=$discriminator, " +
       "hasShortDiscriminator=$hasShortDiscriminator, " +
       "setupPinCode=$setupPinCode, " +
-      "optionalQRCodeInfo=$optionalQRCodeInfo, " +
       "optionalVendorData=$optionalVendorData, " +
       "optionalExtensionData=$optionalExtensionData" +
       ")"
-  }
-
-  fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
-    optionalQRCodeInfo[info.tag] = info
   }
 
   fun isValidManualCode(): Boolean {
@@ -415,7 +403,7 @@ class OnboardingPayload(
    *
    * @param info Optional QR code info object to add
    */
-  private fun addOptionalVendorData(info: OptionalQRCodeInfo) {
+  fun addOptionalVendorData(info: OptionalQRCodeInfo) {
     if (isVendorTag(info.tag)) {
       optionalVendorData[info.tag] = info
       return
@@ -458,7 +446,7 @@ class OnboardingPayload(
    *
    * @param info Optional QR code info object to add
    */
-  private fun addOptionalExtensionData(info: OptionalQRCodeInfoExtension) {
+  fun addOptionalExtensionData(info: OptionalQRCodeInfoExtension) {
     if (isCommonTag(info.tag)) {
       optionalExtensionData[info.tag] = info
       return
@@ -500,6 +488,7 @@ class OnboardingPayload(
   private fun getOptionalExtensionData(tag: Int): OptionalQRCodeInfoExtension {
     return optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")
   }
+
 
   /**
    * A function to retrieve the associated expected numeric value for a tag

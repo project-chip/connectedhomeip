@@ -17,15 +17,12 @@
 
 package matter.onboardingpayload
 
-import matter.tlv.BooleanValue
 import matter.tlv.ContextSpecificTag
 import matter.tlv.IntValue
 import matter.tlv.TlvReader
 import matter.tlv.UnsignedIntValue
 import matter.tlv.Utf8StringValue
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.Charset
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -115,8 +112,11 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
                 info.data = element.value.value
                 info.type = OptionalQRCodeInfoType.TYPE_STRING
             }
-
-            payload.addOptionalQRCodeInfo(info)
+            if(info.tag < 0x80) {
+                payload.addOptionalExtensionData(info)
+            } else {
+                payload.addOptionalVendorData(info)
+            }
         }
 
     }
