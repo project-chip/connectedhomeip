@@ -143,7 +143,8 @@ class TC_DISHM_3_1(MatterBaseTest):
             supported_modes_dut = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
             asserts.assert_true(isinstance(supported_modes_dut, list), "SupportedModes must be a list")
             asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least two entries!")
-            asserts.assert_true(isinstance(supported_modes_dut[0], chip.clusters.Objects.DishwasherMode.Structs.ModeOptionStruct), "SupportedModes must must contain ModeOptionStructs")
+            asserts.assert_true(isinstance(
+                supported_modes_dut[0], chip.clusters.Objects.DishwasherMode.Structs.ModeOptionStruct), "SupportedModes must must contain ModeOptionStructs")
 
             for m in supported_modes_dut:
                 if m.mode != on_mode_dut:
