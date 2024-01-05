@@ -62,4 +62,15 @@ class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
       "uint64=$uint64" +
       ")"
   }
+
+  override fun hashCode(): Int {
+    var result = tag.hashCode()
+    result = 31 * result + type.hashCode()
+    result = 31 * result + data.hashCode()
+    result = 31 * result + int32.hashCode()
+    result = 31 * result + int64.hashCode()
+    result = 31 * result + uint32.hashCode()
+    result = 31 * result + uint64.hashCode()
+    return result
+  }
 }

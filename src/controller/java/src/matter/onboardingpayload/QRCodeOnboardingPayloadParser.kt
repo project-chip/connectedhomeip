@@ -84,7 +84,7 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       return
     }
     val byteBuffer = ByteBuffer.allocate(tlvBytesLength)
-    for (i in 0 until tlvBytesLength) {
+    repeat(tlvBytesLength) {
       val value = readBits(payloadData, index, 8)
       byteBuffer.put(value.toByte())
     }
