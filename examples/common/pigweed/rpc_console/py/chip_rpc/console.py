@@ -220,7 +220,7 @@ def _start_ipython_hdlc_terminal(client: HdlcRpcClient) -> None:
     # Don't send device logs to the root logger.
     _DEVICE_LOG.propagate = False
     with client:
-       interactive_console.embed()
+        interactive_console.embed()
 
 
 def write_to_output(data: bytes,
