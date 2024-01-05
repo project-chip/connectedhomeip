@@ -65,13 +65,13 @@ class TC_VCC_3_3(MatterBaseTest):
         attribute_list = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             defaultOpenLevel = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenLevel)
         else:
             logging.info("Test step skipped")
 
         self.step(4)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
             except InteractionModelError as e:
@@ -81,7 +81,7 @@ class TC_VCC_3_3(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(5)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             target_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
 
             asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
@@ -90,7 +90,7 @@ class TC_VCC_3_3(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(6)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
             asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
@@ -105,7 +105,7 @@ class TC_VCC_3_3(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(7)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
             except InteractionModelError as e:
@@ -115,7 +115,7 @@ class TC_VCC_3_3(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(8)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             target_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
 
             asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
@@ -124,7 +124,7 @@ class TC_VCC_3_3(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(9)
-        if attributes.DefaultOpenLevel.attribute_id not in attribute_list:
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
             current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
             asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
