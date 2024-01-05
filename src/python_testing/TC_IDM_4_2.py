@@ -15,16 +15,16 @@
 #    limitations under the License.
 #
 
+import copy
 import logging
 import random
 import time
-import copy
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
-from chip.interaction_model import Status, InteractionModelError
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -71,7 +71,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 Attribute=attribute
             )
         )
-    
+
     async def get_dut_acl(self):
         sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
@@ -79,13 +79,13 @@ class TC_IDM_4_2(MatterBaseTest):
             keepSubscriptions=False,
             fabricFiltered=True
         )
-        
+
         acl_list = self.get_attribute_from_sub_dict(
             sub=sub,
             cluster=Clusters.AccessControl,
             attribute=Clusters.AccessControl.Attributes.Acl
         )
-        
+
         return acl_list
 
     def is_uint32(self, var):
@@ -117,10 +117,10 @@ class TC_IDM_4_2(MatterBaseTest):
             nodeId=CR2_nodeid,
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
         )
-        
+
         # Get DUT ACL
         dut_acl_original = await self.get_dut_acl()
-        
+
         # Read ServerList attribute
         self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
         ep0_servers = await self.get_descriptor_server_list(CR1)
@@ -312,7 +312,7 @@ class TC_IDM_4_2(MatterBaseTest):
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
                 endpoint=1,
                 cluster=Clusters.BasicInformation.id
-                )],
+            )],
             subjects=[CR2_nodeid])
 
         # Add controller 2 limited ACE to DUT ACL
@@ -361,7 +361,7 @@ class TC_IDM_4_2(MatterBaseTest):
             nodeid=self.dut_node_id,
             attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
         )
-        
+
         # Controller 2 tries to subscribe to all attributes from all clusters
         # from all endpoints on a node it doesn't have access to
         # "INVALID_ACTION" status response expected
