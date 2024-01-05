@@ -168,6 +168,10 @@ class OnboardingPayload(
       ")"
   }
 
+  fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
+    optionalQRCodeInfo[info.tag] = info
+  }
+
   fun isValidManualCode(): Boolean {
     if (setupPinCode >= (1 shl kSetupPINCodeFieldLengthInBits)) {
       return false
