@@ -81,6 +81,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P432F1024GM48"
   enable_fem = true
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
   board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
 } else if (silabs_board == "BRD4161A") {
   silabs_family = "efr32mg12"
