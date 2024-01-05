@@ -17,6 +17,7 @@
  */
 package com.matter.controller.commands.pairing
 
+import chip.devicecontroller.ICDDeviceInfo
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.IPAddress
 import com.matter.controller.commands.common.MatterCommand
@@ -178,13 +179,14 @@ abstract class PairingCommand(
   }
 
   override fun onICDRegistrationComplete(
+    errorCode: Int,
     icdNodeId: Long,
     icdCounter: Long,
-    symmetricKey: ByteArray
+    icdDeviceInfo: ICDDeviceInfo
   ) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${symmetricKey.toHex()}"
+      "onICDRegistrationComplete with errorCode: $errorCode, icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}"
     )
   }
 

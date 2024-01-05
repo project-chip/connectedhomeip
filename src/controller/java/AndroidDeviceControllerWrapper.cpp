@@ -940,18 +940,28 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationCompleteMethod;
+    jclass icdDeviceInfoClass = nullptr;
+    jmethodID icdDeviceInfoStructCtor = nullptr;
+    jobject icdDeviceInfoObj = nullptr;
     jbyteArray jSymmetricKey = nullptr;
-    err                      = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ[B)V",
+    err                      = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(IJJLchip/devicecontroller/ICDDeviceInfo;)V",
                                                                        &onICDRegistrationCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
+
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([B)V");
+    VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     err = JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<uint32_t>(symmetricKey.size()),
                                                      jSymmetricKey);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jlong>(icdNodeId),
-                        static_cast<jlong>(icdCounter), jSymmetricKey);
+    icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey);
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

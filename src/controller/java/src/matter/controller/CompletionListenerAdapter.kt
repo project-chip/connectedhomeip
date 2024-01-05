@@ -18,6 +18,7 @@
 package matter.controller
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDDeviceInfo
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -52,10 +53,11 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
   override fun onICDRegistrationInfoRequired() = listener.onICDRegistrationInfoRequired()
 
   override fun onICDRegistrationComplete(
+    errorCode: Int,
     icdNodeId: Long,
     icdCounter: Long,
-    symmetricKey: ByteArray
-  ) = listener.onICDRegistrationComplete(icdNodeId, icdCounter, symmetricKey)
+    icdDeviceInfo: ICDDeviceInfo
+  ) = listener.onICDRegistrationComplete(errorCode, icdNodeId, icdCounter, icdDeviceInfo)
 
   override fun onError(error: Throwable) = listener.onError(error)
 
