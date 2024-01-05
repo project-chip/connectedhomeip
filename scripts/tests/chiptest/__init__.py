@@ -230,8 +230,7 @@ def target_for_name(name: str):
             name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
             name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
             name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
-            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_") or
-            name.startswith("Test_TC_APPOBSERVER_")):
+            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
         return TestTarget.TV
     if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
         return TestTarget.LOCK
