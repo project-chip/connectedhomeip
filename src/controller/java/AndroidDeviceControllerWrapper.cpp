@@ -954,8 +954,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([B)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<jint>(symmetricKey.size()),
-                                                     jSymmetricKey);
+    err =
+        JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<jint>(symmetricKey.size()), jSymmetricKey);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, err.Format()));
 
