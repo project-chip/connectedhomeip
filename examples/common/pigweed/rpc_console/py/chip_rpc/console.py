@@ -40,8 +40,8 @@ import argparse
 import logging
 import re
 import sys
-import time
 import threading
+import time
 from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from inspect import cleandoc
@@ -50,11 +50,10 @@ from typing import Any, BinaryIO, Callable, Collection
 import pw_cli.log
 from chip_rpc.plugins.device_toolbar import DeviceToolbar
 from chip_rpc.plugins.helper_scripts import HelperScripts
-from pw_console import PwConsoleEmbed
-from pw_console import socket_client
+from pw_console import PwConsoleEmbed, socket_client
 from pw_console.__main__ import create_temp_log_file
 from pw_console.pyserial_wrapper import SerialWithLogging
-from pw_hdlc.rpc import HdlcRpcClient, default_channels, SerialReader, SelectableReader
+from pw_hdlc.rpc import HdlcRpcClient, SelectableReader, SerialReader, default_channels
 from pw_rpc import callback_client
 from pw_rpc.console_tools.console import ClientInfo, flattened_rpc_completions
 from pw_tokenizer import tokens
