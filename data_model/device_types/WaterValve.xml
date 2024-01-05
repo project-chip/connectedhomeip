@@ -55,91 +55,18 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010B" name="Dimmable Plug" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0042" name="Water Valve" revision="1">
   <revisionHistory>
-    <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
-    <revision revision="1" summary="Initial Zigbee 3.0 release"/>
-    <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Added optional occupancy sensing and measurement clusters for energy and power"/>
+    <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
-      <commands>
-        <command id="" name="TriggerEffect">
-          <mandatoryConform/>
-        </command>
-      </commands>
     </cluster>
-    <cluster id="0x0004" name="Groups" side="server">
+    <cluster id="0x0081" name="Valve Configuration and Control" side="server">
       <mandatoryConform/>
-    </cluster>
-    <cluster id="0x0005" name="Scenes" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
-      <commands>
-        <command id="" name="EnhancedAddScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="EnhancedViewScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-      </commands>
-    </cluster>
-    <cluster id="0x0006" name="On/Off" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="LT">
-          <mandatoryConform/>
-        </feature>
-      </features>
-    </cluster>
-    <cluster id="0x0008" name="Level Control" side="server">
-      <mandatoryConform/>
-      <features>
-        <feature code="" name="OO">
-          <mandatoryConform/>
-        </feature>
-        <feature code="" name="LT">
-          <mandatoryConform/>
-        </feature>
-      </features>
-      <attributes>
-        <attribute code="" name="CurrentLevel">
-          <constraint type="between" from="1" to="254"/>
-        </attribute>
-        <attribute code="" name="MinLevel">
-          <constraint type="allowed" value="1"/>
-        </attribute>
-        <attribute code="" name="MaxLevel">
-          <constraint type="allowed" value="254"/>
-        </attribute>
-      </attributes>
-    </cluster>
-    <cluster id="0x0090" name="Electrical Power Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
-      <optionalConform/>
-    </cluster>
-    <cluster id="0x0406" name="Occupancy Sensing" side="client">
-      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>
