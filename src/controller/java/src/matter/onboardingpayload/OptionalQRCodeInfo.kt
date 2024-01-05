@@ -37,8 +37,6 @@ open class OptionalQRCodeInfo {
     if (other !is OptionalQRCodeInfo) return false
 
     return tag == other.tag && type == other.type && data == other.data && int32 == other.int32
-
-    return true
   }
 
   override fun hashCode(): Int {
