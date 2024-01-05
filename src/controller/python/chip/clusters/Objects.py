@@ -25082,9 +25082,9 @@ class DoorLock(Cluster):
                 ClusterObjectFieldDescriptor(Label="aliroReaderVerificationKey", Tag=0x00000080, Type=typing.Union[None, Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="aliroReaderGroupIdentifier", Tag=0x00000081, Type=typing.Union[None, Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="aliroReaderGroupSubIdentifier", Tag=0x00000082, Type=typing.Optional[bytes]),
-                ClusterObjectFieldDescriptor(Label="aliroExpeditedTransactionSupportedProtocolVersions", Tag=0x00000083, Type=typing.Optional[bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroExpeditedTransactionSupportedProtocolVersions", Tag=0x00000083, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="aliroGroupResolvingKey", Tag=0x00000084, Type=typing.Union[None, Nullable, bytes]),
-                ClusterObjectFieldDescriptor(Label="aliroSupportedBLEUWBProtocolVersions", Tag=0x00000085, Type=typing.Optional[bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroSupportedBLEUWBProtocolVersions", Tag=0x00000085, Type=typing.Optional[typing.List[bytes]]),
                 ClusterObjectFieldDescriptor(Label="aliroBLEAdvertisingVersion", Tag=0x00000086, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfAliroCredentialIssuerKeysSupported", Tag=0x00000087, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfAliroEndpointKeysSupported", Tag=0x00000088, Type=typing.Optional[uint]),
@@ -25135,9 +25135,9 @@ class DoorLock(Cluster):
     aliroReaderVerificationKey: 'typing.Union[None, Nullable, bytes]' = None
     aliroReaderGroupIdentifier: 'typing.Union[None, Nullable, bytes]' = None
     aliroReaderGroupSubIdentifier: 'typing.Optional[bytes]' = None
-    aliroExpeditedTransactionSupportedProtocolVersions: 'typing.Optional[bytes]' = None
+    aliroExpeditedTransactionSupportedProtocolVersions: 'typing.Optional[typing.List[bytes]]' = None
     aliroGroupResolvingKey: 'typing.Union[None, Nullable, bytes]' = None
-    aliroSupportedBLEUWBProtocolVersions: 'typing.Optional[bytes]' = None
+    aliroSupportedBLEUWBProtocolVersions: 'typing.Optional[typing.List[bytes]]' = None
     aliroBLEAdvertisingVersion: 'typing.Optional[uint]' = None
     numberOfAliroCredentialIssuerKeysSupported: 'typing.Optional[uint]' = None
     numberOfAliroEndpointKeysSupported: 'typing.Optional[uint]' = None
@@ -26802,9 +26802,9 @@ class DoorLock(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[bytes]])
 
-            value: 'typing.Optional[bytes]' = None
+            value: 'typing.Optional[typing.List[bytes]]' = None
 
         @dataclass
         class AliroGroupResolvingKey(ClusterAttributeDescriptor):
@@ -26834,9 +26834,9 @@ class DoorLock(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[bytes]])
 
-            value: 'typing.Optional[bytes]' = None
+            value: 'typing.Optional[typing.List[bytes]]' = None
 
         @dataclass
         class AliroBLEAdvertisingVersion(ClusterAttributeDescriptor):

@@ -20337,15 +20337,16 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<chip::ByteSpan>>(Id, "aliro-reader-group-sub-identifier",
                                                     Attributes::AliroReaderGroupSubIdentifier::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "aliro-expedited-transaction-supported-protocol-versions",
-                                                    Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id,
-                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
+            Id, "aliro-expedited-transaction-supported-protocol-versions",
+            Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
             Id, "aliro-group-resolving-key", Attributes::AliroGroupResolvingKey::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "aliro-supported-bleuwbprotocol-versions",
-                                                    Attributes::AliroSupportedBLEUWBProtocolVersions::Id,
-                                                    WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
+            Id, "aliro-supported-bleuwbprotocol-versions", Attributes::AliroSupportedBLEUWBProtocolVersions::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "aliro-bleadvertising-version", 0, UINT8_MAX,
                                              Attributes::AliroBLEAdvertisingVersion::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //

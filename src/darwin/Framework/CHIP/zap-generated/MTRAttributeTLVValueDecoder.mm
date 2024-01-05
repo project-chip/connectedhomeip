@@ -9408,8 +9408,23 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSData * _Nonnull value;
-        value = AsData(cppValue);
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSData * newElement_0;
+                newElement_0 = AsData(entry_0);
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     case Attributes::AliroGroupResolvingKey::Id: {
@@ -9434,8 +9449,23 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSData * _Nonnull value;
-        value = AsData(cppValue);
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSData * newElement_0;
+                newElement_0 = AsData(entry_0);
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     case Attributes::AliroBLEAdvertisingVersion::Id: {

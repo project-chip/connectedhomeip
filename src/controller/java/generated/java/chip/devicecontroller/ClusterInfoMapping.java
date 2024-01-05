@@ -11318,6 +11318,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedDoorLockClusterAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback implements ChipClusters.DoorLockCluster.AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<byte[]> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedDoorLockClusterAliroGroupResolvingKeyAttributeCallback implements ChipClusters.DoorLockCluster.AliroGroupResolvingKeyAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -11330,6 +11351,27 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
       responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterAliroSupportedBLEUWBProtocolVersionsAttributeCallback implements ChipClusters.DoorLockCluster.AliroSupportedBLEUWBProtocolVersionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<byte[]> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
+      responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
     }
 

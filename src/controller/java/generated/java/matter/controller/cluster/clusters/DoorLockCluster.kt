@@ -145,6 +145,19 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     object SubscriptionEstablished : AliroReaderGroupIdentifierAttributeSubscriptionState()
   }
 
+  class AliroExpeditedTransactionSupportedProtocolVersionsAttribute(val value: List<ByteArray>?)
+
+  sealed class AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+
+    object SubscriptionEstablished :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+  }
+
   class AliroGroupResolvingKeyAttribute(val value: ByteArray?)
 
   sealed class AliroGroupResolvingKeyAttributeSubscriptionState {
@@ -153,6 +166,19 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     data class Error(val exception: Exception) : AliroGroupResolvingKeyAttributeSubscriptionState()
 
     object SubscriptionEstablished : AliroGroupResolvingKeyAttributeSubscriptionState()
+  }
+
+  class AliroSupportedBLEUWBProtocolVersionsAttribute(val value: List<ByteArray>?)
+
+  sealed class AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
+
+    object SubscriptionEstablished :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -5831,7 +5857,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     }
   }
 
-  suspend fun readAliroExpeditedTransactionSupportedProtocolVersionsAttribute(): ByteArray? {
+  suspend fun readAliroExpeditedTransactionSupportedProtocolVersionsAttribute():
+    AliroExpeditedTransactionSupportedProtocolVersionsAttribute {
     val ATTRIBUTE_ID: UInt = 131u
 
     val attributePath =
@@ -5859,20 +5886,26 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ByteArray? =
+    val decodedValue: List<ByteArray>? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByteArray(AnonymousTag)
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       } else {
         null
       }
 
-    return decodedValue
+    return AliroExpeditedTransactionSupportedProtocolVersionsAttribute(decodedValue)
   }
 
   suspend fun subscribeAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Flow<ByteArraySubscriptionState> {
+  ): Flow<AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 131u
     val attributePaths =
       listOf(
@@ -5891,7 +5924,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            ByteArraySubscriptionState.Error(
+            AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -5910,17 +5943,32 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ByteArray? =
+          val decodedValue: List<ByteArray>? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getByteArray(AnonymousTag)
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
             } else {
               null
             }
 
-          decodedValue?.let { emit(ByteArraySubscriptionState.Success(it)) }
+          decodedValue?.let {
+            emit(
+              AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState.Success(
+                it
+              )
+            )
+          }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+          emit(
+            AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState
+              .SubscriptionEstablished
+          )
         }
       }
     }
@@ -6029,7 +6077,8 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     }
   }
 
-  suspend fun readAliroSupportedBLEUWBProtocolVersionsAttribute(): ByteArray? {
+  suspend fun readAliroSupportedBLEUWBProtocolVersionsAttribute():
+    AliroSupportedBLEUWBProtocolVersionsAttribute {
     val ATTRIBUTE_ID: UInt = 133u
 
     val attributePath =
@@ -6057,20 +6106,26 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ByteArray? =
+    val decodedValue: List<ByteArray>? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByteArray(AnonymousTag)
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
       } else {
         null
       }
 
-    return decodedValue
+    return AliroSupportedBLEUWBProtocolVersionsAttribute(decodedValue)
   }
 
   suspend fun subscribeAliroSupportedBLEUWBProtocolVersionsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Flow<ByteArraySubscriptionState> {
+  ): Flow<AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 133u
     val attributePaths =
       listOf(
@@ -6089,7 +6144,7 @@ class DoorLockCluster(private val controller: MatterController, private val endp
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            ByteArraySubscriptionState.Error(
+            AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -6108,17 +6163,27 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ByteArray? =
+          val decodedValue: List<ByteArray>? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getByteArray(AnonymousTag)
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
             } else {
               null
             }
 
-          decodedValue?.let { emit(ByteArraySubscriptionState.Success(it)) }
+          decodedValue?.let {
+            emit(AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.Success(it))
+          }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+          emit(
+            AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.SubscriptionEstablished
+          )
         }
       }
     }

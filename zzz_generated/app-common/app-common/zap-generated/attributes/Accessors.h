@@ -2480,22 +2480,12 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // 
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 } // namespace AliroReaderGroupSubIdentifier
 
-namespace AliroExpeditedTransactionSupportedProtocolVersions {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace AliroExpeditedTransactionSupportedProtocolVersions
-
 namespace AliroGroupResolvingKey {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
 EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
 } // namespace AliroGroupResolvingKey
-
-namespace AliroSupportedBLEUWBProtocolVersions {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace AliroSupportedBLEUWBProtocolVersions
 
 namespace AliroBLEAdvertisingVersion {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u

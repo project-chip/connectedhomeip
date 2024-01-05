@@ -12407,7 +12407,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AliroReaderGroupSubIdentifier", 1, value);
         }
         case DoorLock::Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
-            chip::ByteSpan value;
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AliroExpeditedTransactionSupportedProtocolVersions", 1, value);
         }
@@ -12417,7 +12417,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AliroGroupResolvingKey", 1, value);
         }
         case DoorLock::Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
-            chip::ByteSpan value;
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AliroSupportedBLEUWBProtocolVersions", 1, value);
         }

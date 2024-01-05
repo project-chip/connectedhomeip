@@ -23958,10 +23958,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.size()));
-            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.data()));
-            value = valueByteArray;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+                env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.data()));
+                newElement_0 = newElement_0ByteArray;
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
             return value;
         }
         case Attributes::AliroGroupResolvingKey::Id: {
@@ -23995,10 +24004,19 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            jbyteArray valueByteArray = env->NewByteArray(static_cast<jsize>(cppValue.size()));
-            env->SetByteArrayRegion(valueByteArray, 0, static_cast<jsize>(cppValue.size()),
-                                    reinterpret_cast<const jbyte *>(cppValue.data()));
-            value = valueByteArray;
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+                env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                        reinterpret_cast<const jbyte *>(entry_0.data()));
+                newElement_0 = newElement_0ByteArray;
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
             return value;
         }
         case Attributes::AliroBLEAdvertisingVersion::Id: {

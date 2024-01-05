@@ -32076,8 +32076,16 @@ public class ChipClusters {
       void onSuccess(@Nullable byte[] value);
     }
 
+    public interface AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
+    }
+
     public interface AliroGroupResolvingKeyAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable byte[] value);
+    }
+
+    public interface AliroSupportedBLEUWBProtocolVersionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<byte[]> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -33234,26 +33242,26 @@ public class ChipClusters {
     }
 
     public void readAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
-        OctetStringAttributeCallback callback) {
+        AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
@@ -33284,26 +33292,26 @@ public class ChipClusters {
     }
 
     public void readAliroSupportedBLEUWBProtocolVersionsAttribute(
-        OctetStringAttributeCallback callback) {
+        AliroSupportedBLEUWBProtocolVersionsAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeAliroSupportedBLEUWBProtocolVersionsAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        AliroSupportedBLEUWBProtocolVersionsAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<byte[]> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, ALIRO_SUPPORTED_B_L_E_U_W_B_PROTOCOL_VERSIONS_ATTRIBUTE_ID, minInterval, maxInterval);
     }

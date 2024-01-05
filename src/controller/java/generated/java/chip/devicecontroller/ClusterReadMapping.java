@@ -10243,10 +10243,10 @@ public class ClusterReadMapping {
         InteractionInfo readDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.DoorLockCluster) cluster).readAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
-              (ChipClusters.OctetStringAttributeCallback) callback
+              (ChipClusters.DoorLockCluster.AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedDoorLockClusterAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback(),
           readDoorLockAliroExpeditedTransactionSupportedProtocolVersionsCommandParams
         );
         result.put("readAliroExpeditedTransactionSupportedProtocolVersionsAttribute", readDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeInteractionInfo);
@@ -10265,10 +10265,10 @@ public class ClusterReadMapping {
         InteractionInfo readDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.DoorLockCluster) cluster).readAliroSupportedBLEUWBProtocolVersionsAttribute(
-              (ChipClusters.OctetStringAttributeCallback) callback
+              (ChipClusters.DoorLockCluster.AliroSupportedBLEUWBProtocolVersionsAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedDoorLockClusterAliroSupportedBLEUWBProtocolVersionsAttributeCallback(),
           readDoorLockAliroSupportedBLEUWBProtocolVersionsCommandParams
         );
         result.put("readAliroSupportedBLEUWBProtocolVersionsAttribute", readDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeInteractionInfo);

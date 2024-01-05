@@ -24721,14 +24721,13 @@ struct TypeInfo
 namespace AliroExpeditedTransactionSupportedProtocolVersions {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 16; }
 };
 } // namespace AliroExpeditedTransactionSupportedProtocolVersions
 namespace AliroGroupResolvingKey {
@@ -24747,14 +24746,13 @@ struct TypeInfo
 namespace AliroSupportedBLEUWBProtocolVersions {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AliroSupportedBLEUWBProtocolVersions::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
-    static constexpr size_t MaxLength() { return 16; }
 };
 } // namespace AliroSupportedBLEUWBProtocolVersions
 namespace AliroBLEAdvertisingVersion {
