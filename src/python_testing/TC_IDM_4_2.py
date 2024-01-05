@@ -340,7 +340,7 @@ class TC_IDM_4_2(MatterBaseTest):
         except ChipStackError as e:
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription to unallowed cluster")
+                                 "Incorrect error response for subscription to unallowed endpoint")
 
         '''
         ##########
@@ -379,7 +379,7 @@ class TC_IDM_4_2(MatterBaseTest):
         except ChipStackError as e:
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription to unallowed cluster")
+                                 "Incorrect error response for subscription to unallowed node")
 
         '''
         ##########
