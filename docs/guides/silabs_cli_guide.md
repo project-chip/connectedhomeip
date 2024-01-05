@@ -15,7 +15,7 @@ available.
 -   [Connecting to the device](#connecting-to-the-device)
     -   [Screen Utility](#screen-utility)
     -   [Tera Term](#tera-term)
--   [Commands List](#commands-list)
+-   [Command List](#command-list)
 -   [Application Specific Commands](#application-specific-commands)
 
 ## Enable the CLI Interfaces
