@@ -35,12 +35,12 @@ class TC_VCC_3_1(MatterBaseTest):
     def steps_TC_VCC_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, ""),
-            TestStep(3, ""),
-            TestStep(4, ""),
-            TestStep(5, ""),
-            TestStep(6, ""),
-            TestStep(7, ""),
+            TestStep(2, "Send Open command"),
+            TestStep(3, "Read TargetState attribute"),
+            TestStep(4, "Read CurrentState attribute"),
+            TestStep(5, "Send Close command"),
+            TestStep(6, "Read TargetState attribute"),
+            TestStep(7, "Read CurrentState attribute"),
         ]
         return steps
 
