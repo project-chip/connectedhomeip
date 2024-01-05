@@ -18,12 +18,13 @@
 import logging
 import random
 import time
+import copy
 
 import chip.clusters as Clusters
 from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
+from chip.interaction_model import Status, InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -70,6 +71,22 @@ class TC_IDM_4_2(MatterBaseTest):
                 Attribute=attribute
             )
         )
+    
+    async def get_dut_acl(self):
+        sub = await self.default_controller.ReadAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+            keepSubscriptions=False,
+            fabricFiltered=True
+        )
+        
+        acl_list = self.get_attribute_from_sub_dict(
+            sub=sub,
+            cluster=Clusters.AccessControl,
+            attribute=Clusters.AccessControl.Attributes.Acl
+        )
+        
+        return acl_list
 
     def is_uint32(self, var):
         return isinstance(var, int) and 0 <= var <= 4294967295
@@ -88,10 +105,22 @@ class TC_IDM_4_2(MatterBaseTest):
         node_label_attr_typed_path = self.get_typed_attribute_path(node_label_attr)
         SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT = 0
         INVALID_ACTION_ERROR_CODE = 0x580
+        same_min_max_interval_sec = 3
 
         # Controller 1 setup
         CR1: ChipDeviceController = self.default_controller
 
+        # Controller 2 setup
+        fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
+        CR2_nodeid = self.matter_test_config.controller_node_id + 1
+        CR2: ChipDeviceController = fabric_admin.NewController(
+            nodeId=CR2_nodeid,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+        )
+        
+        # Get DUT ACL
+        dut_acl_original = await self.get_dut_acl()
+        
         # Read ServerList attribute
         self.print_step("0a", "CR1 reads the Descriptor cluster ServerList attribute from EP0")
         ep0_servers = await self.get_descriptor_server_list(CR1)
@@ -189,35 +218,168 @@ class TC_IDM_4_2(MatterBaseTest):
 
         '''
         ##########
-        Step 3 - 6
+        Step 3
         ##########
         '''
-        # # TODO: How to trigger desired Status responses
+        self.print_step(3, "Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription message to subscribe to an attribute on that cluster for which it does not have access.")
 
-        # # Controller 2 Setup
-        # fabric_admin = self.certificate_authority_manager.activeCaList[0].adminList[0]
-        # CR2_nodeid = self.matter_test_config.controller_node_id + 1
-        # CR2 = fabric_admin.NewController(
-        #     nodeId=CR2_nodeid,
-        #     paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-        # )
+        # Limited ACE for controller 2 with single cluster access
+        CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
+            subjects=[CR2_nodeid])
 
-        # CR2_limited_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-        #     privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
-        #     authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-        #     subjects=[CR2_nodeid],
-        #     targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.Thermostat.id)]
-        # )
-        # await self.write_acl([CR2_limited_acl])
-        # cluster = Clusters.Descriptor
-        # attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        # await self.read_single_attribute_expect_error(
-        #     dev_ctrl=CR2,
-        #     endpoint=0,
-        #     cluster=cluster,
-        #     attribute=attribute,
-        #     error=Status.InvalidAction
-        # )
+        # Add controller 2 limited ACE to DUT ACL
+        dut_acl = copy.deepcopy(dut_acl_original)
+        dut_acl.append(CR2_limited_ace)
+
+        # Write updated DUT ACL into DUT
+        await CR1.WriteAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
+        )
+
+        # Controller 2 tries to subscribe an attribute from a cluster
+        # it doesn't have access to
+        # "INVALID_ACTION" status response expected
+        try:
+            await CR2.ReadAttribute(
+                nodeid=self.dut_node_id,
+                # Attribute from a cluster controller 2 has no access to
+                attributes=[(0, Clusters.AccessControl.Attributes.Acl)],
+                keepSubscriptions=False,
+                reportInterval=[3, 3],
+                autoResubscribe=False
+            )
+        except ChipStackError as e:
+            # Verify that the DUT returns an "INVALID_ACTION" status response
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+                                 "Incorrect error response for subscription to unallowed cluster")
+
+        '''
+        ##########
+        Step 4
+        ##########
+        '''
+        self.print_step(4, "Setup CR2 such that it does not have access to all attributes on a specific cluster and endpoint. CR2 sends a subscription request to subscribe to all attributes for which it does not have access.")
+
+        # Limited ACE for controller 2 with single cluster access
+        CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
+            subjects=[CR2_nodeid])
+
+        # Add controller 2 limited ACE to DUT ACL
+        dut_acl = copy.deepcopy(dut_acl_original)
+        dut_acl.append(CR2_limited_ace)
+
+        # Write updated DUT ACL into DUT
+        await CR1.WriteAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
+        )
+
+        # Controller 2 tries to subscribe to all attributes from a cluster
+        # it doesn't have access to
+        # "INVALID_ACTION" status response expected
+        try:
+            await CR2.ReadAttribute(
+                nodeid=self.dut_node_id,
+                # Cluster controller 2 has no access to
+                attributes=[(0, Clusters.AccessControl)],
+                keepSubscriptions=False,
+                reportInterval=[3, 3],
+                autoResubscribe=False
+            )
+        except ChipStackError as e:
+            # Verify that the DUT returns an "INVALID_ACTION" status response
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+                                 "Incorrect error response for subscription to unallowed cluster")
+
+        '''
+        ##########
+        Step 5
+        ##########
+        '''
+        self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
+
+        # Limited ACE for controller 2 with endpoint 1 access only
+        CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=1,
+                cluster=Clusters.BasicInformation.id
+                )],
+            subjects=[CR2_nodeid])
+
+        # Add controller 2 limited ACE to DUT ACL
+        dut_acl = copy.deepcopy(dut_acl_original)
+        dut_acl.append(CR2_limited_ace)
+
+        # Write updated DUT ACL into DUT
+        await CR1.WriteAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
+        )
+
+        # Controller 2 tries to subscribe to all attributes from all clusters
+        # on an endpoint it doesn't have access to
+        # "INVALID_ACTION" status response expected
+        try:
+            await CR2.ReadAttribute(
+                nodeid=self.dut_node_id,
+                # Endpoint controller 2 has no access to
+                attributes=[(0)],
+                keepSubscriptions=False,
+                reportInterval=[3, 3],
+                autoResubscribe=False
+            )
+        except ChipStackError as e:
+            # Verify that the DUT returns an "INVALID_ACTION" status response
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+                                 "Incorrect error response for subscription to unallowed cluster")
+
+        '''
+        ##########
+        Step 6
+        ##########
+        '''
+        self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
+
+        # ???????????????????????????????????????????
+        # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it?
+        # ???????????????????????????????????????????
+
+        # Add controller 2 limited ACE to DUT ACL
+        dut_acl = copy.deepcopy(dut_acl_original)
+
+        # Write updated DUT ACL into DUT
+        await CR1.WriteAttribute(
+            nodeid=self.dut_node_id,
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
+        )
+        
+        # Controller 2 tries to subscribe to all attributes from all clusters
+        # from all endpoints on a node it doesn't have access to
+        # "INVALID_ACTION" status response expected
+        try:
+            await CR2.ReadAttribute(
+                # ???????????????????????????????????????????
+                # Node controller 2 has no access to?
+                # ???????????????????????????????????????????
+                nodeid=self.dut_node_id,
+                attributes=[],
+                keepSubscriptions=False,
+                reportInterval=[3, 3],
+                autoResubscribe=False
+            )
+        except ChipStackError as e:
+            # Verify that the DUT returns an "INVALID_ACTION" status response
+            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+                                 "Incorrect error response for subscription to unallowed cluster")
 
         '''
         ##########
@@ -268,13 +430,12 @@ class TC_IDM_4_2(MatterBaseTest):
         ##########
         '''
         self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the Subscription between CR1 and DUT. Modify the attribute which has been subscribed to on the DUT.")
-        min_max_interval_sec = 3
 
         # Subscribe to attribute
         sub_cr1_update_value = await CR1.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=node_label_attr_path,
-            reportInterval=(min_max_interval_sec, min_max_interval_sec),
+            reportInterval=(same_min_max_interval_sec, same_min_max_interval_sec),
             keepSubscriptions=False
         )
 
@@ -286,7 +447,7 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
         # Wait MinIntervalFloor seconds before reading updated attribute value
-        time.sleep(min_max_interval_sec)
+        time.sleep(same_min_max_interval_sec)
         new_node_label_read = sub_cr1_update_value.GetAttribute(node_label_attr_typed_path)
 
         # Verify new attribute value after MinIntervalFloor time
