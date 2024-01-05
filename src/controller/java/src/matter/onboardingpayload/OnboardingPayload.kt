@@ -319,7 +319,7 @@ class OnboardingPayload(
     val info = OptionalQRCodeInfoExtension()
     info.tag = kSerialNumberTag
     info.type = OptionalQRCodeInfoType.TYPE_UINT32
-    info.uint32 = serialNumber.toLong()
+    info.uint32 = serialNumber.toUInt()
 
     addOptionalExtensionData(info)
   }

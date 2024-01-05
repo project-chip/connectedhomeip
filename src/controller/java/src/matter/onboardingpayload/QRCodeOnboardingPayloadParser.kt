@@ -110,7 +110,7 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
         info.type = OptionalQRCodeInfoType.TYPE_INT32
       }
       if (value is UnsignedIntValue) {
-        info.uint32 = value.value
+        info.uint32 = value.value.toUInt()
         info.type = OptionalQRCodeInfoType.TYPE_UINT32
       }
       if (value is Utf8StringValue) {

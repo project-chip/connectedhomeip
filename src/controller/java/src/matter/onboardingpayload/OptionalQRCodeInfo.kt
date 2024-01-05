@@ -52,8 +52,8 @@ open class OptionalQRCodeInfo {
 
 class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
   var int64: Long = 0
-  var uint32: Long = 0
-  var uint64: Long = 0
+  var uint32: UInt = 0u
+  var uint64: ULong = 0u
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
