@@ -940,12 +940,12 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationCompleteMethod;
-    jclass icdDeviceInfoClass = nullptr;
+    jclass icdDeviceInfoClass         = nullptr;
     jmethodID icdDeviceInfoStructCtor = nullptr;
-    jobject icdDeviceInfoObj = nullptr;
-    jbyteArray jSymmetricKey = nullptr;
-    err                      = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(IJJLchip/devicecontroller/ICDDeviceInfo;)V",
-                                                                       &onICDRegistrationCompleteMethod);
+    jobject icdDeviceInfoObj          = nullptr;
+    jbyteArray jSymmetricKey          = nullptr;
+    err                               = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+                                                                                "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
     err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
@@ -961,7 +961,8 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey);
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), icdDeviceInfoObj);
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
+                        static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
