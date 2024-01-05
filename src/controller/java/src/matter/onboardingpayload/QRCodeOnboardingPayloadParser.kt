@@ -102,8 +102,9 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       if (tag is ContextSpecificTag) {
         info.tag = tag.tagNumber
       }
-      val value = element.value
+
       // update values
+      val value = element.value
       if (value is IntValue) {
         info.int32 = value.value.toInt()
         info.type = OptionalQRCodeInfoType.TYPE_INT32
