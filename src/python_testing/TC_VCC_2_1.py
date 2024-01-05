@@ -36,14 +36,14 @@ class TC_VCC_2_1(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read attribute list to determine supported attributes"),
             TestStep(3, "Read OpenDuration attribute, if supported"),
-            TestStep(4, "Read AutoCloseTime attribute, if supported"),
-            TestStep(5, "Read RemainingDuration attribute, if supported"),
-            TestStep(6, "Read CurrentState attribute, if supported"),
-            TestStep(7, "Read TargetState attribute, if supported"),
-            TestStep(8, "Read StartUpState attribute, if supported"),
+            TestStep(4, "Read DefaultOpenDuration attribute, if supported"),
+            TestStep(5, "Read AutoCloseTime attribute, if supported"),
+            TestStep(6, "Read RemainingDuration attribute, if supported"),
+            TestStep(7, "Read CurrentState attribute, if supported"),
+            TestStep(8, "Read TargetState attribute, if supported"),
             TestStep(9, "Read CurrentLevel attribute, if supported"),
             TestStep(10, "Read TargetLevel attribute, if supported"),
-            TestStep(11, "Read OpenLevel attribute, if supported"),
+            TestStep(11, "Read DefaultOpenLevel attribute, if supported"),
             TestStep(12, "Read ValveFault attribute, if supported")
         ]
         return steps
@@ -76,6 +76,16 @@ class TC_VCC_2_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(4)
+        if attributes.DefaultOpenDuration.attribute_id in attribute_list:
+            default_open_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+
+            if default_open_duration_dut is not NullValue:
+                asserts.assert_less_equal(default_open_duration_dut, 0xFFFFFFFE, "DefaultOpenDuration attribute is out of range")
+                asserts.assert_greater_equal(default_open_duration_dut, 1, "DefaultOpenDuration attribute is out of range")
+        else:
+            logging.info("Test step skipped")
+
+        self.step(5)
         if attributes.AutoCloseTime.attribute_id in attribute_list:
             auto_close_time_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
@@ -84,7 +94,7 @@ class TC_VCC_2_1(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step(5)
+        self.step(6)
         if attributes.RemainingDuration.attribute_id in attribute_list:
             remaining_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
 
@@ -94,7 +104,7 @@ class TC_VCC_2_1(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step(6)
+        self.step(7)
         if attributes.CurrentState.attribute_id in attribute_list:
             current_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
@@ -104,22 +114,13 @@ class TC_VCC_2_1(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step(7)
+        self.step(8)
         if attributes.TargetState.attribute_id in attribute_list:
             target_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
             if target_state_dut is not NullValue:
                 asserts.assert_less(target_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kUnknownEnumValue,
                                     "TargetState is not in valid range")
-        else:
-            logging.info("Test step skipped")
-
-        self.step(8)
-        if attributes.StartUpState.attribute_id in attribute_list:
-            start_up_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.StartUpState)
-
-            asserts.assert_less(start_up_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kUnknownEnumValue,
-                                "StartUpState is not in valid range")
         else:
             logging.info("Test step skipped")
 
@@ -144,12 +145,12 @@ class TC_VCC_2_1(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step(11)
-        if attributes.OpenLevel.attribute_id in attribute_list:
-            open_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenLevel)
+        if attributes.DefaultOpenLevel.attribute_id in attribute_list:
+            default_open_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenLevel)
 
-            if open_level_dut is not NullValue:
-                asserts.assert_less_equal(open_level_dut, 100, "OpenLevel attribute is out of range")
-                asserts.assert_greater_equal(open_level_dut, 1, "OpenLevel attribute is out of range")
+            if default_open_level_dut is not NullValue:
+                asserts.assert_less_equal(default_open_level_dut, 100, "DefaultOpenLevel attribute is out of range")
+                asserts.assert_greater_equal(default_open_level_dut, 1, "DefaultOpenLevel attribute is out of range")
         else:
             logging.info("Test step skipped")
 
