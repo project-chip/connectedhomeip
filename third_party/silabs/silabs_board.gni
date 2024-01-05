@@ -51,9 +51,6 @@ declare_args() {
 
   # Self-provision enabled
   use_provision_channel = false
-
-  # Board required .rps file to flash instead of .s37
-  use_rps_extension = false
 }
 
 declare_args() {
@@ -114,7 +111,6 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   silabs_board_lower = "brd4325b"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4325C") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -123,7 +119,6 @@ if (silabs_board == "BRD4304A") {
   wifi_soc = true
   wifi_soc_common_flash = true
   silabs_board_lower = "brd4325c"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4325G") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -132,7 +127,6 @@ if (silabs_board == "BRD4304A") {
   wifi_soc = true
   wifi_soc_common_flash = true
   silabs_board_lower = "brd4325g"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -141,7 +135,6 @@ if (silabs_board == "BRD4304A") {
   wifi_soc = true
   wifi_soc_common_flash = true
   silabs_board_lower = "brd4338a"
-  use_rps_extension = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -214,6 +207,14 @@ if (silabs_board == "BRD4304A") {
   assert(
       false,
       "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
+}
+
+declare_args() {
+  # Wifi SoC Board require a .rps file to be flashed to the device to run
+  # this rps file is created from the built binary but it requires Silabs Commander tool
+  # User can set this arg to false to skip the rps creation for WiFi SoCs.
+  # e.g. for CI
+  use_rps_extension = wifi_soc
 }
 
 # qr code cannot be true if lcd is disabled
