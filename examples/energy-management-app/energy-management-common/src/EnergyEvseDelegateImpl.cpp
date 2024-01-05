@@ -48,9 +48,10 @@ Status EnergyEvseDelegate::Disable()
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Disable()");
 
+    DataModel::Nullable<uint32_t> disableTime(0);
     /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 */
-    SetChargingEnabledUntil(0);
-    SetDischargingEnabledUntil(0);
+    SetChargingEnabledUntil(disableTime);
+    SetDischargingEnabledUntil(disableTime);
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
     SetMinimumChargeCurrent(0);
@@ -96,12 +97,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
     {
         /* Charging enabled indefinitely */
         ChipLogError(AppServer, "Charging enabled indefinitely");
+        SetChargingEnabledUntil(chargingEnabledUntil);
     }
     else
     {
         /* check chargingEnabledUntil is in the future */
         ChipLogError(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
-        SetChargingEnabledUntil(chargingEnabledUntil.Value());
+        SetChargingEnabledUntil(chargingEnabledUntil);
         // TODO start a timer to disable charging later
         // if (checkChargingEnabled)
     }
@@ -944,17 +946,25 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetChargingEnabledUntil()
     return mChargingEnabledUntil;
 }
 
-CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(uint32_t newValue)
+CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
 {
     DataModel::Nullable<uint32_t> oldValue = mChargingEnabledUntil;
 
-    mChargingEnabledUntil = MakeNullable(newValue);
-    if ((oldValue.IsNull()) || (oldValue.Value() != newValue))
+    mChargingEnabledUntil = newValue;
+    if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu",
-                      static_cast<unsigned long int>(mChargingEnabledUntil.Value()));
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "ChargingEnabledUntil updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu",
+                          static_cast<unsigned long int>(mChargingEnabledUntil.Value()));
+        }
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -964,17 +974,25 @@ DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetDischargingEnabledUntil()
     return mDischargingEnabledUntil;
 }
 
-CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(uint32_t newValue)
+CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(DataModel::Nullable<uint32_t> newValue)
 {
     DataModel::Nullable<uint32_t> oldValue = mDischargingEnabledUntil;
 
-    mDischargingEnabledUntil = MakeNullable(newValue);
-    if ((oldValue.IsNull()) || (oldValue.Value() != newValue))
+    mDischargingEnabledUntil = newValue;
+    if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu",
-                      static_cast<unsigned long int>(mDischargingEnabledUntil.Value()));
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "DischargingEnabledUntil updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu",
+                          static_cast<unsigned long int>(mDischargingEnabledUntil.Value()));
+        }
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -1092,6 +1110,8 @@ CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
     if (oldValue != newValue)
     {
         ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(mUserMaximumChargeCurrent));
+
+        ComputeMaxChargeCurrentLimit();
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
     }
 

@@ -166,10 +166,10 @@ public:
     CHIP_ERROR SetFaultState(FaultStateEnum);
 
     DataModel::Nullable<uint32_t> GetChargingEnabledUntil() override;
-    CHIP_ERROR SetChargingEnabledUntil(uint32_t);
+    CHIP_ERROR SetChargingEnabledUntil(DataModel::Nullable<uint32_t>);
 
     DataModel::Nullable<uint32_t> GetDischargingEnabledUntil() override;
-    CHIP_ERROR SetDischargingEnabledUntil(uint32_t);
+    CHIP_ERROR SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>);
 
     int64_t GetCircuitCapacity() override;
     CHIP_ERROR SetCircuitCapacity(int64_t);
