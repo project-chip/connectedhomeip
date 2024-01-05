@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package com.rachio.prov.matter.thirdparty
+package matter.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
 import matter.onboardingpayload.CommissioningFlow
@@ -240,8 +240,7 @@ class QRCodeTest {
   @Test
   fun testInvalidQRCodePayload_wrongCharacterSet() {
     var invalidString = kDefaultPayloadQRCode
-    invalidString =
-      invalidString.dropLast(1) + " " // space is not contained in the base38 alphabet
+    invalidString = invalidString.dropLast(1) + " " // space is not contained in the base38 alphabet
 
     try {
       QRCodeOnboardingPayloadParser(invalidString).populatePayload()
