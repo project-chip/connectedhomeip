@@ -606,7 +606,8 @@ public class ChipDeviceController {
     }
   }
 
-  public void onICDRegistrationComplete(int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo) {
+  public void onICDRegistrationComplete(
+      int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo) {
     if (completionListener != null) {
       completionListener.onICDRegistrationComplete(errorCode, icdNodeId, icdCounter, icdDeviceInfo);
     }
@@ -1620,6 +1621,7 @@ public class ChipDeviceController {
     void onICDRegistrationInfoRequired();
 
     /** Notifies when the registration flow for the ICD completes. */
-    void onICDRegistrationComplete(int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo);
+    void onICDRegistrationComplete(
+        int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo);
   }
 }

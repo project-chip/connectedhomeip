@@ -19,14 +19,14 @@ package chip.devicecontroller;
 
 /** Class for holding ICD Device information. */
 public class ICDDeviceInfo {
-    private byte[] symmetricKey;
+  private byte[] symmetricKey;
 
-    public ICDDeviceInfo(byte[] symmetricKey) {
-        this.symmetricKey = symmetricKey;
-    }
+  public ICDDeviceInfo(byte[] symmetricKey) {
+    this.symmetricKey = symmetricKey;
+  }
 
-    /** Returns the 16 bytes ICD symmetric key. */
-    public byte[] getSymmetricKey() {
-        return symmetricKey;
-    }
+  /** Returns the 16 bytes ICD symmetric key. */
+  public byte[] getSymmetricKey() {
+    return symmetricKey;
+  }
 }
