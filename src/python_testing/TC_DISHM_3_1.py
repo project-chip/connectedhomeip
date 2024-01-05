@@ -50,7 +50,6 @@ class TC_DISHM_3_1(MatterBaseTest):
         return ret
 
     async def check_for_valid_mode(self, endpoint, mode):
-        cluster = Clusters.Objects.DishwasherMode
         attr = Clusters.DishwasherMode.Attributes.SupportedModes
         supported_modes = await self.read_mode_attribute_expect_success(endpoint=endpoint, attribute=attr)
 
