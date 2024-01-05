@@ -63,7 +63,7 @@ public:
      * new key to avoid counter rollover problems.
      *
      * @param[in] context context of the client establishing the CASE session
-     * @param[in] peerId Node ID of the peer node
+     * @param[in] peerId Scoped Node ID of the peer node
      * @param[in] err failure reason
      */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);

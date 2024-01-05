@@ -31,9 +31,6 @@
 namespace chip {
 namespace app {
 
-// 4 bytes for counter + 2 bytes for ActiveModeThreshold
-inline constexpr uint8_t kAppDataLength = 6;
-
 using namespace Protocols::SecureChannel;
 /**
  * The ICDClientStorage class is an abstract interface that defines the operations
@@ -85,6 +82,9 @@ public:
      * @param[out] counter counter value received in the CheckIn message
      */
     virtual CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) = 0;
+
+    // 4 bytes for counter + 2 bytes for ActiveModeThreshold
+    static inline constexpr uint8_t kAppDataLength = 6;
 };
 } // namespace app
 } // namespace chip
