@@ -563,6 +563,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     mDeviceNameLength = strlen(mDeviceName); // Device Name length + length field
     VerifyOrExit(mDeviceNameLength < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert((3 + (2 + CHIP_ADV_SHORT_UUID_LEN) + (2 + kMaxDeviceNameLength)) <= MAX_RESPONSE_DATA_LEN,
+                  "Scan Response buffer is too small"); // 1 byte TLV(3) + UUID TLV(4) + Name TLV
 
     mDeviceIdInfoLength = sizeof(mDeviceIdInfo); // Servicedatalen + length+ UUID (Short)
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");
