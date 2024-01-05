@@ -90,7 +90,7 @@ sample applications for different device-types
 
 ### Build Script
 
-To build a Silicon Lbas sample apps, we provide the `gn_silabs_examples.sh`
+To build a Silicon Labs sample apps, we provide the `gn_silabs_examples.sh`
 scripts that can be found in the `./scripts/examples` directory. The build
 script can be used to build all of the Silabs supported examples. The command
 structure is as follows when called from the root of the repository:
@@ -180,12 +180,12 @@ command.
 |      GN argument       | Description                                                                                                                    | Default Value                  |
 | :--------------------: | :----------------------------------------------------------------------------------------------------------------------------- | :----------------------------- |
 |  chip_build_libshell   | Enables the Matter Shell                                                                                                       | false                          |
-|  chip_openthread_ftd   | Defines if the Opentread device is an FTD (true) or an MTD (false)                                                             | true                           |
+|  chip_openthread_ftd   | Defines if the OpenTread device is an FTD (true) or an MTD (false)                                                             | true                           |
 |     efr32_sdk_root     | Location for an alternate Gecko SDK                                                                                            | ./third_party/silabs/gecko_sdk |
 | enable_heap_monitoring | Monitor & log memory usage at runtime                                                                                          | false                          |
 | enable_openthread_cli  | Enables the OpenThread cli                                                                                                     | true                           |
 |    kvs_max_entries     | Set the maximum KVS entries that can be stored in NVM <br /> Thresholds: 30 <= kvs_max_entries <= 255                          | 255                            |
-| chip_enable_icd_server | Configure device as an Intermitently connected device <br /> For Thread builds, chip_openthread_ftd must also be set to false. | false                          |
+| chip_enable_icd_server | Configure device as an intermittently connected device <br /> For Thread builds, chip_openthread_ftd must also be set to false. | false                          |
 |      disable_lcd       | Disable the LCD on devices with an LCD                                                                                         | false                          |
 |      show_qr_code      | Enables QR code on LCD for devices with an LCD                                                                                 | true                           |
 

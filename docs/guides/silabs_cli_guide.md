@@ -71,7 +71,7 @@ screen /dev/cu.usbmodem0004403048491 115200 8-N-1
 
 See the
 [Tera Term guide](https://siliconlabs.github.io/matter/latest/wifi/MATTER_SHELL.html)
-on how to connect to the deivce on Windows.
+on how to connect to the device on Windows.
 
 ## Command List
 

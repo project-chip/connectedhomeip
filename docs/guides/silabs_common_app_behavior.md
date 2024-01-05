@@ -62,7 +62,7 @@ devices.
 
 | LCD UI  | Description                                              |
 | :-----: | :------------------------------------------------------- |
-|  PANID  | Indicates the panid of the configured openthread network |
+|  PANID  | Indicates the PANID of the configured openthread network |
 | OT Type | Indicates the openthread device type (FTD / MTD)         |
 
 > **Note:** The PANID information is not yet printed on the LCD.
