@@ -16,7 +16,6 @@
 #
 
 import logging
-from random import choice
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -25,7 +24,7 @@ from mobly import asserts
 
 
 class TC_BOOLCFG_4_3(MatterBaseTest):
-    async def read_attribute_expect_success(self, endpoint, attribute):
+    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.BooleanStateConfiguration
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -79,13 +78,13 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step("2a")
-        feature_map = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
         is_aud_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible
 
         self.step("2b")
-        attribute_list = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        attribute_list = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         self.step(3)
         if attributes.AlarmsEnabled.attribute_id not in attribute_list:
@@ -168,7 +167,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(7)
         if is_vis_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0b01, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -182,7 +181,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(9)
         if is_vis_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -206,7 +205,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(13)
         if is_vis_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -240,7 +239,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(17)
         if is_aud_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0b10, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -254,7 +253,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(19)
         if is_aud_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
@@ -278,7 +277,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(23)
         if is_aud_feature_supported:
-            activeAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
+            activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
             asserts.assert_equal(activeAlarms, 0, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")

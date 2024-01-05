@@ -16,7 +16,6 @@
 #
 
 import logging
-from random import choice
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
@@ -25,7 +24,7 @@ from mobly import asserts
 
 
 class TC_BOOLCFG_4_1(MatterBaseTest):
-    async def read_attribute_expect_success(self, endpoint, attribute):
+    async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.BooleanStateConfiguration
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
@@ -59,7 +58,7 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.step(2)
-        feature_map = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
         is_aud_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible
@@ -68,7 +67,7 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
 
         self.step(3)
         if is_vis_feature_supported or is_aud_feature_supported:
-            supportedAlarms = await self.read_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
+            supportedAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
         else:
             logging.info("Test step skipped")
 
