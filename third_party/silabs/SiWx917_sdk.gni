@@ -442,9 +442,9 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
 
       # OTA
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/hal/src/sl_si91x_hal_soc_soft_reset.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/firmware_upgrade/firmware_upgradation.c",
     ]
 
     if (!disable_lcd) {
