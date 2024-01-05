@@ -39,7 +39,6 @@ An example RPC command:
 import argparse
 import logging
 import re
-import socket
 import sys
 import time
 import threading
@@ -53,7 +52,6 @@ from chip_rpc.plugins.device_toolbar import DeviceToolbar
 from chip_rpc.plugins.helper_scripts import HelperScripts
 from pw_console import PwConsoleEmbed
 from pw_console import socket_client
-from pw_console import pyserial_wrapper
 from pw_console.__main__ import create_temp_log_file
 from pw_console.pyserial_wrapper import SerialWithLogging
 from pw_hdlc.rpc import HdlcRpcClient, default_channels, SerialReader, SelectableReader
@@ -314,24 +312,8 @@ def console(device: str, baudrate: int,
         reader = SerialReader(serial_device, 8192)
         write = serial_device.write
     else:
-        def disconnect_handler(
-            socket_device: socket_client.SocketClient,
-        ) -> None:
-            """Attempts to reconnect on disconnected socket."""
-            _LOG.error('Socket disconnected. Will retry to connect.')
-            while True:
-                try:
-                    socket_device.connect()
-                    break
-                except:  # pylint: disable=bare-except
-                    # Ignore errors and retry to reconnect.
-                    time.sleep(1)
-            _LOG.info('Successfully reconnected')
-
         try:
-            socket_device = socket_client.SocketClient(
-                socket_addr, on_disconnect=disconnect_handler
-            )
+            socket_device = socket_client.SocketClient(socket_addr)
             reader = SelectableReader(socket_device)
             write = socket_device.write
         except ValueError:
