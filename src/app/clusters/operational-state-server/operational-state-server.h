@@ -331,7 +331,9 @@ namespace RvcOperationalState {
 
 class Delegate : public OperationalState::Delegate {
 public:
-    virtual void HandleGoHome(OperationalState::GenericOperationalError & err) = 0;
+    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
 };
 
 class Instance : public OperationalState::Instance

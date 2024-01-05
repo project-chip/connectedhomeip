@@ -488,7 +488,7 @@ void RvcOperationalState::Instance::HandleGoHomeCommand(HandlerContext & ctx, co
 
     if (err.errorStateID == 0 && opState != to_underlying(OperationalStateEnum::kSeekingCharger))
     {
-        mDelegate->HandleGoHome(err);
+        mDelegate->HandleGoHomeCommandCallback(err);
     }
 
     Commands::OperationalCommandResponse::Type response;
