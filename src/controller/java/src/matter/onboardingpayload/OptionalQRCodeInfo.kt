@@ -43,25 +43,23 @@ class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
     if (other !is OptionalQRCodeInfoExtension) return false
 
     return tag == other.tag &&
-        type == other.type &&
-        data == other.data &&
-        int32 == other.int32 &&
-        int64 == other.int64 &&
-        uint32 == other.uint32 &&
-        uint64 == other.uint64
+      type == other.type &&
+      data == other.data &&
+      int32 == other.int32 &&
+      int64 == other.int64 &&
+      uint32 == other.uint32 &&
+      uint64 == other.uint64
   }
-
 
   override fun toString(): String {
     return "OptionalQRCodeInfoExtension(" +
-        "tag=$tag, " +
-        "type=$type, " +
-        "data=$data, " +
-        "int32=$int32, " +
-        "int64=$int64, " +
-        "uint32=$uint32, " +
-        "uint64=$uint64" +
-        ")"
+      "tag=$tag, " +
+      "type=$type, " +
+      "data=$data, " +
+      "int32=$int32, " +
+      "int64=$int64, " +
+      "uint32=$uint32, " +
+      "uint64=$uint64" +
+      ")"
   }
-
 }

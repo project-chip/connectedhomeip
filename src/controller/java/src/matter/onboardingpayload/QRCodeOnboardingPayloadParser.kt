@@ -17,20 +17,19 @@
 
 package matter.onboardingpayload
 
+import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicInteger
 import matter.tlv.ContextSpecificTag
 import matter.tlv.IntValue
 import matter.tlv.TlvReader
 import matter.tlv.UnsignedIntValue
 import matter.tlv.Utf8StringValue
-import java.nio.ByteBuffer
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * @class QRCodeOnboardingPayloadParser A class that can be used to convert a base38 encoded payload
  *   to a OnboardingPayload object
  */
 class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
-
 
   fun populatePayload(): OnboardingPayload {
     val indexToReadFrom = AtomicInteger(0)
@@ -99,12 +98,12 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       val info = OptionalQRCodeInfoExtension()
 
       element.let {
-        //update tag
+        // update tag
         if (it.tag is ContextSpecificTag) {
           info.tag = it.tag.tagNumber
         }
 
-        //update values
+        // update values
         if (it.value is IntValue) {
           info.int32 = it.value.value.toInt()
           info.type = OptionalQRCodeInfoType.TYPE_INT32
@@ -125,7 +124,6 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
         payload.addOptionalVendorData(info)
       }
     }
-
   }
 
   companion object {
