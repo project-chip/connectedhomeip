@@ -97,30 +97,28 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       }
       val info = OptionalQRCodeInfoExtension()
 
-      element.let { e ->
-        // update tag
-        if (e.tag is ContextSpecificTag) {
-          e.tag.let { info.tag = it.tagNumber }
-        }
+      // update tag
+      if (element.tag is ContextSpecificTag) {
+        element.tag.let { info.tag = it.tagNumber }
+      }
 
-        // update values
-        if (e.value is IntValue) {
-          e.value.let {
-            info.int32 = it.value.toInt()
-            info.type = OptionalQRCodeInfoType.TYPE_INT32
-          }
+      // update values
+      if (element.value is IntValue) {
+        element.value.let {
+          info.int32 = it.value.toInt()
+          info.type = OptionalQRCodeInfoType.TYPE_INT32
         }
-        if (e.value is UnsignedIntValue) {
-          e.value.let {
-            info.uint32 = it.value
-            info.type = OptionalQRCodeInfoType.TYPE_UINT32
-          }
+      }
+      if (element.value is UnsignedIntValue) {
+        element.value.let {
+          info.uint32 = it.value
+          info.type = OptionalQRCodeInfoType.TYPE_UINT32
         }
-        if (e.value is Utf8StringValue) {
-          e.value.let {
-            info.data = it.value
-            info.type = OptionalQRCodeInfoType.TYPE_STRING
-          }
+      }
+      if (element.value is Utf8StringValue) {
+        element.value.let {
+          info.data = it.value
+          info.type = OptionalQRCodeInfoType.TYPE_STRING
         }
       }
 
