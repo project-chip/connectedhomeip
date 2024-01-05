@@ -253,17 +253,11 @@ int32_t wfx_wifi_rsi_init(void)
  * @return
  *        None
  *****************************************************************************************/
-static void sl_print_firmware_version(sl_wifi_firmware_version_t *firmware_version)
+static void sl_print_firmware_version(sl_wifi_firmware_version_t * firmware_version)
 {
-  SILABS_LOG("Firmware version is: %x%x.%d.%d.%d.%d.%d.%d",
-         firmware_version->chip_id,
-         firmware_version->rom_id,
-         firmware_version->major,
-         firmware_version->minor,
-         firmware_version->security_version,
-         firmware_version->patch_num,
-         firmware_version->customer_id,
-         firmware_version->build_num);
+    SILABS_LOG("Firmware version is: %x%x.%d.%d.%d.%d.%d.%d", firmware_version->chip_id, firmware_version->rom_id,
+               firmware_version->major, firmware_version->minor, firmware_version->security_version, firmware_version->patch_num,
+               firmware_version->customer_id, firmware_version->build_num);
 }
 
 /*************************************************************************************
@@ -287,8 +281,8 @@ static sl_status_t wfx_rsi_init(void)
     }
 #endif
 
-    sl_wifi_firmware_version_t  version = { 0 };
-    status                           = sl_wifi_get_firmware_version(&version);
+    sl_wifi_firmware_version_t version = { 0 };
+    status                             = sl_wifi_get_firmware_version(&version);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("Get fw version failed:");
