@@ -31,6 +31,23 @@ open class OptionalQRCodeInfo {
   var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
   var data: String? = null
   var int32: Int = 0
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is OptionalQRCodeInfo) return false
+
+    return tag == other.tag && type == other.type && data == other.data && int32 == other.int32
+
+    return true
+  }
+
+  override fun hashCode(): Int {
+    var result = tag
+    result = 31 * result + type.hashCode()
+    result = 31 * result + (data?.hashCode() ?: 0)
+    result = 31 * result + int32
+    return result
+  }
 }
 
 class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
@@ -40,15 +57,11 @@ class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
+    if (javaClass != other?.javaClass) return false
+    if (!super.equals(other)) return false
     if (other !is OptionalQRCodeInfoExtension) return false
 
-    return tag == other.tag &&
-      type == other.type &&
-      data == other.data &&
-      int32 == other.int32 &&
-      int64 == other.int64 &&
-      uint32 == other.uint32 &&
-      uint64 == other.uint64
+    return int64 == other.int64 && uint32 == other.uint32 && uint64 == other.uint64
   }
 
   override fun toString(): String {
@@ -64,10 +77,7 @@ class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
   }
 
   override fun hashCode(): Int {
-    var result = tag.hashCode()
-    result = 31 * result + type.hashCode()
-    result = 31 * result + data.hashCode()
-    result = 31 * result + int32.hashCode()
+    var result = super.hashCode()
     result = 31 * result + int64.hashCode()
     result = 31 * result + uint32.hashCode()
     result = 31 * result + uint64.hashCode()
