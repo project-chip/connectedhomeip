@@ -180,7 +180,7 @@ command.
 |      GN argument       | Description                                                                                                                     | Default Value                  |
 | :--------------------: | :------------------------------------------------------------------------------------------------------------------------------ | :----------------------------- |
 |  chip_build_libshell   | Enables the Matter Shell                                                                                                        | false                          |
-|  chip_openthread_ftd   | Defines if the OpenThread device is an FTD (true) or an MTD (false)                                                              | true                           |
+|  chip_openthread_ftd   | Defines if the OpenThread device is an FTD (true) or an MTD (false)                                                             | true                           |
 |     efr32_sdk_root     | Location for an alternate Gecko SDK                                                                                             | ./third_party/silabs/gecko_sdk |
 | enable_heap_monitoring | Monitor & log memory usage at runtime                                                                                           | false                          |
 | enable_openthread_cli  | Enables the OpenThread cli                                                                                                      | true                           |
