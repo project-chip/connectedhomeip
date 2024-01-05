@@ -37,13 +37,15 @@ class TC_DISHM_3_3(MatterBaseTest):
                             "Unexpected return type for ChangeToMode")
         return ret
 
-    async def write_on_mode(self, newMode):
+    async def write_on_mode_expect_success(self, newMode):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.OnMode(newMode))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnMode failed")
+        return ret
 
     async def write_startup_onoff(self) -> Clusters.Objects.OnOff.Commands.Off:
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.OnOff.Attributes.StartUpOnOff(1))])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to OnOff failed")
+        return ret
 
     @async_test_body
     async def test_TC_DISHM_3_3(self):
@@ -133,8 +135,7 @@ class TC_DISHM_3_3(MatterBaseTest):
 
             self.print_step(7, "Write to OnMode attribute with NewMode set to %d" % (new_mode_th))
 
-            ret = await self.write_on_mode(newMode=new_mode_th)
-            asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the Onmode should succeed")
+            ret = await self.write_on_mode_expect_success(newMode=new_mode_th)
 
         self.print_step(8, "Read OnMode attribute")
 
