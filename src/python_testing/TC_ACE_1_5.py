@@ -63,9 +63,10 @@ class TC_ACE_1_5(MatterBaseTest):
 
     @async_test_body
     async def test_TC_ACE_1_5(self):
-        self.print_step(1, "Comissioning, already done ")
+        self.print_step(1, "Comissioning, already done")
         self.th1 = self.default_controller
 
+        # TODO: Creates a controller on a new fabric and commissions all in one go.
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 

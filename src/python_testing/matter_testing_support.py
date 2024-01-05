@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import random
 import argparse
 import asyncio
 import builtins
@@ -26,6 +25,7 @@ import math
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
@@ -719,8 +719,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
             return params
 
-        except Exception as e:
-            asserts.fail('Failed to open commissioning window: %s', e)
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
