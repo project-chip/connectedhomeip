@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import json
 import copy
 import logging
 import random
@@ -264,11 +265,13 @@ class TC_IDM_4_2(MatterBaseTest):
         '''
         self.print_step(4, "Setup CR2 such that it does not have access to all attributes on a specific cluster and endpoint. CR2 sends a subscription request to subscribe to all attributes for which it does not have access.")
 
-        # Limited ACE for controller 2 with single cluster access
+        # Limited ACE for controller 2 with single cluster access and specific endpoint
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
+                endpoint=1,
+                cluster=Clusters.BasicInformation.id)],
             subjects=[CR2_nodeid])
 
         # Add controller 2 limited ACE to DUT ACL
@@ -288,7 +291,7 @@ class TC_IDM_4_2(MatterBaseTest):
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Cluster controller 2 has no access to
-                attributes=[(0, Clusters.AccessControl)],
+                attributes=[(0, Clusters.BasicInformation)],
                 keepSubscriptions=False,
                 reportInterval=[3, 3],
                 autoResubscribe=False
@@ -305,14 +308,11 @@ class TC_IDM_4_2(MatterBaseTest):
         '''
         self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
 
-        # Limited ACE for controller 2 with endpoint 1 access only
+        # Limited ACE for controller 2 with endpoint 1 access only to all clusters and all attributes
         CR2_limited_ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(
-                endpoint=1,
-                cluster=Clusters.BasicInformation.id
-            )],
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(endpoint=1)],
             subjects=[CR2_nodeid])
 
         # Add controller 2 limited ACE to DUT ACL
@@ -349,17 +349,16 @@ class TC_IDM_4_2(MatterBaseTest):
         '''
         self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
 
-        # ???????????????????????????????????????????
-        # Skip setting an ACE for controller 2 so the DUT node rejects subscribing to it?
-        # ???????????????????????????????????????????
+        # Skip setting an ACE for controller 2 so
+        # the DUT node rejects subscribing to it
 
         # Add controller 2 limited ACE to DUT ACL
         dut_acl = copy.deepcopy(dut_acl_original)
 
-        # Write updated DUT ACL into DUT
+        # Write original DUT ACL into DUT
         await CR1.WriteAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl))]
+            attributes=[(0, Clusters.AccessControl.Attributes.Acl(dut_acl_original))]
         )
 
         # Controller 2 tries to subscribe to all attributes from all clusters
@@ -367,9 +366,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # "INVALID_ACTION" status response expected
         try:
             await CR2.ReadAttribute(
-                # ???????????????????????????????????????????
-                # Node controller 2 has no access to?
-                # ???????????????????????????????????????????
+                # Node controller 2 has no access to
                 nodeid=self.dut_node_id,
                 attributes=[],
                 keepSubscriptions=False,
@@ -525,7 +522,8 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(11, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
 
         # Specifying single endpoint 0
-        cluster_rev_attr_path = [(0, cluster_rev_attr)]
+        requested_ep = 0
+        cluster_rev_attr_path = [(requested_ep, cluster_rev_attr)]
 
         # Subscribe to global attribute
         sub_cr1_step11 = await CR1.ReadAttribute(
@@ -544,6 +542,11 @@ class TC_IDM_4_2(MatterBaseTest):
             cluster=Clusters.BasicInformation,
             attribute=cluster_rev_attr
         )
+
+        # Verify no data from other endpoints is sent back
+        attributes = sub_cr1_step11.GetAttributes()
+        ep_keys = list(attributes.keys())
+        asserts.assert_true(len(ep_keys) == 1, "More than one endpoint returned, exactly 1 was expected")
 
         # Verify DUT sends back the attribute values for the global attribute
         cluster_rev_attr_typed_path = self.get_typed_attribute_path(cluster_rev_attr)
