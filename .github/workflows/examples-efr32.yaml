@@ -114,7 +114,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target efr32-brd4338a-light-wifi-917-soc-skip-rps-generation \
+                --target efr32-brd4338a-light-wifi-917_soc-skip_rps_generation \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
