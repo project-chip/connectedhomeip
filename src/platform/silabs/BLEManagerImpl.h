@@ -143,7 +143,6 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-
     enum class Flags : uint16_t
     {
         kAdvertisingEnabled     = 0x0001,
@@ -160,6 +159,10 @@ private:
         kMaxDeviceNameLength = 16,
         kUnusedIndex         = 0xFF,
     };
+
+    static constexpr uint8_t kFlagTlvSize       = 3; // 1 byte for length, 1b for type and 1b for the Flag value
+    static constexpr uint8_t kUUIDTlvSize       = 4; // 1 byte for length, 1b for type and 2b for the UUID value
+    static constexpr uint8_t kDeviceNameTlvSize = (2 + kMaxDeviceNameLength); // 1 byte for length, 1b for type and + device name
 
     struct CHIPoBLEConState
     {
