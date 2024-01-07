@@ -297,7 +297,7 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
         {
             /* EV was plugged in and wanted demand, now doesn't want demand */
             mHwState = newState;
-            HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
+            HandleStateMachineEvent(EVSEStateMachineEvent::EVNoDemandEvent);
         }
         break;
     case StateEnum::kPluggedInDemand:
