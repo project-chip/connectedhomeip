@@ -44,7 +44,6 @@ class EventChangeCallback:
         self._subscription.SetEventUpdateCallback(self.__call__)
 
     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        logging.info(f"EVENT RECV'D       ---------------------------\n\n\n!!!\n{res}")
         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
             logging.info(
                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
@@ -81,7 +80,7 @@ class TC_EEVSE_2_2(MatterBaseTest):
                                                                Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent(user_max_charge))])
         asserts.assert_equal(result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
 
-    async def send_enable_charge_command(self, endpoint: int = 0, charge_until: int = None, timedRequestTimeoutMs: int = 60000,
+    async def send_enable_charge_command(self, endpoint: int = 0, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = None, max_charge: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
@@ -94,9 +93,11 @@ class TC_EEVSE_2_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_disable_command(self, endpoint: int = 0,  expected_status: Status = Status.Success):
+    async def send_disable_command(self, endpoint: int = 0, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(), endpoint=1)
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(),
+                                       endpoint=1,
+                                       timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
@@ -411,19 +412,25 @@ class TC_EEVSE_2_2(MatterBaseTest):
 
         self.step("14")
         await self.send_test_event_trigger_pluggedin()
+        # New plug in means session ID should increase by 1
+        session_id = session_id + 1
+
+        # Check we get a new EVConnected event with updated session ID
         event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EVConnected)
-        self.validate_ev_connected_event(event_data, session_id + 1)
+        self.validate_ev_connected_event(event_data, session_id)
 
         self.step("14a")
         await self.send_test_event_trigger_charge_demand()
+        expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging  # This is the value at the event time
         event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
         self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
 
         self.step("14b")
-        await self.check_evse_attribute("SessionID", session_id + 1)
+        await self.check_evse_attribute("SessionID", session_id)
 
         self.step("15")
         await self.send_disable_command()
+        expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging  # This is the value prior to stopping
         event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
         expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
         self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)

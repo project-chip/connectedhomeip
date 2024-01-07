@@ -282,6 +282,7 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
         if (mHwState == StateEnum::kPluggedInNoDemand || mHwState == StateEnum::kPluggedInDemand)
         {
             /* EVSE has been unplugged now */
+            mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVNotDetectedEvent);
         }
         break;
@@ -1276,7 +1277,8 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     }
     else
     {
-        mSessionID = MakeNullable(mSessionID.Value()++);
+        uint32_t sessionID = mSessionID.Value() + 1;
+        mSessionID         = MakeNullable(sessionID);
     }
 
     /* Reset other session values */
