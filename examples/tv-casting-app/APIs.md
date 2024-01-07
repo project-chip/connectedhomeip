@@ -489,12 +489,16 @@ On Linux, the Casting Client can connect to a `CastingPlayer` by successfully
 calling `VerifyOrEstablishConnection` on it.
 
 ```c
-
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
 const uint16_t kDesiredEndpointVendorId = 65521;
 
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
-    ChipLogProgress(AppServer, "ConnectionHandler called with %" CHIP_ERROR_FORMAT, err.Format());
+    if(err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+        ...
+    }
 }
 
 ...
@@ -509,10 +513,195 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
 
 ### Select an Endpoint on the Casting Player
 
+_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp)}_
+
+On a successful connection with a `CastingPlayer`, a Casting Client may select
+one of the Endpoints to interact with based on its attributes (e.g. Vendor ID,
+Product ID, list of supported Clusters, etc).
+
+On Linux, for example, it may select an Endpoint with a particular VendorID.
+
+```c
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
+const uint16_t kDesiredEndpointVendorId = 65521;
+
+std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
+// Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
+auto it = std::find_if(endpoints.begin(), endpoints.end(),
+                        [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
+                            return endpoint->GetVendorId() == 65521;
+                        });
+if (it != endpoints.end())
+{
+    // The desired endpoint is endpoints[index]
+    unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
+    ...
+}
+```
+
 ## Interacting with a Casting Endpoint
+
+Once the Casting Client has selected an `Endpoint`, it is ready to
+[issue commands](#issuing-commands) to it, [read](#read-operations) current
+playback state, and [subscribe](#subscriptions) to playback events.
+
+Refer to the following platform specific files for a list of clusters, command
+and attributes supported by the Matter TV Casting library:
+
+1. Linux:
+   [tv-casting-common/clusters/Clusters.h](tv-casting-common/clusters/Clusters.h)
+
+Refer to the following platform specific files for the IDs and request /
+response types to use with these APIs:
+
+1. Linux:
+   [/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h](/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h)
 
 ### Issuing Commands
 
+_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp)}_
+
+The Casting Client can get a reference to a `endpoint` on a `CastingPlayer`,
+check if it supports the required cluster/command, and send commands to it. It
+can then handle any command response / error the `CastingPlayer` sends back.
+
+On Linux, for example, given an `endpoint`, it can send a `LaunchURL` command
+(part of the Content Launcher cluster) by calling the `Invoke` API on a
+`Command` of type
+`matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>`
+
+```c
+void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the launchURLCommand from the contentLauncherCluster
+    matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> * launchURLCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> *>(
+            contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id));
+    VerifyOrReturn(launchURLCommand != nullptr, ChipLogError(AppServer, "LaunchURL command not found on ContentLauncherCluster"));
+
+    // create the LaunchURL request
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type request;
+    request.contentURL    = chip::CharSpan::fromCharString(kContentURL);
+    request.displayString = chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
+    request.brandingInformation =
+        chip::MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type());
+
+    // call Invoke on launchURLCommand while passing in success/failure callbacks
+    launchURLCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
+                            response.data.Value().data());
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs));      // time out after kTimedInvokeCommandTimeoutMs
+}
+```
+
 ### Read Operations
 
+_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp)}_
+
+The `CastingClient` may read an Attribute from the `Endpoint` on the
+`CastingPlayer`. It should ensure that the desired cluster / attribute are
+available for reading on the endpoint before trying to read it.
+
+On Linux, for example, given an `endpoint`, it can read the `VendorID` (part of
+the Application Basic cluster) by calling the `Read` API on an `Attribute` of
+type
+`matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>`
+
+```c
+void ReadApplicationBasicVendorID(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get applicationBasicCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::application_basic::ApplicationBasicCluster> applicationBasicCluster =
+        endpoint->GetCluster<matter::casting::clusters::application_basic::ApplicationBasicCluster>();
+    VerifyOrReturn(applicationBasicCluster != nullptr);
+
+    // get the vendorIDAttribute from the applicationBasicCluster
+    matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> * vendorIDAttribute =
+        static_cast<matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> *>(
+            applicationBasicCluster->GetAttribute(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id));
+    VerifyOrReturn(vendorIDAttribute != nullptr,
+                   ChipLogError(AppServer, "VendorID attribute not found on ApplicationBasicCluster"));
+
+    // call Read on vendorIDAttribute while passing in success/failure callbacks
+    vendorIDAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d [Before reading value: %d]", after, before.Value());
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d", after);
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "VendorID Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+```
+
 ### Subscriptions
+
+_{Complete Attribute subscription examples:
+[Linux](linux/simple-app-helper.cpp)}_
+
+A Casting Client may subscribe to an attribute on an `Endpoint` of the
+`CastingPlayer` to get data reports when the attributes change.
+
+On Linux, for example, given an `endpoint`, it can subscribe to the
+`CurrentState` (part of the Media Playback Basic cluster) by calling the
+`Subscribe` API on an `Attribute` of type
+`matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>`
+
+```c
+void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaPlaybackCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_playback::MediaPlaybackCluster> mediaPlaybackCluster =
+        endpoint->GetCluster<matter::casting::clusters::media_playback::MediaPlaybackCluster>();
+    VerifyOrReturn(mediaPlaybackCluster != nullptr);
+
+    // get the currentStateAttribute from the mediaPlaybackCluster
+    matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *
+        currentStateAttribute =
+            static_cast<matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *>(
+                mediaPlaybackCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::CurrentState::Id));
+    VerifyOrReturn(currentStateAttribute != nullptr,
+                   ChipLogError(AppServer, "CurrentState attribute not found on MediaPlaybackCluster"));
+
+    // call Subscribe on currentStateAttribute while passing in success/failure callbacks
+    currentStateAttribute->Subscribe(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d [Before reading value: %d]", static_cast<int>(after),
+                                static_cast<int>(before.Value()));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d", static_cast<int>(after));
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "CurrentState Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
+}
+```

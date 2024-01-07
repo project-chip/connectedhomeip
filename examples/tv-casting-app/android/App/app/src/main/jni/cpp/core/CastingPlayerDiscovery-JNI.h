@@ -18,25 +18,24 @@
 
 #pragma once
 
-#include "core/Endpoint.h"
-#include "core/Types.h"
-
-#include "lib/support/logging/CHIPLogging.h"
+#include <jni.h>
 
 namespace matter {
 namespace casting {
-namespace clusters {
+namespace core {
 
-class MediaPlaybackCluster : public core::BaseCluster
+class CastingPlayerDiscoveryJNI
 {
-private:
-protected:
 public:
-    MediaPlaybackCluster(memory::Weak<core::Endpoint> endpoint) : core::BaseCluster(endpoint) {}
-
-    // TODO: add commands
+private:
+    friend CastingPlayerDiscoveryJNI & CastingAppJNIMgr();
+    static CastingPlayerDiscoveryJNI sInstance;
 };
 
-}; // namespace clusters
+inline class CastingPlayerDiscoveryJNI & CastingAppJNIMgr()
+{
+    return CastingPlayerDiscoveryJNI::sInstance;
+}
+}; // namespace core
 }; // namespace casting
 }; // namespace matter

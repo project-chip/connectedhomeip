@@ -354,10 +354,23 @@ public:
     /**
      *  @brief Provide all the frequency bands supported by the Wi-Fi interface
      *
-     *  Provide a default implementation that returns the 2.4 Ghz band support.
+     *  The default implementation returns the 2.4 GHz band support.
      *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities
+     *
+     *  @param bands Reference to a span that is used to return the supported bands.
+     *               The span is initialized with a fixed-size buffer.
+     *               The implementation is expected to resize the span to match the number of returned results.
+     *
+     *  @return CHIP_NO_ERROR on success or a CHIP_ERROR on failure.
      */
-    virtual WiFiBand GetSupportedWiFiBands() { return WiFiBand::k2g4; }
+    virtual CHIP_ERROR GetSupportedWiFiBands(Span<WiFiBand> & bands)
+    {
+        ReturnErrorCodeIf(bands.empty(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        bands.front() = WiFiBand::k2g4;
+        bands.reduce_size(1);
+
+        return CHIP_NO_ERROR;
+    }
 
     ~WiFiDriver() override = default;
 };

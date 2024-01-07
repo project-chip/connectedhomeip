@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2023-2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,40 +14,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "Endpoint.h"
-#include "Types.h"
+#include "core/CastingPlayer.h"
 
-#include "lib/support/logging/CHIPLogging.h"
+#include <lib/core/CHIPError.h>
+
+#include <jni.h>
 
 namespace matter {
 namespace casting {
-namespace core {
+namespace support {
 
-class Endpoint;
+/**
+ * @brief Convertes a native CastingPlayer into a MatterCastingPlayer jobject
+ *
+ * @param CastingPlayer represents a Matter commissioner that is able to play media to a physical
+ * output or to a display screen which is part of the device.
+ *
+ * @return pointer to the CastingPlayer jobject if created successfully, nullptr otherwise.
+ */
+jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer> player);
 
-// Base cluster class
-class BaseCluster
-{
-private:
-protected:
-    memory::Weak<Endpoint> mEndpoint;
-
-public:
-    BaseCluster(memory::Weak<Endpoint> endpoint) { this->mEndpoint = endpoint; }
-
-    virtual ~BaseCluster() {}
-
-    BaseCluster()                       = delete;
-    BaseCluster(BaseCluster & other)    = delete;
-    void operator=(const BaseCluster &) = delete;
-
-protected:
-    memory::Weak<Endpoint> GetEndpoint() const { return mEndpoint.lock(); }
-};
-
-}; // namespace core
+}; // namespace support
 }; // namespace casting
 }; // namespace matter
