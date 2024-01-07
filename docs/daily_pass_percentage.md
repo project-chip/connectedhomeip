@@ -1,9 +1,9 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| tests                                   |          62 |
-| builds                                  |          75 |
-| darwin                                  |          88 |
+| builds                                  |          67 |
+| darwin                                  |          67 |
+| build-example-mw320                     |         100 |
 | build-example-nrf-connect-sdk           |         100 |
 | build-example-ti-cc26x2x7               |         100 |
 | zap                                     |         100 |
@@ -11,7 +11,7 @@
 | delete-old-artifacts                    |         100 |
 | build-example-qpg                       |         100 |
 | build-example-ti-cc32xx                 |         100 |
-| build-example-mw320                     |         100 |
+| validate-gradle-wrapper                 |         100 |
 | build-example-esp32                     |         100 |
 | unit-integration-tests                  |         100 |
 | minimal-build-linux-configure           |         100 |
@@ -20,7 +20,7 @@
 | build-example-infineon                  |         100 |
 | build-example-ameba                     |         100 |
 | build-example-k32w                      |         100 |
-| validate-gradle-wrapper                 |         100 |
+| java-tests                              |         100 |
 | documentation-build                     |         100 |
 | build-example-linux-arm                 |         100 |
 | build-example-i-mx-linux                |         100 |
@@ -30,7 +30,7 @@
 | build-example-stm32                     |         100 |
 | cirque                                  |         100 |
 | build-example-efr32                     |         100 |
-| java-tests                              |         100 |
+| tests                                   |         100 |
 | bloat-check                             |         100 |
 | build-example-bouffalolab               |         100 |
 | recent-fail-summary                     |         100 |
