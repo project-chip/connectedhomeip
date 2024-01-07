@@ -14,6 +14,8 @@
 #   limitations under the License.
 #
 
+include(${CMAKE_CURRENT_LIST_DIR}/factory_wrapper.cmake)
+
 function(generate_build_time_partition fctry_partition esp_secure_cert_partition chip_root)
     set(options FLASH_IN_PROJECT)
     set(multi DEPENDS)
@@ -34,31 +36,19 @@ function(generate_build_time_partition fctry_partition esp_secure_cert_partition
     message(STATUS "secure_cert_partition_offset : ${secure_cert_partition_offset}")
 
     if("${fctry_partition_size}" AND "${fctry_partition_offset}")
-        set(DEFAULT_DEVICE_NAME "My bulb")
-        set(DEFAULT_VENDOR_NAME "Test-vendor")
-        set(DEFAULT_HARDWARE_VERSION 1)
-        set(DEFAULT_HARDWARE_VERSION_STR "Devkit")
-        set(DEFAULT_VENDOR_ID 0xFFF2)
-        set(DEFAULT_PRODUCT_ID 0x8001)
-        set(DEFAULT_DAC_CERT "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Cert.der")
-        set(DEFAULT_DAC_KEY "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Key.der")
-        set(DEFAULT_PAI_CERT "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Cert.der")
-        set(DEFAULT_CERT_DCLRN "${chip_root_abs_path}/credentials/test/certification-declaration/Chip-Test-CD-FFF2-8001.der")
-        set(DEFAULT_PASSCODE 20202020)
-        set(DEFAULT_DISCRIMINATOR 3841)
 
-        set(DEVICE_NAME ${DEFAULT_DEVICE_NAME} CACHE STRING "My bulb")
-        set(VENDOR_NAME ${DEFAULT_VENDOR_NAME} CACHE STRING "Test-vendor")
-        set(HARDWARE_VERSION ${DEFAULT_HARDWARE_VERSION} CACHE STRING 1)
-        set(HARDWARE_VERSION_STR  ${DEFAULT_HARDWARE_VERSION_STR} CACHE STRING "Devkit")
-        set(VENDOR_ID ${DEFAULT_VENDOR_ID} CACHE STRING 0xFFF2)
-        set(PRODUCT_ID ${DEFAULT_PRODUCT_ID} CACHE STRING 0x8001)
-        set(DAC_CERT ${DEFAULT_DAC_CERT} CACHE STRING "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Cert.der")
-        set(DAC_KEY ${DEFAULT_DAC_KEY} CACHE STRING "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Key.der")
-        set(PAI_CERT ${DEFAULT_PAI_CERT} CACHE STRING "${chip_root_abs_path}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Cert.der")
-        set(CERT_DCLRN ${DEFAULT_CERT_DCLRN} CACHE STRING "${chip_root_abs_path}/credentials/test/certification-declaration/Chip-Test-CD-FFF2-8001.der")
-        set(PASSCODE ${DEFAULT_PASSCODE} CACHE STRING 20202020)
-        set(DISCRIMINATOR ${DEFAULT_DISCRIMINATOR} CACHE STRING 3841)
+        set_values()
+
+        set(PREVIOUS_VALUES_FILE "${CMAKE_BINARY_DIR}/previous_values.txt")
+
+        if (NOT EXISTS ${PREVIOUS_VALUES_FILE})
+            file(WRITE ${PREVIOUS_VALUES_FILE} "")
+        endif()
+
+        file(READ ${PREVIOUS_VALUES_FILE} PREVIOUS_VALUES)
+
+        set(CURRENT_VALUES_STRING
+        "${DEVICE_NAME}${VENDOR_NAME}${DISCRIMINATOR}${PASSCODE}${VENDOR_ID}${PRODUCT_ID}${HARDWARE_VERSION}${HARDWARE_VERSION_STR}${DAC_CERT}${DAC_KEY}${PAI_CERT}${CERT_DCLRN}")
 
         message(STATUS "Bulb Name: ${DEVICE_NAME}")
         message(STATUS "Vendor Name: ${VENDOR_NAME}")
@@ -73,26 +63,29 @@ function(generate_build_time_partition fctry_partition esp_secure_cert_partition
         message(STATUS "Passcode: ${PASSCODE}")
         message(STATUS "Discriminator: ${DISCRIMINATOR}")
 
-
-        # Execute Factory partition image generation; this always executes as there is no way to specify for CMake to watch for
-        # contents of the base dir changing.
-        add_custom_target(build_time_partition ALL
-        COMMAND ${generate_esp32_chip_factory_bin.py} -d ${DISCRIMINATOR}
-               -p ${PASSCODE}
-               --product-name "${DEVICE_NAME}"
-               --vendor-name "${VENDOR_NAME}"
-               --vendor-id ${VENDOR_ID}
-               --product-id ${PRODUCT_ID}
-               --hw-ver ${HARDWARE_VERSION}
-               --hw-ver-str "${HARDWARE_VERSION_STR}"
-               --dac-cert ${DAC_CERT}
-               --dac-key ${DAC_KEY}
-               --pai-cert ${PAI_CERT}
-               --cd ${CERT_DCLRN}
-	       --dac-in-secure-cert
-	       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-
+        if (NOT "${CURRENT_VALUES_STRING}" STREQUAL "${PREVIOUS_VALUES}")
+            message(STATUS "Values have changed. Triggering add_custom_target.")
+            add_custom_target(build_time_partition ALL
+            COMMAND ${generate_esp32_chip_factory_bin.py} -d ${DISCRIMINATOR}
+                -p ${PASSCODE}
+                --product-name "${DEVICE_NAME}"
+                --vendor-name "${VENDOR_NAME}"
+                --vendor-id ${VENDOR_ID}
+                --product-id ${PRODUCT_ID}
+                --hw-ver ${HARDWARE_VERSION}
+                --hw-ver-str "${HARDWARE_VERSION_STR}"
+                --dac-cert ${DAC_CERT}
+                --dac-key ${DAC_KEY}
+                --pai-cert ${PAI_CERT}
+                --cd ${CERT_DCLRN}
+            --dac-in-secure-cert
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+            )
+            file(WRITE ${PREVIOUS_VALUES_FILE} ${CURRENT_VALUES_STRING})
+        else()
+            add_custom_target(build_time_partition)
+            message(STATUS "Values have not changed. Skipping add_custom_target.")
+        endif()
 
         set(factory_partition_bin ${CMAKE_BINARY_DIR}/bin/factory_partition.bin)
         set(esp_secure_cert_partition_bin ${CMAKE_BINARY_DIR}/bin/esp_secure_cert_partititon.bin)
