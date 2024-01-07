@@ -18,16 +18,12 @@
 
 import argparse
 import base64
-import csv
 import enum
-import hashlib
-import json
 import logging
 import os
-import pyqrcode
 import sys
-
 from types import SimpleNamespace
+
 import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
@@ -53,6 +49,7 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
                      66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
 
 TOOLS = {}
+
 
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
@@ -171,25 +168,6 @@ FACTORY_DATA = {
     # Other device info provider keys are dynamically generated
     # in the respective functions.
 }
-
-
-def save_config(args):
-    with open(CONFIG_FILE, 'w') as config_file:
-        json.dump(vars(args), config_file)
-
-def load_config():
-    try:
-        with open(CONFIG_FILE, 'r') as config_file:
-            return json.load(config_file)
-    except FileNotFoundError:
-        return None
-
-def calculate_hash(data):
-    return hashlib.sha256(data.encode('utf-8')).hexdigest()
-
-
-def args_changed(current_args, saved_args):
-    return calculate_hash(json.dumps(vars(current_args))) != calculate_hash(json.dumps(saved_args))
 
 
 class CalendarTypes(enum.Enum):
@@ -627,6 +605,7 @@ def get_args():
                         help='Do not generate the factory partition binary')
     parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
 
+
     parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
                         help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
                                           Default is 0.', choices=[0, 1, 2])
@@ -663,30 +642,6 @@ def generate_factory_partiton_binary(args):
 def set_up_out_dirs(args):
     os.makedirs(args.output_dir, exist_ok=True)
 
-def generate_onboarding_data(args):
-    payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_mode, CommissioningFlow(args.commissioning_flow),
-                            args.vendor_id, args.product_id)
-    logging.info('Discovery mode' + str(args.discovery_mode))
-    chip_qrcode = payloads.generate_qrcode()
-    chip_manualcode = payloads.generate_manualcode()
-    # ToDo: remove this if qrcode tool can handle the standard manual code format
-    if args.commissioning_flow == CommissioningFlow.Standard:
-        chip_manualcode = chip_manualcode[:4] + '-' + chip_manualcode[4:7] + '-' + chip_manualcode[7:]
-    else:
-        chip_manualcode = '"' + chip_manualcode[:4] + '-' + chip_manualcode[4:7] + '-' + chip_manualcode[7:11] + '\n' + chip_manualcode[11:15] + '-' + chip_manualcode[15:18] + '-' + chip_manualcode[18:20] + '-' + chip_manualcode[20:21] + '"'
-
-    logging.info('Generated QR code: ' + chip_qrcode)
-    logging.info('Generated manual code: ' + chip_manualcode)
-
-    csv_data = 'qrcode,manualcode,discriminator,passcode\n'
-    csv_data += chip_qrcode + ',' + chip_manualcode + ',' + str(args.discriminator) + ',' + str(args.passcode) + '\n'
-
-    with open(os.path.join(args.output_dir,ONBOARDING_DATA_FILE), 'w') as f:
-        f.write(csv_data)
-
-    chip_qr = pyqrcode.create(chip_qrcode, version=2, error='M')
-    chip_qr.png(os.path.join(args.output_dir,QROCDE_FILE), scale=6)
-
 
 def generate_onboarding_data(args):
     if (args.vendor_id and args.product_id):
@@ -709,14 +664,12 @@ def generate_onboarding_data(args):
 
 
 def main():
-    saved_args = load_config()
     args = get_args()
     set_up_out_dirs(args)
     set_up_factory_data(args)
     generate_factory_partiton_binary(args)
     if (args.discriminator and args.passcode):
         generate_onboarding_data(args)
-
 
 if __name__ == "__main__":
     logging.basicConfig(format='[%(asctime)s] [%(levelname)7s] - %(message)s', level=logging.INFO)
