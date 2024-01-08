@@ -276,7 +276,7 @@ exports.model = {
       4 : "NameSupport",
       5 : "LastConfiguredBy",
       6 : "SceneTableSize",
-      7 : "RemainingCapacity",
+      7 : "FabricSceneInfo",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -676,6 +676,8 @@ exports.model = {
       18 : "UniqueID",
       19 : "CapabilityMinima",
       20 : "ProductAppearance",
+      21 : "SpecificationVersion",
+      22 : "MaxPathsPerInvoke",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -955,6 +957,9 @@ exports.model = {
           "Ssid",
           "Credentials",
           "Breadcrumb",
+          "NetworkIdentity",
+          "ClientIdentifier",
+          "PossessionNonce",
         ],
       },
       3 : {
@@ -977,6 +982,8 @@ exports.model = {
           "NetworkingStatus",
           "DebugText",
           "NetworkIndex",
+          "ClientIdentity",
+          "PossessionSignature",
         ],
       },
       6 : {
@@ -1002,6 +1009,20 @@ exports.model = {
           "Breadcrumb",
         ],
       },
+      9 : {
+        name : "QueryIdentity",
+        arguments : [
+          "KeyIdentifier",
+          "PossessionNonce",
+        ],
+      },
+      10 : {
+        name : "QueryIdentityResponse",
+        arguments : [
+          "Identity",
+          "PossessionSignature",
+        ],
+      },
     },
     attributes : {
       0 : "MaxNetworks",
@@ -1012,6 +1033,9 @@ exports.model = {
       5 : "LastNetworkingStatus",
       6 : "LastNetworkID",
       7 : "LastConnectErrorValue",
+      8 : "SupportedWiFiBands",
+      9 : "SupportedThreadFeatures",
+      10 : "ThreadVersion",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1058,6 +1082,19 @@ exports.model = {
         arguments : [
           "EnableKey",
           "EventTrigger",
+        ],
+      },
+      1 : {
+        name : "TimeSnapshot",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "TimeSnapshotResponse",
+        arguments : [
+          "SystemTimeMs",
+          "PosixTimeMs",
         ],
       },
     },
@@ -1649,14 +1686,155 @@ exports.model = {
 
         ],
       },
+      4 : {
+        name : "StayActiveResponse",
+        arguments : [
+          "PromisedActiveDuration",
+        ],
+      },
     },
     attributes : {
-      0 : "IdleModeInterval",
-      1 : "ActiveModeInterval",
+      0 : "IdleModeDuration",
+      1 : "ActiveModeDuration",
       2 : "ActiveModeThreshold",
       3 : "RegisteredClients",
       4 : "ICDCounter",
       5 : "ClientsSupportedPerFabric",
+      6 : "UserActiveModeTriggerHint",
+      7 : "UserActiveModeTriggerInstruction",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  71 : {
+    name : "Timer",
+    commands : {
+      0 : {
+        name : "SetTimer",
+        arguments : [
+          "NewTime",
+        ],
+      },
+      1 : {
+        name : "ResetTimer",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "AddTime",
+        arguments : [
+          "AdditionalTime",
+        ],
+      },
+      3 : {
+        name : "ReduceTime",
+        arguments : [
+          "TimeReduction",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SetTime",
+      1 : "TimeRemaining",
+      2 : "TimerState",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  72 : {
+    name : "OvenCavityOperationalState",
+    commands : {
+      0 : {
+        name : "Pause",
+        arguments : [
+
+        ],
+      },
+      1 : {
+        name : "Stop",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "Start",
+        arguments : [
+
+        ],
+      },
+      3 : {
+        name : "Resume",
+        arguments : [
+
+        ],
+      },
+      4 : {
+        name : "OperationalCommandResponse",
+        arguments : [
+          "CommandResponseState",
+        ],
+      },
+    },
+    attributes : {
+      0 : "PhaseList",
+      1 : "CurrentPhase",
+      2 : "CountdownTime",
+      3 : "OperationalStateList",
+      4 : "OperationalState",
+      5 : "OperationalError",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  73 : {
+    name : "OvenMode",
+    commands : {
+      0 : {
+        name : "ChangeToMode",
+        arguments : [
+          "NewMode",
+        ],
+      },
+      1 : {
+        name : "ChangeToModeResponse",
+        arguments : [
+          "Status",
+          "StatusText",
+        ],
+      },
+    },
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      2 : "StartUpMode",
+      3 : "OnMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  74 : {
+    name : "LaundryDryerControls",
+    commands : {},
+    attributes : {
+      0 : "SupportedDrynessLevels",
+      1 : "SelectedDrynessLevel",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -1786,7 +1964,6 @@ exports.model = {
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      2 : "StartUpMode",
       3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -1816,7 +1993,6 @@ exports.model = {
     attributes : {
       0 : "SupportedModes",
       1 : "CurrentMode",
-      2 : "StartUpMode",
       3 : "OnMode",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
@@ -1971,6 +2147,52 @@ exports.model = {
       65533 : "ClusterRevision",
     },
   },
+  94 : {
+    name : "MicrowaveOvenMode",
+    commands : {},
+    attributes : {
+      0 : "SupportedModes",
+      1 : "CurrentMode",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  95 : {
+    name : "MicrowaveOvenControl",
+    commands : {
+      0 : {
+        name : "SetCookingParameters",
+        arguments : [
+          "CookMode",
+          "CookTime",
+          "PowerSetting",
+        ],
+      },
+      1 : {
+        name : "AddMoreTime",
+        arguments : [
+          "TimeToAdd",
+        ],
+      },
+    },
+    attributes : {
+      1 : "CookTime",
+      2 : "PowerSetting",
+      3 : "MinPower",
+      4 : "MaxPower",
+      5 : "PowerStep",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
   96 : {
     name : "OperationalState",
     commands : {
@@ -2111,6 +2333,316 @@ exports.model = {
       3 : "InPlaceIndicator",
       4 : "LastChangedTime",
       5 : "ReplacementProductList",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  128 : {
+    name : "BooleanStateConfiguration",
+    commands : {
+      0 : {
+        name : "SuppressAlarm",
+        arguments : [
+          "AlarmsToSuppress",
+        ],
+      },
+      1 : {
+        name : "EnableDisableAlarm",
+        arguments : [
+          "AlarmsToEnableDisable",
+        ],
+      },
+    },
+    attributes : {
+      0 : "CurrentSensitivityLevel",
+      1 : "SupportedSensitivityLevels",
+      2 : "DefaultSensitivityLevel",
+      3 : "AlarmsActive",
+      4 : "AlarmsSuppressed",
+      5 : "AlarmsEnabled",
+      6 : "AlarmsSupported",
+      7 : "SensorFault",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  129 : {
+    name : "ValveConfigurationAndControl",
+    commands : {
+      0 : {
+        name : "Open",
+        arguments : [
+          "OpenDuration",
+          "TargetLevel",
+        ],
+      },
+      1 : {
+        name : "Close",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "OpenDuration",
+      1 : "DefaultOpenDuration",
+      2 : "AutoCloseTime",
+      3 : "RemainingDuration",
+      4 : "CurrentState",
+      5 : "TargetState",
+      6 : "CurrentLevel",
+      7 : "TargetLevel",
+      8 : "DefaultOpenLevel",
+      9 : "ValveFault",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  145 : {
+    name : "ElectricalEnergyMeasurement",
+    commands : {},
+    attributes : {
+      0 : "Accuracy",
+      1 : "CumulativeEnergyImported",
+      2 : "CumulativeEnergyExported",
+      3 : "PeriodicEnergyImported",
+      4 : "PeriodicEnergyExported",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  150 : {
+    name : "DemandResponseLoadControl",
+    commands : {
+      0 : {
+        name : "RegisterLoadControlProgramRequest",
+        arguments : [
+          "LoadControlProgram",
+        ],
+      },
+      1 : {
+        name : "UnregisterLoadControlProgramRequest",
+        arguments : [
+          "LoadControlProgramID",
+        ],
+      },
+      2 : {
+        name : "AddLoadControlEventRequest",
+        arguments : [
+          "Event",
+        ],
+      },
+      3 : {
+        name : "RemoveLoadControlEventRequest",
+        arguments : [
+          "EventID",
+          "CancelControl",
+        ],
+      },
+      4 : {
+        name : "ClearLoadControlEventsRequest",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "LoadControlPrograms",
+      1 : "NumberOfLoadControlPrograms",
+      2 : "Events",
+      3 : "ActiveEvents",
+      4 : "NumberOfEventsPerProgram",
+      5 : "NumberOfTransitions",
+      6 : "DefaultRandomStart",
+      7 : "DefaultRandomDuration",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  152 : {
+    name : "DeviceEnergyManagement",
+    commands : {
+      0 : {
+        name : "PowerAdjustRequest",
+        arguments : [
+          "Power",
+          "Duration",
+        ],
+      },
+      1 : {
+        name : "CancelPowerAdjustRequest",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "StartTimeAdjustRequest",
+        arguments : [
+          "RequestedStartTime",
+        ],
+      },
+      3 : {
+        name : "PauseRequest",
+        arguments : [
+          "Duration",
+        ],
+      },
+      4 : {
+        name : "ResumeRequest",
+        arguments : [
+
+        ],
+      },
+      5 : {
+        name : "ModifyForecastRequest",
+        arguments : [
+          "ForecastId",
+          "SlotAdjustments",
+        ],
+      },
+      6 : {
+        name : "RequestConstraintBasedForecast",
+        arguments : [
+          "Constraints",
+        ],
+      },
+    },
+    attributes : {
+      0 : "ESAType",
+      1 : "ESACanGenerate",
+      2 : "ESAState",
+      3 : "AbsMinPower",
+      4 : "AbsMaxPower",
+      5 : "PowerAdjustmentCapability",
+      6 : "Forecast",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  153 : {
+    name : "EnergyEvse",
+    commands : {
+      0 : {
+        name : "GetTargetsResponse",
+        arguments : [
+          "DayOfWeekforSequence",
+          "ChargingTargets",
+        ],
+      },
+      1 : {
+        name : "Disable",
+        arguments : [
+
+        ],
+      },
+      2 : {
+        name : "EnableCharging",
+        arguments : [
+          "ChargingEnabledUntil",
+          "MinimumChargeCurrent",
+          "MaximumChargeCurrent",
+        ],
+      },
+      3 : {
+        name : "EnableDischarging",
+        arguments : [
+          "DischargingEnabledUntil",
+          "MaximumDischargeCurrent",
+        ],
+      },
+      4 : {
+        name : "StartDiagnostics",
+        arguments : [
+
+        ],
+      },
+      5 : {
+        name : "SetTargets",
+        arguments : [
+          "DayOfWeekforSequence",
+          "ChargingTargets",
+        ],
+      },
+      6 : {
+        name : "GetTargets",
+        arguments : [
+          "DaysToReturn",
+        ],
+      },
+      7 : {
+        name : "ClearTargets",
+        arguments : [
+
+        ],
+      },
+    },
+    attributes : {
+      0 : "State",
+      1 : "SupplyState",
+      2 : "FaultState",
+      3 : "ChargingEnabledUntil",
+      4 : "DischargingEnabledUntil",
+      5 : "CircuitCapacity",
+      6 : "MinimumChargeCurrent",
+      7 : "MaximumChargeCurrent",
+      8 : "MaximumDischargeCurrent",
+      9 : "UserMaximumChargeCurrent",
+      10 : "RandomizationDelayWindow",
+      33 : "NumberOfWeeklyTargets",
+      34 : "NumberOfDailyTargets",
+      35 : "NextChargeStartTime",
+      36 : "NextChargeTargetTime",
+      37 : "NextChargeRequiredEnergy",
+      38 : "NextChargeTargetSoC",
+      39 : "ApproximateEVEfficiency",
+      48 : "StateOfCharge",
+      49 : "BatteryCapacity",
+      50 : "VehicleID",
+      64 : "SessionID",
+      65 : "SessionDuration",
+      66 : "SessionEnergyCharged",
+      67 : "SessionEnergyDischarged",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  155 : {
+    name : "EnergyPreference",
+    commands : {},
+    attributes : {
+      0 : "EnergyBalances",
+      1 : "CurrentEnergyBalance",
+      2 : "EnergyPriorities",
+      3 : "LowPowerModeSensitivities",
+      4 : "CurrentLowPowerModeSensitivity",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3293,6 +3825,7 @@ exports.model = {
     commands : {},
     attributes : {
       0 : "MACAddress",
+      1 : "LinkLocalAddress",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3328,6 +3861,43 @@ exports.model = {
         name : "SkipChannel",
         arguments : [
           "Count",
+        ],
+      },
+      4 : {
+        name : "GetProgramGuide",
+        arguments : [
+          "StartTime",
+          "EndTime",
+          "ChannelList",
+          "PageToken",
+          "RecordingFlag",
+          "ExternalIDList",
+          "Data",
+        ],
+      },
+      5 : {
+        name : "ProgramGuideResponse",
+        arguments : [
+          "Paging",
+          "ProgramList",
+        ],
+      },
+      6 : {
+        name : "RecordProgram",
+        arguments : [
+          "ProgramIdentifier",
+          "ShouldRecordSeries",
+          "ExternalIDList",
+          "Data",
+        ],
+      },
+      7 : {
+        name : "CancelRecordProgram",
+        arguments : [
+          "ProgramIdentifier",
+          "ShouldRecordSeries",
+          "ExternalIDList",
+          "Data",
         ],
       },
     },
@@ -3414,13 +3984,13 @@ exports.model = {
       6 : {
         name : "Rewind",
         arguments : [
-
+          "AudioAdvanceUnmuted",
         ],
       },
       7 : {
         name : "FastForward",
         arguments : [
-
+          "AudioAdvanceUnmuted",
         ],
       },
       8 : {
@@ -3448,6 +4018,25 @@ exports.model = {
           "Position",
         ],
       },
+      12 : {
+        name : "ActivateAudioTrack",
+        arguments : [
+          "TrackID",
+          "AudioOutputIndex",
+        ],
+      },
+      13 : {
+        name : "ActivateTextTrack",
+        arguments : [
+          "TrackID",
+        ],
+      },
+      14 : {
+        name : "DeactivateTextTrack",
+        arguments : [
+
+        ],
+      },
     },
     attributes : {
       0 : "CurrentState",
@@ -3457,6 +4046,10 @@ exports.model = {
       4 : "PlaybackSpeed",
       5 : "SeekRangeEnd",
       6 : "SeekRangeStart",
+      7 : "ActiveAudioTrack",
+      8 : "AvailableAudioTracks",
+      9 : "ActiveTextTrack",
+      10 : "AvailableTextTracks",
       65528 : "GeneratedCommandList",
       65529 : "AcceptedCommandList",
       65530 : "EventList",
@@ -3558,6 +4151,8 @@ exports.model = {
           "Search",
           "AutoPlay",
           "Data",
+          "PlaybackPreferences",
+          "UseCurrentContext",
         ],
       },
       1 : {
@@ -3696,12 +4291,130 @@ exports.model = {
         arguments : [
           "TempAccountIdentifier",
           "SetupPIN",
+          "Node",
         ],
       },
       3 : {
         name : "Logout",
         arguments : [
+          "Node",
+        ],
+      },
+    },
+    attributes : {
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1295 : {
+    name : "ContentControl",
+    commands : {
+      0 : {
+        name : "UpdatePIN",
+        arguments : [
+          "OldPIN",
+          "NewPIN",
+        ],
+      },
+      1 : {
+        name : "ResetPIN",
+        arguments : [
 
+        ],
+      },
+      2 : {
+        name : "ResetPINResponse",
+        arguments : [
+          "PINCode",
+        ],
+      },
+      3 : {
+        name : "Enable",
+        arguments : [
+
+        ],
+      },
+      4 : {
+        name : "Disable",
+        arguments : [
+
+        ],
+      },
+      5 : {
+        name : "AddBonusTime",
+        arguments : [
+          "PINCode",
+          "BonusTime",
+        ],
+      },
+      6 : {
+        name : "SetScreenDailyTime",
+        arguments : [
+          "ScreenTime",
+        ],
+      },
+      7 : {
+        name : "BlockUnratedContent",
+        arguments : [
+
+        ],
+      },
+      8 : {
+        name : "UnblockUnratedContent",
+        arguments : [
+
+        ],
+      },
+      9 : {
+        name : "SetOnDemandRatingThreshold",
+        arguments : [
+          "Rating",
+        ],
+      },
+      10 : {
+        name : "SetScheduledContentRatingThreshold",
+        arguments : [
+          "Rating",
+        ],
+      },
+    },
+    attributes : {
+      0 : "Enabled",
+      1 : "OnDemandRatings",
+      2 : "OnDemandRatingThreshold",
+      3 : "ScheduledContentRatings",
+      4 : "ScheduledContentRatingThreshold",
+      5 : "ScreenDailyTime",
+      6 : "RemainingScreenTime",
+      7 : "BlockUnrated",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
+  1296 : {
+    name : "ContentAppObserver",
+    commands : {
+      0 : {
+        name : "ContentAppMessage",
+        arguments : [
+          "Data",
+          "EncodingHint",
+        ],
+      },
+      1 : {
+        name : "ContentAppMessageResponse",
+        arguments : [
+          "Status",
+          "Data",
+          "EncodingHint",
         ],
       },
     },
@@ -4275,8 +4988,70 @@ exports.model = {
       65533 : "ClusterRevision",
     },
   },
+  4294048800 : {
+    name : "SampleMei",
+    commands : {
+      0 : {
+        name : "Ping",
+        arguments : [
+
+        ],
+      },
+      1 : {
+        name : "AddArgumentsResponse",
+        arguments : [
+          "ReturnValue",
+        ],
+      },
+      2 : {
+        name : "AddArguments",
+        arguments : [
+          "Arg1",
+          "Arg2",
+        ],
+      },
+    },
+    attributes : {
+      0 : "FlipFlop",
+      65528 : "GeneratedCommandList",
+      65529 : "AcceptedCommandList",
+      65530 : "EventList",
+      65531 : "AttributeList",
+      65532 : "FeatureMap",
+      65533 : "ClusterRevision",
+    },
+  },
 
   enums : {
+    "ACCapacityFormatEnum" : [
+      "BTUh",
+    ], //
+    "ACCompressorTypeEnum" : [
+      "Unknown",
+      "T1",
+      "T2",
+      "T3",
+    ], //
+    "ACLouverPositionEnum" : [
+      "Closed",
+      "Open",
+      "Quarter",
+      "Half",
+      "ThreeQuarters",
+    ], //
+    "ACRefrigerantTypeEnum" : [
+      "Unknown",
+      "R22",
+      "R410a",
+      "R407c",
+    ], //
+    "ACTypeEnum" : [
+      "Unknown",
+      "CoolingFixed",
+      "HeatPumpFixed",
+      "CoolingInverter",
+      "HeatPumpInverter",
+    ], //
     "AccessControlEntryAuthModeEnum" : [
       "Pase",
       "Case",
@@ -4336,10 +5111,10 @@ exports.model = {
       "Warning",
       "Critical",
     ], //
-    "ApplicationLauncherStatusEnum" : [
-      "Success",
-      "AppNotAvailable",
-      "SystemBusy",
+    "AnnouncementReasonEnum" : [
+      "SimpleAnnouncement",
+      "UpdateAvailable",
+      "UrgentUpdateAvailable",
     ], //
     "ApplicationStatusEnum" : [
       "Stopped",
@@ -4347,21 +5122,16 @@ exports.model = {
       "ActiveHidden",
       "ActiveVisibleNotFocus",
     ], //
+    "ApplyUpdateActionEnum" : [
+      "Proceed",
+      "AwaitNextAction",
+      "Discontinue",
+    ], //
     "AssociationFailureCauseEnum" : [
       "Unknown",
       "AssociationFailed",
       "AuthenticationFailed",
       "SsidNotFound",
-    ], //
-    "BarrierControlBarrierPosition" : [
-      "Closed",
-      "Open",
-      "Unknown",
-    ], //
-    "BarrierControlMovingState" : [
-      "Stopped",
-      "Closing",
-      "Opening",
     ], //
     "BatApprovedChemistryEnum" : [
       "Unspecified",
@@ -4525,21 +5295,7 @@ exports.model = {
       "SoftwareUpdateCompleted",
       "SoftwareReset",
     ], //
-    "CalendarTypeEnum" : [
-      "Buddhist",
-      "Chinese",
-      "Coptic",
-      "Ethiopian",
-      "Gregorian",
-      "Hebrew",
-      "Indian",
-      "Islamic",
-      "Japanese",
-      "Korean",
-      "Persian",
-      "Taiwanese",
-    ], //
-    "CecKeyCode" : [
+    "CECKeyCodeEnum" : [
       "Select",
       "Up",
       "Down",
@@ -4627,6 +5383,27 @@ exports.model = {
       "F5",
       "Data",
     ], //
+    "CalendarTypeEnum" : [
+      "Buddhist",
+      "Chinese",
+      "Coptic",
+      "Ethiopian",
+      "Gregorian",
+      "Hebrew",
+      "Indian",
+      "Islamic",
+      "Japanese",
+      "Korean",
+      "Persian",
+      "Taiwanese",
+      "UseActiveLocale",
+    ], //
+    "CauseEnum" : [
+      "NormalCompletion",
+      "Offline",
+      "Fault",
+      "UserOptOut",
+    ], //
     "CertificateChainTypeEnum" : [
       "DACCertificate",
       "PAICertificate",
@@ -4636,18 +5413,62 @@ exports.model = {
       "Warning",
       "Critical",
     ], //
+    "ChangeReasonEnum" : [
+      "Unknown",
+      "Success",
+      "Failure",
+      "TimeOut",
+      "DelayByProvider",
+    ], //
     "ChangeTypeEnum" : [
       "Changed",
       "Added",
       "Removed",
     ], //
-    "ChannelStatusEnum" : [
-      "Success",
-      "MultipleMatches",
-      "NoMatches",
+    "ChannelTypeEnum" : [
+      "Satellite",
+      "Cable",
+      "Terrestrial",
     ], //
-    "ColorControlOptions" : [
-      "ExecuteIfOff",
+    "CharacteristicEnum" : [
+      "ForcedSubtitles",
+      "DescribesVideo",
+      "EasyToRead",
+      "FrameBased",
+      "MainProgram",
+      "OriginalContent",
+      "VoiceOverTranslation",
+      "Caption",
+      "Subtitle",
+      "Alternate",
+      "Supplementary",
+      "Commentary",
+      "DubbedTranslation",
+      "Description",
+      "Metadata",
+      "EnhancedAudioIntelligibility",
+      "Emergency",
+      "Karaoke",
+    ], //
+    "CharacteristicEnum" : [
+      "ForcedSubtitles",
+      "DescribesVideo",
+      "EasyToRead",
+      "FrameBased",
+      "MainProgram",
+      "OriginalContent",
+      "VoiceOverTranslation",
+      "Caption",
+      "Subtitle",
+      "Alternate",
+      "Supplementary",
+      "Commentary",
+      "DubbedTranslation",
+      "Description",
+      "Metadata",
+      "EnhancedAudioIntelligibility",
+      "Emergency",
+      "Karaoke",
     ], //
     "ColorEnum" : [
       "Black",
@@ -4735,11 +5556,6 @@ exports.model = {
       "Warning",
       "Critical",
     ], //
-    "ContentLaunchStatusEnum" : [
-      "Success",
-      "UrlNotAvailable",
-      "AuthFailed",
-    ], //
     "ControlModeEnum" : [
       "ConstantSpeed",
       "ConstantPressure",
@@ -4747,6 +5563,20 @@ exports.model = {
       "ConstantFlow",
       "ConstantTemperature",
       "Automatic",
+    ], //
+    "ControlSequenceOfOperationEnum" : [
+      "CoolingOnly",
+      "CoolingWithReheat",
+      "HeatingOnly",
+      "HeatingWithReheat",
+      "CoolingAndHeating",
+      "CoolingAndHeatingWithReheat",
+    ], //
+    "CostTypeEnum" : [
+      "Financial",
+      "GHGEmissions",
+      "Comfort",
+      "Temperature",
     ], //
     "CredentialRuleEnum" : [
       "Single",
@@ -4761,6 +5591,18 @@ exports.model = {
       "FingerVein",
       "Face",
     ], //
+    "CriticalityLevelEnum" : [
+      "Unknown",
+      "Green",
+      "Level1",
+      "Level2",
+      "Level3",
+      "Level4",
+      "Level5",
+      "Emergency",
+      "PlannedOutage",
+      "ServiceDisconnect",
+    ], //
     "DataOperationTypeEnum" : [
       "Add",
       "Clear",
@@ -4769,6 +5611,11 @@ exports.model = {
     "DegradationDirectionEnum" : [
       "Up",
       "Down",
+    ], //
+    "DelayedAllOffEffectVariantEnum" : [
+      "DelayedOffFastFade",
+      "NoFade",
+      "DelayedOffSlowFade",
     ], //
     "DlLockState" : [
       "NotFullyLocked",
@@ -4799,26 +5646,6 @@ exports.model = {
       "ResourceExhausted",
       "NotFound",
     ], //
-    "DoorLockEventSource" : [
-      "Keypad",
-      "Rf",
-      "Manual",
-      "Rfid",
-      "Indeterminate",
-    ], //
-    "DoorLockEventType" : [
-      "Operation",
-      "Programming",
-      "Alarm",
-    ], //
-    "DoorLockOperatingMode" : [
-      "NormalMode",
-      "VacationMode",
-      "PrivacyMode",
-      "NoRfLockOrUnlock",
-      "LocalProgrammingMode",
-      "PassageMode",
-    ], //
     "DoorLockOperationEventCode" : [
       "UnknownOrMfgSpecific",
       "Lock",
@@ -4845,37 +5672,11 @@ exports.model = {
       "IdAdded",
       "IdDeleted",
     ], //
-    "DoorLockSecurityLevel" : [
-      "NetworkSecurity",
-      "ApsSecurity",
-    ], //
     "DoorLockSetPinOrIdStatus" : [
       "Success",
       "GeneralFailure",
       "MemoryFull",
       "DuplicateCodeError",
-    ], //
-    "DoorLockSoundVolume" : [
-      "Silent",
-      "Low",
-      "High",
-    ], //
-    "DoorLockState" : [
-      "NotFullyLocked",
-      "Locked",
-      "Unlocked",
-    ], //
-    "DoorLockType" : [
-      "DeadBolt",
-      "Magnetic",
-      "Mortise",
-      "Rim",
-      "LatchBolt",
-      "Cylindrical",
-      "Tubular",
-      "Interconnected",
-      "DeadLatch",
-      "Other",
     ], //
     "DoorLockUserStatus" : [
       "Available",
@@ -4891,13 +5692,6 @@ exports.model = {
       "NonAccessUser",
       "NotSupported",
     ], //
-    "DoorState" : [
-      "Open",
-      "Closed",
-      "ErrorJammed",
-      "ErrorForcedOpen",
-      "ErrorUnspecified",
-    ], //
     "DoorStateEnum" : [
       "DoorOpen",
       "DoorClosed",
@@ -4905,6 +5699,50 @@ exports.model = {
       "DoorForcedOpen",
       "DoorUnspecifiedError",
       "DoorAjar",
+    ], //
+    "DownloadProtocolEnum" : [
+      "BDXSynchronous",
+      "BDXAsynchronous",
+      "Https",
+      "VendorSpecific",
+    ], //
+    "DrynessLevelEnum" : [
+      "Low",
+      "Normal",
+      "Extra",
+      "Max",
+    ], //
+    "DyingLightEffectVariantEnum" : [
+      "DyingLightFadeOff",
+    ], //
+    "ESAStateEnum" : [
+      "Offline",
+      "Online",
+      "Fault",
+      "UserOptOut",
+      "PowerAdjustActive",
+      "Paused",
+    ], //
+    "ESATypeEnum" : [
+      "Evse",
+      "SpaceHeating",
+      "WaterHeating",
+      "SpaceCooling",
+      "SpaceHeatingCooling",
+      "BatteryStorage",
+      "SolarPV",
+      "FridgeFreezer",
+      "WashingMachine",
+      "Dishwasher",
+      "Cooking",
+      "HomeWaterPump",
+      "IrrigationWaterPump",
+      "PoolPump",
+      "Other",
+    ], //
+    "EffectIdentifierEnum" : [
+      "DelayedAllOff",
+      "DyingLight",
     ], //
     "EffectIdentifierEnum" : [
       "Blink",
@@ -4953,17 +5791,16 @@ exports.model = {
       "Room",
       "Zone",
     ], //
-    "EnhancedColorMode" : [
-      "CurrentHueAndCurrentSaturation",
-      "CurrentXAndCurrentY",
-      "ColorTemperature",
-      "EnhancedCurrentHueAndCurrentSaturation",
+    "EnergyPriorityEnum" : [
+      "Comfort",
+      "Speed",
+      "Efficiency",
+      "WaterConsumption",
     ], //
-    "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
+    "EnergyTransferStoppedReasonEnum" : [
+      "EVStopped",
+      "EVSEStopped",
+      "Other",
     ], //
     "ErrorStateEnum" : [
       "FailedToFindChargingDock",
@@ -4974,6 +5811,12 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
+    ], //
+    "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -5000,8 +5843,27 @@ exports.model = {
       "OffLowHigh",
       "OffLowMedHighAuto",
       "OffLowHighAuto",
-      "OffOnAuto",
-      "OffOn",
+      "OffHighAuto",
+      "OffHigh",
+    ], //
+    "FaultStateEnum" : [
+      "NoError",
+      "MeterFailure",
+      "OverVoltage",
+      "UnderVoltage",
+      "OverCurrent",
+      "ContactWetFailure",
+      "ContactDryFailure",
+      "GroundFault",
+      "PowerLoss",
+      "PowerQuality",
+      "PilotShortCircuit",
+      "EmergencyStop",
+      "EVDisconnected",
+      "WrongPowerSupply",
+      "LiveNeutralSwap",
+      "OverTemperature",
+      "Other",
     ], //
     "FaultType" : [
       "Unspecified",
@@ -5034,9 +5896,15 @@ exports.model = {
       "NonVolatileMemoryError",
       "TamperDetected",
     ], //
+    "HeatingSourceEnum" : [
+      "Any",
+      "Electric",
+      "NonElectric",
+    ], //
     "HourFormatEnum" : [
       "12hr",
       "24hr",
+      "UseActiveLocale",
     ], //
     "HueDirection" : [
       "ShortestDistance",
@@ -5087,18 +5955,13 @@ exports.model = {
       "Cellular",
       "Thread",
     ], //
-    "KeypadInputStatusEnum" : [
-      "Success",
-      "UnsupportedKey",
-      "InvalidKeyInCurrentState",
-    ], //
-    "KeypadLockout" : [
+    "KeypadLockoutEnum" : [
       "NoLockout",
-      "LevelOneLockout",
-      "LevelTwoLockout",
-      "LevelThreeLockout",
-      "LevelFourLockout",
-      "LevelfiveLockout",
+      "Lockout1",
+      "Lockout2",
+      "Lockout3",
+      "Lockout4",
+      "Lockout5",
     ], //
     "LevelValueEnum" : [
       "Unknown",
@@ -5113,6 +5976,25 @@ exports.model = {
     ], //
     "LineupInfoTypeEnum" : [
       "Mso",
+    ], //
+    "LoadControlEventChangeSourceEnum" : [
+      "Automatic",
+      "UserAction",
+    ], //
+    "LoadControlEventStatusEnum" : [
+      "Unknown",
+      "Received",
+      "InProgress",
+      "Completed",
+      "OptedOut",
+      "OptedIn",
+      "Canceled",
+      "Superseded",
+      "PartialOptedOut",
+      "PartialOptedIn",
+      "NoParticipation",
+      "Unavailable",
+      "Failed",
     ], //
     "LockDataTypeEnum" : [
       "Unspecified",
@@ -5139,6 +6021,23 @@ exports.model = {
       "Water",
       "Soil",
     ], //
+    "MeasurementTypeEnum" : [
+      "Unspecified",
+      "Voltage",
+      "ActiveCurrent",
+      "ReactiveCurrent",
+      "ApparentCurrent",
+      "ActivePower",
+      "ReactivePower",
+      "ApparentPower",
+      "RMSVoltage",
+      "RMSCurrent",
+      "RMSPower",
+      "Frequency",
+      "PowerFactor",
+      "NeutralCurrent",
+      "ElectricalEnergy",
+    ], //
     "MeasurementUnitEnum" : [
       "Ppm",
       "Ppb",
@@ -5149,17 +6048,18 @@ exports.model = {
       "Pm3",
       "Bqm3",
     ], //
-    "MediaPlaybackStatusEnum" : [
-      "Success",
-      "InvalidStateForCommand",
-      "NotAllowed",
-      "NotActive",
-      "SpeedOutOfRange",
-      "SeekOutOfRange",
-    ], //
     "MetricTypeEnum" : [
       "Pixels",
       "Percentage",
+    ], //
+    "ModeTag" : [
+      "Normal",
+      "Defrost",
+    ], //
+    "ModeTag" : [
+      "Normal",
+      "Heavy",
+      "Light",
     ], //
     "ModeTag" : [
       "Normal",
@@ -5172,20 +6072,26 @@ exports.model = {
       "RapidFreeze",
     ], //
     "ModeTag" : [
-      "Normal",
-      "Heavy",
-      "Light",
+      "Bake",
+      "Convection",
+      "Grill",
+      "Roast",
+      "Clean",
+      "ConvectionBake",
+      "ConvectionRoast",
+      "Warming",
+      "Proofing",
+    ], //
+    "ModeTag" : [
+      "Idle",
+      "Cleaning",
     ], //
     "ModeTag" : [
       "DeepClean",
       "Vacuum",
       "Mop",
     ], //
-    "ModeTag" : [
-      "Idle",
-      "Cleaning",
-    ], //
-    "MoveMode" : [
+    "MoveModeEnum" : [
       "Up",
       "Down",
     ], //
@@ -5238,68 +6144,11 @@ exports.model = {
       "Extra",
       "Max",
     ], //
-    "OTAAnnouncementReason" : [
-      "SimpleAnnouncement",
-      "UpdateAvailable",
-      "UrgentUpdateAvailable",
-    ], //
-    "OTAApplyUpdateAction" : [
-      "Proceed",
-      "AwaitNextAction",
-      "Discontinue",
-    ], //
-    "OTAChangeReasonEnum" : [
-      "Unknown",
-      "Success",
-      "Failure",
-      "TimeOut",
-      "DelayByProvider",
-    ], //
-    "OTADownloadProtocol" : [
-      "BDXSynchronous",
-      "BDXAsynchronous",
-      "Https",
-      "VendorSpecific",
-    ], //
-    "OTAQueryStatus" : [
-      "UpdateAvailable",
-      "Busy",
-      "NotAvailable",
-      "DownloadProtocolNotSupported",
-    ], //
-    "OTAUpdateStateEnum" : [
-      "Unknown",
-      "Idle",
-      "Querying",
-      "DelayedOnQuery",
-      "Downloading",
-      "Applying",
-      "DelayedOnApply",
-      "RollingBack",
-      "DelayedOnUserConsent",
-    ], //
     "OccupancySensorTypeEnum" : [
       "Pir",
       "Ultrasonic",
       "PIRAndUltrasonic",
       "PhysicalContact",
-    ], //
-    "OnOffDelayedAllOffEffectVariant" : [
-      "FadeToOffIn0p8Seconds",
-      "NoFade",
-      "50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds",
-    ], //
-    "OnOffDyingLightEffectVariant" : [
-      "20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second",
-    ], //
-    "OnOffEffectIdentifier" : [
-      "DelayedAllOff",
-      "DyingLight",
-    ], //
-    "OnOffStartUpOnOff" : [
-      "Off",
-      "On",
-      "TogglePreviousOnOff",
     ], //
     "OperatingModeEnum" : [
       "Normal",
@@ -5334,15 +6183,15 @@ exports.model = {
       "Biometric",
     ], //
     "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
+    ], //
+    "OperationalStateEnum" : [
       "Stopped",
       "Running",
       "Paused",
       "Error",
-    ], //
-    "OperationalStateEnum" : [
-      "SeekingCharger",
-      "Charging",
-      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -5379,6 +6228,9 @@ exports.model = {
       "SportsTeam",
       "Type",
       "Video",
+      "Season",
+      "Episode",
+      "Any",
     ], //
     "PlaybackStateEnum" : [
       "Playing",
@@ -5447,6 +6299,10 @@ exports.model = {
       "Up",
       "Down",
     ], //
+    "ScheduleProgrammingVisibilityEnum" : [
+      "ScheduleProgrammingPermitted",
+      "ScheduleProgrammingDenied",
+    ], //
     "SecurityTypeEnum" : [
       "Unspecified",
       "None",
@@ -5460,7 +6316,12 @@ exports.model = {
       "Standard",
       "Low",
     ], //
-    "SetpointAdjustMode" : [
+    "SetpointChangeSourceEnum" : [
+      "Manual",
+      "Schedule",
+      "External",
+    ], //
+    "SetpointRaiseLowerModeEnum" : [
       "Heat",
       "Cool",
       "Both",
@@ -5471,7 +6332,7 @@ exports.model = {
       "ValueB",
       "ValueC",
     ], //
-    "StartOfWeek" : [
+    "StartOfWeekEnum" : [
       "Sunday",
       "Monday",
       "Tuesday",
@@ -5480,8 +6341,19 @@ exports.model = {
       "Friday",
       "Saturday",
     ], //
-    "StatusCode" : [
-      "CleaningInProgress",
+    "StartUpOnOffEnum" : [
+      "Off",
+      "On",
+      "Toggle",
+    ], //
+    "StateEnum" : [
+      "NotPluggedIn",
+      "PluggedInNoDemand",
+      "PluggedInDemand",
+      "PluggedInCharging",
+      "PluggedInDischarging",
+      "SessionEnding",
+      "Fault",
     ], //
     "StatusCode" : [
       "Stuck",
@@ -5494,12 +6366,37 @@ exports.model = {
       "BatteryLow",
     ], //
     "StatusCode" : [
+      "CleaningInProgress",
+    ], //
+    "StatusCode" : [
       "Busy",
       "PAKEParameterError",
       "WindowNotOpen",
     ], //
     "StatusCode" : [
       "TimeNotAccepted",
+    ], //
+    "StatusCodeEnum" : [
+      "FailureDueToFault",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "UnsupportedKey",
+      "InvalidKeyInCurrentState",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "TargetNotFound",
+      "NotAllowed",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "UnexpectedData",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "AppNotAvailable",
+      "SystemBusy",
     ], //
     "StatusEnum" : [
       "Success",
@@ -5508,46 +6405,48 @@ exports.model = {
       "Busy",
       "Denied",
     ], //
+    "StatusEnum" : [
+      "Success",
+      "URLNotAvailable",
+      "AuthFailed",
+      "TextTrackNotAvailable",
+      "AudioTrackNotAvailable",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "InvalidStateForCommand",
+      "NotAllowed",
+      "NotActive",
+      "SpeedOutOfRange",
+      "SeekOutOfRange",
+    ], //
+    "StatusEnum" : [
+      "Success",
+      "MultipleMatches",
+      "NoMatches",
+    ], //
+    "StatusEnum" : [
+      "UpdateAvailable",
+      "Busy",
+      "NotAvailable",
+      "DownloadProtocolNotSupported",
+    ], //
     "StepDirectionEnum" : [
       "Increase",
       "Decrease",
     ], //
-    "StepMode" : [
+    "StepModeEnum" : [
       "Up",
       "Down",
     ], //
-    "TargetNavigatorStatusEnum" : [
-      "Success",
-      "TargetNotFound",
-      "NotAllowed",
+    "SupplyStateEnum" : [
+      "Disabled",
+      "ChargingEnabled",
+      "DischargingEnabled",
+      "DisabledError",
+      "DisabledDiagnostics",
     ], //
-    "TempUnitEnum" : [
-      "Fahrenheit",
-      "Celsius",
-      "Kelvin",
-    ], //
-    "TemperatureDisplayMode" : [
-      "Celsius",
-      "Fahrenheit",
-    ], //
-    "TemperatureSetpointHold" : [
-      "SetpointHoldOff",
-      "SetpointHoldOn",
-    ], //
-    "ThermostatControlSequence" : [
-      "CoolingOnly",
-      "CoolingWithReheat",
-      "HeatingOnly",
-      "HeatingWithReheat",
-      "CoolingAndHeating",
-      "CoolingAndHeatingWithReheat",
-    ], //
-    "ThermostatRunningMode" : [
-      "Off",
-      "Cool",
-      "Heat",
-    ], //
-    "ThermostatSystemMode" : [
+    "SystemModeEnum" : [
       "Off",
       "Auto",
       "Cool",
@@ -5557,6 +6456,24 @@ exports.model = {
       "FanOnly",
       "Dry",
       "Sleep",
+    ], //
+    "TempUnitEnum" : [
+      "Fahrenheit",
+      "Celsius",
+      "Kelvin",
+    ], //
+    "TemperatureDisplayModeEnum" : [
+      "Celsius",
+      "Fahrenheit",
+    ], //
+    "TemperatureSetpointHoldEnum" : [
+      "SetpointHoldOff",
+      "SetpointHoldOn",
+    ], //
+    "ThermostatRunningModeEnum" : [
+      "Off",
+      "Cool",
+      "Heat",
     ], //
     "TimeSourceEnum" : [
       "None",
@@ -5582,6 +6499,12 @@ exports.model = {
       "Partial",
       "None",
     ], //
+    "TimerStatusEnum" : [
+      "Running",
+      "Paused",
+      "Expired",
+      "Ready",
+    ], //
     "TransferProtocolEnum" : [
       "ResponsePayload",
       "Bdx",
@@ -5599,6 +6522,17 @@ exports.model = {
       "ProjectorScreen",
       "Unknown",
     ], //
+    "UpdateStateEnum" : [
+      "Unknown",
+      "Idle",
+      "Querying",
+      "DelayedOnQuery",
+      "Downloading",
+      "Applying",
+      "DelayedOnApply",
+      "RollingBack",
+      "DelayedOnUserConsent",
+    ], //
     "UserStatusEnum" : [
       "Available",
       "OccupiedEnabled",
@@ -5615,6 +6549,11 @@ exports.model = {
       "ExpiringUser",
       "ScheduleRestrictedUser",
       "RemoteOnlyUser",
+    ], //
+    "ValveStateEnum" : [
+      "Closed",
+      "Open",
+      "Transitioning",
     ], //
     "WiFiBandEnum" : [
       "2g4",
@@ -5645,6 +6584,13 @@ exports.model = {
   },
 
   bitmaps : {
+    "ACErrorCodeBitmap" : {
+      1 : "CompressorFail",
+      2 : "RoomSensorFail",
+      4 : "OutdoorSensorFail",
+      8 : "CoilSensorFail",
+      16 : "FanFail",
+    },
     "AlarmMap" : {
       1 : "InflowError",
       2 : "DrainError",
@@ -5655,6 +6601,14 @@ exports.model = {
     },
     "AlarmMap" : {
       1 : "DoorOpen",
+    },
+    "AlarmModeBitmap" : {
+      1 : "Visual",
+      2 : "Audible",
+    },
+    "BallastStatusBitmap" : {
+      1 : "BallastNonOperational",
+      2 : "LampFailure",
     },
     "BarrierControlCapabilities" : {
       1 : "PartialBarrier",
@@ -5688,6 +6642,9 @@ exports.model = {
       2 : "MaskVal2",
       4 : "MaskVal3",
       64 : "MaskVal4",
+    },
+    "CancelControlBitmap" : {
+      1 : "RandomEnd",
     },
     "ColorCapabilities" : {
       1 : "HueSaturationSupported",
@@ -5725,15 +6682,8 @@ exports.model = {
       32 : "LiftEncoderControlled",
       64 : "TiltEncoderControlled",
     },
-    "DayOfWeek" : {
-      1 : "Sunday",
-      2 : "Monday",
-      4 : "Tuesday",
-      8 : "Wednesday",
-      16 : "Thursday",
-      32 : "Friday",
-      64 : "Saturday",
-      128 : "Away",
+    "CopyModeBitmap" : {
+      1 : "CopyAllScenes",
     },
     "DaysMaskMap" : {
       1 : "Sunday",
@@ -5743,6 +6693,25 @@ exports.model = {
       16 : "Thursday",
       32 : "Friday",
       64 : "Saturday",
+    },
+    "DeviceClassBitmap" : {
+      1 : "Hvac",
+      2 : "StripHeater",
+      4 : "WaterHeater",
+      8 : "PoolPump",
+      16 : "SmartAppliance",
+      32 : "IrrigationPump",
+      64 : "CommercialLoad",
+      128 : "ResidentialLoad",
+      256 : "ExteriorLighting",
+      512 : "InteriorLighting",
+      1024 : "Ev",
+      2048 : "GenerationSystem",
+      4096 : "SmartInverter",
+      8192 : "Evse",
+      16384 : "Resu",
+      32768 : "Ems",
+      65536 : "Sem",
     },
     "DlCredentialRuleMask" : {
       1 : "Single",
@@ -5846,6 +6815,13 @@ exports.model = {
       32 : "Friday",
       64 : "Saturday",
     },
+    "EventControlBitmap" : {
+      1 : "RandomStart",
+    },
+    "EventTransitionControlBitmap" : {
+      1 : "RandomDuration",
+      2 : "IgnoreOptOut",
+    },
     "Feature" : {
       1 : "OnOff",
     },
@@ -5856,9 +6832,6 @@ exports.model = {
       8 : "ExtremelyPoor",
     },
     "Feature" : {
-      1 : "TemperatureUnit",
-    },
-    "Feature" : {
       1 : "Spin",
       2 : "Rinse",
     },
@@ -5866,9 +6839,7 @@ exports.model = {
       1 : "TagList",
     },
     "Feature" : {
-      1 : "TemperatureNumber",
-      2 : "TemperatureLevel",
-      4 : "TemperatureStep",
+      1 : "OnOff",
     },
     "Feature" : {
       1 : "NavigationKeyCodes",
@@ -5876,16 +6847,27 @@ exports.model = {
       4 : "NumberKeys",
     },
     "Feature" : {
-      1 : "WaterMarks",
+      1 : "TemperatureNumber",
+      2 : "TemperatureLevel",
+      4 : "TemperatureStep",
     },
     "Feature" : {
-      1 : "NameUpdates",
+      1 : "TemperatureUnit",
     },
     "Feature" : {
-      1 : "OnOff",
+      1 : "Visual",
+      2 : "Audible",
+      4 : "AlarmSuppress",
+      8 : "SensitivityLevel",
     },
     "Feature" : {
-      1 : "NameUpdates",
+      1 : "Reset",
+    },
+    "Feature" : {
+      1 : "ImportedEnergy",
+      2 : "ExportedEnergy",
+      4 : "CumulativeEnergy",
+      8 : "PeriodicEnergy",
     },
     "Feature" : {
       1 : "PacketCounts",
@@ -5895,11 +6877,17 @@ exports.model = {
       1 : "Extended",
     },
     "Feature" : {
-      1 : "ApplicationPlatform",
+      1 : "Watermarks",
     },
     "Feature" : {
-      1 : "ChannelList",
-      2 : "LineupInfo",
+      1 : "Reset",
+    },
+    "Feature" : {
+      1 : "TimeSync",
+      2 : "Level",
+    },
+    "Feature" : {
+      1 : "CalendarFormat",
     },
     "Feature" : {
       1 : "MultiSpeed",
@@ -5910,21 +6898,44 @@ exports.model = {
       32 : "AirflowDirection",
     },
     "Feature" : {
-      1 : "PacketCounts",
-      2 : "ErrorCounts",
+      1 : "ApplicationPlatform",
+    },
+    "Feature" : {
+      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "Condition",
       2 : "Warning",
-      3 : "ReplacementProductList",
+      4 : "ReplacementProductList",
+    },
+    "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
+    },
+    "Feature" : {
+      1 : "Lighting",
+      2 : "DeadFrontBehavior",
+      4 : "OffOnly",
+    },
+    "Feature" : {
+      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "ContentSearch",
       2 : "URLPlayback",
+      3 : "AdvancedSeek",
+      4 : "TextTracks",
+      5 : "AudioTracks",
     },
     "Feature" : {
-      1 : "Lighting",
-      2 : "DeadFront",
+      1 : "PowerAdjustment",
+      2 : "PowerForecastReporting",
+      4 : "StateForecastReporting",
+      8 : "ForecastAdjustment",
+    },
+    "Feature" : {
+      1 : "EnergyBalance",
+      2 : "LowPowerModeSensitivity",
     },
     "Feature" : {
       1 : "LatchingSwitch",
@@ -5938,14 +6949,38 @@ exports.model = {
       2 : "CoAlarm",
     },
     "Feature" : {
-      1 : "AdvancedSeek",
-      2 : "VariableSpeed",
+      1 : "EnrollmentGroups",
+      2 : "TemperatureOffset",
+      4 : "TemperatureSetpoint",
+      8 : "LoadAdjustment",
+      16 : "DutyCycle",
+      32 : "PowerSavings",
+      64 : "HeatingSource",
     },
     "Feature" : {
-      1 : "CheckInProtocolSupport",
+      1 : "Basic",
+    },
+    "Feature" : {
+      1 : "ScreenTime",
+      2 : "PINManagement",
+      3 : "BlockUnrated",
+      4 : "OnDemandContentRating",
+      5 : "ScheduledContentRating",
     },
     "Feature" : {
       1 : "CacheAndSync",
+    },
+    "Feature" : {
+      1 : "CheckInProtocolSupport",
+      2 : "UserActiveModeTrigger",
+      4 : "LongIdleTimeSupport",
+    },
+    "Feature" : {
+      1 : "AdvancedSeek",
+      2 : "VariableSpeed",
+      3 : "TextTracks",
+      4 : "AudioTracks",
+      5 : "AudioAdvance",
     },
     "Feature" : {
       1 : "TimeZone",
@@ -5960,6 +6995,12 @@ exports.model = {
       8 : "Replaceable",
     },
     "Feature" : {
+      1 : "ChannelList",
+      2 : "LineupInfo",
+      3 : "ElectronicGuide",
+      4 : "RecordProgram",
+    },
+    "Feature" : {
       1 : "Lift",
       2 : "Tilt",
       4 : "PositionAwareLift",
@@ -5968,6 +7009,13 @@ exports.model = {
     },
     "Feature" : {
       1 : "GroupNames",
+    },
+    "Feature" : {
+      1 : "ChargingPreferences",
+      2 : "SoCReporting",
+      4 : "PlugAndCharge",
+      8 : "Rfid",
+      16 : "V2x",
     },
     "Feature" : {
       1 : "OnOff",
@@ -5984,15 +7032,16 @@ exports.model = {
       64 : "LocalOperation",
     },
     "Feature" : {
-      1 : "WiFiNetworkInterface",
-      2 : "ThreadNetworkInterface",
-      4 : "EthernetNetworkInterface",
-    },
-    "Feature" : {
       1 : "PacketCounts",
       2 : "ErrorCounts",
       4 : "MLECounts",
       8 : "MACCounts",
+    },
+    "Feature" : {
+      1 : "WiFiNetworkInterface",
+      2 : "ThreadNetworkInterface",
+      4 : "EthernetNetworkInterface",
+      8 : "PerDeviceCredentials",
     },
     "Feature" : {
       1 : "HueAndSaturation",
@@ -6008,14 +7057,6 @@ exports.model = {
       8 : "FabricScenes",
     },
     "Feature" : {
-      1 : "NumericMeasurement",
-      2 : "LevelIndication",
-      4 : "MediumLevel",
-      8 : "CriticalLevel",
-      16 : "PeakMeasurement",
-      32 : "AverageMeasurement",
-    },
-    "Feature" : {
       1 : "Heating",
       2 : "Cooling",
       4 : "Occupancy",
@@ -6023,6 +7064,14 @@ exports.model = {
       16 : "Setback",
       32 : "AutoMode",
       64 : "LocalTemperatureNotExposed",
+    },
+    "Feature" : {
+      1 : "NumericMeasurement",
+      2 : "LevelIndication",
+      4 : "MediumLevel",
+      8 : "CriticalLevel",
+      16 : "PeakMeasurement",
+      32 : "AverageMeasurement",
     },
     "Feature" : {
       1 : "PinCredential",
@@ -6039,9 +7088,14 @@ exports.model = {
       2048 : "HolidaySchedules",
       4096 : "Unbolt",
     },
-    "LevelControlOptions" : {
-      1 : "ExecuteIfOff",
-      2 : "CoupleColorTempToLevel",
+    "HVACSystemTypeBitmap" : {
+      3 : "CoolingStage",
+      12 : "HeatingStage",
+      16 : "HeatingIsHeatPump",
+      32 : "HeatingUsesFuel",
+    },
+    "LampAlarmModeBitmap" : {
+      1 : "LampBurnHours",
     },
     "Mode" : {
       1 : "MotorDirectionReversed",
@@ -6049,12 +7103,11 @@ exports.model = {
       4 : "MaintenanceMode",
       8 : "LedFeedback",
     },
-    "ModeForSequence" : {
-      1 : "HeatSetpointPresent",
-      2 : "CoolSetpointPresent",
-    },
     "NameSupportBitmap" : {
       128 : "GroupNames",
+    },
+    "NameSupportBitmap" : {
+      128 : "SceneNames",
     },
     "OccupancyBitmap" : {
       1 : "Occupied",
@@ -6064,7 +7117,7 @@ exports.model = {
       2 : "Ultrasonic",
       4 : "PhysicalContact",
     },
-    "OnOffControl" : {
+    "OnOffControlBitmap" : {
       1 : "AcceptOnlyWhenOn",
     },
     "OperationalStatus" : {
@@ -6072,9 +7125,18 @@ exports.model = {
       12 : "Lift",
       48 : "Tilt",
     },
+    "OptionsBitmap" : {
+      1 : "ExecuteIfOff",
+      2 : "CoupleColorTempToLevel",
+    },
+    "ProgrammingOperationModeBitmap" : {
+      1 : "ScheduleActive",
+      2 : "AutoRecovery",
+      4 : "Economy",
+    },
     "PumpStatusBitmap" : {
       1 : "DeviceFault",
-      2 : "Supplyfault",
+      2 : "SupplyFault",
       4 : "SpeedLow",
       8 : "SpeedHigh",
       16 : "LocalOverride",
@@ -6082,6 +7144,25 @@ exports.model = {
       64 : "RemotePressure",
       128 : "RemoteFlow",
       256 : "RemoteTemperature",
+    },
+    "RecordingFlagBitmap" : {
+      1 : "Scheduled",
+      2 : "RecordSeries",
+      3 : "Recorded",
+    },
+    "RelayStateBitmap" : {
+      1 : "Heat",
+      2 : "Cool",
+      4 : "Fan",
+      8 : "HeatStage2",
+      16 : "CoolStage2",
+      32 : "FanStage2",
+      64 : "FanStage3",
+    },
+    "RemoteSensingBitmap" : {
+      1 : "LocalTemperature",
+      2 : "OutdoorTemperature",
+      4 : "Occupancy",
     },
     "RockBitmap" : {
       1 : "RockLeftRight",
@@ -6102,17 +7183,75 @@ exports.model = {
       1024 : "ManualOperation",
       2048 : "Protection",
     },
-    "ScenesCopyMode" : {
-      1 : "CopyAllScenes",
+    "ScheduleDayOfWeekBitmap" : {
+      1 : "Sunday",
+      2 : "Monday",
+      4 : "Tuesday",
+      8 : "Wednesday",
+      16 : "Thursday",
+      32 : "Friday",
+      64 : "Saturday",
+      128 : "Away",
+    },
+    "ScheduleModeBitmap" : {
+      1 : "HeatSetpointPresent",
+      2 : "CoolSetpointPresent",
+    },
+    "SensorFaultBitmap" : {
+      1 : "GeneralFault",
     },
     "SimpleBitmap" : {
       1 : "ValueA",
       2 : "ValueB",
       4 : "ValueC",
     },
-    "SupportedStreamingProtocol" : {
+    "SupportedProtocolsBitmap" : {
       1 : "Dash",
       2 : "Hls",
+      2 : "WebRTC",
+    },
+    "TargetDayOfWeekBitmap" : {
+      1 : "Sunday",
+      2 : "Monday",
+      4 : "Tuesday",
+      8 : "Wednesday",
+      16 : "Thursday",
+      32 : "Friday",
+      64 : "Saturday",
+    },
+    "ThreadCapabilitiesBitmap" : {
+      1 : "IsBorderRouterCapable",
+      2 : "IsRouterCapable",
+      4 : "IsSleepyEndDeviceCapable",
+      8 : "IsFullThreadDevice",
+      16 : "IsSynchronizedSleepyEndDeviceCapable",
+    },
+    "UserActiveModeTriggerBitmap" : {
+      1 : "PowerCycle",
+      2 : "SettingsMenu",
+      4 : "CustomInstruction",
+      8 : "DeviceManual",
+      16 : "ActuateSensor",
+      32 : "ActuateSensorSeconds",
+      64 : "ActuateSensorTimes",
+      128 : "ActuateSensorLightsBlink",
+      256 : "ResetButton",
+      512 : "ResetButtonLightsBlink",
+      1024 : "ResetButtonSeconds",
+      2048 : "ResetButtonTimes",
+      4096 : "SetupButton",
+      8192 : "SetupButtonSeconds",
+      16384 : "SetupButtonLightsBlink",
+      32768 : "SetupButtonTimes",
+      65536 : "AppDefinedButton",
+    },
+    "ValveFaultBitmap" : {
+      1 : "GeneralFault",
+      2 : "Blocked",
+      4 : "Leaking",
+      8 : "NotConnected",
+      16 : "ShortCircuit",
+      32 : "CurrentExceeded",
     },
     "WiFiSecurityBitmap" : {
       1 : "Unencrypted",
@@ -6120,13 +7259,13 @@ exports.model = {
       4 : "WpaPersonal",
       8 : "Wpa2Personal",
       16 : "Wpa3Personal",
+      32 : "Wpa3MatterPdc",
     },
     "WindBitmap" : {
       1 : "SleepWind",
       2 : "NaturalWind",
     },
     "Bitmap16" : {},
-    "Bitmap24" : {},
     "Bitmap32" : {},
     "Bitmap64" : {},
     "Bitmap8" : {},

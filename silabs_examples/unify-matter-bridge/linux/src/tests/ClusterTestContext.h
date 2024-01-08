@@ -88,16 +88,39 @@ public:
      */
     static int Initialize(void * context)
     {
-        if (UnifyBridgeContext::Initialize(context) != SUCCESS)
-            return FAILURE;
-
         auto * ctx = static_cast<ClusterContext *>(context);
+        
+        if (ctx->UMB_Initialize() != CHIP_NO_ERROR)
+            return FAILURE;
+        
+        if (ctx->nlTestSetUp(context) != SUCCESS)
+            return FAILURE;
 
         if (!ctx->mAttributeHandler)
             ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mDeviceTranslator);
 
         if (!ctx->mCommandHandler)
             ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator);
+
+        return SUCCESS;
+    }
+    
+    /**
+     * @brief
+     *   It's necessary to call this function as a part of your teardown of the
+     *   entire test suite.
+     *
+     * @param[inout]  inContext   A pointer to test suite-specific context
+     *                            provided by the test suite driver.
+     */
+    static int Finalize(void * context)
+    {
+        auto * ctx = static_cast<ClusterContext *>(context);
+        
+        if (ctx->nlTestTearDown(context) != SUCCESS)
+            return FAILURE;
+            
+        ctx->UMB_Finalize();
 
         return SUCCESS;
     }

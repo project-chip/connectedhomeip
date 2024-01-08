@@ -21,22 +21,15 @@
 {{#zcl_clusters}}
     {{#zcl_bitmaps}}
         {{#zcl_bitmap_items}}
-            {{#if (unifyMatchStringValue this "Lighting")}}
-            // Special case to handle bitmapitem <Lighting> in on_off and levelcontrol clustres
+            {{#if (matterAppendClusterToBitmap parent.label label)}}
 #define ZCL_BITMAP_{{asDelimitedMacro parent.parent.label}}_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
 #define ZCL_BITMAP_{{asDelimitedMacro parent.parent.label}}_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
-            {{/if}}
-        {{/zcl_bitmap_items}}
-    {{/zcl_bitmaps}}    
-{{/zcl_clusters}}
-
-{{#zcl_bitmaps}}
-    {{#zcl_bitmap_items}}
-        {{#unless (unifyMatchStringValue this "Lighting")}}
+            {{else}}
 #define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
 #define ZCL_BITMAP_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})        
-        {{/unless}}
-    {{/zcl_bitmap_items}}
-{{/zcl_bitmaps}}
+            {{/if}}
+        {{/zcl_bitmap_items}}
+    {{/zcl_bitmaps}}
+{{/zcl_clusters}}
 
 #endif

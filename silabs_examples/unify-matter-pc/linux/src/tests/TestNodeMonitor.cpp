@@ -41,14 +41,22 @@ class TestContext : public UnifyMPCContext
 public:
     static int Init(void * ctxt)
     {
+        TestContext & ctx = *static_cast<TestContext *>(ctxt);
         // Makes sure our required state folders exists
         std::filesystem::create_directories(LOCALSTATEDIR);
-        int ret = TestContext::Initialize(ctxt);
+        auto ret = ctx.Initialize();
         
-        if (ret != SUCCESS)
-            return ret;
+        if (ret != CHIP_NO_ERROR)
+            return FAILURE;
         if (SL_STATUS_OK != attribute_store_init())
             return FAILURE;
+        return SUCCESS;
+    }
+
+    static int Shutdown(void * ctxt)
+    {
+        TestContext & ctx = *static_cast<TestContext *>(ctxt);
+        ctx.Finalize();
         return SUCCESS;
     }
 };
@@ -126,7 +134,9 @@ static nlTestSuite kTheSuite =
     "TestNodeMonitorInterface",
     &sTests[0],
     TestContext::Init,
-    TestContext::Finalize
+    TestContext::Shutdown,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 
 int TestNodeMonitorInterface(void)

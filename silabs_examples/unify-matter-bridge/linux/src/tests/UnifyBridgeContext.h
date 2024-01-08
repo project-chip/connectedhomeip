@@ -32,6 +32,7 @@
 
 // Third party library
 #include <nlunit-test.h>
+#include "sl_log.h"
 
 namespace unify::matter_bridge {
 namespace Test {
@@ -53,10 +54,10 @@ public:
     {}
 
     /// Initialize the underlying layers.
-    CHIP_ERROR Init() override;
+    CHIP_ERROR UMB_Initialize();
 
     // Shutdown all layers, finalize operations
-    void Shutdown() override;
+    void UMB_Finalize();
 
     UnifyEmberInterface mEmberInterface;
     device_translator mDeviceTranslator = device_translator(false);

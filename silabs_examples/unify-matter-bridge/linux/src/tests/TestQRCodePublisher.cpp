@@ -55,8 +55,8 @@ static nlTestSuite kTheSuite =
 {
     "QRCodePublisher",
     &sTests[0],
-    UnifyBridgeContext::Initialize,
-    UnifyBridgeContext::Finalize
+    UnifyBridgeContext::nlTestSetUpTestSuite,
+    UnifyBridgeContext::nlTestTearDownTestSuite
 };
 
 int QRCodePublisherSuite(void)

@@ -70,6 +70,29 @@ function matterAppendClusterToAttrType(clusterName, attributeType) {
   return false;
 }
 
+const bitmap_need_cluster_name_append = {
+  "Feature": {
+    "Lighting": true,
+    "AdvancedSeek": true,
+    "TextTracks": true,
+    "AudioTracks": true,
+  },
+};
+
+function matterAppendClusterToBitmap(bitmapName, bitmapItem) {
+  const bitmapItemName = String(bitmapItem);
+  
+  if (!bitmap_need_cluster_name_append.hasOwnProperty(bitmapName)) {
+    return false;
+  }
+
+  if (bitmap_need_cluster_name_append[bitmapName].hasOwnProperty(bitmapItemName)) {
+    return true;
+  }
+
+  return false;
+}
+
 exports.matterSupportedCluster = matterSupportedCluster
 exports.matterClusterName = matterClusterName
 exports.matterSupportedClusterCommand = matterSupportedClusterCommand
@@ -77,3 +100,4 @@ exports.matterClusterCommandName = matterClusterCommandName
 exports.matterSupportedClusterAttribute = matterSupportedClusterAttribute
 exports.matterClusterAttributeName = matterClusterAttributeName
 exports.matterAppendClusterToAttrType = matterAppendClusterToAttrType
+exports.matterAppendClusterToBitmap = matterAppendClusterToBitmap

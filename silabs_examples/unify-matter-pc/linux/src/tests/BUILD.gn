@@ -41,7 +41,7 @@ chip_test_suite_using_nltest("tests") {
   test_sources = [
     "TestCli.cpp",
     "TestClusterParsers.cpp",
-    #"TestCmdSender.cpp",
+    "TestCmdSender.cpp",
     "TestNodeInterview.cpp",
     "TestNodeMonitor.cpp",
     "TestParserFramework.cpp",

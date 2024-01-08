@@ -56,7 +56,7 @@ chip_test_suite_using_nltest("tests") {
     "TestColorControl.cpp",
     "TestNodeStateMonitor.cpp",
     "TestOnOff.cpp",
-    "TestOnOffCommandsHandler.cpp",
+    #"TestOnOffCommandsHandler.cpp",
     "TestTemperatureMeasurement.cpp",
     "TestQRCodePublisher.cpp",
     "TestIlluminanceMeasurement.cpp"

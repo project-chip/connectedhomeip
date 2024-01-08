@@ -15,16 +15,16 @@
 namespace unify::mpc {
 namespace Test {
 
-CHIP_ERROR UnifyMPCContext::Init()
+CHIP_ERROR UnifyMPCContext::Initialize()
 {
-    ReturnErrorOnFailure(Super::Init());
+    ReturnErrorOnFailure(Super::SetUpTestSuite());
 
     return CHIP_NO_ERROR;
 }
 
-void UnifyMPCContext::Shutdown()
+void UnifyMPCContext::Finalize()
 {
-    Super::Shutdown();
+    Super::TearDownTestSuite();
 }
 
 } // namespace Test

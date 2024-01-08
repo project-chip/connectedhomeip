@@ -178,7 +178,7 @@ void TestReadInteraction::TestReadSender(nlTestSuite * inSuite, void * aContext)
     ctx.DrainAndServiceIO();
 
     GenerateReportData(inSuite, aContext, payload, false, true, false);
-    err = request.client->ProcessReportData(std::move(payload));
+    err = request.client->ProcessReportData(std::move(payload), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mockCallbacks.reported == true);
 }
@@ -206,7 +206,7 @@ void TestReadInteraction::TestSubscribeSender(nlTestSuite * inSuite, void * aCon
     ctx.DrainAndServiceIO();
 
     GenerateReportData(inSuite, aContext, payload, false, true, true);
-    err = request.client->ProcessReportData(std::move(payload));
+    err = request.client->ProcessReportData(std::move(payload), ReadClient::ReportType::kContinuingTransaction);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mockCallbacks.reported == true);
 }
@@ -222,7 +222,9 @@ static void TestCliSendRead(nlTestSuite * inSuite, void * aContext)
 
     NL_TEST_ASSERT(inSuite, (mpc_cli_init() == SL_STATUS_OK));
     NL_TEST_ASSERT(inSuite, (mpc_stdin_handle_command(command.c_str()) == SL_STATUS_OK));
-    ctx.GetLoopback().mNumMessagesToDrop = 1;
+    // If we drop it, it keeps the message exchange active and causes crash
+    //      if we don't drop it UT framework responds with error response and closes exchange
+    //ctx.GetLoopback().mNumMessagesToDrop = 1;
     ctx.DrainAndServiceIO();
 }
 
@@ -274,8 +276,10 @@ static nlTestSuite kTheSuite =
 {
     "TestCmdSenderInterface",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 
 int TestCmdSenderInterface(void)

@@ -46,10 +46,10 @@ public:
     UnifyMPCContext() {}
 
     /// Initialize the underlying layers.
-    CHIP_ERROR Init() override;
+    CHIP_ERROR Initialize();
 
     // Shutdown all layers, finalize operations
-    void Shutdown() override;
+    void Finalize();
 };
 
 } // namespace Test

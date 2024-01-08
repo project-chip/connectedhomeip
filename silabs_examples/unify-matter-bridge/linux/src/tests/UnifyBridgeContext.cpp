@@ -17,9 +17,9 @@
 namespace unify::matter_bridge {
 namespace Test {
 
-CHIP_ERROR UnifyBridgeContext::Init()
+CHIP_ERROR UnifyBridgeContext::UMB_Initialize()
 {
-    ReturnErrorOnFailure(Super::Init());
+    ReturnErrorOnFailure(Super::SetUpTestSuite());
 
     MockAttributePersistenceProvider persistence;
     chip::app::SetAttributePersistenceProvider(&persistence);
@@ -28,9 +28,9 @@ CHIP_ERROR UnifyBridgeContext::Init()
     return CHIP_NO_ERROR;
 }
 
-void UnifyBridgeContext::Shutdown()
+void UnifyBridgeContext::UMB_Finalize()
 {
-    Super::Shutdown();
+    Super::TearDownTestSuite();
 }
 
 } // namespace Test

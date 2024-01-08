@@ -56,7 +56,7 @@ public:
         // Makes sure our required state folders exists
         std::filesystem::create_directories(LOCALSTATEDIR);
 
-        if (SUCCESS != TestContext::Initialize(inContext))
+        if (CHIP_NO_ERROR != ctxt->Initialize())
             return FAILURE;
 
         attribute_store_init();
@@ -72,7 +72,7 @@ public:
     {
 
         attribute_store_teardown();
-        return TestContext::Finalize(inContext);
+        return TestContext::nlTestTearDownTestSuite(inContext);
     }
 };
 
@@ -237,7 +237,9 @@ static nlTestSuite kTheSuite =
     "TestParserFwkInterface",
     &sTests[0],
     TestContext::initialize,
-    TestContext::finalize
+    TestContext::finalize,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 
 };
 
