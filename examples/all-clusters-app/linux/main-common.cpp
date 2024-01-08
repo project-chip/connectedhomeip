@@ -26,9 +26,9 @@
 #include "laundry-washer-mode.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
-#include "rvc-operational-state-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
+#include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>

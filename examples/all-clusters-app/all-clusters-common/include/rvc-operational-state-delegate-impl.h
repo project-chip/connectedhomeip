@@ -49,8 +49,10 @@ private:
         OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
     };
 
-    Span<const OperationalState::GenericOperationalState> mOperationalStateList = Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList = Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
+    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
+        Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
 
 public:
     RvcOperationalStateDelegate() {}

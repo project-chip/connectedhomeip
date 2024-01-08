@@ -22,7 +22,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RvcOperationalState;
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
+                                                                   OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= mOperationalStateList.size())
     {
@@ -32,7 +33,8 @@ CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
+                                                                   OperationalState::GenericOperationalPhase & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {
@@ -98,7 +100,8 @@ void RvcOperationalStateDelegate::HandleStopStateCallback(OperationalState::Gene
     }
 }
 
-void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) {
+void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+{
     // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kSeekingCharger));
     if (error == CHIP_NO_ERROR)
@@ -111,8 +114,8 @@ void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::
     }
 }
 
-static RvcOperationalState::Instance * gRvcOperationalStateInstance  = nullptr;
-static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
+static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
+static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
 void RvcOperationalState::Shutdown()
 {
