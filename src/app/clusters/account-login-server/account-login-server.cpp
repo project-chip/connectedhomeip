@@ -52,33 +52,6 @@ static constexpr size_t kAccountLoginDeletageTableSize =
     EMBER_AF_ACCOUNT_LOGIN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kAccountLoginDeletageTableSize <= kEmberInvalidEndpointIndex, "AccountLogin Delegate table size error");
 
-NodeId getNodeId(const chip::app::CommandHandler * commandObj)
-{
-    // TODO: Why are we doing all these checks?  At all the callsites we have
-    // just received a command, so we better have a handler, exchange, session,
-    // etc.  The only thing we should be checking is that it's a CASE session.
-    if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
-    {
-        ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
-
-    if (!commandObj->GetExchangeContext()->HasSessionHandle())
-    {
-        ChipLogError(Zcl, "Cannot access session of Command Object for Node ID");
-        return kUndefinedNodeId;
-    }
-
-    auto descriptor = commandObj->GetExchangeContext()->GetSessionHandle()->GetSubjectDescriptor();
-    if (descriptor.authMode != Access::AuthMode::kCase)
-    {
-        ChipLogError(Zcl, "Cannot get Node ID from non-CASE session of Command Object");
-        return kUndefinedNodeId;
-    }
-
-    return descriptor.subject;
-}
-
 // -----------------------------------------------------------------------------
 // Delegate Implementation
 

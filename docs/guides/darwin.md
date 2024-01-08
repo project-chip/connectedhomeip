@@ -264,7 +264,7 @@ Example:
 -   [Infineon CYW30739 Lighting](/examples/lighting-app/infineon/cyw30739/README.md)
 -   [Infineon PSoC6](/examples/all-clusters-app/infineon/psoc6/README.md)
 -   [Qorvo](/examples/lighting-app/qpg/README.md)
--   [SiliconLabs](./silabs_efr32_building.md)
+-   [Silicon Labs](./silabs_getting_started.md)
 -   [Simulated Linux](./simulated_device_linux.md)
 -   [Telink](/examples/lighting-app/telink/README.md)
 -   [TI Platform](./ti/ti_platform_overview.md)

@@ -38338,11 +38338,11 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="channelPagingStruct", Tag=0, Type=int),
+                        ClusterObjectFieldDescriptor(Label="paging", Tag=0, Type=Channel.Structs.ChannelPagingStruct),
                         ClusterObjectFieldDescriptor(Label="programList", Tag=1, Type=typing.List[Channel.Structs.ProgramStruct]),
                     ])
 
-            channelPagingStruct: 'int' = 0
+            paging: 'Channel.Structs.ChannelPagingStruct' = field(default_factory=lambda: Channel.Structs.ChannelPagingStruct())
             programList: 'typing.List[Channel.Structs.ProgramStruct]' = field(default_factory=lambda: [])
 
         @dataclass
@@ -42079,14 +42079,14 @@ class ContentAppObserver(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=typing.Optional[ContentAppObserver.Enums.StatusEnum]),
-                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=2, Type=str),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentAppObserver.Enums.StatusEnum),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="encodingHint", Tag=2, Type=typing.Optional[str]),
                     ])
 
-            status: 'typing.Optional[ContentAppObserver.Enums.StatusEnum]' = None
-            data: 'str' = ""
-            encodingHint: 'str' = ""
+            status: 'ContentAppObserver.Enums.StatusEnum' = 0
+            data: 'typing.Optional[str]' = None
+            encodingHint: 'typing.Optional[str]' = None
 
     class Attributes:
         @dataclass
@@ -45542,6 +45542,22 @@ class UnitTesting(Cluster):
             arg1: 'typing.List[UnitTesting.Structs.NestedStructList]' = field(default_factory=lambda: [])
 
         @dataclass
+        class TestBatchHelperResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="buffer", Tag=0, Type=bytes),
+                    ])
+
+            buffer: 'bytes' = b""
+
+        @dataclass
         class TestListInt8UReverseRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000D
@@ -45713,6 +45729,46 @@ class UnitTesting(Cluster):
                     ])
 
             arg1: 'uint' = 0
+
+        @dataclass
+        class TestBatchHelperRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x00000016
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TestBatchHelperResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sleepBeforeResponseTimeMs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sizeOfResponseBuffer", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fillCharacter", Tag=2, Type=uint),
+                    ])
+
+            sleepBeforeResponseTimeMs: 'uint' = 0
+            sizeOfResponseBuffer: 'uint' = 0
+            fillCharacter: 'uint' = 0
+
+        @dataclass
+        class TestSecondBatchHelperRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x00000017
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TestBatchHelperResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sleepBeforeResponseTimeMs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sizeOfResponseBuffer", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fillCharacter", Tag=2, Type=uint),
+                    ])
+
+            sleepBeforeResponseTimeMs: 'uint' = 0
+            sizeOfResponseBuffer: 'uint' = 0
+            fillCharacter: 'uint' = 0
 
     class Attributes:
         @dataclass

@@ -33376,8 +33376,8 @@ public:
 namespace ProgramGuideResponse {
 enum class Fields : uint8_t
 {
-    kChannelPagingStruct = 0,
-    kProgramList         = 1,
+    kPaging      = 0,
+    kProgramList = 1,
 };
 
 struct Type
@@ -33387,7 +33387,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    int16_t channelPagingStruct = static_cast<int16_t>(0);
+    Structs::ChannelPagingStruct::Type paging;
     DataModel::List<const Structs::ProgramStruct::Type> programList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -33403,7 +33403,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    int16_t channelPagingStruct = static_cast<int16_t>(0);
+    Structs::ChannelPagingStruct::DecodableType paging;
     DataModel::DecodableList<Structs::ProgramStruct::DecodableType> programList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -37276,9 +37276,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 
-    Optional<StatusEnum> status;
-    chip::CharSpan data;
-    chip::CharSpan encodingHint;
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
+    Optional<chip::CharSpan> encodingHint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -37293,9 +37293,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ContentAppMessageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentAppObserver::Id; }
 
-    Optional<StatusEnum> status;
-    chip::CharSpan data;
-    chip::CharSpan encodingHint;
+    StatusEnum status = static_cast<StatusEnum>(0);
+    Optional<chip::CharSpan> data;
+    Optional<chip::CharSpan> encodingHint;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ContentAppMessageResponse
@@ -39687,6 +39687,11 @@ struct Type;
 struct DecodableType;
 } // namespace TestListNestedStructListArgumentRequest
 
+namespace TestBatchHelperResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestBatchHelperResponse
+
 namespace TestListInt8UReverseRequest {
 struct Type;
 struct DecodableType;
@@ -39731,6 +39736,16 @@ namespace TestEmitTestFabricScopedEventRequest {
 struct Type;
 struct DecodableType;
 } // namespace TestEmitTestFabricScopedEventRequest
+
+namespace TestBatchHelperRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestBatchHelperRequest
+
+namespace TestSecondBatchHelperRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestSecondBatchHelperRequest
 
 } // namespace Commands
 
@@ -40645,6 +40660,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListNestedStructListArgumentRequest
+namespace TestBatchHelperResponse {
+enum class Fields : uint8_t
+{
+    kBuffer = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestBatchHelperResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan buffer;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestBatchHelperResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    chip::ByteSpan buffer;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestBatchHelperResponse
 namespace TestListInt8UReverseRequest {
 enum class Fields : uint8_t
 {
@@ -40971,6 +41018,82 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEmitTestFabricScopedEventRequest
+namespace TestBatchHelperRequest {
+enum class Fields : uint8_t
+{
+    kSleepBeforeResponseTimeMs = 0,
+    kSizeOfResponseBuffer      = 1,
+    kFillCharacter             = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestBatchHelperRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint16_t sleepBeforeResponseTimeMs = static_cast<uint16_t>(0);
+    uint16_t sizeOfResponseBuffer      = static_cast<uint16_t>(0);
+    uint8_t fillCharacter              = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestBatchHelperRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint16_t sleepBeforeResponseTimeMs = static_cast<uint16_t>(0);
+    uint16_t sizeOfResponseBuffer      = static_cast<uint16_t>(0);
+    uint8_t fillCharacter              = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestBatchHelperRequest
+namespace TestSecondBatchHelperRequest {
+enum class Fields : uint8_t
+{
+    kSleepBeforeResponseTimeMs = 0,
+    kSizeOfResponseBuffer      = 1,
+    kFillCharacter             = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestSecondBatchHelperRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint16_t sleepBeforeResponseTimeMs = static_cast<uint16_t>(0);
+    uint16_t sizeOfResponseBuffer      = static_cast<uint16_t>(0);
+    uint8_t fillCharacter              = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestSecondBatchHelperRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint16_t sleepBeforeResponseTimeMs = static_cast<uint16_t>(0);
+    uint16_t sizeOfResponseBuffer      = static_cast<uint16_t>(0);
+    uint8_t fillCharacter              = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSecondBatchHelperRequest
 } // namespace Commands
 
 namespace Attributes {
