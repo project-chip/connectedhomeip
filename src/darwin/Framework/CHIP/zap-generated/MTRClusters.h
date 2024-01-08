@@ -3166,6 +3166,9 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 - (void)resumeWithParams:(MTRRVCOperationalStateClusterResumeParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 - (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+- (void)goHomeWithParams:(MTRRVCOperationalStateClusterGoHomeParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)goHomeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
