@@ -223,16 +223,14 @@ void M4_sleep_wakeup() {
       btn0_pressed = true;
     }
     if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN)) {
-#ifdef CONFIG_ENABLE_UART
+#ifdef DISPLAY_ENABLED
       // if LCD is enabled, power down the lcd before setting the M4 to sleep
       sl_si91x_hardware_setup();
 #endif
-      SILABS_LOG("M4 sleep successful");
       btn0_pressed = false;
       /* Configure RAM Usage and Retention Size */
       sl_si91x_m4_sleep_wakeup();
       silabsInitLog();
-      SILABS_LOG("M4 wakeup successful");
     }
   }
 }
@@ -328,9 +326,8 @@ static sl_status_t wfx_rsi_init(void)
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
     if (status != SL_STATUS_OK) {
         SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
-    return;
+        return status;
     }
-    SILABS_LOG("m4_ta_secure_handshake Success\r\n");
 #endif /* SL_ICD_ENABLED */
 #endif /* SLI_SI91X_MCU_INTERFACE */
 

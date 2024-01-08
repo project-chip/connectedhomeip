@@ -24,6 +24,13 @@ import("silabs_board.gni")
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
+declare_args() {
+  # Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled
+  alarm_based_wakeup = false
+
+  # Periodic time at which the DUT should wakeup
+  alarm_periodic_time = 30
+}
 # Defines an siwx917 SDK build target.
 #
 # Parameters:
@@ -260,11 +267,14 @@ template("siwx917_sdk") {
         "SL_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${sl_icd_supported_clients_per_fabric}",
         "SL_SI91X_MCU_WIRELESS_BASED_WAKEUP=1",
         "SL_SI91X_MCU_BUTTON_BASED_WAKEUP=1",
-        "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
-        "ALARM_PERIODIC_TIME=5",
       ]
 
-
+      if (alarm_based_wakeup) {
+        defines += [
+          "SL_SI91X_MCU_ALARM_BASED_WAKEUP=1",
+          "ALARM_PERIODIC_TIME=${alarm_periodic_time}",
+        ]
+      }
     }
 
     if (chip_build_libshell) {  # matter shell
