@@ -32,13 +32,24 @@
 #include <libgen.h>
 #include <unistd.h>
 #include "silabs_utils.h"
+
+#ifdef EFR32MG24 //For efr32 NCP combos
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
-
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_wfx_host_api.h"
 #include "spi_multiplex.h"
+#endif // EFR32MG24 && WF200_WIFI
+#else
+#ifdef __cplusplus
+extern "C" {
 #endif
+#include "sl_si91x_driver.h"
+#include "sl_si91x_hal_soc_soft_reset.h"
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+#endif // EFR32MG24
 
 #include "ota.h"
 #include "pal.h"
@@ -52,6 +63,15 @@
  * @brief Name of the file used for storing platform image state.
  */
 #define OTA_PLATFORM_IMAGE_STATE_FILE    "PlatformImageState.txt"
+
+#ifdef SIWX_917
+#define SL_STATUS_FW_UPDATE_DONE ((sl_status_t)0x10003)
+#define SL_FWUP_RPS_HEADER  1
+#define SL_FWUP_RPS_CONTENT 2
+
+static uint8_t flag = SL_FWUP_RPS_HEADER;
+bool reset_flag = false;
+#endif // Siwx917
 
 /**
  * @brief Specify the OTA signature algorithm we support on this platform.
@@ -82,7 +102,8 @@ OtaPalStatus_t otaPal_CloseFile( OtaFileContext_t * const C )
 
 static bool bl_init_done = false;
 
-int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
+#ifdef EFR32MG24
+int16_t otaPal_WriteBlock_efr32( OtaFileContext_t * const C,
                            uint32_t ulOffset,
                            uint8_t * const pcData,
                            uint32_t ulBlockSize )
@@ -112,8 +133,6 @@ int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
         SILABS_LOG("otaPal_WriteBlock bootloader Init Failed %d",err);
         return -1;
     }
-    
-     SILABS_LOG("otaPal_WriteBlock mSlotId %d ulBlockSize %d kAlignmentBytes %d", mSlotId, ulBlockSize, kAlignmentBytes);
 
     while (blockReadOffset < ulBlockSize)
     {
@@ -122,6 +141,7 @@ int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
         blockReadOffset++;
         if (writeBufOffset == kAlignmentBytes)
         {
+            SILABS_LOG("packets mWriteOffset %d, blockReadOffset %d writeBufOffset %d", mWriteOffset, blockReadOffset, writeBufOffset);
             writeBufOffset = 0;
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
@@ -142,7 +162,7 @@ int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
         }
         else if ((blockReadOffset == ulBlockSize) && ulBlockSize!=1024)
         {
-            SILABS_LOG("while loop (blockReadOffset == ulBlockSize) mWriteOffset %d, blockReadOffset %d writeBufOffset %d", mWriteOffset, blockReadOffset, writeBufOffset);
+            SILABS_LOG("last packet mWriteOffset %d, blockReadOffset %d writeBufOffset %d", mWriteOffset, blockReadOffset, writeBufOffset);
             if (writeBufOffset != 0)
             {
                 // Account for last bytes of the image not yet written to storage
@@ -176,8 +196,117 @@ int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
     return ( int16_t ) filerc;
 }
 
+#else
+int16_t otaPal_WriteBlock_siwx917( OtaFileContext_t * const C,
+                           uint32_t ulOffset,
+                           uint8_t * const pcData,
+                           uint32_t ulBlockSize )
+{
+
+    int32_t status = 0;
+    int32_t filerc = 0;
+    uint32_t const kAlignmentBytes = 64;
+    uint8_t mSlotId;
+    static uint32_t mWriteOffset;
+    uint16_t writeBufOffset = 0;
+
+    static uint64_t downloadedBytes;
+    
+    uint32_t blockReadOffset = 0;
+    uint8_t writeBuffer[64] = { 0 };
+ 
+    mSlotId = 0; // Single slot until we support multiple images
+    downloadedBytes = 0;
+
+    while (blockReadOffset < ulBlockSize)
+    {
+        writeBuffer[writeBufOffset] = *(pcData + blockReadOffset);
+        writeBufOffset++;
+        blockReadOffset++;
+        if (writeBufOffset == kAlignmentBytes)
+        {
+            SILABS_LOG("packets mWriteOffset %d, blockReadOffset %d writeBufOffset %d", mWriteOffset, blockReadOffset, writeBufOffset);
+            writeBufOffset = 0;
+            if(flag == SL_FWUP_RPS_HEADER)
+            {
+                // Send RPS header which is received as first chunk
+                status = sl_si91x_fwup_start(writeBuffer);
+
+                // Send RPS content
+                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+
+                flag = SL_FWUP_RPS_CONTENT;
+            }
+            else if(flag == SL_FWUP_RPS_CONTENT)
+            {
+                // Send RPS content
+                status = sl_si91x_fwup_load(writeBuffer, kAlignmentBytes);
+	            if (status != SL_STATUS_OK) {
+                    if (status == SL_STATUS_FW_UPDATE_DONE) {
+                        reset_flag = true;
+                    }
+                }
+                else
+                {
+                    SILABS_LOG("ERROR: In HandleProcessBlock for middle chunk sl_si91x_fwup_load error %ld", status);
+                    return -1;
+                }
+            } 
+            mWriteOffset += kAlignmentBytes;
+            downloadedBytes += kAlignmentBytes;
+            filerc = ( int32_t ) ulBlockSize;
+        }
+        else if ((blockReadOffset == ulBlockSize) && ulBlockSize!=1024)
+        {
+            SILABS_LOG("last packet mWriteOffset %d, blockReadOffset %d writeBufOffset %d", mWriteOffset, blockReadOffset, writeBufOffset);
+            if (writeBufOffset != 0)
+            {
+                // Account for last bytes of the image not yet written to storage
+                downloadedBytes += writeBufOffset;
+          
+                if(flag == SL_FWUP_RPS_CONTENT)
+                {
+                    // Send RPS content
+                    status = sl_si91x_fwup_load(writeBuffer, writeBufOffset);
+                    SILABS_LOG("status: 0x%lX", status);
+	                if (status != SL_STATUS_OK) {
+                        if (status == SL_STATUS_FW_UPDATE_DONE) {
+                            reset_flag = true;
+                        }
+                    }
+                    else
+                    {
+                        SILABS_LOG("ERROR: In HandleProcessBlock for last chunk sl_si91x_fwup_load error %ld", status);
+                        return -1;
+                    }
+                }
+            }
+            mWriteOffset += writeBufOffset;
+            filerc = ( int32_t ) ulBlockSize;
+        }
+    }
+    filerc = ( int32_t ) ulBlockSize;
+    return ( int16_t ) filerc;
+}
+#endif
+
+int16_t otaPal_WriteBlock( OtaFileContext_t * const C,
+                           uint32_t ulOffset,
+                           uint8_t * const pcData,
+                           uint32_t ulBlockSize )
+{
+#ifdef EFR32MG24
+    return otaPal_WriteBlock_efr32( C,ulOffset,pcData,ulBlockSize );
+#else
+    return otaPal_WriteBlock_siwx917( C,ulOffset,pcData,ulBlockSize );
+#endif
+}
+
+
 /* Return no error. POSIX implementation simply does nothing on activate. */
-OtaPalStatus_t otaPal_ActivateNewImage( OtaFileContext_t * const C )
+
+#ifdef EFR32MG24
+OtaPalStatus_t otaPal_ActivateNewImage_efr32( OtaFileContext_t * const C )
 {
     ( void ) C;
 
@@ -204,7 +333,29 @@ OtaPalStatus_t otaPal_ActivateNewImage( OtaFileContext_t * const C )
 
     // This reboots the device
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+
     return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
+}
+
+#else
+OtaPalStatus_t otaPal_ActivateNewImage_siwx917( OtaFileContext_t * const C )
+{
+    ( void ) C;
+    if(reset_flag){
+        SILABS_LOG("M4/TA/combined image update completed - reset started");
+        sl_si91x_soc_soft_reset();
+    }
+    return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
+}
+#endif
+
+OtaPalStatus_t otaPal_ActivateNewImage( OtaFileContext_t * const C )
+{
+#ifdef EFR32MG24
+    return otaPal_ActivateNewImage_efr32( C );
+#else
+    return otaPal_ActivateNewImage_siwx917( C );
+#endif
 }
 
 /* Set the final state of the last transferred (final) OTA file (or bundle).

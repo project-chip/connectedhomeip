@@ -51,7 +51,7 @@ extern "C" {
 /**
  * Output ring-buffer size, must be able to fit largest outgoing publish message topic+payloads
  */
-#define MQTT_OUTPUT_RINGBUF_SIZE 256
+#define MQTT_OUTPUT_RINGBUF_SIZE 512
 
 /**
  * Number of bytes in receive buffer, must be at least the size of the longest incoming topic + 8

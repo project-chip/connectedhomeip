@@ -36,7 +36,7 @@
 /* Include header that defines log levels. */
 // #include "logging_levels.h"
 
-#define OTA_TASK_STACK_SIZE (2*1024)
+#define OTA_TASK_STACK_SIZE (3*1024)
 #define OTA_TASK_PRIORITY 8
 
 /* Logging configuration for the Demo. */
