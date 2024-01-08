@@ -3741,7 +3741,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
@@ -7559,18 +7559,18 @@ endpoint 1 {
     emits event PowerAdjustEnd;
     emits event Paused;
     emits event Resumed;
-    callback attribute ESAType default = 0;
-    callback attribute ESACanGenerate default = 0;
-    callback attribute ESAState default = 0;
-    callback attribute absMinPower default = 0;
-    callback attribute absMaxPower default = 0;
+    callback attribute ESAType;
+    callback attribute ESACanGenerate;
+    callback attribute ESAState;
+    callback attribute absMinPower;
+    callback attribute absMaxPower;
     callback attribute powerAdjustmentCapability;
     callback attribute forecast;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
 
     handle command PowerAdjustRequest;
@@ -7583,24 +7583,24 @@ endpoint 1 {
   }
 
   server cluster EnergyEvse {
-    callback attribute state default = 0;
-    callback attribute supplyState default = 0;
-    callback attribute faultState default = 0;
-    callback attribute chargingEnabledUntil default = 0;
-    callback attribute dischargingEnabledUntil default = 0;
-    callback attribute circuitCapacity default = 0;
-    callback attribute minimumChargeCurrent default = 6000;
-    callback attribute maximumChargeCurrent default = 0;
-    callback attribute maximumDischargeCurrent default = 0;
-    callback attribute userMaximumChargeCurrent default = 0;
-    callback attribute randomizationDelayWindow default = 600;
+    callback attribute state;
+    callback attribute supplyState;
+    callback attribute faultState;
+    callback attribute chargingEnabledUntil;
+    callback attribute dischargingEnabledUntil;
+    callback attribute circuitCapacity;
+    callback attribute minimumChargeCurrent;
+    callback attribute maximumChargeCurrent;
+    callback attribute maximumDischargeCurrent;
+    callback attribute userMaximumChargeCurrent;
+    callback attribute randomizationDelayWindow;
     callback attribute numberOfWeeklyTargets default = 0;
     callback attribute numberOfDailyTargets default = 1;
     callback attribute nextChargeStartTime;
     callback attribute nextChargeTargetTime;
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
-    callback attribute approximateEVEfficiency default = 0xFFFF;
+    callback attribute approximateEVEfficiency;
     callback attribute stateOfCharge;
     callback attribute batteryCapacity;
     callback attribute vehicleID;
@@ -7612,7 +7612,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
 
     handle command GetTargetsResponse;
