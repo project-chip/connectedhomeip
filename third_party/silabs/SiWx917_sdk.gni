@@ -182,7 +182,6 @@ template("siwx917_sdk") {
       "SL_BOARD_REV=\"A00\"",
       "SPI_MULTI_SLAVE=1",
       "SYSCALLS_WRITE=1",
-      "SSI_ULP_MASTER=1",
       "__STATIC_INLINE=static inline",
       "SL_SI91X_SI917_RAM_MEM_CONFIG=2",
       "SL_SI91x_DUAL_INTERRUPTS_ERRATA=1",
