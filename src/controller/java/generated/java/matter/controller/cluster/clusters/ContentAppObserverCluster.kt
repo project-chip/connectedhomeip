@@ -43,7 +43,7 @@ class ContentAppObserverCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
-  class ContentAppMessageResponse(val status: UByte?, val data: String, val encodingHint: String)
+  class ContentAppMessageResponse(val status: UByte, val data: String?, val encodingHint: String?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -127,36 +127,42 @@ class ContentAppObserverCluster(
       val tag = tlvReader.peekElement().tag
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
-        status_decoded =
+        status_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_DATA)) {
+        data_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
           } else {
             if (tlvReader.isNextTag(tag)) {
-              tlvReader.getUByte(tag)
+              tlvReader.getString(tag)
             } else {
               null
             }
           }
       }
 
-      if (tag == ContextSpecificTag(TAG_DATA)) {
-        data_decoded = tlvReader.getString(tag)
-      }
-
       if (tag == ContextSpecificTag(TAG_ENCODING_HINT)) {
-        encodingHint_decoded = tlvReader.getString(tag)
+        encodingHint_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (data_decoded == null) {
-      throw IllegalStateException("data not found in TLV")
-    }
-
-    if (encodingHint_decoded == null) {
-      throw IllegalStateException("encodingHint not found in TLV")
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
     }
 
     tlvReader.exitContainer()

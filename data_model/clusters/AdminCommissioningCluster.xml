@@ -57,7 +57,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003c" name="Administrator Commissioning" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003C" name="Administrator Commissioning" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -81,6 +81,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </item>
     </enum>
+    <enum name="Status Codes" type="status"/>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="WindowStatus" type="CommissioningWindowStatusEnum">
@@ -92,7 +93,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0002" name="AdminVendorId" type="&lt;&lt;ref_DataTypeVendorId&gt;&gt;">
+    <attribute id="0x0002" name="AdminVendorId" type="ref_DataTypeVendorId">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
@@ -106,7 +107,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="PAKEPasscodeVerifier" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="1" name="PAKEPasscodeVerifier" type="ref_DataTypeOctstr">
         <mandatoryConform/>
       </field>
       <field id="2" name="Discriminator" type="uint16">
@@ -117,7 +118,7 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="between" from="1000" to="100000"/>
       </field>
-      <field id="4" name="Salt" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="4" name="Salt" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="between" from="16" to="32"/>
       </field>

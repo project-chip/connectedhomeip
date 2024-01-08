@@ -43,7 +43,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
   class ChangeChannelResponse(val status: UByte, val data: String?)
 
   class ProgramGuideResponse(
-    val channelPagingStruct: Short,
+    val paging: ChannelClusterChannelPagingStruct,
     val programList: List<ChannelClusterProgramStruct>
   )
 
@@ -294,8 +294,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_CHANNEL_PAGING_STRUCT: Int = 0
-    var channelPagingStruct_decoded: Short? = null
+    val TAG_PAGING: Int = 0
+    var paging_decoded: ChannelClusterChannelPagingStruct? = null
 
     val TAG_PROGRAM_LIST: Int = 1
     var programList_decoded: List<ChannelClusterProgramStruct>? = null
@@ -303,8 +303,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_CHANNEL_PAGING_STRUCT)) {
-        channelPagingStruct_decoded = tlvReader.getShort(tag)
+      if (tag == ContextSpecificTag(TAG_PAGING)) {
+        paging_decoded = ChannelClusterChannelPagingStruct.fromTlv(tag, tlvReader)
       }
 
       if (tag == ContextSpecificTag(TAG_PROGRAM_LIST)) {
@@ -321,8 +321,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
       }
     }
 
-    if (channelPagingStruct_decoded == null) {
-      throw IllegalStateException("channelPagingStruct not found in TLV")
+    if (paging_decoded == null) {
+      throw IllegalStateException("paging not found in TLV")
     }
 
     if (programList_decoded == null) {
@@ -331,7 +331,7 @@ class ChannelCluster(private val controller: MatterController, private val endpo
 
     tlvReader.exitContainer()
 
-    return ProgramGuideResponse(channelPagingStruct_decoded, programList_decoded)
+    return ProgramGuideResponse(paging_decoded, programList_decoded)
   }
 
   suspend fun recordProgram(

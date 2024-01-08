@@ -55,12 +55,12 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010b" name="Dimmable Plug-In Unit" revision="3">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010B" name="Dimmable Plug" revision="3">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
     <revision revision="2" summary="New data model format and notation"/>
-    <revision revision="3" summary="Added optional measurement clusters for energy and power"/>
+    <revision revision="3" summary="Added optional occupancy sensing and measurement clusters for energy and power"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
@@ -136,6 +136,9 @@ Davis, CA 95616, USA
       <optionalConform/>
     </cluster>
     <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0406" name="Occupancy Sensing" side="client">
       <optionalConform/>
     </cluster>
   </clusters>

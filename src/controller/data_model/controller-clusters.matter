@@ -2449,7 +2449,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -2925,7 +2925,7 @@ cluster IcdManagement = 70 {
 
 /** This cluster supports creating a simple timer functionality. */
 provisional cluster Timer = 71 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum TimerStatusEnum : enum8 {
     kRunning = 0;
@@ -3095,7 +3095,7 @@ provisional cluster OvenMode = 73 {
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
 cluster LaundryDryerControls = 74 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
@@ -3256,7 +3256,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
@@ -3761,7 +3761,7 @@ provisional cluster MicrowaveOvenControl = 95 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3827,7 +3827,7 @@ cluster OperationalState = 96 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
@@ -4058,9 +4058,14 @@ provisional cluster BooleanStateConfiguration = 128 {
 provisional cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
   enum ValveStateEnum : enum8 {
-    kOpen = 0;
-    kClosed = 1;
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
   }
 
   bitmap Feature : bitmap32 {
@@ -4072,25 +4077,29 @@ provisional cluster ValveConfigurationAndControl = 129 {
     kGeneralFault = 0x1;
     kBlocked = 0x2;
     kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
   }
 
   info event ValveStateChanged = 0 {
     ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
   }
 
   info event ValveFault = 1 {
     ValveFaultBitmap valveFault = 0;
   }
 
-  attribute access(write: manage) nullable elapsed_s openDuration = 0;
-  readonly attribute optional nullable epoch_us autoCloseTime = 1;
-  readonly attribute optional nullable elapsed_s remainingDuration = 2;
-  readonly attribute nullable ValveStateEnum currentState = 3;
-  readonly attribute nullable ValveStateEnum targetState = 4;
-  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
+  readonly attribute nullable elapsed_s openDuration = 0;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
   readonly attribute optional nullable percent currentLevel = 6;
   readonly attribute optional nullable percent targetLevel = 7;
-  attribute access(write: manage) optional nullable percent openLevel = 8;
+  attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4100,20 +4109,14 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenRequest {
-    optional elapsed_s openDuration = 0;
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
   }
 
-  request struct SetLevelRequest {
-    percent level = 0;
-    optional elapsed_s openDuration = 1;
-  }
-
-  /** This command is used to set the valve to its fully open position. */
+  /** This command is used to set the valve to its open position. */
   command Open(OpenRequest): DefaultSuccess = 0;
-  /** This command is used to set the valve to its fully closed position. */
+  /** This command is used to set the valve to its closed position. */
   command Close(): DefaultSuccess = 1;
-  /** This command is used to set the valve to a specific level. */
-  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
@@ -4393,7 +4396,7 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
@@ -4572,7 +4575,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 provisional cluster EnergyEvse = 153 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -4749,6 +4752,40 @@ provisional cluster EnergyEvse = 153 {
   timed command GetTargets(GetTargetsRequest): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
+}
+
+/** This cluster provides an interface to specify preferences for how devices should consume energy. */
+cluster EnergyPreference = 155 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum EnergyPriorityEnum : enum8 {
+    kComfort = 0;
+    kSpeed = 1;
+    kEfficiency = 2;
+    kWaterConsumption = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnergyBalance = 0x1;
+    kLowPowerModeSensitivity = 0x2;
+  }
+
+  struct BalanceStruct {
+    percent step = 0;
+    optional char_string<64> label = 1;
+  }
+
+  readonly attribute optional BalanceStruct energyBalances[] = 0;
+  attribute optional int8u currentEnergyBalance = 1;
+  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
+  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
+  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 /** An interface to a generic way to secure a door */
@@ -7276,7 +7313,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -8145,9 +8182,9 @@ cluster ContentAppObserver = 1296 {
   }
 
   response struct ContentAppMessageResponse = 1 {
-    optional StatusEnum status = 0;
-    char_string data = 1;
-    char_string encodingHint = 2;
+    StatusEnum status = 0;
+    optional char_string data = 1;
+    optional char_string encodingHint = 2;
   }
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */

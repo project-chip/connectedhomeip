@@ -2179,7 +2179,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -3048,9 +3048,9 @@ cluster ContentAppObserver = 1296 {
   }
 
   response struct ContentAppMessageResponse = 1 {
-    optional StatusEnum status = 0;
-    char_string data = 1;
-    char_string encodingHint = 2;
+    StatusEnum status = 0;
+    optional char_string data = 1;
+    optional char_string encodingHint = 2;
   }
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
@@ -3593,18 +3593,6 @@ endpoint 1 {
     handle command SetOnDemandRatingThreshold;
     handle command SetScheduledContentRatingThreshold;
   }
-
-  server cluster ContentAppObserver {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command ContentAppMessage;
-    handle command ContentAppMessageResponse;
-  }
 }
 endpoint 2 {
   device type ma_speaker = 34, version 1;
@@ -3660,6 +3648,7 @@ endpoint 2 {
 endpoint 3 {
   device type ma_contentapp = 36, version 1;
 
+  binding cluster ContentAppObserver;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -3668,6 +3657,16 @@ endpoint 3 {
     callback attribute partsList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision;
+  }
+
+  server cluster Binding {
+    callback attribute binding;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster Channel {
@@ -3824,18 +3823,6 @@ endpoint 3 {
     handle command UnblockUnratedContent;
     handle command SetOnDemandRatingThreshold;
     handle command SetScheduledContentRatingThreshold;
-  }
-
-  server cluster ContentAppObserver {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute eventList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command ContentAppMessage;
-    handle command ContentAppMessageResponse;
   }
 }
 

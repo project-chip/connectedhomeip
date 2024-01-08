@@ -1979,6 +1979,7 @@ limitations under the License.
         <scope>Endpoint</scope>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2115,9 +2116,9 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-valve</name>
+        <name>MA-water-valve</name>
         <domain>CHIP</domain>
-        <typeName>Matter Valve</typeName>
+        <typeName>Matter Water Valve</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0042</deviceId>
         <class>Simple</class>

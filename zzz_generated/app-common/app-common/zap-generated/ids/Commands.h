@@ -938,10 +938,6 @@ namespace Close {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Close
 
-namespace SetLevel {
-static constexpr CommandId Id = 0x00000002;
-} // namespace SetLevel
-
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
