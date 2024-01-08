@@ -61,7 +61,7 @@ Davis, CA 95616, USA
     <revision revision="2" summary="TransitionTime field added to the RecallScene command"/>
     <revision revision="3" summary="CCB 2427 3026"/>
     <revision revision="4" summary="New data model format and notation"/>
-    <revision revision="5" summary="Explicit, TableSize and FabricScenes features; support multi-fabric environment; adding attributes SceneTableSize and RemainingCapacity; add fabric-scoped scene information list"/>
+    <revision revision="5" summary="Added Explicit, TableSize and FabricScenes features; support multi-fabric environment; added attributes SceneTableSize and RemainingCapacity; added fabric-scoped scene information list"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
@@ -137,7 +137,8 @@ Davis, CA 95616, USA
         <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
-      <field id="1" name="AttributeValueList" type="list[AttributeValuePairStruct Type]">
+      <field id="1" name="AttributeValueList" type="list">
+        <entry type="AttributeValuePairStruct"/>
         <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
@@ -159,7 +160,8 @@ Davis, CA 95616, USA
       <field id="3" name="SceneTransitionTime" type="uint16" default="0">
         <mandatoryConform/>
       </field>
-      <field id="4" name="ExtensionFields" type="list[ExtensionFieldSetStruct Type]" default="empty">
+      <field id="4" name="ExtensionFields" type="list" default="empty">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
       </field>
       <field id="5" name="TransitionTime100ms" type="uint8" default="0">
@@ -191,6 +193,7 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <constraint type="max" value="253"/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
@@ -244,8 +247,9 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0007" name="FabricSceneInfo" type="list[SceneInfoStruct Type]">
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0007" name="FabricSceneInfo" type="list">
+      <entry type="SceneInfoStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
       <mandatoryConform>
         <feature name="FS"/>
       </mandatoryConform>
@@ -270,7 +274,8 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]">
+      <field id="4" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -318,7 +323,9 @@ Davis, CA 95616, USA
       <field id="4" name="SceneName" type="string">
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]"/>
+      <field id="5" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+      </field>
     </command>
     <command id="0x02" name="RemoveScene" response="RemoveSceneResponse">
       <access invokePrivilege="manage"/>
@@ -443,7 +450,8 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="4" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]">
+      <field id="4" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
@@ -479,7 +487,9 @@ Davis, CA 95616, USA
       <field id="4" name="SceneName" type="string">
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="5" name="ExtensionFieldSetStructs" type="list[ExtensionFieldSetStruct Type]"/>
+      <field id="5" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+      </field>
     </command>
     <command id="0x42" name="CopyScene" response="CopySceneResponse">
       <access invokePrivilege="manage"/>
