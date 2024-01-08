@@ -658,10 +658,7 @@ JNI_METHOD(void, pairDevice)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -708,10 +705,7 @@ JNI_METHOD(void, pairDeviceWithAddress)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -763,10 +757,7 @@ JNI_METHOD(void, pairDeviceWithCode)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
@@ -2150,6 +2141,73 @@ exit:
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
     return nullptr;
+}
+
+JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, jint jFabricIndex)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jobject jInfo = nullptr;
+    chip::app::ICDClientInfo info;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(jFabricIndex);
+
+    ChipLogProgress(Controller, "getICDClientInfo(%u) called", fabricIndex);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    err = JniReferences::GetInstance().CreateArrayList(jInfo);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
+
+    jmethodID constructor;
+    jclass infoClass;
+    JniLocalReferenceManager manager(env);
+
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(infoClass, "<init>", "(JJJJ[B[B)V");
+    VerifyOrReturnValue(constructor != nullptr, nullptr, ChipLogError(Controller, "Find GetMethodID error!"));
+
+    while (iter->Next(info))
+    {
+        jbyteArray jIcdAesKey  = nullptr;
+        jbyteArray jIcdHmacKey = nullptr;
+        jobject jICDClientInfo = nullptr;
+
+        if (info.peer_node.GetFabricIndex() != fabricIndex)
+        {
+            continue;
+        }
+
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
+                                                  static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset),
+                                                  static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
+
+        err = JniReferences::GetInstance().AddToList(jInfo, jICDClientInfo);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
+    }
+
+    iter->Release();
+
+    return jInfo;
 }
 
 JNI_METHOD(void, subscribe)

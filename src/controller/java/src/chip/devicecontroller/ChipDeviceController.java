@@ -606,9 +606,10 @@ public class ChipDeviceController {
     }
   }
 
-  public void onICDRegistrationComplete(long icdNodeId, long icdCounter) {
+  public void onICDRegistrationComplete(
+      int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo) {
     if (completionListener != null) {
-      completionListener.onICDRegistrationComplete(icdNodeId, icdCounter);
+      completionListener.onICDRegistrationComplete(errorCode, icdNodeId, icdCounter, icdDeviceInfo);
     }
   }
 
@@ -710,6 +711,19 @@ public class ChipDeviceController {
 
   public int getFabricIndex() {
     return getFabricIndex(deviceControllerPtr);
+  }
+
+  public List<ICDClientInfo> getICDClientInfo() {
+    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+  }
+
+  /**
+   * Returns the ICD Client Information
+   *
+   * @param fabricIndex the fabric index to check
+   */
+  public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
+    return getICDClientInfo(deviceControllerPtr, fabricIndex);
   }
 
   /* Shuts down all active subscriptions. */
@@ -1486,6 +1500,8 @@ public class ChipDeviceController {
   private native void updateCommissioningICDRegistrationInfo(
       long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
 
+  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
+
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
@@ -1605,6 +1621,7 @@ public class ChipDeviceController {
     void onICDRegistrationInfoRequired();
 
     /** Notifies when the registration flow for the ICD completes. */
-    void onICDRegistrationComplete(long icdNodeId, long icdCounter);
+    void onICDRegistrationComplete(
+        int errorCode, long icdNodeId, long icdCounter, ICDDeviceInfo icdDeviceInfo);
   }
 }
