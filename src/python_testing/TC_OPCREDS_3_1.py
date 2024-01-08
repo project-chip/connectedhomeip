@@ -19,14 +19,13 @@ import copy
 import logging
 import random
 
-from cryptography import x509
-
-from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 import chip.discovery as Discovery
+from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import TLVReader, TLVWriter
+from cryptography import x509
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
