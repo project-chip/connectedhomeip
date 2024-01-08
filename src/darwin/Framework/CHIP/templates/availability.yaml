@@ -8313,6 +8313,12 @@
               - ActivateAudioTrack
               - ActivateTextTrack
               - DeactivateTextTrack
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestBatchHelperResponse
+              - TestBatchHelperRequest
+              - TestSecondBatchHelperRequest
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
