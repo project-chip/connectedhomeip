@@ -1,0 +1,83 @@
+{
+    "name": "common",
+    "base_path": "",
+    "apps": [],
+    "modifiers": [
+        {
+            "name": "Disable BLE",
+            "description": "",
+            "id": "no-ble",
+            "value": {
+                "chip_enable_ble": "false"
+            }
+        },
+        {
+            "name": "Disable OTA requestor",
+            "description": "",
+            "id": "no-ota",
+            "value": {
+                "chip_enable_ota_requestor": "false"
+            }
+        },
+        {
+            "name": "Enable OpenThread FTD",
+            "description": "",
+            "id": "ot-ftd",
+            "value": {
+                "chip_openthread_ftd": "true"
+            }
+        },
+        {
+            "name": "Enable factory data",
+            "description": "",
+            "id": "factory-data",
+            "value": {
+                "chip_with_factory_data": "1"
+            }
+        },
+        {
+            "name": "Disable logging",
+            "description": "",
+            "id": "no-logs",
+            "value": {
+                "chip_logging": "false"
+            }
+        },
+        {
+            "name": "Use rotating device id",
+            "description": "It can be used in certain interoperability scenarios, where the commissioner uses this additional information.",
+            "id": "rotating-device-id",
+            "value": {
+                "chip_enable_rotating_device_id": "true",
+                "chip_enable_additional_data_advertising": "true"
+            }
+        },
+        {
+            "name": "Use crypto platform",
+            "description": "It should be the default option for most platforms.\nIt is used to accelerate crypto operations by using platform specific hardware.",
+            "id": "crypto-platform",
+            "value": {
+                "chip_crypto": "\"platform\""
+            }
+        },
+        {
+            "name": "Low power",
+            "description": "Enable low power when building applications.",
+            "id": "low-power",
+            "value": {
+                "chip_with_low_power": "1"
+            },
+            "only_if": "contact-sensor-.*-no-logs"
+        }
+    ],
+    "variable_modifiers": [
+        {
+            "name": "Software version",
+            "description": "Software version of the application. It will be used during OTA to check upcoming image version.",
+            "id": "sw-version",
+            "value": {
+                "chip_software_version": ""
+            }
+        }
+    ]
+}
