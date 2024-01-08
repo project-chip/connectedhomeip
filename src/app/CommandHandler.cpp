@@ -295,19 +295,21 @@ void CommandHandler::DecrementHoldOff()
     Close();
 }
 
+CHIP_ERROR CommandHandler::NewSendCommandResponse()
+{
+    System::PacketBufferHandle packet = mChunks.PopHead();
+
+    return mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(packet));
+}
+
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
-    System::PacketBufferHandle commandPacket;
-
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(Finalize(commandPacket));
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
-    // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
-    // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
+    ReturnErrorOnFailure(Finalize());
+    ReturnErrorOnFailure(NewSendCommandResponse());
 
     MoveToState(State::CommandSent);
 
@@ -759,12 +761,16 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
-CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
+CHIP_ERROR CommandHandler::Finalize(bool aHasMoreChunks)
 {
+    System::PacketBufferHandle packet;
+
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
-    return mCommandMessageWriter.Finalize(&commandPacket);
+    ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
+    mChunks.AddToEnd(std::move(packet));
+    return CHIP_NO_ERROR;
 }
 
 const char * CommandHandler::GetStateStr() const

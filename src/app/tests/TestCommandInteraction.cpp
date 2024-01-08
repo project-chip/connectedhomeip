@@ -614,7 +614,6 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    System::PacketBufferHandle commandPacket;
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandlerWithOutstandingCommand commandHandler(&mockCommandHandlerDelegate, requestCommandPath,
                                                         /* aRef = */ NullOptional);
@@ -624,19 +623,11 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     commandHandler.mExchangeCtx.Grab(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
-    err = commandHandler.Finalize(commandPacket);
+    err = commandHandler.Finalize();
+    // TODO it seems like this test name expects SendCommandResponse to be called
+    // and not Finalize.
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
-
-    //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
     // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
     // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
@@ -687,24 +678,16 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, Fields());
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected SendCommandResponse to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -722,24 +705,16 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, BadFields());
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected SendCommandResponse to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -1101,7 +1076,6 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
@@ -1110,17 +1084,10 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected SendCommandResponse to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an

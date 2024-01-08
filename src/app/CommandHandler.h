@@ -480,7 +480,7 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
-    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+    CHIP_ERROR Finalize(bool aHasMoreChunks = false);
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -501,6 +501,9 @@ private:
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
+
+    CHIP_ERROR NewSendCommandResponse();
+
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
@@ -558,6 +561,9 @@ private:
     BasicCommandPathRegistry<CHIP_CONFIG_MAX_PATHS_PER_INVOKE> mBasicCommandPathRegistry;
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
+
+    // A list of buffers, one buffer for each chunk.
+    System::PacketBufferHandle mChunks;
 
     State mState = State::Idle;
     State mBackupState;
