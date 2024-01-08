@@ -31,6 +31,7 @@ declare_args() {
   # Periodic time at which the DUT should wakeup
   alarm_periodic_time = 30
 }
+
 # Defines an siwx917 SDK build target.
 #
 # Parameters:
@@ -255,7 +256,7 @@ template("siwx917_sdk") {
 
     # Enabling led interface
     if (use_wstk_leds) {
-    defines += [ "ENABLE_WSTK_LEDS" ]
+      defines += [ "ENABLE_WSTK_LEDS" ]
     }
 
     if (chip_enable_icd_server) {
@@ -490,7 +491,7 @@ template("siwx917_sdk") {
       ]
     }
 
-    if(chip_enable_icd_server) {
+    if (chip_enable_icd_server) {
       sources += [
         "${sdk_support_root}/matter/si91x/siwx917/BRD4338A/support/src/sl_si91x_m4_ps.c",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/systemlevel/src/rsi_rtc.c",
