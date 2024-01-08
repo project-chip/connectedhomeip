@@ -55,7 +55,7 @@
 #ifdef SIWX_917
 #include "sl_si91x_trng.h"
 #define TRNGKEY_SIZE 4
-#endif
+#endif // SIWX_917
 
 struct wfx_rsi wfx_rsi;
 
@@ -317,12 +317,12 @@ static sl_status_t wfx_rsi_init(void)
     }
 
     // Initiate and program the key required for TRNG hardware engine
-    status = sl_si91x_trng_program_key(trngKey, 4);
+    status = sl_si91x_trng_program_key(trngKey, TRNGKEY_SIZE);
     if (status != SL_STATUS_OK) {
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
-#endif
+#endif // SIWX_917
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
