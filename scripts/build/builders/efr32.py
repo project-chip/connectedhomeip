@@ -154,7 +154,7 @@ class Efr32Builder(GnBuilder):
                  enable_ot_coap_lib: bool = False,
                  no_version: bool = False,
                  enable_917_soc: bool = False,
-                 use_rps_extension: bool = False
+                 use_rps_extension: bool = True
                  ):
         super(Efr32Builder, self).__init__(
             root=app.BuildRoot(root),
@@ -231,8 +231,9 @@ class Efr32Builder(GnBuilder):
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
                 'sl_matter_version_str="v1.2-%s-%s"' % (branchName, shortCommitSha))
-        if use_rps_extension is False:
-            self.extra_gn_options.append('use_rps_extension=false')
+        if enable_917_soc:
+            if use_rps_extension is False:
+                self.extra_gn_options.append('use_rps_extension=false')
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
