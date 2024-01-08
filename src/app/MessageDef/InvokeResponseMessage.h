@@ -140,7 +140,7 @@ public:
 
 private:
     InvokeResponseIBs::Builder mInvokeResponses;
-    bool mIsEndBufferReserved = false;
+    bool mIsEndBufferReserved              = false;
     bool mIsMoreChunkMessageBufferReserved = false;
 };
 } // namespace InvokeResponseMessage
