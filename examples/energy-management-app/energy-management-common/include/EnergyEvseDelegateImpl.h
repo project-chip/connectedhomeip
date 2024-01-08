@@ -153,6 +153,7 @@ public:
     Status SendEVNotDetectedEvent();
     Status SendEnergyTransferStartedEvent();
     Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason);
+    Status SendFaultEvent(FaultStateEnum newFaultState);
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -225,6 +226,10 @@ private:
     int64_t mActualChargingCurrentLimit             = 0;
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
 
+    /* Variables to hold State and SupplyState in case a fault is raised */
+    StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;
+    SupplyStateEnum mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
     Status NotifyApplicationCurrentLimitChange(int64_t maximumChargeCurrent);
@@ -232,6 +237,7 @@ private:
     Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
 
     /* Local State machine handling */
+    Status CheckFaultOrDiagnostic();
     Status HandleStateMachineEvent(EVSEStateMachineEvent event);
     Status HandleEVPluggedInEvent();
     Status HandleEVNotDetectedEvent();

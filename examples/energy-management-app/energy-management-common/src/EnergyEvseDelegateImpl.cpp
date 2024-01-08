@@ -145,9 +145,11 @@ Status EnergyEvseDelegate::StartDiagnostics()
     ChipLogProgress(AppServer, "EnergyEvseDelegate::StartDiagnostics()");
 
     /* update SupplyState to indicate we are now in Diagnostics mode */
+    // TODO save the value of SupplyState so it can be restored later
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
-    // TODO: Generate events
+    // TODO Application code would need to put the SupplyState back
+    // once diagnostics have been completed
 
     return Status::Success;
 }
@@ -245,23 +247,6 @@ Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
     return ComputeMaxChargeCurrentLimit();
 }
 
-bool IsEvPluggedIn(StateEnum state)
-{
-    if ((state == StateEnum::kNotPluggedIn) || (state == StateEnum::kFault) || (state == StateEnum::kSessionEnding))
-    {
-        return false;
-    }
-    return true;
-}
-
-bool IsEvTransferringEnergy(StateEnum state)
-{
-    if ((state == StateEnum::kPluggedInCharging) || (state == StateEnum::kPluggedInDischarging))
-    {
-        return true;
-    }
-    return false;
-}
 /**
  * @brief    Called by EVSE Hardware to indicate if EV is detected
  *
@@ -333,28 +318,34 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
  *
  * @param    FaultStateEnum - the fault condition detected
  */
-Status EnergyEvseDelegate::HwSetFault(FaultStateEnum fault)
+Status EnergyEvseDelegate::HwSetFault(FaultStateEnum newFaultState)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::Fault()");
 
-    if (fault == FaultStateEnum::kNoError)
+    if (mFaultState == newFaultState)
     {
-        /* Update State to previous state */
-        // TODO: need to work out the logic here!
+        ChipLogError(AppServer, "No change in fault state, ignoring call");
+        return Status::Failure;
+    }
 
-        /* Update SupplyState to previous state */
+    /** Before we do anything we log the fault
+     * any change in FaultState reports previous fault and new fault
+     * and the state prior to the fault being raised */
+    SendFaultEvent(newFaultState);
+
+    /* Updated FaultState before we call into the handlers */
+    SetFaultState(newFaultState);
+
+    if (newFaultState == FaultStateEnum::kNoError)
+    {
+        /* Fault has been cleared */
+        HandleStateMachineEvent(EVSEStateMachineEvent::FaultCleared);
     }
     else
     {
-        /* Update State & SupplyState */
-        SetState(StateEnum::kFault);
-        SetSupplyState(SupplyStateEnum::kDisabledError);
+        /* a new Fault has been raised */
+        HandleStateMachineEvent(EVSEStateMachineEvent::FaultRaised);
     }
-
-    /* Update FaultState */
-    SetFaultState(fault);
-
-    // TODO: Generate events
 
     return Status::Success;
 }
@@ -551,10 +542,30 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     return Status::Success;
 }
 
+Status EnergyEvseDelegate::CheckFaultOrDiagnostic()
+{
+    if (mFaultState != FaultStateEnum::kNoError)
+    {
+        ChipLogError(AppServer, "EVSE: Trying to handle command when fault is present");
+        return Status::Failure;
+    }
+
+    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    {
+        ChipLogError(AppServer, "EVSE: Trying to handle command when in diagnostics mode");
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
 Status EnergyEvseDelegate::HandleChargingEnabledEvent()
 {
     /* Check there is no Fault or Diagnostics condition */
-    // TODO -!
+    Status status = CheckFaultOrDiagnostic();
+    if (status != Status::Success)
+    {
+        return status;
+    }
 
     /* update SupplyState to say that charging is now enabled */
     SetSupplyState(SupplyStateEnum::kChargingEnabled);
@@ -587,8 +598,11 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
 Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
 {
     /* Check there is no Fault or Diagnostics condition */
-    // TODO -!
-
+    Status status = CheckFaultOrDiagnostic();
+    if (status != Status::Success)
+    {
+        return status;
+    }
     /* update SupplyState to say that charging is now enabled */
     SetSupplyState(SupplyStateEnum::kDischargingEnabled);
 
@@ -619,7 +633,11 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
 Status EnergyEvseDelegate::HandleDisabledEvent()
 {
     /* Check there is no Fault or Diagnostics condition */
-    // TODO -!
+    Status status = CheckFaultOrDiagnostic();
+    if (status != Status::Success)
+    {
+        return status;
+    }
 
     /* update SupplyState to say that charging is now enabled */
     SetSupplyState(SupplyStateEnum::kDisabled);
@@ -642,12 +660,53 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
     return Status::Success;
 }
 
+/**
+ * @brief This handles the new fault
+ *
+ * Note that if multiple faults happen and this is called repeatedly
+ * We only save the previous State and SupplyState if its the first raising
+ * of the fault, so we can restore the state back once all faults have cleared
+)*/
 Status EnergyEvseDelegate::HandleFaultRaised()
 {
+    /* Save the current State and SupplyState so we can restore them if the fault clears */
+    if (mStateBeforeFault == StateEnum::kUnknownEnumValue)
+    {
+        /* No existing fault - save this value to restore it later if it clears */
+        mStateBeforeFault = mState;
+    }
+
+    if (mSupplyStateBeforeFault == SupplyStateEnum::kUnknownEnumValue)
+    {
+        /* No existing fault */
+        mSupplyStateBeforeFault = mSupplyState;
+    }
+
+    /* Update State & SupplyState */
+    SetState(StateEnum::kFault);
+    SetSupplyState(SupplyStateEnum::kDisabledError);
+
     return Status::Success;
 }
 Status EnergyEvseDelegate::HandleFaultCleared()
 {
+    /* Check that something strange hasn't happened */
+    if ((mStateBeforeFault == StateEnum::kUnknownEnumValue) || (mSupplyStateBeforeFault == SupplyStateEnum::kUnknownEnumValue))
+    {
+        ChipLogError(AppServer, "EVSE: Something wrong trying to clear fault");
+        return Status::Failure;
+    }
+
+    /* Restore the State and SupplyState back to old values once all the faults have cleared
+     * Changing the State should notify the application, so it can continue charging etc
+     */
+    SetState(mStateBeforeFault);
+    SetSupplyState(mSupplyStateBeforeFault);
+
+    /* put back the sentinel to catch new faults if more are raised */
+    mStateBeforeFault       = StateEnum::kUnknownEnumValue;
+    mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+
     return Status::Success;
 }
 
@@ -855,6 +914,25 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
         /* discharging should have a negative value */
         event.energyTransferred = mMeterValueAtEnergyTransferStart - meterValueNow;
     }
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Unable to send notify event: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState)
+{
+    Events::Fault::Type event;
+    EventNumber eventNumber;
+
+    event.sessionID               = mSession.mSessionID; // Note here the event sessionID can be Null!
+    event.state                   = mState;              // This is the state prior to the fault being raised
+    event.faultStatePreviousState = mFaultState;
+    event.faultStateCurrentState  = newFaultState;
 
     CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
     if (CHIP_NO_ERROR != err)
