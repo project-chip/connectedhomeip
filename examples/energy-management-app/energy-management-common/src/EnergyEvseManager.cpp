@@ -59,7 +59,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
 
     // Restore UserMaximumChargeCurrent value
-    uint64_t tempUserMaximumChargeCurrent;
+    int64_t tempUserMaximumChargeCurrent;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),
                                      tempUserMaximumChargeCurrent);
     if (err == CHIP_NO_ERROR)
