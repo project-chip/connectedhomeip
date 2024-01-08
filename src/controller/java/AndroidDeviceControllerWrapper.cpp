@@ -944,9 +944,11 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jmethodID icdDeviceInfoStructCtor = nullptr;
     jobject icdDeviceInfoObj          = nullptr;
     jbyteArray jSymmetricKey          = nullptr;
-    CHIP_ERROR methodErr              = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
-                                                                                "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
-    VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
+    CHIP_ERROR methodErr =
+        JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+                                                "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
     methodErr = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
