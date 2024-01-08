@@ -18,14 +18,14 @@
 
 #include "EndpointListLoader.h"
 
-#include "clusters/ContentLauncherCluster.h"
-#include "clusters/MediaPlaybackCluster.h"
-#include "clusters/TargetNavigatorCluster.h"
+#include "clusters/Clusters.h"
+#include "core/BaseCluster.h"
 #include "core/CastingPlayer.h"
 #include "core/Types.h"
 #include "support/CastingStore.h"
 
 #include "app/clusters/bindings/BindingManager.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace matter {
 namespace casting {
@@ -125,16 +125,40 @@ void EndpointListLoader::Complete()
             {
                 switch (clusterId)
                 {
+                case chip::app::Clusters::ApplicationBasic::Id:
+                    endpoint->RegisterCluster<clusters::application_basic::ApplicationBasicCluster>(clusterId);
+                    break;
+
+                case chip::app::Clusters::ApplicationLauncher::Id:
+                    endpoint->RegisterCluster<clusters::application_launcher::ApplicationLauncherCluster>(clusterId);
+                    break;
+
                 case chip::app::Clusters::ContentLauncher::Id:
-                    endpoint->RegisterCluster<clusters::ContentLauncherCluster>(clusterId);
+                    endpoint->RegisterCluster<clusters::content_launcher::ContentLauncherCluster>(clusterId);
+                    break;
+
+                case chip::app::Clusters::KeypadInput::Id:
+                    endpoint->RegisterCluster<clusters::keypad_input::KeypadInputCluster>(clusterId);
+                    break;
+
+                case chip::app::Clusters::LevelControl::Id:
+                    endpoint->RegisterCluster<clusters::level_control::LevelControlCluster>(clusterId);
+                    break;
+
+                case chip::app::Clusters::OnOff::Id:
+                    endpoint->RegisterCluster<clusters::on_off::OnOffCluster>(clusterId);
                     break;
 
                 case chip::app::Clusters::MediaPlayback::Id:
-                    endpoint->RegisterCluster<clusters::MediaPlaybackCluster>(clusterId);
+                    endpoint->RegisterCluster<clusters::media_playback::MediaPlaybackCluster>(clusterId);
                     break;
 
                 case chip::app::Clusters::TargetNavigator::Id:
-                    endpoint->RegisterCluster<clusters::TargetNavigatorCluster>(clusterId);
+                    endpoint->RegisterCluster<clusters::target_navigator::TargetNavigatorCluster>(clusterId);
+                    break;
+
+                case chip::app::Clusters::WakeOnLan::Id:
+                    endpoint->RegisterCluster<clusters::wake_on_lan::WakeOnLanCluster>(clusterId);
                     break;
 
                 default:
@@ -166,7 +190,7 @@ void EndpointListLoader::Complete()
 
 CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>(
         endpointAttributes,
@@ -186,7 +210,7 @@ CHIP_ERROR EndpointListLoader::ReadVendorId(EndpointAttributes * endpointAttribu
 
 CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductID::TypeInfo>(
         endpointAttributes,
@@ -207,7 +231,7 @@ CHIP_ERROR EndpointListLoader::ReadProductId(EndpointAttributes * endpointAttrib
 
 CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointAttributes)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointAttributes->mId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::Descriptor::Attributes::DeviceTypeList::TypeInfo>(
         endpointAttributes,
@@ -233,7 +257,7 @@ CHIP_ERROR EndpointListLoader::ReadDeviceTypeList(EndpointAttributes * endpointA
 
 CHIP_ERROR EndpointListLoader::ReadServerList(std::vector<chip::ClusterId> * endpointServerList, chip::EndpointId endpointId)
 {
-    MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointId);
+    core::MediaClusterBase cluster(*mExchangeMgr, *mSessionHandle, endpointId);
 
     return cluster.template ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(
         endpointServerList,

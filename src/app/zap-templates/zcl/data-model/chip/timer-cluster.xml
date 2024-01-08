@@ -40,7 +40,7 @@ limitations under the License.
         <server init="false" tick="false">true</server>
         <description>This cluster supports creating a simple timer functionality.</description>
 
-        <globalAttribute side="server" code="0xFFFD" value="1" />
+        <globalAttribute side="either" code="0xFFFD" value="1" />
 
         <attribute side="server" code="0x0000" define="SET_TIME" type="elapsed_s"  writable="false" isNullable="false" optional="false">SetTime</attribute>
         <attribute side="server" code="0x0001" define="TIME_REMAINING" type="elapsed_s"  writable="false"  isNullable="false"   optional="false">TimeRemaining</attribute>
