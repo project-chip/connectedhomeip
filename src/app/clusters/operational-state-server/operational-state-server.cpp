@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::OperationalState::Attributes;
 
 using Status = Protocols::InteractionModel::Status;
 
-Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId):
+Instance::Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId) :
     CommandHandlerInterface(MakeOptional(aEndpointId), aClusterId), AttributeAccessInterface(MakeOptional(aEndpointId), aClusterId),
     mDelegate(aDelegate), mEndpointId(aEndpointId), mClusterId(aClusterId)
 {
@@ -495,5 +495,4 @@ void RvcOperationalState::Instance::HandleGoHomeCommand(HandlerContext & ctx, co
     response.commandResponseState = err;
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-
 }

@@ -329,9 +329,11 @@ protected:
 
 namespace RvcOperationalState {
 
-class Delegate : public OperationalState::Delegate {
+class Delegate : public OperationalState::Delegate
+{
 public:
-    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) {
+    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+    {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
     };
 };
@@ -349,8 +351,7 @@ public:
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      */
     Instance(Delegate * aDelegate, EndpointId aEndpointId) :
-        OperationalState::Instance(aDelegate, aEndpointId, Id),
-        mDelegate(aDelegate)
+        OperationalState::Instance(aDelegate, aEndpointId, Id), mDelegate(aDelegate)
     {}
 
 protected:
