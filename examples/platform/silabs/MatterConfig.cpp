@@ -43,9 +43,6 @@
 
 #ifdef SIWX_917
 #include "wfx_rsi.h"
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-extern "C" void M4_sleep_wakeup(void);
-#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
 #endif /* SIWX_917 */
 
 using namespace ::chip;
