@@ -255,7 +255,7 @@ int NXPWiFiDriver::DisconnectNetwork(void)
 	{
 	    ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
 	}
-    
+
     return ret;
 }
 
