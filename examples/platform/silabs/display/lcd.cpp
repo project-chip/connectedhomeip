@@ -27,7 +27,6 @@
 
 #if (SIWX_917)
 #include "rsi_chip.h"
-#include "sl_memlcd.h"
 #endif
 
 #ifdef QR_CODE_ENABLED
@@ -135,9 +134,6 @@ int SilabsLCD::Update(void)
 
 void SilabsLCD::WriteDemoUI(bool state)
 {
-#if SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
-    sl_memlcd_post_wakeup_init();
-#endif // SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
     if (mCurrentScreen != DemoScreen)
     {
         mCurrentScreen = DemoScreen;
@@ -237,9 +233,6 @@ void SilabsLCD::SetScreen(Screen_e screen)
 
 void SilabsLCD::CycleScreens(void)
 {
-#if SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
-    sl_memlcd_post_wakeup_init();
-#endif // SIWX_917 && SL_ICD_ENABLED && DISPLAY_ENABLED
 #ifdef QR_CODE_ENABLED
     if (mCurrentScreen < QRCodeScreen)
 #else

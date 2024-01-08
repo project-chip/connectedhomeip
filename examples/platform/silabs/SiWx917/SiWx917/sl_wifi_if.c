@@ -34,15 +34,22 @@
 #include "sl_wlan_config.h"
 #include "task.h"
 #include "wfx_host_events.h"
-#include "sl_si91x_m4_ps.h"
 
 #if (EXP_BOARD)
 #include "rsi_bt_common_apis.h"
 #endif
 
 #include "ble_config.h"
+
+#if SL_ICD_ENABLED && SIWX_917
+#include "sl_si91x_m4_ps.h"
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
+
+// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+#define BUTTON_PRESSED 1
+bool btn0_pressed = false;
+#endif // SL_ICD_ENABLED && SIWX_917
 
 #include "dhcp_client.h"
 #include "sl_wifi.h"
@@ -59,10 +66,6 @@ struct wfx_rsi wfx_rsi;
 
 /* Declare a variable to hold the data associated with the created event group. */
 StaticEventGroup_t rsiDriverEventGroup;
-
-// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-#define BUTTON_PRESSED 1
-bool btn0_pressed = false;
 
 bool hasNotifiedIPV6 = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -205,10 +208,12 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 }
 
 #if SL_ICD_ENABLED
+
+#if SIWX_917
 /******************************************************************
  * @fn   M4_sleep_wakeup()
  * @brief
- *       Setting the M4 to sleep
+ *       M4 going to sleep
  *
  * @param[in] None
  * @return
@@ -218,7 +223,6 @@ void M4_sleep_wakeup() {
   if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY) {
     // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
     if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed) {
-        SILABS_LOG("btn pressed *******************");
       sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
       btn0_pressed = true;
     }
@@ -234,6 +238,8 @@ void M4_sleep_wakeup() {
     }
   }
 }
+#endif /* SIWX_917 */
+
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -260,7 +266,6 @@ int32_t wfx_rsi_power_save()
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    SILABS_LOG("Powersave Config Success");
     wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
     return status;
 }
