@@ -137,8 +137,11 @@ public:
      *   @param  cookTime: the input cook time value.
      *   @param  startAfterSetting: the flag to indicate if start for the operation after handling the command.
      *   @param  feature: featureMap bits value of Microwave Oven Control.
-     *   @param  powerSetting: the input power setting value. Set NullOptional if the feature does not support this field.
-     *   @param  wattSettingIndex: the input watts setting index. Set NullOptional if the feature does not support this field.
+     *   @param  powerSetting: the input power setting value. 
+     *   @param  wattSettingIndex: the input watts setting index.
+     *   Note: powerSetting and wattSettingIndex must be mutually exclusive, depends on the feature value.
+     *   If using power as number, wattSettingIndex will be set to NullOptional.
+     *   If using power in watts, powerSetting will be set to NullOptional.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                    bool startAfterSetting, MicrowaveOvenControl::Feature feature,
