@@ -168,8 +168,6 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        print(enabledAlarms)
-
         self.step("9a")
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.EnableDisableAlarm(alarmsToEnableDisable=enabledAlarms), endpoint=endpoint)
