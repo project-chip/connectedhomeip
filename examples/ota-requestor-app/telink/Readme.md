@@ -17,7 +17,7 @@
 2. Activate the build environment:
 
     ```bash
-    $ source ./scripts/activate.sh
+    $ source ./scripts/activate.sh -p all,telink
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for
@@ -25,6 +25,13 @@
 
     ```bash
     $ west build -b <build_target>
+    ```
+
+    Also use key `-DFLASH_SIZE`, if your board has memory size different from 2
+    MB, for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=1m`:
+
+    ```bash
+    $ west build -b tlsr9518adk80d -- -DFLASH_SIZE=4m
     ```
 
 4. Flash binary:
@@ -106,14 +113,15 @@ feature for another Telink example:
 
 -   set CONFIG_CHIP_OTA_REQUESTOR=y in corresponding "prj.conf" configuration
     file.
--   remove "boards/tlsr9518adk80d.overlay" file to enable 2MB flash storage.
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr_final.bin - main binary to flash PCB (Use 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
--   zephyr.bin - ignore this file.
--   zephyr.signed.bin - ignore this file.
+
+All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
+higher SW version than base SW. Set CONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 in
+corresponding “prj.conf” conﬁguration file.
 
 Usage of OTA:
 

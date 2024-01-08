@@ -1,11 +1,11 @@
 package com.matter.virtual.device.app.core.matter
 
-import chip.onboardingpayload.OnboardingPayloadException
-import chip.onboardingpayload.OnboardingPayloadParser
 import com.matter.virtual.device.app.core.matter.model.asSetupPayload
 import com.matter.virtual.device.app.core.model.Payload
 import javax.inject.Inject
 import javax.inject.Singleton
+import matter.onboardingpayload.OnboardingPayloadException
+import matter.onboardingpayload.OnboardingPayloadParser
 import timber.log.Timber
 
 @Singleton

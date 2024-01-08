@@ -27,16 +27,11 @@
 // TODO add includes ?
 extern "C" {
 #include "em_core.h"
+#include "rsi_board.h"
 #include "sl_event_handler.h"
-
-void RSI_Board_LED_Set(int, bool);
-void RSI_Board_LED_Toggle(int);
-void RSI_Wakeupsw_config(void);
-void RSI_Wakeupsw_config_gpio0(void);
-#ifdef SI917_RADIO_BOARD_V2
-void RSI_Wakeupsw_config_gpio11(void);
-#endif
-void sl_system_init(void);
+#include "sl_si91x_led.h"
+#include "sl_si91x_led_config.h"
+#include "sl_system_init.h"
 void soc_pll_config(void);
 }
 
@@ -63,14 +58,6 @@ CHIP_ERROR SilabsPlatform::Init(void)
     // Configuration the clock rate
     soc_pll_config();
 
-    // BTN0 and BTN1 init
-    RSI_Wakeupsw_config();
-#ifdef SI917_RADIO_BOARD_V2
-    RSI_Wakeupsw_config_gpio11();
-#else
-    RSI_Wakeupsw_config_gpio0();
-#endif
-
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
@@ -81,13 +68,15 @@ CHIP_ERROR SilabsPlatform::Init(void)
 void SilabsPlatform::InitLed(void)
 {
     // TODO
+    RSI_Board_Init();
     SilabsPlatformAbstractionBase::InitLed();
 }
 
 CHIP_ERROR SilabsPlatform::SetLed(bool state, uint8_t led)
 {
     // TODO add range check
-    RSI_Board_LED_Set(led, state);
+    (state) ? sl_si91x_led_set(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN)
+            : sl_si91x_led_clear(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
     return CHIP_NO_ERROR;
 }
 
@@ -100,7 +89,7 @@ bool SilabsPlatform::GetLedState(uint8_t led)
 CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 {
     // TODO add range check
-    RSI_Board_LED_Toggle(led);
+    sl_si91x_led_toggle(led ? SL_LED_LED1_PIN : SL_LED_LED0_PIN);
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS

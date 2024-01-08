@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
   set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
@@ -32,13 +33,21 @@ else()
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
+else()
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
+  message(STATUS "Flash memory size is set to: 2mb")
+endif()
+
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
 set(CONF_FILE prj.conf)
@@ -57,6 +66,7 @@ target_compile_options(app PRIVATE -fpermissive)
 target_include_directories(app PRIVATE
                            include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                            
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${TELINK_COMMON}/common/include
@@ -68,7 +78,6 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/ZclDoorLockCallbacks.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-modes-manager.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
@@ -77,7 +86,10 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
@@ -89,7 +101,3 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()

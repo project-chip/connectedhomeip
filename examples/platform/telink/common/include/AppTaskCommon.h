@@ -25,8 +25,12 @@
 #include "LEDWidget.h"
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 #include "PWMDevice.h"
+#endif
+
+#ifdef CONFIG_WS2812_STRIP
+#include "WS2812Device.h"
 #endif
 
 #include <zephyr/drivers/gpio.h>
@@ -76,8 +80,12 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
+#if APP_USE_THREAD_START_BUTTON
         kButtonId_StartThread,
+#endif
+#if APP_USE_BLE_START_BUTTON
         kButtonId_StartBleAdv
+#endif
     } ButtonId;
 #endif
 
@@ -99,7 +107,7 @@ protected:
     static void StartBleAdvHandler(AppEvent * aEvent);
 #endif
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
 #endif
@@ -113,7 +121,7 @@ protected:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     PWMDevice mPwmIdentifyLed;
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);

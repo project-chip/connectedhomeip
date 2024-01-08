@@ -40,9 +40,9 @@ CastingPlayerDiscovery * CastingPlayerDiscovery::GetInstance()
     return _castingPlayerDiscovery;
 }
 
-CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint64_t deviceTypeFilter)
+CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StartDiscovery called");
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StartDiscovery() called");
     VerifyOrReturnError(mState == DISCOVERY_READY, CHIP_ERROR_INCORRECT_STATE);
 
     mCommissionableNodeController.RegisterDeviceDiscoveryDelegate(&mDelegate);
@@ -63,9 +63,11 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint64_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() called");
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
+    mCastingPlayers.clear();
     mState = DISCOVERY_READY;
 
     return CHIP_NO_ERROR;
@@ -73,30 +75,29 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 
 void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
-    ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice called");
+    ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice() called");
     VerifyOrReturn(mClientDelegate != nullptr,
                    ChipLogError(NotSpecified, "CastingPlayerDeviceDiscoveryDelegate, mClientDelegate is a nullptr"));
 
     // convert nodeData to CastingPlayer
     CastingPlayerAttributes attributes;
-    strcpy(attributes.id, nodeData.resolutionData.hostName);
+    snprintf(attributes.id, kIdMaxLength + 1, "%s%u", nodeData.resolutionData.hostName, nodeData.resolutionData.port);
 
-    char port[kPortMaxLength + 1] = {};
-    snprintf(port, sizeof(port), "%u", nodeData.resolutionData.port);
-    strcat(attributes.id, port);
+    chip::Platform::CopyString(attributes.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1, nodeData.commissionData.deviceName);
+    chip::Platform::CopyString(attributes.hostName, chip::Dnssd::kHostNameMaxLength + 1, nodeData.resolutionData.hostName);
+    chip::Platform::CopyString(attributes.instanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1,
+                               nodeData.commissionData.instanceName);
 
-    strcpy(attributes.deviceName, nodeData.commissionData.deviceName);
-    strcpy(attributes.hostName, nodeData.resolutionData.hostName);
-    strcpy(attributes.instanceName, nodeData.commissionData.instanceName);
     attributes.numIPs = (unsigned int) nodeData.resolutionData.numIPs;
     for (unsigned j = 0; j < attributes.numIPs; j++)
     {
         attributes.ipAddresses[j] = nodeData.resolutionData.ipAddress[j];
     }
-    attributes.port       = nodeData.resolutionData.port;
-    attributes.productId  = nodeData.commissionData.productId;
-    attributes.vendorId   = nodeData.commissionData.vendorId;
-    attributes.deviceType = nodeData.commissionData.deviceType;
+    attributes.interfaceId = nodeData.resolutionData.interfaceId;
+    attributes.port        = nodeData.resolutionData.port;
+    attributes.productId   = nodeData.commissionData.productId;
+    attributes.vendorId    = nodeData.commissionData.vendorId;
+    attributes.deviceType  = nodeData.commissionData.deviceType;
 
     memory::Strong<CastingPlayer> player = std::make_shared<CastingPlayer>(attributes);
 

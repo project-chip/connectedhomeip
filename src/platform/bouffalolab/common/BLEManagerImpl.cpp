@@ -16,6 +16,7 @@
  */
 
 #define __ZEPHYR__ 1
+#define CONFIG_EVENTFD 0
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -275,7 +276,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-#if CONFIG_BT_PRIVACY
+#ifdef CONFIG_BT_PRIVACY
         static_assert(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS <= CONFIG_BT_RPA_TIMEOUT,
                       "BLE advertising timeout is too long relative to RPA timeout");
         // Generate new private BLE address

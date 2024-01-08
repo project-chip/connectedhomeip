@@ -38,7 +38,9 @@ AppContentLauncherManager::AppContentLauncherManager(ContentAppAttributeDelegate
 
 void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                     const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                    const CharSpan & data)
+                                                    const CharSpan & data,
+                                                    const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                    bool useCurrentContext)
 {
     ChipLogProgress(Zcl, "AppContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
@@ -62,7 +64,7 @@ void AppContentLauncherManager::HandleLaunchContent(CommandResponseHelper<Launch
     LaunchResponseType response;
     // TODO: Insert code here
     response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
-    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+    response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 
@@ -77,7 +79,7 @@ void AppContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResp
     // TODO: Insert code here
     LaunchResponseType response;
     response.data   = chip::MakeOptional(CharSpan::fromCharString("Success"));
-    response.status = ContentLauncher::ContentLaunchStatusEnum::kSuccess;
+    response.status = ContentLauncher::StatusEnum::kSuccess;
     helper.Success(response);
 }
 

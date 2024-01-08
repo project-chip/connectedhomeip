@@ -32,7 +32,7 @@
 #include <platform/ASR/NetworkCommissioningDriver.h>
 
 #include "init_Matter.h"
-#if CONFIG_ENABLE_CHIP_SHELL
+#ifdef CONFIG_ENABLE_CHIP_SHELL
 #include "matter_shell.h"
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>

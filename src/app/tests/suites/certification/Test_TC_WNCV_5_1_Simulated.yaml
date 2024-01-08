@@ -28,29 +28,28 @@ tests:
     #  command: "WaitForCommissioning"
 
     ##Check Attribute defining the cluster Features
-    - label: "DUT reads the FeatureMap attribute from TH"
-      PICS: WNCV.C.Afffc
+    - label: "Step 1a: DUT reads the FeatureMap attribute from TH"
       wait: "readAttribute"
       attribute: "FeatureMap"
 
     ##Check Attributes defining the product
-    - label: "DUT reads the Type attribute from TH"
+    - label: "Step 2a: DUT reads the Type attribute from TH"
       PICS: WNCV.C.A0000
       wait: "readAttribute"
       attribute: "Type"
 
-    - label: "DUT reads the EndProductType attribute from TH"
+    - label: "Step 2b: DUT reads the EndProductType attribute from TH"
       PICS: WNCV.C.A000d
       wait: "readAttribute"
       attribute: "EndProductType"
 
     ##Check Attributes defining the working status
-    - label: "DUT reads the Mode attribute from TH"
+    - label: "Step 3a: DUT reads the Mode attribute from TH"
       PICS: WNCV.C.A0017
       wait: "readAttribute"
       attribute: "Mode"
 
-    - label: "DUT reads the ConfigStatus attribute from TH"
+    - label: "Step 3b: DUT reads the ConfigStatus attribute from TH"
       PICS: WNCV.C.A0007
       wait: "readAttribute"
       attribute: "ConfigStatus"

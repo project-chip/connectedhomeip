@@ -183,7 +183,7 @@ struct TestAesKey
 public:
     TestAesKey(nlTestSuite * inSuite, const uint8_t * keyBytes, size_t keyLength)
     {
-        Crypto::Aes128KeyByteArray keyMaterial;
+        Crypto::Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(&keyMaterial, keyBytes, keyLength);
 
         CHIP_ERROR err = keystore.CreateKey(keyMaterial, key);
@@ -194,6 +194,24 @@ public:
 
     DefaultSessionKeystore keystore;
     Aes128KeyHandle key;
+};
+
+struct TestHmacKey
+{
+public:
+    TestHmacKey(nlTestSuite * inSuite, const uint8_t * keyBytes, size_t keyLength)
+    {
+        Crypto::Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(&keyMaterial, keyBytes, keyLength);
+
+        CHIP_ERROR err = keystore.CreateKey(keyMaterial, key);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    ~TestHmacKey() { keystore.DestroyKey(key); }
+
+    DefaultSessionKeystore keystore;
+    Hmac128KeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
@@ -881,16 +899,16 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
+static void TestHMAC_SHA256_RawKey(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_raw_key);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
-        hmac_sha256_vector v = hmac_sha256_test_vectors[numOfTestsExecuted];
+        hmac_sha256_vector v = hmac_sha256_test_vectors_raw_key[numOfTestsExecuted];
         size_t out_length    = v.output_hash_length;
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
@@ -898,6 +916,37 @@ static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
         mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
+}
+
+static void TestHMAC_SHA256_KeyHandle(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_key_handle);
+    int numOfTestsExecuted = 0;
+    TestHMAC_sha mHMAC;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hmac_sha256_vector v = hmac_sha256_test_vectors_key_handle[numOfTestsExecuted];
+        size_t out_length    = v.output_hash_length;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
+        out_buffer.Alloc(out_length);
+        NL_TEST_ASSERT(inSuite, out_buffer);
+        Crypto::DefaultSessionKeystore keystore;
+
+        Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(keyMaterial, v.key, v.key_length);
+
+        Hmac128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+
+        keystore.DestroyKey(keyHandle);
     }
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
 }
@@ -2005,7 +2054,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = TestCerts::gTestCerts[i];
+        TestCert certType = TestCerts::gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2193,7 +2242,7 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2201,8 +2250,15 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractSKIDFromX509Cert(cert, skidOut);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        if (!skidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
 }
 
@@ -2220,7 +2276,7 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2228,8 +2284,15 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractAKIDFromX509Cert(cert, akidOut);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+        if (!akidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
 }
 
@@ -2360,7 +2423,7 @@ static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inCont
 
     struct SerialNumberTestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ByteSpan mExpectedResult;
     };
 
@@ -2401,7 +2464,7 @@ static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ChipDN mExpectedDN;
     };
 
@@ -2414,13 +2477,10 @@ static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
     NL_TEST_ASSERT(inSuite,
                    CHIP_NO_ERROR ==
-                       subjectDN_Node02_02.AddAttribute_CommonName(
-                           chip::CharSpan::fromCharString("TEST CERT COMMON NAME Attr for Node02_02"), false));
+                       subjectDN_Node02_02.AddAttribute_CommonName("TEST CERT COMMON NAME Attr for Node02_02"_span, false));
     ChipDN subjectDN_Node02_04;
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002));
-    NL_TEST_ASSERT(inSuite,
-                   CHIP_NO_ERROR ==
-                       subjectDN_Node02_04.AddAttribute_CommonName(chip::CharSpan::fromCharString("TestCert02_04"), false));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_CommonName("TestCert02_04"_span, false));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003));
     NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004));
@@ -2475,7 +2535,7 @@ static void TestIssuer_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ChipDN mExpectedDN;
     };
 
@@ -2941,7 +3001,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-    NL_TEST_DEF("Test HMAC SHA 256", TestHMAC_SHA256),
+    NL_TEST_DEF("Test HMAC SHA 256 - Raw Key", TestHMAC_SHA256_RawKey),
+    NL_TEST_DEF("Test HMAC SHA 256 - Key Handle", TestHMAC_SHA256_KeyHandle),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
@@ -3020,7 +3081,7 @@ int TestCHIPCryptoPAL(void)
         TestCHIPCryptoPAL_Teardown
     };
     // clang-format on
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     add_entropy_source(test_entropy_source, nullptr, 16);

@@ -223,14 +223,20 @@ class Efr32Builder(GnBuilder):
                 ['git', 'describe', '--always', '--dirty', '--exclude', '*']).decode('ascii').strip()
             branchName = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).decode('ascii').strip()
             self.extra_gn_options.append(
-                'sl_matter_version_str="v1.1-%s-%s"' % (branchName, shortCommitSha))
+                'sl_matter_version_str="v1.2-%s-%s"' % (branchName, shortCommitSha))
 
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
             # case for pre-installed images), use it directly.
             sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
             self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+
+        if "GSDK_ROOT" in os.environ and not enable_wifi:
             self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
+
+        if "WISECONNECT_SDK_ROOT" in os.environ and enable_rs911x:
+            wiseconnect_sdk_path = shlex.quote(os.environ['WISECONNECT_SDK_ROOT'])
+            self.extra_gn_options.append(f"wiseconnect_sdk_root=\"{wiseconnect_sdk_path}\"")
 
     def GnBuildArgs(self):
         return self.extra_gn_options

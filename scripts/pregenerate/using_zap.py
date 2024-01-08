@@ -16,7 +16,7 @@ import logging
 import os
 from enum import Enum, auto
 
-from .types import IdlFileType, InputIdlFile
+from .type_definitions import IdlFileType, InputIdlFile
 
 ZAP_GENERATE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'tools', 'zap', 'generate.py'))
 

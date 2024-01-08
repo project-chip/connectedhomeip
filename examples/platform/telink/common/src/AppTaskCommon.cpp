@@ -31,13 +31,8 @@
 #include <app/util/attribute-storage.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
-#include "OTAUtil.h"
-#endif
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
-#include <zephyr/dfu/mcuboot.h>
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#endif
 
 #include <zephyr/fs/nvs.h>
 #include <zephyr/settings/settings.h>
@@ -69,7 +64,7 @@ const struct gpio_dt_spec sButtonRow1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matr
 const struct gpio_dt_spec sButtonRow2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios);
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
 constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
@@ -115,7 +110,7 @@ bool sHaveBLEConnections    = false;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 void OnIdentifyTriggerEffect(Identify * identify)
 {
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
@@ -145,11 +140,13 @@ public:
     void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
     void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
     void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     void OnCommissioningWindowClosed() override
     {
         if (!isComissioningStarted)
             chip::DeviceLayer::Internal::BLEMgr().Shutdown();
     }
+#endif
 };
 
 AppCallbacks sCallbacks;
@@ -245,6 +242,10 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 
     AppEvent event = {};
 
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    StartThreadButtonEventHandler();
+#endif
+
     while (true)
     {
         GetEvent(&event);
@@ -260,7 +261,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(system_state_led), gpios));
+    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(system_state_led), gpios, {}));
 
     UpdateStatusLED();
 #endif
@@ -271,7 +272,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFactoryResetTimer, this);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     // Initialize PWM Identify led
     err = GetAppTask().mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
     if (err != CHIP_NO_ERROR)
@@ -311,30 +312,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#if CONFIG_CHIP_OTA_REQUESTOR
-    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle &&
-        mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#else
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#endif
-    {
-        int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation)
-        {
-            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        }
-        else
-        {
-            LOG_INF("Image confirmed");
-        }
-    }
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -380,18 +357,24 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
     switch (btnId)
     {
+#if APP_USE_EXAMPLE_START_BUTTON
     case kButtonId_ExampleAction:
         ExampleActionButtonEventHandler();
         break;
+#endif
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
+#if APP_USE_THREAD_START_BUTTON
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#endif
+#if APP_USE_BLE_START_BUTTON
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
+#endif
     }
 }
 #endif
@@ -481,7 +464,7 @@ void AppTaskCommon::UpdateStatusLED()
 }
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 void AppTaskCommon::ActionIdentifyStateUpdateHandler(k_timer * timer)
 {
     AppEvent event;
@@ -634,7 +617,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -651,8 +634,13 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
+#else
+        ThreadStackMgrImpl().SetRadioBlocked(false);
+        ThreadStackMgrImpl().SetThreadEnabled(true);
+#endif
         StartDefaultThreadNetwork();
     }
     else
@@ -693,6 +681,23 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
+#endif
         break;
     case DeviceEventType::kThreadStateChange:
         sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
@@ -702,11 +707,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         UpdateStatusLED();
 #endif
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        InitBasicOTARequestor();
+        if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle)
         {
-            InitBasicOTARequestor();
+#endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+            OtaConfirmNewImage();
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#if CONFIG_CHIP_OTA_REQUESTOR
         }
 #endif
         break;

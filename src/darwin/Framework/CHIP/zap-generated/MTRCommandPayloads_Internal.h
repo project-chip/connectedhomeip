@@ -15,15 +15,12 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-@interface MTROperationalCredentialsClusterAttestationResponseParams ()
-@property (nonatomic, strong) NSData * attestationChallenge;
-@end
 
 @interface MTRIdentifyClusterIdentifyParams (InternalMethods)
 
@@ -499,6 +496,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRNetworkCommissioningClusterQueryIdentityParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRNetworkCommissioningClusterQueryIdentityResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::QueryIdentityResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRDiagnosticLogsClusterRetrieveLogsRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -514,6 +523,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRGeneralDiagnosticsClusterTestEventTriggerParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterTimeSnapshotParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct;
 
 @end
 
@@ -727,6 +748,78 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRICDManagementClusterStayActiveResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::StayActiveResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRTimerClusterSetTimerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTimerClusterResetTimerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTimerClusterAddTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRTimerClusterReduceTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterPauseParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterStopParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterStartParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterResumeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenCavityOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenCavityOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTROvenModeClusterChangeToModeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTROvenModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OvenMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRModeSelectClusterChangeToModeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -817,6 +910,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTROperationalStateClusterPauseParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -884,6 +989,150 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRActivatedCarbonFilterMonitoringClusterResetConditionParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRValveConfigurationAndControlClusterOpenParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRValveConfigurationAndControlClusterCloseParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterPowerAdjustRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterCancelPowerAdjustRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterStartTimeAdjustRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterPauseRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterResumeRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterModifyForecastRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterRequestConstraintBasedForecastParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterGetTargetsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTREnergyEVSEClusterDisableParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterEnableChargingParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterEnableDischargingParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterStartDiagnosticsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterSetTargetsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterGetTargetsParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEClusterClearTargetsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1267,6 +1516,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRChannelClusterGetProgramGuideParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRChannelClusterProgramGuideResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRChannelClusterRecordProgramParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRChannelClusterCancelRecordProgramParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRTargetNavigatorClusterNavigateTargetParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1346,6 +1619,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRMediaPlaybackClusterSeekParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaPlaybackClusterActivateAudioTrackParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaPlaybackClusterActivateTextTrackParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMediaPlaybackClusterDeactivateTextTrackParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1468,6 +1759,84 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRAccountLoginClusterLogoutParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterUpdatePINParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterResetPINParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterResetPINResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentControl::Commands::ResetPINResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRContentControlClusterEnableParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterDisableParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterAddBonusTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterSetScreenDailyTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterBlockUnratedContentParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterUnblockUnratedContentParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterSetOnDemandRatingThresholdParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentControlClusterSetScheduledContentRatingThresholdParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentAppObserverClusterContentAppMessageParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRContentAppObserverClusterContentAppMessageResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType &)decodableStruct;
 
 @end
 

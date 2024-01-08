@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRAsyncCallbackReadyHandler)(id context, NSUInteger retryCount);
 
-MTR_NEWLY_DEPRECATED("This class was not intended to be part of the public Matter API")
+MTR_DEPRECATED("This class was not intended to be part of the public Matter API", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2))
 @interface MTRAsyncCallbackWorkQueue : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -33,7 +33,7 @@ MTR_NEWLY_DEPRECATED("This class was not intended to be part of the public Matte
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item;
 @end
 
-MTR_NEWLY_DEPRECATED("This class was not intended to be part of the public Matter API")
+MTR_DEPRECATED("This class was not intended to be part of the public Matter API", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2))
 @interface MTRAsyncCallbackQueueWorkItem : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

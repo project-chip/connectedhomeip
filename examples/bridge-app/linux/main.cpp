@@ -141,9 +141,9 @@ constexpr CommandId onOffIncomingCommands[] = {
 };
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
-DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, onOffIncomingCommands, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr,
+DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr,
                             nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
@@ -195,9 +195,9 @@ DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MeasuredValue::Id,
 //   - Descriptor
 //   - Bridged Device Basic Information
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
-DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
@@ -224,9 +224,10 @@ DECLARE_DYNAMIC_ATTRIBUTE(PowerSource::Attributes::BatChargeLevel::Id, ENUM8, 1,
     DECLARE_DYNAMIC_ATTRIBUTE(PowerSource::Attributes::FeatureMap::Id, BITMAP32, 4, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedComposedDeviceClusters)
-DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(PowerSource::Id, powerSourceAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(PowerSource::Id, powerSourceAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
 DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
@@ -739,10 +740,6 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     return true;
 }
 
-void ApplicationInit() {}
-
-void ApplicationShutdown() {}
-
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
@@ -891,7 +888,7 @@ void * bridge_polling_thread(void * context)
     return nullptr;
 }
 
-int main(int argc, char * argv[])
+void ApplicationInit()
 {
     // Clear out the device database
     memset(gDevices, 0, sizeof(gDevices));
@@ -933,26 +930,6 @@ int main(int argc, char * argv[])
     ComposedTempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedTempSensor2.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
     ComposedPowerSource.SetChangeCallback(&HandleDevicePowerSourceStatusChanged);
-
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
-    // Init Data Model and CHIP App Server
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-#if CHIP_DEVICE_ENABLE_PORT_PARAMS
-    // use a different service port to make testing possible with other sample devices running on same host
-    initParams.operationalServicePort = LinuxDeviceOptions::GetInstance().securedDevicePort;
-#endif
-
-    initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
-    chip::Server::GetInstance().Init(initParams);
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
@@ -1022,11 +999,17 @@ int main(int argc, char * argv[])
         }
     }
 
-    // Run CHIP
-
-    ApplicationInit();
     registerAttributeAccessOverride(&gPowerAttrAccess);
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+}
 
+void ApplicationShutdown() {}
+
+int main(int argc, char * argv[])
+{
+    if (ChipLinuxAppInit(argc, argv) != 0)
+    {
+        return -1;
+    }
+    ChipLinuxAppMainLoop();
     return 0;
 }

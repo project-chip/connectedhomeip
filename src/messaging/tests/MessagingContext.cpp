@@ -38,6 +38,9 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     ReturnErrorOnFailure(PlatformMemoryUser::Init());
 
+    // Make sure the storage is clean, so we will not reuse any stale data.
+    mStorage.ClearStorage();
+
     ReturnErrorOnFailure(mOpKeyStore.Init(&mStorage));
     ReturnErrorOnFailure(mOpCertStore.Init(&mStorage));
 
@@ -76,6 +79,7 @@ void MessagingContext::Shutdown()
     VerifyOrDie(mInitialized);
     mInitialized = false;
 
+    mMessageCounterManager.Shutdown();
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
     mFabricTable.Shutdown();
@@ -105,10 +109,10 @@ void MessagingContext::SetMRPMode(MRPMode mode)
 {
     if (mode == MRPMode::kDefault)
     {
-        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
-        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
-        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
-        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(GetDefaultMRPConfig());
+        mSessionBobToAlice->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        mSessionAliceToBob->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(GetDefaultMRPConfig());
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         ClearLocalMRPConfigOverride();
@@ -132,13 +136,13 @@ void MessagingContext::SetMRPMode(MRPMode mode)
         VerifyOrDie(false);
 #endif
 
-        mSessionBobToAlice->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        mSessionBobToAlice->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
-        mSessionAliceToBob->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        mSessionAliceToBob->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
-        mSessionCharlieToDavid->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        mSessionCharlieToDavid->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
-        mSessionDavidToCharlie->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        mSessionDavidToCharlie->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
             MessagingContext::kResponsiveIdleRetransTimeout, MessagingContext::kResponsiveActiveRetransTimeout));
     }
 }
@@ -163,10 +167,24 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
                                                         mBobFabricIndex, mAliceAddress, CryptoContext::SessionRole::kInitiator);
 }
 
+CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, kAliceKeyId, GetBobFabric()->GetNodeId(),
+                                                        GetAliceFabric()->GetNodeId(), mBobFabricIndex, mAliceAddress,
+                                                        CryptoContext::SessionRole::kInitiator);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
     return mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(), kBobKeyId,
                                                         mAliceFabricIndex, mBobAddress, CryptoContext::SessionRole::kResponder);
+}
+
+CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, kBobKeyId, GetAliceFabric()->GetNodeId(),
+                                                        GetBobFabric()->GetNodeId(), mAliceFabricIndex, mBobAddress,
+                                                        CryptoContext::SessionRole::kResponder);
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()

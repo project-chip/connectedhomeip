@@ -82,6 +82,11 @@ static_library("android") {
   public_configs = []
 }
 
+source_set("inet") {
+  sources = [ "InetInterfaceImpl.cpp" ]
+  deps = [ "${chip_root}/src/lib/support" ]
+}
+
 android_library("java") {
   output_name = "AndroidPlatform.jar"
 

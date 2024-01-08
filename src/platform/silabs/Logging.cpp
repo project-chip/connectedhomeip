@@ -12,7 +12,6 @@
 #include <openthread/platform/logging.h>
 #endif
 
-#include "AppConfig.h"
 #include <stdio.h>
 #include <string.h>
 

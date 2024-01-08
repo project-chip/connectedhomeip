@@ -95,6 +95,8 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
@@ -117,7 +119,7 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libAppTests"
 
   test_sources = [
@@ -126,6 +128,7 @@ chip_test_suite("tests") {
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
@@ -136,10 +139,9 @@ chip_test_suite("tests") {
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
-    "TestExtensionFieldSets.cpp",
     "TestFabricScopedEventLogging.cpp",
     "TestICDManager.cpp",
-    "TestIcdMonitoringTable.cpp",
+    "TestICDMonitoringTable.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
     "TestNumericAttributeTraits.cpp",
@@ -148,7 +150,6 @@ chip_test_suite("tests") {
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
-    "TestSceneTable.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTimeSyncDataProvider.cpp",
@@ -161,6 +162,7 @@ chip_test_suite("tests") {
   }
 
   test_sources += [ "TestAclAttribute.cpp" ]
+  test_sources += [ "TestDefaultICDClientStorage.cpp" ]
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -196,18 +198,28 @@ chip_test_suite("tests") {
     ":binding-test-srcs",
     ":operational-state-test-srcs",
     ":ota-requestor-test-srcs",
-    ":power-cluster-test-srcs",
-    ":scenes-table-test-srcs",
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd:manager-srcs",
+    "${chip_root}/src/app/icd:manager",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support:testing",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  if (chip_device_platform != "android") {
+    test_sources += [
+      "TestExtensionFieldSets.cpp",
+      "TestSceneTable.cpp",
+    ]
+    public_deps += [
+      ":power-cluster-test-srcs",
+      ":scenes-table-test-srcs",
+    ]
+  }
 
   # Do not run TestCommissionManager when running ICD specific unit tests.
   # ICDManager has a dependency on the Accessors.h file which causes a link error

@@ -38,12 +38,9 @@ if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
 endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
-    if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
+    if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
         set(is_debug TRUE)
     else()
-        if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-            message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
-        endif()
         set(is_debug FALSE)
     endif()
 endif()
@@ -227,6 +224,7 @@ if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
         chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
     endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
+    chip_gn_arg_append("chip_external_platform_include_dir" "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_INCLUDE_DIR}\"")
 endif()
 
 # Set up CHIP project configuration file
@@ -265,12 +263,20 @@ if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
   chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
+     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+endif()
+
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_MATTER_EVENT_LIST)
+    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -488,7 +494,7 @@ foreach(phy_blob ${phy_blobs})
     list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
 endforeach()
 
-set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos)
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
 idf_build_get_property(build_components BUILD_COMPONENTS)
 foreach(component ${components_to_link})
     # Some of the components are not present in IDF v4.x

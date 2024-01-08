@@ -49,6 +49,11 @@ class CompletionListenerAdapter(val listener: MatterController.CompletionListene
 
   override fun onOpCSRGenerationComplete(csr: ByteArray) = listener.onOpCSRGenerationComplete(csr)
 
+  override fun onICDRegistrationInfoRequired() = listener.onICDRegistrationInfoRequired()
+
+  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) =
+    listener.onICDRegistrationComplete(icdNodeId, icdCounter)
+
   override fun onError(error: Throwable) = listener.onError(error)
 
   override fun onCloseBleComplete() {

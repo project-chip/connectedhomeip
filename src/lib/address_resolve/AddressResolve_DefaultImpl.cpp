@@ -195,7 +195,7 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
     VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
+    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_NOT_FOUND);
 
     auto listener = handle.GetListener();
     auto peerId   = handle.GetRequest().GetPeerId();
@@ -286,6 +286,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
         result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
         result.supportsTcp     = nodeData.resolutionData.supportsTcp;
+
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            result.isICDOperatingAsLIT = nodeData.resolutionData.isICDOperatingAsLIT.Value();
+        }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {

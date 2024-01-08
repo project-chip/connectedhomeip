@@ -29,16 +29,11 @@ config:
     TEST_EVENT_TRIGGER_KEY:
         type: int64u
         defaultValue: "0x0000000000000003"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
-      cluster: "DelayCommands"
-      command: "WaitForCommissionee"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-
     - label: "Step 1a: Reset Devices to factory defaults"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
@@ -56,6 +51,16 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "Step 1a: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
 
     - label: "Step 1b: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -183,7 +188,6 @@ tests:
     - label:
           "Step 4a: TH reads the Uptime attribute value of DUT. Store the value
           in uptime1"
-      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -192,7 +196,6 @@ tests:
               type: int64u
 
     - label: "Wait 10 seconds"
-      PICS: DGGEN.S.A0002
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -203,7 +206,6 @@ tests:
     - label:
           "Step 4b: TH reads a Uptime attribute value of DUT. Store the value in
           uptime2. Verify that uptime2 is greater than uptime1."
-      PICS: DGGEN.S.A0002
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -241,7 +243,6 @@ tests:
     - label:
           "Step 4c: TH reads a Uptime attribute value of DUT. Store the value in
           uptime3. Verify that uptime3 is lesser than uptime2."
-      PICS: DGGEN.S.A0003
       command: "readAttribute"
       attribute: "UpTime"
       response:
@@ -397,6 +398,7 @@ tests:
               minValue: 0x0
               maxValue: 0xFFFFFFFE
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
     - label: "Wait for 2 hours and 5 minutes."
       PICS: DGGEN.S.A0003
       cluster: "DelayCommands"
@@ -436,6 +438,16 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    - label: "Step 10b: TH starts a commissioning process with DUT"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -455,6 +467,7 @@ tests:
           constraints:
               type: int32u
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29580
     - label: "Wait for 1 hour 5 minutes."
       PICS: DGGEN.S.A0003
       cluster: "DelayCommands"

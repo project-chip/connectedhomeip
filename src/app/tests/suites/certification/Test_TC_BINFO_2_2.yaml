@@ -139,13 +139,37 @@ tests:
       minInterval: 30
       maxInterval: 100
 
-    - label: "Verify that ShutDown event has priority set as CRITICAL"
+    - label:
+          "Shutdown the DUT and Verify that ShutDown event has priority set as
+          CRITICAL"
+      verification: |
+          To verify ShutDown event follow the below commands , Pls use equivalent command on the respective DUT
+
+
+          1. Launch chip-tool into interactive mode with the command
+
+          ./chip-tool interactive start
+
+          2.  run below command in interactive mode shell and  Turn down the DUT
+          basicinformation subscribe-event shut-down 20 100 1 0
+
+          verify that ShutDown event as priority set has CRITICAL on TH(Chip-tool)
+
+          CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Event 0x0000_0001
+          [1653050528.900202][119367:119372] CHIP:TOO:          Event number: 5
+          [1653050528.900295][119367:119372] CHIP:TOO:          Priority: Critical
+          [1653050528.900386][119367:119372] CHIP:TOO:          Timestamp: 289436805
+          [1653050528.900630][119367:119372] CHIP:TOO:   ShutDown: {
+          [1653050528.900732][119367:119372] CHIP:TOO:    }
+          [1653050528.900892][119367:119372] CHIP:DMG: Refresh LivenessCheckTime for 28000 milliseconds with SubscriptionId = 0x27408c83 Peer = 01:0000000000000001
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP && BINFO.S.E01
       arguments:
           values:
               - name: "message"
-                value: "If priority set as CRITICAL enter 'y' for success"
+                value:
+                    "Enter 'y' after successfully ShutDown DUT & priority set as
+                    CRITICAL"
               - name: "expectedValue"
                 value: "y"

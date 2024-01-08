@@ -24,6 +24,7 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Server.h>
 #include <app/util/config.h>
+#include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -31,7 +32,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <zap-generated/CHIPClusters.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -684,7 +684,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
     ChipLogProgress(Controller, "Attempting to update Binding list");
     BindingListType bindingList(bindings.data(), bindings.size());
 
-    chip::Controller::BindingCluster cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
+    Controller::ClusterBase cluster(exchangeMgr, sessionHandle, kTargetBindingClusterEndpointId);
 
     ReturnErrorOnFailure(
         cluster.WriteAttribute<Binding::Attributes::Binding::TypeInfo>(bindingList, nullptr, successCb, failureCb));

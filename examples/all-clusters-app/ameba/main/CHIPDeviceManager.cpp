@@ -93,6 +93,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 exit:
     return err;
 }
+
+void CHIPDeviceManager::Shutdown()
+{
+    PlatformMgr().Shutdown();
+}
+
 } // namespace DeviceManager
 } // namespace chip
 

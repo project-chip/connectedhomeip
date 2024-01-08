@@ -88,6 +88,8 @@ enum
     kPathLength_NotSpecified               = -1,
 };
 
+inline constexpr uint64_t kUseRandomSerialNumber = 0;
+
 enum CertFormat
 {
     kCertFormat_Unknown = 0,

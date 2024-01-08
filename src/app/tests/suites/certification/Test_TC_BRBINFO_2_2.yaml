@@ -32,7 +32,7 @@ tests:
 
           3. TH reads Reachable attribute from DUT and saves for future use
 
-          4. TH subscribes to StartUp, ShutDown, ReachableChanged and Leave events on the Basic cluster of the DUT
+          4. TH subscribes to StartUp, ShutDown, ReachableChanged and Leave events on the Bridged Device Basic Information cluster of the DUT
 
           5. TH saves the FabricIndex during commissioning
       disabled: true

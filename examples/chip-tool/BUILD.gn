@@ -70,6 +70,8 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
+    "commands/icd/ICDCommand.cpp",
+    "commands/icd/ICDCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -89,6 +91,7 @@ static_library("chip-tool-utils") {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
     deps += [
       "${chip_root}/examples/common/websocket-server",
+      "${chip_root}/src/platform/logging:headers",
       "${editline_root}:editline",
     ]
   }
@@ -99,6 +102,7 @@ static_library("chip-tool-utils") {
 
   public_deps = [
     "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/controller/data_model",

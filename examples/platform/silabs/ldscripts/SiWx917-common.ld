@@ -28,8 +28,8 @@
  ******************************************************************************/
  MEMORY
  {
-   rom   (rx)  : ORIGIN = 0x81c2000, LENGTH = 0x200000
-   ram     (rwx) : ORIGIN = 0x400, LENGTH = 0x4e200
+   rom   (rx)  : ORIGIN = 0x8202000, LENGTH = 0x1fe000
+   ram     (rwx) : ORIGIN = 0x400, LENGTH = 0x4fc00
  }
 
 ENTRY(Reset_Handler)
@@ -39,8 +39,8 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-     	KEEP(*(.reset_handler))
-		*(EXCLUDE_FILE(*sl_si91x_bus.o *sl_si91x_driver.o *sli_si91x_multithreaded.o *rsi_hal_mcu_m4_ram.o ) .text*)
+        KEEP(*(.reset_handler))
+		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *heap_*.c.o) .text*)
 		
     /* .ctors */
     *crtbegin.o(.ctors)
@@ -127,10 +127,24 @@ SECTIONS
 		*(.rodata*)
 		*(vtable)
 		*(.data*)
-		*sl_si91x_bus.o(.text*)
-		*sl_si91x_driver.o(.text*)
-		*sli_si91x_multithreaded.o(.text*)
-		*rsi_hal_mcu_m4_ram.o(.text*)
+		*sl_si91x_bus.c.o(.text*)
+		*sl_si91x_driver.c.o(.text*)
+		*sli_si91x_multithreaded.c.o(.text*)
+		*rsi_hal_mcu_m4_ram.c.o(.text*)
+  	    	*rsi_deepsleep_soc.c.o(.text*)
+		*croutine.c.o(.text*)
+		*event_groups.c.o(.text*)
+		*list.c.o(.text*)
+		*queue.c.o(.text*)
+		*cmsis_os2.c.o(.text*)
+		*stream_buffer.c.o(.text*)
+		*tasks.c.o(.text*)
+		*timers.c.o(.text*)
+		*freertos_umm_malloc_host.c.o(.text*)
+		*malloc_buffers.c.o(.text*)
+		*sl_rsi_utility.c.o(.text*)
+		*port.c.o(.text*)
+		*heap_*.c.o(.text*)
 
     . = ALIGN(4);
     /* preinit data */
@@ -210,8 +224,8 @@ SECTIONS
   } > ram
   
 	__heap_size = __HeapLimit - __HeapBase;
-  __ram_end__ = 0x400 + 0x4e200;
-  __main_flash_end__ = 0x81c2000 + 0x200000;
+  __ram_end__ = 0x400 + 0x4fc00;
+  __main_flash_end__ = 0x8202000 + 0x1fe000;
   
 	   /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
    * block sizes and then "place" them at the end of flash when the size is known. */
@@ -224,7 +238,8 @@ SECTIONS
     KEEP(*(.simee*))
   } > rom
 
-  linker_nvm_end = __main_flash_end__;
+  /* Last page of flash is reserved for the manufacturing token space */
+  linker_nvm_end = __main_flash_end__ - 4096;
   linker_nvm_begin = linker_nvm_end - SIZEOF(.nvm);
   linker_nvm_size = SIZEOF(.nvm);
   linker_storage_end = linker_nvm_begin;
@@ -234,7 +249,7 @@ SECTIONS
   linker_storage_size = SIZEOF(.internal_storage);
   ASSERT((linker_storage_begin >= (__etext + SIZEOF(.data))), "FLASH memory overflowed !")
 
-  app_flash_end = 0x81c2000 + 0x200000;
+  app_flash_end = 0x8202000 + 0x1fe000;
   ASSERT( (linker_nvm_begin + SIZEOF(.nvm)) <= app_flash_end, "NVM3 is excessing the flash size !")
 }
 

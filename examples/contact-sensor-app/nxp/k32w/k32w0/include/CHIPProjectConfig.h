@@ -59,6 +59,11 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xA220
 
+// Set the following define to use the Certification Declaration from below and not use it stored in factory data section
+#ifndef CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION
+#define CHIP_USE_DEVICE_CONFIG_CERTIFICATION_DECLARATION 0
+#endif
+
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
 //-> vendor_id = 0x1037
@@ -188,8 +193,7 @@
 #define CHIP_CONFIG_MAX_FABRICS 5 // 5 is the minimum number of supported fabrics
 
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
-#define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL 1000_ms32
-#define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL 100_ms32
+
 /**
  * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
  *

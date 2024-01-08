@@ -25,7 +25,7 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <init_Matter.h>
 #include <mbedtls/platform.h>
-#if CONFIG_ENABLE_CHIP_SHELL
+#ifdef CONFIG_ENABLE_CHIP_SHELL
 #include <shell/launch_shell.h>
 #endif
 #include <platform/ASR/ASRFactoryDataProvider.h>
@@ -113,7 +113,7 @@ CHIP_ERROR MatterInitializer::Init_Matter_Server(void)
     err = PlatformMgr().StartEventLoopTask();
     ReturnErrorOnFailure(err);
 
-#if CONFIG_ENABLE_CHIP_SHELL
+#ifdef CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
 

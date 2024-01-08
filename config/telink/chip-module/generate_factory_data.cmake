@@ -116,6 +116,17 @@ if(CONFIG_CHIP_DEVICE_ENABLE_KEY)
 string(APPEND script_args "--enable-key \"${CONFIG_CHIP_DEVICE_ENABLE_KEY}\"\n")
 endif()
 
+# get code-partition factory_partition address
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_addr(factory_off PATH ${dts_partition_path})
+
+# get code-partition factory_partition size
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_size(factory_size PATH ${dts_partition_path})
+
+string(APPEND script_args "--offset ${factory_off}\n")
+string(APPEND script_args "--size ${factory_size}\n")
+
 string(APPEND script_args "--output \"${output_path}\"/factory\n")
 
 set(factory_data_bin ${output_path}/factory/factory_data.bin)

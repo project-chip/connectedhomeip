@@ -943,7 +943,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     // Sequence 4: Rename fabric index 2, applies immediately when nothing pending
     {
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(2, CharSpan("roboto")));
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(2, "roboto"_span));
         NL_TEST_ASSERT_EQUALS(inSuite, fabricTable.FabricCount(), 2);
 
         NL_TEST_ASSERT_EQUALS(inSuite, storage.GetNumKeys(), numStorageAfterUpdate); // Number of keys unchanged
@@ -2261,32 +2261,32 @@ void TestFabricLabelChange(nlTestSuite * inSuite, void * inContext)
     // Second scope: set FabricLabel to "acme fabric", make sure it cannot be reverted
     {
         // Fabric label starts unset from prior scope
-        CharSpan fabricLabel = CharSpan::fromCharString("placeholder");
+        CharSpan fabricLabel = "placeholder"_span;
 
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
         NL_TEST_ASSERT(inSuite, fabricLabel.size() == 0);
 
         // Set a valid name
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(1, CharSpan::fromCharString("acme fabric")));
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(1, "acme fabric"_span));
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
-        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("acme fabric")) == true);
+        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("acme fabric"_span) == true);
 
         // Revert pending fabric data. Should not revert name since nothing pending.
         fabricTable.RevertPendingFabricData();
 
-        fabricLabel = CharSpan::fromCharString("placeholder");
+        fabricLabel = "placeholder"_span;
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
-        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("acme fabric")) == true);
+        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("acme fabric"_span) == true);
 
         // Verify we fail to set too large a label (> kFabricLabelMaxLengthInBytes)
-        CharSpan fabricLabelTooBig = CharSpan::fromCharString("012345678901234567890123456789123456");
+        CharSpan fabricLabelTooBig = "012345678901234567890123456789123456"_span;
         NL_TEST_ASSERT(inSuite, fabricLabelTooBig.size() > chip::kFabricLabelMaxLengthInBytes);
 
         NL_TEST_ASSERT(inSuite, fabricTable.SetFabricLabel(1, fabricLabelTooBig) == CHIP_ERROR_INVALID_ARGUMENT);
 
-        fabricLabel = CharSpan::fromCharString("placeholder");
+        fabricLabel = "placeholder"_span;
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
-        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("acme fabric")) == true);
+        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("acme fabric"_span) == true);
     }
 
     // Third scope: set fabric label after an update, it sticks, but then goes back after revert
@@ -2320,23 +2320,23 @@ void TestFabricLabelChange(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, fabricInfo->GetVendorId() == kVendorId);
 
             CharSpan fabricLabel = fabricInfo->GetFabricLabel();
-            NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("acme fabric")) == true);
+            NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("acme fabric"_span) == true);
         }
 
         // Update fabric label
-        CharSpan fabricLabel = CharSpan::fromCharString("placeholder");
-        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(1, CharSpan::fromCharString("roboto fabric")));
+        CharSpan fabricLabel = "placeholder"_span;
+        NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.SetFabricLabel(1, "roboto fabric"_span));
 
-        fabricLabel = CharSpan::fromCharString("placeholder");
+        fabricLabel = "placeholder"_span;
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
-        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("roboto fabric")) == true);
+        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("roboto fabric"_span) == true);
 
         // Revert pending fabric data. Should revert name to "acme fabric"
         fabricTable.RevertPendingFabricData();
 
-        fabricLabel = CharSpan::fromCharString("placeholder");
+        fabricLabel = "placeholder"_span;
         NL_TEST_ASSERT_SUCCESS(inSuite, fabricTable.GetFabricLabel(1, fabricLabel));
-        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal(CharSpan::fromCharString("acme fabric")) == true);
+        NL_TEST_ASSERT(inSuite, fabricLabel.data_equal("acme fabric"_span) == true);
     }
 }
 

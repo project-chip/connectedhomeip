@@ -17,6 +17,7 @@
 
 import inspect
 import logging
+import random
 from dataclasses import dataclass
 
 import chip.clusters as Clusters
@@ -184,7 +185,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # The only way to have no accessing fabric is to have a PASE session and no added NOC
         # KeySetRead - fabric scoped command, should not be accessible over PASE
         # To get a PASE session, we need an open commissioning window
-        discriminator = self.matter_test_config.discriminators[0] + 1
+        discriminator = random.randint(0, 4095)
 
         params = self.default_controller.OpenCommissioningWindow(
             nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
@@ -260,7 +261,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # Try with RevokeCommissioning
         # First open a commissioning window for us to revoke, so we know this command is able to succeed absent this error
         _ = self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
+            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
         cmd = FakeRevokeCommissioning()
         try:
             await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)

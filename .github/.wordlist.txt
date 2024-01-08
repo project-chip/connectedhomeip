@@ -130,6 +130,7 @@ BarrierControl
 BasicCHIPRegression
 BasicInformation
 baudrate
+BCM
 BD
 BDX
 BDXDownloader
@@ -248,6 +249,7 @@ CKIT
 CLA
 clapre
 CLI
+CLIs
 cloudbuild
 CLRF
 clusterAttrs
@@ -264,6 +266,7 @@ CMS
 CMSIS
 CMVH
 cn
+COAP
 codeaurora
 codebase
 codegen
@@ -477,6 +480,7 @@ edaf
 edc
 EDR
 ee
+eea
 EEE
 eef
 ef
@@ -654,11 +658,13 @@ iaszone
 ibb
 ICA
 ICD
+ICDs
 iCloud
 ICMP
 IDF
 IDL
 IDLs
+idt
 idx
 ifconfig
 ifdef
@@ -789,6 +795,7 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+lladdr
 LocalConfigDisabled
 localedef
 localhost
@@ -909,6 +916,7 @@ namespacing
 nano
 natively
 navpad
+NCP
 ncs
 nding
 NDK
@@ -926,6 +934,7 @@ nl
 NLUnitTest
 NLUnitTests
 nmcli
+nmtui
 noc
 NodeId
 nongnu
@@ -1015,17 +1024,21 @@ PairDevice
 PAIs
 PAKE
 palletsprojects
+PANID
 pankore
 param
 params
 PartNumber
 PASE
 Passcode
+passRetained
+passwd
 PBKDF
 pbuf
 pbufs
 pbxproj
 PCA
+pcap
 pcaps
 PDFs
 PDK
@@ -1051,6 +1064,7 @@ PlatformManager
 PlatformManagerImpl
 plt
 png
+Podman
 PollControl
 pollInterval
 polymorphism
@@ -1167,6 +1181,7 @@ rootfs
 RPC
 RPCs
 RPi
+RPi's
 RPis
 RSA
 rsn
@@ -1216,6 +1231,7 @@ SendNewInputEvent
 sendto
 seqdiag
 SERIALDEVICE
+serialno
 SerialNumber
 ServiceId
 SetDns
@@ -1325,12 +1341,14 @@ systime
 sysv
 TargetNavigator
 TBD
+tbody
 tcl
 TCP
 teardown
 Telink
 TemperatureMeasurement
 templating
+Tera
 testability
 TestArray
 TestCluster
@@ -1459,6 +1477,7 @@ utils
 UUID
 ux
 validator
+vcom
 VCP
 Vectorcall
 VendorID
@@ -1486,6 +1505,7 @@ WantedBy
 watchdogTimeout
 watchOS
 webpage
+wf
 wg
 wget
 whde

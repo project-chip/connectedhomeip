@@ -50,7 +50,7 @@
         counter++;
         [expectation fulfill];
     };
-    [workQueue enqueueWorkItem:workItem1];
+    [workQueue enqueueWorkItem:workItem1 description:@"work item 1"];
 
     // Check for leaks.
     MTRAsyncWorkItem * __weak weakItem = workItem1;
@@ -77,7 +77,7 @@
         counter++;
         completion(MTRAsyncWorkComplete);
     };
-    [workQueue enqueueWorkItem:workItem1];
+    [workQueue enqueueWorkItem:workItem1 descriptionWithFormat:@"work item %d", 1];
 
     MTRAsyncWorkItem * workItem2 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     workItem2.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
@@ -87,7 +87,7 @@
         }
         completion(MTRAsyncWorkComplete);
     };
-    [workQueue enqueueWorkItem:workItem2];
+    [workQueue enqueueWorkItem:workItem2 description:@"work item 2"];
 
     [self waitForExpectationsWithTimeout:2 handler:nil];
 
@@ -114,7 +114,7 @@
             completion(MTRAsyncWorkNeedsRetry);
         }
     };
-    [workQueue enqueueWorkItem:workItem1];
+    [workQueue enqueueWorkItem:workItem1 description:@"needs a retry"];
 
     MTRAsyncWorkItem * workItem2 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
     workItem2.readyHandler = ^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
@@ -144,7 +144,7 @@
         completion(MTRAsyncWorkComplete);
         [expectation1 fulfill];
     };
-    [workQueue enqueueWorkItem:workItem1];
+    [workQueue enqueueWorkItem:workItem1 description:@"workItem1"];
 
     [self waitForExpectations:@[ expectation1 ] timeout:2];
 
@@ -153,7 +153,7 @@
         [expectation2 fulfill];
         completion(MTRAsyncWorkComplete);
     };
-    [workQueue enqueueWorkItem:workItem2];
+    [workQueue enqueueWorkItem:workItem2 description:@"workItem2"];
 
     [self waitForExpectationsWithTimeout:2 handler:nil];
 }
@@ -243,12 +243,12 @@
         }];
         [workItem1 setBatchingID:1
                             data:@(1)
-                         handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond, BOOL * _Nonnull fullyMerged) {
+                         handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond) {
                              XCTAssertEqualObjects(opaqueDataFirst, @(1));
                              XCTAssertEqualObjects(opaqueDataSecond, @(2));
-                             *fullyMerged = YES;
+                             return MTRBatchedFully;
                          }];
-        [workQueue enqueueWorkItem:workItem1];
+        [workQueue enqueueWorkItem:workItem1 description:@"workItem1"];
 
         MTRAsyncWorkItem * workItem2 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem2 setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
@@ -257,17 +257,18 @@
         }];
         [workItem2 setBatchingID:1
                             data:@(2)
-                         handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond, BOOL * _Nonnull fullyMerged) {
+                         handler:^(id _Nonnull opaqueDataFirst, id _Nonnull opaqueDataSecond) {
                              workItem2BatchingCalled = YES;
+                             return MTRBatchedPartially;
                          }];
-        [workQueue enqueueWorkItem:workItem2];
+        [workQueue enqueueWorkItem:workItem2 description:@"workItem2"];
 
         MTRAsyncWorkItem * workItem3 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
         [workItem3 setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
             [workItem3ReadyExpectation fulfill];
             completion(MTRAsyncWorkComplete);
         }];
-        [workQueue enqueueWorkItem:workItem3];
+        [workQueue enqueueWorkItem:workItem3 description:@"workItem3"];
 
         completion(MTRAsyncWorkComplete);
     };

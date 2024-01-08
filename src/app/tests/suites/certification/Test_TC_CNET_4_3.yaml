@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,165 +11,146 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     12.4.3. [TC-CNET-4.3] [Ethernet] Verification for attributes check
     [DUT-Server]
+
 PICS:
     - CNET.S.F02
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
+    cluster: "Network Commissioning"
+    # PIXIT.CNET.ENDPOINT_ETHERNET
     endpoint: 0
+    NetworkID:
+        type: octet_string
+        defaultValue: "hex:6574682D617070"
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J042C00KA0648G00"
 
 tests:
-    - label: "Step 1: Factory reset the DUT"
-      verification: |
+    - label: "Step 1: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
 
-      disabled: true
+    - label: "Step 1: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 2: Commission TH and DUT on Ethernet setup"
-      verification: |
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
 
-      disabled: true
+    - label: "Step 2: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Step 3: TH reads Descriptor Cluster from the DUT with EP0 TH reads
           ServerList from the DUT"
-      verification: |
-          ./chip-tool descriptor read server-list 1 0
+      cluster: "Descriptor"
+      command: "readAttribute"
+      attribute: "ServerList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
 
-          Via the TH (chip-tool), verify that the server list has value as 49.
-
-          [1646226258.250313][2446:2451] CHIP:DMG:        SuppressResponse = true,
-          [1646226258.250337][2446:2451] CHIP:DMG:        InteractionModelRevision = 1
-          [1646226258.250359][2446:2451] CHIP:DMG: }
-          [1646226258.252027][2446:2451] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_001D Attribute 0x0000_0001DataVersion: 3582931896
-          [1646226258.252128][2446:2451] CHIP:TOO:   server list: 25 entries
-          [1646226258.252183][2446:2451] CHIP:TOO:     [1]: 3
-          [1646226258.252208][2446:2451] CHIP:TOO:     [2]: 4
-          [1646226258.252232][2446:2451] CHIP:TOO:     [3]: 29
-          [1646226258.252256][2446:2451] CHIP:TOO:     [4]: 30
-          [1646226258.252280][2446:2451] CHIP:TOO:     [5]: 31
-          [1646226258.252303][2446:2451] CHIP:TOO:     [6]: 40
-          [1646226258.252326][2446:2451] CHIP:TOO:     [7]: 42
-          [1646226258.252349][2446:2451] CHIP:TOO:     [8]: 43
-          [1646226258.252373][2446:2451] CHIP:TOO:     [9]: 44
-          [1646226258.252396][2446:2451] CHIP:TOO:     [10]: 45
-          [1646226258.252420][2446:2451] CHIP:TOO:     [11]: 46
-          [1646226258.252443][2446:2451] CHIP:TOO:     [12]: 48
-          [1646226258.252466][2446:2451] CHIP:TOO:     [13]: 49
-          [1646226258.252489][2446:2451] CHIP:TOO:     [14]: 50
-          [1646226258.252512][2446:2451] CHIP:TOO:     [15]: 51
-          [1646226258.252536][2446:2451] CHIP:TOO:     [16]: 52
-          [1646226258.252559][2446:2451] CHIP:TOO:     [17]: 53
-          [1646226258.252582][2446:2451] CHIP:TOO:     [18]: 54
-          [1646226258.252605][2446:2451] CHIP:TOO:     [19]: 55
-          [1646226258.252629][2446:2451] CHIP:TOO:     [20]: 60
-          [1646226258.252652][2446:2451] CHIP:TOO:     [21]: 62
-          [1646226258.252675][2446:2451] CHIP:TOO:     [22]: 63
-          [1646226258.252698][2446:2451] CHIP:TOO:     [23]: 64
-          [1646226258.252721][2446:2451] CHIP:TOO:     [24]: 65
-          [1646226258.252745][2446:2451] CHIP:TOO:     [25]: 1029
-          [1646226258.255517][2446:2451] CHIP:EM: Sending Standalone Ack for MessageCounter:10627940 on exchange 21443i
-      disabled: true
-
-    - label: "Step 4: TH reads FeatureMap attribute from the DUT"
-      verification: |
-          ./chip-tool networkcommissioning read feature-map 1 0
-
-          Via the TH (chip-tool), verify that FeatureMap attribute value as 4 for Ethernet NetworkInterface.
-
-          [1649309323.273092][2611:2617] CHIP:DMG: }
-          [1649309323.273466][2611:2617] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_FFFC DataVersion: 3138976789
-          [1649309323.278715][2611:2617] CHIP:TOO:   FeatureMap: 4
-          [1649309323.278863][2611:2617] CHIP:EM: Sending Standalone Ack for MessageCounter:532597 on exchange 51560i
-      disabled: true
-
-    - label: "Step 5: TH reads the MaxNetworks attribute from the DUT"
-      PICS: CNET.S.A0000
-      verification: |
-          ./chip-tool networkcommissioning read max-networks 1 0
-
-          Via the TH (chip-tool), Verify the MaxNetworks attribute that contains value in the range of 1 to 255.
-
-          [1646226441.815782][2475:2480] CHIP:DMG:        SuppressResponse = true,
-          [1646226441.815849][2475:2480] CHIP:DMG:        InteractionModelRevision = 1
-          [1646226441.815889][2475:2480] CHIP:DMG: }
-          [1646226441.816092][2475:2480] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0000DataVersion: 3622667250
-          [1646226441.816191][2475:2480] CHIP:TOO:   MaxNetworks: 1
-          [1646226441.816288][2475:2480] CHIP:EM: Sending Standalone Ack for MessageCounter:14864333 on exchange 39473i
-      disabled: true
+    - label: "Step 4a: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 4
+          constraints:
+              type: bitmap32
 
     - label:
-          "Step 6: TH saves the MaxNetworks attribute value as
-          'MaxNetworksValue' for future use"
-      verification: |
-          TH saves MaxNetworks attribute value
-      disabled: true
+          "Step 5 & 6: TH reads the MaxNetworks attribute from the DUT. TH saves
+          the MaxNetworks attribute value as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
 
     - label: "Step 7: TH reads the Networks attribute list from the DUT"
       PICS: CNET.S.A0001
-      verification: |
-          ./chip-tool networkcommissioning read networks 1 0
-
-          Via the TH (chip-tool), Verify:
-          -the Networks attribute has NetworkID that should be the type of octstr with a length range of 1 to 32.
-          -that the connected status should be type of bool and value as TRUE.
-
-          [1654076774.294361][33659:33664] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0001 DataVersion: 609053543
-          [1654076774.294505][33659:33664] CHIP:TOO:   Networks: 1 entries
-          [1654076774.294625][33659:33664] CHIP:TOO:     [1]: {
-          [1654076774.294679][33659:33664] CHIP:TOO:       NetworkID: 6368697035
-          [1654076774.294726][33659:33664] CHIP:TOO:       Connected: TRUE
-          [1654076774.294774][33659:33664] CHIP:TOO:      }
-      disabled: true
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains: [{ NetworkID: NetworkID, Connected: true }]
 
     - label: "Step 8: TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
-      verification: |
-
-      disabled: true
+      command: "readAttribute"
+      attribute: "InterfaceEnabled"
+      response:
+          value: true
+          constraints:
+              type: boolean
 
     - label: "Step 9: TH reads LastNetworkingStatus attribute from the DUT"
       PICS: CNET.S.A0005
-      verification: |
-          ./chip-tool networkcommissioning read last-networking-status 1 0
-
-          Via the TH (chip-tool), Verify the LastNetworkingStatus attribute that contains value as null as per spec.
-
-          [1659609891.611493][3877:3882] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0005 DataVersion: 4108508964
-          [1659609891.611559][3877:3882] CHIP:TOO:   LastNetworkingStatus: null
-          [1659609891.611689][3877:3882] CHIP:EM: Sending Standalone Ack for MessageCounter:172102677 on exchange 50438i
-      disabled: true
+      command: "readAttribute"
+      attribute: "LastNetworkingStatus"
+      response:
+          value: null
 
     - label:
-          "Step 10: TH reads the LastNetworkID attribute from the DUT TH reads
+          "Step 10: TH reads the LastNetworkID attribute from the DUT. TH reads
           the Networks attribute from the DUT"
       PICS: CNET.S.A0006
-      verification: |
-          ./chip-tool networkcommissioning read last-network-id 1 0
+      command: "readAttribute"
+      attribute: "LastNetworkID"
+      response:
+          value: null
+          constraints:
+              type: octet_string
+              minLength: 1
+              maxLength: 32
 
-          Via the TH (chip-tool), Verify:
-          -that the LastNetworkID attribute that contains NetworkID that should be the type of octstr with a length range of 1 to 32.
-          -if the Networks attribute list is Empty, then LastNetworkID attribute value is null.
-
-          [1659610135.589352][3895:3900] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0006 DataVersion: 4108508964
-          [1659610135.589410][3895:3900] CHIP:TOO:   LastNetworkID: null
-          [1659610135.589549][3895:3900] CHIP:EM: Sending Standalone Ack for MessageCounter:28696356 on exchange 52969i
-      disabled: true
+    - label: "Step 10: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains: [{ NetworkID: NetworkID, Connected: true }]
 
     - label:
           "Step 11: TH reads the LastConnectErrorValue attribute from the DUT"
       PICS: CNET.S.A0007
-      verification: |
-          ./chip-tool networkcommissioning read last-connect-error-value 1 0
-
-          Via the TH (chip-tool), Verify the LastConnectErrorValue attribute that contains value as null.
-
-          [1653483224.839873][28189:28194] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0007 DataVersion: 3189790698
-          [1653483224.839927][28189:28194] CHIP:TOO:   LastConnectErrorValue: null
-          [1653483224.840028][28189:28194] CHIP:EM: Sending Standalone Ack for MessageCounter:289132 on exchange 60682i
-      disabled: true
+      command: "readAttribute"
+      attribute: "LastConnectErrorValue"
+      response:
+          value: null
+          constraints:
+              type: int32s

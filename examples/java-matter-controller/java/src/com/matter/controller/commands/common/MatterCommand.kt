@@ -103,7 +103,7 @@ abstract class MatterCommand(
   }
 
   fun waitCompleteMs(timeoutMs: Long) {
-    futureResult.setTimeoutMs(timeoutMs)
+    futureResult.timeoutMs = timeoutMs
     futureResult.waitResult()
   }
 

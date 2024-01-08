@@ -67,6 +67,10 @@ constexpr uint8_t kUpdateTokenLen = 32;
         return;
     }
 
+    if (_delayedActionTime) {
+        _selectedCandidate.delayedActionTime = _delayedActionTime;
+    }
+
     _selectedCandidate.updateToken = [self generateUpdateToken];
     NSLog(@"Query Image Status: %hhu", _queryImageStatus);
     _selectedCandidate.status = @(_queryImageStatus);

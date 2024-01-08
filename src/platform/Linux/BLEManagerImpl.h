@@ -23,9 +23,14 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
+#include "bluez/BluezAdvertisement.h"
+#include "bluez/BluezEndpoint.h"
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 
@@ -34,21 +39,6 @@ namespace DeviceLayer {
 namespace Internal {
 
 void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
-
-struct BLEAdvConfig
-{
-    char * mpBleName;
-    uint32_t mAdapterId;
-    uint8_t mMajor;
-    uint8_t mMinor;
-    uint16_t mVendorId;
-    uint16_t mProductId;
-    uint64_t mDeviceId;
-    uint8_t mPairingStatus;
-    ChipAdvType mType;
-    uint16_t mDuration;
-    const char * mpAdvertisingUUID;
-};
 
 enum class BleScanState : uint8_t
 {
@@ -103,7 +93,6 @@ public:
     static void HandleTXComplete(BLE_CONNECTION_OBJECT user_data);
 
     static void NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, void * apAppstate);
-    static void NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvStartComplete(bool aIsSuccess, void * apAppstate);
     static void NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * apAppstate);
 
@@ -184,9 +173,6 @@ private:
         kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
 
-    CHIP_ERROR StartBLEAdvertising();
-    CHIP_ERROR StopBLEAdvertising();
-
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
@@ -195,13 +181,20 @@ private:
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
-    BLEAdvConfig mBLEAdvConfig;
-    BLEScanConfig mBLEScanConfig;
     BitFlags<Flags> mFlags;
+
+    uint32_t mAdapterId = 0;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral            = false;
-    BluezEndpoint * mpEndpoint = nullptr;
-    std::unique_ptr<ChipDeviceScanner> mDeviceScanner;
+    bool mIsCentral = false;
+    BluezEndpoint mEndpoint;
+
+    BluezAdvertisement mBLEAdvertisement;
+    ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    uint16_t mBLEAdvDurationMs = 20;
+    const char * mpBLEAdvUUID  = nullptr;
+
+    ChipDeviceScanner mDeviceScanner;
+    BLEScanConfig mBLEScanConfig;
 };
 
 /**

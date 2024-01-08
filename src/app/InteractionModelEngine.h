@@ -26,9 +26,10 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -306,6 +307,9 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
+    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
+    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
     // Get direct access to the underlying read handler pool
@@ -377,6 +381,7 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
+    friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;

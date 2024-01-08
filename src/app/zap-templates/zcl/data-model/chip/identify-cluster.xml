@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="IdentifyTypeEnum" type="ENUM8">
+  <enum name="IdentifyTypeEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="None" value="0x00"/>
     <item name="LightOutput" value="0x01"/>
@@ -27,7 +27,7 @@ limitations under the License.
     <item name="Actuator" value="0x05"/>
   </enum>
 
-  <enum name="EffectIdentifierEnum" type="ENUM8">
+  <enum name="EffectIdentifierEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="Blink" value="0x00"/>
     <item name="Breathe" value="0x01"/>
@@ -37,7 +37,7 @@ limitations under the License.
     <item name="StopEffect" value="0xFF"/>
   </enum>
 
-  <enum name="EffectVariantEnum" type="ENUM8">
+  <enum name="EffectVariantEnum" type="enum8">
     <cluster code="0x0003"/>
     <item name="Default" value="0x00"/>
   </enum>
@@ -52,14 +52,14 @@ limitations under the License.
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="4"/>
 
-    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="INT16U" writable="true"  default="0x0" optional="false">IdentifyTime</attribute>
+    <attribute side="server" code="0x0000" define="IDENTIFY_TIME" type="int16u" writable="true"  default="0x0" optional="false">IdentifyTime</attribute>
     <attribute side="server" code="0x0001" define="IDENTIFY_TYPE" type="IdentifyTypeEnum" writable="false" default="0x00" optional="false">IdentifyType</attribute>
 
     <command source="client" code="0x00" name="Identify" optional="false">
       <description>
         Command description for Identify
       </description>
-      <arg name="IdentifyTime" type="INT16U"/>
+      <arg name="IdentifyTime" type="int16u"/>
       <access op="invoke" privilege="manage"/>
     </command>
     <command source="client" code="0x40" name="TriggerEffect" optional="true">

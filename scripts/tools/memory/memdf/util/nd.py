@@ -73,7 +73,7 @@ def update(nd: MutableMapping, src: Mapping) -> None:
                 nd[k] += v
             else:
                 nd[k].append(v)
-        elif type(nd[k]) == type(v):
+        elif type(nd[k]) is type(v):
             nd[k] = v
         else:
             raise TypeError(f"type mismatch {k},{v} was {nd[k]}")

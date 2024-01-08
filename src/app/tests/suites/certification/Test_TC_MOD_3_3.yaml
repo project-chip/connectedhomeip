@@ -127,7 +127,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Commission device after reboot"
+    - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:

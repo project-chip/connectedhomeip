@@ -95,6 +95,9 @@ MTR_HIDDEN
     } else if (errorCode == CHIP_ERROR_DECODE_FAILED) {
         code = MTRErrorCodeTLVDecodeFailed;
         [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"TLV decoding failed.", nil) }];
+    } else if (errorCode == CHIP_ERROR_DNS_SD_UNAUTHORIZED) {
+        code = MTRErrorCodeDNSSDUnauthorized;
+        [userInfo addEntriesFromDictionary:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Access denied to perform DNS-SD lookups.  Check that \"_matter._tcp\" and/or \"_matterc._udp\" are listed under the NSBonjourServices key in Info.plist", nil) }];
     } else {
         code = MTRErrorCodeGeneralError;
         [userInfo addEntriesFromDictionary:@{
@@ -229,6 +232,11 @@ MTR_HIDDEN
     return [NSError errorWithDomain:MTRInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
 }
 
++ (NSError *)errorForIMStatusCode:(chip::Protocols::InteractionModel::Status)status
+{
+    return [self errorForIMStatus:chip::app::StatusIB(status)];
+}
+
 + (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
     if (error == nil) {
@@ -281,6 +289,15 @@ MTR_HIDDEN
         break;
     case MTRErrorCodeBufferTooSmall:
         code = CHIP_ERROR_BUFFER_TOO_SMALL.AsInteger();
+        break;
+    case MTRErrorCodeFabricExists:
+        code = CHIP_ERROR_FABRIC_EXISTS.AsInteger();
+        break;
+    case MTRErrorCodeTLVDecodeFailed:
+        code = CHIP_ERROR_DECODE_FAILED.AsInteger();
+        break;
+    case MTRErrorCodeDNSSDUnauthorized:
+        code = CHIP_ERROR_DNS_SD_UNAUTHORIZED.AsInteger();
         break;
     case MTRErrorCodeGeneralError: {
         if (error.userInfo != nil && error.userInfo[@"errorCode"] != nil) {

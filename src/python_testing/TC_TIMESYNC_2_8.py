@@ -29,6 +29,10 @@ from mobly import asserts
 
 
 class TC_TIMESYNC_2_8(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # This test has potentially 6 15 s waits, so set timeout to 100
+        return 100
 
     async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization

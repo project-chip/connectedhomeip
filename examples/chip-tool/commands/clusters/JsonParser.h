@@ -130,6 +130,7 @@ private:
 private:
     static void LogErrorLocation(chip::Optional<unsigned> & errorColumn, const char * json)
     {
+#if CHIP_ERROR_LOGGING
         if (!errorColumn.HasValue())
         {
             return;
@@ -160,5 +161,6 @@ private:
         errorMarker += "^";
         ChipLogError(chipTool, "%s", errorMarker.c_str());
         errorColumn.ClearValue();
+#endif // CHIP_ERROR_LOGGING
     }
 };

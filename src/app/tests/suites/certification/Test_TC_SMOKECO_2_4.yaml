@@ -511,7 +511,7 @@ tests:
     - label:
           "Step 38: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -521,7 +521,7 @@ tests:
               type: boolean
 
     - label: "Step 39: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -532,7 +532,7 @@ tests:
     - label:
           "Step 40: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -542,7 +542,7 @@ tests:
               type: boolean
 
     - label: "Step 41: TH reads SelfTestComplete event from DUT"
-      PICS: SMOKECO.S.E05
+      PICS: SMOKECO.S.E05 && SMOKECO.M.ManuallyControlledTest
       command: "readEvent"
       event: "SelfTestComplete"
       eventNumber: "LastReceivedEventNumber + 1"
@@ -550,7 +550,7 @@ tests:
           value: {}
 
     - label: "Step 42: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -559,7 +559,7 @@ tests:
               type: enum8
 
     - label: "Step 43: TH reads AllClear event from DUT"
-      PICS: SMOKECO.S.E0a
+      PICS: SMOKECO.S.E0a && SMOKECO.M.ManuallyControlledTest
       command: "readEvent"
       event: "AllClear"
       eventNumber: "LastReceivedEventNumber + 1"

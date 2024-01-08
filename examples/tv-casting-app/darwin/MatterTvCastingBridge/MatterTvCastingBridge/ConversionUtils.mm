@@ -84,7 +84,15 @@
 {
     VerifyOrReturnError(objCVideoPlayer.isInitialized, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(outTargetVideoPlayerInfo.Initialize(objCVideoPlayer.nodeId, objCVideoPlayer.fabricIndex, nullptr, nullptr,
-        objCVideoPlayer.vendorId, objCVideoPlayer.productId, objCVideoPlayer.deviceType, [objCVideoPlayer.deviceName UTF8String]));
+        objCVideoPlayer.vendorId, objCVideoPlayer.productId, objCVideoPlayer.deviceType, [objCVideoPlayer.deviceName UTF8String],
+        [objCVideoPlayer.hostName UTF8String], 0, nullptr, objCVideoPlayer.port, [objCVideoPlayer.instanceName UTF8String],
+        chip::System::Clock::Timestamp(objCVideoPlayer.lastDiscoveredMs)));
+    if (objCVideoPlayer.MACAddress != nil) {
+        outTargetVideoPlayerInfo.SetMACAddress(
+            chip::CharSpan([objCVideoPlayer.MACAddress UTF8String], objCVideoPlayer.MACAddress.length));
+    }
+    outTargetVideoPlayerInfo.SetIsAsleep(objCVideoPlayer.isAsleep);
+
     for (ContentApp * contentApp in objCVideoPlayer.contentApps) {
         TargetEndpointInfo * endpoint = outTargetVideoPlayerInfo.GetOrAddEndpoint(contentApp.endpointId);
         VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -143,6 +151,36 @@
     return objCDiscoveredNodeData;
 }
 
++ (DiscoveredNodeData *)convertToDiscoveredNodeDataFrom:(TargetVideoPlayerInfo * _Nonnull)cppTargetVideoPlayerInfo
+{
+    DiscoveredNodeData * objCDiscoveredNodeData = [DiscoveredNodeData new];
+
+    objCDiscoveredNodeData.deviceType = cppTargetVideoPlayerInfo->GetDeviceType();
+    objCDiscoveredNodeData.vendorId = cppTargetVideoPlayerInfo->GetVendorId();
+    objCDiscoveredNodeData.productId = cppTargetVideoPlayerInfo->GetProductId();
+    objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetDeviceName()
+                                                           encoding:NSUTF8StringEncoding];
+    objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetInstanceName()
+                                                             encoding:NSUTF8StringEncoding];
+
+    objCDiscoveredNodeData.port = cppTargetVideoPlayerInfo->GetPort();
+    objCDiscoveredNodeData.hostName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetHostName()
+                                                         encoding:NSUTF8StringEncoding];
+    objCDiscoveredNodeData.numIPs = cppTargetVideoPlayerInfo->GetNumIPs();
+    if (cppTargetVideoPlayerInfo->GetNumIPs() > 0) {
+        objCDiscoveredNodeData.ipAddresses = [NSMutableArray new];
+    }
+    for (size_t i = 0; i < cppTargetVideoPlayerInfo->GetNumIPs(); i++) {
+        char addrCString[chip::Inet::IPAddress::kMaxStringLength];
+        cppTargetVideoPlayerInfo->GetIpAddresses()[i].ToString(addrCString, chip::Inet::IPAddress::kMaxStringLength);
+        objCDiscoveredNodeData.ipAddresses[i] = [NSString stringWithCString:addrCString encoding:NSASCIIStringEncoding];
+    }
+
+    VideoPlayer * connectableVideoPlayer = [ConversionUtils convertToObjCVideoPlayerFrom:cppTargetVideoPlayerInfo];
+    [objCDiscoveredNodeData setConnectableVideoPlayer:connectableVideoPlayer];
+    return objCDiscoveredNodeData;
+}
+
 + (VideoPlayer *)convertToObjCVideoPlayerFrom:(TargetVideoPlayerInfo * _Nonnull)cppTargetVideoPlayerInfo
 {
     VideoPlayer * objCVideoPlayer = [VideoPlayer new];
@@ -155,6 +193,18 @@
         objCVideoPlayer.isConnected = (cppTargetVideoPlayerInfo->GetOperationalDeviceProxy() != nil);
         objCVideoPlayer.deviceName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetDeviceName()
                                                         encoding:NSUTF8StringEncoding];
+        objCVideoPlayer.port = cppTargetVideoPlayerInfo->GetPort();
+        if (cppTargetVideoPlayerInfo->GetMACAddress() != nullptr && cppTargetVideoPlayerInfo->GetMACAddress()->size() > 0) {
+            objCVideoPlayer.MACAddress = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetMACAddress()->data()
+                                                            encoding:NSUTF8StringEncoding];
+        }
+        objCVideoPlayer.isAsleep = cppTargetVideoPlayerInfo->IsAsleep();
+        objCVideoPlayer.lastDiscoveredMs = cppTargetVideoPlayerInfo->GetLastDiscovered().count();
+        objCVideoPlayer.instanceName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetInstanceName()
+                                                          encoding:NSUTF8StringEncoding];
+        objCVideoPlayer.hostName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetHostName()
+                                                      encoding:NSUTF8StringEncoding];
+
         objCVideoPlayer.contentApps = [NSMutableArray new];
         TargetEndpointInfo * cppTargetEndpointInfos = cppTargetVideoPlayerInfo->GetEndpoints();
         for (size_t i = 0; i < kMaxNumberOfEndpoints && cppTargetEndpointInfos[i].IsInitialized(); i++) {

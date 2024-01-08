@@ -19,7 +19,6 @@ import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
@@ -38,6 +37,11 @@ config("includes") {
     ".",
     "${root_gen_dir}/include",
   ]
+
+  if (chip_device_platform == "external" &&
+      chip_external_platform_include_dir != "") {
+    include_dirs += [ "${chip_external_platform_include_dir}" ]
+  }
 
   # TODO: generated file dependency should be a lib NOT an include
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
@@ -61,6 +65,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]

@@ -48,6 +48,8 @@ struct ConcreteAttributePath : public ConcreteClusterPath
         mExpanded = false;
     }
 
+    bool IsValid() const { return ConcreteClusterPath::HasValidIds() && IsValidAttributeId(mAttributeId); }
+
     bool operator==(const ConcreteAttributePath & aOther) const
     {
         return ConcreteClusterPath::operator==(aOther) && (mAttributeId == aOther.mAttributeId);
@@ -129,6 +131,12 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
 
     bool IsListOperation() const { return mListOp != ListOperation::NotList; }
     bool IsListItemOperation() const { return ((mListOp != ListOperation::NotList) && (mListOp != ListOperation::ReplaceAll)); }
+
+    void LogPath() const
+    {
+        ChipLogProgress(DataManagement, "Concrete Attribute Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mEndpointId,
+                        ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
+    }
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e

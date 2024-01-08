@@ -27,10 +27,6 @@ import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
-import chip.jsontlv.putJsonString
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
@@ -41,6 +37,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.jsontlv.putJsonString
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class WildcardFragment : Fragment() {
   private var _binding: WildcardFragmentBinding? = null
@@ -646,7 +646,7 @@ class WildcardFragment : Fragment() {
   }
 
   interface TlvWriterInterface {
-    fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag = AnonymousTag)
+    fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag = AnonymousTag)
   }
 
   companion object {
@@ -660,49 +660,49 @@ class WildcardFragment : Fragment() {
       mapOf(
         "json" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.putJsonString(tag, value)
             }
           },
         "UnsignedInt" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value.toULong())
             }
           },
         "Int" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value.toLong())
             }
           },
         "Boolean" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value.toBoolean())
             }
           },
         "Float" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value.toFloat())
             }
           },
         "Double" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value.toDouble())
             }
           },
         "String" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(tag, value)
             }
           },
         "ByteArray(Hex)" to
           object : TlvWriterInterface {
-            override fun generate(writer: TlvWriter, value: String, tag: chip.tlv.Tag) {
+            override fun generate(writer: TlvWriter, value: String, tag: matter.tlv.Tag) {
               writer.put(
                 tag,
                 value.chunked(2).map { it.toInt(16) and 0xFF }.map { it.toByte() }.toByteArray()

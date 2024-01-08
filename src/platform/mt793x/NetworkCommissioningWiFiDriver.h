@@ -122,7 +122,7 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    chip::BitFlags<WiFiSecurityBitmap> ConvertSecuritytype(wifi_auth_mode_t auth_mode);
+    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> ConvertSecuritytype(wifi_auth_mode_t auth_mode);
 
     void OnConnectWiFiNetwork();
     static GenioWiFiDriver & GetInstance()

@@ -7,6 +7,8 @@ import chip.devicecontroller.ResubscriptionAttemptCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
+import chip.devicecontroller.model.ChipPathId
+import chip.devicecontroller.model.DataVersionFilter
 import chip.devicecontroller.model.NodeState
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.Collections
@@ -81,10 +83,19 @@ class PairOnNetworkLongImSubscribeCommand(
         )
       )
 
+    val dataVersionFilterList =
+      listOf(
+        DataVersionFilter.newInstance(
+          ChipPathId.forId(/* endpointId= */ 0),
+          ChipPathId.forId(CLUSTER_ID_BASIC),
+          CLUSTER_ID_BASIC_VERSION,
+        )
+      )
+
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),
@@ -103,6 +114,7 @@ class PairOnNetworkLongImSubscribeCommand(
         devicePointer,
         attributePathList,
         Collections.emptyList(),
+        dataVersionFilterList,
         0,
         5,
         false,
@@ -120,5 +132,6 @@ class PairOnNetworkLongImSubscribeCommand(
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_BASIC = 0x0028L
     private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
+    private const val CLUSTER_ID_BASIC_VERSION = 0L
   }
 }

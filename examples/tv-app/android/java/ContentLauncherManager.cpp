@@ -47,7 +47,9 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
 
 void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchResponseType> & helper,
                                                  const DecodableList<ParameterType> & parameterList, bool autoplay,
-                                                 const chip::CharSpan & data)
+                                                 const chip::CharSpan & data,
+                                                 const chip::Optional<PlaybackPreferencesType> playbackPreferences,
+                                                 bool useCurrentContext)
 {
     Commands::LauncherResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -86,7 +88,7 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);
@@ -141,7 +143,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = chip::Optional<CharSpan>(dataStr.charSpan());
 
         err = helper.Success(response);

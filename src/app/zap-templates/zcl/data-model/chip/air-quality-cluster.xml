@@ -30,7 +30,7 @@ limitations under the License.
   </cluster>
 
   <!-- Feature Map -->
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x005B" />
     <field name="Fair" mask="0x01" />
     <field name="Moderate" mask="0x02" />
@@ -39,7 +39,7 @@ limitations under the License.
   </bitmap>
 
   <!-- Cluster Data Types -->
-  <enum name="AirQualityEnum" type="ENUM8">
+  <enum name="AirQualityEnum" type="enum8">
     <cluster code="0x005B" />
     <item value="0" name="Unknown" />
     <item value="1" name="Good" />

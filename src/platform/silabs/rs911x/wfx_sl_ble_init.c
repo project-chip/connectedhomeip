@@ -349,10 +349,10 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 
 uint32_t rsi_ble_add_matter_service(void)
 {
-    uuid_t custom_service                = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
-    custom_service.size                  = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
-    custom_service.val.val16             = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
-    uint8_t data[RSI_BLE_CS_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
+    uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
+    custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
+    custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
+    uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
     static const uuid_t custom_characteristic_RX = { .size             = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
                                                      .reserved         = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },

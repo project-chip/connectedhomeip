@@ -44,7 +44,7 @@ asr_sdk_sources("bridge_app_sdk_sources") {
     "ASR_LOG_ENABLED=1",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
-    "ENABLE_ASR_BRIDGE_SUBDEVICE_TEST=1",
+    "ENABLE_ASR_BRIDGE_SUBDEVICE_TEST",
   ]
 
   if (chip_enable_factory_data) {
@@ -109,7 +109,7 @@ asr_executable("bridge_app") {
   defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]
 
   if (chip_build_libshell) {
-    defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]
+    defines += [ "CONFIG_ENABLE_CHIP_SHELL" ]
     sources += [ "${examples_plat_dir}/shell/launch_shell.cpp" ]
     include_dirs += [ "${examples_plat_dir}/shell" ]
   }

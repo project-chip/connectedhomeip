@@ -38,6 +38,12 @@ declare_args() {
 
   # Enable mbedtls HW acceleration
   mbedtls_alt_enabled = true
+
+  # OTA parameters
+  matter_device_vid = ""
+  matter_device_pid = ""
+  matter_device_software_version = ""
+  matter_device_software_version_string = ""
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -92,13 +98,36 @@ template("qpg_sdk") {
     #MBed TLS built from third_party/mbedtls tree - OT config not used
     defines = [ "MBEDTLS_CONFIG_FILE=\"${qpg_target_ic}-mbedtls-config.h\"" ]
 
+    # Overrule CHIPProjectConfig.h settings
+    if (matter_device_vid != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${matter_device_vid}" ]
+    }
+    if (matter_device_pid != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}" ]
+    }
+    if (matter_device_software_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_device_software_version_string}\"" ]
+    }
+    if (matter_device_software_version != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_device_software_version}" ]
+    }
+
+    if (qpg_target_ic == "qpg6200") {
+      defines += [ "QPG_6200" ]
+    } else {
+      include_dirs += [ "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0" ]
+    }
+
     if (mbedtls_alt_enabled) {
       defines += [ "QORVO_CRYPTO_ENGINE" ]
     } else {
       defines += [ "MBEDTLS_SW_ONLY" ]
     }
 
-    cflags = []
+    #Wundef fix - to be updated in SDK
+    defines += [ "GP_SCHED_NR_OF_IDLE_CALLBACKS=0" ]
+
+    cflags = [ "-Wundef" ]
 
     # Allow warning due to mbedtls
     cflags += [

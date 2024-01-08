@@ -23,7 +23,6 @@
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -641,6 +640,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // a shared root store. Therefore we would later fail path validation due to
     // missing root. Let's early-bail with InvalidNOC.
     VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = NodeOperationalCertStatusEnum::kInvalidNOC);
+
+    // Check this explicitly before adding the fabric so we don't need to back out changes if this is an error.
+    VerifyOrExit(IsOperationalNodeId(commandData.caseAdminSubject) || IsCASEAuthTag(commandData.caseAdminSubject),
+                 nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
 
     err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
                                                                  &newFabricIndex);

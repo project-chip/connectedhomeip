@@ -1,0 +1,4 @@
+zeroconf==0.74.0
+bleak==0.21.1
+psutil==5.9.6
+termcolor==2.3.0

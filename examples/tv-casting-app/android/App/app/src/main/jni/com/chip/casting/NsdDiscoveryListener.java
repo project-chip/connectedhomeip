@@ -109,6 +109,7 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
   @Override
   public void onStartDiscoveryFailed(String serviceType, int errorCode) {
     Log.e(TAG, "Discovery failed to start: Error code:" + errorCode);
+    TvCastingApp.getInstance().resetDiscoveryState();
     failureCallback.handle(
         new MatterError(
             3, "NsdDiscoveryListener Discovery failed to start: Nsd Error code:" + errorCode));
