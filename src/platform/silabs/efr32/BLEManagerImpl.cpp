@@ -444,6 +444,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     mDeviceNameLength = strlen(mDeviceName); // Device Name length + length field
     VerifyOrExit(mDeviceNameLength < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert((kUUIDTlvSize + kDeviceNameTlvSize) <= MAX_RESPONSE_DATA_LEN, "Scan Response buffer is too small");
 
     mDeviceIdInfoLength = sizeof(mDeviceIdInfo); // Servicedatalen + length+ UUID (Short)
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");
@@ -1053,7 +1054,7 @@ extern "C" void sl_bt_on_event(sl_bt_msg_t * evt)
                 evt->data.evt_gatt_server_characteristic_status.connection);
         }
         else if ((evt->data.evt_gatt_server_characteristic_status.characteristic == gattdb_CHIPoBLEChar_Tx) &&
-                 (evt->data.evt_gatt_server_characteristic_status.status_flags == gatt_server_client_config))
+                 (evt->data.evt_gatt_server_characteristic_status.status_flags == sl_bt_gatt_server_client_config))
         {
             chip::DeviceLayer::Internal::BLEMgrImpl().HandleTXCharCCCDWrite(evt);
         }

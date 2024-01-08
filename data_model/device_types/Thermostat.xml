@@ -83,7 +83,7 @@ Davis, CA 95616, USA
         <condition name="Zigbee"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x000a" name="Time" side="client">
+    <cluster id="0x000A" name="Time" side="client">
       <optionalConform>
         <condition name="Zigbee"/>
       </optionalConform>
@@ -100,13 +100,13 @@ Davis, CA 95616, USA
         <optionalConform/>
       </otherwiseConform>
     </cluster>
-    <cluster id="0x009b" name="Energy Preference" side="server">
+    <cluster id="0x009B" name="Energy Preference" side="server">
       <optionalConform/>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="Schedule Configuration">
+        <feature code="" name="Schedule">
           <otherwiseConform>
             <optionalConform>
               <condition name="Zigbee"/>
