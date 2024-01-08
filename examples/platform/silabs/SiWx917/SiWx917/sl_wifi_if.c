@@ -52,6 +52,11 @@
 #define ADV_MULTIPROBE 1
 #define ADV_SCAN_PERIODICITY 10
 
+#ifdef SIWX_917
+#include "sl_si91x_trng.h"
+#define TRNGKEY_SIZE 4
+#endif
+
 struct wfx_rsi wfx_rsi;
 
 /* Declare a variable to hold the data associated with the created event group. */
@@ -301,6 +306,23 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
+#ifdef SIWX_917
+    uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    if (status != SL_STATUS_OK) {
+        SILABS_LOG("TRNG Entropy Failed");
+        return status;
+    }
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key(trngKey, 4);
+    if (status != SL_STATUS_OK) {
+        SILABS_LOG("TRNG Key Programming Failed");
+        return status;
+    }
+#endif
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
