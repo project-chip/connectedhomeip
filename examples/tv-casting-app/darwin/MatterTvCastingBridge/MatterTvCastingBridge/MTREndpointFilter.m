@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,25 +15,8 @@
  *    limitations under the License.
  */
 
-import SwiftUI
+#import "MTREndpointFilter.h"
 
-struct ContentView: View {
-    var body: some View {
-        NavigationView {
-            if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
-            {
-                MTRDiscoveryExampleView()
-            }
-            else
-            {
-                StartFromCacheView()
-            }
-        }
-    }
-}
+@implementation MTREndpointFilter
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+@end
