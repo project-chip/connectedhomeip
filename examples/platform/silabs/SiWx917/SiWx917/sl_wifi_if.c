@@ -311,14 +311,16 @@ static sl_status_t wfx_rsi_init(void)
 
     // To check the Entropy of TRNG and verify TRNG functioning.
     status = sl_si91x_trng_entropy();
-    if (status != SL_STATUS_OK) {
+    if (status != SL_STATUS_OK)
+    {
         SILABS_LOG("TRNG Entropy Failed");
         return status;
     }
 
     // Initiate and program the key required for TRNG hardware engine
     status = sl_si91x_trng_program_key(trngKey, TRNGKEY_SIZE);
-    if (status != SL_STATUS_OK) {
+    if (status != SL_STATUS_OK)
+    {
         SILABS_LOG("TRNG Key Programming Failed");
         return status;
     }
