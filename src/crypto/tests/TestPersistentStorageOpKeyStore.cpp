@@ -33,6 +33,101 @@ using namespace chip::Crypto;
 
 namespace {
 
+/**
+ * Implementation of OperationalKeystore for testing purposes.
+ *
+ * Not all methods of OperationalKeystore are implemented, only the currently needed.
+ * Currently this implementation supports only one fabric and one operational key.
+ *
+ * The Validate method can be used to validate the provided P256SerializedKeypair with the
+ * stored kP256SerializedKeypairRaw data.
+ */
+class TestOperationalKeystore final : public Crypto::OperationalKeystore
+{
+public:
+    constexpr static uint8_t kP256SerializedKeypairRaw[] = {
+        0x4,  0xd0, 0x99, 0xde, 0xd1, 0x15, 0xea, 0xcf, 0x8f, 0x13, 0xde, 0xaf, 0x74, 0x65, 0xf3, 0x10, 0x3a, 0x75, 0x94, 0x51,
+        0x37, 0x3c, 0xc,  0x9a, 0x25, 0xc7, 0xad, 0xb4, 0x31, 0x39, 0x62, 0xec, 0x12, 0xa3, 0xdf, 0x28, 0x5f, 0x2c, 0x86, 0x47,
+        0x2d, 0x1f, 0x5d, 0x45, 0x1d, 0x9f, 0xbc, 0xe8, 0x47, 0xf2, 0x1f, 0x40, 0x17, 0x61, 0x2b, 0x9a, 0x4e, 0x68, 0x9c, 0xe9,
+        0x9e, 0xb7, 0x45, 0xdc, 0xcd, 0xb,  0x90, 0xd0, 0x24, 0xa5, 0x6d, 0x64, 0x97, 0x62, 0x75, 0x42, 0x91, 0x74, 0xfc, 0xfe,
+        0xcb, 0x1,  0x6c, 0xc,  0x74, 0x6f, 0x39, 0x9f, 0x5,  0x96, 0x1b, 0xe6, 0x4a, 0x97, 0xe5, 0x84, 0x72
+    };
+
+    bool HasOpKeypairForFabric(FabricIndex fabricIndex) const override { return fabricIndex == mUsedFabricIndex; };
+
+    CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override
+    {
+        // Only one Fabric is supported
+        if (mUsedFabricIndex != 0)
+        {
+            ChipLogError(Test,
+                         "The TestOperationalKeystore has been initialized already, please use RemoveOpKeypairForFabric or remove "
+                         "the object to store a new fabric");
+            return CHIP_ERROR_INVALID_FABRIC_INDEX;
+        }
+        mUsedFabricIndex = fabricIndex;
+        (void) outCertificateSigningRequest;
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair) override
+    {
+        VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+        // Simulate not existing value while the fabric index is valid.
+        if (fabricIndex != mUsedFabricIndex)
+        {
+            return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        }
+
+        if (outKeypair.Capacity() != sizeof(kP256SerializedKeypairRaw))
+        {
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+
+        memcpy(outKeypair.Bytes(), kP256SerializedKeypairRaw, outKeypair.Capacity());
+        outKeypair.SetLength(sizeof(kP256SerializedKeypairRaw));
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override
+    {
+        mUsedFabricIndex = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    bool ValidateKeypair(Crypto::P256SerializedKeypair & keypair)
+    {
+        return (keypair.Length() == sizeof(kP256SerializedKeypairRaw) &&
+                memcmp(keypair.ConstBytes(), kP256SerializedKeypairRaw, keypair.Length()) == 0);
+    }
+
+    // Not implemented methods, they are not used in any tests yet.
+    bool HasPendingOpKeypair() const override { return false; }
+    CHIP_ERROR ActivateOpKeypairForFabric(FabricIndex fabricIndex, const Crypto::P256PublicKey & nocPublicKey) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR MigrateOpKeypairForFabric(FabricIndex fabricIndex, OperationalKeystore & operationalKeystore) const override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    void RevertPendingKeypair() override {}
+    CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
+                                 Crypto::P256ECDSASignature & outSignature) const override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    Crypto::P256Keypair * AllocateEphemeralKeypairForCASE() override { return nullptr; }
+    void ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair) override {}
+
+private:
+    FabricIndex mUsedFabricIndex = 0;
+};
+
 void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
 {
     TestPersistentStorageDelegate storageDelegate;
@@ -174,6 +269,15 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
     NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == true);
 
+    // Exporting a key
+    P256SerializedKeypair serializedKeypair;
+    NL_TEST_ASSERT(inSuite, opKeystore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair) == CHIP_NO_ERROR);
+
+    // Exporting a key from the bad fabric index
+    NL_TEST_ASSERT(inSuite,
+                   opKeystore.ExportOpKeypairForFabric(kBadFabricIndex, serializedKeypair) ==
+                       CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
     // After committing, signing works with the key that was pending
     P256ECDSASignature sig3;
     uint8_t message2[] = { 10, 11, 12, 13 };
@@ -216,11 +320,69 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
     opKeyStore.Finish();
 }
 
+void TestMigrationKeys(nlTestSuite * inSuite, void * inContext)
+{
+
+    chip::TestPersistentStorageDelegate storageDelegate;
+    TestOperationalKeystore testOperationalKeystore;
+    PersistentStorageOperationalKeystore opKeyStore;
+    FabricIndex kFabricIndex    = 111;
+    std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
+
+    opKeyStore.Init(&storageDelegate);
+
+    // Failure on invalid Fabric indexes
+    NL_TEST_ASSERT(inSuite,
+                   opKeyStore.MigrateOpKeypairForFabric(kUndefinedFabricIndex, testOperationalKeystore) ==
+                       CHIP_ERROR_INVALID_FABRIC_INDEX);
+    NL_TEST_ASSERT(inSuite,
+                   opKeyStore.MigrateOpKeypairForFabric(kMaxValidFabricIndex + 1, testOperationalKeystore) ==
+                       CHIP_ERROR_INVALID_FABRIC_INDEX);
+
+    // The key does not exists in the any of the Operational Keystores
+    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == false);
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+    NL_TEST_ASSERT(inSuite,
+                   opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) ==
+                       CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    // Create a key in the old Operational Keystore
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
+    MutableByteSpan csrSpan{ csrBuf };
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan) == CHIP_NO_ERROR);
+
+    // Migrate the key to the PersistentStorageOperationalKeystore
+    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, storageDelegate.GetNumKeys() == 1);
+    NL_TEST_ASSERT(inSuite, storageDelegate.HasKey(opKeyStorageKey) == true);
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+
+    // Verify the migration
+    P256SerializedKeypair serializedKeypair;
+    NL_TEST_ASSERT(inSuite, opKeyStore.ExportOpKeypairForFabric(kFabricIndex, serializedKeypair) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.ValidateKeypair(serializedKeypair));
+
+    // Verify that migration method returns success when there is no OpKey stored in the old keystore, but already exists in PSA
+    // ITS.
+    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
+
+    // The key already exists in ITS, but there is an another attempt to migrate the new key.
+    // The key should not be overwritten, but the key from the previous persistent keystore should be removed.
+    MutableByteSpan csrSpan2{ csrBuf };
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.NewOpKeypairForFabric(kFabricIndex, csrSpan2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
+    NL_TEST_ASSERT(inSuite, opKeyStore.MigrateOpKeypairForFabric(kFabricIndex, testOperationalKeystore) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, testOperationalKeystore.HasOpKeypairForFabric(kFabricIndex) == false);
+
+    opKeyStore.Finish();
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF("Test Basic Lifecycle of PersistentStorageOperationalKeystore", TestBasicLifeCycle),
-                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys), NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF("Test ephemeral key management", TestEphemeralKeys),
+                                 NL_TEST_DEF("Test keys migration ", TestMigrationKeys), NL_TEST_SENTINEL() };
 
 /**
  *  Set up the test suite.
