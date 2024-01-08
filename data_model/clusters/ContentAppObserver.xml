@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="CONTENTAPPOBSERVER" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="APPOBSERVER" scope="Endpoint"/>
   <dataTypes>
     <enum name="StatusEnum">
       <item value="0" name="Success" summary="Command succeeded">

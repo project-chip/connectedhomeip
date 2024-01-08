@@ -320,7 +320,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to copy tlv element with error %s", ErrorStr(err));
                    aPath.LogPath());
     size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
     // Convert TLV to JSON
     std::string json;
@@ -459,7 +459,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Fail to copy element with error %s", ErrorStr(err));
                    aEventHeader.LogPath());
     size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
     // Convert TLV to JSON
     std::string json;
@@ -526,7 +526,7 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(JNIEnv * env, const app::Concrete
         err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
         ReturnErrorOnFailure(err);
         size = writer.GetLengthWritten();
-        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), static_cast<jint>(size));
 
         // Convert TLV to JSON
         std::string json;
