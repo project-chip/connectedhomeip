@@ -326,7 +326,7 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 #else // For SoC
-#if SL_ICD_ENABLED 
+#if SL_ICD_ENABLED
     uint8_t xtal_enable = 1;
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
     if (status != SL_STATUS_OK) {

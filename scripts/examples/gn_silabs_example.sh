@@ -116,7 +116,7 @@ if [ "$#" == "0" ]; then
         alarm_based_wakeup
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
         alarm_periodic_time
-            Periodic time at which the 917 SoC should wakeup (Default: 30sec) 
+            Periodic time at which the 917 SoC should wakeup (Default: 30sec)
         Presets
         --icd
             enable ICD features, set thread mtd
