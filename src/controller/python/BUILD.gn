@@ -60,7 +60,8 @@ shared_library("ChipDeviceCtrl") {
 
   sources += [ "chip/native/CommonStackInit.cpp" ]
 
-  defines = []
+  # Ensure that the module will be compatible with the Python >= 3.7 API.
+  defines = [ "Py_LIMITED_API=0x03070000" ]
 
   if (chip_controller) {
     sources += [
