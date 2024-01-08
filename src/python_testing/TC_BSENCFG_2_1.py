@@ -24,7 +24,7 @@ from mobly import asserts
 
 class TC_BSENCFG_2_1(MatterBaseTest):
     async def read_ts_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.BooleanSensorConfiguration
+        cluster = Clusters.Objects.BooleanStateConfiguration
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     @async_test_body
@@ -33,7 +33,7 @@ class TC_BSENCFG_2_1(MatterBaseTest):
         endpoint = self.user_params.get("endpoint", 1)
 
         self.print_step(1, "Commissioning, already done")
-        attributes = Clusters.BooleanSensorConfiguration.Attributes
+        attributes = Clusters.BooleanStateConfiguration.Attributes
 
         self.print_step(2, "Read attribute list to determine supported attributes")
         attribute_list = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
@@ -41,7 +41,7 @@ class TC_BSENCFG_2_1(MatterBaseTest):
         self.print_step(3, "Read SensitivityLevel attribute, if supported")
         if attributes.SensitivityLevel.attribute_id in attribute_list:
             sensitivity_level_dut = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.SensitivityLevel)
-            asserts.assert_less(sensitivity_level_dut, Clusters.Objects.BooleanSensorConfiguration.Enums.SensitivityEnum.kUnknownEnumValue,
+            asserts.assert_less(sensitivity_level_dut, Clusters.Objects.BooleanStateConfiguration.Enums.SensitivityEnum.kUnknownEnumValue,
                                 "SensitivityLevel is not in valid range")
         else:
             logging.info("Test step skipped")

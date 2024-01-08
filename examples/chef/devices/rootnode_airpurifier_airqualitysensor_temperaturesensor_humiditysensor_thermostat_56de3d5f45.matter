@@ -734,8 +734,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */

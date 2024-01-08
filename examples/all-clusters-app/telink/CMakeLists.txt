@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
   set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
@@ -65,6 +66,7 @@ target_compile_options(app PRIVATE -fpermissive)
 target_include_directories(app PRIVATE
                            include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                            
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${TELINK_COMMON}/common/include
@@ -84,7 +86,10 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp

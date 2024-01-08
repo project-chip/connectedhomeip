@@ -155,6 +155,19 @@ typedef void (*OnDeviceConnectionRetry)(void * context, const ScopedNodeId & pee
 class DLL_EXPORT OperationalSessionSetup : public SessionEstablishmentDelegate, public AddressResolve::NodeListener
 {
 public:
+    struct ConnnectionFailureInfo
+    {
+        const ScopedNodeId peerId;
+        CHIP_ERROR error;
+        SessionEstablishmentStage sessionStage;
+
+        ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
+            peerId(peer), error(err), sessionStage(stage)
+        {}
+    };
+
+    using OnSetupFailure = void (*)(void * context, const ConnnectionFailureInfo & failureInfo);
+
     ~OperationalSessionSetup() override;
 
     OperationalSessionSetup(const CASEClientInitParams & params, CASEClientPoolDelegate * clientPool, ScopedNodeId peerId,
@@ -180,8 +193,8 @@ public:
      * The device is expected to have been commissioned, A CASE session
      * setup will be triggered.
      *
-     * On establishing the session, the callback function `onConnection` will be called. If the
-     * session setup fails, `onFailure` will be called.
+     * If session setup succeeds, the callback function `onConnection` will be called.
+     * If session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately,
      * before the Connect call returns.
@@ -192,11 +205,28 @@ public:
      */
     void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    /*
+     * This function can be called to establish a secure session with the device.
+     *
+     * The device is expected to have been commissioned, A CASE session
+     * setup will be triggered.
+     *
+     * If session setup succeeds, the callback function `onConnection` will be called.
+     * If session setup fails, `onSetupFailure` will be called.
+     *
+     * If the session already exists, `onConnection` will be called immediately,
+     * before the Connect call returns.
+     *
+     * `onSetupFailure` may be called before the Connect call returns, for error cases that are detected synchronously
+     * (e.g. inability to start an address lookup).
+     */
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnSetupFailure> * onSetupFailure);
+
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -264,6 +294,7 @@ private:
 
     Callback::CallbackDeque mConnectionSuccess;
     Callback::CallbackDeque mConnectionFailure;
+    Callback::CallbackDeque mSetupFailure;
 
     OperationalSessionReleaseDelegate * mReleaseDelegate;
 
@@ -306,8 +337,12 @@ private:
 
     void CleanupCASEClient();
 
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 Callback::Callback<OnSetupFailure> * onSetupFailure);
+
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                    Callback::Callback<OnSetupFailure> * onSetupFailure);
 
     enum class ReleaseBehavior
     {
@@ -316,11 +351,13 @@ private:
     };
 
     /*
-     * This dequeues all failure and success callbacks and appropriately
-     * invokes either set depending on the value of error.
+     * This dequeues all failure and success callbacks and appropriately invokes either set depending
+     * on the value of error.
      *
-     * If error == CHIP_NO_ERROR, only success callbacks are invoked.
-     * Otherwise, only failure callbacks are invoked.
+     * If error == CHIP_NO_ERROR, only success callbacks are invoked. Otherwise, only failure callbacks are invoked.
+     *
+     * The state offers additional context regarding the failure, indicating the specific state in which
+     * the error occurs. It is only relayed through failure callbacks when the error is not equal to CHIP_NO_ERROR.
      *
      * If releaseBehavior is Release, this uses mReleaseDelegate to release
      * ourselves (aka `this`). As a result any caller should return right away
@@ -328,15 +365,22 @@ private:
      *
      * Setting releaseBehavior to DoNotRelease is meant for use from the destructor
      */
-    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
+    void DequeueConnectionCallbacks(CHIP_ERROR error, SessionEstablishmentStage stage,
+                                    ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
+
+    void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release)
+    {
+        this->DequeueConnectionCallbacks(error, SessionEstablishmentStage::kNotInKeyExchange, releaseBehavior);
+    }
 
     /**
      * Helper for DequeueConnectionCallbacks that handles the actual callback
      * notifications. This happens after the object has been released, if it's
      * being released.
      */
-    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & successReady,
-                                          CHIP_ERROR error, const ScopedNodeId & peerId, bool performingAddressUpdate,
+    static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & setupFailureReady,
+                                          Callback::Cancelable & successReady, CHIP_ERROR error, SessionEstablishmentStage stage,
+                                          const ScopedNodeId & peerId, bool performingAddressUpdate,
                                           Messaging::ExchangeManager * exchangeMgr,
                                           const Optional<SessionHandle> & optionalSessionHandle);
 

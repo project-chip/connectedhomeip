@@ -19,6 +19,7 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
+get_filename_component(ENERGY_MANAGEMENT_COMMON_DIR ${CHIP_ROOT}/examples/energy-management-app/energy-management-common/ REALPATH)
 
 include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
@@ -49,6 +50,7 @@ include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 target_include_directories(app PRIVATE
                            main/include
                            ${ALL_CLUSTERS_COMMON_DIR}/include
+                           ${ENERGY_MANAGEMENT_COMMON_DIR}/include                           
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-app
                            ${NRFCONNECT_COMMON}/util/include)
@@ -61,10 +63,13 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/static-supported-temperature-levels.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/bridged-actions-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/binding-handler.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 chip_configure_data_model(app
