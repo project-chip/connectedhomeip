@@ -31,7 +31,7 @@ class TC_VCC_4_3(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     def desc_TC_VCC_4_3(self) -> str:
-        return "[TC-VCC-4.2] AutoCloseTime functionality with DUT as Server"
+        return "[TC-VCC-4.3] AutoCloseTime functionality with DUT as Server"
 
     def steps_TC_VCC_4_3(self) -> list[TestStep]:
         steps = [
