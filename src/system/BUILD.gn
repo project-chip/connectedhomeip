@@ -111,15 +111,15 @@ buildconfig_header("system_buildconfig") {
     "CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING=${chip_system_config_zephyr_locking}",
     "CHIP_SYSTEM_CONFIG_NO_LOCKING=${chip_system_config_no_locking}",
     "CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS=${chip_system_config_provide_statistics}",
-    "HAVE_CLOCK_GETTIME=${have_clock_gettime}",
-    "HAVE_CLOCK_SETTIME=${have_clock_settime}",
-    "HAVE_GETTIMEOFDAY=${have_gettimeofday}",
-    "HAVE_SYS_TIME_H=true",
-    "HAVE_NETINET_ICMP6_H=true",
-    "HAVE_ICMP6_FILTER=true",
     "CONFIG_HAVE_VCBPRINTF=false",
     "CONFIG_HAVE_VSNPRINTF_EX=false",
-    "HAVE_SYS_SOCKET_H=${chip_system_config_use_sockets}",
+    "ifndef:HAVE_CLOCK_GETTIME=${have_clock_gettime}",
+    "ifndef:HAVE_CLOCK_SETTIME=${have_clock_settime}",
+    "ifndef:HAVE_GETTIMEOFDAY=${have_gettimeofday}",
+    "ifndef:HAVE_ICMP6_FILTER=true",
+    "ifndef:HAVE_NETINET_ICMP6_H=true",
+    "ifndef:HAVE_SYS_SOCKET_H=${chip_system_config_use_sockets}",
+    "ifndef:HAVE_SYS_TIME_H=true",
   ]
 
   if (chip_project_config_include != "") {
