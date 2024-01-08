@@ -133,3 +133,12 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 4
+
+    - label: "Step 12: TH reads from the DUT the Uncertainty attribute."
+      PICS: CMOCONC.S.A0007
+      command: "readAttribute"
+      attribute: "Uncertainty"
+      response:
+          constraints:
+              type: single
+              minValue: 0
