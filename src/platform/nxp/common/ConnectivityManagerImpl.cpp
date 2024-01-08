@@ -51,7 +51,6 @@ extern "C" {
 
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 
-
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -109,8 +108,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
     else if (event->Type == kPlatformNxpStartWlanConnectEvent)
     {
-        bool is_wlan_added = false;
-        struct wlan_network searchedNetwork = {0};
+        bool is_wlan_added                  = false;
+        struct wlan_network searchedNetwork = { 0 };
 
         /* If network was added before on a previous connection call or other API, do not add it again */
         if (wlan_get_network_byname(event->Platform.pNetworkDataEvent->name, &searchedNetwork) != WM_SUCCESS)

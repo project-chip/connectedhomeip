@@ -240,21 +240,21 @@ int NXPWiFiDriver::DisconnectNetwork(void)
 {
     int ret = 0;
 
-	if (ConnectivityMgrImpl().IsWiFiStationConnected())
-	{
-	    ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
+    if (ConnectivityMgrImpl().IsWiFiStationConnected())
+    {
+        ChipLogProgress(NetworkProvisioning, "Disconnecting from WiFi network.");
 
-	    ret = wlan_disconnect();
+        ret = wlan_disconnect();
 
-	    if (ret != WM_SUCCESS)
-	    {
-	        ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t)ret);
-	    }
-	}
-	else
-	{
-	    ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
-	}
+        if (ret != WM_SUCCESS)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to disconnect from network with error: %u", (uint8_t) ret);
+        }
+    }
+    else
+    {
+        ChipLogError(NetworkProvisioning, "Error: WiFi not connected!");
+    }
 
     return ret;
 }
