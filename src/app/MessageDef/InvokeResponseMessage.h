@@ -111,11 +111,25 @@ public:
     InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
+     *  @brief Set True if the set of InvokeResponseIB have to be sent across multiple packets in a single transaction
+     *  @param [in] aMoreChunkedMessages  true if more chunked messages are needed
+     *  @return A reference to *this
+     */
+    CHIP_ERROR ReserveSpaceForMoreChunkedMessages();
+
+    /**
      *  @brief Mark the end of this InvokeResponseMessage
      *
      *  @return The builder's final status.
      */
     CHIP_ERROR EndOfInvokeResponseMessage();
+
+    /**
+     *  @brief Get number of bytes required in the buffer by MoreChunkedMessages
+     *
+     *  @return Expected number of bytes required in the buffer by MoreChunkedMessages()
+     */
+    uint32_t GetSizeForMoreChunkResponses();
 
     /**
      *  @brief Get number of bytes required in the buffer by EndOfInvokeResponseMessage()
@@ -127,6 +141,7 @@ public:
 private:
     InvokeResponseIBs::Builder mInvokeResponses;
     bool mIsEndBufferReserved = false;
+    bool mIsMoreChunkMessageBufferReserved = false;
 };
 } // namespace InvokeResponseMessage
 } // namespace app
