@@ -307,7 +307,7 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 #ifdef SIWX_917
-    uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
 
     // To check the Entropy of TRNG and verify TRNG functioning.
     status = sl_si91x_trng_entropy();
