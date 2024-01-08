@@ -64,20 +64,17 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def teardown_test(self):
-        await self._cleanup_acl(default_acl=self.default_acl)
+        await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
+            (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
 
-    async def _setup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct], privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
+    async def _setup_acl(self, privilege: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]):
         if privilege is None:
             return
-        new_acl = deepcopy(default_acl)
+        new_acl = deepcopy(self.default_acl)
         new_entry = Clusters.AccessControl.Structs.AccessControlEntryStruct(
             privilege=privilege, authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase, subjects=[self.TH2_nodeid])
         new_acl.append(new_entry)
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl(new_acl))])
-
-    async def _cleanup_acl(self, default_acl: list[Clusters.AccessControl.Structs.AccessControlEntryStruct]):
-        await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
-            (0, Clusters.AccessControl.Attributes.Acl(default_acl))])
 
     def _record_errors(self):
         ''' Checks through all the endpoints and records all the spec warnings in one go so we don't get repeats'''
@@ -172,13 +169,13 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def run_access_test(self, test_type: AccessTestType):
         # Read all the attributes on TH2 using admin access
         if test_type == AccessTestType.WRITE:
-            await self._setup_acl(default_acl=self.default_acl, privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+            await self._setup_acl(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
             wildcard_read = await self.TH2.Read(self.dut_node_id, [()])
 
         privilege_enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
-            await self._setup_acl(default_acl=self.default_acl, privilege=privilege)
+            await self._setup_acl(privilege=privilege)
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, device_cluster_data in endpoint.items():
                     if cluster_id > 0x7FFF or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
