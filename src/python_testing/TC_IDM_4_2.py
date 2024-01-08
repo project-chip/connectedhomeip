@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import json
 import copy
 import logging
 import random
