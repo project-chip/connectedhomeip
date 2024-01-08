@@ -6198,6 +6198,10 @@ internal cluster UnitTesting = 4294048773 {
     NestedStructList arg1[] = 0;
   }
 
+  response struct TestBatchHelperResponse = 12 {
+    octet_string<800> buffer = 0;
+  }
+
   request struct TestListInt8UReverseRequestRequest {
     int8u arg1[] = 0;
   }
@@ -6242,6 +6246,18 @@ internal cluster UnitTesting = 4294048773 {
 
   request struct TestEmitTestFabricScopedEventRequestRequest {
     int8u arg1 = 0;
+  }
+
+  request struct TestBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
+  }
+
+  request struct TestSecondBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
   }
 
   /** Simple command without any parameters and without a specific response */
@@ -6309,6 +6325,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
   /** Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response. */
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
+  /** Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
+  /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
@@ -8012,6 +8032,8 @@ endpoint 1 {
     handle command TestSimpleOptionalArgumentRequest;
     handle command TestEmitTestEventRequest;
     handle command TestEmitTestFabricScopedEventRequest;
+    handle command TestBatchHelperRequest;
+    handle command TestSecondBatchHelperRequest;
   }
 }
 endpoint 2 {

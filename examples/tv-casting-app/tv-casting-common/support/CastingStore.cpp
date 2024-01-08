@@ -90,8 +90,8 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.Next failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    chip::TLV::TLVType outerContainerType = chip::TLV::kTLVType_Structure;
-    err                                   = reader.EnterContainer(outerContainerType);
+    chip::TLV::TLVType outerContainerType;
+    err = reader.EnterContainer(outerContainerType);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -99,8 +99,8 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.Next failed %" CHIP_ERROR_FORMAT, err.Format()));
     chip::TLV::Tag outerContainerTag = reader.GetTag();
-    uint8_t outerContainerTagTagNum  = static_cast<uint8_t>(chip::TLV::TagNumFromTag(outerContainerTag));
-    VerifyOrReturnValue(outerContainerTagTagNum == kCastingStoreDataVersionTag, castingPlayers,
+    uint8_t outerContainerTagNum     = static_cast<uint8_t>(chip::TLV::TagNumFromTag(outerContainerTag));
+    VerifyOrReturnValue(outerContainerTagNum == kCastingStoreDataVersionTag, castingPlayers,
                         ChipLogError(AppServer, "CastingStoreDataVersionTag not found"));
     uint32_t version;
     err = reader.Get(version);
@@ -109,23 +109,24 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
     ChipLogProgress(AppServer, "CastingStore::ReadAll TLV(CastingStoreData) version: %d", version);
 
     // Entering CastingPlayers container
-    chip::TLV::TLVType castingPlayersContainerType = chip::TLV::kTLVType_Array;
-    err                                            = reader.Next();
+    err = reader.Next();
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.Next failed %" CHIP_ERROR_FORMAT, err.Format()));
+    chip::TLV::TLVType castingPlayersContainerType;
     err = reader.EnterContainer(castingPlayersContainerType);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         // Entering CastingPlayer container
-        chip::TLV::TLVType castingPlayerContainerType = chip::TLV::kTLVType_Structure;
-        err                                           = reader.EnterContainer(castingPlayerContainerType);
+        chip::TLV::TLVType castingPlayerContainerType;
+        err = reader.EnterContainer(castingPlayerContainerType);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                             ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
         core::CastingPlayerAttributes attributes;
         std::vector<core::EndpointAttributes> endpointAttributesList;
+        std::map<chip::EndpointId, std::vector<chip::ClusterId>> endpointServerListMap;
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
             chip::TLV::Tag castingPlayerContainerTag = reader.GetTag();
@@ -181,6 +182,23 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                 continue;
             }
 
+            if (castingPlayerContainerTagNum == kCastingPlayerPortTag)
+            {
+                err = reader.Get(attributes.port);
+                VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                    ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
+                continue;
+            }
+
+            if (castingPlayerContainerTagNum == kCastingPlayerInstanceNameTag)
+            {
+                err = reader.GetBytes(reinterpret_cast<uint8_t *>(attributes.instanceName),
+                                      chip::Dnssd::Commission::kInstanceNameMaxLength + 1);
+                VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                    ChipLogError(AppServer, "TLVReader.GetBytes failed %" CHIP_ERROR_FORMAT, err.Format()));
+                continue;
+            }
+
             if (castingPlayerContainerTagNum == kCastingPlayerDeviceNameTag)
             {
                 err = reader.GetBytes(reinterpret_cast<uint8_t *>(attributes.deviceName), chip::Dnssd::kMaxDeviceNameLen + 1);
@@ -200,16 +218,17 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
             if (castingPlayerContainerTagNum == kCastingPlayerEndpointsContainerTag)
             {
                 // Entering Endpoints container
-                chip::TLV::TLVType endpointsContainerType = chip::TLV::kTLVType_Array;
-                err                                       = reader.EnterContainer(endpointsContainerType);
+                chip::TLV::TLVType endpointsContainerType;
+                err = reader.EnterContainer(endpointsContainerType);
                 VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                                     ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
                 core::EndpointAttributes endpointAttributes;
+                std::vector<chip::ClusterId> serverList;
                 while ((err = reader.Next()) == CHIP_NO_ERROR)
                 {
                     // Entering Endpoint container
-                    chip::TLV::TLVType endpointContainerType = chip::TLV::kTLVType_Structure;
-                    err                                      = reader.EnterContainer(endpointContainerType);
+                    chip::TLV::TLVType endpointContainerType;
+                    err = reader.EnterContainer(endpointContainerType);
                     VerifyOrReturnValue(
                         err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -249,8 +268,8 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                         if (endpointContainerTagNum == kCastingPlayerEndpointDeviceTypeListContainerTag)
                         {
                             // Entering DeviceTypeList container
-                            chip::TLV::TLVType deviceTypeListContainerType = chip::TLV::kTLVType_Array;
-                            err                                            = reader.EnterContainer(deviceTypeListContainerType);
+                            chip::TLV::TLVType deviceTypeListContainerType;
+                            err = reader.EnterContainer(deviceTypeListContainerType);
                             VerifyOrReturnValue(
                                 err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                                 ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -258,7 +277,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                             while ((err = reader.Next()) == CHIP_NO_ERROR)
                             {
                                 // Entering DeviceTypeStruct container
-                                chip::TLV::TLVType deviceTypeStructContainerType = chip::TLV::kTLVType_Structure;
+                                chip::TLV::TLVType deviceTypeStructContainerType;
                                 err = reader.EnterContainer(deviceTypeStructContainerType);
                                 VerifyOrReturnValue(
                                     err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
@@ -303,7 +322,7 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                                                                      err.Format()));
 
                                     deviceTypeList.push_back(deviceTypeStruct);
-                                    break;
+                                    continue;
                                 }
                             }
                             if (err == CHIP_END_OF_TLV)
@@ -315,9 +334,49 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                                     ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
                                 endpointAttributes.mDeviceTypeList = deviceTypeList;
-                                break;
+                                continue;
                             }
-                            continue;
+                        }
+
+                        if (endpointContainerTagNum == kCastingPlayerEndpointServerListContainerTag)
+                        {
+                            // Entering ServerList container
+                            chip::TLV::TLVType serverListContainerType;
+                            err = reader.EnterContainer(serverListContainerType);
+                            VerifyOrReturnValue(
+                                err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                ChipLogError(AppServer, "TLVReader.EnterContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
+
+                            while ((err = reader.Next()) == CHIP_NO_ERROR)
+                            {
+                                chip::TLV::Tag serverListContainerTag = reader.GetTag();
+                                VerifyOrReturnValue(chip::TLV::IsContextTag(serverListContainerTag),
+                                                    std::vector<core::CastingPlayer>(),
+                                                    ChipLogError(AppServer, "Unexpected non-context TLV tag"));
+
+                                uint8_t serverListContainerTagNum =
+                                    static_cast<uint8_t>(chip::TLV::TagNumFromTag(serverListContainerTag));
+                                if (serverListContainerTagNum == kCastingPlayerEndpointServerClusterIdTag)
+                                {
+                                    chip::ClusterId clusterId;
+                                    err = reader.Get(clusterId);
+                                    VerifyOrReturnValue(
+                                        err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                        ChipLogError(AppServer, "TLVReader.Get failed %" CHIP_ERROR_FORMAT, err.Format()));
+                                    serverList.push_back(clusterId);
+                                    continue;
+                                }
+                            }
+
+                            if (err == CHIP_END_OF_TLV)
+                            {
+                                // Exiting ServerList container
+                                err = reader.ExitContainer(serverListContainerType);
+                                VerifyOrReturnValue(
+                                    err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                    ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
+                                continue;
+                            }
                         }
                     }
 
@@ -330,7 +389,8 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                             ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
                         endpointAttributesList.push_back(endpointAttributes);
-                        break;
+                        endpointServerListMap[endpointAttributes.mId] = serverList;
+                        continue;
                     }
                 }
 
@@ -341,29 +401,27 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
                     VerifyOrReturnValue(
                         err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
                         ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
-                    break;
+                    continue;
                 }
-
-                continue;
             }
+        }
+        if (err == CHIP_END_OF_TLV)
+        {
+            // Exiting CastingPlayer container
+            err = reader.ExitContainer(castingPlayerContainerType);
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
+                                ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-            if (err == CHIP_END_OF_TLV)
+            // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
+            core::CastingPlayer castingPlayer(attributes);
+            for (auto & endpointAttributes : endpointAttributesList)
             {
-                // Exiting CastingPlayer container
-                err = reader.ExitContainer(castingPlayerContainerType);
-                VerifyOrReturnValue(err == CHIP_NO_ERROR, std::vector<core::CastingPlayer>(),
-                                    ChipLogError(AppServer, "TLVReader.ExitContainer failed %" CHIP_ERROR_FORMAT, err.Format()));
-
-                // create a castingPlayer with Endpoints and add it to the castingPlayers to be returned
-                core::CastingPlayer castingPlayer(attributes);
-                for (auto & endpointAttributes : endpointAttributesList)
-                {
-                    std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(&castingPlayer, endpointAttributes));
-                    castingPlayer.RegisterEndpoint(endpoint);
-                }
-                castingPlayers.push_back(castingPlayer);
-                break;
+                std::shared_ptr<core::Endpoint> endpoint(new core::Endpoint(&castingPlayer, endpointAttributes));
+                endpoint->RegisterClusters(endpointServerListMap[endpointAttributes.mId]);
+                castingPlayer.RegisterEndpoint(endpoint);
             }
+            castingPlayers.push_back(castingPlayer);
+            continue;
         }
     }
 
@@ -380,6 +438,123 @@ std::vector<core::CastingPlayer> CastingStore::ReadAll()
 
     ChipLogProgress(AppServer, "CastingStore::ReadAll CastingPlayers size: %lu", static_cast<unsigned long>(castingPlayers.size()));
     return castingPlayers;
+}
+
+CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayers)
+{
+    ChipLogProgress(AppServer, "CastingStore::WriteAll called");
+
+    chip::TLV::TLVWriter tlvWriter;
+    uint8_t castingStoreData[kCastingStoreDataMaxBytes];
+    tlvWriter.Init(castingStoreData, kCastingStoreDataMaxBytes);
+
+    chip::TLV::TLVType outerContainerType;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingStoreDataVersionTag), kCurrentCastingStoreDataVersion));
+
+    chip::TLV::TLVType castingPlayersContainerType;
+    // CastingPlayers container starts
+    ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayersContainerTag), chip::TLV::kTLVType_Array,
+                                                  castingPlayersContainerType));
+
+    for (auto & castingPlayer : castingPlayers)
+    {
+        chip::TLV::TLVType castingPlayerContainerType;
+        // CastingPlayer container starts
+        ReturnErrorOnFailure(
+            tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, castingPlayerContainerType));
+
+        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerIdTag), (const uint8_t *) castingPlayer.GetId(),
+                                                static_cast<uint32_t>(strlen(castingPlayer.GetId()) + 1)));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerNodeIdTag), castingPlayer.GetNodeId()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerFabricIndexTag), castingPlayer.GetFabricIndex()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerVendorIdTag), castingPlayer.GetVendorId()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerProductIdTag), castingPlayer.GetProductId()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerDeviceTypeIdTag), castingPlayer.GetDeviceType()));
+        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerPortTag), castingPlayer.GetPort()));
+        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerInstanceNameTag),
+                                                (const uint8_t *) castingPlayer.GetInstanceName(),
+                                                static_cast<uint32_t>(strlen(castingPlayer.GetInstanceName()) + 1)));
+        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerDeviceNameTag),
+                                                (const uint8_t *) castingPlayer.GetDeviceName(),
+                                                static_cast<uint32_t>(strlen(castingPlayer.GetDeviceName()) + 1)));
+        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerHostNameTag),
+                                                (const uint8_t *) castingPlayer.GetHostName(),
+                                                static_cast<uint32_t>(strlen(castingPlayer.GetHostName()) + 1)));
+
+        // Endpoints container starts
+        chip::TLV::TLVType endpointsContainerType;
+        ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointsContainerTag),
+                                                      chip::TLV::kTLVType_Array, endpointsContainerType));
+        std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
+        for (auto & endpoint : endpoints)
+        {
+            chip::TLV::TLVType endpointContainerType;
+            // Endpoint container starts
+            ReturnErrorOnFailure(
+                tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, endpointContainerType));
+            ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointIdTag), endpoint->GetId()));
+            ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointVendorIdTag), endpoint->GetVendorId()));
+            ReturnErrorOnFailure(
+                tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointProductIdTag), endpoint->GetProductId()));
+
+            // DeviceTypeList container starts
+            chip::TLV::TLVType deviceTypeListContainerType;
+            ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeListContainerTag),
+                                                          chip::TLV::kTLVType_Array, deviceTypeListContainerType));
+            std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> deviceTypeList =
+                endpoint->GetDeviceTypeList();
+            for (chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType deviceTypeStruct : deviceTypeList)
+            {
+                chip::TLV::TLVType deviceTypeStructContainerType;
+                // DeviceTypeStruct container starts
+                ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure,
+                                                              deviceTypeStructContainerType));
+                ReturnErrorOnFailure(
+                    tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeTag), deviceTypeStruct.deviceType));
+                ReturnErrorOnFailure(
+                    tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeRevisionTag), deviceTypeStruct.revision));
+
+                // DeviceTypeStruct container ends
+                ReturnErrorOnFailure(tlvWriter.EndContainer(deviceTypeStructContainerType));
+            }
+            // DeviceTypeList container ends
+            ReturnErrorOnFailure(tlvWriter.EndContainer(deviceTypeListContainerType));
+
+            // ServerList container starts
+            chip::TLV::TLVType serverListContainerType;
+            ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointServerListContainerTag),
+                                                          chip::TLV::kTLVType_Structure, serverListContainerType));
+            std::vector<chip::ClusterId> serverList = endpoint->GetServerList();
+            for (chip::ClusterId clusterId : serverList)
+            {
+                ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointServerClusterIdTag), clusterId));
+            }
+            // ServerList container ends
+            ReturnErrorOnFailure(tlvWriter.EndContainer(serverListContainerType));
+
+            // Endpoint container ends
+            ReturnErrorOnFailure(tlvWriter.EndContainer(endpointContainerType));
+        }
+        // Endpoints container ends
+        ReturnErrorOnFailure(tlvWriter.EndContainer(endpointsContainerType));
+
+        // CastingPlayer container ends
+        ReturnErrorOnFailure(tlvWriter.EndContainer(castingPlayerContainerType));
+    }
+
+    // CastingPlayers container ends
+    ReturnErrorOnFailure(tlvWriter.EndContainer(castingPlayersContainerType));
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+
+    ReturnErrorOnFailure(tlvWriter.Finalize());
+    ChipLogProgress(AppServer,
+                    "CastingStore::WriteAll TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
+                    "and version: %d",
+                    tlvWriter.GetLengthWritten(), static_cast<unsigned long>(castingPlayers.size()),
+                    kCurrentCastingStoreDataVersion);
+    return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kCastingStoreDataKey, castingStoreData,
+                                                                       tlvWriter.GetLengthWritten());
 }
 
 CHIP_ERROR CastingStore::DeleteAll()
@@ -441,119 +616,6 @@ void CastingStore::OnFabricRemoved(const chip::FabricTable & fabricTable, chip::
             WriteAll(castingPlayers);
         }
     }
-}
-
-CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayers)
-{
-    ChipLogProgress(AppServer, "CastingStore::WriteAll called");
-
-    chip::TLV::TLVWriter tlvWriter;
-    uint8_t castingStoreData[kCastingStoreDataMaxBytes];
-    tlvWriter.Init(castingStoreData, kCastingStoreDataMaxBytes);
-
-    chip::TLV::TLVType outerContainerType = chip::TLV::kTLVType_Structure;
-    ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::AnonymousTag(), chip::TLV::kTLVType_Structure, outerContainerType));
-    ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingStoreDataVersionTag), kCurrentCastingStoreDataVersion));
-
-    chip::TLV::TLVType castingPlayersContainerType = chip::TLV::kTLVType_Array;
-    // CastingPlayers container starts
-    ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayersContainerTag), chip::TLV::kTLVType_Array,
-                                                  castingPlayersContainerType));
-
-    for (auto & castingPlayer : castingPlayers)
-    {
-        chip::TLV::TLVType castingPlayerContainerType = chip::TLV::kTLVType_Structure;
-        // CastingPlayer container starts
-        ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerContainerTag),
-                                                      chip::TLV::kTLVType_Structure, castingPlayerContainerType));
-
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerIdTag), castingPlayer.GetId()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerNodeIdTag), castingPlayer.GetNodeId()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerFabricIndexTag), castingPlayer.GetFabricIndex()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerVendorIdTag), castingPlayer.GetVendorId()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerProductIdTag), castingPlayer.GetProductId()));
-        ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerDeviceTypeIdTag), castingPlayer.GetDeviceType()));
-        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerDeviceNameTag),
-                                                (const uint8_t *) castingPlayer.GetDeviceName(),
-                                                static_cast<uint32_t>(strlen(castingPlayer.GetDeviceName()) + 1)));
-        ReturnErrorOnFailure(tlvWriter.PutBytes(chip::TLV::ContextTag(kCastingPlayerHostNameTag),
-                                                (const uint8_t *) castingPlayer.GetHostName(),
-                                                static_cast<uint32_t>(strlen(castingPlayer.GetHostName()) + 1)));
-
-        // Endpoints container starts
-        chip::TLV::TLVType endpointsContainerType = chip::TLV::kTLVType_Array;
-        ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointsContainerTag),
-                                                      chip::TLV::kTLVType_Array, endpointsContainerType));
-        std::vector<memory::Strong<core::Endpoint>> endpoints = core::CastingPlayer::GetTargetCastingPlayer()->GetEndpoints();
-        for (auto & endpoint : endpoints)
-        {
-            chip::TLV::TLVType endpointContainerType = chip::TLV::kTLVType_Structure;
-            // Endpoint container starts
-            ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointContainerTag),
-                                                          chip::TLV::kTLVType_Structure, endpointContainerType));
-            ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointIdTag), endpoint->GetId()));
-            ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointVendorIdTag), endpoint->GetVendorId()));
-            ReturnErrorOnFailure(
-                tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointProductIdTag), endpoint->GetProductId()));
-
-            // DeviceTypeList container starts
-            chip::TLV::TLVType deviceTypeListContainerType = chip::TLV::kTLVType_Array;
-            ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeListContainerTag),
-                                                          chip::TLV::kTLVType_Array, deviceTypeListContainerType));
-            std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> deviceTypeList =
-                endpoint->GetDeviceTypeList();
-            for (chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType deviceTypeStruct : deviceTypeList)
-            {
-                chip::TLV::TLVType deviceTypeStructContainerType = chip::TLV::kTLVType_Structure;
-                // DeviceTypeStruct container starts
-                ReturnErrorOnFailure(
-                    tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeStructContainerTag),
-                                             chip::TLV::kTLVType_Structure, deviceTypeStructContainerType));
-                ReturnErrorOnFailure(
-                    tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeTag), deviceTypeStruct.deviceType));
-                ReturnErrorOnFailure(
-                    tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointDeviceTypeRevisionTag), deviceTypeStruct.revision));
-
-                // DeviceTypeStruct container ends
-                ReturnErrorOnFailure(tlvWriter.EndContainer(deviceTypeStructContainerType));
-            }
-            // DeviceTypeList container ends
-            ReturnErrorOnFailure(tlvWriter.EndContainer(deviceTypeListContainerType));
-
-            // ServerList container starts
-            chip::TLV::TLVType serverListContainerType = chip::TLV::kTLVType_Array;
-            ReturnErrorOnFailure(tlvWriter.StartContainer(chip::TLV::ContextTag(kCastingPlayerEndpointServerListContainerTag),
-                                                          chip::TLV::kTLVType_Array, serverListContainerType));
-            std::vector<chip::ClusterId> serverList = endpoint->GetServerList();
-            for (chip::ClusterId clusterId : serverList)
-            {
-                ReturnErrorOnFailure(tlvWriter.Put(chip::TLV::ContextTag(kCastingPlayerEndpointServerClusterIdTag), clusterId));
-            }
-            // ServerList container ends
-            ReturnErrorOnFailure(tlvWriter.EndContainer(serverListContainerType));
-
-            // Endpoint container ends
-            ReturnErrorOnFailure(tlvWriter.EndContainer(endpointContainerType));
-        }
-        // Endpoints container ends
-        ReturnErrorOnFailure(tlvWriter.EndContainer(endpointsContainerType));
-
-        // CastingPlayer container ends
-        ReturnErrorOnFailure(tlvWriter.EndContainer(castingPlayerContainerType));
-    }
-
-    // CastingPlayers container ends
-    ReturnErrorOnFailure(tlvWriter.EndContainer(castingPlayersContainerType));
-    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
-
-    ReturnErrorOnFailure(tlvWriter.Finalize());
-    ChipLogProgress(AppServer,
-                    "CastingStore::WriteAll TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
-                    "and version: %d",
-                    tlvWriter.GetLengthWritten(), static_cast<unsigned long>(castingPlayers.size()),
-                    kCurrentCastingStoreDataVersion);
-    return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kCastingStoreDataKey, castingStoreData,
-                                                                       tlvWriter.GetLengthWritten());
 }
 
 }; // namespace support
