@@ -198,7 +198,7 @@ public:
     DataModel::Nullable<Percent> GetNextChargeTargetSoC() override;
 
     DataModel::Nullable<uint16_t> GetApproximateEVEfficiency() override;
-    CHIP_ERROR SetApproximateEVEfficiency(uint16_t) override;
+    CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t>) override;
 
     /* SOC attributes */
     DataModel::Nullable<Percent> GetStateOfCharge() override;

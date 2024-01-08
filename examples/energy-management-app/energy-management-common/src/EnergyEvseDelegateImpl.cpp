@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
+#include <app/SafeAttributePersistenceProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -122,7 +123,7 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
  * @brief   Called when EVSE cluster receives EnableDischarging command
  *
  * @param dischargingEnabledUntil (can be null to indefinite discharging)
- * @param maximumChargeCurrent (in mA)
+ * @param maximumDischargeCurrent (in mA)
  */
 Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
                                              const int64_t & maximumDischargeCurrent)
@@ -963,6 +964,11 @@ CHIP_ERROR EnergyEvseDelegate::SetChargingEnabledUntil(DataModel::Nullable<uint3
             ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu",
                           static_cast<unsigned long int>(mChargingEnabledUntil.Value()));
         }
+
+        // Write new value to persistent storage.
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mChargingEnabledUntil);
+
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
     }
 
@@ -991,6 +997,10 @@ CHIP_ERROR EnergyEvseDelegate::SetDischargingEnabledUntil(DataModel::Nullable<ui
             ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu",
                           static_cast<unsigned long int>(mDischargingEnabledUntil.Value()));
         }
+        // Write new value to persistent storage.
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mDischargingEnabledUntil);
+
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
     }
 
@@ -1113,6 +1123,11 @@ CHIP_ERROR EnergyEvseDelegate::SetUserMaximumChargeCurrent(int64_t newValue)
         ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(mUserMaximumChargeCurrent));
 
         ComputeMaxChargeCurrentLimit();
+
+        // Write new value to persistent storage.
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mUserMaximumChargeCurrent);
+
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
     }
 
@@ -1138,6 +1153,11 @@ CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
     {
         ChipLogDetail(AppServer, "RandomizationDelayWindow updated to %lu",
                       static_cast<unsigned long int>(mRandomizationDelayWindow));
+
+        // Write new value to persistent storage.
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mRandomizationDelayWindow);
+
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
     }
     return CHIP_NO_ERROR;
@@ -1175,14 +1195,25 @@ DataModel::Nullable<uint16_t> EnergyEvseDelegate::GetApproximateEVEfficiency()
     return mApproximateEVEfficiency;
 }
 
-CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(uint16_t newValue)
+CHIP_ERROR EnergyEvseDelegate::SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> newValue)
 {
     DataModel::Nullable<uint16_t> oldValue = mApproximateEVEfficiency;
 
-    mApproximateEVEfficiency = MakeNullable(newValue);
-    if ((oldValue.IsNull()) || (oldValue.Value() != newValue))
+    mApproximateEVEfficiency = newValue;
+    if ((oldValue != newValue))
     {
-        ChipLogDetail(AppServer, "ApproximateEVEfficiency updated to %d", mApproximateEVEfficiency.Value());
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "ApproximateEVEfficiency updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "ApproximateEVEfficiency updated to %d", mApproximateEVEfficiency.Value());
+        }
+        // Write new value to persistent storage.
+        ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mApproximateEVEfficiency);
+
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
     }
 
@@ -1291,7 +1322,10 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyCharged::Id);
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, SessionEnergyDischarged::Id);
 
-    // TODO persist mSessionID
+    // Write values to persistent storage.
+    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
+    GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSessionID);
+
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
     // TODO persist mSessionEnergyDischargedAtStart
