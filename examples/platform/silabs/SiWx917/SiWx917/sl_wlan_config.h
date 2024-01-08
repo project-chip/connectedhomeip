@@ -28,16 +28,16 @@
 //! Disable feature
 #define RSI_DISABLE 0
 
-#define IVT_OFFSET_ADDR 0x8202000  /*<!Application IVT location VTOR offset>        */
+#define IVT_OFFSET_ADDR 0x8202000         /*<!Application IVT location VTOR offset>        */
 #define WKP_RAM_USAGE_LOCATION 0x24061EFC /*<!Bootloader RAM usage location upon wake up  */
 
 #define WIRELESS_WAKEUP_IRQHandler NPSS_TO_MCU_WIRELESS_INTR_IRQn
 #define WIRELESS_WAKEUP_IRQHandler_Priority 17
 
 /* Constants required to manipulate the NVIC. */
-#define portNVIC_SHPR3_REG (*((volatile uint32_t *)0xe000ed20))
-#define portNVIC_PENDSV_PRI  (((uint32_t)(0x3f << 4)) << 16UL)
-#define portNVIC_SYSTICK_PRI (((uint32_t)(0x3f << 4)) << 24UL)
+#define portNVIC_SHPR3_REG (*((volatile uint32_t *) 0xe000ed20))
+#define portNVIC_PENDSV_PRI (((uint32_t) (0x3f << 4)) << 16UL)
+#define portNVIC_SYSTICK_PRI (((uint32_t) (0x3f << 4)) << 24UL)
 
 static const sl_wifi_device_configuration_t config = {
     .boot_option = LOAD_NWP_FW,

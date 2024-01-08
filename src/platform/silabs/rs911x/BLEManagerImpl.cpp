@@ -163,7 +163,8 @@ void sl_ble_event_handling_task(void)
             break;
         }
 
-        if (chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected()) {
+        if (chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected())
+        {
             // Once DUT is connected adding a 500ms delay
             // TODO: Fix this with a better event handling
             vTaskDelay(pdMS_TO_TICKS(500));

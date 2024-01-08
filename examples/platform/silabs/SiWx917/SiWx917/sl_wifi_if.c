@@ -42,9 +42,9 @@
 #include "ble_config.h"
 
 #if SL_ICD_ENABLED && SIWX_917
-#include "sl_si91x_m4_ps.h"
 #include "rsi_rom_power_save.h"
 #include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_m4_ps.h"
 
 // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
 #define BUTTON_PRESSED 1
@@ -219,24 +219,28 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
  * @return
  *        None
  *********************************************************************/
-void M4_sleep_wakeup() {
-  if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY) {
-    // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
-    if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed) {
-      sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
-      btn0_pressed = true;
-    }
-    if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN)) {
+void M4_sleep_wakeup()
+{
+    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
+    {
+        // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+        if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+        {
+            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+            btn0_pressed = true;
+        }
+        if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+        {
 #ifdef DISPLAY_ENABLED
-      // if LCD is enabled, power down the lcd before setting the M4 to sleep
-      sl_si91x_hardware_setup();
+            // if LCD is enabled, power down the lcd before setting the M4 to sleep
+            sl_si91x_hardware_setup();
 #endif
-      btn0_pressed = false;
-      /* Configure RAM Usage and Retention Size */
-      sl_si91x_m4_sleep_wakeup();
-      silabsInitLog();
+            btn0_pressed = false;
+            /* Configure RAM Usage and Retention Size */
+            sl_si91x_m4_sleep_wakeup();
+            silabsInitLog();
+        }
     }
-  }
 }
 #endif /* SIWX_917 */
 
@@ -329,7 +333,8 @@ static sl_status_t wfx_rsi_init(void)
 #if SL_ICD_ENABLED
     uint8_t xtal_enable = 1;
     status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
-    if (status != SL_STATUS_OK) {
+    if (status != SL_STATUS_OK)
+    {
         SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
         return status;
     }
@@ -552,8 +557,8 @@ static sl_status_t wfx_rsi_do_join(void)
         sl_wifi_set_join_callback(join_callback_handler, NULL);
 
         // Setting the listen interval to 0 which will set it to DTIM interval
-        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0};
-        status = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
+        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
+        status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
