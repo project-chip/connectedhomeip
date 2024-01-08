@@ -168,7 +168,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step("9a")
+        self.step("9b")
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.EnableDisableAlarm(alarmsToEnableDisable=enabledAlarms), endpoint=endpoint)
         except InteractionModelError as e:
