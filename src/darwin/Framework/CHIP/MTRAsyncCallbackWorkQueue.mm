@@ -15,6 +15,10 @@
  *    limitations under the License.
  */
 
+// NOTE: This class was not intended to be part of the public Matter API;
+// internally this class has been replaced by MTRAsyncWorkQueue. This code
+// remains here simply to preserve API/ABI compatibility.
+
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 

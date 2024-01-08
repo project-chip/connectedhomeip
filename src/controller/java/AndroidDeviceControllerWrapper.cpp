@@ -444,6 +444,66 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
     return err;
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Controller::CommissioningParameters & params,
+                                                                    jobject icdRegistrationInfo)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(icdRegistrationInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID getCheckInNodeIdMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getCheckInNodeId", "()Ljava/lang/Long;",
+                                                        &getCheckInNodeIdMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jCheckInNodeId = env->CallObjectMethod(icdRegistrationInfo, getCheckInNodeIdMethod);
+
+    jmethodID getMonitoredSubjectMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getMonitoredSubject", "()Ljava/lang/Long;",
+                                                        &getMonitoredSubjectMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jMonitoredSubject = env->CallObjectMethod(icdRegistrationInfo, getMonitoredSubjectMethod);
+
+    jmethodID getSymmetricKeyMethod;
+    err =
+        chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getSymmetricKey", "()[B", &getSymmetricKeyMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
+
+    chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
+    if (jCheckInNodeId != nullptr)
+    {
+        checkInNodeId = static_cast<chip::NodeId>(chip::JniReferences::GetInstance().LongToPrimitive(jCheckInNodeId));
+    }
+    else
+    {
+        checkInNodeId = mController->GetNodeId();
+    }
+    params.SetICDCheckInNodeId(checkInNodeId);
+
+    uint64_t monitoredSubject = static_cast<uint64_t>(checkInNodeId);
+    if (jMonitoredSubject != nullptr)
+    {
+        monitoredSubject = static_cast<uint64_t>(chip::JniReferences::GetInstance().LongToPrimitive(jMonitoredSubject));
+    }
+    params.SetICDMonitoredSubject(monitoredSubject);
+
+    if (jSymmetricKey != nullptr)
+    {
+        JniByteArray jniSymmetricKey(env, jSymmetricKey);
+        VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+    }
+    else
+    {
+        chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
+    }
+    params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
+
+    return err;
+}
+
 CHIP_ERROR AndroidDeviceControllerWrapper::UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params)
 {
     // this will wipe out any custom attestationNonce and csrNonce that was being used.
@@ -812,6 +872,31 @@ void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
     chip::DeviceLayer::StackUnlock unlock;
 
     CallJavaMethod("onScanNetworksFailure", static_cast<jint>(error.AsInteger()));
+}
+
+void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onICDRegistrationInfoRequiredMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationInfoRequired", "()V",
+                                                             &onICDRegistrationInfoRequiredMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationInfoRequiredMethod);
+}
+
+void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onICDRegistrationCompleteMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ)V",
+                                                             &onICDRegistrationCompleteMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jlong>(icdNodeId),
+                        static_cast<jlong>(icdCounter));
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

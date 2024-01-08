@@ -19,6 +19,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <string>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -342,10 +344,29 @@ void PairingCommand::OnCommissioningStatusUpdate(PeerId peerId, CommissioningSta
     }
 }
 
-void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
+void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
+
+    // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
+    // appending a numm-terminator at the end of the string.
+    std::string userActiveModeTriggerInstruction;
+
+    // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+    if (info.icd.userActiveModeTriggerInstruction.size() != 0)
+    {
+        userActiveModeTriggerInstruction =
+            std::string(info.icd.userActiveModeTriggerInstruction.data(), info.icd.userActiveModeTriggerInstruction.size());
+    }
+
+    if (info.icd.userActiveModeTriggerHint.HasAny())
+    {
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
+                        info.icd.userActiveModeTriggerHint.Raw());
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
+                        userActiveModeTriggerInstruction.c_str());
+    }
 }
 
 void PairingCommand::OnFabricCheck(NodeId matchingNodeId)

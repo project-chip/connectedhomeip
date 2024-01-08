@@ -994,7 +994,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
+@interface MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -1007,12 +1013,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRValveConfigurationAndControlClusterCloseParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRValveConfigurationAndControlClusterSetLevelParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2056,6 +2056,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRUnitTestingClusterTestBatchHelperResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRUnitTestingClusterTestListInt8UReverseRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2105,6 +2111,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestBatchHelperRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestSecondBatchHelperRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
