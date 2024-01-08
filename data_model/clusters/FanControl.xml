@@ -114,36 +114,36 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="FanModeSequenceEnum">
-      <item value="0" name="Off/Low/Med/High" summary="Fan is capable of off, low, medium and high modes">
+      <item value="0" name="Off" summary="Fan is capable of off, low, medium and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
           </notTerm>
         </optionalConform>
       </item>
-      <item value="1" name="Off/Low/High" summary="Fan is capable of off, low and high modes">
+      <item value="1" name="Off" summary="Fan is capable of off, low and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
           </notTerm>
         </optionalConform>
       </item>
-      <item value="2" name="Off/Low/Med/High/Auto" summary="Fan is capable of off, low, medium, high and auto modes">
+      <item value="2" name="Off" summary="Fan is capable of off, low, medium, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="3" name="Off/Low/High/Auto" summary="Fan is capable of off, low, high and auto modes">
+      <item value="3" name="Off" summary="Fan is capable of off, low, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="4" name="Off/High/Auto" summary="Fan is capable of off, high and auto modes">
+      <item value="4" name="Off" summary="Fan is capable of off, high and auto modes">
         <optionalConform choice="a">
           <feature name="AUT"/>
         </optionalConform>
       </item>
-      <item value="5" name="Off/High" summary="Fan is capable of off and high modes">
+      <item value="5" name="Off" summary="Fan is capable of off and high modes">
         <optionalConform choice="a">
           <notTerm>
             <feature name="AUT"/>
@@ -259,7 +259,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000a" name="WindSetting" type="WindBitmap" default="0">
+    <attribute id="0x000A" name="WindSetting" type="WindBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform>
@@ -267,7 +267,7 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x000b" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
+    <attribute id="0x000B" name="AirflowDirection" type="AirflowDirectionEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true"/>
       <mandatoryConform>

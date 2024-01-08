@@ -2426,7 +2426,7 @@ cluster TimeSynchronization = 56 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -2788,7 +2788,7 @@ cluster BooleanState = 69 {
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
 cluster LaundryDryerControls = 74 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
@@ -2952,7 +2952,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
 
 /** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
@@ -3425,7 +3425,7 @@ provisional cluster MicrowaveOvenMode = 94 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3491,7 +3491,7 @@ cluster OperationalState = 96 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
@@ -3743,7 +3743,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 provisional cluster EnergyEvse = 153 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
