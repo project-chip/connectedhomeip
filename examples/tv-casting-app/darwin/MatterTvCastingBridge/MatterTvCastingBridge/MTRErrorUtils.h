@@ -1,8 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +15,25 @@
  *    limitations under the License.
  */
 
+#import "MatterError.h"
+#include <lib/core/CHIPError.h>
+
+#import <Foundation/Foundation.h>
+
+#ifndef MTRErrorUtils_h
+#define MTRErrorUtils_h
+
 /**
- *    @file
- *      Overrides to default OpenThread configuration.
- *
+ * @brief - Conversion utilities to/from CHIP_ERROR (C++) / MatterError (Objective C) / NSError
  */
+@interface MTRErrorUtils : NSObject
 
-#pragma once
++ (MatterError * _Nonnull)MatterErrorFromChipError:(CHIP_ERROR)chipError;
 
-// Use the TI-supplied default platform configuration for remainder
-#include "openthread-core-cc13x2_26x2-config.h"
++ (NSError * _Nonnull)NSErrorFromChipError:(CHIP_ERROR)chipError;
+
++ (NSError * _Nonnull)NSErrorFromMatterError:(MatterError * _Nonnull)matterError;
+
+@end
+
+#endif /* MTRErrorUtils_h */
