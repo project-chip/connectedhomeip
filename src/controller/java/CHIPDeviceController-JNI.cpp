@@ -2165,9 +2165,9 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
 
     jmethodID constructor;
     jclass infoClass;
+    JniLocalReferenceManager manager(env);
 
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
-    JniClass icdClientInfoClass(infoClass);
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                         ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
 
