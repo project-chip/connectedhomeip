@@ -944,20 +944,20 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jmethodID icdDeviceInfoStructCtor = nullptr;
     jobject icdDeviceInfoObj          = nullptr;
     jbyteArray jSymmetricKey          = nullptr;
-    err                               = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+    CHIP_ERROR methodErr              = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
                                                                                 "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
+    methodErr = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
     icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([B)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
-    err =
+    methodErr =
         JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<jint>(symmetricKey.size()), jSymmetricKey);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
     icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey);
 
