@@ -25,9 +25,9 @@
 #include "glib.h"
 #include "lcd.h"
 
-#if SL_WIFI
+#if SL_WIFI && !SIWX_917
 #include "spi_multiplex.h"
-#endif // SL_WIFI
+#endif // SL_WIFI && !SIWX_917
 
 // LCD line define
 constexpr uint8_t kTempLcdInitialX = 30;
