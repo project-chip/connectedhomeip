@@ -1,5 +1,19 @@
 # Using esp_secure_cert partition
 
+**WARNING:** The following steps outline the development workflow for building a
+matter device.
+
+Please take a look at
+[security considerations](https://docs.espressif.com/projects/esp-matter/en/latest/esp32/security.html)
+and review the security guidelines outlined in
+[security workflow](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/security/host-based-security-workflows.html)
+for production workflows.
+
+Ensure to select the appropriate SoC from the menu on the left-hand side, as the
+provided references are specific to ESP32.
+
+---
+
 ## 1.1 ESP Secure Cert Partition
 
 -   When a device is pre-provisioned, PKI credentials are generated for the
@@ -176,6 +190,15 @@ CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER=y
 CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER=y
 CONFIG_CHIP_FACTORY_NAMESPACE_PARTITION_LABEL="fctry"
 ```
+
+By default, the secure cert DAC provider implementation reads the Certification
+Declaration (CD) from the 'chip-factory' NVS namespace. Enable
+`CONFIG_ENABLE_SET_CERT_DECLARATION_API` option to enable an API which lets you
+set the CD from the application and the configured CD will be used for
+subsequent CD reads.
+
+[Component config -> CHIP Device Layer -> Commissioning options -> Enable Set CD
+API]
 
 In order to use the esp_secure_cert_partition, in addition to enabling the above
 config options, you should also have the esp_secure_cert_partition and factory

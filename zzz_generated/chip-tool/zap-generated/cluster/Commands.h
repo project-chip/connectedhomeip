@@ -30,6 +30,7 @@
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/ReportCommand.h>
 #include <commands/clusters/WriteAttributeCommand.h>
+#include <commands/common/Commands.h>
 
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
@@ -97,12 +98,13 @@
 | RvcOperationalState                                                 | 0x0061 |
 | HepaFilterMonitoring                                                | 0x0071 |
 | ActivatedCarbonFilterMonitoring                                     | 0x0072 |
-| BooleanSensorConfiguration                                          | 0x0080 |
+| BooleanStateConfiguration                                           | 0x0080 |
 | ValveConfigurationAndControl                                        | 0x0081 |
 | ElectricalEnergyMeasurement                                         | 0x0091 |
 | DemandResponseLoadControl                                           | 0x0096 |
 | DeviceEnergyManagement                                              | 0x0098 |
 | EnergyEvse                                                          | 0x0099 |
+| EnergyPreference                                                    | 0x009B |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -6371,16 +6373,21 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster BooleanSensorConfiguration                                  | 0x0080 |
+| Cluster BooleanStateConfiguration                                   | 0x0080 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SuppressRequest                                                   |   0x00 |
+| * SuppressAlarm                                                     |   0x00 |
+| * EnableDisableAlarm                                                |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * SensitivityLevel                                                  | 0x0000 |
-| * AlarmsActive                                                      | 0x0001 |
-| * AlarmsSuppressed                                                  | 0x0002 |
-| * AlarmsEnabled                                                     | 0x0003 |
+| * CurrentSensitivityLevel                                           | 0x0000 |
+| * SupportedSensitivityLevels                                        | 0x0001 |
+| * DefaultSensitivityLevel                                           | 0x0002 |
+| * AlarmsActive                                                      | 0x0003 |
+| * AlarmsSuppressed                                                  | 0x0004 |
+| * AlarmsEnabled                                                     | 0x0005 |
+| * AlarmsSupported                                                   | 0x0006 |
+| * SensorFault                                                       | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -6394,13 +6401,13 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SuppressRequest
+ * Command SuppressAlarm
  */
-class BooleanSensorConfigurationSuppressRequest : public ClusterCommand
+class BooleanStateConfigurationSuppressAlarm : public ClusterCommand
 {
 public:
-    BooleanSensorConfigurationSuppressRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("suppress-request", credsIssuerConfig)
+    BooleanStateConfigurationSuppressAlarm(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("suppress-alarm", credsIssuerConfig)
     {
         AddArgument("AlarmsToSuppress", 0, UINT8_MAX, &mRequest.alarmsToSuppress);
         ClusterCommand::AddArguments();
@@ -6408,8 +6415,8 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -6418,8 +6425,8 @@ public:
 
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -6428,7 +6435,45 @@ public:
     }
 
 private:
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type mRequest;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Type mRequest;
+};
+
+/*
+ * Command EnableDisableAlarm
+ */
+class BooleanStateConfigurationEnableDisableAlarm : public ClusterCommand
+{
+public:
+    BooleanStateConfigurationEnableDisableAlarm(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("enable-disable-alarm", credsIssuerConfig)
+    {
+        AddArgument("AlarmsToEnableDisable", 0, UINT8_MAX, &mRequest.alarmsToEnableDisable);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanStateConfiguration::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -6437,18 +6482,17 @@ private:
 | Commands:                                                           |        |
 | * Open                                                              |   0x00 |
 | * Close                                                             |   0x01 |
-| * SetLevel                                                          |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * OpenDuration                                                      | 0x0000 |
-| * AutoCloseTime                                                     | 0x0001 |
-| * RemainingDuration                                                 | 0x0002 |
-| * CurrentState                                                      | 0x0003 |
-| * TargetState                                                       | 0x0004 |
-| * StartUpState                                                      | 0x0005 |
+| * DefaultOpenDuration                                               | 0x0001 |
+| * AutoCloseTime                                                     | 0x0002 |
+| * RemainingDuration                                                 | 0x0003 |
+| * CurrentState                                                      | 0x0004 |
+| * TargetState                                                       | 0x0005 |
 | * CurrentLevel                                                      | 0x0006 |
 | * TargetLevel                                                       | 0x0007 |
-| * OpenLevel                                                         | 0x0008 |
+| * DefaultOpenLevel                                                  | 0x0008 |
 | * ValveFault                                                        | 0x0009 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
@@ -6471,6 +6515,7 @@ public:
     ValveConfigurationAndControlOpen(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("open", credsIssuerConfig)
     {
         AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
+        AddArgument("TargetLevel", 0, UINT8_MAX, &mRequest.targetLevel);
         ClusterCommand::AddArguments();
     }
 
@@ -6533,45 +6578,6 @@ public:
 
 private:
     chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::Type mRequest;
-};
-
-/*
- * Command SetLevel
- */
-class ValveConfigurationAndControlSetLevel : public ClusterCommand
-{
-public:
-    ValveConfigurationAndControlSetLevel(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-level", credsIssuerConfig)
-    {
-        AddArgument("Level", 0, UINT8_MAX, &mRequest.level);
-        AddArgument("OpenDuration", 0, UINT32_MAX, &mRequest.openDuration);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ValveConfigurationAndControl::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -7457,6 +7463,27 @@ public:
 private:
     chip::app::Clusters::EnergyEvse::Commands::ClearTargets::Type mRequest;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster EnergyPreference                                            | 0x009B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * EnergyBalances                                                    | 0x0000 |
+| * CurrentEnergyBalance                                              | 0x0001 |
+| * EnergyPriorities                                                  | 0x0002 |
+| * LowPowerModeSensitivities                                         | 0x0003 |
+| * CurrentLowPowerModeSensitivity                                    | 0x0004 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -12768,6 +12795,8 @@ private:
 | * TestSimpleOptionalArgumentRequest                                 |   0x13 |
 | * TestEmitTestEventRequest                                          |   0x14 |
 | * TestEmitTestFabricScopedEventRequest                              |   0x15 |
+| * TestBatchHelperRequest                                            |   0x16 |
+| * TestSecondBatchHelperRequest                                      |   0x17 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -13748,6 +13777,86 @@ private:
     chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
 };
 
+/*
+ * Command TestBatchHelperRequest
+ */
+class UnitTestingTestBatchHelperRequest : public ClusterCommand
+{
+public:
+    UnitTestingTestBatchHelperRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-batch-helper-request", credsIssuerConfig)
+    {
+        AddArgument("SleepBeforeResponseTimeMs", 0, UINT16_MAX, &mRequest.sleepBeforeResponseTimeMs);
+        AddArgument("SizeOfResponseBuffer", 0, UINT16_MAX, &mRequest.sizeOfResponseBuffer);
+        AddArgument("FillCharacter", 0, UINT8_MAX, &mRequest.fillCharacter);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Type mRequest;
+};
+
+/*
+ * Command TestSecondBatchHelperRequest
+ */
+class UnitTestingTestSecondBatchHelperRequest : public ClusterCommand
+{
+public:
+    UnitTestingTestSecondBatchHelperRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-second-batch-helper-request", credsIssuerConfig)
+    {
+        AddArgument("SleepBeforeResponseTimeMs", 0, UINT16_MAX, &mRequest.sleepBeforeResponseTimeMs);
+        AddArgument("SizeOfResponseBuffer", 0, UINT16_MAX, &mRequest.sizeOfResponseBuffer);
+        AddArgument("FillCharacter", 0, UINT8_MAX, &mRequest.fillCharacter);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type mRequest;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster FaultInjection                                              | 0xFFF1FC06 |
 |------------------------------------------------------------------------------|
@@ -13864,6 +13973,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * PingCountEvent                                                    | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -19172,43 +19282,58 @@ void registerClusterActivatedCarbonFilterMonitoring(Commands & commands, Credent
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
-void registerClusterBooleanSensorConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+void registerClusterBooleanStateConfiguration(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
-    using namespace chip::app::Clusters::BooleanSensorConfiguration;
+    using namespace chip::app::Clusters::BooleanStateConfiguration;
 
-    const char * clusterName = "BooleanSensorConfiguration";
+    const char * clusterName = "BooleanStateConfiguration";
 
     commands_list clusterCommands = {
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                        //
-        make_unique<BooleanSensorConfigurationSuppressRequest>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                          //
+        make_unique<BooleanStateConfigurationSuppressAlarm>(credsIssuerConfig),      //
+        make_unique<BooleanStateConfigurationEnableDisableAlarm>(credsIssuerConfig), //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),          //
-        make_unique<ReadAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::app::Clusters::BooleanSensorConfiguration::SensitivityEnum>>(
-            Id, "sensitivity-level", 0, UINT8_MAX, Attributes::SensitivityLevel::Id, WriteCommandType::kWrite,
-            credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "current-sensitivity-level", Attributes::CurrentSensitivityLevel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "supported-sensitivity-levels", Attributes::SupportedSensitivityLevels::Id,
+                                   credsIssuerConfig),                                                                           //
+        make_unique<ReadAttribute>(Id, "default-sensitivity-level", Attributes::DefaultSensitivityLevel::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "alarms-supported", Attributes::AlarmsSupported::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "sensor-fault", Attributes::SensorFault::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                  //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                    //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-sensitivity-level", 0, UINT8_MAX, Attributes::CurrentSensitivityLevel::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "supported-sensitivity-levels", 0, UINT8_MAX,
+                                             Attributes::SupportedSensitivityLevels::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "default-sensitivity-level", 0, UINT8_MAX, Attributes::DefaultSensitivityLevel::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
             Id, "alarms-active", 0, UINT8_MAX, Attributes::AlarmsActive::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
             Id, "alarms-suppressed", 0, UINT8_MAX, Attributes::AlarmsSuppressed::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanSensorConfiguration::AlarmModeBitmap>>>(
-            Id, "alarms-enabled", 0, UINT8_MAX, Attributes::AlarmsEnabled::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
+            Id, "alarms-enabled", 0, UINT8_MAX, Attributes::AlarmsEnabled::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::AlarmModeBitmap>>>(
+            Id, "alarms-supported", 0, UINT8_MAX, Attributes::AlarmsSupported::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::BooleanStateConfiguration::SensorFaultBitmap>>>(
+            Id, "sensor-fault", 0, UINT16_MAX, Attributes::SensorFault::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19221,12 +19346,19 @@ void registerClusterBooleanSensorConfiguration(Commands & commands, CredentialIs
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "sensitivity-level", Attributes::SensitivityLevel::Id, credsIssuerConfig),          //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, "current-sensitivity-level", Attributes::CurrentSensitivityLevel::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "supported-sensitivity-levels", Attributes::SupportedSensitivityLevels::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "default-sensitivity-level", Attributes::DefaultSensitivityLevel::Id,
+                                        credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "alarms-active", Attributes::AlarmsActive::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "alarms-suppressed", Attributes::AlarmsSuppressed::Id, credsIssuerConfig),          //
         make_unique<SubscribeAttribute>(Id, "alarms-enabled", Attributes::AlarmsEnabled::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "alarms-supported", Attributes::AlarmsSupported::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "sensor-fault", Attributes::SensorFault::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -19256,23 +19388,22 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                   //
-        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),     //
-        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig),    //
-        make_unique<ValveConfigurationAndControlSetLevel>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                //
+        make_unique<ValveConfigurationAndControlOpen>(credsIssuerConfig),  //
+        make_unique<ValveConfigurationAndControlClose>(credsIssuerConfig), //
         //
         // Attributes
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<ReadAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -19282,7 +19413,10 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
-            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "open-duration", 0, UINT32_MAX, Attributes::OpenDuration::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "default-open-duration", 0, UINT32_MAX,
+                                                                              Attributes::DefaultOpenDuration::Id,
+                                                                              WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint64_t>>>(Id, "auto-close-time", 0, UINT64_MAX,
                                                                               Attributes::AutoCloseTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -19295,14 +19429,12 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
         make_unique<
             WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>>(
             Id, "target-state", 0, UINT8_MAX, Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum>>(
-            Id, "start-up-state", 0, UINT8_MAX, Attributes::StartUpState::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "current-level", 0, UINT8_MAX, Attributes::CurrentLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
             Id, "target-level", 0, UINT8_MAX, Attributes::TargetLevel::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::Percent>>>(
-            Id, "open-level", 0, UINT8_MAX, Attributes::OpenLevel::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::Percent>>(Id, "default-open-level", 0, UINT8_MAX, Attributes::DefaultOpenLevel::Id,
+                                                   WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap>>>(
             Id, "valve-fault", 0, UINT16_MAX, Attributes::ValveFault::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
@@ -19320,14 +19452,14 @@ void registerClusterValveConfigurationAndControl(Commands & commands, Credential
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "open-duration", Attributes::OpenDuration::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "default-open-duration", Attributes::DefaultOpenDuration::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "auto-close-time", Attributes::AutoCloseTime::Id, credsIssuerConfig),               //
         make_unique<SubscribeAttribute>(Id, "remaining-duration", Attributes::RemainingDuration::Id, credsIssuerConfig),        //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "start-up-state", Attributes::StartUpState::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "current-level", Attributes::CurrentLevel::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "target-level", Attributes::TargetLevel::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "open-level", Attributes::OpenLevel::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "default-open-level", Attributes::DefaultOpenLevel::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "valve-fault", Attributes::ValveFault::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
@@ -19753,14 +19885,15 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
             Id, "vehicle-id", Attributes::VehicleID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
             Id, "session-id", 0, UINT32_MAX, Attributes::SessionID::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "session-duration", 0, UINT32_MAX, Attributes::SessionDuration::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-charged", INT64_MIN, INT64_MAX,
-                                             Attributes::SessionEnergyCharged::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
-        make_unique<WriteAttribute<int64_t>>(Id, "session-energy-discharged", INT64_MIN, INT64_MAX,
-                                             Attributes::SessionEnergyDischarged::Id, WriteCommandType::kForceWrite,
-                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "session-duration", 0, UINT32_MAX,
+                                                                              Attributes::SessionDuration::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-charged", INT64_MIN, INT64_MAX,
+                                                                             Attributes::SessionEnergyCharged::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<int64_t>>>(Id, "session-energy-discharged", INT64_MIN, INT64_MAX,
+                                                                             Attributes::SessionEnergyDischarged::Id,
+                                                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19831,6 +19964,86 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeEvent>(Id, "energy-transfer-stopped", Events::EnergyTransferStopped::Id, credsIssuerConfig), //
         make_unique<SubscribeEvent>(Id, "fault", Events::Fault::Id, credsIssuerConfig),                                   //
         make_unique<SubscribeEvent>(Id, "rfid", Events::Rfid::Id, credsIssuerConfig),                                     //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterEnergyPreference(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EnergyPreference;
+
+    const char * clusterName = "EnergyPreference";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "energy-balances", Attributes::EnergyBalances::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "current-energy-balance", Attributes::CurrentEnergyBalance::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "energy-priorities", Attributes::EnergyPriorities::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "current-low-power-mode-sensitivity", Attributes::CurrentLowPowerModeSensitivity::Id,
+                                   credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type>>>(
+            Id, "energy-balances", Attributes::EnergyBalances::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-energy-balance", 0, UINT8_MAX, Attributes::CurrentEnergyBalance::Id,
+                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::EnergyPriorityEnum>>>(
+            Id, "energy-priorities", Attributes::EnergyPriorities::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type>>>(
+            Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-low-power-mode-sensitivity", 0, UINT8_MAX,
+                                             Attributes::CurrentLowPowerModeSensitivity::Id, WriteCommandType::kWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "energy-balances", Attributes::EnergyBalances::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "current-energy-balance", Attributes::CurrentEnergyBalance::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "energy-priorities", Attributes::EnergyPriorities::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "low-power-mode-sensitivities", Attributes::LowPowerModeSensitivities::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "current-low-power-mode-sensitivity", Attributes::CurrentLowPowerModeSensitivity::Id,
+                                        credsIssuerConfig),                                                                     //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -24768,6 +24981,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
         make_unique<UnitTestingTestEmitTestEventRequest>(credsIssuerConfig),                //
         make_unique<UnitTestingTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
+        make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
+        make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
         //
         // Attributes
         //
@@ -25284,8 +25499,10 @@ void registerClusterSampleMei(Commands & commands, CredentialIssuerCommands * cr
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                      //
+        make_unique<ReadEvent>(Id, "ping-count-event", Events::PingCountEvent::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeEvent>(Id, "ping-count-event", Events::PingCountEvent::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -25378,12 +25595,13 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterRvcOperationalState(commands, credsIssuerConfig);
     registerClusterHepaFilterMonitoring(commands, credsIssuerConfig);
     registerClusterActivatedCarbonFilterMonitoring(commands, credsIssuerConfig);
-    registerClusterBooleanSensorConfiguration(commands, credsIssuerConfig);
+    registerClusterBooleanStateConfiguration(commands, credsIssuerConfig);
     registerClusterValveConfigurationAndControl(commands, credsIssuerConfig);
     registerClusterElectricalEnergyMeasurement(commands, credsIssuerConfig);
     registerClusterDemandResponseLoadControl(commands, credsIssuerConfig);
     registerClusterDeviceEnergyManagement(commands, credsIssuerConfig);
     registerClusterEnergyEvse(commands, credsIssuerConfig);
+    registerClusterEnergyPreference(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);
