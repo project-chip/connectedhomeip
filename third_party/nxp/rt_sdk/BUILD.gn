@@ -31,13 +31,12 @@ import("//build_overrides/openthread.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
-
 group("nxp_sdk") {
   public_deps = [
     ":nxp_transceiver",
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk",
     nxp_sdk_driver_target,
     nxp_sdk_target,
-    "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_sdk",
   ]
 
   if (chip_enable_ble) {
@@ -70,7 +69,7 @@ config("lwip_rt_config") {
   } else if (chip_enable_openthread) {
     include_dirs += [ "lwip/openthread" ]
   } else if (chip_enable_wifi) {
-    include_dirs += [ 
+    include_dirs += [
       "lwip/wifi",
       "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
     ]

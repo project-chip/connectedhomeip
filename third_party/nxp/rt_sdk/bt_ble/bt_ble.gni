@@ -216,7 +216,6 @@ template("bt_ble_target") {
       deps = []
     }
 
-
     if (!defined(public_configs)) {
       public_configs = []
     }
