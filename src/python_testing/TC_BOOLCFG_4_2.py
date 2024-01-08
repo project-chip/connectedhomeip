@@ -39,7 +39,7 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
             TestStep("3a", "Create variable named enabledAlarms"),
             TestStep("3b", "If VIS is supported, set bit 0 to 1"),
             TestStep("3c", "If AUD is supported, set bit 1 to 1"),
-            TestStep("3d", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
+            TestStep("3d", "Set AlarmsEnabled attribute to value of enabledAlarms using EnableDisableAlarm command"),
             TestStep(4, "Send TestEventTrigger with SensorTrigger event"),
             TestStep(5, "Read AlarmsActive attribute"),
             TestStep("6a", "Verify VIS alarm is active, if supported"),
