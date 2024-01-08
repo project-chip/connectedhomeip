@@ -7803,8 +7803,12 @@
               Feature:
                   DeadFrontBehavior: DeadFront
 
-- release: "Future"
-  versions: "future"
+- release: "Early 2024"
+  versions:
+      iOS: "17.4"
+      macOS: "14.4"
+      watchOS: "10.4"
+      tvOS: "17.4"
   introduced:
       clusters:
           - RVCRunMode
@@ -8524,3 +8528,6 @@
               # as the enum.  The old enum name never had the new value name.
               ContentLaunchStatusEnum:
                   - URLNotAvailable
+
+- release: "Future"
+  versions: "future"

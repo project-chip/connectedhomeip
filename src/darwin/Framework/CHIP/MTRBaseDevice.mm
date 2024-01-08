@@ -2227,7 +2227,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributeRequestPath> endpoint %u cluster %u attribute %u",
+    return [NSString stringWithFormat:@"<MTRAttributeRequestPath endpoint %u cluster %u attribute %u>",
                      (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
                      (uint32_t) _attribute.unsignedLongValue];
 }
@@ -2248,7 +2248,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToAttributeRequestPath:object];
@@ -2299,7 +2299,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventRequestPath> endpoint %u cluster %u event %u",
+    return [NSString stringWithFormat:@"<MTREventRequestPath endpoint %u cluster %u event %u>",
                      (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
                      (uint32_t) _event.unsignedLongValue];
 }
@@ -2320,7 +2320,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToEventRequestPath:object];
@@ -2370,7 +2370,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRClusterPath> endpoint %u cluster %u", (uint16_t) _endpoint.unsignedShortValue,
+    return [NSString stringWithFormat:@"<MTRClusterPath endpoint %u cluster %u>", (uint16_t) _endpoint.unsignedShortValue,
                      (uint32_t) _cluster.unsignedLongValue];
 }
 
@@ -2389,7 +2389,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToClusterPath:object];
@@ -2418,7 +2418,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster %u attribute %u>",
                      (uint16_t) self.endpoint.unsignedShortValue, (uint32_t) self.cluster.unsignedLongValue,
                      (uint32_t) _attribute.unsignedLongValue];
 }
@@ -2441,7 +2441,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
 - (BOOL)isEqual:(id)object
 {
-    if (![object isKindOfClass:[self class]]) {
+    if ([object class] != [self class]) {
         return NO;
     }
     return [self isEqualToAttributePath:object];
@@ -2485,7 +2485,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 - (NSString *)description
 {
     return
-        [NSString stringWithFormat:@"<MTREventPath> endpoint %u cluster %u event %u", (uint16_t) self.endpoint.unsignedShortValue,
+        [NSString stringWithFormat:@"<MTREventPath endpoint %u cluster %u event %u>", (uint16_t) self.endpoint.unsignedShortValue,
                   (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
 }
 
@@ -2495,6 +2495,24 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
 
     return [[MTREventPath alloc] initWithPath:path];
+}
+
+- (BOOL)isEqualToEventPath:(MTREventPath *)eventPath
+{
+    return [self isEqualToClusterPath:eventPath] && [_event isEqualToNumber:eventPath.event];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+    return [self isEqualToEventPath:object];
+}
+
+- (NSUInteger)hash
+{
+    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _event.unsignedLongValue;
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -2525,12 +2543,37 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     return self;
 }
 
+- (NSString *)description
+{
+    return
+        [NSString stringWithFormat:@"<MTRCommandPath endpoint %u cluster %lu command %lu>", self.endpoint.unsignedShortValue,
+                  self.cluster.unsignedLongValue, _command.unsignedLongValue];
+}
+
 + (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
 {
     ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));
 
     return [[MTRCommandPath alloc] initWithPath:path];
+}
+
+- (BOOL)isEqualToCommandPath:(MTRCommandPath *)commandPath
+{
+    return [self isEqualToClusterPath:commandPath] && [_command isEqualToNumber:commandPath.command];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+    return [self isEqualToCommandPath:object];
+}
+
+- (NSUInteger)hash
+{
+    return self.endpoint.unsignedShortValue ^ self.cluster.unsignedLongValue ^ _command.unsignedLongValue;
 }
 
 - (id)copyWithZone:(NSZone *)zone

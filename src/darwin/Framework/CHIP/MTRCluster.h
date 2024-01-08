@@ -44,20 +44,20 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The endpoint this cluster lives on.
  */
-@property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
 /**
  * Base for all MTRBaseCluster* types.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRGenericBaseCluster : MTRCluster
 @end
 
 /**
  * Base for all MTRCluster* types.
  */
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRGenericCluster : MTRCluster
 /**
  * The device this cluster object is associated with.

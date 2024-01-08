@@ -26,7 +26,7 @@
 extern "C" {
 #endif
 #include "sl_si91x_driver.h"
-#ifdef RSI_M4_INTERFACE
+#ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_hal_soc_soft_reset.h"
 #endif
 #ifdef __cplusplus
