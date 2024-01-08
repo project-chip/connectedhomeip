@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include "core/Endpoint.h"
-#include "core/Types.h"
+#include <app/util/af-types.h>
+#include <common/CHIPDeviceManager.h>
+#include <common/CommonDeviceCallbacks.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#include "lib/support/logging/CHIPLogging.h"
-
-namespace matter {
-namespace casting {
-namespace clusters {
-
-class TargetNavigatorCluster : public core::BaseCluster
+class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
-private:
-protected:
 public:
-    TargetNavigatorCluster(memory::Weak<core::Endpoint> endpoint) : core::BaseCluster(endpoint) {}
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                             uint8_t type, uint16_t size, uint8_t * value);
 
-    // TODO: add commands
+private:
+    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };
-
-}; // namespace clusters
-}; // namespace casting
-}; // namespace matter

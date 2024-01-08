@@ -221,7 +221,7 @@ void CastingPlayer::LogDetail() const
     }
     if (strlen(mAttributes.deviceName) != 0)
     {
-        ChipLogDetail(AppServer, "\tName: %s", mAttributes.deviceName);
+        ChipLogDetail(AppServer, "\tDevice Name: %s", mAttributes.deviceName);
     }
     if (strlen(mAttributes.hostName) != 0)
     {
@@ -287,7 +287,7 @@ ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer *
                            ChipLogError(AppServer, "Invalid ConnectionContext received in DeviceConnection success callback"));
 
             connectionContext->mTargetCastingPlayer->mConnectionState = core::CASTING_PLAYER_CONNECTED;
-            connectionContext->mOnDeviceConnectedFn(context, exchangeMgr, sessionHandle);
+            connectionContext->mOnDeviceConnectedFn(connectionContext->mClientContext, exchangeMgr, sessionHandle);
             delete connectionContext;
         },
         this);
