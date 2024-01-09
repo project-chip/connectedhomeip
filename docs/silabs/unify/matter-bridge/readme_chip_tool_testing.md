@@ -36,6 +36,9 @@ Use  [Test_TC_G.PICS](./PICS/Test_TC_G.PICS)
 
 Use [Test_TC_DGGEN.PICS](./PICS/Test_TC_DGGEN.PICS)
 
+## Thermostat
+
+Use [Test_TC_TSTAT.PICS](./PICS/Test_TC_TSTAT.PICS)
 # Test results
 
 When running the Unify Matter Bridge with the chip-tool tests, multiple 
@@ -73,3 +76,7 @@ factors may affect the test result. First of all the capabilities of the backing
 | Test_TC_LVL_6_1      | 2 Failures |Test_TC_LEVEL.PICS    |PowerStrip Sample| Due to timing issues reported values falls outside the expected range |
 | Test_TC_LVL_7_1  | NA          | Test_TC_LEVEL.PICS ||           |
 | Test_TC_LVL_8_1  | NA          | Test_TC_LEVEL.PICS ||           |
+| Test_TC_STAT_1_1 | OK          | Test_TC_TSTAT.PICS ||           |
+| Test_TC_STAT_2_1 | OK          | Test_TC_TSTAT.PICS ||           |
+| Test_TC_STAT_2_2 | OK          | Test_TC_TSTAT.PICS ||           |
+|                  |             |                    ||           |

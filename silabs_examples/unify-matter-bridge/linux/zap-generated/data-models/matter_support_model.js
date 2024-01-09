@@ -5803,6 +5803,12 @@ exports.model = {
       "Other",
     ], //
     "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
+    ], //
+    "ErrorStateEnum" : [
       "FailedToFindChargingDock",
       "Stuck",
       "DustBinMissing",
@@ -5811,12 +5817,6 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
-    ], //
-    "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -6062,16 +6062,6 @@ exports.model = {
       "Light",
     ], //
     "ModeTag" : [
-      "Normal",
-      "Delicate",
-      "Heavy",
-      "Whites",
-    ], //
-    "ModeTag" : [
-      "RapidCool",
-      "RapidFreeze",
-    ], //
-    "ModeTag" : [
       "Bake",
       "Convection",
       "Grill",
@@ -6083,13 +6073,23 @@ exports.model = {
       "Proofing",
     ], //
     "ModeTag" : [
-      "Idle",
-      "Cleaning",
+      "Normal",
+      "Delicate",
+      "Heavy",
+      "Whites",
+    ], //
+    "ModeTag" : [
+      "RapidCool",
+      "RapidFreeze",
     ], //
     "ModeTag" : [
       "DeepClean",
       "Vacuum",
       "Mop",
+    ], //
+    "ModeTag" : [
+      "Idle",
+      "Cleaning",
     ], //
     "MoveModeEnum" : [
       "Up",
@@ -6183,15 +6183,15 @@ exports.model = {
       "Biometric",
     ], //
     "OperationalStateEnum" : [
-      "SeekingCharger",
-      "Charging",
-      "Docked",
-    ], //
-    "OperationalStateEnum" : [
       "Stopped",
       "Running",
       "Paused",
       "Error",
+    ], //
+    "OperationalStateEnum" : [
+      "SeekingCharger",
+      "Charging",
+      "Docked",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -6356,6 +6356,9 @@ exports.model = {
       "Fault",
     ], //
     "StatusCode" : [
+      "CleaningInProgress",
+    ], //
+    "StatusCode" : [
       "Stuck",
       "DustBinMissing",
       "DustBinFull",
@@ -6364,9 +6367,6 @@ exports.model = {
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
       "BatteryLow",
-    ], //
-    "StatusCode" : [
-      "CleaningInProgress",
     ], //
     "StatusCode" : [
       "Busy",
@@ -6839,12 +6839,12 @@ exports.model = {
       1 : "TagList",
     },
     "Feature" : {
-      1 : "OnOff",
-    },
-    "Feature" : {
       1 : "NavigationKeyCodes",
       2 : "LocationKeys",
       4 : "NumberKeys",
+    },
+    "Feature" : {
+      1 : "OnOff",
     },
     "Feature" : {
       1 : "TemperatureNumber",
@@ -6855,13 +6855,13 @@ exports.model = {
       1 : "TemperatureUnit",
     },
     "Feature" : {
+      1 : "Reset",
+    },
+    "Feature" : {
       1 : "Visual",
       2 : "Audible",
       4 : "AlarmSuppress",
       8 : "SensitivityLevel",
-    },
-    "Feature" : {
-      1 : "Reset",
     },
     "Feature" : {
       1 : "ImportedEnergy",
@@ -6874,13 +6874,13 @@ exports.model = {
       2 : "ErrorCounts",
     },
     "Feature" : {
+      1 : "Reset",
+    },
+    "Feature" : {
       1 : "Extended",
     },
     "Feature" : {
       1 : "Watermarks",
-    },
-    "Feature" : {
-      1 : "Reset",
     },
     "Feature" : {
       1 : "TimeSync",
@@ -6890,15 +6890,15 @@ exports.model = {
       1 : "CalendarFormat",
     },
     "Feature" : {
+      1 : "ApplicationPlatform",
+    },
+    "Feature" : {
       1 : "MultiSpeed",
       2 : "Auto",
       4 : "Rocking",
       8 : "Wind",
       16 : "Step",
       32 : "AirflowDirection",
-    },
-    "Feature" : {
-      1 : "ApplicationPlatform",
     },
     "Feature" : {
       1 : "NameUpdates",
@@ -6921,17 +6921,17 @@ exports.model = {
       1 : "NameUpdates",
     },
     "Feature" : {
+      1 : "PowerAdjustment",
+      2 : "PowerForecastReporting",
+      4 : "StateForecastReporting",
+      8 : "ForecastAdjustment",
+    },
+    "Feature" : {
       1 : "ContentSearch",
       2 : "URLPlayback",
       3 : "AdvancedSeek",
       4 : "TextTracks",
       5 : "AudioTracks",
-    },
-    "Feature" : {
-      1 : "PowerAdjustment",
-      2 : "PowerForecastReporting",
-      4 : "StateForecastReporting",
-      8 : "ForecastAdjustment",
     },
     "Feature" : {
       1 : "EnergyBalance",
@@ -6968,12 +6968,12 @@ exports.model = {
       5 : "ScheduledContentRating",
     },
     "Feature" : {
-      1 : "CacheAndSync",
-    },
-    "Feature" : {
       1 : "CheckInProtocolSupport",
       2 : "UserActiveModeTrigger",
       4 : "LongIdleTimeSupport",
+    },
+    "Feature" : {
+      1 : "CacheAndSync",
     },
     "Feature" : {
       1 : "AdvancedSeek",

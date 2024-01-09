@@ -1051,8 +1051,8 @@ inline std::optional<Thermostat::ControlSequenceOfOperationEnum> from_json(const
         { "CoolingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingWithReheat },
         { "HeatingOnly", Thermostat::ControlSequenceOfOperationEnum::kHeatingOnly },
         { "HeatingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kHeatingWithReheat },
-        { "CoolingAndHeating", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating },
-        { "CoolingAndHeatingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat },
+        { "CoolingAndHeating4Pipes", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating },
+        { "CoolingAndHeating4PipesWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat },
     };
 
     auto i = table.find(value);
@@ -1122,7 +1122,7 @@ inline std::optional<Thermostat::SystemModeEnum> from_json(const nlohmann::json&
         { "Auto", Thermostat::SystemModeEnum::kAuto },
         { "Cool", Thermostat::SystemModeEnum::kCool },
         { "Heat", Thermostat::SystemModeEnum::kHeat },
-        { "EmergencyHeat", Thermostat::SystemModeEnum::kEmergencyHeat },
+        { "EmergencyHeating", Thermostat::SystemModeEnum::kEmergencyHeat },
         { "Precooling", Thermostat::SystemModeEnum::kPrecooling },
         { "FanOnly", Thermostat::SystemModeEnum::kFanOnly },
         { "Dry", Thermostat::SystemModeEnum::kDry },

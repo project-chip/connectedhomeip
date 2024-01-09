@@ -59,7 +59,8 @@ chip_test_suite_using_nltest("tests") {
     #"TestOnOffCommandsHandler.cpp",
     "TestTemperatureMeasurement.cpp",
     "TestQRCodePublisher.cpp",
-    "TestIlluminanceMeasurement.cpp"
+    "TestIlluminanceMeasurement.cpp",
+    "TestThermostat.cpp"
   ]
 
   cflags = [ "-Wconversion" ]

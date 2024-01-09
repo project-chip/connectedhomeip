@@ -159,6 +159,7 @@ int main(int argc, char * argv[])
     INIT_ZAP_TRANSLATOR(Identify);
     INIT_ZAP_TRANSLATOR(LevelControl);
     INIT_ZAP_TRANSLATOR(ColorControl);
+    INIT_ZAP_TRANSLATOR(Thermostat);
 
     // Sensor clusters
     INIT_ZAP_TRANSLATOR(IlluminanceMeasurement);

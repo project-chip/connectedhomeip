@@ -92,6 +92,10 @@ namespace unify::matter_bridge {
 #define LEVEL_ONOFF_DEPENDENCY_FEATURE_MAP_MASK 0x01
 #define LEVEL_LIGHTING_FEATURE_MAP_MASK 0x02
 
+#define THERMOSTAT_HEATING_FEATURE_MAP 0x01
+#define THERMOSTAT_COOLING_FEATURE_MAP 0x02
+
+using namespace chip::app;
 using namespace chip::app::Clusters;
 
 ClusterEmulator::ClusterEmulator()
@@ -169,6 +173,34 @@ uint32_t ClusterEmulator::read_feature_map_revision(const ConcreteReadAttributeP
             return (LEVEL_ONOFF_DEPENDENCY_FEATURE_MAP_MASK | LEVEL_LIGHTING_FEATURE_MAP_MASK);
         }
         break;
+    case Thermostat::Id: {
+        uint32_t result = 0;
+        ConcreteAttributePath cooling_atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, 
+                                    Thermostat::Attributes::OccupiedCoolingSetpoint::Id);
+
+        ConcreteAttributePath heating_atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, 
+                                    Thermostat::Attributes::OccupiedHeatingSetpoint::Id);
+
+        Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo::Type coolingCapabilities;
+        Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo::Type heatingCapabilities;
+
+        auto coolingSupport = cache.get<Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo::Type>(cooling_atr_path,
+            coolingCapabilities);
+        auto heatingSupport = cache.get<Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo::Type>(heating_atr_path,
+            heatingCapabilities);
+        if (coolingSupport)
+        {
+            result |= THERMOSTAT_COOLING_FEATURE_MAP;
+        }
+        if (heatingSupport)
+        {
+            result |= THERMOSTAT_HEATING_FEATURE_MAP;
+        }
+
+        sl_log_debug(LOG_TAG, "FeatureMap Cache check: Cooling - %x", coolingSupport );
+        sl_log_debug(LOG_TAG, "FeatureMap Cache check: Heating - %x", heatingSupport );
+        return result;
+    }
     }
     return 0;
 }

@@ -1145,9 +1145,9 @@ nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ControlSequ
     case ControlSequenceOfOperationEnum::kHeatingWithReheat:
         return "HeatingWithReheat";
     case ControlSequenceOfOperationEnum::kCoolingAndHeating:
-        return "CoolingAndHeating";
+        return "CoolingAndHeating4Pipes";
     case ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat:
-        return "CoolingAndHeatingWithReheat";
+        return "CoolingAndHeating4PipesWithReheat";
     default:
         return "{}";
     }
@@ -1219,7 +1219,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::SystemModeE
     case SystemModeEnum::kHeat:
         return "Heat";
     case SystemModeEnum::kEmergencyHeat:
-        return "EmergencyHeat";
+        return "EmergencyHeating";
     case SystemModeEnum::kPrecooling:
         return "Precooling";
     case SystemModeEnum::kFanOnly:

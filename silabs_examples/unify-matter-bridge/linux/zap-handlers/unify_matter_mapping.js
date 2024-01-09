@@ -162,11 +162,11 @@ const enums_unify_to_matter = {
     "ThermostatACLouverPosition" : "",  // FIXME
     "ThermostatACRefrigerantType" : "",  // FIXME
     "ThermostatACType" : "",  // FIXME
-    "ThermostatControlSequenceOfOperation" : "ThermostatControlSequence",
+    "ThermostatControlSequenceOfOperation" : "ControlSequenceOfOperationEnum",
     "ThermostatProgrammingOperationModeProgrammingMode" : "",  // FIXME
     "ThermostatSetpointChangeSource" : "",  // FIXME
     "ThermostatStartOfWeek" : "StartOfWeek",
-    "ThermostatSystemMode" : "ThermostatSystemMode",
+    "ThermostatSystemMode" : "SystemModeEnum",
     "ThermostatTemperatureSetpointHold" : "TemperatureSetpointHold",
     "ThermostatThermostatRunningMode" : "ThermostatRunningMode",
     "ThermostatUserInterfaceConfigurationKeypadLockout" : "KeypadLockout",
