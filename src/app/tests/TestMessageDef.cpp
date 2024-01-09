@@ -2136,6 +2136,29 @@ void InvokeResponseMessageEndOfMessageReservationTest(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, remainingLengthAfterInitWithReservation == remainingLengthAfterEndingInvokeResponseMessage);
 }
 
+void InvokeResponseMessageReservationForEndandMoreChunkTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    InvokeResponseMessage::Builder invokeResponseMessageBuilder;
+    const uint32_t kSmallBufferSize = 100;
+    writer.Init(chip::System::PacketBufferHandle::New(kSmallBufferSize, /* aReservedSize = */ 0), /* useChainedBuffers = */ false);
+    err = invokeResponseMessageBuilder.InitWithEndBufferReserved(&writer);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeResponseMessageBuilder.ReserveSpaceForMoreChunkedMessages();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remainingLengthAllReservations = writer.GetRemainingFreeLength();
+
+    invokeResponseMessageBuilder.MoreChunkedMessages(/* aMoreChunkedMessages = */ true);
+    NL_TEST_ASSERT(apSuite, invokeResponseMessageBuilder.GetError() == CHIP_NO_ERROR);
+    err = invokeResponseMessageBuilder.EndOfInvokeResponseMessage();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    uint32_t remainingLengthAfterEndingInvokeResponseMessage = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(apSuite, remainingLengthAllReservations == remainingLengthAfterEndingInvokeResponseMessage);
+}
+
 void InvokeResponsesEndOfResponseReservationTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2373,6 +2396,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("InvokeRequestsEndOfRequestReservationTest", InvokeRequestsEndOfRequestReservationTest),
                 NL_TEST_DEF("InvokeInvokeResponseMessageTest", InvokeInvokeResponseMessageTest),
                 NL_TEST_DEF("InvokeResponseMessageEndOfMessageReservationTest", InvokeResponseMessageEndOfMessageReservationTest),
+                NL_TEST_DEF("InvokeResponseMessageReservationForEndandMoreChunkTest", InvokeResponseMessageReservationForEndandMoreChunkTest),
                 NL_TEST_DEF("InvokeResponsesEndOfResponseReservationTest", InvokeResponsesEndOfResponseReservationTest),
                 NL_TEST_DEF("ReportDataMessageTest", ReportDataMessageTest),
                 NL_TEST_DEF("ReadRequestMessageTest", ReadRequestMessageTest),
