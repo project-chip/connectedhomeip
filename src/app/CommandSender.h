@@ -70,15 +70,15 @@ public:
 
         /**
          * @brief Should CommandSender send path specific errors to OnResponse* callbacks.
-         * 
+         *
          * Any callbacks that override this method to return true must support capability of
          * handling multiple callbacks to OnResponse* callbacks even with non-successful StatusIB
          * values.
          *
          * Clients that want to support batch commands must override this method and return true.
-         * 
+         *
          * Callback SHALL always return a consistent value that does NOT change.
-         * 
+         *
          * @return true when callback's expect path specific error to come in OnResponse* callback
          * @return false when callback's expect path specific error to come in OnError callback
          */
@@ -163,7 +163,7 @@ public:
          *   StatusIB::InitFromChipError can be used to extract the status.
          *      - Note path specific error only come here happens if PathSpecificErrorGoesToOnResponseCallbacks()
          *        returns false.
-         *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a 
+         *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a
          *        path-specific error from the OnError callback.
          * - CHIP_ERROR*: All other cases.
          *
