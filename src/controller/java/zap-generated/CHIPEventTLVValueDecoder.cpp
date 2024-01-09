@@ -2610,8 +2610,11 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                 ChipLogError(Zcl, "Could not find class ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent");
                 return nullptr;
             }
-            jmethodID onTransitionToActiveModeStructCtor = env->GetMethodID(onTransitionToActiveModeStructClass, "<init>", "()V");
-            if (onTransitionToActiveModeStructCtor == nullptr)
+
+            jmethodID onTransitionToActiveModeStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, onTransitionToActiveModeStructClass, "<init>", "()V",
+                                                                &onTransitionToActiveModeStructCtor);
+            if (err != CHIP_NO_ERROR || onTransitionToActiveModeStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent constructor");
                 return nullptr;
