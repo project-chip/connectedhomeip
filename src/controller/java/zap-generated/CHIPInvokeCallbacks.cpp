@@ -317,8 +317,7 @@ void CHIPGroupsClusterRemoveGroupResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID);
 }
 CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -558,8 +557,7 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CallbackFn
     env->CallVoidMethod(javaCallbackRef, javaMethod, Action, DelayedActionTime);
 }
 CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CHIPGeneralCommissioningClusterArmFailSafeResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -757,8 +755,7 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
     env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
 CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CHIPNetworkCommissioningClusterScanNetworksResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1012,8 +1009,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
 }
 CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CHIPNetworkCommissioningClusterNetworkConfigResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1137,8 +1133,7 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
                         PossessionSignature);
 }
 CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1225,8 +1220,7 @@ void CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, ErrorValue);
 }
 CHIPNetworkCommissioningClusterQueryIdentityResponseCallback::CHIPNetworkCommissioningClusterQueryIdentityResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterQueryIdentityResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPNetworkCommissioningClusterQueryIdentityResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1401,8 +1395,7 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, LogContent, UTCTimeStamp, TimeSinceBoot);
 }
 CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1477,8 +1470,7 @@ void CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeMs, PosixTimeMs);
 }
 CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback::CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPTimeSynchronizationClusterSetTimeZoneResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1539,8 +1531,7 @@ void CHIPTimeSynchronizationClusterSetTimeZoneResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, DSTOffsetRequired);
 }
 CHIPOperationalCredentialsClusterAttestationResponseCallback::CHIPOperationalCredentialsClusterAttestationResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1823,8 +1814,7 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, StatusCode, FabricIndex, DebugText);
 }
 CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CHIPGroupKeyManagementClusterKeySetReadResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2078,8 +2068,7 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
     env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
 }
 CHIPIcdManagementClusterRegisterClientResponseCallback::CHIPIcdManagementClusterRegisterClientResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPIcdManagementClusterRegisterClientResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPIcdManagementClusterRegisterClientResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2392,8 +2381,7 @@ void CHIPOvenModeClusterChangeToModeResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
 }
 CHIPLaundryWasherModeClusterChangeToModeResponseCallback::CHIPLaundryWasherModeClusterChangeToModeResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPLaundryWasherModeClusterChangeToModeResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2768,8 +2756,7 @@ void CHIPDishwasherModeClusterChangeToModeResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, StatusText);
 }
 CHIPOperationalStateClusterOperationalCommandResponseCallback::CHIPOperationalStateClusterOperationalCommandResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPOperationalStateClusterOperationalCommandResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4803,8 +4790,7 @@ void CHIPDoorLockClusterSetCredentialResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, UserIndex, NextCredentialIndex);
 }
 CHIPDoorLockClusterGetCredentialStatusResponseCallback::CHIPDoorLockClusterGetCredentialStatusResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4923,8 +4909,7 @@ void CHIPDoorLockClusterGetCredentialStatusResponseCallback::CallbackFn(
                         NextCredentialIndex);
 }
 CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CHIPThermostatClusterGetWeeklyScheduleResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5900,8 +5885,7 @@ void CHIPChannelClusterProgramGuideResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Paging, ProgramList);
 }
 CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CHIPTargetNavigatorClusterNavigateTargetResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6179,8 +6163,7 @@ void CHIPContentLauncherClusterLauncherResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Data);
 }
 CHIPApplicationLauncherClusterLauncherResponseCallback::CHIPApplicationLauncherClusterLauncherResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6370,8 +6353,7 @@ void CHIPContentControlClusterResetPINResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, PINCode);
 }
 CHIPContentAppObserverClusterContentAppMessageResponseCallback::CHIPContentAppObserverClusterContentAppMessageResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPContentAppObserverClusterContentAppMessageResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPContentAppObserverClusterContentAppMessageResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6722,8 +6704,7 @@ void CHIPUnitTestingClusterTestSpecificResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
 CHIPUnitTestingClusterTestAddArgumentsResponseCallback::CHIPUnitTestingClusterTestAddArgumentsResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestAddArgumentsResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestAddArgumentsResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6784,8 +6765,7 @@ void CHIPUnitTestingClusterTestAddArgumentsResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
 CHIPUnitTestingClusterTestSimpleArgumentResponseCallback::CHIPUnitTestingClusterTestSimpleArgumentResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestSimpleArgumentResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestSimpleArgumentResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6846,8 +6826,7 @@ void CHIPUnitTestingClusterTestSimpleArgumentResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
 CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback::CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestStructArrayArgumentResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestStructArrayArgumentResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7258,8 +7237,7 @@ void CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1, arg2, arg3, arg4, arg5, arg6);
 }
 CHIPUnitTestingClusterTestListInt8UReverseResponseCallback::CHIPUnitTestingClusterTestListInt8UReverseResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestListInt8UReverseResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestListInt8UReverseResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7394,8 +7372,7 @@ void CHIPUnitTestingClusterTestEnumsResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1, arg2);
 }
 CHIPUnitTestingClusterTestNullableOptionalResponseCallback::CHIPUnitTestingClusterTestNullableOptionalResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestNullableOptionalResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestNullableOptionalResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8356,8 +8333,7 @@ void CHIPUnitTestingClusterSimpleStructResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
 }
 CHIPUnitTestingClusterTestEmitTestEventResponseCallback::CHIPUnitTestingClusterTestEmitTestEventResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPUnitTestingClusterTestEmitTestEventResponseCallbackType>(CallbackFn, this)
+    jobject javaCallback) : Callback::Callback<CHIPUnitTestingClusterTestEmitTestEventResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)

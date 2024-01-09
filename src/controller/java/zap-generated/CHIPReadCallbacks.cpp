@@ -29,8 +29,7 @@
 
 CHIPIdentifyGeneratedCommandListAttributeCallback::CHIPIdentifyGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPIdentifyClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPIdentifyClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -101,8 +100,7 @@ void CHIPIdentifyGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPIdentifyAcceptedCommandListAttributeCallback::CHIPIdentifyAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPIdentifyClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPIdentifyClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -313,8 +311,7 @@ void CHIPIdentifyAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPGroupsGeneratedCommandListAttributeCallback::CHIPGroupsGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGroupsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -385,8 +382,7 @@ void CHIPGroupsGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
 CHIPGroupsAcceptedCommandListAttributeCallback::CHIPGroupsAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGroupsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -795,8 +791,7 @@ void CHIPScenesFabricSceneInfoAttributeCallback::CallbackFn(
 
 CHIPScenesGeneratedCommandListAttributeCallback::CHIPScenesGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPScenesClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPScenesClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -867,8 +862,7 @@ void CHIPScenesGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
 CHIPScenesAcceptedCommandListAttributeCallback::CHIPScenesAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPScenesClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPScenesClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1145,8 +1139,7 @@ void CHIPOnOffStartUpOnOffAttributeCallback::CallbackFn(
 
 CHIPOnOffGeneratedCommandListAttributeCallback::CHIPOnOffGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPOnOffClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOnOffClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1848,8 +1841,7 @@ void CHIPLevelControlOnLevelAttributeCallback::CallbackFn(void * context, const 
 
 CHIPLevelControlOnTransitionTimeAttributeCallback::CHIPLevelControlOnTransitionTimeAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPLevelControlClusterOnTransitionTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLevelControlClusterOnTransitionTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1916,8 +1908,7 @@ void CHIPLevelControlOnTransitionTimeAttributeCallback::CallbackFn(void * contex
 
 CHIPLevelControlOffTransitionTimeAttributeCallback::CHIPLevelControlOffTransitionTimeAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPLevelControlClusterOffTransitionTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLevelControlClusterOffTransitionTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1984,8 +1975,7 @@ void CHIPLevelControlOffTransitionTimeAttributeCallback::CallbackFn(void * conte
 
 CHIPLevelControlDefaultMoveRateAttributeCallback::CHIPLevelControlDefaultMoveRateAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPLevelControlClusterDefaultMoveRateAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLevelControlClusterDefaultMoveRateAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2334,8 +2324,7 @@ void CHIPLevelControlEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPLevelControlAttributeListAttributeCallback::CHIPLevelControlAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPLevelControlClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLevelControlClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2550,8 +2539,7 @@ void CHIPBinaryInputBasicAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPBinaryInputBasicEventListAttributeCallback::CHIPBinaryInputBasicEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPBinaryInputBasicClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBinaryInputBasicClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2622,8 +2610,7 @@ void CHIPBinaryInputBasicEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPBinaryInputBasicAttributeListAttributeCallback::CHIPBinaryInputBasicAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPBinaryInputBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBinaryInputBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2838,8 +2825,7 @@ void CHIPPulseWidthModulationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPPulseWidthModulationEventListAttributeCallback::CHIPPulseWidthModulationEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPPulseWidthModulationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPulseWidthModulationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3427,8 +3413,7 @@ void CHIPDescriptorTagListAttributeCallback::CallbackFn(
 
 CHIPDescriptorGeneratedCommandListAttributeCallback::CHIPDescriptorGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPDescriptorClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDescriptorClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3499,8 +3484,7 @@ void CHIPDescriptorGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPDescriptorAcceptedCommandListAttributeCallback::CHIPDescriptorAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPDescriptorClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDescriptorClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3871,8 +3855,7 @@ void CHIPBindingBindingAttributeCallback::CallbackFn(
 
 CHIPBindingGeneratedCommandListAttributeCallback::CHIPBindingGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPBindingClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBindingClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -3943,8 +3926,7 @@ void CHIPBindingGeneratedCommandListAttributeCallback::CallbackFn(void * context
 
 CHIPBindingAcceptedCommandListAttributeCallback::CHIPBindingAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPBindingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBindingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -4687,8 +4669,7 @@ void CHIPAccessControlEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPAccessControlAttributeListAttributeCallback::CHIPAccessControlAttributeListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPAccessControlClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPAccessControlClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5003,8 +4984,7 @@ void CHIPActionsEndpointListsAttributeCallback::CallbackFn(
 
 CHIPActionsGeneratedCommandListAttributeCallback::CHIPActionsGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPActionsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPActionsClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5075,8 +5055,7 @@ void CHIPActionsGeneratedCommandListAttributeCallback::CallbackFn(void * context
 
 CHIPActionsAcceptedCommandListAttributeCallback::CHIPActionsAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPActionsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPActionsClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5431,8 +5410,7 @@ void CHIPBasicInformationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPBasicInformationEventListAttributeCallback::CHIPBasicInformationEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPBasicInformationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBasicInformationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5503,8 +5481,7 @@ void CHIPBasicInformationEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPBasicInformationAttributeListAttributeCallback::CHIPBasicInformationAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPBasicInformationClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBasicInformationClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7201,8 +7178,7 @@ void CHIPUnitLocalizationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPUnitLocalizationEventListAttributeCallback::CHIPUnitLocalizationEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitLocalizationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitLocalizationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7273,8 +7249,7 @@ void CHIPUnitLocalizationEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitLocalizationAttributeListAttributeCallback::CHIPUnitLocalizationAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitLocalizationClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitLocalizationClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7911,8 +7886,7 @@ void CHIPPowerSourceWiredAssessedCurrentAttributeCallback::CallbackFn(void * con
 
 CHIPPowerSourceActiveWiredFaultsAttributeCallback::CHIPPowerSourceActiveWiredFaultsAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterActiveWiredFaultsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterActiveWiredFaultsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8048,8 +8022,7 @@ void CHIPPowerSourceBatVoltageAttributeCallback::CallbackFn(void * context, cons
 
 CHIPPowerSourceBatPercentRemainingAttributeCallback::CHIPPowerSourceBatPercentRemainingAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterBatPercentRemainingAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterBatPercentRemainingAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8116,8 +8089,7 @@ void CHIPPowerSourceBatPercentRemainingAttributeCallback::CallbackFn(void * cont
 
 CHIPPowerSourceBatTimeRemainingAttributeCallback::CHIPPowerSourceBatTimeRemainingAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterBatTimeRemainingAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterBatTimeRemainingAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8184,8 +8156,7 @@ void CHIPPowerSourceBatTimeRemainingAttributeCallback::CallbackFn(void * context
 
 CHIPPowerSourceActiveBatFaultsAttributeCallback::CHIPPowerSourceActiveBatFaultsAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterActiveBatFaultsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterActiveBatFaultsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8256,8 +8227,7 @@ void CHIPPowerSourceActiveBatFaultsAttributeCallback::CallbackFn(
 
 CHIPPowerSourceBatTimeToFullChargeAttributeCallback::CHIPPowerSourceBatTimeToFullChargeAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterBatTimeToFullChargeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterBatTimeToFullChargeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8324,8 +8294,7 @@ void CHIPPowerSourceBatTimeToFullChargeAttributeCallback::CallbackFn(void * cont
 
 CHIPPowerSourceBatChargingCurrentAttributeCallback::CHIPPowerSourceBatChargingCurrentAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterBatChargingCurrentAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterBatChargingCurrentAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8606,8 +8575,7 @@ void CHIPPowerSourceGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPPowerSourceAcceptedCommandListAttributeCallback::CHIPPowerSourceAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPPowerSourceClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPowerSourceClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8962,8 +8930,7 @@ void CHIPGeneralCommissioningAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPGeneralCommissioningEventListAttributeCallback::CHIPGeneralCommissioningEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPGeneralCommissioningClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGeneralCommissioningClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9106,8 +9073,7 @@ void CHIPGeneralCommissioningAttributeListAttributeCallback::CallbackFn(
 
 CHIPNetworkCommissioningNetworksAttributeCallback::CHIPNetworkCommissioningNetworksAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -9677,8 +9643,7 @@ void CHIPNetworkCommissioningAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPNetworkCommissioningEventListAttributeCallback::CHIPNetworkCommissioningEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPNetworkCommissioningClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPNetworkCommissioningClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -10035,8 +10000,7 @@ void CHIPDiagnosticLogsEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPDiagnosticLogsAttributeListAttributeCallback::CHIPDiagnosticLogsAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -10642,8 +10606,7 @@ void CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPGeneralDiagnosticsEventListAttributeCallback::CHIPGeneralDiagnosticsEventListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPGeneralDiagnosticsClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGeneralDiagnosticsClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -11094,8 +11057,7 @@ void CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPSoftwareDiagnosticsEventListAttributeCallback::CHIPSoftwareDiagnosticsEventListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -11438,8 +11400,7 @@ void CHIPThreadNetworkDiagnosticsNetworkNameAttributeCallback::CallbackFn(
 
 CHIPThreadNetworkDiagnosticsPanIdAttributeCallback::CHIPThreadNetworkDiagnosticsPanIdAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterPanIdAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterPanIdAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -12490,8 +12451,7 @@ void CHIPThreadNetworkDiagnosticsPendingTimestampAttributeCallback::CallbackFn(
 
 CHIPThreadNetworkDiagnosticsDelayAttributeCallback::CHIPThreadNetworkDiagnosticsDelayAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterDelayAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterDelayAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -12989,8 +12949,7 @@ void CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
 
 CHIPWiFiNetworkDiagnosticsBssidAttributeCallback::CHIPWiFiNetworkDiagnosticsBssidAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterBssidAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterBssidAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -13260,8 +13219,7 @@ void CHIPWiFiNetworkDiagnosticsChannelNumberAttributeCallback::CallbackFn(void *
 
 CHIPWiFiNetworkDiagnosticsRssiAttributeCallback::CHIPWiFiNetworkDiagnosticsRssiAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterRssiAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterRssiAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14656,8 +14614,7 @@ void CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::CallbackFn(
 
 CHIPTimeSynchronizationUTCTimeAttributeCallback::CHIPTimeSynchronizationUTCTimeAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterUTCTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterUTCTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14724,8 +14681,7 @@ void CHIPTimeSynchronizationUTCTimeAttributeCallback::CallbackFn(void * context,
 
 CHIPTimeSynchronizationDefaultNTPAttributeCallback::CHIPTimeSynchronizationDefaultNTPAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterDefaultNTPAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterDefaultNTPAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14788,8 +14744,7 @@ void CHIPTimeSynchronizationDefaultNTPAttributeCallback::CallbackFn(void * conte
 
 CHIPTimeSynchronizationTimeZoneAttributeCallback::CHIPTimeSynchronizationTimeZoneAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterTimeZoneAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterTimeZoneAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -14905,8 +14860,7 @@ void CHIPTimeSynchronizationTimeZoneAttributeCallback::CallbackFn(
 
 CHIPTimeSynchronizationDSTOffsetAttributeCallback::CHIPTimeSynchronizationDSTOffsetAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterDSTOffsetAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterDSTOffsetAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -15024,8 +14978,7 @@ void CHIPTimeSynchronizationDSTOffsetAttributeCallback::CallbackFn(
 
 CHIPTimeSynchronizationLocalTimeAttributeCallback::CHIPTimeSynchronizationLocalTimeAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterLocalTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterLocalTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -15236,8 +15189,7 @@ void CHIPTimeSynchronizationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPTimeSynchronizationEventListAttributeCallback::CHIPTimeSynchronizationEventListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPTimeSynchronizationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimeSynchronizationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -15670,8 +15622,7 @@ void CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback::CallbackFn
 
 CHIPSwitchGeneratedCommandListAttributeCallback::CHIPSwitchGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPSwitchClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSwitchClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -15742,8 +15693,7 @@ void CHIPSwitchGeneratedCommandListAttributeCallback::CallbackFn(void * context,
 
 CHIPSwitchAcceptedCommandListAttributeCallback::CHIPSwitchAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPSwitchClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSwitchClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -16380,8 +16330,7 @@ void CHIPAdministratorCommissioningAttributeListAttributeCallback::CallbackFn(
 
 CHIPOperationalCredentialsNOCsAttributeCallback::CHIPOperationalCredentialsNOCsAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -16494,8 +16443,7 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
 
 CHIPOperationalCredentialsFabricsAttributeCallback::CHIPOperationalCredentialsFabricsAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -16983,8 +16931,7 @@ void CHIPOperationalCredentialsAttributeListAttributeCallback::CallbackFn(
 
 CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CHIPGroupKeyManagementGroupKeyMapAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -17095,8 +17042,7 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
 
 CHIPGroupKeyManagementGroupTableAttributeCallback::CHIPGroupKeyManagementGroupTableAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -17371,8 +17317,7 @@ void CHIPGroupKeyManagementAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPGroupKeyManagementEventListAttributeCallback::CHIPGroupKeyManagementEventListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupKeyManagementClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPGroupKeyManagementClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -17605,8 +17550,7 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
 
 CHIPFixedLabelGeneratedCommandListAttributeCallback::CHIPFixedLabelGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPFixedLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFixedLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -17677,8 +17621,7 @@ void CHIPFixedLabelGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPFixedLabelAcceptedCommandListAttributeCallback::CHIPFixedLabelAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPFixedLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFixedLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -17979,8 +17922,7 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(
 
 CHIPUserLabelGeneratedCommandListAttributeCallback::CHIPUserLabelGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPUserLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUserLabelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -18051,8 +17993,7 @@ void CHIPUserLabelGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPUserLabelAcceptedCommandListAttributeCallback::CHIPUserLabelAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPUserLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUserLabelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -18407,8 +18348,7 @@ void CHIPProxyConfigurationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPProxyConfigurationEventListAttributeCallback::CHIPProxyConfigurationEventListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPProxyConfigurationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPProxyConfigurationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -18765,8 +18705,7 @@ void CHIPProxyDiscoveryEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPProxyDiscoveryAttributeListAttributeCallback::CHIPProxyDiscoveryAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPProxyDiscoveryClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPProxyDiscoveryClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -18837,8 +18776,7 @@ void CHIPProxyDiscoveryAttributeListAttributeCallback::CallbackFn(
 
 CHIPProxyValidGeneratedCommandListAttributeCallback::CHIPProxyValidGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPProxyValidClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPProxyValidClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -18909,8 +18847,7 @@ void CHIPProxyValidGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPProxyValidAcceptedCommandListAttributeCallback::CHIPProxyValidAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPProxyValidClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPProxyValidClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19335,8 +19272,7 @@ void CHIPBooleanStateEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPBooleanStateAttributeListAttributeCallback::CHIPBooleanStateAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPBooleanStateClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBooleanStateClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19407,8 +19343,7 @@ void CHIPBooleanStateAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPIcdManagementRegisteredClientsAttributeCallback::CHIPIcdManagementRegisteredClientsAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPIcdManagementClusterRegisteredClientsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPIcdManagementClusterRegisteredClientsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19734,8 +19669,7 @@ void CHIPIcdManagementEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPIcdManagementAttributeListAttributeCallback::CHIPIcdManagementAttributeListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPIcdManagementClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPIcdManagementClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -19806,8 +19740,7 @@ void CHIPIcdManagementAttributeListAttributeCallback::CallbackFn(
 
 CHIPTimerGeneratedCommandListAttributeCallback::CHIPTimerGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPTimerClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTimerClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -20983,8 +20916,7 @@ void CHIPOvenModeOnModeAttributeCallback::CallbackFn(void * context, const chip:
 
 CHIPOvenModeGeneratedCommandListAttributeCallback::CHIPOvenModeGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOvenModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -21055,8 +20987,7 @@ void CHIPOvenModeGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPOvenModeAcceptedCommandListAttributeCallback::CHIPOvenModeAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPOvenModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOvenModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -21551,8 +21482,7 @@ void CHIPLaundryDryerControlsAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPLaundryDryerControlsEventListAttributeCallback::CHIPLaundryDryerControlsEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryDryerControlsClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryDryerControlsClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -21695,8 +21625,7 @@ void CHIPLaundryDryerControlsAttributeListAttributeCallback::CallbackFn(
 
 CHIPModeSelectStandardNamespaceAttributeCallback::CHIPModeSelectStandardNamespaceAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPModeSelectClusterStandardNamespaceAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPModeSelectClusterStandardNamespaceAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22035,8 +21964,7 @@ void CHIPModeSelectOnModeAttributeCallback::CallbackFn(void * context, const chi
 
 CHIPModeSelectGeneratedCommandListAttributeCallback::CHIPModeSelectGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPModeSelectClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPModeSelectClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22107,8 +22035,7 @@ void CHIPModeSelectGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPModeSelectAcceptedCommandListAttributeCallback::CHIPModeSelectAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPModeSelectClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPModeSelectClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22473,8 +22400,7 @@ void CHIPLaundryWasherModeSupportedModesAttributeCallback::CallbackFn(
 
 CHIPLaundryWasherModeStartUpModeAttributeCallback::CHIPLaundryWasherModeStartUpModeAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryWasherModeClusterStartUpModeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryWasherModeClusterStartUpModeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22750,8 +22676,7 @@ void CHIPLaundryWasherModeAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPLaundryWasherModeEventListAttributeCallback::CHIPLaundryWasherModeEventListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryWasherModeClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryWasherModeClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -22822,8 +22747,7 @@ void CHIPLaundryWasherModeEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPLaundryWasherModeAttributeListAttributeCallback::CHIPLaundryWasherModeAttributeListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryWasherModeClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryWasherModeClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -23858,8 +23782,7 @@ void CHIPLaundryWasherControlsAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPLaundryWasherControlsEventListAttributeCallback::CHIPLaundryWasherControlsEventListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPLaundryWasherControlsClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLaundryWasherControlsClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -24218,8 +24141,7 @@ void CHIPRvcRunModeOnModeAttributeCallback::CallbackFn(void * context, const chi
 
 CHIPRvcRunModeGeneratedCommandListAttributeCallback::CHIPRvcRunModeGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcRunModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcRunModeClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -24290,8 +24212,7 @@ void CHIPRvcRunModeGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPRvcRunModeAcceptedCommandListAttributeCallback::CHIPRvcRunModeAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcRunModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcRunModeClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -24502,8 +24423,7 @@ void CHIPRvcRunModeAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPRvcCleanModeSupportedModesAttributeCallback::CHIPRvcCleanModeSupportedModesAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcCleanModeClusterSupportedModesAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcCleanModeClusterSupportedModesAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -24934,8 +24854,7 @@ void CHIPRvcCleanModeEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPRvcCleanModeAttributeListAttributeCallback::CHIPRvcCleanModeAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcCleanModeClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcCleanModeClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25219,8 +25138,7 @@ void CHIPTemperatureControlAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPTemperatureControlEventListAttributeCallback::CHIPTemperatureControlEventListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPTemperatureControlClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTemperatureControlClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25507,8 +25425,7 @@ void CHIPRefrigeratorAlarmAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPRefrigeratorAlarmEventListAttributeCallback::CHIPRefrigeratorAlarmEventListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPRefrigeratorAlarmClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRefrigeratorAlarmClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25579,8 +25496,7 @@ void CHIPRefrigeratorAlarmEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPRefrigeratorAlarmAttributeListAttributeCallback::CHIPRefrigeratorAlarmAttributeListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPRefrigeratorAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRefrigeratorAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25651,8 +25567,7 @@ void CHIPRefrigeratorAlarmAttributeListAttributeCallback::CallbackFn(
 
 CHIPDishwasherModeSupportedModesAttributeCallback::CHIPDishwasherModeSupportedModesAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPDishwasherModeClusterSupportedModesAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDishwasherModeClusterSupportedModesAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -25804,8 +25719,7 @@ void CHIPDishwasherModeSupportedModesAttributeCallback::CallbackFn(
 
 CHIPDishwasherModeStartUpModeAttributeCallback::CHIPDishwasherModeStartUpModeAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPDishwasherModeClusterStartUpModeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDishwasherModeClusterStartUpModeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26151,8 +26065,7 @@ void CHIPDishwasherModeEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPDishwasherModeAttributeListAttributeCallback::CHIPDishwasherModeAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPDishwasherModeClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDishwasherModeClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26223,8 +26136,7 @@ void CHIPDishwasherModeAttributeListAttributeCallback::CallbackFn(
 
 CHIPAirQualityGeneratedCommandListAttributeCallback::CHIPAirQualityGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPAirQualityClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPAirQualityClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26295,8 +26207,7 @@ void CHIPAirQualityGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPAirQualityAcceptedCommandListAttributeCallback::CHIPAirQualityAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPAirQualityClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPAirQualityClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -26721,8 +26632,7 @@ void CHIPSmokeCoAlarmEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPSmokeCoAlarmAttributeListAttributeCallback::CHIPSmokeCoAlarmAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPSmokeCoAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSmokeCoAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27007,8 +26917,7 @@ void CHIPDishwasherAlarmEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPDishwasherAlarmAttributeListAttributeCallback::CHIPDishwasherAlarmAttributeListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPDishwasherAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDishwasherAlarmClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27377,8 +27286,7 @@ void CHIPMicrowaveOvenModeAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPMicrowaveOvenModeEventListAttributeCallback::CHIPMicrowaveOvenModeEventListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPMicrowaveOvenModeClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMicrowaveOvenModeClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27449,8 +27357,7 @@ void CHIPMicrowaveOvenModeEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPMicrowaveOvenModeAttributeListAttributeCallback::CHIPMicrowaveOvenModeAttributeListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPMicrowaveOvenModeClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMicrowaveOvenModeClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27737,8 +27644,7 @@ void CHIPMicrowaveOvenControlAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPMicrowaveOvenControlEventListAttributeCallback::CHIPMicrowaveOvenControlEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPMicrowaveOvenControlClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMicrowaveOvenControlClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27881,8 +27787,7 @@ void CHIPMicrowaveOvenControlAttributeListAttributeCallback::CallbackFn(
 
 CHIPOperationalStatePhaseListAttributeCallback::CHIPOperationalStatePhaseListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -27956,8 +27861,7 @@ void CHIPOperationalStatePhaseListAttributeCallback::CallbackFn(
 
 CHIPOperationalStateCurrentPhaseAttributeCallback::CHIPOperationalStateCurrentPhaseAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalStateClusterCurrentPhaseAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalStateClusterCurrentPhaseAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28024,8 +27928,7 @@ void CHIPOperationalStateCurrentPhaseAttributeCallback::CallbackFn(void * contex
 
 CHIPOperationalStateCountdownTimeAttributeCallback::CHIPOperationalStateCountdownTimeAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalStateClusterCountdownTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalStateClusterCountdownTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28348,8 +28251,7 @@ void CHIPOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPOperationalStateEventListAttributeCallback::CHIPOperationalStateEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28420,8 +28322,7 @@ void CHIPOperationalStateEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPOperationalStateAttributeListAttributeCallback::CHIPOperationalStateAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPOperationalStateClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOperationalStateClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28492,8 +28393,7 @@ void CHIPOperationalStateAttributeListAttributeCallback::CallbackFn(
 
 CHIPRvcOperationalStatePhaseListAttributeCallback::CHIPRvcOperationalStatePhaseListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcOperationalStateClusterPhaseListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -28959,8 +28859,7 @@ void CHIPRvcOperationalStateAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPRvcOperationalStateEventListAttributeCallback::CHIPRvcOperationalStateEventListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPRvcOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPRvcOperationalStateClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -29906,8 +29805,7 @@ void CHIPHepaFilterMonitoringAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPHepaFilterMonitoringEventListAttributeCallback::CHIPHepaFilterMonitoringEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPHepaFilterMonitoringClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPHepaFilterMonitoringClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -33980,8 +33878,7 @@ void CHIPEnergyEvseStateAttributeCallback::CallbackFn(
 
 CHIPEnergyEvseChargingEnabledUntilAttributeCallback::CHIPEnergyEvseChargingEnabledUntilAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterChargingEnabledUntilAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterChargingEnabledUntilAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34116,8 +34013,7 @@ void CHIPEnergyEvseDischargingEnabledUntilAttributeCallback::CallbackFn(void * c
 
 CHIPEnergyEvseNextChargeStartTimeAttributeCallback::CHIPEnergyEvseNextChargeStartTimeAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeStartTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeStartTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34184,8 +34080,7 @@ void CHIPEnergyEvseNextChargeStartTimeAttributeCallback::CallbackFn(void * conte
 
 CHIPEnergyEvseNextChargeTargetTimeAttributeCallback::CHIPEnergyEvseNextChargeTargetTimeAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeTargetTimeAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeTargetTimeAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34320,8 +34215,7 @@ void CHIPEnergyEvseNextChargeRequiredEnergyAttributeCallback::CallbackFn(void * 
 
 CHIPEnergyEvseNextChargeTargetSoCAttributeCallback::CHIPEnergyEvseNextChargeTargetSoCAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeTargetSoCAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterNextChargeTargetSoCAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34522,8 +34416,7 @@ void CHIPEnergyEvseStateOfChargeAttributeCallback::CallbackFn(void * context,
 
 CHIPEnergyEvseBatteryCapacityAttributeCallback::CHIPEnergyEvseBatteryCapacityAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterBatteryCapacityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterBatteryCapacityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34717,8 +34610,7 @@ void CHIPEnergyEvseSessionIDAttributeCallback::CallbackFn(void * context, const 
 
 CHIPEnergyEvseSessionDurationAttributeCallback::CHIPEnergyEvseSessionDurationAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterSessionDurationAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterSessionDurationAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34785,8 +34677,7 @@ void CHIPEnergyEvseSessionDurationAttributeCallback::CallbackFn(void * context,
 
 CHIPEnergyEvseSessionEnergyChargedAttributeCallback::CHIPEnergyEvseSessionEnergyChargedAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterSessionEnergyChargedAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterSessionEnergyChargedAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34921,8 +34812,7 @@ void CHIPEnergyEvseSessionEnergyDischargedAttributeCallback::CallbackFn(void * c
 
 CHIPEnergyEvseGeneratedCommandListAttributeCallback::CHIPEnergyEvseGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -34993,8 +34883,7 @@ void CHIPEnergyEvseGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPEnergyEvseAcceptedCommandListAttributeCallback::CHIPEnergyEvseAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyEvseClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyEvseClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -35205,8 +35094,7 @@ void CHIPEnergyEvseAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPEnergyPreferenceEnergyBalancesAttributeCallback::CHIPEnergyPreferenceEnergyBalancesAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyPreferenceClusterEnergyBalancesAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyPreferenceClusterEnergyBalancesAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -35633,8 +35521,7 @@ void CHIPEnergyPreferenceAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPEnergyPreferenceEventListAttributeCallback::CHIPEnergyPreferenceEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyPreferenceClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyPreferenceClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -35705,8 +35592,7 @@ void CHIPEnergyPreferenceEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPEnergyPreferenceAttributeListAttributeCallback::CHIPEnergyPreferenceAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPEnergyPreferenceClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPEnergyPreferenceClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -36255,8 +36141,7 @@ void CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::Callback
 
 CHIPDoorLockGeneratedCommandListAttributeCallback::CHIPDoorLockGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPDoorLockClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDoorLockClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -36327,8 +36212,7 @@ void CHIPDoorLockGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPDoorLockAcceptedCommandListAttributeCallback::CHIPDoorLockAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPDoorLockClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -37303,8 +37187,7 @@ void CHIPWindowCoveringEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPWindowCoveringAttributeListAttributeCallback::CHIPWindowCoveringAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPWindowCoveringClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPWindowCoveringClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -37589,8 +37472,7 @@ void CHIPBarrierControlEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPBarrierControlAttributeListAttributeCallback::CHIPBarrierControlAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPBarrierControlClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBarrierControlClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39179,8 +39061,7 @@ void CHIPPumpConfigurationAndControlAttributeListAttributeCallback::CallbackFn(
 
 CHIPThermostatLocalTemperatureAttributeCallback::CHIPThermostatLocalTemperatureAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterLocalTemperatureAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterLocalTemperatureAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39247,8 +39128,7 @@ void CHIPThermostatLocalTemperatureAttributeCallback::CallbackFn(void * context,
 
 CHIPThermostatOutdoorTemperatureAttributeCallback::CHIPThermostatOutdoorTemperatureAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterOutdoorTemperatureAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterOutdoorTemperatureAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39383,8 +39263,7 @@ void CHIPThermostatTemperatureSetpointHoldDurationAttributeCallback::CallbackFn(
 
 CHIPThermostatSetpointChangeAmountAttributeCallback::CHIPThermostatSetpointChangeAmountAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterSetpointChangeAmountAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterSetpointChangeAmountAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39451,8 +39330,7 @@ void CHIPThermostatSetpointChangeAmountAttributeCallback::CallbackFn(void * cont
 
 CHIPThermostatOccupiedSetbackAttributeCallback::CHIPThermostatOccupiedSetbackAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39519,8 +39397,7 @@ void CHIPThermostatOccupiedSetbackAttributeCallback::CallbackFn(void * context,
 
 CHIPThermostatOccupiedSetbackMinAttributeCallback::CHIPThermostatOccupiedSetbackMinAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackMinAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackMinAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39587,8 +39464,7 @@ void CHIPThermostatOccupiedSetbackMinAttributeCallback::CallbackFn(void * contex
 
 CHIPThermostatOccupiedSetbackMaxAttributeCallback::CHIPThermostatOccupiedSetbackMaxAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackMaxAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterOccupiedSetbackMaxAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39655,8 +39531,7 @@ void CHIPThermostatOccupiedSetbackMaxAttributeCallback::CallbackFn(void * contex
 
 CHIPThermostatUnoccupiedSetbackAttributeCallback::CHIPThermostatUnoccupiedSetbackAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39723,8 +39598,7 @@ void CHIPThermostatUnoccupiedSetbackAttributeCallback::CallbackFn(void * context
 
 CHIPThermostatUnoccupiedSetbackMinAttributeCallback::CHIPThermostatUnoccupiedSetbackMinAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackMinAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackMinAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39791,8 +39665,7 @@ void CHIPThermostatUnoccupiedSetbackMinAttributeCallback::CallbackFn(void * cont
 
 CHIPThermostatUnoccupiedSetbackMaxAttributeCallback::CHIPThermostatUnoccupiedSetbackMaxAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackMaxAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterUnoccupiedSetbackMaxAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -39859,8 +39732,7 @@ void CHIPThermostatUnoccupiedSetbackMaxAttributeCallback::CallbackFn(void * cont
 
 CHIPThermostatACCoilTemperatureAttributeCallback::CHIPThermostatACCoilTemperatureAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterACCoilTemperatureAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterACCoilTemperatureAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -40873,8 +40745,7 @@ void CHIPThermostatSetpointHoldExpiryTimestampAttributeCallback::CallbackFn(void
 
 CHIPThermostatGeneratedCommandListAttributeCallback::CHIPThermostatGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -40945,8 +40816,7 @@ void CHIPThermostatGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPThermostatAcceptedCommandListAttributeCallback::CHIPThermostatAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPThermostatClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPThermostatClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -41288,8 +41158,7 @@ void CHIPFanControlSpeedSettingAttributeCallback::CallbackFn(void * context, con
 
 CHIPFanControlGeneratedCommandListAttributeCallback::CHIPFanControlGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPFanControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFanControlClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -41360,8 +41229,7 @@ void CHIPFanControlGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPFanControlAcceptedCommandListAttributeCallback::CHIPFanControlAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPFanControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFanControlClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -41868,8 +41736,7 @@ void CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback::Cal
 
 CHIPColorControlNumberOfPrimariesAttributeCallback::CHIPColorControlNumberOfPrimariesAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterNumberOfPrimariesAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterNumberOfPrimariesAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -41936,8 +41803,7 @@ void CHIPColorControlNumberOfPrimariesAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary1IntensityAttributeCallback::CHIPColorControlPrimary1IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary1IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary1IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42004,8 +41870,7 @@ void CHIPColorControlPrimary1IntensityAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary2IntensityAttributeCallback::CHIPColorControlPrimary2IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary2IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary2IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42072,8 +41937,7 @@ void CHIPColorControlPrimary2IntensityAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary3IntensityAttributeCallback::CHIPColorControlPrimary3IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary3IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary3IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42140,8 +42004,7 @@ void CHIPColorControlPrimary3IntensityAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary4IntensityAttributeCallback::CHIPColorControlPrimary4IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary4IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary4IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42208,8 +42071,7 @@ void CHIPColorControlPrimary4IntensityAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary5IntensityAttributeCallback::CHIPColorControlPrimary5IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary5IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary5IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42276,8 +42138,7 @@ void CHIPColorControlPrimary5IntensityAttributeCallback::CallbackFn(void * conte
 
 CHIPColorControlPrimary6IntensityAttributeCallback::CHIPColorControlPrimary6IntensityAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterPrimary6IntensityAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterPrimary6IntensityAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -42830,8 +42691,7 @@ void CHIPColorControlEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPColorControlAttributeListAttributeCallback::CHIPColorControlAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPColorControlClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPColorControlClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -43387,8 +43247,7 @@ void CHIPBallastConfigurationAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPBallastConfigurationEventListAttributeCallback::CHIPBallastConfigurationEventListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPBallastConfigurationClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPBallastConfigurationClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -44787,8 +44646,7 @@ void CHIPPressureMeasurementMaxMeasuredValueAttributeCallback::CallbackFn(void *
 
 CHIPPressureMeasurementScaledValueAttributeCallback::CHIPPressureMeasurementScaledValueAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPPressureMeasurementClusterScaledValueAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPressureMeasurementClusterScaledValueAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -45135,8 +44993,7 @@ void CHIPPressureMeasurementAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPPressureMeasurementEventListAttributeCallback::CHIPPressureMeasurementEventListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPPressureMeasurementClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPPressureMeasurementClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -45279,8 +45136,7 @@ void CHIPPressureMeasurementAttributeListAttributeCallback::CallbackFn(
 
 CHIPFlowMeasurementMeasuredValueAttributeCallback::CHIPFlowMeasurementMeasuredValueAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPFlowMeasurementClusterMeasuredValueAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFlowMeasurementClusterMeasuredValueAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -45697,8 +45553,7 @@ void CHIPFlowMeasurementEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPFlowMeasurementAttributeListAttributeCallback::CHIPFlowMeasurementAttributeListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPFlowMeasurementClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFlowMeasurementClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -46409,8 +46264,7 @@ void CHIPOccupancySensingAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPOccupancySensingEventListAttributeCallback::CHIPOccupancySensingEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPOccupancySensingClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOccupancySensingClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -46481,8 +46335,7 @@ void CHIPOccupancySensingEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPOccupancySensingAttributeListAttributeCallback::CHIPOccupancySensingAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPOccupancySensingClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPOccupancySensingClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -53002,8 +52855,7 @@ void CHIPRadonConcentrationMeasurementAttributeListAttributeCallback::CallbackFn
 
 CHIPWakeOnLanGeneratedCommandListAttributeCallback::CHIPWakeOnLanGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPWakeOnLanClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPWakeOnLanClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -53074,8 +52926,7 @@ void CHIPWakeOnLanGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPWakeOnLanAcceptedCommandListAttributeCallback::CHIPWakeOnLanAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPWakeOnLanClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPWakeOnLanClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -53456,8 +53307,7 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
 
 CHIPChannelGeneratedCommandListAttributeCallback::CHIPChannelGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPChannelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPChannelClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -53528,8 +53378,7 @@ void CHIPChannelGeneratedCommandListAttributeCallback::CallbackFn(void * context
 
 CHIPChannelAcceptedCommandListAttributeCallback::CHIPChannelAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPChannelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPChannelClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -53740,8 +53589,7 @@ void CHIPChannelAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPTargetNavigatorTargetListAttributeCallback::CHIPTargetNavigatorTargetListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPTargetNavigatorClusterTargetListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTargetNavigatorClusterTargetListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -54054,8 +53902,7 @@ void CHIPTargetNavigatorEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPTargetNavigatorAttributeListAttributeCallback::CHIPTargetNavigatorAttributeListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPTargetNavigatorClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPTargetNavigatorClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -54256,8 +54103,7 @@ void CHIPMediaPlaybackDurationAttributeCallback::CallbackFn(void * context, cons
 
 CHIPMediaPlaybackSeekRangeEndAttributeCallback::CHIPMediaPlaybackSeekRangeEndAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeEndAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeEndAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -54324,8 +54170,7 @@ void CHIPMediaPlaybackSeekRangeEndAttributeCallback::CallbackFn(void * context,
 
 CHIPMediaPlaybackSeekRangeStartAttributeCallback::CHIPMediaPlaybackSeekRangeStartAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeStartAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMediaPlaybackClusterSeekRangeStartAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -54920,8 +54765,7 @@ void CHIPMediaPlaybackEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPMediaPlaybackAttributeListAttributeCallback::CHIPMediaPlaybackAttributeListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPMediaPlaybackClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMediaPlaybackClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55098,8 +54942,7 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(
 
 CHIPMediaInputGeneratedCommandListAttributeCallback::CHIPMediaInputGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPMediaInputClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMediaInputClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55170,8 +55013,7 @@ void CHIPMediaInputGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPMediaInputAcceptedCommandListAttributeCallback::CHIPMediaInputAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPMediaInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPMediaInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55382,8 +55224,7 @@ void CHIPMediaInputAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPLowPowerGeneratedCommandListAttributeCallback::CHIPLowPowerGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPLowPowerClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLowPowerClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55454,8 +55295,7 @@ void CHIPLowPowerGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPLowPowerAcceptedCommandListAttributeCallback::CHIPLowPowerAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPLowPowerClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPLowPowerClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55738,8 +55578,7 @@ void CHIPKeypadInputGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPKeypadInputAcceptedCommandListAttributeCallback::CHIPKeypadInputAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPKeypadInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPKeypadInputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -55950,8 +55789,7 @@ void CHIPKeypadInputAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPContentLauncherAcceptHeaderAttributeCallback::CHIPContentLauncherAcceptHeaderAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPContentLauncherClusterAcceptHeaderAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPContentLauncherClusterAcceptHeaderAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -56232,8 +56070,7 @@ void CHIPContentLauncherEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPContentLauncherAttributeListAttributeCallback::CHIPContentLauncherAttributeListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPContentLauncherClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPContentLauncherClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -56480,8 +56317,7 @@ void CHIPAudioOutputGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPAudioOutputAcceptedCommandListAttributeCallback::CHIPAudioOutputAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPAudioOutputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPAudioOutputClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -56692,8 +56528,7 @@ void CHIPAudioOutputAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPApplicationLauncherCatalogListAttributeCallback::CHIPApplicationLauncherCatalogListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPApplicationLauncherClusterCatalogListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPApplicationLauncherClusterCatalogListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -56908,8 +56743,7 @@ void CHIPApplicationLauncherAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPApplicationLauncherEventListAttributeCallback::CHIPApplicationLauncherEventListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPApplicationLauncherClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPApplicationLauncherClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -57268,8 +57102,7 @@ void CHIPApplicationBasicAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPApplicationBasicEventListAttributeCallback::CHIPApplicationBasicEventListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPApplicationBasicClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPApplicationBasicClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -57340,8 +57173,7 @@ void CHIPApplicationBasicEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPApplicationBasicAttributeListAttributeCallback::CHIPApplicationBasicAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -57626,8 +57458,7 @@ void CHIPAccountLoginEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPAccountLoginAttributeListAttributeCallback::CHIPAccountLoginAttributeListAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPAccountLoginClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPAccountLoginClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -57698,8 +57529,7 @@ void CHIPAccountLoginAttributeListAttributeCallback::CallbackFn(void * context,
 
 CHIPContentControlOnDemandRatingsAttributeCallback::CHIPContentControlOnDemandRatingsAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPContentControlClusterOnDemandRatingsAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPContentControlClusterOnDemandRatingsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -58122,8 +57952,7 @@ void CHIPContentControlEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPContentControlAttributeListAttributeCallback::CHIPContentControlAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPContentControlClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPContentControlClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -58338,8 +58167,7 @@ void CHIPContentAppObserverAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPContentAppObserverEventListAttributeCallback::CHIPContentAppObserverEventListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPContentAppObserverClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPContentAppObserverClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -58626,8 +58454,7 @@ void CHIPElectricalMeasurementAcceptedCommandListAttributeCallback::CallbackFn(
 
 CHIPElectricalMeasurementEventListAttributeCallback::CHIPElectricalMeasurementEventListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPElectricalMeasurementClusterEventListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPElectricalMeasurementClusterEventListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -58840,8 +58667,7 @@ void CHIPUnitTestingListInt8uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingListOctetStringAttributeCallback::CHIPUnitTestingListOctetStringAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterListOctetStringAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterListOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -59581,8 +59407,7 @@ void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn
 
 CHIPUnitTestingListLongOctetStringAttributeCallback::CHIPUnitTestingListLongOctetStringAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterListLongOctetStringAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterListLongOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -59652,8 +59477,7 @@ void CHIPUnitTestingListLongOctetStringAttributeCallback::CallbackFn(
 
 CHIPUnitTestingListFabricScopedAttributeCallback::CHIPUnitTestingListFabricScopedAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterListFabricScopedAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterListFabricScopedAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -59920,8 +59744,7 @@ void CHIPUnitTestingListFabricScopedAttributeCallback::CallbackFn(
 
 CHIPUnitTestingNullableBooleanAttributeCallback::CHIPUnitTestingNullableBooleanAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableBooleanAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBooleanAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -59987,8 +59810,7 @@ void CHIPUnitTestingNullableBooleanAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableBitmap8AttributeCallback::CHIPUnitTestingNullableBitmap8AttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap8AttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap8AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60055,8 +59877,7 @@ void CHIPUnitTestingNullableBitmap8AttributeCallback::CallbackFn(
 
 CHIPUnitTestingNullableBitmap16AttributeCallback::CHIPUnitTestingNullableBitmap16AttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap16AttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap16AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60123,8 +59944,7 @@ void CHIPUnitTestingNullableBitmap16AttributeCallback::CallbackFn(
 
 CHIPUnitTestingNullableBitmap32AttributeCallback::CHIPUnitTestingNullableBitmap32AttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap32AttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap32AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60191,8 +60011,7 @@ void CHIPUnitTestingNullableBitmap32AttributeCallback::CallbackFn(
 
 CHIPUnitTestingNullableBitmap64AttributeCallback::CHIPUnitTestingNullableBitmap64AttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap64AttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableBitmap64AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60325,8 +60144,7 @@ void CHIPUnitTestingNullableInt8uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt16uAttributeCallback::CHIPUnitTestingNullableInt16uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60393,8 +60211,7 @@ void CHIPUnitTestingNullableInt16uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt24uAttributeCallback::CHIPUnitTestingNullableInt24uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60461,8 +60278,7 @@ void CHIPUnitTestingNullableInt24uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt32uAttributeCallback::CHIPUnitTestingNullableInt32uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60529,8 +60345,7 @@ void CHIPUnitTestingNullableInt32uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt40uAttributeCallback::CHIPUnitTestingNullableInt40uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60597,8 +60412,7 @@ void CHIPUnitTestingNullableInt40uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt48uAttributeCallback::CHIPUnitTestingNullableInt48uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60665,8 +60479,7 @@ void CHIPUnitTestingNullableInt48uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt56uAttributeCallback::CHIPUnitTestingNullableInt56uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60733,8 +60546,7 @@ void CHIPUnitTestingNullableInt56uAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt64uAttributeCallback::CHIPUnitTestingNullableInt64uAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64uAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64uAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60866,8 +60678,7 @@ void CHIPUnitTestingNullableInt8sAttributeCallback::CallbackFn(void * context, c
 
 CHIPUnitTestingNullableInt16sAttributeCallback::CHIPUnitTestingNullableInt16sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt16sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -60934,8 +60745,7 @@ void CHIPUnitTestingNullableInt16sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt24sAttributeCallback::CHIPUnitTestingNullableInt24sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt24sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61002,8 +60812,7 @@ void CHIPUnitTestingNullableInt24sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt32sAttributeCallback::CHIPUnitTestingNullableInt32sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt32sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61070,8 +60879,7 @@ void CHIPUnitTestingNullableInt32sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt40sAttributeCallback::CHIPUnitTestingNullableInt40sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt40sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61138,8 +60946,7 @@ void CHIPUnitTestingNullableInt40sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt48sAttributeCallback::CHIPUnitTestingNullableInt48sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt48sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61206,8 +61013,7 @@ void CHIPUnitTestingNullableInt48sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt56sAttributeCallback::CHIPUnitTestingNullableInt56sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt56sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61274,8 +61080,7 @@ void CHIPUnitTestingNullableInt56sAttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableInt64sAttributeCallback::CHIPUnitTestingNullableInt64sAttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64sAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableInt64sAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61408,8 +61213,7 @@ void CHIPUnitTestingNullableEnum8AttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableEnum16AttributeCallback::CHIPUnitTestingNullableEnum16AttributeCallback(jobject javaCallback,
                                                                                                bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnum16AttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnum16AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61476,8 +61280,7 @@ void CHIPUnitTestingNullableEnum16AttributeCallback::CallbackFn(void * context,
 
 CHIPUnitTestingNullableFloatSingleAttributeCallback::CHIPUnitTestingNullableFloatSingleAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatSingleAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatSingleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61544,8 +61347,7 @@ void CHIPUnitTestingNullableFloatSingleAttributeCallback::CallbackFn(void * cont
 
 CHIPUnitTestingNullableFloatDoubleAttributeCallback::CHIPUnitTestingNullableFloatDoubleAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatDoubleAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableFloatDoubleAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61612,8 +61414,7 @@ void CHIPUnitTestingNullableFloatDoubleAttributeCallback::CallbackFn(void * cont
 
 CHIPUnitTestingNullableOctetStringAttributeCallback::CHIPUnitTestingNullableOctetStringAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableOctetStringAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableOctetStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61679,8 +61480,7 @@ void CHIPUnitTestingNullableOctetStringAttributeCallback::CallbackFn(void * cont
 
 CHIPUnitTestingNullableCharStringAttributeCallback::CHIPUnitTestingNullableCharStringAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableCharStringAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableCharStringAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -61743,8 +61543,7 @@ void CHIPUnitTestingNullableCharStringAttributeCallback::CallbackFn(void * conte
 
 CHIPUnitTestingNullableEnumAttrAttributeCallback::CHIPUnitTestingNullableEnumAttrAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnumAttrAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterNullableEnumAttrAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -62155,8 +61954,7 @@ void CHIPUnitTestingGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPUnitTestingAcceptedCommandListAttributeCallback::CHIPUnitTestingAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                          bool keepAlive) :
-    chip::Callback::Callback<CHIPUnitTestingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPUnitTestingClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -62581,8 +62379,7 @@ void CHIPFaultInjectionEventListAttributeCallback::CallbackFn(void * context,
 
 CHIPFaultInjectionAttributeListAttributeCallback::CHIPFaultInjectionAttributeListAttributeCallback(jobject javaCallback,
                                                                                                    bool keepAlive) :
-    chip::Callback::Callback<CHIPFaultInjectionClusterAttributeListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPFaultInjectionClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -62653,8 +62450,7 @@ void CHIPFaultInjectionAttributeListAttributeCallback::CallbackFn(
 
 CHIPSampleMeiGeneratedCommandListAttributeCallback::CHIPSampleMeiGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
-    chip::Callback::Callback<CHIPSampleMeiClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSampleMeiClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -62725,8 +62521,7 @@ void CHIPSampleMeiGeneratedCommandListAttributeCallback::CallbackFn(
 
 CHIPSampleMeiAcceptedCommandListAttributeCallback::CHIPSampleMeiAcceptedCommandListAttributeCallback(jobject javaCallback,
                                                                                                      bool keepAlive) :
-    chip::Callback::Callback<CHIPSampleMeiClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this),
-    keepAlive(keepAlive)
+    chip::Callback::Callback<CHIPSampleMeiClusterAcceptedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
