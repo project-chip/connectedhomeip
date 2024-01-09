@@ -71,11 +71,11 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
 
-        number_of_supported_levels = 0
+        numberOfSupportedLevels = 0
 
         self.step(3)
         if is_sens_level_feature_supported:
-            number_of_supported_levels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
+            numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
         else:
             logging.info("Test step skipped")
 
@@ -97,14 +97,14 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step(6)
         if is_sens_level_feature_supported:
-            for sens_level in range(number_of_supported_levels):
+            for sens_level in range(numberOfSupportedLevels):
                 logging.info(f"Write sensitivity level ({sens_level}) to CurrentSensitivityLevel)")
                 result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(sens_level))])
                 asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
 
         self.step(7)
         if attributes.DefaultSensitivityLevel.attribute_id in attribute_list:
-            selected_non_default_level = choice([i for i in range(number_of_supported_levels) if i not in [default_level]])
+            selected_non_default_level = choice([i for i in range(numberOfSupportedLevels) if i not in [default_level]])
             logging.info(f"Write non-default sensitivity level ({selected_non_default_level}) to CurrentSensitivityLevel)")
             result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(selected_non_default_level))])
             asserts.assert_equal(result[0].Status, Status.Success, "CurrentSensitivityLevel write failed")
@@ -117,7 +117,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         self.step(9)
         if is_sens_level_feature_supported:
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(10))])
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.CurrentSensitivityLevel(numberOfSupportedLevels))])
             asserts.assert_equal(result[0].Status, Status.ConstraintError,
                                  "CurrentSensitivityLevel did not return CONSTRAINT_ERROR")
 
