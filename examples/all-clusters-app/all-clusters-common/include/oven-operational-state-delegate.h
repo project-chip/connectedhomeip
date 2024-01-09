@@ -40,7 +40,6 @@ private:
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
     };
 
-
 public:
     /**
      * Get the countdown time. This attribute is not supported in our example app.
