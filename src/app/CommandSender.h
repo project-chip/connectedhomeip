@@ -489,7 +489,7 @@ private:
     bool mTimedRequest                          = false;
     bool mBufferAllocated                       = false;
     bool mBatchCommandsEnabled                  = false;
-    bool mPathSpecificErrorToOnResponseCallback = false;
+    bool mUsingExtendedPathCallbacks = false;
 };
 
 } // namespace app
