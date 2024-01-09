@@ -43,16 +43,7 @@ public:
      * If UDC was already in progress when this method was called, it will return a CHIP_ERROR_INCORRECT_STATE without changing the
      * internal state.
      */
-    static CHIP_ERROR SetUdcStatus(bool udcInProgress)
-    {
-        if (sUdcInProgress == udcInProgress)
-        {
-            ChipLogError(AppServer, "UDC in progress state is already %d", sUdcInProgress);
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        sUdcInProgress = udcInProgress;
-        return CHIP_NO_ERROR;
-    }
+    static CHIP_ERROR SetUdcStatus(bool udcInProgress);
 
 private:
     /**

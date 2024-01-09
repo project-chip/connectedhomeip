@@ -31,22 +31,41 @@
  */
 + (MTRCastingApp * _Nullable)getSharedInstance;
 
+- (dispatch_queue_t _Nullable)getWorkQueue;
+
+- (dispatch_queue_t _Nullable)getClientQueue;
+
 /**
- * @brief Initializes the MTRCastingApp with appParameters
+ * @brief Initializes the MTRCastingApp with an MTRDataSource
  *
  * @param dataSource provides all the parameters required to initialize the MTRCastingApp
  */
-- (MatterError * _Nonnull)initializeWithDataSource:(id<MTRDataSource> _Nonnull)dataSource;
+- (NSError * _Nullable)initializeWithDataSource:(id<MTRDataSource> _Nonnull)dataSource;
 
 /**
- * @brief Starts the Matter server that the MTRCastingApp runs on and registers all the necessary delegates
+ * @brief (async) Starts the Matter server that the MTRCastingApp runs on and registers all the necessary delegates
  */
-- (MatterError * _Nonnull)start;
+- (void)startWithCompletionBlock:(void (^_Nonnull __strong)(NSError * _Nullable __strong))completion;
 
 /**
- * @brief Stops the Matter server that the MTRCastingApp runs on
+ * @brief (async) Stops the Matter server that the MTRCastingApp runs on
  */
-- (MatterError * _Nonnull)stop;
+- (void)stopWithCompletionBlock:(void (^_Nonnull __strong)(NSError * _Nullable __strong))completion;
+
+/**
+ * @brief true, if MTRCastingApp is running. false otherwise
+ */
+- (bool)isRunning;
+
+/**
+ * @brief Tears down all active subscriptions.
+ */
+- (NSError * _Nullable)ShutdownAllSubscriptions;
+
+/**
+ * @brief Clears app cache that contains the information about CastingPlayers previously connected to
+ */
+- (NSError * _Nullable)ClearCache;
 
 @end
 

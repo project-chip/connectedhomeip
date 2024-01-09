@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Added ProductAppearance attribute"/>
-    <revision revision="3" summary="Added SpecificationVersion and MaxPathsPerInvoke attributes"/>
+    <revision revision="3" summary="Added SpecificationVersion attribute"/>
   </revisionHistory>
   <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
   <attributes>
@@ -93,22 +93,22 @@ Davis, CA 95616, USA
     <attribute id="0x0009" name="SoftwareVersion">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000a" name="SoftwareVersionString">
+    <attribute id="0x000A" name="SoftwareVersionString">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000b" name="ManufacturingDate">
+    <attribute id="0x000B" name="ManufacturingDate">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000c" name="PartNumber">
+    <attribute id="0x000C" name="PartNumber">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000d" name="ProductURL">
+    <attribute id="0x000D" name="ProductURL">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000e" name="ProductLabel">
+    <attribute id="0x000E" name="ProductLabel">
       <optionalConform/>
     </attribute>
-    <attribute id="0x000f" name="SerialNumber">
+    <attribute id="0x000F" name="SerialNumber">
       <optionalConform/>
     </attribute>
     <attribute id="0x0010" name="LocalConfigDisabled">
@@ -127,9 +127,6 @@ Davis, CA 95616, USA
       <optionalConform/>
     </attribute>
     <attribute id="0x0015" name="SpecificationVersion">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0016" name="MaxPathsPerInvoke">
       <disallowConform/>
     </attribute>
   </attributes>

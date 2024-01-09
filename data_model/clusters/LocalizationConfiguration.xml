@@ -55,19 +55,19 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002b" name="Localization Configuration" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002B" name="Localization Configuration" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="LCFG" scope="Node"/>
   <attributes>
-    <attribute id="0x0000" name="ActiveLocale" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="MS">
+    <attribute id="0x0000" name="ActiveLocale" type="ref_DataTypeString" default="MS">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
       <constraint type="max" value="35"/>
     </attribute>
-    <attribute id="0x0001" name="SupportedLocales" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeString&gt;&gt;]" default="MS">
+    <attribute id="0x0001" name="SupportedLocales" type="ref_DataTypeList[ref_DataTypeString]" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>

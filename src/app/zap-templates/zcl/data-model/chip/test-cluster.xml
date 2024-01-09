@@ -440,6 +440,26 @@ limitations under the License.
       <arg name="arg1" type="int8u"/>
     </command>
 
+    <command source="client" code="0x16" name="TestBatchHelperRequest"
+             optional="true" response="TestBatchHelperResponse" apiMaturity="provisional">
+      <description>
+        Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
+      </description>
+      <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
+      <arg name="fillCharacter" type="int8u"/>
+    </command>
+
+    <command source="client" code="0x17" name="TestSecondBatchHelperRequest"
+             optional="true" response="TestBatchHelperResponse" apiMaturity="provisional">
+      <description>
+        Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter.
+      </description>
+      <arg name="sleepBeforeResponseTimeMs" type="int16u"/>
+      <arg name="sizeOfResponseBuffer" min="0" max="800" type="int16u"/>
+      <arg name="fillCharacter" type="int8u"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="true" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -564,6 +584,13 @@ limitations under the License.
         Delivers the ID of an event in response to test command emitting fabric scope events.
       </description>
       <arg name="value" type="int64u"/>
+    </command>
+
+    <command source="server" code="0x0C" name="TestBatchHelperResponse" optional="true" disableDefaultResponse="true" apiMaturity="provisional">
+      <description>
+        Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in the Request.
+      </description>
+      <arg name="buffer" type="octet_string" length="800"/>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">

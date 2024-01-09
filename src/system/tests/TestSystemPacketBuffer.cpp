@@ -392,7 +392,10 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
 
         if (!buffer.IsNull())
         {
+            // TODO: the code below seems maybe questionable: OF_LWIP_PBUF is never used
+            // NOLINTBEGIN(bugprone-casting-through-void)
             const pbuf * const pb = TO_LWIP_PBUF(buffer.Get());
+            // NOLINTEND(bugprone-casting-through-void)
 
             NL_TEST_ASSERT(inSuite, pb->len == 0);
             NL_TEST_ASSERT(inSuite, pb->tot_len == 0);
@@ -2021,7 +2024,7 @@ int TestSystemPacketBuffer()
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));

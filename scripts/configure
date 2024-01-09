@@ -304,7 +304,9 @@ function download_zap() {
     case "$platform" in
     Linux\ x86_64) flavor=linux-x64 ;;
     Linux\ arm64) flavor=linux-arm64 ;;
-    Darwin\ *) flavor=mac-x64 ;; # there is no mac arm build of zap (can run x64 via Rosetta)
+    Linux\ aarch64) flavor=linux-arm64 ;;
+    Darwin\ x86_64) flavor=mac-x64 ;;
+    Darwin\ arm64) flavor=mac-arm64 ;;
     *) fail "Unable to determine zap flavor for $platform" ;;
     esac
     local url="https://github.com/project-chip/zap/releases/download/${version}/zap-${flavor}.zip"

@@ -125,7 +125,7 @@ public:
      * using CommissioningDelegate.SetCommissioningParameters(), and then call DeviceCommissioner.ICDRegistrationInfoReady()
      * in order to resume the commissioning process.
      *
-     * The implementation may set the credentials before start commissioning, and call ICDRegistrationInfoReady() directly.
+     * Not called if the ICD registration info is provided up front.
      */
     virtual void OnICDRegistrationInfoRequired() {}
 

@@ -209,6 +209,7 @@ if (chip_device_platform != "external") {
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
     chip_system_layer_impl_config_file = ""
+    chip_external_platform_include_dir = ""
   }
 }
 

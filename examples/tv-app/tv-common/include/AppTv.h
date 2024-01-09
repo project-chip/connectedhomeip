@@ -101,8 +101,8 @@ protected:
     ApplicationLauncherManager mApplicationLauncherDelegate;
     ChannelManager mChannelDelegate;
     ContentLauncherManager mContentLauncherDelegate;
-    ContentAppObserver mContentAppObserverDelegate;
-    ContentController mContentControlDelegate;
+    ContentAppObserverManager mContentAppObserverDelegate;
+    ContentControlManager mContentControlDelegate;
     KeypadInputManager mKeypadInputDelegate;
     MediaPlaybackManager mMediaPlaybackDelegate;
     TargetNavigatorManager mTargetNavigatorDelegate;

@@ -73,7 +73,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: "Test: shell example"
-              if: steps.build_shell.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_shell.outcome == 'success'
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test shell'
@@ -103,7 +103,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: "Test: tv-app example"
-              if: steps.build_tv_app.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_tv_app.outcome == 'success'
               timeout-minutes: 10
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
@@ -125,7 +125,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: "Test: all-clusters-app example"
-              if: steps.build_all_clusters_app.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_all_clusters_app.outcome == 'success'
               timeout-minutes: 5
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
@@ -161,7 +161,7 @@ jobs:
                   scripts/examples/gn_build_example.sh examples/ota-provider-app/linux/ out/ota-provider chip_config_network_layer_ble=false
 
             - name: "Test: lock-app example (mbedtls)"
-              if: steps.build_lock_app_mbedtls.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_lock_app_mbedtls.outcome == 'success'
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_python_env.sh out/venv \
@@ -169,7 +169,7 @@ jobs:
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
             - name: "Test: ota-requestor-app example"
-              if: steps.build_ota_requestor_app.outcome == 'success' && steps.build_ota_provider_app.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_ota_requestor_app.outcome == 'success' && steps.build_ota_provider_app.outcome == 'success'
               timeout-minutes: 30
               run: |
                   mkdir out/binaries
@@ -182,7 +182,7 @@ jobs:
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME down
 
             - name: "Test: unit-tests (mbedtls)"
-              if: steps.build_unit_tests_mbedtls.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_unit_tests_mbedtls.outcome == 'success'
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'
@@ -199,7 +199,7 @@ jobs:
                     /tmp/bloat_reports/
 
             - name: "Test: lock-app example (psa)"
-              if: steps.build_lock_app_psa.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_lock_app_psa.outcome == 'success'
               run: |
                   scripts/setup/openiotsdk/network_setup.sh -n $TEST_NETWORK_NAME up
                   scripts/run_in_python_env.sh out/venv \
@@ -212,7 +212,7 @@ jobs:
                   scripts/examples/openiotsdk_example.sh -b psa unit-tests
 
             - name: "Test: unit-tests (psa)"
-              if: steps.build_unit_tests_psa.outcome == 'success'
+              if: github.event_name == 'workflow_dispatch' && steps.build_unit_tests_psa.outcome == 'success'
               run: |
                   scripts/run_in_python_env.sh out/venv \
                     'scripts/examples/openiotsdk_example.sh --no-activate -C test unit-tests'

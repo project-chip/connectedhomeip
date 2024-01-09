@@ -156,6 +156,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
@@ -172,6 +173,9 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/OperationalStateManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
+
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
@@ -217,6 +221,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
     ${chip_dir}/examples/platform/ameba/route_hook

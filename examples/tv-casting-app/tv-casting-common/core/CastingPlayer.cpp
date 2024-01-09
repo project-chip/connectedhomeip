@@ -63,6 +63,8 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
             if (ContainsDesiredEndpoint(&cachedCastingPlayers[index], desiredEndpointFilter))
             {
+                ChipLogProgress(
+                    AppServer, "CastingPlayer::VerifyOrEstablishConnection calling FindOrEstablishSession on cached CastingPlayer");
                 *this = cachedCastingPlayers[index];
 
                 FindOrEstablishSession(
@@ -80,7 +82,12 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectCallback onCompleted, uns
                     [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
                         ChipLogError(AppServer, "CastingPlayer::VerifyOrEstablishConnection Connection to CastingPlayer failed");
                         CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
-                        support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                        CHIP_ERROR e = support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                        if (e != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(AppServer, "CastingStore::Delete() failed. Err: %" CHIP_ERROR_FORMAT, e.Format());
+                        }
+
                         VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
                         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
                         mTargetCastingPlayer = nullptr;
@@ -123,6 +130,12 @@ exit:
     }
 }
 
+void CastingPlayer::Disconnect()
+{
+    mConnectionState     = CASTING_PLAYER_NOT_CONNECTED;
+    mTargetCastingPlayer = nullptr;
+}
+
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 {
     auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
@@ -148,10 +161,10 @@ CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
     VerifyOrReturnValue(ipAddressToUse != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "No IP Address found to send UDC request to"));
 
+    ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
+
     ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
         chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId)));
-
-    ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
     return CHIP_NO_ERROR;
 }
@@ -221,7 +234,7 @@ void CastingPlayer::LogDetail() const
     }
     if (strlen(mAttributes.deviceName) != 0)
     {
-        ChipLogDetail(AppServer, "\tName: %s", mAttributes.deviceName);
+        ChipLogDetail(AppServer, "\tDevice Name: %s", mAttributes.deviceName);
     }
     if (strlen(mAttributes.hostName) != 0)
     {
@@ -287,7 +300,7 @@ ConnectionContext::ConnectionContext(void * clientContext, core::CastingPlayer *
                            ChipLogError(AppServer, "Invalid ConnectionContext received in DeviceConnection success callback"));
 
             connectionContext->mTargetCastingPlayer->mConnectionState = core::CASTING_PLAYER_CONNECTED;
-            connectionContext->mOnDeviceConnectedFn(context, exchangeMgr, sessionHandle);
+            connectionContext->mOnDeviceConnectedFn(connectionContext->mClientContext, exchangeMgr, sessionHandle);
             delete connectionContext;
         },
         this);
