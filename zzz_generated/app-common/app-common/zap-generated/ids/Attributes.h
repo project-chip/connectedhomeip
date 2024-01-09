@@ -3618,6 +3618,10 @@ namespace ValveFault {
 static constexpr AttributeId Id = 0x00000009;
 } // namespace ValveFault
 
+namespace LevelStep {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelStep
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
