@@ -13126,6 +13126,24 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000016: {
+                "commandId": 0x00000016,
+                "commandName": "TestBatchHelperRequest",
+                "args": {
+                    "sleepBeforeResponseTimeMs": "int",
+                    "sizeOfResponseBuffer": "int",
+                    "fillCharacter": "int",
+                },
+            },
+            0x00000017: {
+                "commandId": 0x00000017,
+                "commandName": "TestSecondBatchHelperRequest",
+                "args": {
+                    "sleepBeforeResponseTimeMs": "int",
+                    "sizeOfResponseBuffer": "int",
+                    "fillCharacter": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
