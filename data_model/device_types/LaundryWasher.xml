@@ -73,7 +73,7 @@ Davis, CA 95616, USA
         </feature>
       </features>
     </cluster>
-    <cluster id="0x0051" name="Laundry Mode" side="server">
+    <cluster id="0x0051" name="Laundry Washer Mode" side="server">
       <optionalConform/>
       <features>
         <feature code="" name="OnOff">

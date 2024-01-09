@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000a" name="Door Lock" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x000A" name="Door Lock" revision="2">
   <revisionHistory>
     <revision revision="0" summary="Represents device definitions prior to Zigbee 3.0"/>
     <revision revision="1" summary="Initial Zigbee 3.0 release"/>
@@ -85,7 +85,7 @@ Davis, CA 95616, USA
         <condition name="Zigbee"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x000a" name="Time" side="client">
+    <cluster id="0x000A" name="Time" side="client">
       <optionalConform>
         <condition name="Zigbee"/>
       </optionalConform>
@@ -98,7 +98,7 @@ Davis, CA 95616, USA
     <cluster id="0x0101" name="Door Lock" side="server">
       <mandatoryConform/>
       <features>
-        <feature code="" name="RID (RFID Credential)">
+        <feature code="" name="RID">
           <otherwiseConform>
             <optionalConform>
               <condition name="Zigbee"/>
@@ -107,12 +107,12 @@ Davis, CA 95616, USA
             <optionalConform/>
           </otherwiseConform>
         </feature>
-        <feature code="" name="LOG (Logging)">
+        <feature code="" name="LOG">
           <optionalConform>
             <condition name="Zigbee"/>
           </optionalConform>
         </feature>
-        <feature code="" name="USR (User)">
+        <feature code="" name="USR">
           <mandatoryConform>
             <andTerm>
               <condition name="Matter"/>
@@ -125,7 +125,7 @@ Davis, CA 95616, USA
             </andTerm>
           </mandatoryConform>
         </feature>
-        <feature code="" name="NOT (Notification)">
+        <feature code="" name="NOT">
           <optionalConform>
             <condition name="Zigbee"/>
           </optionalConform>

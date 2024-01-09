@@ -274,4 +274,6 @@
     <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
     <string name="ota_provider_write_text">Write</string>
     <string name="ota_provider_node_id_text">Node ID</string>
+
+    <string name="icd_btn_text">Intermittently Connected Device</string>
 </resources>
