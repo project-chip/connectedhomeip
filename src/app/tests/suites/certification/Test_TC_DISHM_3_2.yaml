@@ -16,7 +16,7 @@
 name: 263.4.2. [TC-DISHM-3.2] StartUpMode verification with DUT as Server
 
 PICS:
-    - DISHM.S
+    - DISHM.S.A0002
 
 config:
     nodeId: 0x12344321

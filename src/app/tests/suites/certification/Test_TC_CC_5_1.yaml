@@ -30,7 +30,7 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId
-
+  
     - label: "Step 1a: TH writes 0 to the Options attribute"
       PICS: CC.S.F03 && CC.S.A000f
       command: "writeAttribute"

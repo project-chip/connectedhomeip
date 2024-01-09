@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.2. [TC-S-2.2] Primary functionality with server as DUT
+name: 123.2.2. [TC-S-2.2] Primary functionality with DUT as Server
 
 PICS:
     - S.S

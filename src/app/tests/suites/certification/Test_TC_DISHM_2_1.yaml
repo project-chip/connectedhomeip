@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 263.3.1. [TC-DISHM-2.1] ChangeToModeWithStatus Verification DUT as Server
+name: 263.3.1. [TC-DISHM-2.1] Change to Mode functionality with DUT as Server
 
 PICS:
     - DISHM.S
@@ -108,13 +108,13 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.DISHM.MODE_CHANGE_FAIL"
-      PICS: DISHM.S.M.CAN_TEST_MODE_FAILURE
+      PICS: DISHM.S.M.CAN_TEST_MODE_FAILURE && DISHM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       disabled: true
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: DISHM.S.A0001
+      PICS: DISHM.S.A0001 && DISHM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 
@@ -157,12 +157,13 @@ tests:
     - label:
           "Step 9: Manually put the device in a state from which it will
           SUCCESSFULLY transition to PIXIT.DISHM.MODE_CHANGE_OK"
+      PICS: DISHM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       disabled: true
 
     - label: "Step 10: TH reads from the DUT the CurrentMode attribute."
-      PICS: DISHM.S.A0001
+      PICS: DISHM.S.A0001 && DISHM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 

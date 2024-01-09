@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Window Covering [TC-WNCV-1.1] Global attributes with server as DUT
+name: Window Covering [TC-WNCV-1.1] Global attributes [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -142,7 +142,7 @@ tests:
               contains: [26]
 
     - label:
-          "Step 4c: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 &
+          "Step 4c: TH reads the Feature dependent(WNCV.S.F00 & WNCV.S.F02 &
           WNCV.S.F03) attribute in AttributeList"
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.F03
       command: "readAttribute"
@@ -153,7 +153,7 @@ tests:
               contains: [16, 17]
 
     - label:
-          "Step 4d: Read the Feature dependent(WNCV.S.F00 & WNCV.S.F02 )
+          "Step 4d: TH reads the Feature dependent(WNCV.S.F00 & WNCV.S.F02 )
           attribute in AttributeList"
       PICS: WNCV.S.F00 && WNCV.S.F02
       command: "readAttribute"
@@ -164,7 +164,7 @@ tests:
               contains: [11, 14]
 
     - label:
-          "Step 4e: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 &
+          "Step 4e: TH reads the Feature dependent(WNCV.S.F01 & WNCV.S.F04 &
           WNCV.S.F03) attribute in AttributeList"
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.F03
       command: "readAttribute"
@@ -175,7 +175,7 @@ tests:
               contains: [18, 19]
 
     - label:
-          "Step 4f: Read the Feature dependent(WNCV.S.F01 & WNCV.S.F04 )
+          "Step 4f: TH reads the Feature dependent(WNCV.S.F01 & WNCV.S.F04 )
           attribute in AttributeList"
       PICS: WNCV.S.F01 && WNCV.S.F04
       command: "readAttribute"
@@ -185,7 +185,7 @@ tests:
               type: list
               contains: [12, 15]
 
-    - label: "Step 5: Read the global attribute: EventList"
+    - label: "Step 5: TH reads from the DUT the (0xFFFA) EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
