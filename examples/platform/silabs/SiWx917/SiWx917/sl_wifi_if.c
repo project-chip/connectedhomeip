@@ -238,7 +238,9 @@ void M4_sleep_wakeup()
             btn0_pressed = false;
             /* Configure RAM Usage and Retention Size */
             sl_si91x_m4_sleep_wakeup();
+#if SILABS_LOG_ENABLED
             silabsInitLog();
+#endif
         }
     }
 }

@@ -113,9 +113,9 @@ if [ "$#" == "0" ]; then
             Use provided hardware version at build time
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
-        alarm_based_wakeup
+        si91x_alarm_based_wakeup
             Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
-        alarm_periodic_time
+        si91x_alarm_periodic_time
             Periodic time at which the 917 SoC should wakeup (Default: 30sec)
         Presets
         --icd
