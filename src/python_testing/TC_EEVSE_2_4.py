@@ -18,7 +18,6 @@
 import logging
 import queue
 import time
-from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
