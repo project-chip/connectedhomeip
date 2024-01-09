@@ -837,7 +837,7 @@ template("efr32_sdk") {
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       sources += [
         "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
-  #      "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
+        "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
       ]
     }
 
@@ -866,7 +866,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
-    #    "${silabs_gen_folder}/autogen/sl_uartdrv_init.c",
+        "${silabs_gen_folder}/autogen/sl_uartdrv_init.c",
       ]
 
       if (use_external_flash) {
