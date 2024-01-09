@@ -45,61 +45,45 @@ static std::array<PresetStruct::Type, kMaxPresets> gsActivePresets;
 static unsigned int gsEditingPresetsEmptyIndex = 0;
 static std::array<PresetStruct::Type, kMaxPresets> gsEditingPresets;
 
-static void onEditStart(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
+static void onEditStart(ThermostatMatterScheduleManager * mgr)
 {
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditStart %s",
-                    type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
+    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditStart");
 }
 
-static void onEditCancel(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
+static void onEditCancel(ThermostatMatterScheduleManager * mgr)
 {
-    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCancel %s",
-                    type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
-    if (type == ThermostatMatterScheduleManager::Presets)
-    {
-        gsEditingPresetsEmptyIndex = 0;
-    }
+    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCancel");
+    gsEditingPresetsEmptyIndex = 0;
 }
 
-static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr, ThermostatMatterScheduleManager::editType type)
+static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    if (type == ThermostatMatterScheduleManager::Presets)
+    ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit");
+    Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
+    Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
+
+    status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
+    SuccessOrExit(status);
+
+    // New presets look good, lets generate some new ID's for the new presets.
+    for (unsigned int index = 0; index < gsEditingPresetsEmptyIndex; ++index)
     {
-        ChipLogProgress(Zcl, "ThermstatScheduleManager - onEditCommit %s",
-                        type == ThermostatMatterScheduleManager::Presets ? "Presets" : "Schedules");
-        Span<PresetStruct::Type> oldPresets = Span<PresetStruct::Type>(gsActivePresets).SubSpan(0, gsActivePresetsEmptyIndex);
-        Span<PresetStruct::Type> newPresets = Span<PresetStruct::Type>(gsEditingPresets).SubSpan(0, gsEditingPresetsEmptyIndex);
-
-        status = mgr->ThermostatMatterScheduleManager::ValidatePresetsForCommitting(oldPresets, newPresets);
-        SuccessOrExit(status);
-
-        // New presets look good, lets generate some new ID's for the new presets.
-        for (unsigned int index = 0; index < gsEditingPresetsEmptyIndex; ++index)
+        if (gsEditingPresets[index].presetHandle.IsNull() || gsEditingPresets[index].presetHandle.Value().empty())
         {
-            if (gsEditingPresets[index].presetHandle.IsNull() || gsEditingPresets[index].presetHandle.Value().empty())
-            {
-                char handle[16];
-                snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
-                gsEditingPresets[index].presetHandle.SetNonNull(ByteSpan((const unsigned char *) handle, strlen(handle)));
-            }
+            char handle[16];
+            snprintf(handle, 16, "%s%d", userPresetPrefix, nextNewHandle++);
+            gsEditingPresets[index].presetHandle.SetNonNull(ByteSpan((const unsigned char *) handle, strlen(handle)));
         }
+    }
 
-        // copy the presets to the active list.
-        gsActivePresets            = gsEditingPresets;
-        gsEditingPresetsEmptyIndex = 0;
+    // copy the presets to the active list.
+    gsActivePresets            = gsEditingPresets;
+    gsEditingPresetsEmptyIndex = 0;
 
-        // TODO: update thermostat attributes for new presets.
-    }
-    else if (type == ThermostatMatterScheduleManager::Schedules)
-    {
-        // TODO: schedules impl
-    }
-    else
-    {
-        VerifyOrDie(false);
-    }
+    // TODO: update thermostat attributes for new presets.
+    // TODO: do the validation and commit for schedules.
 
 exit:
     return status;

@@ -42,6 +42,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-schedules-manager.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
     "WindowCoveringManager.cpp",
