@@ -2377,7 +2377,6 @@ limitations under the License.
             </include>
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            </include>
         </clusters>
     </deviceType>
 </configurator>
