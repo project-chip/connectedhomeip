@@ -1356,8 +1356,8 @@ class BaseTestHelper:
                          "awk \'{{print $2}}\')\"").format(self.remote_server_app))
                     time.sleep(1)
                     stdin, stdout, stderr = client.exec_command(
-                            ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
-                             "awk \'{{print $2}}\'").format(self.remote_server_app))
+                        ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                         "awk \'{{print $2}}\'").format(self.remote_server_app))
                     if not stdout.read().decode().strip():
                         logger.info(f"Succeed to kill remote process {self.remote_server_app}")
                     else:
@@ -1436,7 +1436,7 @@ class BaseTestHelper:
         return True
 
     def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
-            remote_server_app: str, subscription_capacity: int):
+                                                remote_server_app: str, subscription_capacity: int):
         remoteDeviceRestarted = False
         updateLock = threading.Lock()
         updateCv = threading.Condition(updateLock)
@@ -1459,8 +1459,8 @@ class BaseTestHelper:
                          "awk \'{{print $2}}\')\"").format(self.remote_server_app))
                     time.sleep(1)
                     stdin, stdout, stderr = client.exec_command(
-                            ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
-                             "awk \'{{print $2}}\'").format(self.remote_server_app))
+                        ("ps aux | grep -E \'out/debug/standalone/{}\' | grep -v grep | grep -v gdb | "
+                         "awk \'{{print $2}}\'").format(self.remote_server_app))
                     if not stdout.read().decode().strip():
                         logger.info(f"Succeed to kill remote process {self.remote_server_app}")
                     else:

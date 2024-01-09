@@ -31,7 +31,7 @@ TEST_SETUPPIN = 20202021
 
 TEST_ENDPOINT_ID = 0
 
-TEST_SSH_PORT=2222
+TEST_SSH_PORT = 2222
 
 
 def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
@@ -142,7 +142,7 @@ def main():
 
     FailIfNot(
         test.TestSubscriptionResumptionCapacityStep2(options.nodeid, TEST_ENDPOINT_ID, options.deviceAddress,
-            TEST_SSH_PORT, options.remoteServerApp, options.subscriptionCapacity),
+                                                     TEST_SSH_PORT, options.remoteServerApp, options.subscriptionCapacity),
         "Failed on testing subscription resumption capacity")
 
     timeoutTicker.stop()

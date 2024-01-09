@@ -31,6 +31,7 @@ TEST_SETUPPIN = 20202021
 
 TEST_ENDPOINT_ID = 0
 
+
 def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
     logger.info("Testing discovery")
     device = test.TestDiscovery(discriminator=discriminator)
